@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 74 components in 9 categories: actions (10), forms (16), navigation (7), feedback (9), surfaces (8), content (13), icons (1), charts (7), patterns (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 114 components in 9 categories: actions (14), forms (27), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 
@@ -89,7 +89,7 @@ Conventions that hold across the catalogue:
 - Reading: body copy stays between 45 and 90 characters per line, with 66 characters as the default measure. Body line-height stays between 1.2 and 1.45 times its font size; Vlak defaults to 1.45.
 - Controlled and uncontrolled: `value` / `defaultValue` / `onValueChange` (Select, Combobox, Tabs, RadioGroup, ToggleGroup, Slider, Calendar, DatePicker); `checked` / `defaultChecked` / `onCheckedChange` (Switch); `pressed` / `defaultPressed` / `onPressedChange` (Toggle); `open` / `onClose` (Dialog, AlertDialog, Sheet, Drawer, CommandDialog). Checkbox and Radio are native inputs and use `checked` / `onChange`.
 - `className` and `style` merge with the component's own; native attributes and event handlers pass through to the root element (the props tables say which attribute set each component extends).
-- Refs: 147 of 148 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
+- Refs: 187 of 188 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
 - Names: components that render no visible label take `aria-label` or `aria-labelledby` (Select, Combobox, Switch, Slider, ButtonGroup, ToggleGroup, RadioGroup, ScrollArea, Carousel, Split). Dialogs are named by their Title part.
 - Platform first: `<dialog>`, `<details>`, the Popover API, scroll snap, and native inputs do the work. Where the platform has nothing, the APG pattern applies (listbox, menu, grid, tabs) with full keyboard support, listed on each page.
 - Sentence case everywhere. No all caps. Copy is short and matter-of-fact.

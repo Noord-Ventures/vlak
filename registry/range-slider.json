@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "range-slider",
+  "type": "registry:component",
+  "title": "Range slider",
+  "description": "Sets an ordered numeric interval with two named native range controls and visible endpoint values.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/field.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/range-slider.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useFieldControl } from \"./field\";\n\nexport interface RangeSliderProps extends Omit<React.HTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\"> {\n  value?: [number, number];\n  defaultValue?: [number, number];\n  onValueChange?: (value: [number, number]) => void;\n  min?: number;\n  max?: number;\n  step?: number;\n  label?: React.ReactNode;\n  lowerLabel?: string;\n  upperLabel?: string;\n  name?: string;\n  disabled?: boolean;\n  formatValue?: (value: number) => string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0, borderWidth: 0, margin: 0, padding: 0, color: vlak.ink },\n  legend: { fontSize: vlak.controlLabel, color: vlak.gray, marginBottom: \"0.5rem\", padding: 0 },\n  row: { display: \"grid\", gridTemplateColumns: \"minmax(3rem, auto) minmax(0, 1fr) minmax(3rem, auto)\", gap: \"0.75rem\", alignItems: \"center\" },\n  label: { fontSize: vlak.controlFs },\n  input: { width: \"100%\", minWidth: vlak.hit, height: vlak.hit, margin: 0, accentColor: vlak.ink, cursor: \"pointer\", outlineColor: vlak.ink, outlineOffset: 2 },\n  output: { fontSize: vlak.controlFs, fontVariantNumeric: \"tabular-nums\", textAlign: \"end\" },\n});\n\nexport const RangeSlider = React.forwardRef<HTMLFieldSetElement, RangeSliderProps>(function RangeSlider({\n  value, defaultValue, onValueChange, min = 0, max = 100, step = 1, label = \"Range\", lowerLabel = \"From\", upperLabel = \"To\", name, disabled, formatValue = String, className, style, ...props\n}, ref) {\n  const [current, setValue, fieldRef] = useInputValue<[number, number], HTMLFieldSetElement>(value, defaultValue ?? [min, max], onValueChange);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const field = useFieldControl(props);\n  const high = Math.max(min, max);\n  const lower = Math.min(high, Math.max(min, current[0]));\n  const upper = Math.min(high, Math.max(lower, current[1]));\n  const root = rs([\"rs-range-slider\", className], styles.root);\n  const legend = rs([\"rs-range-slider-legend\"], styles.legend);\n  const row = rs([\"rs-range-slider-row\"], styles.row);\n  const lab = rs([\"rs-range-slider-label\"], styles.label);\n  const input = rs([\"rs-range-slider-input\"], styles.input);\n  const output = rs([\"rs-range-slider-output\"], styles.output);\n  return <fieldset {...props} ref={mergedRef} disabled={disabled} className={root.className} style={{ ...root.style, ...style }} aria-describedby={field[\"aria-describedby\"]} aria-invalid={field[\"aria-invalid\"]}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    <div className={row.className} style={row.style}>\n      <label htmlFor={`${id}-lower`} className={lab.className} style={lab.style}>{lowerLabel}</label>\n      <input id={`${id}-lower`} type=\"range\" name={name ? `${name}[0]` : undefined} min={min} max={upper} step={step} value={lower} aria-valuetext={formatValue(lower)} className={input.className} style={input.style} onChange={(event) => setValue([Math.min(upper, event.currentTarget.valueAsNumber), upper])} />\n      <output htmlFor={`${id}-lower`} className={output.className} style={output.style}>{formatValue(lower)}</output>\n    </div>\n    <div className={row.className} style={row.style}>\n      <label htmlFor={`${id}-upper`} className={lab.className} style={lab.style}>{upperLabel}</label>\n      <input id={`${id}-upper`} type=\"range\" name={name ? `${name}[1]` : undefined} min={lower} max={high} step={step} value={upper} aria-valuetext={formatValue(upper)} className={input.className} style={input.style} onChange={(event) => setValue([lower, Math.max(lower, event.currentTarget.valueAsNumber)])} />\n      <output htmlFor={`${id}-upper`} className={output.className} style={output.style}>{formatValue(upper)}</output>\n    </div>\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/range-slider.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/range-slider.css",
+      "content": "/* ── range-slider: generated from packages/react/src/components/range-slider.tsx ── */\n.rs-range-slider{display:grid;gap:0.5rem;min-width:0;border-width:0;margin:0;padding:0;color:var(--text)}\n.rs-range-slider-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.5rem;padding:0}\n.rs-range-slider-row{display:grid;grid-template-columns:minmax(3rem, auto) minmax(0, 1fr) minmax(3rem, auto);gap:0.75rem;align-items:center}\n.rs-range-slider-label{font-size:var(--control-fs)}\n.rs-range-slider-input{width:100%;min-width:var(--hit);height:var(--hit);margin:0;accent-color:var(--text);cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-range-slider-output{font-size:var(--control-fs);font-variant-numeric:tabular-nums;text-align:end}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/range-slider.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-range-slider",
+        "rs-range-slider-legend",
+        "rs-range-slider-row",
+        "rs-range-slider-label",
+        "rs-range-slider-input",
+        "rs-range-slider-output"
+      ],
+      "snippet": "<fieldset class=\"rs-range-slider\"><legend class=\"rs-range-slider-legend\">Budget</legend><div class=\"rs-range-slider-row\"><label class=\"rs-range-slider-label\" for=\"budget-from\">From</label><input class=\"rs-range-slider-input\" id=\"budget-from\" type=\"range\" min=\"0\" max=\"800\" value=\"120\" /><output class=\"rs-range-slider-output\" for=\"budget-from\">120</output></div><div class=\"rs-range-slider-row\"><label class=\"rs-range-slider-label\" for=\"budget-to\">To</label><input class=\"rs-range-slider-input\" id=\"budget-to\" type=\"range\" min=\"120\" max=\"800\" value=\"420\" /><output class=\"rs-range-slider-output\" for=\"budget-to\">420</output></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "field",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "RangeSlider",
+        "Interval selector",
+        "Min max slider",
+        "Dual range"
+      ],
+      "example": "import { RangeSlider } from \"@noorddev/vlak-react\";\n\n<RangeSlider label=\"Budget\" name=\"budget\" defaultValue={[120, 420]} min={0} max={800} step={20} formatValue={(value) => `€${value}`} />",
+      "usage": {
+        "use": [
+          "A numeric lower and upper bound such as budget or duration.",
+          "Separate labeled tracks when each endpoint needs clear keyboard and touch access."
+        ],
+        "avoid": [
+          "A single setting; use Slider.",
+          "Time-based seeking with buffered media; use MediaScrubber."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between the lower and upper native range inputs."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Uses the browser's native range stepping within the other endpoint's bounds."
+        }
+      ],
+      "a11y": [
+        "Uses a fieldset and legend with a separate label and visible output for each endpoint; each input has a 44px-high target.",
+        "Each endpoint's native min/max prevents crossing. formatValue also supplies aria-valuetext.",
+        "With name, native form values are submitted as name[0] and name[1]. Uncontrolled values reset with the form.",
+        "The ref reaches the fieldset; Field hint and error descriptions reach the group."
+      ]
+    }
+  }
+}

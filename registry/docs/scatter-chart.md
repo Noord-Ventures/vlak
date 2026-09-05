@@ -9,8 +9,8 @@ Page: https://vlak.dev/components/scatter-chart/
 
 ## When to use
 
-- Two numeric variables per point; group on a point to split series.
-- xDomain and yDomain to pin the axes.
+- Two numeric variables per point; group annotates the legend and accessible data table, not a separate visual mark style.
+- xDomain and yDomain pin valid numeric axes; invalid or equal domains fall back to the data extent.
 
 ## When not to
 
@@ -98,6 +98,7 @@ Forwards `ref` to the `HTMLDivElement`.
 ## Accessibility
 
 - A focusable, named plot with a visually hidden table of x and y per point.
+- Non-finite coordinates are excluded. Empty datasets display No data to display without invalid SVG coordinates.
 
 ## Classes
 

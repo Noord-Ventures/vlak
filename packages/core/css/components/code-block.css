@@ -1,0 +1,8 @@
+/* ── code-block: generated from packages/react/src/components/code-block.tsx ── */
+.rs-code-block{margin:0;width:100%;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);color:var(--text);background-color:var(--bg)}
+.rs-code-block-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-code-block-pre{margin:0;overflow-x:auto;padding:1rem;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;tab-size:2;outline-color:var(--text);outline-offset:-2px}
+.rs-code-block-wrap{white-space:pre-wrap;overflow-wrap:anywhere}
+.rs-code-block-line{display:block;min-height:1.45em}
+.rs-code-block-number{display:inline-block;user-select:none;color:var(--text-secondary);min-width:3ch;margin-inline-end:2ch;text-align:end}
+.rs-code-block-status{font-size:0.875rem;color:var(--text-secondary)}

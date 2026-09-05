@@ -1,0 +1,5 @@
+/* ── virtual-list: generated from packages/react/src/components/virtual-list.tsx ── */
+.rs-virtual-list{overflow-y:auto;overscroll-behavior:contain;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0;color:var(--text);position:relative}
+.rs-virtual-list-canvas{position:relative;min-width:0}
+.rs-virtual-list-item{position:absolute;inset-inline:0;inset-block-start:0;box-sizing:border-box;display:flex;align-items:center;padding-inline:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);outline-color:var(--text);outline-offset:-2px;overflow:hidden}
+.rs-virtual-list-empty{padding:1rem;color:var(--text-secondary);line-height:1.45}

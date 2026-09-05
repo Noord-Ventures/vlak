@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { additions } from "./additions";
 import { Use as Accordion } from "./accordion/use";
 import { Use as Alert } from "./alert/use";
 import { Use as AlertDialog } from "./alert-dialog/use";
@@ -156,7 +157,7 @@ const uses: Record<string, ComponentType> = {
 };
 
 export function UseSlot({ name }: { name: string }) {
-  const Use = uses[name];
+  const Use = uses[name] ?? additions[name];
   if (!Use) return null;
   return <Use />;
 }

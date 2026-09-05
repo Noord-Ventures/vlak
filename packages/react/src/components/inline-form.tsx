@@ -11,9 +11,14 @@ export interface InlineFormProps
   placeholder?: string;
   buttonLabel?: React.ReactNode;
   successLabel?: React.ReactNode;
+  pendingLabel?: React.ReactNode;
+  errorLabel?: React.ReactNode;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
   /** The action only appears once this returns true. Defaults to a loose e-mail check. */
   validate?: (value: string) => boolean;
-  onSubmit?: (value: string) => void;
+  onSubmit?: (value: string) => void | Promise<void>;
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
 }
 
@@ -24,7 +29,9 @@ const fadeIn = stylex.keyframes({
 
 const styles = stylex.create({
   field: {
+    boxSizing: "border-box",
     display: "flex",
+    flexWrap: "wrap",
     alignItems: {
       default: "center",
       [mq.phone]: "stretch",
@@ -61,6 +68,7 @@ const styles = stylex.create({
     transition: `border-color ${vlak.durationSnap} ${vlak.ease}`,
   },
   input: {
+    boxSizing: "border-box",
     flexGrow: 1,
     minWidth: 0,
     appearance: "none",
@@ -85,7 +93,7 @@ const styles = stylex.create({
       [mq.phone]: "0.875rem",
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     "::placeholder": {
@@ -104,7 +112,7 @@ const styles = stylex.create({
   },
   btn: {
     height: {
-      default: "1.75rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     minHeight: {
@@ -119,7 +127,7 @@ const styles = stylex.create({
       default: "0.78125rem",
       [mq.phone]: vlak.controlFs,
     },
-    minWidth: 0,
+    minWidth: vlak.hit,
     borderRadius: {
       default: 0,
       [mq.phone]: 0,
@@ -148,65 +156,98 @@ const styles = stylex.create({
     animationDuration: vlak.durationConfirm,
     animationTimingFunction: vlak.ease,
   },
+  error: {
+    flexBasis: "100%",
+    margin: 0,
+    padding: "0.5rem",
+    fontSize: vlak.controlFs,
+    color: vlak.ink,
+  },
 });
 
-/** One field, one action; the action sits inside the field. */
+/** One field, one action; asynchronous actions only confirm after they resolve. */
 export const InlineForm = React.forwardRef<HTMLFormElement, InlineFormProps>(function InlineForm({
   placeholder = "Your e-mail",
   buttonLabel = "Subscribe",
   successLabel = "You're on the list",
+  pendingLabel = "Submitting…",
+  errorLabel = "Could not submit. Please try again.",
+  value: controlledValue,
+  defaultValue = "",
+  onValueChange,
   validate = (v) => /.+@.+\..+/.test(v),
   onSubmit,
   className,
   style,
   inputProps,
   ...props
-}: InlineFormProps, ref: React.ForwardedRef<HTMLFormElement>) {
-  const [value, setValue] = React.useState("");
-  const [done, setDone] = React.useState(false);
+}, ref) {
+  const [inner, setInner] = React.useState(defaultValue);
+  const value = controlledValue ?? inner;
+  const [state, setState] = React.useState<"idle" | "pending" | "success" | "error">("idle");
+  const submitting = React.useRef(false);
+  const errorId = React.useId();
   const valid = validate(value);
-
-  if (done) {
-    const ok = rs(["rs-subscribed"], styles.subscribed);
-    return (
-      <div className={ok.className} style={ok.style}>
-        <Icon name="check" size={16} />
-        {successLabel}
-      </div>
-    );
-  }
-
+  const pending = state === "pending";
   const sx = rs(["rs-inline-field", className], styles.field);
-  const input = rs(["rs-inline-input"], styles.input);
+  const input = rs(["rs-inline-input", inputProps?.className], styles.input);
   const reveal = rs(["rs-reveal", valid && "rs-reveal-in"], styles.reveal, valid && styles.revealIn);
   const btn = rs(["rs-btn-primary", "rs-inline-btn", "rs-inline-field-btn"], styles.btn);
+  const ok = rs(["rs-subscribed"], styles.subscribed);
+  const error = rs(["rs-inline-error"], styles.error);
 
   return (
     <form
       ref={ref}
+      {...props}
       className={sx.className}
       style={{ ...sx.style, ...style }}
-      onSubmit={(e) => {
+      aria-busy={pending || undefined}
+      onSubmit={async (e) => {
         e.preventDefault();
-        if (!valid) return;
-        onSubmit?.(value);
-        setDone(true);
+        if (!valid || submitting.current) return;
+        if (!onSubmit) { setState("error"); return; }
+        submitting.current = true;
+        setState("pending");
+        try {
+          await onSubmit(value);
+          setState("success");
+        } catch {
+          setState("error");
+        } finally {
+          submitting.current = false;
+        }
       }}
-      {...props}
     >
-      <input
-        className={input.className}
-        style={input.style}
-        placeholder={placeholder}
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        {...inputProps}
-      />
-      <span className={reveal.className} style={reveal.style}>
-        <button type="submit" className={btn.className} style={btn.style} tabIndex={valid ? 0 : -1}>
-          {buttonLabel}
-        </button>
-      </span>
+      {state === "success" ? (
+        <div role="status" className={ok.className} style={ok.style}>
+          <Icon name="check" size={16} />{successLabel}
+        </div>
+      ) : <>
+        <input
+          {...inputProps}
+          className={input.className}
+          style={{ ...input.style, ...inputProps?.style }}
+          placeholder={placeholder}
+          aria-label={inputProps?.["aria-label"] ?? placeholder}
+          aria-describedby={[inputProps?.["aria-describedby"], state === "error" ? errorId : undefined].filter(Boolean).join(" ") || undefined}
+          value={value}
+          disabled={pending || inputProps?.disabled}
+          onChange={(e) => {
+            inputProps?.onChange?.(e);
+            if (e.defaultPrevented) return;
+            if (controlledValue === undefined) setInner(e.target.value);
+            onValueChange?.(e.target.value);
+            if (state === "error") setState("idle");
+          }}
+        />
+        <span className={reveal.className} style={reveal.style}>
+          <button type="submit" className={btn.className} style={btn.style} disabled={!valid || pending || inputProps?.disabled} tabIndex={valid ? 0 : -1}>
+            {pending ? pendingLabel : buttonLabel}
+          </button>
+        </span>
+        {state === "error" && <p id={errorId} role="alert" className={error.className} style={error.style}>{errorLabel}</p>}
+      </>}
     </form>
   );
 });

@@ -1,6 +1,6 @@
 # Vlak
 
-> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 74 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
+> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 114 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
 
 Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-react/css"`, vendor the source with `npx @noorddev/vlak-cli add <name>`, or use `npx shadcn add https://vlak.dev/r/<name>.json`. Every component page below has install paths, a React example, a props table generated from the types, keyboard interactions, and accessibility notes.
 
@@ -14,7 +14,11 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Actions
 
-- [Button](https://vlak.dev/docs/button.md): Triggers an action. Solid primary or 1px ghost; 40px tall, 36px small.
+- [Toolbar](https://vlak.dev/docs/toolbar.md): Groups actions behind one Tab stop with arrow-key navigation.
+- [Overflow list](https://vlak.dev/docs/overflow-list.md): Keeps priority actions visible and moves excess actions into a menu.
+- [Playback controls](https://vlak.dev/docs/playback-controls.md): Groups named play, pause, previous, next, and stop controls with 44px targets.
+- [Canvas controls](https://vlak.dev/docs/canvas-controls.md): Adjusts bounded zoom and exposes fit and reset actions for a canvas.
+- [Button](https://vlak.dev/docs/button.md): Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.
 - [Button group](https://vlak.dev/docs/button-group.md): Keeps related actions together as joined ghost buttons with 1px dividers.
 - [Text link](https://vlak.dev/docs/link.md): Navigates to a page or resource. Hairline underline; in-copy variant is inset 1px.
 - [Dropdown menu](https://vlak.dev/docs/dropdown-menu.md): Presents a compact list of actions. Menu roles and arrow-key navigation are built in.
@@ -27,15 +31,26 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Forms
 
+- [Number field](https://vlak.dev/docs/number-field.md): Edits a numeric value with native validation, units, and bounded 44px increase and decrease actions.
+- [Range slider](https://vlak.dev/docs/range-slider.md): Sets an ordered numeric interval with two named native range controls and visible endpoint values.
+- [Multi-select](https://vlak.dev/docs/multi-select.md): Selects multiple predefined options from a searchable native disclosure with named checkboxes.
+- [Tag input](https://vlak.dev/docs/tag-input.md): Creates and removes freeform text tokens with paste splitting, duplicate prevention, and validation.
+- [Date range picker](https://vlak.dev/docs/date-range-picker.md): Collects start and end dates with two native date editors, shared constraints, and 44px controls.
+- [Time field](https://vlak.dev/docs/time-field.md): Edits a time using the platform's localized time control with native bounds and second-based steps.
+- [File upload](https://vlak.dev/docs/file-upload.md): Collects validated files through browse or drop, with optional upload progress, cancellation, and retry.
+- [Transfer list](https://vlak.dev/docs/transfer-list.md): Assigns options between available and selected lists using native checkboxes and explicit move actions.
+- [Inline edit](https://vlak.dev/docs/inline-edit.md): Switches a text value into an editor with explicit save and cancel, validation, and optional async persistence.
+- [Rating](https://vlak.dev/docs/rating.md): Collects a discrete numeric score with 44px native radio choices and an optional clear action.
+- [Media scrubber](https://vlak.dev/docs/media-scrubber.md): Seeks through media in seconds with elapsed time, buffering, chapters, and optional previews.
 - [Input](https://vlak.dev/docs/input.md): Collects one line of text. 1px border, 2px focus ring, 12px label above.
 - [Label](https://vlak.dev/docs/label.md): Names a form control. 12px secondary text, set above the control.
 - [Field](https://vlak.dev/docs/field.md): Groups a label, control, and hint or error in one vertical field.
 - [Input group](https://vlak.dev/docs/input-group.md): Joins a text field with a prefix or suffix inside one 1px border.
 - [Native select](https://vlak.dev/docs/native-select.md): Presents browser-native options inside a 1px control border.
 - [Radio](https://vlak.dev/docs/radio.md): Selects one option from a group. The selected dot fills with ink.
-- [Checkbox](https://vlak.dev/docs/checkbox.md): Selects any number of options. 16px box, 3px radius, ink fill when checked.
-- [Switch](https://vlak.dev/docs/switch.md): Turns one setting on or off. 32×18px; on fills with ink, off uses a 1px track.
-- [Slider](https://vlak.dev/docs/slider.md): Selects one value from a range. 2px track, 14px thumb, 24px hit area.
+- [Checkbox](https://vlak.dev/docs/checkbox.md): Selects any number of options. A 44px target surrounds the check mark; indeterminate uses a minus.
+- [Switch](https://vlak.dev/docs/switch.md): Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.
+- [Slider](https://vlak.dev/docs/slider.md): Selects one value from a range. A fine track sits inside a 44px hit area.
 - [Select](https://vlak.dev/docs/select.md): Selects one option from an overlay. The closed trigger carries a chevron.
 - [Textarea](https://vlak.dev/docs/textarea.md): Collects multiple lines of text. Resizes vertically only.
 - [One-time code](https://vlak.dev/docs/input-otp.md): Collects a one-time code in one cell per character. Supports auto-advance, backspace, and paste.
@@ -46,6 +61,8 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Navigation
 
+- [Tree view](https://vlak.dev/docs/tree-view.md): Navigates a hierarchy with expansion, single selection, and roving focus.
+- [Bottom navigation](https://vlak.dev/docs/bottom-navigation.md): Presents mobile destinations with current state and safe-area spacing.
 - [Tabs](https://vlak.dev/docs/tabs.md): Switches between related panels. Text labels in one row; active tab has a 1px underline.
 - [Breadcrumbs](https://vlak.dev/docs/breadcrumbs.md): Shows a page's place in a hierarchy. Ancestors are links; the current page is full ink.
 - [Crumb bar](https://vlak.dev/docs/crumb-bar.md): Keeps the current path visible while scrolling. Fixed at 72px with a 1px bottom rule when active.
@@ -56,6 +73,10 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Feedback
 
+- [Error summary](https://vlak.dev/docs/error-summary.md): Summarizes invalid fields and moves focus to their inputs.
+- [Notification center](https://vlak.dev/docs/notification-center.md): Keeps persistent notifications with read, unread, action, and dismissal state.
+- [Task progress](https://vlak.dev/docs/task-progress.md): Tracks long-running work with phases, honest progress, cancellation, and retry.
+- [Connection status](https://vlak.dev/docs/connection-status.md): Communicates connecting, connected, offline, and reconnecting states.
 - [Progress](https://vlak.dev/docs/progress.md): Shows completion for a known process. 4px bar; the label carries the percentage.
 - [Badge](https://vlak.dev/docs/badge.md): Labels status or category. 11px text with outline, solid, and muted variants.
 - [Alert](https://vlak.dev/docs/alert.md): Calls attention to contextual information. 1px frame and icon; critical variant fills with ink.
@@ -79,6 +100,15 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Content
 
+- [Description list](https://vlak.dev/docs/description-list.md): Aligns semantic labels and values in a responsive description list.
+- [Metric](https://vlak.dev/docs/metric.md): Displays a numeric reading with tabular figures and aligned units.
+- [Activity timeline](https://vlak.dev/docs/activity-timeline.md): Lists timestamped events with actors and optional expandable details.
+- [Code block](https://vlak.dev/docs/code-block.md): Shows source text with optional line numbers, wrapping, and copy feedback.
+- [Json viewer](https://vlak.dev/docs/json-viewer.md): Inspects structured data with bounded nested disclosures and path search.
+- [Diff viewer](https://vlak.dev/docs/diff-viewer.md): Compares text revisions in unified or split rows with explicit change labels.
+- [Sortable list](https://vlak.dev/docs/sortable-list.md): Reorders items with drag handles, move buttons, and keyboard shortcuts.
+- [Virtual list](https://vlak.dev/docs/virtual-list.md): Windows large fixed-height collections while preserving focused rows.
+- [Waveform](https://vlak.dev/docs/waveform.md): Displays supplied audio amplitudes with optional seeking and editable selection bounds.
 - [Mono chip](https://vlak.dev/docs/chip.md): Marks a short technical identifier. Monospace text with a 1px mixed border.
 - [Table](https://vlak.dev/docs/table.md): Presents structured values in rows and columns. 1px row rules; total rows use 2px rules.
 - [Accordion](https://vlak.dev/docs/accordion.md): Reveals related sections on demand. Native details rows with 1px rules.
@@ -89,7 +119,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Collapsible](https://vlak.dev/docs/collapsible.md): Shows or hides one section with a native details disclosure.
 - [Kbd](https://vlak.dev/docs/kbd.md): Labels a keyboard key. Monospace cap with a 1px frame and heavier bottom edge.
 - [Carousel](https://vlak.dev/docs/carousel.md): Browses a sequence on a scroll-snap track. Buttons move one slide; the ends feather.
-- [Data table](https://vlak.dev/docs/data-table.md): Sorts and presents structured records. Column headers expose aria-sort.
+- [Data table](https://vlak.dev/docs/data-table.md): Sorts, filters and selects structured records. Native controls expose sort and selection state.
 - [Aspect ratio](https://vlak.dev/docs/aspect-ratio.md): Keeps media at a defined aspect ratio while it fills the available box.
 - [References](https://vlak.dev/docs/references.md): Connects inline citations to a numbered source list and cite box. Numerals hang in the gutter.
 
@@ -109,8 +139,18 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Patterns
 
+- [Filter bar](https://vlak.dev/docs/filter-bar.md): Shows active filters with individual removal, reset, and a result count.
+- [Query builder](https://vlak.dev/docs/query-builder.md): Builds nested filter conditions from fields, operators, and values.
+- [Master detail](https://vlak.dev/docs/master-detail.md): Links selection to a detail panel with a mobile back path.
+- [Property grid](https://vlak.dev/docs/property-grid.md): Aligns editable labels, values, units, and hints in an inspector.
+- [Media player](https://vlak.dev/docs/media-player.md): Connects native audio or video to playback, seeking, captions, speed, volume, and full screen.
+- [Image viewer](https://vlak.dev/docs/image-viewer.md): Inspects an image collection with zoom, navigation, and a native dialog lightbox.
+- [Message composer](https://vlak.dev/docs/message-composer.md): Composes text and optional attachments with submission shortcuts and retained drafts on failure.
+- [File browser](https://vlak.dev/docs/file-browser.md): Explores a supplied file hierarchy through folders, breadcrumbs, search, and list or grid views.
+- [Kanban board](https://vlak.dev/docs/kanban-board.md): Moves and reorders cards across named columns with drag and keyboard alternatives.
+- [Scheduler](https://vlak.dev/docs/scheduler.md): Plans events in agenda, week, or month views with date navigation and accessible rescheduling.
 - [Inline form](https://vlak.dev/docs/inline-form.md): Pairs one field with an embedded submit action. The button appears after validation.
-- [Workflow card](https://vlak.dev/docs/workflow.md): Builds an ordered pipeline from draggable steps. 1px dashed frame, chips, and ghost add action.
+- [Workflow card](https://vlak.dev/docs/workflow.md): Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 - [Assistant panel](https://vlak.dev/docs/assistant.md): Frames an assistant exchange with a user message, reply, suggestion, and input row.
 
 ## Optional

@@ -1,6 +1,6 @@
 # Checkbox
 
-Selects any number of options. 16px box, 3px radius, ink fill when checked.
+Selects any number of options. A 44px target surrounds the check mark; indeterminate uses a minus.
 
 Category: forms  
 Name: `checkbox`  
@@ -73,6 +73,8 @@ Forwards `ref` to the `HTMLInputElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `label` | `ReactNode` |  |  |
+| `indeterminate` | `boolean` | `false` |  |
+| `onCheckedChange` | `(checked: boolean) => void` |  |  |
 
 ## Keyboard
 
@@ -85,7 +87,7 @@ Forwards `ref` to the `HTMLInputElement`.
 
 - A native <input type="checkbox"> hidden from view inside a <label>; the 16px box mirrors its state.
 - label is the accessible name. Without one, pass aria-label.
-- Controlled with checked and onChange, or uncontrolled with defaultChecked.
+- Controlled with checked and onCheckedChange or native onChange, or uncontrolled with defaultChecked. indeterminate sets the native mixed state.
 
 ## Classes
 

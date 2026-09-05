@@ -18,6 +18,11 @@ export interface CalendarProps
   weekStart?: 0 | 1;
   /** Move focus to the roving day on mount (a date picker opening). */
   autoFocus?: boolean;
+  min?: Date;
+  max?: Date;
+  disabled?: boolean;
+  isDateDisabled?: (date: Date) => boolean;
+  locale?: string;
 }
 
 const DOW = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
@@ -39,12 +44,14 @@ function addMonths(d: Date, n: number): Date {
   const last = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
   return new Date(first.getFullYear(), first.getMonth(), Math.min(d.getDate(), last));
 }
-const longDate = (d: Date) =>
-  d.toLocaleDateString("en", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+const longDate = (d: Date, locale = "en") =>
+  d.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
 const styles = stylex.create({
   cal: {
-    width: "15.75rem",
+    width: "19.25rem",
+    maxWidth: "100%",
+    overflowX: "auto",
   },
   head: {
     display: "flex",
@@ -77,11 +84,11 @@ const styles = stylex.create({
   page: {
     boxSizing: "border-box",
     width: {
-      default: "1.625rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     height: {
-      default: "1.625rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     minWidth: {
@@ -134,11 +141,11 @@ const styles = stylex.create({
     color: "inherit",
   },
   grid: {
-    width: "15.75rem",
+    width: "100%",
   },
   row: {
     display: "grid",
-    gridTemplateColumns: "repeat(7, 36px)",
+    gridTemplateColumns: "repeat(7, minmax(44px, 1fr))",
   },
   dow: {
     fontSize: {
@@ -153,15 +160,16 @@ const styles = stylex.create({
     paddingInline: 0,
   },
   day: {
+    opacity: { default: 1, '[aria-disabled="true"]': 0.4 },
     transition: {
       default: vlak.transition,
       [mq.reduce]: "none",
     },
     boxSizing: "border-box",
-    width: "2.25rem",
-    height: "2.25rem",
-    minWidth: "2.25rem",
-    minHeight: "2.25rem",
+    width: "100%",
+    height: vlak.hit,
+    minWidth: vlak.hit,
+    minHeight: vlak.hit,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -178,7 +186,7 @@ const styles = stylex.create({
     },
     borderWidth: 0,
     borderStyle: "none",
-    borderRadius: "var(--rs-in, var(--radius-sm))",
+    borderRadius: vlak.radiusSm,
     cursor: "pointer",
     fontFamily: "inherit",
     padding: 0,
@@ -234,6 +242,11 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   defaultMonth,
   weekStart = 1,
   autoFocus,
+  min,
+  max,
+  disabled = false,
+  isDateDisabled,
+  locale = "en",
   className,
   style,
   onKeyDown,
@@ -245,6 +258,8 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   const [inner, setInner] = React.useState(defaultValue);
   const selectedDate = isControlled ? value : inner;
   const today = new Date();
+  const dateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const unavailable = (d: Date) => disabled || (!!min && dateOnly(d) < dateOnly(min)) || (!!max && dateOnly(d) > dateOnly(max)) || !!isDateDisabled?.(d);
 
   const [month, setMonth] = React.useState(() => startOfMonth(selectedDate ?? defaultMonth ?? today));
   const [focusDate, setFocusDate] = React.useState(
@@ -280,7 +295,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
     cellRefs.current.get(dayKey(roving))?.focus();
   });
 
-  /* Only on mount: the picker asks once, when it opens. */
+  /* A picker requests focus after its measured overlay becomes visible. */
   const rovingOnMount = React.useRef(roving);
   React.useEffect(() => {
     if (autoFocus) cellRefs.current.get(dayKey(rovingOnMount.current))?.focus();
@@ -292,9 +307,10 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   const weeks = Array.from({ length: 6 }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)),
   );
-  const title = month.toLocaleDateString("en", { month: "long", year: "numeric" });
-  const dows = weekStart === 1 ? DOW : ["Su", ...DOW.slice(0, 6)];
-  const dowsLong = weekStart === 1 ? DOW_LONG : ["Sunday", ...DOW_LONG.slice(0, 6)];
+  const title = month.toLocaleDateString(locale, { month: "long", year: "numeric" });
+  const weekdayDates = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 7 + weekStart + i));
+  const dows = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "short" }));
+  const dowsLong = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "long" }));
 
   const shift = (delta: number) => {
     const next = addMonths(month, delta);
@@ -303,12 +319,15 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   };
 
   const moveFocus = (next: Date) => {
+    if (min && dateOnly(next) < dateOnly(min)) next = min;
+    if (max && dateOnly(next) > dateOnly(max)) next = max;
     setFocusDate(next);
     if (!sameMonth(next, month)) setMonth(startOfMonth(next));
     focusPending.current = true;
   };
 
   const choose = (d: Date) => {
+    if (unavailable(d)) return;
     if (!isControlled) setInner(d);
     onValueChange?.(d);
     onSelect?.(d);
@@ -376,10 +395,10 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
           {title}
         </span>
         <span className={nav.className} style={nav.style}>
-          <button type="button" className={page.className} style={page.style} aria-label="Previous month" onClick={() => shift(-1)}>
+          <button type="button" className={page.className} style={page.style} disabled={disabled || (!!min && startOfMonth(month) <= startOfMonth(min))} aria-label="Previous month" onClick={() => shift(-1)}>
             <Icon name="chevron-left" size={12} className={icon.className} style={icon.style} />
           </button>
-          <button type="button" className={page.className} style={page.style} aria-label="Next month" onClick={() => shift(1)}>
+          <button type="button" className={page.className} style={page.style} disabled={disabled || (!!max && startOfMonth(month) >= startOfMonth(max))} aria-label="Next month" onClick={() => shift(1)}>
             <Icon name="chevron-right" size={12} className={icon.className} style={icon.style} />
           </button>
         </span>
@@ -415,12 +434,13 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
                   }}
                   type="button"
                   role="gridcell"
-                  tabIndex={!out && sameDay(roving, d) ? 0 : -1}
+                  tabIndex={!disabled && !out && sameDay(roving, d) ? 0 : -1}
                   className={day.className}
                   style={day.style}
                   aria-selected={selected}
+                  aria-disabled={unavailable(d) || undefined}
                   aria-current={isToday ? "date" : undefined}
-                  aria-label={longDate(d)}
+                  aria-label={longDate(d, locale)}
                   onClick={() => choose(d)}
                 >
                   {d.getDate()}

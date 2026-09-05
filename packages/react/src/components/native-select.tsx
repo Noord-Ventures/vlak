@@ -5,17 +5,25 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useFieldControl } from "./field";
+import { Icon } from "./icon";
 
 export interface NativeSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label?: React.ReactNode;
 }
 
-const chevronLight =
-  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='16' height='16' fill='none' stroke='%231A1A1A' stroke-width='1' stroke-linecap='butt' stroke-linejoin='miter'><g transform='rotate(90 8 8)'><path d='M5.5 3.5 L10.5 8 L5.5 12.5' vector-effect='non-scaling-stroke'/></g></svg>\")";
-const chevronDark =
-  "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' width='16' height='16' fill='none' stroke='%23E8E8E8' stroke-width='1' stroke-linecap='butt' stroke-linejoin='miter'><g transform='rotate(90 8 8)'><path d='M5.5 3.5 L10.5 8 L5.5 12.5' vector-effect='non-scaling-stroke'/></g></svg>\")";
-
 const styles = stylex.create({
+  control: {
+    position: "relative",
+    width: "100%",
+  },
+  icon: {
+    position: "absolute",
+    insetInlineEnd: "0.75rem",
+    top: "50%",
+    marginTop: "-0.5rem",
+    color: vlak.ink,
+    pointerEvents: "none",
+  },
   field: {
     width: "100%",
     display: "flex",
@@ -52,12 +60,6 @@ const styles = stylex.create({
     color: "var(--text)",
     caretColor: "var(--text)",
     backgroundColor: "var(--bg)",
-    backgroundImage: {
-      default: chevronLight,
-      ':is([data-theme="dark"] *)': chevronDark,
-    },
-    backgroundRepeat: "no-repeat",
-    backgroundPosition: "right 10px center",
     borderWidth: vlak.hairline,
     borderStyle: "solid",
     borderColor: {
@@ -102,7 +104,10 @@ export const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProp
     const field = useFieldControl(props);
     const invalid = field.invalid;
     const sx = rs(["rs-native-select", invalid && "rs-native-select-invalid", className], styles.select, invalid && styles.invalid);
+    const wrap = rs(["rs-native-select-control"], styles.control);
+    const icon = rs(["rs-native-select-icon"], styles.icon);
     const control = (
+      <div className={wrap.className} style={wrap.style}>
       <select
         ref={ref}
         id={selectId}
@@ -114,6 +119,8 @@ export const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProp
       >
         {children}
       </select>
+      <Icon name="chevron-right" rotate={90} className={icon.className} style={icon.style} />
+      </div>
     );
     if (label == null) return control;
     const stack = rs(["rs-field", "rs-native-select-field"], styles.field);

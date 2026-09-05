@@ -51,7 +51,7 @@ npx shadcn add https://vlak.dev/r/assistant.json
 ## Example
 
 ```tsx
-import { Assistant, AssistantHead, AssistantInput, AssistantMsg, AssistantReply, AssistantSend, AssistantStatus, AssistantTitle, AssistantUserBlock } from "@noorddev/vlak-react";
+import { Assistant, AssistantHead, AssistantMsg, AssistantReply, AssistantStatus, AssistantTitle, AssistantUserBlock, MessageComposer } from "@noorddev/vlak-react";
 
 <Assistant>
   <AssistantHead>
@@ -62,10 +62,7 @@ import { Assistant, AssistantHead, AssistantInput, AssistantMsg, AssistantReply,
     <AssistantUserBlock>Make the intro tighter.</AssistantUserBlock>
   </AssistantMsg>
   <AssistantReply>Done. Two sentences, same claim.</AssistantReply>
-  <AssistantInput>
-    <input aria-label="Message" placeholder="Ask anything" />
-    <AssistantSend>Send</AssistantSend>
-  </AssistantInput>
+  <MessageComposer onSend={sendMessage} />
 </Assistant>
 ```
 

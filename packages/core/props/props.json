@@ -1,6 +1,2217 @@
 {
   "version": "0.4.0",
   "components": {
+    "description-list": {
+      "exports": [
+        {
+          "name": "DescriptionList",
+          "kind": "component",
+          "description": "Aligned, semantic labels and values without an extra card.",
+          "extends": "HTMLAttributes<HTMLDListElement>",
+          "ref": "HTMLDListElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "DescriptionItem[]",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "metric": {
+      "exports": [
+        {
+          "name": "Metric",
+          "kind": "component",
+          "description": "A numeric reading with stable baseline, tabular figures, and an explicit unit.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"children\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | number",
+              "required": true
+            },
+            {
+              "name": "unit",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "comparison",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "trend",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Optional trend visualization, for example an existing Sparkline."
+            },
+            {
+              "name": "locale",
+              "type": "string",
+              "required": false,
+              "default": "\"en\""
+            },
+            {
+              "name": "formatOptions",
+              "type": "Intl.NumberFormatOptions",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "activity-timeline": {
+      "exports": [
+        {
+          "name": "ActivityTimeline",
+          "kind": "component",
+          "description": "Chronological events in caller-supplied order, with optional native disclosures.",
+          "extends": "HTMLAttributes<HTMLOListElement>",
+          "ref": "HTMLOListElement",
+          "props": [
+            {
+              "name": "events",
+              "type": "ActivityEvent[]",
+              "required": true
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"No activity yet\""
+            },
+            {
+              "name": "locale",
+              "type": "string",
+              "required": false,
+              "default": "\"en\""
+            },
+            {
+              "name": "timeZone",
+              "type": "string",
+              "required": false,
+              "default": "\"UTC\""
+            }
+          ]
+        }
+      ]
+    },
+    "code-block": {
+      "exports": [
+        {
+          "name": "CodeBlock",
+          "kind": "component",
+          "description": "Plain source with optional numbering and honest asynchronous copy feedback.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "code",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "language",
+              "type": "string",
+              "required": false,
+              "default": "\"Text\""
+            },
+            {
+              "name": "lineNumbers",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "wrap",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "copyable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "onCopyCode",
+              "type": "(code: string) => void | Promise<void>",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "json-viewer": {
+      "exports": [
+        {
+          "name": "JSONViewer",
+          "kind": "component",
+          "description": "Bounded JSON inspection using native disclosures and path/value search.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "data",
+              "type": "unknown",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Structured data\""
+            },
+            {
+              "name": "searchable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "maxDepth",
+              "type": "number",
+              "required": false,
+              "default": "8",
+              "description": "Bounds rendering of unusually deep data."
+            },
+            {
+              "name": "maxEntries",
+              "type": "number",
+              "required": false,
+              "default": "100",
+              "description": "Maximum children shown per object or array."
+            },
+            {
+              "name": "maxNodes",
+              "type": "number",
+              "required": false,
+              "default": "1000",
+              "description": "Total node budget across the inspected document."
+            },
+            {
+              "name": "maxStringLength",
+              "type": "number",
+              "required": false,
+              "default": "2000",
+              "description": "Maximum string characters displayed per value, before escaping."
+            }
+          ]
+        }
+      ]
+    },
+    "diff-viewer": {
+      "exports": [
+        {
+          "name": "diffLines",
+          "kind": "function",
+          "description": "Line LCS with bounded memory. Large changes use a truthful coarse replacement.",
+          "props": []
+        },
+        {
+          "name": "DiffViewer",
+          "kind": "component",
+          "description": "Monochrome before/after comparison with explicit change labels, never color alone.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "before",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "after",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Changes\""
+            },
+            {
+              "name": "view",
+              "type": "\"unified\" | \"split\"",
+              "required": false
+            },
+            {
+              "name": "defaultView",
+              "type": "\"unified\" | \"split\"",
+              "required": false,
+              "default": "\"unified\""
+            },
+            {
+              "name": "onViewChange",
+              "type": "(view: \"unified\" | \"split\") => void",
+              "required": false
+            },
+            {
+              "name": "pageSize",
+              "type": "number",
+              "required": false,
+              "default": "200",
+              "description": "Maximum rendered rows per page, clamped to 1–1000."
+            }
+          ]
+        }
+      ]
+    },
+    "error-summary": {
+      "exports": [
+        {
+          "name": "ErrorSummary",
+          "kind": "component",
+          "description": "A form-wide summary linking each message to the field that needs attention.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"title\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "errors",
+              "type": "FormError[]",
+              "required": true
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Check the following fields\""
+            },
+            {
+              "name": "autoFocus",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Move focus to the summary after a failed submission, not while typing."
+            }
+          ]
+        }
+      ]
+    },
+    "notification-center": {
+      "exports": [
+        {
+          "name": "NotificationCenter",
+          "kind": "component",
+          "description": "Persistent notifications with controlled read/unread and dismissal state.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"defaultValue\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "NotificationItem[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "NotificationItem[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(items: NotificationItem[]) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Notifications\""
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"You're up to date\""
+            }
+          ]
+        }
+      ]
+    },
+    "task-progress": {
+      "exports": [
+        {
+          "name": "TaskProgress",
+          "kind": "component",
+          "description": "Honest long-running task state, including unknown progress and action failures.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "state",
+              "type": "TaskState",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "required": false,
+              "description": "Percentage, omit while the amount of work is unknown."
+            },
+            {
+              "name": "phases",
+              "type": "TaskPhase[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "elapsedSeconds",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "remainingSeconds",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "onCancel",
+              "type": "() => void | Promise<void>",
+              "required": false
+            },
+            {
+              "name": "onRetry",
+              "type": "() => void | Promise<void>",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "connection-status": {
+      "exports": [
+        {
+          "name": "ConnectionStatus",
+          "kind": "component",
+          "description": "Application-supplied connection state. A successful retry does not assume reconnection.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "state",
+              "type": "ConnectionState",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "onRetry",
+              "type": "() => void | Promise<void>",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "tree-view": {
+      "exports": [
+        {
+          "name": "TreeView",
+          "kind": "component",
+          "description": "Single selection and APG-style roving focus through a hierarchical collection.",
+          "extends": "Omit<HTMLAttributes<HTMLUListElement>, \"defaultValue\" | \"onSelect\">",
+          "ref": "HTMLUListElement",
+          "props": [
+            {
+              "name": "nodes",
+              "type": "TreeNode[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "expanded",
+              "type": "string[]",
+              "required": false
+            },
+            {
+              "name": "defaultExpanded",
+              "type": "string[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onExpandedChange",
+              "type": "(ids: string[]) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "toolbar": {
+      "exports": [
+        {
+          "name": "Toolbar",
+          "kind": "component",
+          "description": "Named action collection with one Tab stop and roving keyboard focus.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "actions",
+              "type": "ToolbarAction[]",
+              "required": true
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\"",
+              "required": false,
+              "default": "\"horizontal\""
+            }
+          ]
+        }
+      ]
+    },
+    "bottom-navigation": {
+      "exports": [
+        {
+          "name": "BottomNavigation",
+          "kind": "component",
+          "description": "Mobile destinations with safe-area padding and native links. Keep to five items.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "BottomNavigationItem[]",
+              "required": true
+            },
+            {
+              "name": "current",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Primary navigation\""
+            }
+          ]
+        }
+      ]
+    },
+    "overflow-list": {
+      "exports": [
+        {
+          "name": "OverflowList",
+          "kind": "component",
+          "description": "Keeps priority actions in order and moves the remainder into a keyboard menu.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "OverflowAction[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Actions\""
+            },
+            {
+              "name": "maxVisible",
+              "type": "number",
+              "required": false,
+              "default": "items.length",
+              "description": "Upper bound on visible priority actions, available width may show fewer."
+            }
+          ]
+        }
+      ]
+    },
+    "filter-bar": {
+      "exports": [
+        {
+          "name": "FilterBar",
+          "kind": "component",
+          "description": "Removable active filters and result count. Supply filter editors as children.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "ActiveFilter[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "ActiveFilter[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(filters: ActiveFilter[]) => void",
+              "required": false
+            },
+            {
+              "name": "resultCount",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Active filters\""
+            }
+          ]
+        }
+      ]
+    },
+    "query-builder": {
+      "exports": [
+        {
+          "name": "describeQuery",
+          "kind": "function",
+          "description": "Human-readable summary only. This is not SQL and never executes a query.",
+          "props": []
+        },
+        {
+          "name": "QueryBuilder",
+          "kind": "component",
+          "description": "A structured filter expression with nested groups and native field editors.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "fields",
+              "type": "QueryField[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "QueryGroup",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "QueryGroup",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(query: QueryGroup) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Filter conditions\""
+            },
+            {
+              "name": "maxDepth",
+              "type": "number",
+              "required": false,
+              "default": "3",
+              "description": "Maximum group nesting, capped at eight."
+            }
+          ]
+        }
+      ]
+    },
+    "sortable-list": {
+      "exports": [
+        {
+          "name": "SortableList",
+          "kind": "component",
+          "description": "Reordering through drag, named move buttons, or Alt and the arrow keys.",
+          "extends": "Omit<HTMLAttributes<HTMLOListElement>, \"defaultValue\">",
+          "ref": "HTMLOListElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "SortableItem[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "SortableItem[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(items: SortableItem[]) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Reorder items\""
+            }
+          ]
+        }
+      ]
+    },
+    "virtual-list": {
+      "exports": [
+        {
+          "name": "VirtualList",
+          "kind": "component",
+          "description": "Fixed-height windowing with a retained focused row and keyboard navigation.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "VirtualItem[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "rowHeight",
+              "type": "number",
+              "required": false,
+              "default": "44",
+              "description": "Fixed row height, at least 44px."
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "required": false,
+              "default": "352"
+            },
+            {
+              "name": "overscan",
+              "type": "number",
+              "required": false,
+              "default": "4"
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"No items\""
+            }
+          ]
+        }
+      ]
+    },
+    "master-detail": {
+      "exports": [
+        {
+          "name": "MasterDetail",
+          "kind": "component",
+          "description": "List/detail selection with a mobile back path and preserved item focus.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "MasterDetailItem[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Items\""
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(id: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Select an item to see its details\""
+            }
+          ]
+        }
+      ]
+    },
+    "property-grid": {
+      "exports": [
+        {
+          "name": "PropertyGrid",
+          "kind": "component",
+          "description": "Editable property rows with shared label/value/unit alignment.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "fields",
+              "type": "PropertyField[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "PropertyValues",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "PropertyValues",
+              "required": false,
+              "default": "{}"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(values: PropertyValues) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Properties\""
+            }
+          ]
+        }
+      ]
+    },
+    "number-field": {
+      "exports": [
+        {
+          "name": "NumberField",
+          "kind": "component",
+          "description": "Numeric input with native validation and bounded increment/decrement actions.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\" | \"size\" | \"min\" | \"max\" | \"step\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "number | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: number | null) => void",
+              "required": false
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "incrementLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Increase value\""
+            },
+            {
+              "name": "decrementLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Decrease value\""
+            },
+            {
+              "name": "controlsPlacement",
+              "type": "\"inline\" | \"stacked\"",
+              "required": false,
+              "default": "\"inline\"",
+              "description": "Stack the increase button above decrease at the end of the field."
+            }
+          ]
+        }
+      ]
+    },
+    "range-slider": {
+      "exports": [
+        {
+          "name": "RangeSlider",
+          "kind": "component",
+          "extends": "Omit<HTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "[number, number]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "[number, number]",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: [number, number]) => void",
+              "required": false
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false,
+              "default": "100"
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Range\""
+            },
+            {
+              "name": "lowerLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"From\""
+            },
+            {
+              "name": "upperLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"To\""
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "formatValue",
+              "type": "(value: number) => string",
+              "required": false,
+              "default": "String"
+            }
+          ]
+        }
+      ]
+    },
+    "multi-select": {
+      "exports": [
+        {
+          "name": "MultiSelect",
+          "kind": "component",
+          "description": "A native disclosure containing named checkboxes; selections remain visible when collapsed.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "options",
+              "type": "MultiSelectOption[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string[]) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Options\""
+            },
+            {
+              "name": "placeholder",
+              "type": "string",
+              "required": false,
+              "default": "\"Select options\""
+            },
+            {
+              "name": "searchable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "searchLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Filter options\""
+            },
+            {
+              "name": "emptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"No matching options\""
+            },
+            {
+              "name": "clearLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Clear selection\""
+            }
+          ]
+        }
+      ]
+    },
+    "tag-input": {
+      "exports": [
+        {
+          "name": "TagInput",
+          "kind": "component",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string[]) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Tags\""
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "placeholder",
+              "type": "string",
+              "required": false,
+              "default": "\"Add a tag\""
+            },
+            {
+              "name": "maxTags",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "validate",
+              "type": "(tag: string) => string",
+              "required": false,
+              "description": "Return an error for an invalid token, or undefined to accept it."
+            },
+            {
+              "name": "addLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Add\""
+            },
+            {
+              "name": "removeLabel",
+              "type": "(tag: string) => string",
+              "required": false,
+              "default": "(tag) => `Remove ${tag}`"
+            }
+          ]
+        }
+      ]
+    },
+    "date-range-picker": {
+      "exports": [
+        {
+          "name": "DateRangePicker",
+          "kind": "component",
+          "description": "Two native date editors share bounds; changing the start beyond the end clears the end.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "DateRangeValue",
+              "required": false,
+              "description": "ISO calendar dates, YYYY-MM-DD; no time zone conversion."
+            },
+            {
+              "name": "defaultValue",
+              "type": "DateRangeValue",
+              "required": false,
+              "default": "{ start: \"\", end: \"\" }"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: DateRangeValue) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Date range\""
+            },
+            {
+              "name": "startLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Start date\""
+            },
+            {
+              "name": "endLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"End date\""
+            },
+            {
+              "name": "min",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "time-field": {
+      "exports": [
+        {
+          "name": "TimeField",
+          "kind": "component",
+          "description": "The platform time editor, including its locale, keyboard and step validation.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": false,
+              "description": "A 24-hour HTML time value, HH:mm or HH:mm:ss. The browser localizes editing."
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "file-upload": {
+      "exports": [
+        {
+          "name": "FileUpload",
+          "kind": "component",
+          "description": "Validated file selection, with an optional cancellable upload transport.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "File[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "File[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(files: File[]) => void",
+              "required": false
+            },
+            {
+              "name": "accept",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "multiple",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "maxFiles",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "maxSize",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Choose files\""
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Drop files here or browse\""
+            },
+            {
+              "name": "onReject",
+              "type": "(rejections: FileUploadRejection[]) => void",
+              "required": false
+            },
+            {
+              "name": "onUpload",
+              "type": "(file: File, context: FileUploadContext) => Promise<void>",
+              "required": false,
+              "description": "Optional transport supplied by the app. Omit to collect files without uploading."
+            }
+          ]
+        }
+      ]
+    },
+    "transfer-list": {
+      "exports": [
+        {
+          "name": "TransferList",
+          "kind": "component",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "options",
+              "type": "TransferListOption[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string[]) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Assign options\""
+            },
+            {
+              "name": "availableLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Available\""
+            },
+            {
+              "name": "selectedLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Selected\""
+            },
+            {
+              "name": "addLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Add selected\""
+            },
+            {
+              "name": "removeLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Remove selected\""
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"No options\""
+            }
+          ]
+        }
+      ]
+    },
+    "inline-edit": {
+      "exports": [
+        {
+          "name": "InlineEdit",
+          "kind": "component",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Value\""
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "placeholder",
+              "type": "string",
+              "required": false,
+              "default": "\"Not set\""
+            },
+            {
+              "name": "validate",
+              "type": "(value: string) => string",
+              "required": false
+            },
+            {
+              "name": "onSave",
+              "type": "(value: string) => void | Promise<void>",
+              "required": false,
+              "description": "Resolves before the value is committed. Rejections leave the draft editable."
+            },
+            {
+              "name": "editLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Edit\""
+            },
+            {
+              "name": "saveLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Save\""
+            },
+            {
+              "name": "cancelLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Cancel\""
+            }
+          ]
+        }
+      ]
+    },
+    "rating": {
+      "exports": [
+        {
+          "name": "Rating",
+          "kind": "component",
+          "description": "A discrete score using native radios; zero means no rating.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: number) => void",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false,
+              "default": "5"
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Rating\""
+            },
+            {
+              "name": "getLabel",
+              "type": "(value: number, max: number) => string",
+              "required": false,
+              "default": "(score, total) => `${score} of ${total}`"
+            },
+            {
+              "name": "clearable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "clearLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Clear rating\""
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "playback-controls": {
+      "exports": [
+        {
+          "name": "PlaybackControls",
+          "kind": "component",
+          "description": "Named, keyboard-operable transport buttons. Playback state may be owned by a media element.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "playing",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultPlaying",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onPlayingChange",
+              "type": "(playing: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onPrevious",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "onNext",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "onStop",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "previousDisabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "nextDisabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "previousLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Previous track\""
+            },
+            {
+              "name": "nextLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Next track\""
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Playback controls\""
+            }
+          ]
+        }
+      ]
+    },
+    "media-scrubber": {
+      "exports": [
+        {
+          "name": "formatMediaTime",
+          "kind": "function",
+          "description": "Elapsed media time, including hours when needed. Invalid duration is displayed as zero.",
+          "props": []
+        },
+        {
+          "name": "MediaScrubber",
+          "kind": "component",
+          "description": "A native range in seconds with elapsed and total time. The input remains a 44px target.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "duration",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Playback position\""
+            },
+            {
+              "name": "showTime",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "buffered",
+              "type": "number",
+              "required": false,
+              "default": "0",
+              "description": "Last buffered second."
+            },
+            {
+              "name": "chapters",
+              "type": "readonly MediaChapter[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "preview",
+              "type": "(seconds: number) => ReactNode",
+              "required": false,
+              "description": "Thumbnail or other visual preview for the pointed or focused second."
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: number) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "media-player": {
+      "exports": [
+        {
+          "name": "MediaPlayer",
+          "kind": "component",
+          "description": "Native media with Vlak transport, seeking, volume, captions, and recoverable loading errors.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLMediaElement",
+          "props": [
+            {
+              "name": "src",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "title",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "kind",
+              "type": "\"audio\" | \"video\"",
+              "required": false,
+              "default": "\"video\""
+            },
+            {
+              "name": "poster",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "preload",
+              "type": "\"none\" | \"metadata\" | \"auto\"",
+              "required": false,
+              "default": "\"metadata\""
+            },
+            {
+              "name": "tracks",
+              "type": "readonly MediaTrack[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "transcript",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "onPlayingChange",
+              "type": "(playing: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onTimeChange",
+              "type": "(seconds: number) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "waveform": {
+      "exports": [
+        {
+          "name": "Waveform",
+          "kind": "component",
+          "description": "A waveform from supplied amplitude data, optionally scrubbed through a native range.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "samples",
+              "type": "readonly number[]",
+              "required": true,
+              "description": "Amplitudes from zero to one; values are clamped."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(position: number) => void",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "region",
+              "type": "WaveformRegion",
+              "required": false
+            },
+            {
+              "name": "defaultRegion",
+              "type": "WaveformRegion",
+              "required": false,
+              "default": "{ start: 0, end: 1 }"
+            },
+            {
+              "name": "onRegionChange",
+              "type": "(region: WaveformRegion) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "image-viewer": {
+      "exports": [
+        {
+          "name": "ImageViewer",
+          "kind": "component",
+          "description": "Inspect a labelled image collection inline or in a native lightbox.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "images",
+              "type": "readonly ViewerImage[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(index: number) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Image viewer\""
+            }
+          ]
+        }
+      ]
+    },
+    "canvas-controls": {
+      "exports": [
+        {
+          "name": "CanvasControls",
+          "kind": "component",
+          "description": "Zoom, fit, and reset actions for a canvas. The canvas owns pan and rendering.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "zoom",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultZoom",
+              "type": "number",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "onZoomChange",
+              "type": "(zoom: number) => void",
+              "required": false
+            },
+            {
+              "name": "minZoom",
+              "type": "number",
+              "required": false,
+              "default": "0.25"
+            },
+            {
+              "name": "maxZoom",
+              "type": "number",
+              "required": false,
+              "default": "4"
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "required": false,
+              "default": "0.25"
+            },
+            {
+              "name": "onFit",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "onReset",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Canvas controls\""
+            }
+          ]
+        }
+      ]
+    },
+    "message-composer": {
+      "exports": [
+        {
+          "name": "MessageComposer",
+          "kind": "component",
+          "description": "A message draft with attachments, IME-safe shortcuts, and retained text after send failures.",
+          "extends": "Omit<FormHTMLAttributes<HTMLFormElement>, \"defaultValue\" | \"onSubmit\">",
+          "ref": "HTMLTextAreaElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(text: string) => void",
+              "required": false
+            },
+            {
+              "name": "onSend",
+              "type": "(message: ComposedMessage) => void | Promise<void>",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Message\""
+            },
+            {
+              "name": "placeholder",
+              "type": "string",
+              "required": false,
+              "default": "\"Write a message…\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "allowAttachments",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "accept",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "maxLength",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "sendOnEnter",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter."
+            },
+            {
+              "name": "generating",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Application-owned response generation, separate from submission pending state."
+            },
+            {
+              "name": "onStop",
+              "type": "() => void",
+              "required": false,
+              "description": "Requests that the application stop generation; does not itself cancel a network request."
+            }
+          ]
+        }
+      ]
+    },
+    "file-browser": {
+      "exports": [
+        {
+          "name": "FileBrowser",
+          "kind": "component",
+          "description": "A controlled file collection with folder tree, breadcrumbs, search, and list or grid views.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\" | \"onSelect\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "entries",
+              "type": "BrowserEntry[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Files\""
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "folder",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "defaultFolder",
+              "type": "string | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onFolderChange",
+              "type": "(id: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "onOpen",
+              "type": "(entry: BrowserEntry) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "kanban-board": {
+      "exports": [
+        {
+          "name": "KanbanBoard",
+          "kind": "component",
+          "description": "Movable cards with drag, keyboard reordering, and named destination selectors.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "columns",
+              "type": "readonly KanbanColumn[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "KanbanCard[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "KanbanCard[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(cards: KanbanCard[]) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Board\""
+            }
+          ]
+        }
+      ]
+    },
+    "scheduler": {
+      "exports": [
+        {
+          "name": "Scheduler",
+          "kind": "component",
+          "description": "Agenda, week, and month planning in an explicit or browser-local zone. Mutations are callbacks.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "events",
+              "type": "readonly SchedulerEvent[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "Date",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "Date",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(day: Date) => void",
+              "required": false
+            },
+            {
+              "name": "view",
+              "type": "SchedulerView",
+              "required": false
+            },
+            {
+              "name": "defaultView",
+              "type": "SchedulerView",
+              "required": false,
+              "default": "\"week\""
+            },
+            {
+              "name": "onViewChange",
+              "type": "(view: SchedulerView) => void",
+              "required": false
+            },
+            {
+              "name": "onEventSelect",
+              "type": "(event: SchedulerEvent) => void",
+              "required": false
+            },
+            {
+              "name": "onSlotSelect",
+              "type": "(start: Date) => void",
+              "required": false
+            },
+            {
+              "name": "onEventMove",
+              "type": "(event: SchedulerEvent, next: { start: Date; end: Date; }) => void",
+              "required": false
+            },
+            {
+              "name": "weekStart",
+              "type": "0 | 1",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "locale",
+              "type": "string",
+              "required": false,
+              "default": "\"en\""
+            },
+            {
+              "name": "timeZone",
+              "type": "string",
+              "required": false,
+              "description": "IANA zone, for example Europe/Amsterdam. Defaults to the browser zone."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Schedule\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
     "button": {
       "exports": [
         {
@@ -213,7 +2424,7 @@
         {
           "name": "InlineForm",
           "kind": "component",
-          "description": "One field, one action; the action sits inside the field.",
+          "description": "One field, one action; asynchronous actions only confirm after they resolve.",
           "extends": "Omit<FormHTMLAttributes<HTMLFormElement>, \"onSubmit\">",
           "ref": "HTMLFormElement",
           "props": [
@@ -236,6 +2447,34 @@
               "default": "\"You're on the list\""
             },
             {
+              "name": "pendingLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Submitting…\""
+            },
+            {
+              "name": "errorLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Could not submit. Please try again.\""
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
               "name": "validate",
               "type": "(value: string) => boolean",
               "required": false,
@@ -244,7 +2483,7 @@
             },
             {
               "name": "onSubmit",
-              "type": "(value: string) => void",
+              "type": "(value: string) => void | Promise<void>",
               "required": false
             },
             {
@@ -319,6 +2558,17 @@
             {
               "name": "label",
               "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "indeterminate",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onCheckedChange",
+              "type": "(checked: boolean) => void",
               "required": false
             }
           ]
@@ -793,7 +3043,7 @@
         {
           "name": "innerRadius",
           "kind": "function",
-          "description": "Steve Ruiz innerRadius: fit a circle to the −padding isosurface of a circular corner SDF. The initial guess R = outerRadius is the wrong answer. Clamp at 0. https://x.com/steveruizok/status/2072651352908370013",
+          "description": "The exact inner circle shares its outer circle's center. No iterative fitting is needed.",
           "props": []
         },
         {
@@ -1749,7 +3999,7 @@
           "props": [
             {
               "name": "values",
-              "type": "number[]",
+              "type": "(number | null)[]",
               "required": true
             },
             {
@@ -2240,6 +4490,13 @@
               "required": false
             },
             {
+              "name": "sharedDomain",
+              "type": "boolean",
+              "required": false,
+              "default": "true",
+              "description": "Compare panels on one scale by default. Disable only for independent trends."
+            },
+            {
               "name": "locale",
               "type": "string",
               "required": false,
@@ -2321,7 +4578,7 @@
           "name": "InputOTP",
           "kind": "component",
           "description": "One cell per character. Auto-advance, backspace, paste.",
-          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onChange\">",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\">",
           "ref": "HTMLDivElement",
           "props": [
             {
@@ -2331,9 +4588,43 @@
               "default": "6"
             },
             {
-              "name": "onChange",
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
               "type": "(code: string) => void",
               "required": false
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onChange",
+              "type": "(code: string) => void",
+              "required": false,
+              "description": "Deprecated. Use onValueChange."
             },
             {
               "name": "onComplete",
@@ -2717,6 +5008,33 @@
               "type": "boolean",
               "required": false,
               "description": "Move focus to the roving day on mount (a date picker opening)."
+            },
+            {
+              "name": "min",
+              "type": "Date",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "Date",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "isDateDisabled",
+              "type": "(date: Date) => boolean",
+              "required": false
+            },
+            {
+              "name": "locale",
+              "type": "string",
+              "required": false,
+              "default": "\"en\""
             }
           ]
         }
@@ -2767,6 +5085,26 @@
             {
               "name": "disabled",
               "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "min",
+              "type": "Date",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "Date",
+              "required": false
+            },
+            {
+              "name": "isDateDisabled",
+              "type": "(date: Date) => boolean",
+              "required": false
+            },
+            {
+              "name": "locale",
+              "type": "string",
               "required": false
             },
             {

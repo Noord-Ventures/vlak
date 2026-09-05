@@ -1,0 +1,6 @@
+/* ── description-list: generated from packages/react/src/components/description-list.tsx ── */
+.rs-description-list{margin:0;width:100%;min-width:0;color:var(--text)}
+.rs-description-list-row{display:grid;grid-template-columns:minmax(8rem, 1fr) minmax(0, 2fr);gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+@media (max-width: 640px){.rs-description-list-row{grid-template-columns:minmax(0, 1fr)}}
+.rs-description-list-label{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45}
+.rs-description-list-value{margin:0;min-width:0;overflow-wrap:anywhere;line-height:1.45;font-variant-numeric:tabular-nums}

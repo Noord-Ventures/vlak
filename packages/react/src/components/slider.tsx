@@ -29,7 +29,7 @@ const styles = stylex.create({
       [mq.phone]: 1,
     },
     marginBlock: {
-      default: "0.6875rem",
+      default: "1.3125rem",
       [mq.phone]: "1.25rem",
     },
     marginInline: 0,
@@ -80,13 +80,13 @@ const styles = stylex.create({
     position: "absolute",
     insetInlineStart: 0,
     insetInlineEnd: 0,
-    // 24px tall on desktop, 44px on phones: the hit area, not the 2px track.
+    // The hit area is 44px; the visible track stays quiet.
     top: {
-      default: "-0.6875rem",
+      default: "-1.3125rem",
       [mq.phone]: "-1.25rem",
     },
     bottom: {
-      default: "-0.6875rem",
+      default: "-1.3125rem",
       [mq.phone]: "-1.25rem",
     },
     width: "100%",

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "query-builder",
+  "type": "registry:component",
+  "title": "Query builder",
+  "description": "Builds nested filter conditions from fields, operators, and values.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/native-select.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/query-builder.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Input } from \"./input\";\nimport { NativeSelect } from \"./native-select\";\n\nexport interface QueryField { id: string; label: string; type?: \"text\" | \"number\" }\nexport interface QueryRule { id: string; field: string; operator: \"is\" | \"is-not\" | \"contains\" | \"greater-than\" | \"less-than\"; value: string }\nexport interface QueryGroup { id: string; combinator: \"and\" | \"or\"; rules: Array<QueryRule | QueryGroup> }\nexport interface QueryBuilderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  fields: QueryField[];\n  value?: QueryGroup;\n  defaultValue?: QueryGroup;\n  onValueChange?: (query: QueryGroup) => void;\n  label?: string;\n  /** Maximum group nesting, capped at eight. */\n  maxDepth?: number;\n}\nconst operators = [{ value: \"is\", label: \"is\" }, { value: \"is-not\", label: \"is not\" }, { value: \"contains\", label: \"contains\" }, { value: \"greater-than\", label: \"is greater than\" }, { value: \"less-than\", label: \"is less than\" }] as const;\nfunction fieldOperators(field?: QueryField) {\n  return operators.filter(operator => field?.type === \"number\" ? operator.value !== \"contains\" : ![\"greater-than\", \"less-than\"].includes(operator.value));\n}\n/** Human-readable summary only. This is not SQL and never executes a query. */\nexport function describeQuery(group: QueryGroup, fields: QueryField[]): string {\n  if (!group.rules.length) return \"No conditions\";\n  return `(${group.rules.map(rule => \"rules\" in rule ? describeQuery(rule, fields) : `${fields.find(field => field.id === rule.field)?.label ?? rule.field} ${operators.find(operator => operator.value === rule.operator)?.label ?? rule.operator} ${JSON.stringify(rule.value)}`).join(` ${group.combinator} `)})`;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"1rem\", width: \"100%\", minWidth: 0, color: vlak.ink },\n  group: { borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, padding: \"1rem\", margin: 0, minWidth: 0, display: \"grid\", gap: \"0.75rem\" },\n  legend: { fontWeight: 600, fontSize: \"0.875rem\", paddingInline: \"0.25rem\" },\n  rule: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(min(100%, 9rem), 1fr))\", gap: \"0.5rem\", alignItems: \"end\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  summary: { margin: 0, maxWidth: \"66ch\", overflowWrap: \"anywhere\", fontSize: \"0.875rem\", lineHeight: 1.45, color: vlak.gray },\n});\nfunction replaceGroup(tree: QueryGroup, id: string, next: (group: QueryGroup) => QueryGroup): QueryGroup {\n  return tree.id === id ? next(tree) : { ...tree, rules: tree.rules.map(rule => \"rules\" in rule ? replaceGroup(rule, id, next) : rule) };\n}\n\n/** A structured filter expression with nested groups and native field editors. */\nexport const QueryBuilder = React.forwardRef<HTMLDivElement, QueryBuilderProps>(function QueryBuilder({ fields, value, defaultValue, onValueChange, label = \"Filter conditions\", maxDepth = 3, className, style, ...props }, ref) {\n  const prefix = React.useId();\n  const counter = React.useRef(0);\n  const makeId = () => `${prefix}-${++counter.current}`;\n  const [inner, setInner] = React.useState<QueryGroup>(() => defaultValue ?? { id: `${prefix}-root`, combinator: \"and\", rules: [] });\n  const current = value ?? inner;\n  const depthLimit = Math.max(1, Math.min(8, Number.isFinite(maxDepth) ? Math.floor(maxDepth) : 3));\n  const root = rs([\"rs-query-builder\", className], styles.root);\n  const groupStyle = rs([\"rs-query-builder-group\"], styles.group);\n  const legend = rs([\"rs-query-builder-legend\"], styles.legend);\n  const row = rs([\"rs-query-builder-rule\"], styles.rule);\n  const actions = rs([\"rs-query-builder-actions\"], styles.actions);\n  const summary = rs([\"rs-query-builder-summary\"], styles.summary);\n  const update = (id: string, change: (group: QueryGroup) => QueryGroup) => { const next = replaceGroup(current, id, change); if (value === undefined) setInner(next); onValueChange?.(next); };\n  const renderGroup = (group: QueryGroup, depth: number, parent?: string): React.ReactNode => <fieldset key={group.id} {...groupStyle}><legend {...legend}>{depth === 0 ? label : `Condition group ${depth + 1}`}</legend>\n    <NativeSelect label=\"Match conditions\" value={group.combinator} onChange={event => update(group.id, previous => ({ ...previous, combinator: event.target.value as \"and\" | \"or\" }))}><option value=\"and\">All conditions</option><option value=\"or\">Any condition</option></NativeSelect>\n    {group.rules.map((rule, index) => \"rules\" in rule ? renderGroup(rule, depth + 1, group.id) : <div key={rule.id} {...row}>\n      <NativeSelect label={`Field ${index + 1}`} value={rule.field} onChange={event => { const fieldId = event.currentTarget.value; const allowed = fieldOperators(fields.find(field => field.id === fieldId)); update(group.id, previous => ({ ...previous, rules: previous.rules.map(entry => entry.id === rule.id ? { ...rule, field: fieldId, operator: allowed.some(operator => operator.value === rule.operator) ? rule.operator : \"is\", value: \"\" } : entry) })); }}>{fields.map(field => <option key={field.id} value={field.id}>{field.label}</option>)}</NativeSelect>\n      <NativeSelect label={`Operator ${index + 1}`} value={rule.operator} onChange={event => update(group.id, previous => ({ ...previous, rules: previous.rules.map(entry => entry.id === rule.id ? { ...rule, operator: event.target.value as QueryRule[\"operator\"] } : entry) }))}>{!fieldOperators(fields.find(field => field.id === rule.field)).some(operator => operator.value === rule.operator) && <option value={rule.operator} disabled>Choose an operator</option>}{fieldOperators(fields.find(field => field.id === rule.field)).map(operator => <option key={operator.value} value={operator.value}>{operator.label}</option>)}</NativeSelect>\n      <Input label={`Value ${index + 1}`} type={fields.find(field => field.id === rule.field)?.type ?? \"text\"} value={rule.value} onChange={event => update(group.id, previous => ({ ...previous, rules: previous.rules.map(entry => entry.id === rule.id ? { ...rule, value: event.target.value } : entry) }))} />\n      <Button variant=\"ghost\" aria-label={`Remove condition ${index + 1}`} onClick={event => { const fieldset = event.currentTarget.closest(\"fieldset\"); fieldset?.querySelector(\"select\")?.focus(); update(group.id, previous => ({ ...previous, rules: previous.rules.filter(entry => entry.id !== rule.id) })); }}>Remove</Button>\n    </div>)}\n    {!group.rules.length && <p {...summary}>No conditions in this group</p>}\n    <div {...actions}><Button variant=\"ghost\" disabled={!fields.length} onClick={() => update(group.id, previous => ({ ...previous, rules: [...previous.rules, { id: makeId(), field: fields[0]!.id, operator: \"is\", value: \"\" }] }))}>Add condition</Button>{depth + 1 < depthLimit && <Button variant=\"ghost\" onClick={() => update(group.id, previous => ({ ...previous, rules: [...previous.rules, { id: makeId(), combinator: \"and\", rules: [] }] }))}>Add group</Button>}{parent && <Button variant=\"ghost\" onClick={event => { const parentFieldset = event.currentTarget.closest(\"fieldset\")?.parentElement?.closest(\"fieldset\"); parentFieldset?.querySelector(\"select\")?.focus(); update(parent, previous => ({ ...previous, rules: previous.rules.filter(entry => entry.id !== group.id) })); }}>Remove group</Button>}</div>\n  </fieldset>;\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>{renderGroup(current, 0)}<p {...summary} role=\"note\" aria-label=\"Query summary\">{describeQuery(current, fields)}</p></div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/query-builder.tsx"
+    },
+    {
+      "path": "vlak/styles/query-builder.css",
+      "content": "/* ── query-builder: generated from packages/react/src/components/query-builder.tsx ── */\n.rs-query-builder{display:grid;gap:1rem;width:100%;min-width:0;color:var(--text)}\n.rs-query-builder-group{border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;margin:0;min-width:0;display:grid;gap:0.75rem}\n.rs-query-builder-legend{font-weight:600;font-size:0.875rem;padding-inline:0.25rem}\n.rs-query-builder-rule{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.5rem;align-items:end}\n.rs-query-builder-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-query-builder-summary{margin:0;max-width:66ch;overflow-wrap:anywhere;font-size:0.875rem;line-height:1.45;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/query-builder.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-query-builder",
+        "rs-query-builder-group",
+        "rs-query-builder-legend",
+        "rs-query-builder-rule",
+        "rs-query-builder-actions",
+        "rs-query-builder-summary"
+      ],
+      "snippet": "<div class=\"rs-query-builder\"><fieldset class=\"rs-query-builder-group\"><legend class=\"rs-query-builder-legend\">Filter conditions</legend><p class=\"rs-query-builder-summary\">Name contains \"Drive\"</p></fieldset></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "input",
+        "native-select",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "QueryBuilder"
+      ],
+      "example": "import { QueryBuilder } from \"@noorddev/vlak-react\";\n\n<QueryBuilder fields={[{ id: \"name\", label: \"Name\" }, { id: \"range\", label: \"Range\", type: \"number\" }]} defaultValue={{ id: \"root\", combinator: \"and\", rules: [{ id: \"rule\", field: \"name\", operator: \"contains\", value: \"Drive\" }] }} />",
+      "usage": {
+        "use": [
+          "User-defined filters and conditional rule sets."
+        ],
+        "avoid": [
+          "Executing SQL or trusting the summary as a database query."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space, native select keys",
+          "does": "Native fields handle entry and selection; buttons add or remove rules/groups."
+        }
+      ],
+      "a11y": [
+        "Fieldsets name nested groups. Every editor has a label and a human-readable expression summary is available."
+      ]
+    }
+  }
+}

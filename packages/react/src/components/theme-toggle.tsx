@@ -27,11 +27,11 @@ const styles = stylex.create({
     },
     zIndex: vlak.zSticky,
     width: {
-      default: "1.5rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     height: {
-      default: "1.5rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     minWidth: {
@@ -109,13 +109,26 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>
   const [dark, setDark] = React.useState<boolean | null>(null);
 
   React.useEffect(() => {
-    setDark(document.documentElement.dataset.theme === "dark");
+    const media = window.matchMedia?.("(prefers-color-scheme: dark)");
+    const read = () => {
+      const explicit = document.documentElement.dataset.theme;
+      setDark(explicit === "dark" || (explicit !== "light" && !!media?.matches));
+    };
+    read();
+    const observer = new MutationObserver(read);
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    media?.addEventListener("change", read);
+    return () => {
+      observer.disconnect();
+      media?.removeEventListener("change", read);
+    };
   }, []);
 
   const toggle = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const next = document.documentElement.dataset.theme !== "dark";
-    if (next) document.documentElement.dataset.theme = "dark";
-    else delete document.documentElement.dataset.theme;
+    const explicit = document.documentElement.dataset.theme;
+    const effectiveDark = explicit === "dark" || (explicit !== "light" && !!window.matchMedia?.("(prefers-color-scheme: dark)").matches);
+    const next = !effectiveDark;
+    document.documentElement.dataset.theme = next ? "dark" : "light";
     try {
       localStorage.setItem(storageKey, next ? "dark" : "light");
     } catch {

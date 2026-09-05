@@ -1,0 +1,3 @@
+/* ── playback-controls: generated from packages/react/src/components/playback-controls.tsx ── */
+.rs-playback-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;padding-bottom:0.75rem;color:var(--text)}
+.rs-playback-action{width:var(--hit);min-width:var(--hit);height:var(--hit);padding:0;flex-shrink:0}

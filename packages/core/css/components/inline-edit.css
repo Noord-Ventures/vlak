@@ -1,0 +1,8 @@
+/* ── inline-edit: generated from packages/react/src/components/inline-edit.tsx ── */
+.rs-inline-edit{display:grid;gap:0.5rem;min-width:0}
+.rs-inline-edit-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;min-width:0}
+.rs-inline-edit-label{font-size:var(--control-label);color:var(--text-secondary)}
+.rs-inline-edit-value{min-width:0;flex:1 1 10rem;font-size:var(--control-fs);overflow-wrap:anywhere}
+.rs-inline-edit-input{min-width:0;flex:1 1 10rem}
+.rs-inline-edit-action{width:auto}
+.rs-inline-edit-error{margin:0;color:var(--text);font-size:var(--control-label)}

@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
+import { useOverlayPosition } from "../use-overlay-position";
 import { Calendar } from "./calendar";
 import { Icon } from "./icon";
 import { menuStyles } from "./dropdown-menu";
@@ -27,6 +28,10 @@ export interface DatePickerProps
   placeholder?: string;
   format?: (date: Date) => string;
   disabled?: boolean;
+  min?: Date;
+  max?: Date;
+  isDateDisabled?: (date: Date) => boolean;
+  locale?: string;
   /** Accessible name of the calendar dialog. */
   dialogLabel?: string;
 }
@@ -47,6 +52,10 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(func
   placeholder = "Pick a date",
   format = defaultDateFormat,
   disabled,
+  min,
+  max,
+  isDateDisabled,
+  locale,
   dialogLabel = "Choose a date",
   className,
   style,
@@ -60,6 +69,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(func
   const setRootRef = useMergedRefs(rootRef, ref);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [open, setOpen] = React.useState(false);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const placement = useOverlayPosition(open, panelRef, triggerRef);
   const [inner, setInner] = React.useState(defaultValue);
   const isControlled = value !== undefined;
   const current = isControlled ? value : inner;
@@ -127,8 +138,8 @@ export const DatePicker = React.forwardRef<HTMLDivElement, DatePickerProps>(func
         <Icon name="calendar" size={16} />
       </button>
       {open && (
-        <div id={dialogId} role="dialog" aria-label={dialogLabel} className={menu.className} style={menu.style}>
-          <Calendar autoFocus value={current} onValueChange={choose} />
+        <div ref={panelRef} id={dialogId} role="dialog" aria-label={dialogLabel} className={menu.className} style={{ ...menu.style, ...placement }}>
+          <Calendar autoFocus={placement.visibility === "visible"} value={current} onValueChange={choose} min={min} max={max} isDateDisabled={isDateDisabled} locale={locale} />
         </div>
       )}
     </div>

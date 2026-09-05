@@ -67,9 +67,10 @@ const styles = stylex.create({
     color: vlak.ink,
     letterSpacing: "-0.01em",
     minHeight: {
-      default: "1.5rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
+    minWidth: vlak.hit,
   },
   dot: {
     width: {

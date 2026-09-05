@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "overflow-list",
+  "type": "registry:component",
+  "title": "Overflow list",
+  "description": "Keeps priority actions visible and moves excess actions into a menu.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/overflow-list.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { inertAttrs } from \"./compat\";\nimport { Button } from \"./button\";\nimport { DropdownMenu } from \"./dropdown-menu\";\n\nexport interface OverflowAction { id: string; label: string; onAction: () => void; disabled?: boolean }\nexport interface OverflowListProps extends React.HTMLAttributes<HTMLDivElement> {\n  items: OverflowAction[];\n  label?: string;\n  /** Upper bound on visible priority actions, available width may show fewer. */\n  maxVisible?: number;\n}\nconst styles = stylex.create({\n  root: { position: \"relative\", display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", width: \"100%\", minWidth: 0, color: vlak.ink },\n  measure: { position: \"absolute\", visibility: \"hidden\", pointerEvents: \"none\", display: \"flex\", gap: \"0.5rem\", width: \"max-content\", insetBlockStart: 0, insetInlineStart: 0 },\n  sample: { display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", minWidth: vlak.hit, minHeight: vlak.hit, boxSizing: \"border-box\", borderWidth: vlak.hairline, borderStyle: \"solid\", paddingInline: \"1.375rem\", fontFamily: \"inherit\", fontSize: vlak.controlFs, letterSpacing: \"-0.01em\", whiteSpace: \"nowrap\" },\n  more: { flexShrink: 0, minWidth: 0 },\n});\n\n/** Keeps priority actions in order and moves the remainder into a keyboard menu. */\nexport const OverflowList = React.forwardRef<HTMLDivElement, OverflowListProps>(function OverflowList({ items, label = \"Actions\", maxVisible = items.length, className, style, ...props }, ref) {\n  const limit = Math.max(0, Math.min(items.length, Number.isFinite(maxVisible) ? Math.floor(maxVisible) : items.length));\n  const [count, setCount] = React.useState(Math.min(limit, 3));\n  const local = React.useRef<HTMLDivElement | null>(null);\n  const measure = React.useRef<HTMLDivElement | null>(null);\n  const more = React.useRef<HTMLDivElement | null>(null);\n  const focusMore = React.useRef(false);\n  React.useLayoutEffect(() => {\n    const update = () => {\n      const available = local.current?.clientWidth ?? 0; if (!available || !measure.current) return;\n      const widths = [...measure.current.children].map(element => element.getBoundingClientRect().width);\n      const all = widths.slice(0, items.length).reduce((total, width) => total + width, 0) + Math.max(0, items.length - 1) * 8;\n      let visible = 0; let used = 0;\n      if (items.length <= limit && all <= available) visible = items.length;\n      else { const reserve = (widths.at(-1) ?? 120) + 8; for (let index = 0; index < limit; index++) { used += (widths[index] ?? 44) + (index ? 8 : 0); if (used + reserve > available) break; visible++; } }\n      const active = local.current?.contains(document.activeElement) ? document.activeElement?.getAttribute(\"data-overflow-id\") : null;\n      if (active && items.findIndex(item => item.id === active) >= visible) focusMore.current = true;\n      setCount(visible);\n    };\n    update();\n    if (typeof ResizeObserver === \"undefined\" || !local.current) return;\n    const observer = new ResizeObserver(update); observer.observe(local.current); if (measure.current) observer.observe(measure.current);\n    return () => observer.disconnect();\n  }, [items, limit]);\n  React.useLayoutEffect(() => { if (focusMore.current) { more.current?.querySelector(\"button\")?.focus(); focusMore.current = false; } });\n  const visibleCount = Math.min(count, limit);\n  const root = rs([\"rs-overflow-list\", className], styles.root);\n  const measurement = rs([\"rs-overflow-list-measure\"], styles.measure);\n  const sample = rs([\"rs-overflow-list-sample\"], styles.sample);\n  const overflow = rs([\"rs-overflow-list-more\"], styles.more);\n  return <div ref={element => { local.current = element; if (typeof ref === \"function\") ref(element); else if (ref) ref.current = element; }} role=\"group\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {items.slice(0, visibleCount).map(item => <Button key={item.id} data-overflow-id={item.id} variant=\"ghost\" disabled={item.disabled} style={{ width: \"auto\", flexShrink: 0, whiteSpace: \"nowrap\" }} onClick={item.onAction}>{item.label}</Button>)}\n    {visibleCount < items.length && <div ref={more} {...overflow}><DropdownMenu label=\"More actions\" style={{ minWidth: 0 }} items={items.slice(visibleCount).map(item => ({ label: item.label, disabled: item.disabled, onSelect: item.onAction }))} /></div>}\n    <div ref={measure} {...measurement} aria-hidden=\"true\" {...inertAttrs(true)}>{items.map(item => <span key={item.id} {...sample}>{item.label}</span>)}<span {...sample}>More actions ▾</span></div>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/overflow-list.tsx"
+    },
+    {
+      "path": "vlak/compat.ts",
+      "content": "import * as React from \"react\";\n\n/* React 18 and 19 spell newer DOM attributes differently: 19 knows\n   popoverTarget and boolean inert, 18 only passes lowercase unknown\n   attributes through as strings. These helpers emit the right shape. */\nconst major = Number.parseInt(React.version.split(\".\")[0] ?? \"19\", 10);\n\n/** Attributes that point a button at a popover element. */\nexport function popoverTargetAttrs(id: string): Record<string, string> {\n  return major >= 19 ? { popoverTarget: id } : { popovertarget: id };\n}\n\n/** The inert attribute, on when `on` is true. */\nexport function inertAttrs(on: boolean): Record<string, boolean | string | undefined> {\n  if (major >= 19) return { inert: on };\n  return { inert: on ? \"\" : undefined };\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/compat.ts"
+    },
+    {
+      "path": "vlak/styles/overflow-list.css",
+      "content": "/* ── overflow-list: generated from packages/react/src/components/overflow-list.tsx ── */\n.rs-overflow-list{position:relative;display:flex;align-items:center;gap:0.5rem;width:100%;min-width:0;color:var(--text)}\n.rs-overflow-list-measure{position:absolute;visibility:hidden;pointer-events:none;display:flex;gap:0.5rem;width:max-content;inset-block-start:0;inset-inline-start:0}\n.rs-overflow-list-sample{display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;border-width:1px;border-style:solid;padding-inline:1.375rem;font-family:inherit;font-size:var(--control-fs);letter-spacing:-0.01em;white-space:nowrap}\n.rs-overflow-list-more{flex-shrink:0;min-width:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/overflow-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "actions",
+      "classes": [
+        "rs-overflow-list",
+        "rs-overflow-list-measure",
+        "rs-overflow-list-sample",
+        "rs-overflow-list-more"
+      ],
+      "snippet": "<div class=\"rs-overflow-list\" role=\"group\" aria-label=\"Actions\"><button class=\"rs-btn-ghost\">Copy</button><div class=\"rs-overflow-list-more\"><button class=\"rs-btn-ghost\" aria-haspopup=\"menu\">More actions</button></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "OverflowList"
+      ],
+      "example": "import { OverflowList } from \"@noorddev/vlak-react\";\n\n<OverflowList maxVisible={2} items={[{ id: \"copy\", label: \"Copy\", onAction: () => {} }, { id: \"duplicate\", label: \"Duplicate\", onAction: () => {} }, { id: \"archive\", label: \"Archive\", onAction: () => {} }]} />",
+      "usage": {
+        "use": [
+          "Responsive action rows where order also establishes priority."
+        ],
+        "avoid": [
+          "Hiding critical navigation or a form's only submit action."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space, arrows, Escape",
+          "does": "Native visible buttons activate normally. The overflow uses DropdownMenu keyboard navigation and Escape."
+        }
+      ],
+      "a11y": [
+        "Overflow actions remain in a named menu. Hidden measurement text is excluded from accessibility."
+      ]
+    }
+  }
+}

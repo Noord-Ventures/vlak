@@ -1,0 +1,13 @@
+/* ── transfer-list: generated from packages/react/src/components/transfer-list.tsx ── */
+.rs-transfer-list{border-width:0;padding:0;margin:0;min-width:0}
+.rs-transfer-list-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.75rem;padding:0}
+.rs-transfer-list-columns{display:grid;grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr);gap:0.75rem;align-items:center}
+@media (max-width: 640px){.rs-transfer-list-columns{grid-template-columns:minmax(0, 1fr)}}
+.rs-transfer-list-panel{min-width:0;margin:0;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);align-self:stretch}
+.rs-transfer-list-heading{padding-inline:0.25rem;font-size:var(--control-fs);color:var(--text)}
+.rs-transfer-list-options{display:grid;gap:0.25rem;min-height:8.25rem;align-content:start;max-height:22rem;overflow-y:auto}
+.rs-transfer-list-item{min-height:var(--hit);display:flex;align-items:center;padding-inline:0.25rem}
+.rs-transfer-list-actions{display:grid;gap:0.5rem}
+.rs-transfer-list-action{width:auto}
+.rs-transfer-list-empty{margin:0;color:var(--text-secondary);font-size:var(--control-fs)}
+.rs-transfer-list-status{margin:0.75rem 0 0;color:var(--text-secondary);font-size:var(--control-label)}

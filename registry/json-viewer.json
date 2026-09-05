@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "json-viewer",
+  "type": "registry:component",
+  "title": "Json viewer",
+  "description": "Inspects structured data with bounded nested disclosures and path search.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/json-viewer.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Input } from \"./input\";\n\nexport interface JSONViewerProps extends React.HTMLAttributes<HTMLDivElement> {\n  data: unknown;\n  label?: string;\n  searchable?: boolean;\n  /** Bounds rendering of unusually deep data. */\n  maxDepth?: number;\n  /** Maximum children shown per object or array. */\n  maxEntries?: number;\n  /** Total node budget across the inspected document. */\n  maxNodes?: number;\n  /** Maximum string characters displayed per value, before escaping. */\n  maxStringLength?: number;\n}\ninterface DataNode { path: string; name: string; value: string; children?: DataNode[]; omitted?: number | \"more\" }\nfunction shorten(value: string, limit: number): string { return value.length > limit ? `${value.slice(0, limit)}… [truncated]` : value; }\nfunction describe(value: unknown, maxStringLength: number): string {\n  if (typeof value === \"string\") return JSON.stringify(shorten(value, maxStringLength));\n  if (value === null) return \"null\";\n  if (typeof value === \"object\") return Array.isArray(value) ? `Array (${value.length})` : \"Object\";\n  if (typeof value === \"function\") return \"[Function]\";\n  return String(value);\n}\nfunction inspect(value: unknown, name: string, path: string, depth: number, maxDepth: number, maxEntries: number, maxStringLength: number, parents: Set<object>, budget: { remaining: number }): DataNode {\n  budget.remaining--;\n  const node: DataNode = { name, path, value: describe(value, maxStringLength) };\n  if (value === null || typeof value !== \"object\") return node;\n  if (parents.has(value)) return { ...node, value: \"[Circular]\" };\n  if (depth >= maxDepth) return { ...node, value: `${node.value}, depth limit reached` };\n  const next = new Set(parents).add(value);\n  node.children = [];\n  const add = (key: string) => {\n    const childName = shorten(key, Math.min(256, maxStringLength));\n    const childPath = shorten(`${path}[${JSON.stringify(childName)}]`, 4096);\n    // Inspect descriptors, never invoke accessors as a side effect of displaying data.\n    const descriptor = Object.getOwnPropertyDescriptor(value, key);\n    if (descriptor && !Object.hasOwn(descriptor, \"value\")) {\n      budget.remaining--;\n      node.children!.push({ name: childName, path: childPath, value: descriptor.get ? \"[Getter]\" : \"[Setter]\" });\n    } else node.children!.push(inspect(descriptor?.value, childName, childPath, depth + 1, maxDepth, maxEntries, maxStringLength, next, budget));\n  };\n  try {\n    if (Array.isArray(value)) {\n      for (let index = 0; index < Math.min(value.length, maxEntries) && budget.remaining > 0; index++) add(String(index));\n      node.omitted = value.length - node.children.length;\n    } else {\n      // Stop enumerating once the visible budget is filled. Object.entries would\n      // read every property value, including getters, before applying that limit.\n      for (const key in value) {\n        if (!Object.hasOwn(value, key)) continue;\n        if (node.children.length >= maxEntries || budget.remaining <= 0) { node.omitted = \"more\"; break; }\n        add(key);\n      }\n    }\n  } catch {\n    node.value = `${node.value}, remaining properties could not be inspected`;\n  }\n  return node;\n}\nfunction matches(node: DataNode, query: string): boolean {\n  return `${node.path} ${node.value}`.toLocaleLowerCase().includes(query) || Boolean(node.children?.some(child => matches(child, query)));\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"1rem\", width: \"100%\", minWidth: 0, color: vlak.ink },\n  tools: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  body: { padding: \"1rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, minWidth: 0, overflowWrap: \"anywhere\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", fontSize: \"0.875rem\", lineHeight: 1.45 },\n  summary: { minHeight: vlak.hit, alignContent: \"center\", cursor: \"pointer\", borderRadius: vlak.radiusSm, outlineColor: vlak.ink, outlineOffset: 2 },\n  children: { paddingInlineStart: \"1rem\" },\n  value: { minHeight: \"2rem\", alignContent: \"center\", margin: 0 },\n  note: { color: vlak.gray, fontFamily: \"inherit\" },\n});\nfunction JsonNode({ node, query, expand }: { node: DataNode; query: string; expand: boolean }) {\n  const [open, setOpen] = React.useState(expand);\n  const summary = rs([\"rs-json-viewer-summary\"], styles.summary);\n  const children = rs([\"rs-json-viewer-children\"], styles.children);\n  const value = rs([\"rs-json-viewer-value\"], styles.value);\n  const note = rs([\"rs-json-viewer-note\"], styles.note);\n  if (query && !matches(node, query)) return null;\n  if (!node.children) return <p {...value} title={node.path}><span>{node.name}: </span><span>{node.value}</span></p>;\n  return <details open={query ? true : open} onToggle={event => setOpen(event.currentTarget.open)}>\n    <summary {...summary} title={node.path}>{node.name}: <span {...note}>{node.value}</span></summary>\n    <div {...children}>{node.children.map((child, index) => <JsonNode key={`${index}:${child.path}`} node={child} query={query} expand={expand} />)}{node.omitted ? <p {...note}>{node.omitted === \"more\" ? \"Additional entries not displayed\" : `${node.omitted} additional entries not displayed`}</p> : null}</div>\n  </details>;\n}\n\n/** Bounded JSON inspection using native disclosures and path/value search. */\nexport const JSONViewer = React.forwardRef<HTMLDivElement, JSONViewerProps>(function JSONViewer({ data, label = \"Structured data\", searchable = true, maxDepth = 8, maxEntries = 100, maxNodes = 1000, maxStringLength = 2000, className, style, ...props }, ref) {\n  const [query, setQuery] = React.useState(\"\");\n  const [expansion, setExpansion] = React.useState({ open: true, revision: 0 });\n  const tree = React.useMemo(() => inspect(data, \"$\", \"$\", 0, Math.max(1, Math.min(20, Number.isFinite(maxDepth) ? Math.floor(maxDepth) : 8)), Math.max(1, Math.min(1000, Number.isFinite(maxEntries) ? Math.floor(maxEntries) : 100)), Math.max(100, Math.min(10000, Number.isFinite(maxStringLength) ? Math.floor(maxStringLength) : 2000)), new Set(), { remaining: Math.max(1, Math.min(10000, Number.isFinite(maxNodes) ? Math.floor(maxNodes) : 1000)) }), [data, maxDepth, maxEntries, maxNodes, maxStringLength]);\n  const normalized = query.trim().toLocaleLowerCase();\n  const root = rs([\"rs-json-viewer\", className], styles.root);\n  const tools = rs([\"rs-json-viewer-tools\"], styles.tools);\n  const body = rs([\"rs-json-viewer-body\"], styles.body);\n  return <div ref={ref} role=\"region\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {searchable && <Input label=\"Search paths and values\" type=\"search\" value={query} onChange={event => setQuery(event.target.value)} />}\n    <div {...tools}><Button variant=\"ghost\" onClick={() => setExpansion(previous => ({ open: true, revision: previous.revision + 1 }))}>Expand all</Button><Button variant=\"ghost\" disabled={Boolean(normalized)} onClick={() => setExpansion(previous => ({ open: false, revision: previous.revision + 1 }))}>Collapse all</Button></div>\n    <div {...body}>{normalized && !matches(tree, normalized) ? <p role=\"status\">No matching paths or values</p> : <JsonNode key={expansion.revision} node={tree} query={normalized} expand={expansion.open} />}</div>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/json-viewer.tsx"
+    },
+    {
+      "path": "vlak/styles/json-viewer.css",
+      "content": "/* ── json-viewer: generated from packages/react/src/components/json-viewer.tsx ── */\n.rs-json-viewer{display:grid;gap:1rem;width:100%;min-width:0;color:var(--text)}\n.rs-json-viewer-tools{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-json-viewer-body{padding:1rem;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45}\n.rs-json-viewer-summary{min-height:var(--hit);align-content:center;cursor:pointer;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}\n.rs-json-viewer-children{padding-inline-start:1rem}\n.rs-json-viewer-value{min-height:2rem;align-content:center;margin:0}\n.rs-json-viewer-note{color:var(--text-secondary);font-family:inherit}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/json-viewer.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-json-viewer",
+        "rs-json-viewer-tools",
+        "rs-json-viewer-body",
+        "rs-json-viewer-summary",
+        "rs-json-viewer-children",
+        "rs-json-viewer-value",
+        "rs-json-viewer-note"
+      ],
+      "snippet": "<div class=\"rs-json-viewer\" role=\"region\" aria-label=\"Vehicle data\"><div class=\"rs-json-viewer-body\"><details open><summary class=\"rs-json-viewer-summary\">vehicle: Object</summary><div class=\"rs-json-viewer-children\"><p class=\"rs-json-viewer-value\">range: 386</p></div></details></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "input",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "JSONViewer"
+      ],
+      "example": "import { JSONViewer } from \"@noorddev/vlak-react\";\n\n<JSONViewer label=\"Vehicle data\" data={{ vehicle: { range: 386, battery: 84 }, connected: true }} />",
+      "usage": {
+        "use": [
+          "Inspecting API responses, configuration, and nested records."
+        ],
+        "avoid": [
+          "Editing structured data; use a form or editor."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches search, expand/collapse controls, and summaries; Enter or Space toggles a disclosure."
+        }
+      ],
+      "a11y": [
+        "Uses native details rather than a partial tree role. Depth, entry, total node, and string length limits disclose truncation; circular references are labeled. Inspection does not invoke getters. Search covers the displayed, bounded data."
+      ]
+    }
+  }
+}

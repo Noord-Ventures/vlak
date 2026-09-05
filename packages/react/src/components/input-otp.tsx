@@ -6,8 +6,15 @@ import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useFieldControl } from "./field";
 
-export interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange"> {
+export interface InputOTPProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue"> {
   length?: number;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (code: string) => void;
+  name?: string;
+  disabled?: boolean;
+  readOnly?: boolean;
+  /** @deprecated Use onValueChange. */
   onChange?: (code: string) => void;
   /** Called once every cell is filled. */
   onComplete?: (code: string) => void;
@@ -24,8 +31,9 @@ const styles = stylex.create({
     },
   },
   cell: {
+    boxSizing: "border-box",
     width: {
-      default: "2.5rem",
+      default: vlak.hit,
       [mq.phone]: "auto",
     },
     flexGrow: {
@@ -33,8 +41,8 @@ const styles = stylex.create({
       [mq.phone]: 1,
     },
     minWidth: {
-      default: null,
-      [mq.phone]: vlak.radiusSm,
+      default: vlak.hit,
+      [mq.phone]: vlak.hit,
     },
     height: {
       default: "3rem",
@@ -61,7 +69,7 @@ const styles = stylex.create({
     },
     borderRadius: {
       default: vlak.radiusSm,
-      [mq.phone]: 0,
+      [mq.phone]: vlak.radiusSm,
     },
     outlineWidth: {
       default: 0,
@@ -89,7 +97,13 @@ const styles = stylex.create({
 
 /** One cell per character. Auto-advance, backspace, paste. */
 export const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(function InputOTP({
-  length = 6,
+  length: requestedLength = 6,
+  value,
+  defaultValue = "",
+  onValueChange,
+  name,
+  disabled = false,
+  readOnly = false,
   onChange,
   onComplete,
   className,
@@ -97,16 +111,23 @@ export const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(function
   "aria-label": ariaLabel = "One-time code",
   ...props
 }, ref) {
-  const [chars, setChars] = React.useState<string[]>(() => Array(length).fill(""));
+  const length = Number.isFinite(requestedLength) ? Math.max(1, Math.min(12, Math.floor(requestedLength))) : 6;
+  const normalize = (code: string) => Array.from({ length }, (_, i) => code.replace(/\D/g, "")[i] ?? "");
+  const [inner, setChars] = React.useState<string[]>(() => normalize(defaultValue));
+  const chars = value === undefined ? Array.from({ length }, (_, i) => inner[i] ?? "") : normalize(value);
+  const lastComplete = React.useRef<string | undefined>(undefined);
   const refs = React.useRef<Array<HTMLInputElement | null>>([]);
   const field = useFieldControl(props);
   const invalid = field.invalid;
 
   const commit = (next: string[]) => {
-    setChars(next);
+    if (disabled || readOnly) return;
+    if (value === undefined) setChars(next);
     const code = next.join("");
+    onValueChange?.(code);
     onChange?.(code);
-    if (code.length === length) onComplete?.(code);
+    if (code.length === length && lastComplete.current !== code) onComplete?.(code);
+    lastComplete.current = code.length === length ? code : undefined;
   };
 
   const setAt = (index: number, value: string) => {
@@ -137,6 +158,7 @@ export const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(function
       {...props}
       aria-describedby={field["aria-describedby"]}
     >
+      {name && <input type="hidden" name={name} value={chars.join("")} disabled={disabled} />}
       {chars.map((char, index) => (
         <input
           key={index}
@@ -144,6 +166,8 @@ export const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(function
             refs.current[index] = el;
           }}
           inputMode="numeric"
+          disabled={disabled}
+          readOnly={readOnly}
           autoComplete={index === 0 ? "one-time-code" : "off"}
           maxLength={1}
           value={char}
@@ -151,6 +175,7 @@ export const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(function
           aria-invalid={field["aria-invalid"]}
           className={cell.className}
           style={cell.style}
+          onFocus={(e) => e.currentTarget.select()}
           onChange={(e) => {
             const value = e.target.value.replace(/\D/g, "");
             if (value.length > 1) {
@@ -161,7 +186,9 @@ export const InputOTP = React.forwardRef<HTMLDivElement, InputOTPProps>(function
             if (value) refs.current[index + 1]?.focus();
           }}
           onKeyDown={(e) => {
+            if (readOnly || disabled) return;
             if (e.key === "Backspace" && !chars[index] && index > 0) {
+              e.preventDefault();
               refs.current[index - 1]?.focus();
               setAt(index - 1, "");
             }

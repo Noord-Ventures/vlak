@@ -1,0 +1,12 @@
+/* ── master-detail: generated from packages/react/src/components/master-detail.tsx ── */
+.rs-master-detail{display:grid;grid-template-columns:minmax(12rem, 1fr) minmax(0, 2fr);gap:1.25rem;min-width:0;color:var(--text)}
+@media (max-width: 640px){.rs-master-detail{grid-template-columns:minmax(0, 1fr)}}
+.rs-master-detail-list{display:flex;flex-direction:column;gap:0.25rem;min-width:0}
+@media (max-width: 640px){.rs-master-detail-list-hidden,.rs-master-detail-panel-hidden{display:none}}
+.rs-master-detail-selected{background-color:var(--control-fill);font-weight:600}
+.rs-master-detail-button{display:flex;flex-direction:column;align-items:flex-start;gap:0.25rem;min-height:var(--hit);padding:0.75rem;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);font-family:inherit;font-size:1rem;text-align:start;cursor:pointer;outline-color:var(--text);outline-offset:-2px}
+.rs-master-detail-description{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;font-weight:400}
+.rs-master-detail-panel{min-width:0;overflow-wrap:anywhere}
+.rs-master-detail-title{font-size:1.25rem;line-height:1.2;margin-block:1rem;outline-color:var(--text);outline-offset:2px}
+.rs-master-detail-back{display:none;margin-bottom:1rem}
+@media (max-width: 640px){.rs-master-detail-back{display:block}}

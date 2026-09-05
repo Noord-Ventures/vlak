@@ -1,6 +1,6 @@
 # Workflow card
 
-Builds an ordered pipeline from draggable steps. 1px dashed frame, chips, and ghost add action.
+Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 
 Category: patterns  
 Name: `workflow`  
@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/workflow.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-flow" style="grid-template-columns:184px;width:184px"><div class="rs-flow-step"><span class="rs-flow-num">1</span><h4>Proposal</h4><p>Scope, timeline, and fee on one page.</p><div class="rs-flow-subs"><span>Brief</span><span>Fee</span><span class="rs-flow-sub-add">+</span></div></div><button type="button" class="rs-flow-add"><span class="rs-flow-plus">+</span> Add a step</button></div>
+<div class="rs-flow" style="grid-template-columns:184px;width:184px"><div class="rs-flow-step"><span class="rs-flow-num">1</span><h3 class="rs-flow-title">Proposal</h3><p>Scope, timeline, and fee on one page.</p><div class="rs-flow-subs"><span>Brief</span><span>Fee</span><span class="rs-flow-sub-add">+</span></div></div><button type="button" class="rs-flow-add"><span class="rs-flow-plus">+</span> Add a step</button></div>
 ```
 
 ## Example
@@ -161,7 +161,7 @@ No props of its own.
 
 ## Accessibility
 
-- FlowAdd is a native <button>; FlowTitle is an <h4>. FlowSubAdd is a <span>: wrap it in a button when it acts.
+- FlowAdd is a native <button>; FlowTitle is an <h3>. FlowSubAdd is a <span>: wrap it in a button when it acts. FlowStep is presentational and is not draggable by itself.
 
 ## Classes
 

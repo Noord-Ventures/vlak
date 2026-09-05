@@ -10,4 +10,4 @@
 @media (max-width: 480px){.rs-icon-cell{width:100%}}
 .rs-icon-pair{display:flex;align-items:center;gap:1rem;min-height:1.5rem}
 .rs-icon-kin{display:flex;align-items:center;gap:0.5rem;min-height:1.5rem}
-.rs-icon-label{font-size:0.6875rem;line-height:1.3;color:var(--text-secondary);text-transform:none}
+.rs-icon-label{margin:0;font-size:0.6875rem;line-height:1.3;color:var(--text-secondary);text-transform:none}

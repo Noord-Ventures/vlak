@@ -68,9 +68,9 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Av
   { src, alt, name, initials, size = "md", className, style, ...props },
   ref,
 ) {
-  const [failed, setFailed] = React.useState(false);
+  const [failedSrc, setFailedSrc] = React.useState<string>();
   const inRow = React.useContext(AvatarRowContext);
-  const showImage = src && !failed;
+  const showImage = src && src !== failedSrc;
   const altText = alt ?? name ?? initials ?? "";
   const sx = rs(["rs-avatar", size === "sm" && "rs-avatar-sm", size === "lg" && "rs-avatar-lg", className, inRow && "rs-avatar-in-row"], styles.avatar, size === "sm" && styles.sm, size === "lg" && styles.lg, inRow && styles.inRow);
   const img = rs(["rs-avatar-image"], styles.image);
@@ -79,7 +79,7 @@ export const Avatar = React.forwardRef<HTMLSpanElement, AvatarProps>(function Av
   return (
     <span ref={ref} {...named} {...props} className={sx.className} style={{ ...sx.style, ...style }}>
       {showImage ? (
-        <img className={img.className} style={img.style} src={src} alt={altText} onError={() => setFailed(true)} />
+        <img className={img.className} style={img.style} src={src} alt={altText} onError={() => setFailedSrc(src)} />
       ) : (
         initials
       )}

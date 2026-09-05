@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import dynamic from "next/dynamic";
-import { Badge, Button, Card, CardBody, CardLabel, CardTitle, Icon, Item, Progress, ToggleGroup } from "@noorddev/vlak-react";
+import { Badge, Button, Card, CardBody, CardLabel, CardTitle, Icon, Item, Progress, ToggleGroup, CanvasControls, TreeView, PropertyGrid, DescriptionList } from "@noorddev/vlak-react";
 import { WallpaperGenerator } from "./wallpaper-generator";
 import { Drive } from "./drive";
 
@@ -16,6 +16,7 @@ function Render() {
   const [wireframe, setWireframe] = React.useState(false);
   const [material, setMaterial] = React.useState<"clay" | "graphite">("clay");
   const [view, setView] = React.useState(0);
+  const [inspector, setInspector] = React.useState("surface");
   const [status, setStatus] = React.useState<"loading" | "ready" | "error">("loading");
   const [reducedMotion, setReducedMotion] = React.useState(false);
   React.useEffect(() => {
@@ -40,10 +41,9 @@ function Render() {
       <div className="cx-timeline"><Button variant="ghost" disabled={!ready || reducedMotion} aria-label={playing ? "Pause turntable" : "Play turntable"} onClick={() => setRotating(!rotating)}><Icon name={playing ? "pause" : "play"} size={12}/></Button><span>Turntable</span><i/><span>{status === "loading" ? "Loading model" : status === "error" ? "Unavailable" : reducedMotion ? "Reduced motion" : playing ? "Playing" : "Paused"}</span></div>
     </div>
     <aside>
-      <p className="cx-label">Model</p><b>Vehicle study 01</b>
-      <dl><div><dt>Triangles</dt><dd>204,461</dd></div><div><dt>Vertices</dt><dd>114,716</dd></div><div><dt>Materials</dt><dd>21</dd></div></dl>
-      <p className="cx-label">Body material</p>
-      <Button variant="ghost" disabled={!ready} className="cx-row" onClick={() => setMaterial(material === "clay" ? "graphite" : "clay")}><i className={"cx-swatch " + material}/>{material === "clay" ? "Warm clay" : "Graphite"}<Icon name="refresh" size={12}/></Button>
+      <TreeView label="Model inspector" value={inspector} onValueChange={setInspector} defaultExpanded={["vehicle"]} nodes={[{ id: "vehicle", label: "Vehicle study 01", children: [{ id: "surface", label: "Surface" }, { id: "viewport", label: "Viewport" }] }]} />
+      <DescriptionList items={[{ id: "triangles", label: "Triangles", value: "204,461" }, { id: "vertices", label: "Vertices", value: "114,716" }, { id: "materials", label: "Materials", value: "21" }]} />
+      <PropertyGrid label={inspector === "viewport" ? "Viewport" : "Surface"} value={{ material, wireframe, rotating }} onValueChange={(values) => { setMaterial(values.material === "graphite" ? "graphite" : "clay"); setWireframe(Boolean(values.wireframe)); setRotating(Boolean(values.rotating)); }} fields={inspector === "viewport" ? [{ id: "wireframe", label: "Show mesh", type: "switch", disabled: !ready }, { id: "rotating", label: "Auto-rotate", type: "switch", disabled: !ready || reducedMotion }] : [{ id: "material", label: "Body material", type: "select", disabled: !ready, options: [{ value: "clay", label: "Warm clay" }, { value: "graphite", label: "Graphite" }] }]} />
       <p className="cx-panel-hint">Inspect the full vehicle mesh, change the paint, or drag to orbit. The turntable pauses while you use the viewer.</p>
     </aside>
   </div>;
@@ -58,6 +58,7 @@ const assets = [
 const layers = ["True colour", "Moisture", "Thermal"] as const;
 
 function Orbit() {
+  const [zoom, setZoom] = React.useState(1);
   const [layer, setLayer] = React.useState<(typeof layers)[number]>("True colour");
   const [selected, setSelected] = React.useState(0);
   const [queued, setQueued] = React.useState<string[]>([]);
@@ -67,10 +68,13 @@ function Orbit() {
     <header><span>European Observation Network</span><Button size="sm" disabled={isQueued} onClick={() => setQueued([...queued, asset.name])}><Icon name={isQueued ? "check" : "camera"} size={12}/>{isQueued ? "Capture queued" : "Queue capture"}</Button></header>
     <aside aria-label="Observation assets"><p className="cx-label">Assets</p>{assets.map((item, index) => <Button variant="ghost" aria-pressed={selected === index} className={`cx-orbit-asset${selected === index ? " on" : ""}`} key={item.name} onClick={() => setSelected(index)}><span><i className={selected === index ? "live" : ""}/>{item.name}</span><small>{queued.includes(item.name) ? "Capture queued" : item.region}</small></Button>)}</aside>
     <div className="cx-workspace" data-layer={layer.toLowerCase().replace(" ", "-")} data-asset={selected}>
+      <div className="cx-orbit-visual" style={{ transform: `scale(${zoom})` }}>
       <img src="/interfaces/concepts/europe-observation-v1.jpg" alt={"Illustrative " + layer.toLowerCase() + " observation of Western Europe"}/>
       <div className="cx-orbit-grid"/><svg className="cx-pass-track" viewBox="0 0 600 560" aria-hidden="true"><path d="M-30 530 C 120 410, 190 390, 270 280 S 430 135, 640 40"/><circle cx="270" cy="280" r="5"/><circle cx="435" cy="134" r="4"/></svg><div className="cx-sweep"/><div className="cx-target cx-target-a"/><div className="cx-target cx-target-b"/><div className="cx-reticle"/>
-      <div className="cx-coords"><i/>{asset.name}<br/>{asset.coords}<br/>Simulated pass · 10 m / px</div>
+      </div>
+      <div className="cx-coords"><i/>{asset.name}<br/>{asset.coords}<br/>Simulated pass · {Math.round(10 / zoom)} m / px</div>
       <ToggleGroup className="cx-layers" aria-label="Observation layer" value={layer} onValueChange={(value) => setLayer(value as (typeof layers)[number])} options={layers.map((value) => ({ value, label: value }))}/>
+      <CanvasControls className="cx-orbit-controls" zoom={zoom} onZoomChange={setZoom} minZoom={1} maxZoom={2.5} step={0.25} label="Observation view controls" />
     </div>
     <Card className="cx-orbit-inspector" role="region" aria-label={`${asset.name} pass details`}>
       <CardLabel>{asset.name}</CardLabel>

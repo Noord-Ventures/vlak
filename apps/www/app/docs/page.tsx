@@ -169,7 +169,7 @@ export default function DocsPage() {
           <a className="rs-link" href="/components">
             Components
           </a>
-          : all 74, with props, keyboard, and markup.
+          : every component, with props, keyboard, and markup.
         </li>
       </ul>
     </DocsShell>

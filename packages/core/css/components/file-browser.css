@@ -1,0 +1,20 @@
+/* ── file-browser: generated from packages/react/src/components/file-browser.tsx ── */
+.rs-file-browser{display:flex;flex-direction:column;width:100%;min-width:0;gap:1rem;color:var(--text)}
+.rs-file-browser-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.rs-file-browser-path{display:flex;align-items:center;flex-wrap:wrap;gap:0.25rem;list-style-type:none;padding:0;margin:0}
+.rs-file-browser-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem}
+.rs-file-browser-view-active{background-color:var(--control-fill);font-weight:600}
+.rs-file-browser-body{display:grid;grid-template-columns:minmax(10rem, 1fr) minmax(0, 3fr);gap:1rem;min-width:0}
+@media (max-width: 640px){.rs-file-browser-body{grid-template-columns:minmax(0, 1fr)}}
+.rs-file-browser-tree{min-width:0;border-inline-end-width:1px;border-inline-end-style:solid;border-inline-end-color:var(--divider);padding-inline-end:0.75rem}
+.rs-file-browser-content{min-width:0;display:flex;flex-direction:column;gap:0.75rem}
+.rs-file-browser-list{list-style-type:none;padding:0;margin:0;display:grid;grid-template-columns:minmax(0, 1fr);gap:0.5rem}
+.rs-file-browser-grid{grid-template-columns:repeat(auto-fill, minmax(8rem, 1fr))}
+.rs-file-browser-item{display:flex;gap:0.75rem;align-items:center;width:100%;min-width:0;min-height:var(--hit);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding:0.75rem;background-color:transparent;color:var(--text);text-align:start;font-family:inherit;font-size:0.875rem;cursor:pointer}
+.rs-file-browser-item:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+.rs-file-browser-item:disabled{color:var(--text-secondary);cursor:not-allowed}
+.rs-file-browser-tile{flex-direction:column;align-items:flex-start;min-height:7.5rem}
+.rs-file-browser-selected{background-color:var(--control-fill);font-weight:600}
+.rs-file-browser-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
+.rs-file-browser-meta{color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45}
+.rs-file-browser-empty{margin:0;padding-block:1rem;color:var(--text-secondary);line-height:1.45}

@@ -1,0 +1,4 @@
+/* ── toolbar: generated from packages/react/src/components/toolbar.tsx ── */
+.rs-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text)}
+.rs-toolbar-vertical{flex-direction:column;align-items:stretch}
+.rs-toolbar-pressed{font-weight:600}

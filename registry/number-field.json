@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "number-field",
+  "type": "registry:component",
+  "title": "Number field",
+  "description": "Edits a numeric value with native validation, units, and bounded 44px increase and decrease actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/number-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Button } from \"./button\";\nimport { Input } from \"./input\";\n\nexport interface NumberFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\" | \"size\" | \"min\" | \"max\" | \"step\"> {\n  value?: number | null;\n  defaultValue?: number | null;\n  onValueChange?: (value: number | null) => void;\n  min?: number;\n  max?: number;\n  step?: number;\n  label?: React.ReactNode;\n  unit?: string;\n  incrementLabel?: string;\n  decrementLabel?: string;\n  /** Stack the increase button above decrease at the end of the field. */\n  controlsPlacement?: \"inline\" | \"stacked\";\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  label: { color: vlak.gray, fontSize: vlak.controlLabel },\n  row: { display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", minWidth: 0 },\n  input: { minWidth: 0, flex: \"1 1 5rem\", fontVariantNumeric: \"tabular-nums\" },\n  unit: { color: vlak.gray, fontSize: vlak.controlFs },\n  controls: { display: \"flex\", gap: \"0.5rem\", flexShrink: 0 },\n  stacked: { flexDirection: \"column\" },\n  action: { width: vlak.hit, minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: 0, flex: \"0 0 auto\" },\n});\n\n/** Numeric input with native validation and bounded increment/decrement actions. */\nexport const NumberField = React.forwardRef<HTMLInputElement, NumberFieldProps>(function NumberField({\n  value, defaultValue = null, onValueChange, min, max, step = 1, label, unit,\n  incrementLabel = \"Increase value\", decrementLabel = \"Decrease value\", controlsPlacement = \"inline\", id,\n  disabled, readOnly, className, style, ...props\n}, ref) {\n  const generated = React.useId();\n  const inputId = id ?? generated;\n  const [current, setValue, inputRef] = useInputValue<number | null, HTMLInputElement>(value, defaultValue, onValueChange);\n  const mergedRef = useMergedRefs(ref, inputRef);\n  const move = (direction: -1 | 1) => {\n    const native = inputRef.current;\n    if (native) {\n      const previous = native.value;\n      try {\n        // Native stepping snaps off-grid values and handles an initially empty field.\n        // Restore before emitting so a controlled caller can reject the change.\n        native.stepUp(direction);\n        const next = native.valueAsNumber;\n        native.value = previous;\n        if (Number.isFinite(next)) { setValue(next); return; }\n      } catch { native.value = previous; }\n    }\n    const stride = Number.isFinite(step) && step > 0 ? step : 1;\n    const next = Number(((current ?? min ?? 0) + direction * stride).toFixed(10));\n    setValue(Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, next)));\n  };\n  const root = rs([\"rs-number-field\", className], styles.root);\n  const lab = rs([\"rs-number-field-label\"], styles.label);\n  const row = rs([\"rs-number-field-row\"], styles.row);\n  const input = rs([\"rs-number-field-input\"], styles.input);\n  const suffix = rs([\"rs-number-field-unit\"], styles.unit);\n  const action = rs([\"rs-number-field-action\"], styles.action);\n  const stacked = controlsPlacement === \"stacked\";\n  const controls = rs([\"rs-number-field-controls\", stacked && \"rs-number-field-controls-stacked\"], styles.controls, stacked && styles.stacked);\n  const decrement = <Button key=\"decrease\" variant=\"ghost\" className={action.className} style={action.style} disabled={disabled || readOnly || (min != null && current != null && current <= min)} aria-label={decrementLabel} aria-controls={inputId} onClick={() => move(-1)}>−</Button>;\n  const increment = <Button key=\"increase\" variant=\"ghost\" className={action.className} style={action.style} disabled={disabled || readOnly || (max != null && current != null && current >= max)} aria-label={incrementLabel} aria-controls={inputId} onClick={() => move(1)}>+</Button>;\n  return <div className={root.className} style={{ ...root.style, ...style }}>\n    {label != null && <label htmlFor={inputId} className={lab.className} style={lab.style}>{label}</label>}\n    <div className={row.className} style={row.style}>\n      <Input {...props} ref={mergedRef} id={inputId} plain type=\"number\" inputMode=\"decimal\" value={current ?? \"\"} min={min} max={max} step={step} disabled={disabled} readOnly={readOnly} className={input.className} style={input.style} aria-describedby={[props[\"aria-describedby\"], unit ? `${inputId}-unit` : null].filter(Boolean).join(\" \") || undefined} onChange={(event) => setValue(Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null)} />\n      {unit && <span id={`${inputId}-unit`} className={suffix.className} style={suffix.style}>{unit}</span>}\n      <div className={controls.className} style={controls.style}>{stacked ? [increment, decrement] : [decrement, increment]}</div>\n    </div>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/number-field.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/number-field.css",
+      "content": "/* ── number-field: generated from packages/react/src/components/number-field.tsx ── */\n.rs-number-field{display:grid;gap:0.5rem;min-width:0}\n.rs-number-field-label{color:var(--text-secondary);font-size:var(--control-label)}\n.rs-number-field-row{display:flex;align-items:center;gap:0.5rem;min-width:0}\n.rs-number-field-input{min-width:0;flex:1 1 5rem;font-variant-numeric:tabular-nums}\n.rs-number-field-unit{color:var(--text-secondary);font-size:var(--control-fs)}\n.rs-number-field-controls{display:flex;gap:0.5rem;flex-shrink:0}\n.rs-number-field-controls-stacked{flex-direction:column}\n.rs-number-field-action{width:var(--hit);min-width:var(--hit);min-height:var(--hit);padding-inline:0;flex:0 0 auto}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/number-field.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-number-field",
+        "rs-number-field-label",
+        "rs-number-field-row",
+        "rs-number-field-input",
+        "rs-number-field-unit",
+        "rs-number-field-action",
+        "rs-number-field-controls",
+        "rs-number-field-controls-stacked"
+      ],
+      "snippet": "<div class=\"rs-number-field\"><label class=\"rs-number-field-label\" for=\"cabin-temperature\">Cabin temperature</label><div class=\"rs-number-field-row\"><input class=\"rs-input rs-number-field-input\" id=\"cabin-temperature\" type=\"number\" min=\"16\" max=\"28\" value=\"20\" aria-describedby=\"cabin-unit\" /><span class=\"rs-number-field-unit\" id=\"cabin-unit\">°C</span><div class=\"rs-number-field-controls\"><button class=\"rs-btn-ghost rs-number-field-action\" type=\"button\" aria-label=\"Decrease value\">−</button><button class=\"rs-btn-ghost rs-number-field-action\" type=\"button\" aria-label=\"Increase value\">+</button></div></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "NumberField",
+        "Number input",
+        "Numeric stepper",
+        "Quantity field"
+      ],
+      "example": "import { NumberField } from \"@noorddev/vlak-react\";\n\n<NumberField label=\"Cabin temperature\" name=\"temperature\" defaultValue={20} min={16} max={28} step={0.5} unit=\"°C\" controlsPlacement=\"stacked\" />",
+      "usage": {
+        "use": [
+          "Numeric quantities that need visible stepping, native bounds, or a unit.",
+          "Stacked controls when increase belongs above decrease at the end of a reading."
+        ],
+        "avoid": [
+          "A continuous interval with two endpoints; use RangeSlider.",
+          "Codes and identifiers, which may have leading zeroes; use Input."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between the number field and available step actions."
+        },
+        {
+          "keys": "Arrow up, Arrow down",
+          "does": "Uses the browser's native numeric stepping while the input is focused."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates a focused increase or decrease button."
+        }
+      ],
+      "a11y": [
+        "The forwarded ref reaches the native number input; label, native form attributes, and name reach that input.",
+        "min, max, and step use native validity. The buttons clamp at bounds; typed values retain native validation feedback.",
+        "A cleared field reports null. value/defaultValue/onValueChange support controlled and uncontrolled use; form reset restores uncontrolled defaults.",
+        "The unit is linked as a description. Each step action has a name and a 44px target."
+      ]
+    }
+  }
+}

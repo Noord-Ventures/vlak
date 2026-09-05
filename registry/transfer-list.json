@@ -1,0 +1,98 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "transfer-list",
+  "type": "registry:component",
+  "title": "Transfer list",
+  "description": "Assigns options between available and selected lists using native checkboxes and explicit move actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/checkbox.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/transfer-list.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Checkbox } from \"./checkbox\";\nimport { Button } from \"./button\";\n\nexport interface TransferListOption { value: string; label: string; disabled?: boolean }\nexport interface TransferListProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\"> {\n  options: TransferListOption[];\n  value?: string[];\n  defaultValue?: string[];\n  onValueChange?: (value: string[]) => void;\n  label?: React.ReactNode;\n  availableLabel?: string;\n  selectedLabel?: string;\n  addLabel?: string;\n  removeLabel?: string;\n  emptyLabel?: string;\n}\n\nconst styles = stylex.create({\n  root: { borderWidth: 0, padding: 0, margin: 0, minWidth: 0 },\n  legend: { fontSize: vlak.controlLabel, color: vlak.gray, marginBottom: \"0.75rem\", padding: 0 },\n  columns: { display: \"grid\", gridTemplateColumns: { default: \"minmax(0, 1fr) auto minmax(0, 1fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem\", alignItems: \"center\" },\n  panel: { minWidth: 0, margin: 0, padding: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, alignSelf: \"stretch\" },\n  heading: { paddingInline: \"0.25rem\", fontSize: vlak.controlFs, color: vlak.ink },\n  list: { display: \"grid\", gap: \"0.25rem\", minHeight: \"8.25rem\", alignContent: \"start\", maxHeight: \"22rem\", overflowY: \"auto\" },\n  item: { minHeight: vlak.hit, display: \"flex\", alignItems: \"center\", paddingInline: \"0.25rem\" },\n  actions: { display: \"grid\", gap: \"0.5rem\" },\n  action: { width: \"auto\" },\n  empty: { margin: 0, color: vlak.gray, fontSize: vlak.controlFs },\n  status: { margin: \"0.75rem 0 0\", color: vlak.gray, fontSize: vlak.controlLabel },\n});\n\nexport const TransferList = React.forwardRef<HTMLFieldSetElement, TransferListProps>(function TransferList({\n  options, value, defaultValue = [], onValueChange, label = \"Assign options\", availableLabel = \"Available\", selectedLabel = \"Selected\", addLabel = \"Add selected\", removeLabel = \"Remove selected\", emptyLabel = \"No options\", name, disabled, className, style, ...props\n}, ref) {\n  const [current, setValue, fieldRef] = useInputValue<string[], HTMLFieldSetElement>(value, defaultValue, onValueChange, () => setMarked([]));\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const [marked, setMarked] = React.useState<string[]>([]);\n  const available = options.filter((option) => !current.includes(option.value));\n  const selected = current.map((entry) => options.find((option) => option.value === entry) ?? { value: entry, label: `${entry} (unavailable)` });\n  const chosenAvailable = available.filter((option) => marked.includes(option.value) && !option.disabled);\n  const chosenSelected = selected.filter((option) => marked.includes(option.value) && !option.disabled);\n  const root = rs([\"rs-transfer-list\", className], styles.root);\n  const legend = rs([\"rs-transfer-list-legend\"], styles.legend);\n  const columns = rs([\"rs-transfer-list-columns\"], styles.columns);\n  const panel = rs([\"rs-transfer-list-panel\"], styles.panel);\n  const heading = rs([\"rs-transfer-list-heading\"], styles.heading);\n  const list = rs([\"rs-transfer-list-options\"], styles.list);\n  const item = rs([\"rs-transfer-list-item\"], styles.item);\n  const actions = rs([\"rs-transfer-list-actions\"], styles.actions);\n  const action = rs([\"rs-transfer-list-action\"], styles.action);\n  const empty = rs([\"rs-transfer-list-empty\"], styles.empty);\n  const status = rs([\"rs-transfer-list-status\"], styles.status);\n  const renderPanel = (title: string, entries: TransferListOption[]) => <fieldset className={panel.className} style={panel.style}><legend className={heading.className} style={heading.style}>{title} ({entries.length})</legend><div className={list.className} style={list.style}>\n    {entries.map((option) => <div key={option.value} className={item.className} style={item.style}><Checkbox label={option.label} disabled={disabled || option.disabled} checked={marked.includes(option.value)} onChange={(event) => { const checked = event.currentTarget.checked; setMarked((previous) => checked ? [...previous, option.value] : previous.filter((entry) => entry !== option.value)); }} /></div>)}\n    {!entries.length && <p className={empty.className} style={empty.style}>{emptyLabel}</p>}\n  </div></fieldset>;\n  return <fieldset {...props} ref={mergedRef} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    <div className={columns.className} style={columns.style}>{renderPanel(availableLabel, available)}<div className={actions.className} style={actions.style}>\n      <Button variant=\"ghost\" disabled={disabled || !chosenAvailable.length} className={action.className} style={action.style} onClick={() => { setValue([...current, ...chosenAvailable.map((option) => option.value)]); setMarked([]); }}>{addLabel}</Button>\n      <Button variant=\"ghost\" disabled={disabled || !chosenSelected.length} className={action.className} style={action.style} onClick={() => { setValue(current.filter((entry) => !chosenSelected.some((option) => option.value === entry))); setMarked([]); }}>{removeLabel}</Button>\n    </div>{renderPanel(selectedLabel, selected)}</div>\n    <p role=\"status\" className={status.className} style={status.style}>{selected.length} selected</p>\n    {name && current.map((entry) => <input type=\"hidden\" key={entry} name={name} value={entry} disabled={disabled} />)}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/transfer-list.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/transfer-list.css",
+      "content": "/* ── transfer-list: generated from packages/react/src/components/transfer-list.tsx ── */\n.rs-transfer-list{border-width:0;padding:0;margin:0;min-width:0}\n.rs-transfer-list-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.75rem;padding:0}\n.rs-transfer-list-columns{display:grid;grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr);gap:0.75rem;align-items:center}\n@media (max-width: 640px){.rs-transfer-list-columns{grid-template-columns:minmax(0, 1fr)}}\n.rs-transfer-list-panel{min-width:0;margin:0;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);align-self:stretch}\n.rs-transfer-list-heading{padding-inline:0.25rem;font-size:var(--control-fs);color:var(--text)}\n.rs-transfer-list-options{display:grid;gap:0.25rem;min-height:8.25rem;align-content:start;max-height:22rem;overflow-y:auto}\n.rs-transfer-list-item{min-height:var(--hit);display:flex;align-items:center;padding-inline:0.25rem}\n.rs-transfer-list-actions{display:grid;gap:0.5rem}\n.rs-transfer-list-action{width:auto}\n.rs-transfer-list-empty{margin:0;color:var(--text-secondary);font-size:var(--control-fs)}\n.rs-transfer-list-status{margin:0.75rem 0 0;color:var(--text-secondary);font-size:var(--control-label)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/transfer-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-transfer-list",
+        "rs-transfer-list-legend",
+        "rs-transfer-list-columns",
+        "rs-transfer-list-panel",
+        "rs-transfer-list-heading",
+        "rs-transfer-list-options",
+        "rs-transfer-list-item",
+        "rs-transfer-list-actions",
+        "rs-transfer-list-action",
+        "rs-transfer-list-empty",
+        "rs-transfer-list-status"
+      ],
+      "snippet": "<fieldset class=\"rs-transfer-list\"><legend class=\"rs-transfer-list-legend\">Assign cities</legend><div class=\"rs-transfer-list-columns\"><fieldset class=\"rs-transfer-list-panel\"><legend class=\"rs-transfer-list-heading\">Available</legend><label class=\"rs-transfer-list-item\"><input type=\"checkbox\" /> Alkmaar</label></fieldset><div class=\"rs-transfer-list-actions\"><button class=\"rs-btn-ghost\" type=\"button\">Add selected</button><button class=\"rs-btn-ghost\" type=\"button\">Remove selected</button></div><fieldset class=\"rs-transfer-list-panel\"><legend class=\"rs-transfer-list-heading\">Selected</legend><p class=\"rs-transfer-list-empty\">No options</p></fieldset></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "checkbox",
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "TransferList",
+        "Dual listbox",
+        "Assignment lists"
+      ],
+      "example": "import { TransferList } from \"@noorddev/vlak-react\";\n\n<TransferList label=\"Coverage areas\" name=\"areas\" options={[{ value: \"alkmaar\", label: \"Alkmaar\" }, { value: \"bergen\", label: \"Bergen\" }, { value: \"castricum\", label: \"Castricum\" }]} defaultValue={[\"alkmaar\"]} />",
+      "usage": {
+        "use": [
+          "Assigning a visible subset from a manageable option list.",
+          "Work where available and assigned options should stay visible together."
+        ],
+        "avoid": [
+          "Very large lists; use searchable MultiSelect.",
+          "Ordering selected records; use SortableList."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Space",
+          "does": "Moves through and marks native checkbox options."
+        },
+        {
+          "keys": "Enter, Space on a move action",
+          "does": "Adds or removes the marked options; marked state clears after the move."
+        }
+      ],
+      "a11y": [
+        "A top-level fieldset names the task; available and selected lists have distinct legends and counts.",
+        "Every option and move action has a 44px target. Disabled options stay fixed; unavailable moves are disabled.",
+        "The selected count is a polite status. Hidden fields submit each selected value under name.",
+        "The ref reaches the fieldset. Form reset restores uncontrolled values and clears marked options."
+      ]
+    }
+  }
+}

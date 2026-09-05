@@ -1,83 +1,19 @@
-/**
- * Vlak concentric radius.
- *
- * Steve Ruiz’s innerRadius: sample the −padding isosurface of a circular
- * corner SDF, then fit a circle whose center stays at the known concentric
- * center. The initial guess R = outerRadius is the wrong answer (copying the
- * outer radius onto the inner corner). Clamp at 0.
- *
- * https://x.com/steveruizok/status/2072651352908370013
- */
-
+/** The exact inner circle shares its outer circle's center. No iterative fitting is needed. */
 export interface InnerRadiusOptions {
-  /** Gradient-descent step size. */
+  /** @deprecated Retained for source compatibility; the exact solution needs no learning rate. */
   lr?: number;
-  /** Fit iterations. */
+  /** @deprecated Retained for source compatibility; the exact solution needs no iterations. */
   epochs?: number;
 }
 
-const STEVE = { lr: 0.1, epochs: 5000 } as const;
-const cache = new Map<string, number>();
-
-function clampRadius(value: number): number {
-  if (!Number.isFinite(value) || value <= 0) return 0;
-  const rounded = Math.round(value * 1e6) / 1e6;
-  const nearest = Math.round(rounded);
-  return Math.abs(rounded - nearest) < 1e-4 ? nearest : rounded;
-}
-
-/**
- * Perfect concentric inner radius for a circular corner of `outerRadius`
- * inset by `padding`.
- */
 export function innerRadius(
   outerRadius: number,
   padding: number,
-  { lr = STEVE.lr, epochs = STEVE.epochs }: InnerRadiusOptions = {},
+  _options: InnerRadiusOptions = {},
 ): number {
-  const key = `${outerRadius}:${padding}:${lr}:${epochs}`;
-  const hit = cache.get(key);
-  if (hit != null) return hit;
-
-  const result = computeInnerRadius(outerRadius, padding, lr, epochs);
-  cache.set(key, result);
-  return result;
-}
-
-function computeInnerRadius(outerRadius: number, padding: number, lr: number, epochs: number): number {
   if (!Number.isFinite(outerRadius) || outerRadius <= 0) return 0;
-  if (!Number.isFinite(padding) || padding <= 0) return clampRadius(outerRadius);
-  // The −padding isosurface of a disk of radius R only exists for padding < R.
-  if (padding >= outerRadius) return 0;
-
-  // SDF of a circular corner of radius R centered at (R, R).
-  const sdf = (x: number, y: number) => Math.hypot(x - outerRadius, y - outerRadius) - outerRadius;
-
-  // Sample the −padding level set along the corner's angular sweep.
-  const targets: Array<[number, number]> = [];
-  for (let t = Math.PI; t <= 1.5 * Math.PI; t += 0.01) {
-    // March along the ray from the corner center until sdf == −padding.
-    let r = outerRadius;
-    for (let i = 0; i < 100; i++) {
-      const x = outerRadius + r * Math.cos(t);
-      const y = outerRadius + r * Math.sin(t);
-      r -= sdf(x, y) + padding; // Newton-ish
-    }
-    targets.push([outerRadius + r * Math.cos(t), outerRadius + r * Math.sin(t)]);
-  }
-
-  // Fit a circle (center fixed at the known concentric center) to those points.
-  let R = outerRadius; // initial guess: the wrong answer
-  const n = targets.length;
-  for (let e = 0; e < epochs; e++) {
-    let grad = 0;
-    for (const [x, y] of targets) {
-      const d = Math.hypot(x - outerRadius, y - outerRadius);
-      grad += 2 * (R - d); // d/dR of (R − d)^2
-    }
-    R -= lr * (grad / n);
-  }
-  return clampRadius(R);
+  if (!Number.isFinite(padding) || padding <= 0) return outerRadius;
+  return Math.max(0, outerRadius - padding);
 }
 
 /** Nested inner radius: Steve’s innerRadius, clamped at 0. */

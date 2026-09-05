@@ -33,11 +33,11 @@ const styles = stylex.create({
     },
     boxSizing: "border-box",
     width: {
-      default: "1.625rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     height: {
-      default: "1.625rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     minWidth: {

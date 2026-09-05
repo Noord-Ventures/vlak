@@ -6,7 +6,7 @@
 @media (prefers-reduced-motion: reduce){.rs-carousel-track{scroll-behavior:auto}}
 .rs-carousel-nav{display:flex;gap:0.3125rem;margin-top:0.625rem}
 @media (max-width: 640px){.rs-carousel-nav{gap:0.5rem;margin-top:0.875rem}}
-.rs-page.rs-carousel-page{box-sizing:border-box;width:1.625rem;height:1.625rem;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.8125rem;color:var(--text-secondary);border-width:1px;border-style:solid;border-color:var(--control-border);padding:0;background-color:transparent;font-family:inherit;cursor:pointer}
+.rs-page.rs-carousel-page{box-sizing:border-box;width:var(--hit);height:var(--hit);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.8125rem;color:var(--text-secondary);border-width:1px;border-style:solid;border-color:var(--control-border);padding:0;background-color:transparent;font-family:inherit;cursor:pointer}
 .rs-page.rs-carousel-page:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (max-width: 640px){.rs-page.rs-carousel-page{width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);border-radius:var(--radius-sm);font-size:var(--control-fs)}}
 @media (forced-colors: active){.rs-page.rs-carousel-page{color:ButtonText;border-color:ButtonText}}

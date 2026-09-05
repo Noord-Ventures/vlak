@@ -1,6 +1,6 @@
 # Button
 
-Triggers an action. Solid primary or 1px ghost; 40px tall, 36px small.
+Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.
 
 Category: actions  
 Name: `button`  

@@ -1,0 +1,6 @@
+/* ── date-range-picker: generated from packages/react/src/components/date-range-picker.tsx ── */
+.rs-date-range-picker{min-width:0;border-width:0;margin:0;padding:0}
+.rs-date-range-picker-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.75rem;padding:0}
+.rs-date-range-picker-fields{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:0.75rem;min-width:0}
+@media (max-width: 480px){.rs-date-range-picker-fields{grid-template-columns:minmax(0, 1fr)}}
+.rs-date-range-picker-input{min-width:0;max-width:100%;box-sizing:border-box;color-scheme:inherit}

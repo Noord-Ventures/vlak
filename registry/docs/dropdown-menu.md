@@ -87,6 +87,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | Arrow down, Enter, Space | Opens the menu on the first item |
 | Arrow up | Opens the menu on the last item |
 | Arrow down, Arrow up | Moves between items and wraps |
+| Arrow right, Arrow left | Opens a child menu or returns to its parent; directions reverse in RTL |
 | Home, End | First or last item |
 | Type letters | Moves to the next item starting with them |
 | Enter, Space | Selects the item and closes |
@@ -98,10 +99,11 @@ Forwards `ref` to the `HTMLDivElement`.
 - The trigger is a <button> with aria-haspopup="menu", aria-expanded, and aria-controls; label is its name.
 - The panel is role="menu" labelled by the trigger; items are <button role="menuitem"> with one roving tab stop.
 - Disabled items carry aria-disabled and are skipped; separators are <hr>. A click outside closes without moving focus.
+- items opens a named nested menu. checked and onCheckedChange expose controlled menuitemcheckbox state. Escape returns to the immediate parent before closing the root menu.
 
 ## Classes
 
-`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`
+`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`, `rs-menu-nested`
 
 ## Dependencies
 

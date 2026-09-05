@@ -1,5 +1,5 @@
 /* ── radio: generated from packages/react/src/components/radio.tsx ── */
-.rs-radio{display:flex;align-items:center;gap:0.5625rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;min-height:1.5rem}
+.rs-radio{display:flex;align-items:center;gap:0.5625rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;min-height:var(--hit);min-width:var(--hit)}
 @media (max-width: 640px){.rs-radio{gap:0.75rem;font-size:1.0625rem;min-height:var(--hit)}}
 .rs-radio-dot{width:1rem;height:1rem;border-radius:50%;border-width:1.5px;border-style:solid;border-color:var(--control-border);position:relative;flex-shrink:0;box-sizing:border-box}
 @media (max-width: 640px){.rs-radio-dot{width:1.375rem;height:1.375rem}}

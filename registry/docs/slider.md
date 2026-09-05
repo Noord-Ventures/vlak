@@ -1,6 +1,6 @@
 # Slider
 
-Selects one value from a range. 2px track, 14px thumb, 24px hit area.
+Selects one value from a range. A fine track sits inside a 44px hit area.
 
 Category: forms  
 Name: `slider`  
@@ -91,7 +91,7 @@ Forwards `ref` to the `HTMLInputElement`.
 
 - A native <input type="range"> drives the ink track; the platform exposes value, min, and max.
 - It has no visible text; pass aria-label or aria-labelledby.
-- The 14px thumb sits on a 24px hit area and shows a focus ring on :focus-visible.
+- The visible thumb sits on a 44px hit area and shows a focus ring on :focus-visible.
 
 ## Classes
 

@@ -115,9 +115,10 @@ try {
   await page.goto(base + "/interfaces/frontier/", { waitUntil: "networkidle" });
   assert.notEqual(await page.locator(".cx-frontier-ring-a").evaluate(element => getComputedStyle(element).animationName), "none", "Frontier hero graphic should animate when motion is allowed");
   await page.goto(base + "/interfaces/drive/", { waitUntil: "networkidle" });
-  const valueTops = await page.locator(".cx-ev-panels .cx-ev-value").evaluateAll(elements => elements.map(element => Math.round(element.getBoundingClientRect().top)));
+  const valueTops = await page.locator(".cx-ev-panels .rs-metric-reading, .cx-ev-panels .rs-number-field-row").evaluateAll(elements => elements.map(element => Math.round(element.getBoundingClientRect().top)));
+  assert.equal(valueTops.length, 3, "Range, battery, and cabin use shared value tracks");
   assert.equal(new Set(valueTops).size, 1, `EV values should share one baseline, got ${valueTops.join(", ")}`);
-  const temperatureControls = await page.locator(".cx-ev-temp-controls button").evaluateAll(elements => elements.map(element => {
+  const temperatureControls = await page.locator(".cx-ev-cabin-field .rs-number-field-controls button").evaluateAll(elements => elements.map(element => {
     const box = element.getBoundingClientRect();
     return { top: box.top, left: box.left };
   }));

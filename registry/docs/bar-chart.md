@@ -9,8 +9,8 @@ Page: https://vlak.dev/components/bar-chart/
 
 ## When to use
 
-- Comparing categories; data for one series, series plus labels for several.
-- stacked when the series share a field; orientation="horizontal" for long labels.
+- Comparing categories; data for one series, series plus labels for up to four grouped series.
+- stacked separates positive and negative totals; orientation="horizontal" and inverted work with either grouping mode.
 
 ## When not to
 
@@ -111,6 +111,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - The plot is a focusable <svg role="group"> with aria-roledescription="interactive chart", named by aria-label, aria-labelledby, yLabel, or the series names.
 - A visually hidden table carries every value; the legend is aria-hidden because the table names the series.
+- Every series renders. Null and non-finite bars are omitted and read as No data; signed bars retain nonzero geometry when inverted.
 
 ## Classes
 

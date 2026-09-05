@@ -60,20 +60,21 @@ const styles = stylex.create({
     flexBasis: 0,
   },
   item: {
+    boxSizing: "border-box",
     transition: {
       default: vlak.transition,
       [mq.reduce]: "none",
     },
     display: {
-      default: "block",
+      default: "flex",
       [mq.phone]: "flex",
     },
     alignItems: {
-      default: null,
+      default: "center",
       [mq.phone]: "center",
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     paddingTop: {

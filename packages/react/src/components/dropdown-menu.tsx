@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
+import { useOverlayPosition } from "../use-overlay-position";
 
 import { Icon } from "./icon";
 
@@ -15,6 +16,11 @@ export interface DropdownMenuItem {
   onSelect?: () => void;
   disabled?: boolean;
   separator?: boolean;
+  /** Checked items use menuitemcheckbox semantics. */
+  checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  /** A nested action menu. A parent item opens its children rather than selecting. */
+  items?: DropdownMenuItem[];
 }
 
 export interface DropdownMenuProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -31,7 +37,7 @@ export const menuStyles = stylex.create({
     },
     minWidth: {
       default: "11.25rem",
-      [mq.phone]: vlak.radiusSm,
+      [mq.phone]: 0,
     },
     width: {
       default: null,
@@ -70,7 +76,7 @@ export const menuStyles = stylex.create({
     backgroundColor: "transparent",
     width: "100%",
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     outlineWidth: {
@@ -97,7 +103,7 @@ export const menuStyles = stylex.create({
     borderColor: vlak.divider,
     borderRadius: {
       default: vlak.radiusSm,
-      [mq.phone]: 0,
+      [mq.phone]: vlak.radiusSm,
     },
     marginTop: {
       default: "0.375rem",
@@ -175,7 +181,7 @@ export const menuStyles = stylex.create({
     backgroundColor: "transparent",
     fontFamily: "inherit",
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     /* The menu clips at its edge, so the ring sits inside the row. */
@@ -252,6 +258,8 @@ export interface MenuPanelProps {
   onHorizontal?: (dir: -1 | 1) => void;
   /** The `role="menu"` element, for outside-click checks. */
   panelRef?: React.Ref<HTMLDivElement>;
+  /** Internal nested-menu return action. */
+  onBack?: () => void;
 }
 
 /**
@@ -268,6 +276,7 @@ export function MenuPanel({
   onClose,
   onHorizontal,
   panelRef,
+  onBack,
 }: MenuPanelProps) {
   const actionable = items.filter((item) => !item.separator);
   const enabled = actionable.map((item, index) => (item.disabled ? -1 : index)).filter((i) => i >= 0);
@@ -275,28 +284,44 @@ export function MenuPanel({
     initial === "last" ? (enabled[enabled.length - 1] ?? 0) : (enabled[0] ?? 0),
   );
   const itemRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
+  const [submenu, setSubmenu] = React.useState<number | null>(null);
+  const subAnchor = React.useRef<HTMLButtonElement | null>(null);
+  subAnchor.current = submenu === null ? null : itemRefs.current[submenu] ?? null;
   const typed = React.useRef({ buffer: "", at: 0 });
   const typedTimer = React.useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   React.useEffect(() => {
-    itemRefs.current[active]?.focus();
-  }, [active]);
+    // A positioned popover mounts hidden while its bounds are measured.
+    // Browsers cannot focus its items until the visible commit has landed.
+    if (style?.visibility !== "hidden") itemRefs.current[active]?.focus();
+  }, [active, style?.visibility]);
 
   React.useEffect(() => () => clearTimeout(typedTimer.current), []);
 
   const choose = (item: DropdownMenuItem) => {
     if (item.disabled) return;
+    if (item.items?.length) { setSubmenu(actionable.indexOf(item)); return; }
     onClose("select");
+    if (item.checked !== undefined) item.onCheckedChange?.(!item.checked);
     item.onSelect?.();
   };
 
   const step = (dir: -1 | 1) => {
     if (enabled.length === 0) return;
+    setSubmenu(null);
     const pos = enabled.indexOf(active);
     setActive(enabled[(pos + dir + enabled.length) % enabled.length]!);
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if ((e.target as Element).closest('[role="menu"]') !== e.currentTarget) return;
+    const rtl = getComputedStyle(e.currentTarget).direction === "rtl";
+    const forward = rtl ? "ArrowLeft" : "ArrowRight";
+    const backward = rtl ? "ArrowRight" : "ArrowLeft";
+    if (e.key === forward && actionable[active]?.items?.length) {
+      e.preventDefault(); setSubmenu(active); return;
+    }
+    if (e.key === backward && onBack) { e.preventDefault(); onBack(); return; }
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
@@ -308,10 +333,12 @@ export function MenuPanel({
         return;
       case "Home":
         e.preventDefault();
+        setSubmenu(null);
         if (enabled.length) setActive(enabled[0]!);
         return;
       case "End":
         e.preventDefault();
+        setSubmenu(null);
         if (enabled.length) setActive(enabled[enabled.length - 1]!);
         return;
       case "ArrowLeft":
@@ -323,7 +350,7 @@ export function MenuPanel({
         return;
       case "Escape":
         e.preventDefault();
-        onClose("escape");
+        if (onBack) onBack(); else onClose("escape");
         return;
       case "Tab":
         onClose("tab");
@@ -349,7 +376,7 @@ export function MenuPanel({
       }, 500);
       const texts = actionable.map((item) => (item.disabled ? "" : menuItemText(item)));
       const next = typeAheadIndex(texts, active, buffer);
-      if (next >= 0) setActive(next);
+      if (next >= 0) { setSubmenu(null); setActive(next); }
     }
   };
 
@@ -385,22 +412,44 @@ export function MenuPanel({
               itemRefs.current[current] = el;
             }}
             type="button"
-            role="menuitem"
+            role={item.checked !== undefined ? "menuitemcheckbox" : "menuitem"}
+            aria-checked={item.checked}
+            aria-haspopup={item.items?.length ? "menu" : undefined}
+            aria-expanded={item.items?.length ? submenu === current : undefined}
+            aria-controls={item.items?.length && submenu === current ? `${id}-sub-${current}` : undefined}
             tabIndex={current === active ? 0 : -1}
             aria-disabled={item.disabled || undefined}
             className={row.className}
             style={row.style}
             onPointerEnter={() => {
-              if (!item.disabled) setActive(current);
+              if (!item.disabled && current !== active) { setSubmenu(null); setActive(current); }
             }}
+            onFocus={() => { if (!item.disabled) setActive(current); }}
             onClick={() => choose(item)}
           >
+            {item.checked && <Icon name="check" />}
             {item.label}
+            {item.items?.length ? <Icon name="chevron-right" style={{ float: "inline-end", marginInlineStart: 16 }} /> : null}
           </button>
         );
       })}
+      {submenu !== null && submenu === active && actionable[submenu]?.items?.length ? <NestedMenu
+        id={`${id}-sub-${submenu}`}
+        items={actionable[submenu]!.items!}
+        labelledBy={`${id}-item-${submenu}`}
+        anchor={subAnchor}
+        onClose={onClose}
+        onBack={() => { setSubmenu(null); itemRefs.current[active]?.focus(); }}
+      /> : null}
     </div>
   );
+}
+
+function NestedMenu({ anchor, ...props }: Omit<MenuPanelProps, "panelRef" | "style" | "className"> & { anchor: React.RefObject<HTMLButtonElement | null> }) {
+  const panel = React.useRef<HTMLDivElement>(null);
+  const position = useOverlayPosition(true, panel, anchor, undefined, "inline-end");
+  const menu = rs(["rs-menu", "rs-menu-nested"], menuStyles.menu, menuStyles.menuFixed);
+  return <MenuPanel {...props} panelRef={panel} className={menu.className} style={{ ...menu.style, ...position }} />;
 }
 
 /** Action menu with menu semantics and keyboard navigation. */
@@ -416,6 +465,8 @@ export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const [open, setOpen] = React.useState(false);
   const [initial, setInitial] = React.useState<"first" | "last">("first");
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const placement = useOverlayPosition(open, panelRef, triggerRef);
 
   React.useEffect(() => {
     if (!open) return;
@@ -475,12 +526,13 @@ export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
       </button>
       {open && (
         <MenuPanel
+          panelRef={panelRef}
           id={menuId}
           items={items}
           labelledBy={triggerId}
           initial={initial}
           className={menu.className}
-          style={menu.style}
+          style={{ ...menu.style, ...placement }}
           onClose={close}
         />
       )}

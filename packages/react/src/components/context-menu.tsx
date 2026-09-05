@@ -4,6 +4,7 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
+import { useOverlayPosition } from "../use-overlay-position";
 import type { DropdownMenuItem, MenuCloseReason } from "./dropdown-menu";
 import { MenuPanel, menuStyles } from "./dropdown-menu";
 
@@ -52,6 +53,7 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(fu
   const [at, setAt] = React.useState<{ x: number; y: number } | null>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
   const restoreTo = React.useRef<HTMLElement | null>(null);
+  const placement = useOverlayPosition(at !== null, menuRef, restoreTo, at);
 
   React.useEffect(() => {
     if (!at) return;
@@ -111,7 +113,7 @@ export const ContextMenu = React.forwardRef<HTMLDivElement, ContextMenuProps>(fu
           id={menuId}
           items={items}
           className={menu.className}
-          style={{ ...menu.style, left: at.x, top: at.y }}
+          style={{ ...menu.style, ...placement }}
           onClose={close}
         />
       )}

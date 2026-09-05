@@ -9,7 +9,7 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalogComponents, vlakComponents, vlakTokens } from "@noorddev/vlak";
 import { starterPage } from "./starter";
@@ -240,16 +240,16 @@ async function resolveFromRegistry(
   return { resolved, unknown };
 }
 
-function writeItemFiles(cwd: string, item: RegistryItem, componentsDir: string, overwrite: boolean): WriteResult[] {
-  const results: WriteResult[] = [];
+function planItemFiles(item: RegistryItem, componentsDir: string): Array<{ path: string; content: string }> {
+  const files: Array<{ path: string; content: string }> = [];
   for (const file of item.files) {
     if (!file.path.endsWith(".tsx") && !file.path.endsWith(".ts")) continue;
     // Registry targets are `components/vlak/<tree>`; keep the tree so nested
     // imports (charts/, shared helpers) resolve exactly as they do in the source.
     const rel = file.target.replace(/^components\/vlak\//, "").replace(/^vlak\//, "");
-    results.push(writeFileSafe(cwd, join(componentsDir, rel), file.content, overwrite));
+    files.push({ path: join(componentsDir, rel), content: file.content });
   }
-  return results;
+  return files;
 }
 
 /**
@@ -274,12 +274,30 @@ export async function add(
   const { resolved, unknown } = registry
     ? await resolveFromRegistry(registry, names)
     : resolveWithDependencies(names);
-  const outcomes: AddOutcome[] = [];
-  for (const item of resolved) {
+  // A helper can be part of several registry items without owning a registry
+  // entry itself. Deduplicate destinations across the entire command, not just
+  // item names. Validate the full plan before writing so conflicting registry
+  // definitions never silently select whichever item happened to install last.
+  const destinations = new Map<string, { content: string; owner: string }>();
+  const plan = resolved.map(item => {
     const cssOnly = item.meta?.vlak?.cssOnly ?? false;
-    const results = cssOnly ? [] : writeItemFiles(cwd, item, config.componentsDir, options.overwrite ?? false);
-    outcomes.push({ item, cssOnly, results });
-  }
+    const files = (cssOnly ? [] : planItemFiles(item, config.componentsDir)).filter(file => {
+      const destination = resolve(cwd, file.path);
+      const previous = destinations.get(destination);
+      if (previous) {
+        if (previous.content !== file.content) throw new Error(`Registry file conflict at ${file.path}: ${previous.owner} and ${item.name} provide different contents.`);
+        return false;
+      }
+      destinations.set(destination, { content: file.content, owner: item.name });
+      return true;
+    });
+    return { item, cssOnly, files };
+  });
+  const outcomes: AddOutcome[] = plan.map(({ item, cssOnly, files }) => ({
+    item,
+    cssOnly,
+    results: files.map(file => writeFileSafe(cwd, file.path, file.content, options.overwrite ?? false)),
+  }));
   return { outcomes, unknown };
 }
 

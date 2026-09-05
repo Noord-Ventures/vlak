@@ -154,11 +154,12 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 
 | Key | Value |
 | --- | --- |
-| `sizes` | `[12,16]` |
+| `sizes` | `[12,16,24]` |
+| `variants` | `["line","filled"]` |
 | `stroke` | `1` |
 | `viewBox` | `16` |
 | `center` | `[8,8]` |
-| `rule` | `1px currentColor hairline, butt/miter, no rx, no fill; draw at 12 or 16` |
+| `rule` | `Line: 1px currentColor hairline, butt/miter, no rx. Filled: solid silhouettes with transparent detail cuts. Draw at 12, 16, or 24; 12px uses simplified fine detail` |
 
 ### motion
 

@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
+import { useOverlayPosition } from "../use-overlay-position";
 
 import { menuStyles } from "./dropdown-menu";
 import { optionText, type SelectOption } from "./select";
@@ -81,6 +82,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
   const inputRef = React.useRef<HTMLInputElement>(null);
   const activeRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const placement = useOverlayPosition(open, panelRef, inputRef);
   const [inner, setInner] = React.useState(defaultValue);
   const [searchValue, setSearchValue] = React.useState("");
   const [activeIndex, setActiveIndex] = React.useState(0);
@@ -233,7 +236,8 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
           aria-labelledby={hasList ? (ariaLabelledby ?? inputId) : undefined}
           tabIndex={-1}
           className={menu.className}
-          style={menu.style}
+          ref={panelRef}
+          style={{ ...menu.style, ...placement }}
           onMouseDown={(e) => e.preventDefault()}
         >
           {matches.length === 0 && (

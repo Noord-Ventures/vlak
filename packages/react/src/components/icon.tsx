@@ -10,6 +10,8 @@ import {
   iconNames,
   marks,
   resolveIcon,
+  smallFilledCutouts,
+  smallFilledMarks,
   type IconName,
   type IconRotate,
   type MarkEl,
@@ -22,12 +24,14 @@ export type { IconName, IconRotate };
 export type { DrawnName, IconAlias, IconGroup } from "./icon-marks";
 
 /**
- * Vlak chrome marks. Vera 28 Aug 2026; optical recut 1 Sep 2026; R1 pairs 1 Sep 2026.
+ * Vlak chrome marks. Vera 28 Aug 2026; optical detail pass 5 Sep 2026.
  *
  * 16×16 module, optical center 8,8. Line: stroke 1, fill none.
  * Filled: same figures, solid closed geometry, currentColor. Select open
  * figures use hand-cut silhouettes to keep the pair optically complete.
- * Cap butt, join miter, no rx. Hairline stays 1 CSS px at 12, 16, and 24.
+ * Cap butt, join miter, no rx. Line hairlines stay 1 CSS px at 12, 16, and 24.
+ * Filled geometry and its strokes scale together; small detail cuts stay at
+ * least 1 CSS px. Dense silhouettes have a dedicated 12px optical cut.
  * Copied is check. Accordion down is chevron-right rotated 90°.
  * The first five marks keep their original construction; copy has a tighter
  * measured overlap and L/R chevrons take a +0.25y optical nudge toward 8,8.
@@ -56,7 +60,7 @@ const maskPositiveStroke = {
   strokeWidth: 2,
   strokeLinecap: "butt",
   strokeLinejoin: "miter",
-  vectorEffect: "non-scaling-stroke",
+  vectorEffect: "none",
 } as const;
 const maskCutoutFill = { fill: "black", stroke: "none" } as const;
 const maskCutoutStroke = {
@@ -65,7 +69,7 @@ const maskCutoutStroke = {
   strokeWidth: 1.25,
   strokeLinecap: "butt",
   strokeLinejoin: "miter",
-  vectorEffect: "non-scaling-stroke",
+  vectorEffect: "none",
 } as const;
 
 export type IconSize = 12 | 16 | 24;
@@ -139,6 +143,7 @@ const styles = stylex.create({
     minHeight: "1.5rem",
   },
   label: {
+    margin: 0,
     fontSize: "0.6875rem",
     lineHeight: 1.3,
     color: vlak.gray,
@@ -170,9 +175,9 @@ function renderEl(el: MarkEl, key: number, variant: IconVariant): React.ReactNod
   }
 }
 
-function renderMaskEl(el: MarkEl, key: number, cutout: boolean): React.ReactNode {
+function renderMaskEl(el: MarkEl, key: number, cutout: boolean, size: IconSize): React.ReactNode {
   const ink = cutout
-    ? (isClosed(el) ? maskCutoutFill : maskCutoutStroke)
+    ? (isClosed(el) ? maskCutoutFill : { ...maskCutoutStroke, strokeWidth: Math.max(1.25, 16 / size) })
     : (isClosed(el) ? maskPositiveFill : maskPositiveStroke);
   switch (el.t) {
     case "path":
@@ -202,12 +207,11 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function Icon(
 ) {
   const resolved = resolveIcon(name);
   const turn = rotate ?? resolved.rotate;
-  const figure =
-    variant === "filled" ? (filledMarks[resolved.mark] ?? marks[resolved.mark]) : marks[resolved.mark];
+  const figure = variant === "filled"
+    ? ((size === 12 ? smallFilledMarks[resolved.mark] : undefined) ?? filledMarks[resolved.mark] ?? marks[resolved.mark])
+    : marks[resolved.mark];
   const maskId = `rs-icon-${React.useId().replace(/:/g, "")}`;
-  const cutouts = new Set(filledCutouts[resolved.mark] ?? []);
-  const nodes = figure.map((el, i) => renderEl(el, i, variant));
-  const filledNodes = figure.map((el, i) => renderMaskEl(el, i, cutouts.has(i)));
+  const cutouts = new Set((size === 12 ? smallFilledCutouts[resolved.mark] : undefined) ?? filledCutouts[resolved.mark] ?? []);
   const sx = rs(["rs-icon", variant === "filled" && "rs-icon-filled", className], styles.icon);
   return (
     <svg
@@ -226,14 +230,16 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function Icon(
         <>
           <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width="16" height="16">
             <rect width="16" height="16" fill="black" stroke="none" />
-            {turn ? <g transform={`rotate(${turn} 8 8)`}>{filledNodes}</g> : filledNodes}
+            <g transform={turn ? `rotate(${turn} 8 8)` : undefined}>
+              {figure.map((el, i) => renderMaskEl(el, i, cutouts.has(i), size))}
+            </g>
           </mask>
           <rect width="16" height="16" fill="currentColor" stroke="none" mask={`url(#${maskId})`} />
         </>
       ) : turn ? (
-        <g transform={`rotate(${turn} 8 8)`}>{nodes}</g>
+        <g transform={`rotate(${turn} 8 8)`}>{figure.map((el, i) => renderEl(el, i, variant))}</g>
       ) : (
-        nodes
+        figure.map((el, i) => renderEl(el, i, variant))
       )}
     </svg>
   );
@@ -263,6 +269,9 @@ export const IconCatalog = React.forwardRef<HTMLDivElement, { className?: string
   const label = rs(["rs-icon-label"], styles.label);
   return (
     <div ref={ref} className={catalog.className} style={catalog.style}>
+      <p className={label.className} style={label.style}>
+        Line on the left, filled on the right. Each shown at 12, 16, and 24px.
+      </p>
       {iconGroups.map((g) => (
         <section
           key={g.title}
@@ -273,6 +282,7 @@ export const IconCatalog = React.forwardRef<HTMLDivElement, { className?: string
           <h3 className={groupTitle.className} style={groupTitle.style}>
             {g.title}
           </h3>
+          <p className={label.className} style={label.style}>Line 12 · 16 · 24 / Filled 12 · 16 · 24</p>
           <div className={grid.className} style={grid.style}>
             {g.names.map((mark) => (
               <div key={`${g.title}-${mark}`} className={cell.className} style={cell.style}>

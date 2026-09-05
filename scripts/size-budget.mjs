@@ -23,11 +23,21 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 
 /* [label, path or directory + filter, gzipped budget in bytes] */
 const budgets = [
-  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 18 * 1024],
+  // The 40-component expansion increases the whole-catalog artifacts. Keep
+  // the existing Button and atomic CSS budgets, and add leaf-specific caps
+  // so growth in the catalog cannot hide a regression in a common control.
+  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 24 * 1024],
   ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024],
-  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 72 * 1024],
+  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 136 * 1024],
   ["@noorddev/vlak-react components/button.js", "packages/react/dist/components/button.js", 4 * 1024],
-  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 48 * 1024],
+  ["@noorddev/vlak-react components/number-field.js", "packages/react/dist/components/number-field.js", 3 * 1024],
+  ["@noorddev/vlak-react components/playback-controls.js", "packages/react/dist/components/playback-controls.js", 2 * 1024],
+  ["@noorddev/vlak-react components/virtual-list.js", "packages/react/dist/components/virtual-list.js", 3 * 1024],
+  ["@noorddev/vlak-react components/query-builder.js", "packages/react/dist/components/query-builder.js", 4 * 1024],
+  ["@noorddev/vlak-react components/media-player.js", "packages/react/dist/components/media-player.js", 5 * 1024],
+  ["@noorddev/vlak-react components/scheduler.js", "packages/react/dist/components/scheduler.js", 6 * 1024],
+  ["@noorddev/vlak-react components/file-upload.js", "packages/react/dist/components/file-upload.js", 5 * 1024],
+  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 64 * 1024],
 ];
 
 let failed = false;

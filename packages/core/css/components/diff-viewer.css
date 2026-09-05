@@ -1,0 +1,9 @@
+/* ── diff-viewer: generated from packages/react/src/components/diff-viewer.tsx ── */
+.rs-diff-viewer{width:100%;min-width:0;color:var(--text)}
+.rs-diff-viewer-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:1rem}
+.rs-diff-viewer-tools{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-diff-viewer-scroll{overflow-x:auto;border-width:1px;border-style:solid;border-color:var(--divider);outline-color:var(--text);outline-offset:2px}
+.rs-diff-viewer-table{width:100%;border-collapse:collapse;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;text-align:start}
+.rs-diff-viewer-cell{padding-block:0.25rem;padding-inline:0.75rem;white-space:pre-wrap;overflow-wrap:anywhere;vertical-align:top;text-align:start}
+.rs-diff-viewer-change{background-color:var(--control-fill);font-weight:500}
+.rs-diff-viewer-number{color:var(--text-secondary);width:3ch;padding-inline:0.5rem;vertical-align:top;font-variant-numeric:tabular-nums;text-align:end}

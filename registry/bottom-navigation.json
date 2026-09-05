@@ -1,0 +1,72 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bottom-navigation",
+  "type": "registry:component",
+  "title": "Bottom navigation",
+  "description": "Presents mobile destinations with current state and safe-area spacing.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/bottom-navigation.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Icon, type IconName } from \"./icons\";\n\nexport interface BottomNavigationItem { id: string; label: string; href: string; icon?: IconName; count?: number }\nexport interface BottomNavigationProps extends React.HTMLAttributes<HTMLElement> {\n  items: BottomNavigationItem[];\n  current?: string;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { backgroundColor: vlak.paper, color: vlak.ink, borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, paddingBottom: \"env(safe-area-inset-bottom, 0px)\" },\n  list: { listStyleType: \"none\", display: \"grid\", gridAutoFlow: \"column\", gridAutoColumns: \"minmax(0, 1fr)\", gap: \"0.25rem\", padding: \"0.5rem\", margin: 0 },\n  link: { display: \"flex\", flexDirection: \"column\", alignItems: \"center\", justifyContent: \"center\", gap: \"0.25rem\", minWidth: vlak.hit, minHeight: vlak.hit, boxSizing: \"border-box\", padding: \"0.5rem\", color: vlak.gray, textDecoration: \"none\", fontSize: \"0.875rem\", borderRadius: vlak.radiusSm, textAlign: \"center\", overflowWrap: \"anywhere\", outlineColor: vlak.ink, outlineOffset: 2 },\n  current: { color: vlak.ink, fontWeight: 600, backgroundColor: vlak.controlFill },\n});\n\n/** Mobile destinations with safe-area padding and native links. Keep to five items. */\nexport const BottomNavigation = React.forwardRef<HTMLElement, BottomNavigationProps>(function BottomNavigation({ items, current, label = \"Primary navigation\", className, style, ...props }, ref) {\n  const root = rs([\"rs-bottom-navigation\", className], styles.root);\n  const list = rs([\"rs-bottom-navigation-list\"], styles.list);\n  return <nav ref={ref} aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}><ul {...list}>{items.map(item => {\n    const active = current === item.id;\n    const link = rs([\"rs-bottom-navigation-link\", active && \"rs-bottom-navigation-current\"], styles.link, active && styles.current);\n    return <li key={item.id}><a {...link} href={item.href} aria-current={active ? \"page\" : undefined}>{item.icon && <Icon name={item.icon} />}<span>{item.label}{item.count != null ? ` (${item.count})` : \"\"}</span></a></li>;\n  })}</ul></nav>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/bottom-navigation.tsx"
+    },
+    {
+      "path": "vlak/styles/bottom-navigation.css",
+      "content": "/* ── bottom-navigation: generated from packages/react/src/components/bottom-navigation.tsx ── */\n.rs-bottom-navigation{background-color:var(--bg);color:var(--text);border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-bottom:env(safe-area-inset-bottom, 0px)}\n.rs-bottom-navigation-list{list-style-type:none;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0, 1fr);gap:0.25rem;padding:0.5rem;margin:0}\n.rs-bottom-navigation-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.25rem;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;padding:0.5rem;color:var(--text-secondary);text-decoration:none;font-size:0.875rem;border-radius:var(--radius-sm);text-align:center;overflow-wrap:anywhere;outline-color:var(--text);outline-offset:2px}\n.rs-bottom-navigation-current{color:var(--text);font-weight:600;background-color:var(--control-fill)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/bottom-navigation.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "navigation",
+      "classes": [
+        "rs-bottom-navigation",
+        "rs-bottom-navigation-list",
+        "rs-bottom-navigation-link",
+        "rs-bottom-navigation-current"
+      ],
+      "snippet": "<nav class=\"rs-bottom-navigation\" aria-label=\"Primary navigation\"><ul class=\"rs-bottom-navigation-list\"><li><a class=\"rs-bottom-navigation-link rs-bottom-navigation-current\" href=\"/\" aria-current=\"page\">Home</a></li><li><a class=\"rs-bottom-navigation-link\" href=\"/docs/\">Docs</a></li></ul></nav>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "BottomNavigation"
+      ],
+      "example": "import { BottomNavigation } from \"@noorddev/vlak-react\";\n\n<BottomNavigation current=\"interfaces\" items={[{ id: \"components\", label: \"Components\", href: \"/components/\", icon: \"grid\" }, { id: \"interfaces\", label: \"Interfaces\", href: \"/interfaces/\", icon: \"layout\" }, { id: \"docs\", label: \"Docs\", href: \"/docs/\", icon: \"file-text\" }]} />",
+      "usage": {
+        "use": [
+          "Three to five primary destinations in a mobile product."
+        ],
+        "avoid": [
+          "Action commands or large collections of destinations."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter",
+          "does": "Tab moves through native links; Enter follows the destination."
+        }
+      ],
+      "a11y": [
+        "A named navigation landmark and aria-current page indicate the active destination. Count badges are readable text."
+      ]
+    }
+  }
+}

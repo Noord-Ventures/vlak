@@ -74,7 +74,7 @@ const styles = stylex.create({
       ":focus-visible": -2,
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     "::placeholder": {
@@ -142,7 +142,7 @@ const styles = stylex.create({
     },
     cursor: "pointer",
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
   },
@@ -353,7 +353,7 @@ export interface CommandDialogProps extends CommandProps {
 
 /** The palette in a native <dialog>. Wire ⌘K in your app to setOpen(true). */
 export const CommandDialog = React.forwardRef<HTMLDialogElement, CommandDialogProps>(function CommandDialog(
-  { open, onClose, className, ...props },
+  { open, onClose, className, "aria-label": ariaLabel = "Commands", "aria-labelledby": ariaLabelledBy, ...props },
   ref,
 ) {
   return (
@@ -361,6 +361,8 @@ export const CommandDialog = React.forwardRef<HTMLDialogElement, CommandDialogPr
       ref={ref}
       open={open}
       onClose={onClose}
+      aria-label={ariaLabelledBy ? undefined : ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       className={["rs-command", "rs-command-dialog", className].filter(Boolean).join(" ")}
       extraStyles={[styles.palette]}
     >

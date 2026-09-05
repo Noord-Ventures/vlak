@@ -1,7 +1,7 @@
 /* ── pagination: generated from packages/react/src/components/pagination.tsx ── */
 .rs-pages{display:flex;align-items:center;gap:0.3125rem}
 @media (max-width: 640px){.rs-pages{gap:0.5rem;flex-wrap:wrap}}
-.rs-page{transition:var(--transition);box-sizing:border-box;width:1.625rem;height:1.625rem;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.8125rem;color:var(--text-secondary);border-width:1px;border-style:solid;border-color:var(--control-border);padding:0;background-color:transparent;font-family:inherit;cursor:pointer;opacity:1}
+.rs-page{transition:var(--transition);box-sizing:border-box;width:var(--hit);height:var(--hit);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.8125rem;color:var(--text-secondary);border-width:1px;border-style:solid;border-color:var(--control-border);padding:0;background-color:transparent;font-family:inherit;cursor:pointer;opacity:1}
 .rs-page:hover{border-color:var(--control-fill);background-color:var(--control-fill)}
 .rs-page:disabled{cursor:not-allowed;opacity:0.4}
 .rs-page:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}

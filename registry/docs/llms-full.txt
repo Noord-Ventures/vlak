@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 74 components in 9 categories: actions (10), forms (16), navigation (7), feedback (9), surfaces (8), content (13), icons (1), charts (7), patterns (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 114 components in 9 categories: actions (14), forms (27), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 
@@ -89,7 +89,7 @@ Conventions that hold across the catalogue:
 - Reading: body copy stays between 45 and 90 characters per line, with 66 characters as the default measure. Body line-height stays between 1.2 and 1.45 times its font size; Vlak defaults to 1.45.
 - Controlled and uncontrolled: `value` / `defaultValue` / `onValueChange` (Select, Combobox, Tabs, RadioGroup, ToggleGroup, Slider, Calendar, DatePicker); `checked` / `defaultChecked` / `onCheckedChange` (Switch); `pressed` / `defaultPressed` / `onPressedChange` (Toggle); `open` / `onClose` (Dialog, AlertDialog, Sheet, Drawer, CommandDialog). Checkbox and Radio are native inputs and use `checked` / `onChange`.
 - `className` and `style` merge with the component's own; native attributes and event handlers pass through to the root element (the props tables say which attribute set each component extends).
-- Refs: 147 of 148 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
+- Refs: 187 of 188 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
 - Names: components that render no visible label take `aria-label` or `aria-labelledby` (Select, Combobox, Switch, Slider, ButtonGroup, ToggleGroup, RadioGroup, ScrollArea, Carousel, Split). Dialogs are named by their Title part.
 - Platform first: `<dialog>`, `<details>`, the Popover API, scroll snap, and native inputs do the work. Where the platform has nothing, the APG pattern applies (listbox, menu, grid, tabs) with full keyboard support, listed on each page.
 - Sentence case everywhere. No all caps. Copy is short and matter-of-fact.
@@ -286,11 +286,12 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 
 | Key | Value |
 | --- | --- |
-| `sizes` | `[12,16]` |
+| `sizes` | `[12,16,24]` |
+| `variants` | `["line","filled"]` |
 | `stroke` | `1` |
 | `viewBox` | `16` |
 | `center` | `[8,8]` |
-| `rule` | `1px currentColor hairline, butt/miter, no rx, no fill; draw at 12 or 16` |
+| `rule` | `Line: 1px currentColor hairline, butt/miter, no rx. Filled: solid silhouettes with transparent detail cuts. Draw at 12, 16, or 24; 12px uses simplified fine detail` |
 
 ### motion
 
@@ -372,9 +373,4106 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 
 ---
 
+# Description list
+
+Aligns semantic labels and values in a responsive description list.
+
+Category: content  
+Name: `description-list`  
+Also known as: DescriptionList  
+Page: https://vlak.dev/components/description-list/
+
+## When to use
+
+- Read-only properties, specifications, and account details.
+
+## When not to
+
+- Editable properties; use PropertyGrid.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { DescriptionList } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add description-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/description-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<dl class="rs-description-list"><div class="rs-description-list-row"><dt class="rs-description-list-label">Estimated range</dt><dd class="rs-description-list-value">386 km</dd></div></dl>
+```
+
+## Example
+
+```tsx
+import { DescriptionList } from "@noorddev/vlak-react";
+
+<DescriptionList items={[{ id: "range", label: "Estimated range", value: "386 km" }, { id: "battery", label: "Battery", value: "84%" }]} />
+```
+
+## Props
+
+### DescriptionList
+
+Aligned, semantic labels and values without an extra card.
+
+Extends `HTMLAttributes<HTMLDListElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDListElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `DescriptionItem[]` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Links or controls supplied as values keep their native keyboard behavior. |
+
+## Accessibility
+
+- Uses dl, dt, and dd; labels and values remain in reading order on small screens.
+
+## Classes
+
+`rs-description-list`, `rs-description-list-row`, `rs-description-list-label`, `rs-description-list-value`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/description-list.tsx`  
+CSS: `packages/core/css/components/description-list.css`
+
+
+---
+
+# Metric
+
+Displays a numeric reading with tabular figures and aligned units.
+
+Category: content  
+Name: `metric`  
+Also known as: Metric  
+Page: https://vlak.dev/components/metric/
+
+## When to use
+
+- Dashboard readings, vehicle status, and concise numeric comparisons.
+
+## When not to
+
+- Full data series; use Charts.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { Metric } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add metric
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/metric.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-metric"><p class="rs-metric-label">Estimated range</p><div class="rs-metric-reading"><span class="rs-metric-value">386</span><span class="rs-metric-unit">km</span></div></div>
+```
+
+## Example
+
+```tsx
+import { Metric } from "@noorddev/vlak-react";
+
+<Metric label="Estimated range" value={386} unit="km" description="Ready for your next journey" comparison="18 km more than yesterday" />
+```
+
+## Props
+
+### Metric
+
+A numeric reading with stable baseline, tabular figures, and an explicit unit.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `value` (required) | `string \| number` |  |  |
+| `unit` | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `comparison` | `ReactNode` |  |  |
+| `trend` | `ReactNode` |  | Optional trend visualization, for example an existing Sparkline. |
+| `locale` | `string` | `"en"` |  |
+| `formatOptions` | `Intl.NumberFormatOptions` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| None | Static reading; no additional keyboard stop. |
+
+## Accessibility
+
+- The label, formatted value, and unit are readable text. Provide a text equivalent for an optional trend graphic.
+
+## Classes
+
+`rs-metric`, `rs-metric-label`, `rs-metric-reading`, `rs-metric-value`, `rs-metric-unit`, `rs-metric-detail`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/metric.tsx`  
+CSS: `packages/core/css/components/metric.css`
+
+
+---
+
+# Activity timeline
+
+Lists timestamped events with actors and optional expandable details.
+
+Category: content  
+Name: `activity-timeline`  
+Also known as: ActivityTimeline  
+Page: https://vlak.dev/components/activity-timeline/
+
+## When to use
+
+- Audit history, project activity, and chronological event records.
+
+## When not to
+
+- Steps toward a goal; use Stepper or TaskProgress.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ActivityTimeline } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add activity-timeline
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/activity-timeline.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<ol class="rs-activity-timeline"><li class="rs-activity-timeline-event"><time class="rs-activity-timeline-time" datetime="2026-09-05T10:00:00Z">5 September, 10:00</time><div><p class="rs-activity-timeline-title">Revision published</p></div></li></ol>
+```
+
+## Example
+
+```tsx
+import { ActivityTimeline } from "@noorddev/vlak-react";
+
+<ActivityTimeline events={[{ id: "release", title: "Revision published", dateTime: "2026-09-05T10:00:00Z", actor: "Studio", description: "Updated the vehicle controls", details: "Numeric baselines and playback spacing are now shared." }]} />
+```
+
+## Props
+
+### ActivityTimeline
+
+Chronological events in caller-supplied order, with optional native disclosures.
+
+Extends `HTMLAttributes<HTMLOListElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLOListElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `events` (required) | `ActivityEvent[]` |  |  |
+| `emptyLabel` | `string` | `"No activity yet"` |  |
+| `locale` | `string` | `"en"` |  |
+| `timeZone` | `string` | `"UTC"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches each summary; Enter or Space expands the native disclosure. |
+
+## Accessibility
+
+- An ordered list with machine-readable time elements. Optional details use native disclosure semantics.
+
+## Classes
+
+`rs-activity-timeline`, `rs-activity-timeline-event`, `rs-activity-timeline-time`, `rs-activity-timeline-title`, `rs-activity-timeline-body`, `rs-activity-timeline-summary`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/activity-timeline.tsx`  
+CSS: `packages/core/css/components/activity-timeline.css`
+
+
+---
+
+# Code block
+
+Shows source text with optional line numbers, wrapping, and copy feedback.
+
+Category: content  
+Name: `code-block`  
+Also known as: CodeBlock  
+Page: https://vlak.dev/components/code-block/
+
+## When to use
+
+- Installation commands, code samples, and technical documents.
+
+## When not to
+
+- Comparing revisions; use DiffViewer.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CodeBlock } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add code-block
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/code-block.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<figure class="rs-code-block"><figcaption class="rs-code-block-header">TypeScript</figcaption><pre class="rs-code-block-pre" tabindex="0" aria-label="TypeScript source"><code>const range = 386;</code></pre></figure>
+```
+
+## Example
+
+```tsx
+import { CodeBlock } from "@noorddev/vlak-react";
+
+<CodeBlock language="TypeScript" code={"const range = 386;\nconst unit = \"km\";"} lineNumbers />
+```
+
+## Props
+
+### CodeBlock
+
+Plain source with optional numbering and honest asynchronous copy feedback.
+
+Extends `HTMLAttributes<HTMLElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `code` (required) | `string` |  |  |
+| `language` | `string` | `"Text"` |  |
+| `lineNumbers` | `boolean` | `false` |  |
+| `wrap` | `boolean` | `false` |  |
+| `copyable` | `boolean` | `true` |  |
+| `onCopyCode` | `(code: string) => void \| Promise<void>` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches the copy action and scrollable source; Enter or Space copies. |
+
+## Accessibility
+
+- Line numbers are decorative. Copy completion and failure are announced only after the operation resolves.
+
+## Classes
+
+`rs-code-block`, `rs-code-block-header`, `rs-code-block-pre`, `rs-code-block-wrap`, `rs-code-block-line`, `rs-code-block-number`, `rs-code-block-status`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/code-block.tsx`  
+CSS: `packages/core/css/components/code-block.css`
+
+
+---
+
+# Json viewer
+
+Inspects structured data with bounded nested disclosures and path search.
+
+Category: content  
+Name: `json-viewer`  
+Also known as: JSONViewer  
+Page: https://vlak.dev/components/json-viewer/
+
+## When to use
+
+- Inspecting API responses, configuration, and nested records.
+
+## When not to
+
+- Editing structured data; use a form or editor.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { JSONViewer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add json-viewer
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/json-viewer.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-json-viewer" role="region" aria-label="Vehicle data"><div class="rs-json-viewer-body"><details open><summary class="rs-json-viewer-summary">vehicle: Object</summary><div class="rs-json-viewer-children"><p class="rs-json-viewer-value">range: 386</p></div></details></div></div>
+```
+
+## Example
+
+```tsx
+import { JSONViewer } from "@noorddev/vlak-react";
+
+<JSONViewer label="Vehicle data" data={{ vehicle: { range: 386, battery: 84 }, connected: true }} />
+```
+
+## Props
+
+### JSONViewer
+
+Bounded JSON inspection using native disclosures and path/value search.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` (required) | `unknown` |  |  |
+| `label` | `string` | `"Structured data"` |  |
+| `searchable` | `boolean` | `true` |  |
+| `maxDepth` | `number` | `8` | Bounds rendering of unusually deep data. |
+| `maxEntries` | `number` | `100` | Maximum children shown per object or array. |
+| `maxNodes` | `number` | `1000` | Total node budget across the inspected document. |
+| `maxStringLength` | `number` | `2000` | Maximum string characters displayed per value, before escaping. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches search, expand/collapse controls, and summaries; Enter or Space toggles a disclosure. |
+
+## Accessibility
+
+- Uses native details rather than a partial tree role. Depth, entry, total node, and string length limits disclose truncation; circular references are labeled. Inspection does not invoke getters. Search covers the displayed, bounded data.
+
+## Classes
+
+`rs-json-viewer`, `rs-json-viewer-tools`, `rs-json-viewer-body`, `rs-json-viewer-summary`, `rs-json-viewer-children`, `rs-json-viewer-value`, `rs-json-viewer-note`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [input](input.md).  
+React: `packages/react/src/components/json-viewer.tsx`  
+CSS: `packages/core/css/components/json-viewer.css`
+
+
+---
+
+# Diff viewer
+
+Compares text revisions in unified or split rows with explicit change labels.
+
+Category: content  
+Name: `diff-viewer`  
+Also known as: DiffViewer  
+Page: https://vlak.dev/components/diff-viewer/
+
+## When to use
+
+- Reviewing configuration, document, or code changes.
+
+## When not to
+
+- Rich document editing or merging conflicts.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { diffLines, DiffViewer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add diff-viewer
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/diff-viewer.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-diff-viewer"><div class="rs-diff-viewer-scroll" tabindex="0" role="region" aria-label="Changes"><table class="rs-diff-viewer-table"><caption>Changes</caption><thead><tr><th scope="col">Change</th><th scope="col">Content</th></tr></thead><tbody><tr class="rs-diff-viewer-change"><th scope="row">Added</th><td class="rs-diff-viewer-cell">range: 386</td></tr></tbody></table></div></div>
+```
+
+## Example
+
+```tsx
+import { DiffViewer } from "@noorddev/vlak-react";
+
+<DiffViewer label="Configuration changes" before={"range: 368\nbattery: 84"} after={"range: 386\nbattery: 84"} />
+```
+
+## Props
+
+### DiffViewer
+
+Monochrome before/after comparison with explicit change labels, never color alone.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `before` (required) | `string` |  |  |
+| `after` (required) | `string` |  |  |
+| `label` | `string` | `"Changes"` |  |
+| `view` | `"unified" \| "split"` |  |  |
+| `defaultView` | `"unified" \| "split"` | `"unified"` |  |
+| `onViewChange` | `(view: "unified" \| "split") => void` |  |  |
+| `pageSize` | `number` | `200` | Maximum rendered rows per page, clamped to 1–1000. |
+
+### Functions
+
+- `diffLines` (function): Line LCS with bounded memory. Large changes use a truthful coarse replacement.
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches layout buttons, the scrollable comparison, and page controls; Enter or Space switches layout or moves between line pages. |
+
+## Accessibility
+
+- Table headers and explicit Added/Removed labels communicate changes without color. Large replacements use a bounded coarse diff. At most 200 rows render per page by default; pageSize is capped at 1000, with page ranges announced and all lines reachable through navigation.
+
+## Classes
+
+`rs-diff-viewer`, `rs-diff-viewer-header`, `rs-diff-viewer-tools`, `rs-diff-viewer-scroll`, `rs-diff-viewer-table`, `rs-diff-viewer-cell`, `rs-diff-viewer-change`, `rs-diff-viewer-number`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/diff-viewer.tsx`  
+CSS: `packages/core/css/components/diff-viewer.css`
+
+
+---
+
+# Error summary
+
+Summarizes invalid fields and moves focus to their inputs.
+
+Category: feedback  
+Name: `error-summary`  
+Also known as: ErrorSummary  
+Page: https://vlak.dev/components/error-summary/
+
+## When to use
+
+- Failed form submissions with errors across several fields.
+
+## When not to
+
+- Validation on every keystroke; keep inline field feedback nearby.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ErrorSummary } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add error-summary
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/error-summary.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-error-summary" role="alert" aria-labelledby="error-title" tabindex="-1"><h2 id="error-title" class="rs-error-summary-title">Check the following fields</h2><ul class="rs-error-summary-list"><li><a class="rs-error-summary-link" href="#email">Enter an email address</a></li></ul></div>
+```
+
+## Example
+
+```tsx
+import { ErrorSummary } from "@noorddev/vlak-react";
+
+<ErrorSummary errors={[{ id: "email", message: "Enter an email address" }]} />
+```
+
+## Props
+
+### ErrorSummary
+
+A form-wide summary linking each message to the field that needs attention.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "title">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `errors` (required) | `FormError[]` |  |  |
+| `title` | `ReactNode` | `"Check the following fields"` |  |
+| `autoFocus` | `boolean` | `false` | Move focus to the summary after a failed submission, not while typing. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches each field link; Enter focuses the corresponding input. |
+
+## Accessibility
+
+- Uses role alert with a heading. autoFocus is opt-in for failed submission, not continuous validation.
+
+## Classes
+
+`rs-error-summary`, `rs-error-summary-title`, `rs-error-summary-list`, `rs-error-summary-link`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/error-summary.tsx`  
+CSS: `packages/core/css/components/error-summary.css`
+
+
+---
+
+# Notification center
+
+Keeps persistent notifications with read, unread, action, and dismissal state.
+
+Category: feedback  
+Name: `notification-center`  
+Also known as: NotificationCenter  
+Page: https://vlak.dev/components/notification-center/
+
+## When to use
+
+- An inbox of persistent application notifications.
+
+## When not to
+
+- Ephemeral confirmation; use Toast.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { NotificationCenter } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add notification-center
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/notification-center.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<section class="rs-notification-center" aria-label="Notifications"><ul class="rs-notification-center-list"><li class="rs-notification-center-item rs-notification-center-unread"><h3 class="rs-notification-center-title">Export ready</h3><p class="rs-notification-center-detail">Unread</p></li></ul></section>
+```
+
+## Example
+
+```tsx
+import { NotificationCenter } from "@noorddev/vlak-react";
+
+<NotificationCenter defaultValue={[{ id: "export", title: "Export ready", description: "Your study is ready to download" }, { id: "invite", title: "Studio invitation", read: true }]} />
+```
+
+## Props
+
+### NotificationCenter
+
+Persistent notifications with controlled read/unread and dismissal state.
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `NotificationItem[]` |  |  |
+| `defaultValue` | `NotificationItem[]` | `[]` |  |
+| `onValueChange` | `(items: NotificationItem[]) => void` |  |  |
+| `label` | `string` | `"Notifications"` |  |
+| `emptyLabel` | `string` | `"You're up to date"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches read, action, and dismiss buttons; Enter or Space activates. |
+
+## Accessibility
+
+- Unread state is also exposed in text and control names. User changes are announced through a polite status.
+
+## Classes
+
+`rs-notification-center`, `rs-notification-center-header`, `rs-notification-center-title`, `rs-notification-center-list`, `rs-notification-center-item`, `rs-notification-center-unread`, `rs-notification-center-detail`, `rs-notification-center-actions`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/notification-center.tsx`  
+CSS: `packages/core/css/components/notification-center.css`
+
+
+---
+
+# Task progress
+
+Tracks long-running work with phases, honest progress, cancellation, and retry.
+
+Category: feedback  
+Name: `task-progress`  
+Also known as: TaskProgress  
+Page: https://vlak.dev/components/task-progress/
+
+## When to use
+
+- Exports, uploads, background processing, and recoverable operations.
+
+## When not to
+
+- A brief loading indicator; use Spinner.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { TaskProgress } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add task-progress
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/task-progress.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<section class="rs-task-progress" aria-label="Exporting study"><h2 class="rs-task-progress-title">Exporting study</h2><p role="status">In progress</p><progress class="rs-task-progress-bar" aria-label="Export progress" max="100" value="42"></progress></section>
+```
+
+## Example
+
+```tsx
+import { TaskProgress } from "@noorddev/vlak-react";
+
+<TaskProgress label="Exporting study" state="running" value={42} elapsedSeconds={12} phases={[{ id: "prepare", label: "Prepare", state: "complete" }, { id: "render", label: "Render", state: "active" }, { id: "package", label: "Package", state: "pending" }]} />
+```
+
+## Props
+
+### TaskProgress
+
+Honest long-running task state, including unknown progress and action failures.
+
+Extends `HTMLAttributes<HTMLElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `state` (required) | `TaskState` |  |  |
+| `value` | `number` |  | Percentage, omit while the amount of work is unknown. |
+| `phases` | `TaskPhase[]` | `[]` |  |
+| `description` | `ReactNode` |  |  |
+| `elapsedSeconds` | `number` |  |  |
+| `remainingSeconds` | `number` |  |  |
+| `onCancel` | `() => void \| Promise<void>` |  |  |
+| `onRetry` | `() => void \| Promise<void>` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches cancel or retry when supplied; Enter or Space invokes the callback. |
+
+## Accessibility
+
+- Native progress supports unknown completion when value is omitted. State changes are announced, elapsed seconds are not repeatedly announced.
+
+## Classes
+
+`rs-task-progress`, `rs-task-progress-title`, `rs-task-progress-bar`, `rs-task-progress-detail`, `rs-task-progress-phases`, `rs-task-progress-phase`, `rs-task-progress-actions`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/task-progress.tsx`  
+CSS: `packages/core/css/components/task-progress.css`
+
+
+---
+
+# Connection status
+
+Communicates connecting, connected, offline, and reconnecting states.
+
+Category: feedback  
+Name: `connection-status`  
+Also known as: ConnectionStatus  
+Page: https://vlak.dev/components/connection-status/
+
+## When to use
+
+- Network-dependent controls and synchronization status.
+
+## When not to
+
+- Inferring server connectivity from browser online status alone.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ConnectionStatus } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add connection-status
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/connection-status.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-connection-status"><span class="rs-connection-status-label" role="status">Connected</span><span class="rs-connection-status-detail">Changes are synchronized</span></div>
+```
+
+## Example
+
+```tsx
+import { ConnectionStatus } from "@noorddev/vlak-react";
+
+<ConnectionStatus state="connected" description="Changes are synchronized" />
+```
+
+## Props
+
+### ConnectionStatus
+
+Application-supplied connection state. A successful retry does not assume reconnection.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `state` (required) | `ConnectionState` |  |  |
+| `label` | `string` |  |  |
+| `description` | `ReactNode` |  |  |
+| `onRetry` | `() => void \| Promise<void>` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches retry when offline and a callback is supplied; Enter or Space retries. |
+
+## Accessibility
+
+- State is visible text announced politely. Retry completion does not assume the connection recovered.
+
+## Classes
+
+`rs-connection-status`, `rs-connection-status-label`, `rs-connection-status-detail`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/connection-status.tsx`  
+CSS: `packages/core/css/components/connection-status.css`
+
+
+---
+
+# Tree view
+
+Navigates a hierarchy with expansion, single selection, and roving focus.
+
+Category: navigation  
+Name: `tree-view`  
+Also known as: TreeView  
+Page: https://vlak.dev/components/tree-view/
+
+## When to use
+
+- File trees, nested assets, and hierarchical selection.
+
+## When not to
+
+- A flat list of destination links; use Sidebar.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { TreeView } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add tree-view
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/tree-view.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<ul class="rs-tree-view" role="tree" aria-label="Studies"><li role="none"><div class="rs-tree-view-item rs-tree-view-selected" role="treeitem" aria-selected="true" aria-level="1" tabindex="0">Drive</div></li></ul>
+```
+
+## Example
+
+```tsx
+import { TreeView } from "@noorddev/vlak-react";
+
+<TreeView label="Studies" defaultExpanded={["studies"]} defaultValue="drive" nodes={[{ id: "studies", label: "Studies", children: [{ id: "drive", label: "Drive" }, { id: "orbit", label: "Orbit" }] }, { id: "archive", label: "Archive" }]} />
+```
+
+## Props
+
+### TreeView
+
+Single selection and APG-style roving focus through a hierarchical collection.
+
+Extends `Omit<HTMLAttributes<HTMLUListElement>, "defaultValue" | "onSelect">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLUListElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `nodes` (required) | `TreeNode[]` |  |  |
+| `label` (required) | `string` |  |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` |  |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `expanded` | `string[]` |  |  |
+| `defaultExpanded` | `string[]` | `[]` |  |
+| `onExpandedChange` | `(ids: string[]) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Arrows, Home, End, Enter, Space, letters | Arrows navigate and expand/collapse; Enter or Space selects; typing finds a visible label. |
+
+## Accessibility
+
+- One tree item is in the Tab sequence. Level, position, selected, expanded, and disabled state are explicit.
+
+## Classes
+
+`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/tree-view.tsx`  
+CSS: `packages/core/css/components/tree-view.css`
+
+
+---
+
+# Toolbar
+
+Groups actions behind one Tab stop with arrow-key navigation.
+
+Category: actions  
+Name: `toolbar`  
+Also known as: Toolbar  
+Page: https://vlak.dev/components/toolbar/
+
+## When to use
+
+- Editor commands and collections of related actions.
+
+## When not to
+
+- A simple joined visual group with independent Tab stops; use ButtonGroup.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { Toolbar } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add toolbar
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/toolbar.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-toolbar" role="toolbar" aria-label="Editing"><button class="rs-btn-ghost" tabindex="0">Copy</button><button class="rs-btn-ghost" tabindex="-1">Undo</button></div>
+```
+
+## Example
+
+```tsx
+import { Toolbar } from "@noorddev/vlak-react";
+
+<Toolbar label="Editing" actions={[{ id: "copy", label: "Copy", icon: "copy", onAction: () => {} }, { id: "undo", label: "Undo", icon: "undo", onAction: () => {} }]} />
+```
+
+## Props
+
+### Toolbar
+
+Named action collection with one Tab stop and roving keyboard focus.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `actions` (required) | `ToolbarAction[]` |  |  |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, arrows, Home, End, Enter, Space | Tab enters once; arrows and Home/End move between enabled actions; Enter/Space activates. |
+
+## Accessibility
+
+- Exposes a named toolbar with orientation and pressed state. Disabled actions are skipped during roving navigation.
+
+## Classes
+
+`rs-toolbar`, `rs-toolbar-vertical`, `rs-toolbar-pressed`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/toolbar.tsx`  
+CSS: `packages/core/css/components/toolbar.css`
+
+
+---
+
+# Bottom navigation
+
+Presents mobile destinations with current state and safe-area spacing.
+
+Category: navigation  
+Name: `bottom-navigation`  
+Also known as: BottomNavigation  
+Page: https://vlak.dev/components/bottom-navigation/
+
+## When to use
+
+- Three to five primary destinations in a mobile product.
+
+## When not to
+
+- Action commands or large collections of destinations.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { BottomNavigation } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add bottom-navigation
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/bottom-navigation.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<nav class="rs-bottom-navigation" aria-label="Primary navigation"><ul class="rs-bottom-navigation-list"><li><a class="rs-bottom-navigation-link rs-bottom-navigation-current" href="/" aria-current="page">Home</a></li><li><a class="rs-bottom-navigation-link" href="/docs/">Docs</a></li></ul></nav>
+```
+
+## Example
+
+```tsx
+import { BottomNavigation } from "@noorddev/vlak-react";
+
+<BottomNavigation current="interfaces" items={[{ id: "components", label: "Components", href: "/components/", icon: "grid" }, { id: "interfaces", label: "Interfaces", href: "/interfaces/", icon: "layout" }, { id: "docs", label: "Docs", href: "/docs/", icon: "file-text" }]} />
+```
+
+## Props
+
+### BottomNavigation
+
+Mobile destinations with safe-area padding and native links. Keep to five items.
+
+Extends `HTMLAttributes<HTMLElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `BottomNavigationItem[]` |  |  |
+| `current` | `string` |  |  |
+| `label` | `string` | `"Primary navigation"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter | Tab moves through native links; Enter follows the destination. |
+
+## Accessibility
+
+- A named navigation landmark and aria-current page indicate the active destination. Count badges are readable text.
+
+## Classes
+
+`rs-bottom-navigation`, `rs-bottom-navigation-list`, `rs-bottom-navigation-link`, `rs-bottom-navigation-current`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/bottom-navigation.tsx`  
+CSS: `packages/core/css/components/bottom-navigation.css`
+
+
+---
+
+# Overflow list
+
+Keeps priority actions visible and moves excess actions into a menu.
+
+Category: actions  
+Name: `overflow-list`  
+Also known as: OverflowList  
+Page: https://vlak.dev/components/overflow-list/
+
+## When to use
+
+- Responsive action rows where order also establishes priority.
+
+## When not to
+
+- Hiding critical navigation or a form's only submit action.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { OverflowList } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add overflow-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/overflow-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-overflow-list" role="group" aria-label="Actions"><button class="rs-btn-ghost">Copy</button><div class="rs-overflow-list-more"><button class="rs-btn-ghost" aria-haspopup="menu">More actions</button></div></div>
+```
+
+## Example
+
+```tsx
+import { OverflowList } from "@noorddev/vlak-react";
+
+<OverflowList maxVisible={2} items={[{ id: "copy", label: "Copy", onAction: () => {} }, { id: "duplicate", label: "Duplicate", onAction: () => {} }, { id: "archive", label: "Archive", onAction: () => {} }]} />
+```
+
+## Props
+
+### OverflowList
+
+Keeps priority actions in order and moves the remainder into a keyboard menu.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `OverflowAction[]` |  |  |
+| `label` | `string` | `"Actions"` |  |
+| `maxVisible` | `number` | `items.length` | Upper bound on visible priority actions, available width may show fewer. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space, arrows, Escape | Native visible buttons activate normally. The overflow uses DropdownMenu keyboard navigation and Escape. |
+
+## Accessibility
+
+- Overflow actions remain in a named menu. Hidden measurement text is excluded from accessibility.
+
+## Classes
+
+`rs-overflow-list`, `rs-overflow-list-measure`, `rs-overflow-list-sample`, `rs-overflow-list-more`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/overflow-list.tsx`  
+CSS: `packages/core/css/components/overflow-list.css`
+
+
+---
+
+# Filter bar
+
+Shows active filters with individual removal, reset, and a result count.
+
+Category: patterns  
+Name: `filter-bar`  
+Also known as: FilterBar  
+Page: https://vlak.dev/components/filter-bar/
+
+## When to use
+
+- Search results and data views with multiple active filters.
+
+## When not to
+
+- Editing complex logic directly; use QueryBuilder.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { FilterBar } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add filter-bar
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/filter-bar.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-filter-bar" role="group" aria-label="Active filters"><button class="rs-btn-ghost" aria-label="Remove Alkmaar filter">Alkmaar ×</button><span class="rs-filter-bar-count" role="status">12 results</span></div>
+```
+
+## Example
+
+```tsx
+import { FilterBar } from "@noorddev/vlak-react";
+
+<FilterBar defaultValue={[{ id: "city", label: "Alkmaar" }, { id: "status", label: "Published" }]} resultCount={12} />
+```
+
+## Props
+
+### FilterBar
+
+Removable active filters and result count. Supply filter editors as children.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `ActiveFilter[]` |  |  |
+| `defaultValue` | `ActiveFilter[]` | `[]` |  |
+| `onValueChange` | `(filters: ActiveFilter[]) => void` |  |  |
+| `resultCount` | `number` |  |  |
+| `label` | `string` | `"Active filters"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Tab reaches remove/reset actions; Enter or Space applies changes and returns focus to the group. |
+
+## Accessibility
+
+- Removal buttons name their filters. Result count is a polite status; children can supply labeled filter editors.
+
+## Classes
+
+`rs-filter-bar`, `rs-filter-bar-count`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/filter-bar.tsx`  
+CSS: `packages/core/css/components/filter-bar.css`
+
+
+---
+
+# Query builder
+
+Builds nested filter conditions from fields, operators, and values.
+
+Category: patterns  
+Name: `query-builder`  
+Also known as: QueryBuilder  
+Page: https://vlak.dev/components/query-builder/
+
+## When to use
+
+- User-defined filters and conditional rule sets.
+
+## When not to
+
+- Executing SQL or trusting the summary as a database query.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { describeQuery, QueryBuilder } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add query-builder
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/query-builder.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-query-builder"><fieldset class="rs-query-builder-group"><legend class="rs-query-builder-legend">Filter conditions</legend><p class="rs-query-builder-summary">Name contains "Drive"</p></fieldset></div>
+```
+
+## Example
+
+```tsx
+import { QueryBuilder } from "@noorddev/vlak-react";
+
+<QueryBuilder fields={[{ id: "name", label: "Name" }, { id: "range", label: "Range", type: "number" }]} defaultValue={{ id: "root", combinator: "and", rules: [{ id: "rule", field: "name", operator: "contains", value: "Drive" }] }} />
+```
+
+## Props
+
+### QueryBuilder
+
+A structured filter expression with nested groups and native field editors.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fields` (required) | `QueryField[]` |  |  |
+| `value` | `QueryGroup` |  |  |
+| `defaultValue` | `QueryGroup` |  |  |
+| `onValueChange` | `(query: QueryGroup) => void` |  |  |
+| `label` | `string` | `"Filter conditions"` |  |
+| `maxDepth` | `number` | `3` | Maximum group nesting, capped at eight. |
+
+### Functions
+
+- `describeQuery` (function): Human-readable summary only. This is not SQL and never executes a query.
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space, native select keys | Native fields handle entry and selection; buttons add or remove rules/groups. |
+
+## Accessibility
+
+- Fieldsets name nested groups. Every editor has a label and a human-readable expression summary is available.
+
+## Classes
+
+`rs-query-builder`, `rs-query-builder-group`, `rs-query-builder-legend`, `rs-query-builder-rule`, `rs-query-builder-actions`, `rs-query-builder-summary`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [input](input.md), [native-select](native-select.md).  
+React: `packages/react/src/components/query-builder.tsx`  
+CSS: `packages/core/css/components/query-builder.css`
+
+
+---
+
+# Sortable list
+
+Reorders items with drag handles, move buttons, and keyboard shortcuts.
+
+Category: content  
+Name: `sortable-list`  
+Also known as: SortableList  
+Page: https://vlak.dev/components/sortable-list/
+
+## When to use
+
+- Ordering tasks, workflow steps, and priority lists.
+
+## When not to
+
+- Cross-column status changes alone; use KanbanBoard.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { SortableList } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add sortable-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/sortable-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<ol class="rs-sortable-list" aria-label="Reorder items"><li class="rs-sortable-list-item"><div class="rs-sortable-list-content">Research</div><div class="rs-sortable-list-actions"><button class="rs-btn-ghost" aria-label="Move Research down">Move down</button></div></li></ol>
+```
+
+## Example
+
+```tsx
+import { SortableList } from "@noorddev/vlak-react";
+
+<SortableList defaultValue={[{ id: "research", label: "Research" }, { id: "design", label: "Design" }, { id: "build", label: "Build" }]} />
+```
+
+## Props
+
+### SortableList
+
+Reordering through drag, named move buttons, or Alt and the arrow keys.
+
+Extends `Omit<HTMLAttributes<HTMLOListElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLOListElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `SortableItem[]` |  |  |
+| `defaultValue` | `SortableItem[]` | `[]` |  |
+| `onValueChange` | `(items: SortableItem[]) => void` |  |  |
+| `label` | `string` | `"Reorder items"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space, Alt+Arrow up/down | Move buttons work with Enter/Space; Alt with Up/Down on a handle changes its position. |
+
+## Accessibility
+
+- Each move action names the item; position changes are announced and focus stays with the moved item.
+
+## Classes
+
+`rs-sortable-list`, `rs-sortable-list-item`, `rs-sortable-list-content`, `rs-sortable-list-actions`, `rs-sortable-list-status`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/sortable-list.tsx`  
+CSS: `packages/core/css/components/sortable-list.css`
+
+
+---
+
+# Virtual list
+
+Windows large fixed-height collections while preserving focused rows.
+
+Category: content  
+Name: `virtual-list`  
+Also known as: VirtualList  
+Page: https://vlak.dev/components/virtual-list/
+
+## When to use
+
+- Large collections where fixed-height rows are an acceptable constraint.
+
+## When not to
+
+- Short lists or variable-height content without a fixed row contract.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { VirtualList } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add virtual-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/virtual-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-virtual-list" role="list" aria-label="Records" style="height:264px"><div class="rs-virtual-list-canvas" role="none" style="height:44px"><div class="rs-virtual-list-item" role="listitem" tabindex="0" aria-posinset="1" aria-setsize="1" style="height:44px">Record 1</div></div></div>
+```
+
+## Example
+
+```tsx
+import { VirtualList } from "@noorddev/vlak-react";
+
+<VirtualList label="Records" height={264} items={Array.from({ length: 200 }, (_, index) => ({ id: String(index), label: `Record ${index + 1}` }))} />
+```
+
+## Props
+
+### VirtualList
+
+Fixed-height windowing with a retained focused row and keyboard navigation.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `VirtualItem[]` |  |  |
+| `label` (required) | `string` |  |  |
+| `rowHeight` | `number` | `44` | Fixed row height, at least 44px. |
+| `height` | `number` | `352` |  |
+| `overscan` | `number` | `4` |  |
+| `emptyLabel` | `string` | `"No items"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Arrow up/down, Home, End | A row enters the Tab sequence; arrows and Home/End scroll and focus rows. Nested controls keep their own keys. |
+
+## Accessibility
+
+- List items expose total size and position. Focused rows are retained when outside the visible window.
+
+## Classes
+
+`rs-virtual-list`, `rs-virtual-list-canvas`, `rs-virtual-list-item`, `rs-virtual-list-empty`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/virtual-list.tsx`  
+CSS: `packages/core/css/components/virtual-list.css`
+
+
+---
+
+# Master detail
+
+Links selection to a detail panel with a mobile back path.
+
+Category: patterns  
+Name: `master-detail`  
+Also known as: MasterDetail  
+Page: https://vlak.dev/components/master-detail/
+
+## When to use
+
+- Inboxes, asset browsers, and list/detail workspaces.
+
+## When not to
+
+- Independent panels without a selection relationship; use Split.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { MasterDetail } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add master-detail
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/master-detail.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-master-detail"><div class="rs-master-detail-list" role="group" aria-label="Studies"><button class="rs-master-detail-button rs-master-detail-selected" aria-pressed="true">Drive</button></div><section class="rs-master-detail-panel" aria-label="Drive details"><h2 class="rs-master-detail-title">Drive</h2><p>Vehicle controls</p></section></div>
+```
+
+## Example
+
+```tsx
+import { MasterDetail } from "@noorddev/vlak-react";
+
+<MasterDetail label="Studies" items={[{ id: "drive", label: "Drive", description: "Vehicle controls", detail: <p>Range, energy, and media in one shared grid.</p> }, { id: "orbit", label: "Orbit", description: "Observation network", detail: <p>Track assets and their current passes.</p> }]} />
+```
+
+## Props
+
+### MasterDetail
+
+List/detail selection with a mobile back path and preserved item focus.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `MasterDetailItem[]` |  |  |
+| `label` | `string` | `"Items"` |  |
+| `value` | `string \| null` |  |  |
+| `defaultValue` | `string \| null` | `null` |  |
+| `onValueChange` | `(id: string \| null) => void` |  |  |
+| `emptyLabel` | `string` | `"Select an item to see its details"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Select an item with its button; focus moves to the detail heading. Mobile Back restores focus to its list item. |
+
+## Accessibility
+
+- Native selected buttons and a named detail region. Mobile layout preserves an explicit return path.
+
+## Classes
+
+`rs-master-detail`, `rs-master-detail-list`, `rs-master-detail-list-hidden`, `rs-master-detail-panel`, `rs-master-detail-panel-hidden`, `rs-master-detail-title`, `rs-master-detail-description`, `rs-master-detail-back`, `rs-master-detail-button`, `rs-master-detail-selected`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/master-detail.tsx`  
+CSS: `packages/core/css/components/master-detail.css`
+
+
+---
+
+# Property grid
+
+Aligns editable labels, values, units, and hints in an inspector.
+
+Category: patterns  
+Name: `property-grid`  
+Also known as: PropertyGrid  
+Page: https://vlak.dev/components/property-grid/
+
+## When to use
+
+- Inspector panels and dense settings with mixed field types.
+
+## When not to
+
+- Read-only facts; use DescriptionList.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { PropertyGrid } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add property-grid
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/property-grid.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-property-grid" role="group" aria-label="Properties"><div class="rs-property-grid-row"><label class="rs-property-grid-label" for="property-name">Name</label><div class="rs-property-grid-control"><input class="rs-input" id="property-name" value="Drive" /></div></div></div>
+```
+
+## Example
+
+```tsx
+import { PropertyGrid } from "@noorddev/vlak-react";
+
+<PropertyGrid defaultValue={{ name: "Drive", range: 386, enabled: true }} fields={[{ id: "name", label: "Name" }, { id: "range", label: "Range", type: "number", unit: "km", min: 0 }, { id: "enabled", label: "Connected", type: "switch" }]} />
+```
+
+## Props
+
+### PropertyGrid
+
+Editable property rows with shared label/value/unit alignment.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fields` (required) | `PropertyField[]` |  |  |
+| `value` | `PropertyValues` |  |  |
+| `defaultValue` | `PropertyValues` | `{}` |  |
+| `onValueChange` | `(values: PropertyValues) => void` |  |  |
+| `label` | `string` | `"Properties"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, native field keys, Space | Native text/number/select fields keep their editing keys; Space toggles a switch. |
+
+## Accessibility
+
+- Each row labels its actual control and associates its hint. Native numeric constraints remain available to forms.
+
+## Classes
+
+`rs-property-grid`, `rs-property-grid-row`, `rs-property-grid-label`, `rs-property-grid-control`, `rs-property-grid-note`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [native-select](native-select.md), [switch](switch.md).  
+React: `packages/react/src/components/property-grid.tsx`  
+CSS: `packages/core/css/components/property-grid.css`
+
+
+---
+
+# Number field
+
+Edits a numeric value with native validation, units, and bounded 44px increase and decrease actions.
+
+Category: forms  
+Name: `number-field`  
+Also known as: NumberField, Number input, Numeric stepper, Quantity field  
+Page: https://vlak.dev/components/number-field/
+
+## When to use
+
+- Numeric quantities that need visible stepping, native bounds, or a unit.
+- Stacked controls when increase belongs above decrease at the end of a reading.
+
+## When not to
+
+- A continuous interval with two endpoints; use RangeSlider.
+- Codes and identifiers, which may have leading zeroes; use Input.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { NumberField } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add number-field
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/number-field.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-number-field"><label class="rs-number-field-label" for="cabin-temperature">Cabin temperature</label><div class="rs-number-field-row"><input class="rs-input rs-number-field-input" id="cabin-temperature" type="number" min="16" max="28" value="20" aria-describedby="cabin-unit" /><span class="rs-number-field-unit" id="cabin-unit">°C</span><div class="rs-number-field-controls"><button class="rs-btn-ghost rs-number-field-action" type="button" aria-label="Decrease value">−</button><button class="rs-btn-ghost rs-number-field-action" type="button" aria-label="Increase value">+</button></div></div></div>
+```
+
+## Example
+
+```tsx
+import { NumberField } from "@noorddev/vlak-react";
+
+<NumberField label="Cabin temperature" name="temperature" defaultValue={20} min={16} max={28} step={0.5} unit="°C" controlsPlacement="stacked" />
+```
+
+## Props
+
+### NumberField
+
+Numeric input with native validation and bounded increment/decrement actions.
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "defaultValue" | "onChange" | "size" | "min" | "max" | "step">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number \| null` |  |  |
+| `defaultValue` | `number \| null` | `null` |  |
+| `onValueChange` | `(value: number \| null) => void` |  |  |
+| `min` | `number` |  |  |
+| `max` | `number` |  |  |
+| `step` | `number` | `1` |  |
+| `label` | `ReactNode` |  |  |
+| `unit` | `string` |  |  |
+| `incrementLabel` | `string` | `"Increase value"` |  |
+| `decrementLabel` | `string` | `"Decrease value"` |  |
+| `controlsPlacement` | `"inline" \| "stacked"` | `"inline"` | Stack the increase button above decrease at the end of the field. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between the number field and available step actions. |
+| Arrow up, Arrow down | Uses the browser's native numeric stepping while the input is focused. |
+| Enter, Space | Activates a focused increase or decrease button. |
+
+## Accessibility
+
+- The forwarded ref reaches the native number input; label, native form attributes, and name reach that input.
+- min, max, and step use native validity. The buttons clamp at bounds; typed values retain native validation feedback.
+- A cleared field reports null. value/defaultValue/onValueChange support controlled and uncontrolled use; form reset restores uncontrolled defaults.
+- The unit is linked as a description. Each step action has a name and a 44px target.
+
+## Classes
+
+`rs-number-field`, `rs-number-field-label`, `rs-number-field-row`, `rs-number-field-input`, `rs-number-field-unit`, `rs-number-field-action`, `rs-number-field-controls`, `rs-number-field-controls-stacked`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [button](button.md).  
+React: `packages/react/src/components/number-field.tsx`  
+CSS: `packages/core/css/components/number-field.css`
+
+
+---
+
+# Range slider
+
+Sets an ordered numeric interval with two named native range controls and visible endpoint values.
+
+Category: forms  
+Name: `range-slider`  
+Also known as: RangeSlider, Interval selector, Min max slider, Dual range  
+Page: https://vlak.dev/components/range-slider/
+
+## When to use
+
+- A numeric lower and upper bound such as budget or duration.
+- Separate labeled tracks when each endpoint needs clear keyboard and touch access.
+
+## When not to
+
+- A single setting; use Slider.
+- Time-based seeking with buffered media; use MediaScrubber.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { RangeSlider } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add range-slider
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/range-slider.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-range-slider"><legend class="rs-range-slider-legend">Budget</legend><div class="rs-range-slider-row"><label class="rs-range-slider-label" for="budget-from">From</label><input class="rs-range-slider-input" id="budget-from" type="range" min="0" max="800" value="120" /><output class="rs-range-slider-output" for="budget-from">120</output></div><div class="rs-range-slider-row"><label class="rs-range-slider-label" for="budget-to">To</label><input class="rs-range-slider-input" id="budget-to" type="range" min="120" max="800" value="420" /><output class="rs-range-slider-output" for="budget-to">420</output></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { RangeSlider } from "@noorddev/vlak-react";
+
+<RangeSlider label="Budget" name="budget" defaultValue={[120, 420]} min={0} max={800} step={20} formatValue={(value) => `€${value}`} />
+```
+
+## Props
+
+### RangeSlider
+
+Extends `Omit<HTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `[number, number]` |  |  |
+| `defaultValue` | `[number, number]` |  |  |
+| `onValueChange` | `(value: [number, number]) => void` |  |  |
+| `min` | `number` | `0` |  |
+| `max` | `number` | `100` |  |
+| `step` | `number` | `1` |  |
+| `label` | `ReactNode` | `"Range"` |  |
+| `lowerLabel` | `string` | `"From"` |  |
+| `upperLabel` | `string` | `"To"` |  |
+| `name` | `string` |  |  |
+| `disabled` | `boolean` |  |  |
+| `formatValue` | `(value: number) => string` | `String` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between the lower and upper native range inputs. |
+| Arrow keys, Home, End | Uses the browser's native range stepping within the other endpoint's bounds. |
+
+## Accessibility
+
+- Uses a fieldset and legend with a separate label and visible output for each endpoint; each input has a 44px-high target.
+- Each endpoint's native min/max prevents crossing. formatValue also supplies aria-valuetext.
+- With name, native form values are submitted as name[0] and name[1]. Uncontrolled values reset with the form.
+- The ref reaches the fieldset; Field hint and error descriptions reach the group.
+
+## Classes
+
+`rs-range-slider`, `rs-range-slider-legend`, `rs-range-slider-row`, `rs-range-slider-label`, `rs-range-slider-input`, `rs-range-slider-output`
+
+## Dependencies
+
+Registry dependencies: [field](field.md).  
+React: `packages/react/src/components/range-slider.tsx`  
+CSS: `packages/core/css/components/range-slider.css`
+
+
+---
+
+# Multi-select
+
+Selects multiple predefined options from a searchable native disclosure with named checkboxes.
+
+Category: forms  
+Name: `multi-select`  
+Also known as: MultiSelect, Multiple select, Checkbox picker  
+Page: https://vlak.dev/components/multi-select/
+
+## When to use
+
+- Multiple values from a known option set.
+- A compact summary that expands to filterable checkbox choices.
+
+## When not to
+
+- Freeform values; use TagInput.
+- One option only; use Select or NativeSelect.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { MultiSelect } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add multi-select
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/multi-select.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-multi-select"><legend class="rs-multi-select-legend">Cities</legend><details><summary class="rs-multi-select-trigger">Select options</summary><div class="rs-multi-select-panel"><label class="rs-multi-select-option"><input type="checkbox" name="cities" value="alkmaar" /> Alkmaar</label><label class="rs-multi-select-option"><input type="checkbox" name="cities" value="bergen" /> Bergen</label></div></details></fieldset>
+```
+
+## Example
+
+```tsx
+import { MultiSelect } from "@noorddev/vlak-react";
+
+<MultiSelect label="Cities" name="cities" options={[{ value: "alkmaar", label: "Alkmaar" }, { value: "bergen", label: "Bergen" }, { value: "castricum", label: "Castricum" }]} defaultValue={["alkmaar"]} />
+```
+
+## Props
+
+### MultiSelect
+
+A native disclosure containing named checkboxes; selections remain visible when collapsed.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` (required) | `MultiSelectOption[]` |  |  |
+| `value` | `string[]` |  |  |
+| `defaultValue` | `string[]` | `[]` |  |
+| `onValueChange` | `(value: string[]) => void` |  |  |
+| `label` | `ReactNode` | `"Options"` |  |
+| `placeholder` | `string` | `"Select options"` |  |
+| `searchable` | `boolean` | `true` |  |
+| `searchLabel` | `string` | `"Filter options"` |  |
+| `emptyLabel` | `ReactNode` | `"No matching options"` |  |
+| `clearLabel` | `string` | `"Clear selection"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Enter, Space | Opens or closes the native summary, or toggles the focused checkbox. |
+| Tab | Moves through search, available checkboxes, and clear selection. |
+| Escape | Closes the disclosure and returns focus to its summary. |
+
+## Accessibility
+
+- Uses native details and checkboxes instead of exposing an incomplete listbox interaction.
+- The legend names the field; each checkbox has its own visible name. Selected rows change fill across the full surface.
+- Disabled options cannot change; clear preserves disabled selections. Empty search results are announced politely.
+- With name, selected values are submitted as repeated fields. The ref reaches the fieldset; uncontrolled selections reset with the form.
+
+## Classes
+
+`rs-multi-select`, `rs-multi-select-legend`, `rs-multi-select-trigger`, `rs-multi-select-panel`, `rs-multi-select-options`, `rs-multi-select-option`, `rs-multi-select-selected`, `rs-multi-select-empty`, `rs-multi-select-clear`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [button](button.md), [checkbox](checkbox.md), [icons](icons.md), [field](field.md).  
+React: `packages/react/src/components/multi-select.tsx`  
+CSS: `packages/core/css/components/multi-select.css`
+
+
+---
+
+# Tag input
+
+Creates and removes freeform text tokens with paste splitting, duplicate prevention, and validation.
+
+Category: forms  
+Name: `tag-input`  
+Also known as: TagInput, Token input, Chips input, Freeform tags  
+Page: https://vlak.dev/components/tag-input/
+
+## When to use
+
+- Short freeform labels, recipients, or keywords.
+- Comma-separated or newline-separated pasted values that should become distinct tokens.
+
+## When not to
+
+- A fixed vocabulary; use MultiSelect.
+- Long prose; use Textarea.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { TagInput } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add tag-input
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/tag-input.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-tag-input"><label class="rs-tag-input-label" for="project-tags">Project tags</label><ul class="rs-tag-input-list" aria-label="Current tags"><li class="rs-tag-input-tag">Design<button class="rs-btn-ghost rs-tag-input-remove" type="button" aria-label="Remove Design">×</button></li></ul><div class="rs-tag-input-row"><input class="rs-input rs-tag-input-input" id="project-tags" placeholder="Add a tag" /><button class="rs-btn-ghost rs-tag-input-add" type="button">Add</button></div></div>
+```
+
+## Example
+
+```tsx
+import { TagInput } from "@noorddev/vlak-react";
+
+<TagInput label="Project tags" name="tags" defaultValue={["Research", "Design"]} maxTags={5} validate={(tag) => tag.length > 24 ? "Use 24 characters or fewer" : undefined} />
+```
+
+## Props
+
+### TagInput
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string[]` |  |  |
+| `defaultValue` | `string[]` | `[]` |  |
+| `onValueChange` | `(value: string[]) => void` |  |  |
+| `label` | `ReactNode` | `"Tags"` |  |
+| `name` | `string` |  |  |
+| `disabled` | `boolean` |  |  |
+| `placeholder` | `string` | `"Add a tag"` |  |
+| `maxTags` | `number` |  |  |
+| `validate` | `(tag: string) => string` |  | Return an error for an invalid token, or undefined to accept it. |
+| `addLabel` | `string` | `"Add"` |  |
+| `removeLabel` | `(tag: string) => string` | `(tag) => \`Remove ${tag}\`` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Enter, comma | Commits a trimmed draft as a tag without submitting the form. |
+| Backspace in an empty input | Focuses the last tag's remove button. |
+| Escape | Clears the current draft and its error. |
+| Tab, Enter, Space | Reaches and activates named Add and Remove buttons. |
+
+## Accessibility
+
+- The forwarded ref reaches the text input. Each 44px remove target is named with its tag.
+- Exact duplicate tags are ignored; validate and maxTags reject an addition while preserving the draft and exposing an alert.
+- Hidden fields submit each tag under name. Form reset restores uncontrolled tags and clears the draft.
+- Keyboard composition is respected; Enter does not commit while an input method is composing text.
+
+## Classes
+
+`rs-tag-input`, `rs-tag-input-label`, `rs-tag-input-list`, `rs-tag-input-tag`, `rs-tag-input-remove`, `rs-tag-input-row`, `rs-tag-input-input`, `rs-tag-input-add`, `rs-tag-input-feedback`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [button](button.md), [icons](icons.md), [field](field.md).  
+React: `packages/react/src/components/tag-input.tsx`  
+CSS: `packages/core/css/components/tag-input.css`
+
+
+---
+
+# Date range picker
+
+Collects start and end dates with two native date editors, shared constraints, and 44px controls.
+
+Category: forms  
+Name: `date-range-picker`  
+Also known as: DateRangePicker, Date interval, Start and end dates  
+Page: https://vlak.dev/components/date-range-picker/
+
+## When to use
+
+- A start/end date range that should use the platform's date editor and calendar picker.
+- Forms that submit ISO calendar dates without time-zone conversion.
+
+## When not to
+
+- A single date; use DatePicker or Calendar.
+- Time-of-day selection; use TimeField.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { DateRangePicker } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add date-range-picker
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/date-range-picker.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-date-range-picker"><legend class="rs-date-range-picker-legend">Stay</legend><div class="rs-date-range-picker-fields"><label>Start date<input class="rs-input rs-date-range-picker-input" type="date" name="stay[start]" value="2026-09-08" /></label><label>End date<input class="rs-input rs-date-range-picker-input" type="date" name="stay[end]" min="2026-09-08" value="2026-09-12" /></label></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { DateRangePicker } from "@noorddev/vlak-react";
+
+<DateRangePicker label="Stay" name="stay" defaultValue={{ start: "2026-09-08", end: "2026-09-12" }} min="2026-09-01" required />
+```
+
+## Props
+
+### DateRangePicker
+
+Two native date editors share bounds; changing the start beyond the end clears the end.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `DateRangeValue` |  | ISO calendar dates, YYYY-MM-DD; no time zone conversion. |
+| `defaultValue` | `DateRangeValue` | `{ start: "", end: "" }` |  |
+| `onValueChange` | `(value: DateRangeValue) => void` |  |  |
+| `label` | `ReactNode` | `"Date range"` |  |
+| `startLabel` | `string` | `"Start date"` |  |
+| `endLabel` | `string` | `"End date"` |  |
+| `min` | `string` |  |  |
+| `max` | `string` |  |  |
+| `required` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through the two native date editors and their platform picker controls. |
+| Arrow keys | Edits the active date segment according to the browser's native behavior. |
+
+## Accessibility
+
+- Uses a fieldset/legend and a separately labeled native date input for each endpoint. The browser owns each date popup.
+- Values use year-month-day strings, for example 2026-09-06. A new start after the old end clears the end; end's minimum follows the start.
+- min, max, and required use native constraint validation. A supplied inverted controlled range is marked invalid.
+- With name, form fields are name[start] and name[end]. The ref reaches the fieldset; uncontrolled values reset with the form.
+
+## Classes
+
+`rs-date-range-picker`, `rs-date-range-picker-legend`, `rs-date-range-picker-fields`, `rs-date-range-picker-input`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [field](field.md).  
+React: `packages/react/src/components/date-range-picker.tsx`  
+CSS: `packages/core/css/components/date-range-picker.css`
+
+
+---
+
+# Time field
+
+Edits a time using the platform's localized time control with native bounds and second-based steps.
+
+Category: forms  
+Name: `time-field`  
+Also known as: TimeField, Time input, Time picker  
+Page: https://vlak.dev/components/time-field/
+
+## When to use
+
+- A time of day with browser-native locale and keyboard behavior.
+- Minutes or seconds, with the native step measured in seconds.
+
+## When not to
+
+- An elapsed duration; use NumberField with units.
+- A calendar date; use DatePicker.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { TimeField } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add time-field
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/time-field.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<label>Start time<input class="rs-input rs-time-field" type="time" name="start-time" value="09:30" min="09:00" max="18:00" step="900" /></label>
+```
+
+## Example
+
+```tsx
+import { TimeField } from "@noorddev/vlak-react";
+
+<TimeField label="Start time" name="start-time" defaultValue="09:30" min="09:00" max="18:00" step={900} hint="Appointments start every 15 minutes" />
+```
+
+## Props
+
+### TimeField
+
+The platform time editor, including its locale, keyboard and step validation.
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "defaultValue" | "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` |  | A 24-hour HTML time value, HH:mm or HH:mm:ss. The browser localizes editing. |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `label` | `ReactNode` |  |  |
+| `hint` | `ReactNode` |  |  |
+| `error` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, arrow keys | Uses the browser's time segment navigation and native stepping. |
+| Typing | Edits the active hour, minute, or second segment according to the platform. |
+
+## Accessibility
+
+- Wraps Input, preserving label, hint, error, native form attributes, disabled/readOnly and the forwarded input ref.
+- Values use HH:mm or HH:mm:ss; the visible editor follows the browser's locale and 12/24-hour preference.
+- No date or time-zone conversion is performed. Controlled/uncontrolled state and form reset are supported.
+
+## Classes
+
+`rs-time-field`
+
+## Dependencies
+
+Registry dependencies: [input](input.md).  
+React: `packages/react/src/components/time-field.tsx`  
+CSS: `packages/core/css/components/time-field.css`
+
+
+---
+
+# File upload
+
+Collects validated files through browse or drop, with optional upload progress, cancellation, and retry.
+
+Category: forms  
+Name: `file-upload`  
+Also known as: FileUpload, Drop zone, Attachment upload, File input  
+Page: https://vlak.dev/components/file-upload/
+
+## When to use
+
+- Validated attachment queues with native file browsing and drag-and-drop.
+- Provide onUpload when the app has a transport; it receives an AbortSignal and progress callback.
+
+## When not to
+
+- Assuming files upload automatically; without onUpload this only collects selected files.
+- Client checks as security enforcement; validate uploaded files again on the server.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { FileUpload } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add file-upload
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/file-upload.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-file-upload"><div class="rs-file-upload-drop"><span class="rs-file-upload-title">Choose files</span><span class="rs-file-upload-description" id="files-hint">Drop files here or browse</span><input class="rs-file-upload-input" type="file" multiple aria-label="Choose files" aria-describedby="files-hint" /></div></div>
+```
+
+## Example
+
+```tsx
+import { FileUpload } from "@noorddev/vlak-react";
+
+<FileUpload label="Project files" name="attachments" accept=".pdf,.txt" maxFiles={5} maxSize={10 * 1024 * 1024} description="PDF or text, up to 10 MB each" />
+```
+
+## Props
+
+### FileUpload
+
+Validated file selection, with an optional cancellable upload transport.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `File[]` |  |  |
+| `defaultValue` | `File[]` | `[]` |  |
+| `onValueChange` | `(files: File[]) => void` |  |  |
+| `accept` | `string` |  |  |
+| `multiple` | `boolean` | `true` |  |
+| `maxFiles` | `number` |  |  |
+| `maxSize` | `number` |  |  |
+| `disabled` | `boolean` |  |  |
+| `name` | `string` |  |  |
+| `label` | `string` | `"Choose files"` |  |
+| `description` | `ReactNode` | `"Drop files here or browse"` |  |
+| `onReject` | `(rejections: FileUploadRejection[]) => void` |  |  |
+| `onUpload` | `(file: File, context: FileUploadContext) => Promise<void>` |  | Optional transport supplied by the app. Omit to collect files without uploading. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Reaches the native file picker and labeled Remove, Cancel, and Retry actions. |
+
+## Accessibility
+
+- The native file input covers the drop target, remains keyboard-focusable, and receives the forwarded ref.
+- Rejected types, sizes and counts produce readable errors. Upload status is announced; progress bars are named with the file.
+- The app supplies onUpload(file, { signal, onProgress }). Cancel aborts the signal; errors retain the file and expose Retry.
+- With name, the browser's formdata event appends the accepted queue to native FormData. Use multipart/form-data for native file submission. Disabled queues are omitted.
+- Form reset restores uncontrolled files, clears errors and aborts active uploads. Unmount aborts outstanding transports.
+
+## Classes
+
+`rs-file-upload`, `rs-file-upload-drop`, `rs-file-upload-drag`, `rs-file-upload-input`, `rs-file-upload-title`, `rs-file-upload-description`, `rs-file-upload-list`, `rs-file-upload-item`, `rs-file-upload-row`, `rs-file-upload-name`, `rs-file-upload-actions`, `rs-file-upload-action`, `rs-file-upload-status`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [progress](progress.md).  
+React: `packages/react/src/components/file-upload.tsx`  
+CSS: `packages/core/css/components/file-upload.css`
+
+
+---
+
+# Transfer list
+
+Assigns options between available and selected lists using native checkboxes and explicit move actions.
+
+Category: forms  
+Name: `transfer-list`  
+Also known as: TransferList, Dual listbox, Assignment lists  
+Page: https://vlak.dev/components/transfer-list/
+
+## When to use
+
+- Assigning a visible subset from a manageable option list.
+- Work where available and assigned options should stay visible together.
+
+## When not to
+
+- Very large lists; use searchable MultiSelect.
+- Ordering selected records; use SortableList.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { TransferList } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add transfer-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/transfer-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-transfer-list"><legend class="rs-transfer-list-legend">Assign cities</legend><div class="rs-transfer-list-columns"><fieldset class="rs-transfer-list-panel"><legend class="rs-transfer-list-heading">Available</legend><label class="rs-transfer-list-item"><input type="checkbox" /> Alkmaar</label></fieldset><div class="rs-transfer-list-actions"><button class="rs-btn-ghost" type="button">Add selected</button><button class="rs-btn-ghost" type="button">Remove selected</button></div><fieldset class="rs-transfer-list-panel"><legend class="rs-transfer-list-heading">Selected</legend><p class="rs-transfer-list-empty">No options</p></fieldset></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { TransferList } from "@noorddev/vlak-react";
+
+<TransferList label="Coverage areas" name="areas" options={[{ value: "alkmaar", label: "Alkmaar" }, { value: "bergen", label: "Bergen" }, { value: "castricum", label: "Castricum" }]} defaultValue={["alkmaar"]} />
+```
+
+## Props
+
+### TransferList
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` (required) | `TransferListOption[]` |  |  |
+| `value` | `string[]` |  |  |
+| `defaultValue` | `string[]` | `[]` |  |
+| `onValueChange` | `(value: string[]) => void` |  |  |
+| `label` | `ReactNode` | `"Assign options"` |  |
+| `availableLabel` | `string` | `"Available"` |  |
+| `selectedLabel` | `string` | `"Selected"` |  |
+| `addLabel` | `string` | `"Add selected"` |  |
+| `removeLabel` | `string` | `"Remove selected"` |  |
+| `emptyLabel` | `string` | `"No options"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Space | Moves through and marks native checkbox options. |
+| Enter, Space on a move action | Adds or removes the marked options; marked state clears after the move. |
+
+## Accessibility
+
+- A top-level fieldset names the task; available and selected lists have distinct legends and counts.
+- Every option and move action has a 44px target. Disabled options stay fixed; unavailable moves are disabled.
+- The selected count is a polite status. Hidden fields submit each selected value under name.
+- The ref reaches the fieldset. Form reset restores uncontrolled values and clears marked options.
+
+## Classes
+
+`rs-transfer-list`, `rs-transfer-list-legend`, `rs-transfer-list-columns`, `rs-transfer-list-panel`, `rs-transfer-list-heading`, `rs-transfer-list-options`, `rs-transfer-list-item`, `rs-transfer-list-actions`, `rs-transfer-list-action`, `rs-transfer-list-empty`, `rs-transfer-list-status`
+
+## Dependencies
+
+Registry dependencies: [checkbox](checkbox.md), [button](button.md).  
+React: `packages/react/src/components/transfer-list.tsx`  
+CSS: `packages/core/css/components/transfer-list.css`
+
+
+---
+
+# Inline edit
+
+Switches a text value into an editor with explicit save and cancel, validation, and optional async persistence.
+
+Category: forms  
+Name: `inline-edit`  
+Also known as: InlineEdit, Editable text, Click to edit  
+Page: https://vlak.dev/components/inline-edit/
+
+## When to use
+
+- A short text value edited in its reading context.
+- Provide onSave to await persistence before committing a new value.
+
+## When not to
+
+- Long-form writing; use Textarea.
+- Implicit save-on-blur flows; this requires an explicit save.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { InlineEdit } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add inline-edit
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/inline-edit.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-inline-edit"><span class="rs-inline-edit-label">Project name</span><div class="rs-inline-edit-row"><span class="rs-inline-edit-value">Field study</span><button class="rs-btn-ghost rs-inline-edit-action" type="button" aria-label="Edit Project name">Edit</button></div></div>
+```
+
+## Example
+
+```tsx
+import { InlineEdit } from "@noorddev/vlak-react";
+
+<InlineEdit label="Project name" name="project" defaultValue="Field study" validate={(value) => value.trim() ? undefined : "Enter a project name"} />
+```
+
+## Props
+
+### InlineEdit
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `label` | `string` | `"Value"` |  |
+| `name` | `string` |  |  |
+| `disabled` | `boolean` |  |  |
+| `placeholder` | `string` | `"Not set"` |  |
+| `validate` | `(value: string) => string` |  |  |
+| `onSave` | `(value: string) => void \| Promise<void>` |  | Resolves before the value is committed. Rejections leave the draft editable. |
+| `editLabel` | `string` | `"Edit"` |  |
+| `saveLabel` | `string` | `"Save"` |  |
+| `cancelLabel` | `string` | `"Cancel"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Enter, Space on Edit | Opens the editor, focuses the input and selects its text. |
+| Enter in the editor | Validates and saves without submitting the enclosing form. |
+| Escape in the editor | Discards the draft and returns focus to Edit. |
+
+## Accessibility
+
+- The input is named by the visible label. Save errors preserve the draft and appear as alerts.
+- Successful save and cancel return focus to Edit. Pending saves disable duplicate actions and expose aria-busy.
+- Hidden name submits only the committed value. Form reset restores uncontrolled defaults and discards drafts; late pending responses do not reapply them.
+- The forwarded ref reaches the root div. No nested form is introduced.
+
+## Classes
+
+`rs-inline-edit`, `rs-inline-edit-row`, `rs-inline-edit-label`, `rs-inline-edit-value`, `rs-inline-edit-input`, `rs-inline-edit-action`, `rs-inline-edit-error`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [button](button.md).  
+React: `packages/react/src/components/inline-edit.tsx`  
+CSS: `packages/core/css/components/inline-edit.css`
+
+
+---
+
+# Rating
+
+Collects a discrete numeric score with 44px native radio choices and an optional clear action.
+
+Category: forms  
+Name: `rating`  
+Also known as: Rating, Score input, Rating group  
+Page: https://vlak.dev/components/rating/
+
+## When to use
+
+- An explicit score on a short, ordered scale.
+- Clearable feedback where no rating is distinct from the lowest score.
+
+## When not to
+
+- Unordered choices; use Radio.
+- Large or continuous numeric ranges; use Slider or NumberField.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { Rating } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add rating
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/rating.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-rating"><legend class="rs-rating-legend">Usefulness</legend><div class="rs-rating-choices"><label class="rs-rating-choice">1<input class="rs-rating-input" type="radio" name="usefulness" value="1" aria-label="1 of 3" /></label><label class="rs-rating-choice rs-rating-selected">2<input class="rs-rating-input" type="radio" name="usefulness" value="2" aria-label="2 of 3" checked /></label><label class="rs-rating-choice">3<input class="rs-rating-input" type="radio" name="usefulness" value="3" aria-label="3 of 3" /></label></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { Rating } from "@noorddev/vlak-react";
+
+<Rating label="How useful was this?" name="usefulness" max={5} defaultValue={4} getLabel={(value, max) => `${value} out of ${max}`} />
+```
+
+## Props
+
+### Rating
+
+A discrete score using native radios; zero means no rating.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` |  |  |
+| `defaultValue` | `number` | `0` |  |
+| `onValueChange` | `(value: number) => void` |  |  |
+| `max` | `number` | `5` |  |
+| `label` | `ReactNode` | `"Rating"` |  |
+| `getLabel` | `(value: number, max: number) => string` | `(score, total) => \`${score} of ${total}\`` |  |
+| `clearable` | `boolean` | `true` |  |
+| `clearLabel` | `string` | `"Clear rating"` |  |
+| `required` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Enters the native radio group at its current choice and reaches Clear. |
+| Arrow keys | Moves and selects among the native radio choices. |
+| Space | Selects a focused radio or activates Clear. |
+
+## Accessibility
+
+- The fieldset legend names the score; getLabel gives each choice a complete name such as 3 of 5.
+- Selection changes the full choice surface. Each choice is 44px with a 4px corner and a visible focus outline.
+- Zero means no rating. max is limited to 1–10 whole choices. required uses native radio-group validation.
+- name submits the selected score. The ref reaches the fieldset; uncontrolled values reset with the form.
+
+## Classes
+
+`rs-rating`, `rs-rating-legend`, `rs-rating-choices`, `rs-rating-choice`, `rs-rating-selected`, `rs-rating-input`, `rs-rating-clear`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/rating.tsx`  
+CSS: `packages/core/css/components/rating.css`
+
+
+---
+
+# Playback controls
+
+Groups named play, pause, previous, next, and stop controls with 44px targets.
+
+Category: actions  
+Name: `playback-controls`  
+Also known as: PlaybackControls, Transport controls, Media controls  
+Page: https://vlak.dev/components/playback-controls/
+
+## When to use
+
+- Transport controls beside media metadata or inside a player.
+- Custom previous and next labels when actions restart or seek.
+
+## When not to
+
+- A media source by itself; use MediaPlayer to bind to audio or video.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { PlaybackControls } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add playback-controls
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/playback-controls.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-playback-controls" role="group" aria-label="Playback controls"><button class="rs-btn-primary rs-playback-action" type="button" aria-label="Play">Play</button></div>
+```
+
+## Example
+
+```tsx
+import { PlaybackControls } from "@noorddev/vlak-react";
+
+<PlaybackControls playing={playing} onPlayingChange={setPlaying} onPrevious={restartTrack} previousLabel="Restart track" onNext={skipAhead} nextLabel="Skip ahead" />
+```
+
+## Props
+
+### PlaybackControls
+
+Named, keyboard-operable transport buttons. Playback state may be owned by a media element.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `playing` | `boolean` |  |  |
+| `defaultPlaying` | `boolean` | `false` |  |
+| `onPlayingChange` | `(playing: boolean) => void` |  |  |
+| `onPrevious` | `() => void` |  |  |
+| `onNext` | `() => void` |  |  |
+| `onStop` | `() => void` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `previousDisabled` | `boolean` | `false` |  |
+| `nextDisabled` | `boolean` | `false` |  |
+| `previousLabel` | `string` | `"Previous track"` |  |
+| `nextLabel` | `string` | `"Next track"` |  |
+| `label` | `string` | `"Playback controls"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves between enabled transport buttons. |
+| Enter, Space | Activates the focused transport action. |
+
+## Accessibility
+
+- Every icon button has a state-aware accessible name.
+- Optional previous, next, and stop actions render only when supplied.
+- The containing group has a customisable label; disabled actions use native disabled buttons.
+
+## Classes
+
+`rs-playback-controls`, `rs-playback-action`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/playback-controls.tsx`  
+CSS: `packages/core/css/components/playback-controls.css`
+
+
+---
+
+# Media scrubber
+
+Seeks through media in seconds with elapsed time, buffering, chapters, and optional previews.
+
+Category: forms  
+Name: `media-scrubber`  
+Also known as: MediaScrubber, Seek bar, Media timeline  
+Page: https://vlak.dev/components/media-scrubber/
+
+## When to use
+
+- A media timeline where values are seconds.
+- Chapter navigation or supplied thumbnail previews.
+
+## When not to
+
+- An arbitrary numeric setting; use Slider.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { formatMediaTime, MediaScrubber } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add media-scrubber
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/media-scrubber.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-media-scrubber"><input type="range" min="0" max="240" value="42" aria-label="Playback position" aria-valuetext="0:42 of 4:00" /><div class="rs-media-scrubber-times"><span>0:42</span><span>4:00</span></div></div>
+```
+
+## Example
+
+```tsx
+import { MediaScrubber } from "@noorddev/vlak-react";
+
+<MediaScrubber value={position} duration={240} buffered={180} onValueChange={setPosition} chapters={[{ time: 0, label: "Opening" }, { time: 90, label: "The detail" }]} />
+```
+
+## Props
+
+### MediaScrubber
+
+A native range in seconds with elapsed and total time. The input remains a 44px target.
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "defaultValue" | "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `duration` (required) | `number` |  |  |
+| `label` | `string` | `"Playback position"` |  |
+| `showTime` | `boolean` | `true` |  |
+| `buffered` | `number` | `0` | Last buffered second. |
+| `chapters` | `readonly MediaChapter[]` | `[]` |  |
+| `preview` | `(seconds: number) => ReactNode` |  | Thumbnail or other visual preview for the pointed or focused second. |
+| `value` | `number` |  |  |
+| `defaultValue` | `number` | `0` |  |
+| `step` | `number` | `1` |  |
+| `onValueChange` | `(value: number) => void` |  |  |
+
+### Functions
+
+- `formatMediaTime` (function): Elapsed media time, including hours when needed. Invalid duration is displayed as zero.
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Arrow keys, Home, End | Uses the native range input to seek within the duration. |
+| Tab | Moves to the optional native chapter selector; selecting a chapter seeks to its start. |
+
+## Accessibility
+
+- The range announces elapsed and total time with aria-valuetext.
+- Unknown or invalid duration disables seeking.
+- Previews are visual supplements; the native range supplies the equivalent position text.
+
+## Classes
+
+`rs-media-scrubber`, `rs-media-scrubber-times`, `rs-media-scrubber-track`, `rs-media-scrubber-rail`, `rs-media-scrubber-buffered`, `rs-media-scrubber-slider`, `rs-media-scrubber-preview`, `rs-media-scrubber-chapters`
+
+## Dependencies
+
+Registry dependencies: [slider](slider.md), [native-select](native-select.md).  
+React: `packages/react/src/components/media-scrubber.tsx`  
+CSS: `packages/core/css/components/media-scrubber.css`
+
+
+---
+
+# Media player
+
+Connects native audio or video to playback, seeking, captions, speed, volume, and full screen.
+
+Category: patterns  
+Name: `media-player`  
+Also known as: MediaPlayer, Audio player, Video player  
+Page: https://vlak.dev/components/media-player/
+
+## When to use
+
+- Playing an actual audio or video source with consistent controls.
+- Media with captions and a supplied text transcript.
+
+## When not to
+
+- DRM, adaptive streaming protocols, or a video editing timeline.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { MediaPlayer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add media-player
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/media-player.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-media-player" role="region" aria-label="Film"><h3 class="rs-media-player-title">Film</h3><video class="rs-media-player-media" controls aria-label="Film"><track kind="captions" src="captions.vtt" srclang="en" label="English" /></video></div>
+```
+
+## Example
+
+```tsx
+import { MediaPlayer } from "@noorddev/vlak-react";
+
+<MediaPlayer src="/film.mp4" title="A closer look" tracks={[{ src: "/film-en.vtt", srcLang: "en", label: "English", default: true }]} transcript={<p>A text transcript of the film.</p>} />
+```
+
+## Props
+
+### MediaPlayer
+
+Native media with Vlak transport, seeking, volume, captions, and recoverable loading errors.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLMediaElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` (required) | `string` |  |  |
+| `title` (required) | `string` |  |  |
+| `kind` | `"audio" \| "video"` | `"video"` |  |
+| `poster` | `string` |  |  |
+| `preload` | `"none" \| "metadata" \| "auto"` | `"metadata"` |  |
+| `tracks` | `readonly MediaTrack[]` | `[]` |  |
+| `transcript` | `ReactNode` |  |  |
+| `onPlayingChange` | `(playing: boolean) => void` |  |  |
+| `onTimeChange` | `(seconds: number) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves through transport, seeking, volume, speed, captions, and available full-screen actions. |
+| Enter, Space | Activates buttons; range and select controls retain native keyboard behavior. |
+| Escape | Exits browser full screen. |
+
+## Accessibility
+
+- Native controls remain available before hydration.
+- Supply caption tracks for spoken video and a transcript where appropriate.
+- Load and play failures are announced; retry preserves access to the player.
+- Full screen is shown only when the browser supplies the API.
+
+## Classes
+
+`rs-media-player`, `rs-media-player-media`, `rs-media-player-title`, `rs-media-player-controls`, `rs-media-player-action`, `rs-media-player-volume`, `rs-media-player-status`, `rs-media-player-transcript`, `rs-media-player-summary`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md), [slider](slider.md), [native-select](native-select.md), [playback-controls](playback-controls.md), [media-scrubber](media-scrubber.md).  
+React: `packages/react/src/components/media-player.tsx`  
+CSS: `packages/core/css/components/media-player.css`
+
+
+---
+
+# Waveform
+
+Displays supplied audio amplitudes with optional seeking and editable selection bounds.
+
+Category: content  
+Name: `waveform`  
+Also known as: Waveform, Audio waveform, Audio region  
+Page: https://vlak.dev/components/waveform/
+
+## When to use
+
+- A supplied waveform for an audio recording.
+- Seeking or selecting an interval in normalised zero-to-one coordinates.
+
+## When not to
+
+- Generating or decoding audio data; provide amplitude samples.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { Waveform } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add waveform
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/waveform.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-waveform"><svg class="rs-waveform-plot" viewBox="0 0 80 48" role="img" aria-label="Audio waveform"><path d="M0 24 H10 V10 H12 V38 H14 V24 H30 V4 H32 V44 H34 V24 H80" fill="none" stroke="currentColor" /></svg></div>
+```
+
+## Example
+
+```tsx
+import { Waveform } from "@noorddev/vlak-react";
+
+<Waveform samples={[0.2, 0.5, 0.8, 0.3, 0.7, 0.4]} label="Interview waveform" value={position} onValueChange={setPosition} region={region} onRegionChange={setRegion} />
+```
+
+## Props
+
+### Waveform
+
+A waveform from supplied amplitude data, optionally scrubbed through a native range.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `samples` (required) | `readonly number[]` |  | Amplitudes from zero to one; values are clamped. |
+| `label` (required) | `string` |  |  |
+| `value` | `number` |  |  |
+| `defaultValue` | `number` | `0` |  |
+| `onValueChange` | `(position: number) => void` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `region` | `WaveformRegion` |  |  |
+| `defaultRegion` | `WaveformRegion` | `{ start: 0, end: 1 }` |  |
+| `onRegionChange` | `(region: WaveformRegion) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Arrow keys, Home, End | Operates the native seek range and optional selection start and end ranges. |
+
+## Accessibility
+
+- Static waveforms have a labelled image role.
+- Interactive waveforms announce percentage and selection endpoints.
+- Long inputs are reduced to no more than 240 peak bars to bound SVG rendering cost.
+
+## Classes
+
+`rs-waveform`, `rs-waveform-stage`, `rs-waveform-plot`, `rs-waveform-input`, `rs-waveform-region`, `rs-waveform-region-controls`, `rs-waveform-label`, `rs-waveform-bar`, `rs-waveform-played`
+
+## Dependencies
+
+Registry dependencies: [slider](slider.md).  
+React: `packages/react/src/components/waveform.tsx`  
+CSS: `packages/core/css/components/waveform.css`
+
+
+---
+
+# Image viewer
+
+Inspects an image collection with zoom, navigation, and a native dialog lightbox.
+
+Category: patterns  
+Name: `image-viewer`  
+Also known as: ImageViewer, Lightbox, Image gallery  
+Page: https://vlak.dev/components/image-viewer/
+
+## When to use
+
+- Examining a finite collection of labelled images.
+- Inline preview with an optional focused lightbox.
+
+## When not to
+
+- Editing pixels or drawing annotations; use an image editor.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ImageViewer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add image-viewer
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/image-viewer.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-image-viewer" role="region" aria-label="Image viewer"><div class="rs-image-viewer-canvas"><img class="rs-image-viewer-image" src="image.jpg" alt="Describe the image" /></div><p class="rs-image-viewer-caption">Image caption</p></div>
+```
+
+## Example
+
+```tsx
+import { ImageViewer } from "@noorddev/vlak-react";
+
+<ImageViewer images={[{ src: "/front.jpg", alt: "Front cover", caption: "Front cover" }, { src: "/back.jpg", alt: "Back cover", caption: "Back cover" }]} />
+```
+
+## Props
+
+### ImageViewer
+
+Inspect a labelled image collection inline or in a native lightbox.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `images` (required) | `readonly ViewerImage[]` |  |  |
+| `value` | `number` |  |  |
+| `defaultValue` | `number` | `0` |  |
+| `onValueChange` | `(index: number) => void` |  |  |
+| `label` | `string` | `"Image viewer"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Arrow left, Arrow right | Changes images when the image canvas is focused. |
+| Tab, Enter, Space | Operates image navigation and zoom controls. |
+| Escape | Closes the native lightbox and returns focus to its opener. |
+
+## Accessibility
+
+- Each image requires alt text.
+- Native dialog supplies modal focus behavior; visible errors replace broken image output.
+- Navigation buttons disable at collection boundaries.
+
+## Classes
+
+`rs-image-viewer`, `rs-image-viewer-canvas`, `rs-image-viewer-plane`, `rs-image-viewer-image`, `rs-image-viewer-controls`, `rs-image-viewer-navigation`, `rs-image-viewer-action`, `rs-image-viewer-caption`, `rs-image-viewer-modal`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md), [canvas-controls](canvas-controls.md), [dialog](dialog.md).  
+React: `packages/react/src/components/image-viewer.tsx`  
+CSS: `packages/core/css/components/image-viewer.css`
+
+
+---
+
+# Canvas controls
+
+Adjusts bounded zoom and exposes fit and reset actions for a canvas.
+
+Category: actions  
+Name: `canvas-controls`  
+Also known as: CanvasControls, Zoom controls, Viewport controls  
+Page: https://vlak.dev/components/canvas-controls/
+
+## When to use
+
+- A canvas, diagram, map, or image with application-owned transforms.
+
+## When not to
+
+- Rendering or panning the canvas; these controls emit zoom and action callbacks.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CanvasControls } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add canvas-controls
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/canvas-controls.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-canvas-controls" role="group" aria-label="Canvas controls"><button class="rs-btn-ghost rs-canvas-action" type="button" aria-label="Zoom out">−</button><output class="rs-canvas-zoom" aria-label="Zoom level">100%</output><button class="rs-btn-ghost rs-canvas-action" type="button" aria-label="Zoom in">+</button></div>
+```
+
+## Example
+
+```tsx
+import { CanvasControls } from "@noorddev/vlak-react";
+
+<CanvasControls zoom={zoom} onZoomChange={setZoom} minZoom={0.25} maxZoom={4} onFit={fitCanvas} onReset={resetPan} />
+```
+
+## Props
+
+### CanvasControls
+
+Zoom, fit, and reset actions for a canvas. The canvas owns pan and rendering.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `zoom` | `number` |  |  |
+| `defaultZoom` | `number` | `1` |  |
+| `onZoomChange` | `(zoom: number) => void` |  |  |
+| `minZoom` | `number` | `0.25` |  |
+| `maxZoom` | `number` | `4` |  |
+| `step` | `number` | `0.25` |  |
+| `onFit` | `() => void` |  |  |
+| `onReset` | `() => void` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `label` | `string` | `"Canvas controls"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Operates zoom, optional fit, and reset buttons. |
+
+## Accessibility
+
+- Zoom has a visible numeric reading.
+- Limits disable the corresponding zoom action.
+- All actions keep at least a 44px target.
+
+## Classes
+
+`rs-canvas-controls`, `rs-canvas-action`, `rs-canvas-zoom`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/canvas-controls.tsx`  
+CSS: `packages/core/css/components/canvas-controls.css`
+
+
+---
+
+# Message composer
+
+Composes text and optional attachments with submission shortcuts and retained drafts on failure.
+
+Category: patterns  
+Name: `message-composer`  
+Also known as: MessageComposer, Chat input, Comment composer  
+Page: https://vlak.dev/components/message-composer/
+
+## When to use
+
+- Chat, comments, or a support reply.
+- Async submission that must preserve a draft when it fails.
+- Application-owned response generation with a Stop response action.
+
+## When not to
+
+- An arbitrary multi-field form or uploading files without a message.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { MessageComposer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add message-composer
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/message-composer.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<form class="rs-message-composer" aria-label="Message"><label>Message<textarea class="rs-textarea" placeholder="Write a message…"></textarea></label><div class="rs-message-composer-actions"><button class="rs-btn-primary" type="submit">Send</button></div></form>
+```
+
+## Example
+
+```tsx
+import { MessageComposer } from "@noorddev/vlak-react";
+
+<MessageComposer onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept="image/*,.pdf" />
+```
+
+## Props
+
+### MessageComposer
+
+A message draft with attachments, IME-safe shortcuts, and retained text after send failures.
+
+Extends `Omit<FormHTMLAttributes<HTMLFormElement>, "defaultValue" | "onSubmit">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLTextAreaElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(text: string) => void` |  |  |
+| `onSend` (required) | `(message: ComposedMessage) => void \| Promise<void>` |  |  |
+| `label` | `string` | `"Message"` |  |
+| `placeholder` | `string` | `"Write a message…"` |  |
+| `disabled` | `boolean` | `false` |  |
+| `allowAttachments` | `boolean` | `false` |  |
+| `accept` | `string` |  |  |
+| `maxLength` | `number` |  |  |
+| `sendOnEnter` | `boolean` | `false` | Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter. |
+| `generating` | `boolean` | `false` | Application-owned response generation, separate from submission pending state. |
+| `onStop` | `() => void` |  | Requests that the application stop generation; does not itself cancel a network request. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Cmd+Enter, Ctrl+Enter | Submits the draft when no send or response generation is in progress. |
+| Enter, Shift+Enter | With sendOnEnter enabled, Enter submits and Shift+Enter inserts a line; IME composition never submits. |
+| Tab, Enter, Space | Operates attachment, send, and stop actions. |
+
+## Accessibility
+
+- The textarea has a visible label and shortcut description.
+- Sending prevents duplicate submission; results are announced.
+- Only a successful send clears the draft and attachments; failures retain both.
+- generating replaces Send with Stop response but keeps the next draft editable. onStop requests application cancellation; it does not cancel network activity itself.
+
+## Classes
+
+`rs-message-composer`, `rs-message-composer-actions`, `rs-message-composer-action`, `rs-message-composer-files`, `rs-message-composer-file`, `rs-message-composer-hint`, `rs-message-composer-input`
+
+## Dependencies
+
+Registry dependencies: [textarea](textarea.md), [button](button.md), [icons](icons.md).  
+React: `packages/react/src/components/message-composer.tsx`  
+CSS: `packages/core/css/components/message-composer.css`
+
+
+---
+
+# File browser
+
+Explores a supplied file hierarchy through folders, breadcrumbs, search, and list or grid views.
+
+Category: patterns  
+Name: `file-browser`  
+Also known as: FileBrowser, File explorer, Asset browser  
+Page: https://vlak.dev/components/file-browser/
+
+## When to use
+
+- Browsing a supplied file tree and choosing a file.
+- Folder-local search with consistent selection in list and grid views.
+
+## When not to
+
+- Direct filesystem access or cloud storage sync; the application supplies data and actions.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { FileBrowser } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add file-browser
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/file-browser.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-file-browser" role="region" aria-label="Files"><nav aria-label="Folder breadcrumbs">Files</nav><ul class="rs-file-browser-list"><li><button class="rs-file-browser-item" type="button" aria-pressed="false">Cover.pdf</button></li></ul></div>
+```
+
+## Example
+
+```tsx
+import { FileBrowser } from "@noorddev/vlak-react";
+
+<FileBrowser entries={[{ id: "design", name: "Design", kind: "folder", children: [{ id: "cover", name: "Cover.pdf", kind: "file", size: "1.2 MB" }] }]} onOpen={openFile} />
+```
+
+## Props
+
+### FileBrowser
+
+A controlled file collection with folder tree, breadcrumbs, search, and list or grid views.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onSelect">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `entries` (required) | `BrowserEntry[]` |  |  |
+| `label` | `string` | `"Files"` |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` |  |  |
+| `onValueChange` | `(id: string) => void` |  |  |
+| `folder` | `string \| null` |  |  |
+| `defaultFolder` | `string \| null` | `null` |  |
+| `onFolderChange` | `(id: string \| null) => void` |  |  |
+| `onOpen` | `(entry: BrowserEntry) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Arrow keys, Home, End, type-ahead | Navigates the folder tree using its roving focus behavior. |
+| Tab, Enter, Space | Uses breadcrumbs, selects files, switches view, and activates Open selected. |
+
+## Accessibility
+
+- Folder tree, breadcrumbs, search, and file collection each have names.
+- Selected files use aria-pressed and a full surface change.
+- Files can be opened by an explicit keyboard-operable action as well as double click.
+
+## Classes
+
+`rs-file-browser`, `rs-file-browser-toolbar`, `rs-file-browser-path`, `rs-file-browser-action`, `rs-file-browser-body`, `rs-file-browser-tree`, `rs-file-browser-content`, `rs-file-browser-list`, `rs-file-browser-grid`, `rs-file-browser-name`, `rs-file-browser-meta`, `rs-file-browser-empty`, `rs-file-browser-view-active`, `rs-file-browser-item`, `rs-file-browser-tile`, `rs-file-browser-selected`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md), [input](input.md), [tree-view](tree-view.md).  
+React: `packages/react/src/components/file-browser.tsx`  
+CSS: `packages/core/css/components/file-browser.css`
+
+
+---
+
+# Kanban board
+
+Moves and reorders cards across named columns with drag and keyboard alternatives.
+
+Category: patterns  
+Name: `kanban-board`  
+Also known as: KanbanBoard, Task board, Workflow board  
+Page: https://vlak.dev/components/kanban-board/
+
+## When to use
+
+- Finite work items moving through named states.
+- Column changes and ordering that should remain keyboard accessible.
+
+## When not to
+
+- A large virtualised issue tracker or automatic workflow rules.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { KanbanBoard } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add kanban-board
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/kanban-board.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-kanban-board" role="region" aria-label="Board"><div class="rs-kanban-columns"><section class="rs-kanban-column"><h3 class="rs-kanban-heading">In progress</h3><p class="rs-kanban-card">Review the proof</p></section></div></div>
+```
+
+## Example
+
+```tsx
+import { KanbanBoard } from "@noorddev/vlak-react";
+
+<KanbanBoard columns={[{ id: "todo", label: "To do" }, { id: "doing", label: "In progress" }, { id: "done", label: "Done" }]} value={cards} onValueChange={setCards} />
+```
+
+## Props
+
+### KanbanBoard
+
+Movable cards with drag, keyboard reordering, and named destination selectors.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `columns` (required) | `readonly KanbanColumn[]` |  |  |
+| `value` | `KanbanCard[]` |  |  |
+| `defaultValue` | `KanbanCard[]` | `[]` |  |
+| `onValueChange` | `(cards: KanbanCard[]) => void` |  |  |
+| `label` | `string` | `"Board"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Alt+Arrow up, Alt+Arrow down | Reorders the focused card handle within its column. |
+| Tab, Enter, Space | Operates move up and down buttons and each card's native destination selector. |
+
+## Accessibility
+
+- Every column is a named section; card counts are visible.
+- A native destination selector is the keyboard alternative to dragging across columns.
+- Moves are announced and disabled cards remain immovable.
+
+## Classes
+
+`rs-kanban-board`, `rs-kanban-columns`, `rs-kanban-column`, `rs-kanban-heading`, `rs-kanban-card`, `rs-kanban-title`, `rs-kanban-detail`, `rs-kanban-status`
+
+## Dependencies
+
+Registry dependencies: [native-select](native-select.md), [sortable-list](sortable-list.md).  
+React: `packages/react/src/components/kanban-board.tsx`  
+CSS: `packages/core/css/components/kanban-board.css`
+
+
+---
+
+# Scheduler
+
+Plans events in agenda, week, or month views with date navigation and accessible rescheduling.
+
+Category: patterns  
+Name: `scheduler`  
+Also known as: Scheduler, Event calendar, Agenda  
+Page: https://vlak.dev/components/scheduler/
+
+## When to use
+
+- An event collection in agenda, week, or month views, using a named timeZone or the browser zone.
+- Selecting a new event time or rescheduling while preserving duration.
+
+## When not to
+
+- Recurrence expansion or conflict enforcement; prepare those in the application.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { Scheduler } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add scheduler
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/scheduler.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-scheduler" role="region" aria-label="Schedule"><h3 class="rs-scheduler-title">Monday, 7 September</h3><ol class="rs-scheduler-list"><li class="rs-scheduler-event"><span>Review</span><span class="rs-scheduler-time">09:00–09:30</span></li></ol></div>
+```
+
+## Example
+
+```tsx
+import { Scheduler } from "@noorddev/vlak-react";
+
+<Scheduler events={events} defaultValue={new Date("2026-09-07T12:00:00Z")} timeZone="Europe/Amsterdam" defaultView="week" onSlotSelect={createEvent} onEventSelect={openEvent} onEventMove={rescheduleEvent} />
+```
+
+## Props
+
+### Scheduler
+
+Agenda, week, and month planning in an explicit or browser-local zone. Mutations are callbacks.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `events` (required) | `readonly SchedulerEvent[]` |  |  |
+| `value` | `Date` |  |  |
+| `defaultValue` | `Date` |  |  |
+| `onValueChange` | `(day: Date) => void` |  |  |
+| `view` | `SchedulerView` |  |  |
+| `defaultView` | `SchedulerView` | `"week"` |  |
+| `onViewChange` | `(view: SchedulerView) => void` |  |  |
+| `onEventSelect` | `(event: SchedulerEvent) => void` |  |  |
+| `onSlotSelect` | `(start: Date) => void` |  |  |
+| `onEventMove` | `(event: SchedulerEvent, next: { start: Date; end: Date; }) => void` |  |  |
+| `weekStart` | `0 \| 1` | `1` |  |
+| `locale` | `string` | `"en"` |  |
+| `timeZone` | `string` |  | IANA zone, for example Europe/Amsterdam. Defaults to the browser zone. |
+| `label` | `string` | `"Schedule"` |  |
+| `disabled` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Operates date navigation, event buttons, scheduling actions, and view selection. |
+| Escape | Closes the rescheduling dialog and returns focus to the triggering action. |
+
+## Accessibility
+
+- Month view is a native table with weekday headers.
+- Week columns and navigation are named; native date and time inputs retain platform behavior.
+- Rescheduling uses a named native dialog and announces the new time.
+- Event Date values and callbacks are instants; date and time inputs use the displayed zone. Invalid intervals and nonexistent daylight-saving times are rejected. Repeated times choose the earlier occurrence.
+- Server rendering uses a stable loading shell until hydration so browser time zones and the current date cannot cause a hydration mismatch.
+
+## Classes
+
+`rs-scheduler`, `rs-scheduler-toolbar`, `rs-scheduler-action`, `rs-scheduler-title`, `rs-scheduler-scroll`, `rs-scheduler-week`, `rs-scheduler-date`, `rs-scheduler-month`, `rs-scheduler-weekday`, `rs-scheduler-list`, `rs-scheduler-event`, `rs-scheduler-event-button`, `rs-scheduler-time`, `rs-scheduler-empty`, `rs-scheduler-form`, `rs-scheduler-day`, `rs-scheduler-selected`, `rs-scheduler-cell`, `rs-scheduler-outside`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [icons](icons.md), [input](input.md), [native-select](native-select.md), [dialog](dialog.md).  
+React: `packages/react/src/components/scheduler.tsx`  
+CSS: `packages/core/css/components/scheduler.css`
+
+
+---
+
 # Button
 
-Triggers an action. Solid primary or 1px ghost; 40px tall, 36px small.
+Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.
 
 Category: actions  
 Name: `button`  
@@ -1139,7 +5237,7 @@ npx shadcn add https://vlak.dev/r/native-select.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<select class="rs-native-select"><option>Alkmaar</option><option>Amsterdam</option><option>Rotterdam</option></select>
+<div class="rs-native-select-control"><select class="rs-native-select" aria-label="City"><option>Alkmaar</option><option>Amsterdam</option><option>Rotterdam</option></select><svg class="rs-native-select-icon rs-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" transform="rotate(90 8 8)" vector-effect="non-scaling-stroke" /></svg></div>
 ```
 
 ## Example
@@ -1183,11 +5281,11 @@ Forwards `ref` to the `HTMLSelectElement`.
 
 ## Classes
 
-`rs-native-select`, `rs-native-select-invalid`, `rs-native-select-field`, `rs-native-select-label`
+`rs-native-select`, `rs-native-select-invalid`, `rs-native-select-field`, `rs-native-select-label`, `rs-native-select-control`, `rs-native-select-icon`
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [icons](icons.md).  
 React: `packages/react/src/components/native-select.tsx`  
 CSS: `packages/core/css/components/native-select.css`
 
@@ -1211,7 +5309,7 @@ Page: https://vlak.dev/components/inline-form/
 ## When not to
 
 - More than one field; use Form with Field.
-- Actions with side effects that need confirmation; the success state is immediate.
+- Actions needing a separate confirmation step; compose a Dialog before submitting.
 
 ## Install
 
@@ -1261,7 +5359,7 @@ import { InlineForm } from "@noorddev/vlak-react";
 
 ### InlineForm
 
-One field, one action; the action sits inside the field.
+One field, one action; asynchronous actions only confirm after they resolve.
 
 Extends `Omit<FormHTMLAttributes<HTMLFormElement>, "onSubmit">`: every native attribute, `className`, `style`, and event handler passes through.
 
@@ -1272,8 +5370,13 @@ Forwards `ref` to the `HTMLFormElement`.
 | `placeholder` | `string` | `"Your e-mail"` |  |
 | `buttonLabel` | `ReactNode` | `"Subscribe"` |  |
 | `successLabel` | `ReactNode` | `"You're on the list"` |  |
+| `pendingLabel` | `ReactNode` | `"Submitting…"` |  |
+| `errorLabel` | `ReactNode` | `"Could not submit. Please try again."` |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(value: string) => void` |  |  |
 | `validate` | `(value: string) => boolean` | `(v) => /.+@.+\..+/.test(v)` | The action only appears once this returns true. Defaults to a loose e-mail check. |
-| `onSubmit` | `(value: string) => void` |  |  |
+| `onSubmit` | `(value: string) => void \| Promise<void>` |  |  |
 | `inputProps` | `InputHTMLAttributes<HTMLInputElement>` |  |  |
 
 ## Keyboard
@@ -1285,13 +5388,15 @@ Forwards `ref` to the `HTMLFormElement`.
 
 ## Accessibility
 
-- The input has a placeholder only; pass inputProps={{ "aria-label": … }} to name it.
+- The input is named by inputProps aria-label, falling back to the placeholder; use a clear persistent name.
 - The submit button stays out of the tab order (tabIndex -1) until validate returns true.
-- After submit the form is replaced by the successLabel text and a check mark.
+- Submission awaits the onSubmit promise. aria-busy and pendingLabel indicate progress; duplicate submits are ignored, failure is an alert, and retry preserves the value.
+- Success is a live status inside the same form, preserving its ref. Without an onSubmit handler the form cannot claim success.
+- Controlled with value and onValueChange, or uncontrolled with defaultValue; native inputProps onChange is composed with internal state.
 
 ## Classes
 
-`rs-inline-field`, `rs-inline-input`, `rs-inline-btn`, `rs-reveal`, `rs-reveal-in`, `rs-subscribed`, `rs-inline-field-btn`
+`rs-inline-field`, `rs-inline-input`, `rs-inline-btn`, `rs-reveal`, `rs-reveal-in`, `rs-subscribed`, `rs-inline-field-btn`, `rs-inline-error`
 
 ## Dependencies
 
@@ -1423,7 +5528,7 @@ CSS: `packages/core/css/components/radio.css`
 
 # Checkbox
 
-Selects any number of options. 16px box, 3px radius, ink fill when checked.
+Selects any number of options. A 44px target surrounds the check mark; indeterminate uses a minus.
 
 Category: forms  
 Name: `checkbox`  
@@ -1496,6 +5601,8 @@ Forwards `ref` to the `HTMLInputElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `label` | `ReactNode` |  |  |
+| `indeterminate` | `boolean` | `false` |  |
+| `onCheckedChange` | `(checked: boolean) => void` |  |  |
 
 ## Keyboard
 
@@ -1508,7 +5615,7 @@ Forwards `ref` to the `HTMLInputElement`.
 
 - A native <input type="checkbox"> hidden from view inside a <label>; the 16px box mirrors its state.
 - label is the accessible name. Without one, pass aria-label.
-- Controlled with checked and onChange, or uncontrolled with defaultChecked.
+- Controlled with checked and onCheckedChange or native onChange, or uncontrolled with defaultChecked. indeterminate sets the native mixed state.
 
 ## Classes
 
@@ -1525,7 +5632,7 @@ CSS: `packages/core/css/components/checkbox.css`
 
 # Switch
 
-Turns one setting on or off. 32×18px; on fills with ink, off uses a 1px track.
+Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.
 
 Category: forms  
 Name: `switch`  
@@ -1628,7 +5735,7 @@ CSS: `packages/core/css/components/switch.css`
 
 # Slider
 
-Selects one value from a range. 2px track, 14px thumb, 24px hit area.
+Selects one value from a range. A fine track sits inside a 44px hit area.
 
 Category: forms  
 Name: `slider`  
@@ -1719,7 +5826,7 @@ Forwards `ref` to the `HTMLInputElement`.
 
 - A native <input type="range"> drives the ink track; the platform exposes value, min, and max.
 - It has no visible text; pass aria-label or aria-labelledby.
-- The 14px thumb sits on a 24px hit area and shows a focus ring on :focus-visible.
+- The visible thumb sits on a 44px hit area and shows a focus ring on :focus-visible.
 
 ## Classes
 
@@ -1952,6 +6059,7 @@ Forwards `ref` to the `HTMLDivElement`.
 - TabList is role="tablist" (aria-orientation when vertical); pass aria-label to name it.
 - Tab is a <button role="tab"> with aria-selected and aria-controls; TabPanel is role="tabpanel" with aria-labelledby, hidden when not selected.
 - One roving tab stop: only the selected tab is in the tab order.
+- Without a default, the first enabled tab is selected. Removing or disabling the active tab reconciles to the first enabled tab; each target is at least 44px.
 - Controlled with value and onValueChange, or uncontrolled with defaultValue.
 
 ## Classes
@@ -4485,6 +8593,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | Arrow down, Enter, Space | Opens the menu on the first item |
 | Arrow up | Opens the menu on the last item |
 | Arrow down, Arrow up | Moves between items and wraps |
+| Arrow right, Arrow left | Opens a child menu or returns to its parent; directions reverse in RTL |
 | Home, End | First or last item |
 | Type letters | Moves to the next item starting with them |
 | Enter, Space | Selects the item and closes |
@@ -4496,10 +8605,11 @@ Forwards `ref` to the `HTMLDivElement`.
 - The trigger is a <button> with aria-haspopup="menu", aria-expanded, and aria-controls; label is its name.
 - The panel is role="menu" labelled by the trigger; items are <button role="menuitem"> with one roving tab stop.
 - Disabled items carry aria-disabled and are skipped; separators are <hr>. A click outside closes without moving focus.
+- items opens a named nested menu. checked and onCheckedChange expose controlled menuitemcheckbox state. Escape returns to the immediate parent before closing the root menu.
 
 ## Classes
 
-`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`
+`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`, `rs-menu-nested`
 
 ## Dependencies
 
@@ -5317,7 +9427,7 @@ Forwards `ref` to the `HTMLSpanElement`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `values` (required) | `number[]` |  |  |
+| `values` (required) | `(number \| null)[]` |  |  |
 | `width` | `number` | `120` |  |
 | `height` | `number` | `28` |  |
 | `spot` | `string \| boolean` |  |  |
@@ -5340,6 +9450,8 @@ Forwards `ref` to the `HTMLSpanElement`.
 - A visually hidden table carries every value, so the data reads without the picture; the tooltip is role="status".
 - Sparkline is role="img" with a name built from label, the count, and the last value, plus the same hidden table.
 - Numbers format through Intl.NumberFormat; locale picks the reader's own by default. Marks stay visible in forced colors.
+- Null or non-finite samples create gaps instead of fabricated zeros. Missing values read as No data; empty plots announce their state, and an empty Sparkline has no invented last point.
+- Explicit domains generate ticks within their bounds and clip marks to the plot. Without a domain, negative values remain visible.
 
 ## Classes
 
@@ -5365,8 +9477,8 @@ Page: https://vlak.dev/components/bar-chart/
 
 ## When to use
 
-- Comparing categories; data for one series, series plus labels for several.
-- stacked when the series share a field; orientation="horizontal" for long labels.
+- Comparing categories; data for one series, series plus labels for up to four grouped series.
+- stacked separates positive and negative totals; orientation="horizontal" and inverted work with either grouping mode.
 
 ## When not to
 
@@ -5467,6 +9579,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - The plot is a focusable <svg role="group"> with aria-roledescription="interactive chart", named by aria-label, aria-labelledby, yLabel, or the series names.
 - A visually hidden table carries every value; the legend is aria-hidden because the table names the series.
+- Every series renders. Null and non-finite bars are omitted and read as No data; signed bars retain nonzero geometry when inverted.
 
 ## Classes
 
@@ -5610,8 +9723,8 @@ Page: https://vlak.dev/components/scatter-chart/
 
 ## When to use
 
-- Two numeric variables per point; group on a point to split series.
-- xDomain and yDomain to pin the axes.
+- Two numeric variables per point; group annotates the legend and accessible data table, not a separate visual mark style.
+- xDomain and yDomain pin valid numeric axes; invalid or equal domains fall back to the data extent.
 
 ## When not to
 
@@ -5699,6 +9812,7 @@ Forwards `ref` to the `HTMLDivElement`.
 ## Accessibility
 
 - A focusable, named plot with a visually hidden table of x and y per point.
+- Non-finite coordinates are excluded. Empty datasets display No data to display without invalid SVG coordinates.
 
 ## Classes
 
@@ -5809,6 +9923,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - Donut renders role="img" named by the caption or label and the value text; a visually hidden table carries value and max.
 - Share renders a named group of slices with a hidden table of label and value per slice.
+- Invalid totals do not produce a percentage. Share excludes negative and non-finite slices and explains an empty total.
 
 ## Classes
 
@@ -5921,6 +10036,7 @@ Forwards `ref` to the `HTMLDivElement`.
 ## Accessibility
 
 - A focusable, named plot with a visually hidden table of label and count per bin.
+- Counts must be finite and non-negative; invalid bins are excluded, and an empty dataset is announced.
 
 ## Classes
 
@@ -5946,8 +10062,8 @@ Page: https://vlak.dev/components/small-multiples/
 
 ## When to use
 
-- The same measure across places, products, or periods, one small line chart per panel on shared axes.
-- Four to eight panels in a row of 184px columns.
+- The same measure across places, products, or periods, one small line chart per panel on a shared value domain by default.
+- Set sharedDomain=false only for independent trends; it removes direct magnitude comparison.
 
 ## When not to
 
@@ -6016,6 +10132,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | `grid` | `boolean` | `true` |  |
 | `ticks` | `number` | `3` |  |
 | `spot` | `string \| boolean` |  |  |
+| `sharedDomain` | `boolean` | `true` | Compare panels on one scale by default. Disable only for independent trends. |
 | `locale` | `string` |  | BCP 47 tag for number formatting; undefined is the reader's own. |
 
 ## Keyboard
@@ -6031,7 +10148,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-chart-multi`
+`rs-chart-multi`, `rs-chart-multi-item`, `rs-chart-multi-cap`
 
 ## Dependencies
 
@@ -6397,14 +10514,20 @@ import { InputOTP } from "@noorddev/vlak-react";
 
 One cell per character. Auto-advance, backspace, paste.
 
-Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
 
 Forwards `ref` to the `HTMLDivElement`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `length` | `number` | `6` |  |
-| `onChange` | `(code: string) => void` |  |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(code: string) => void` |  |  |
+| `name` | `string` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
+| `onChange` | `(code: string) => void` |  | Deprecated. Use onValueChange. |
 | `onComplete` | `(code: string) => void` |  | Called once every cell is filled. |
 | `aria-label` | `string` | `"One-time code"` | Defines a string value that labels the current element. |
 
@@ -6422,6 +10545,8 @@ Forwards `ref` to the `HTMLDivElement`.
 - Renders role="group" named by aria-label ("One-time code" by default); each cell is an <input> named "Digit n".
 - inputMode="numeric" and autoComplete="one-time-code" on the first cell let phones offer the code.
 - Inside Field, hint and error reach the group and cells through aria-describedby and aria-invalid.
+- Controlled with value and onValueChange, or uncontrolled with defaultValue; name submits one hidden complete-code value. disabled and readOnly apply to every cell.
+- Each cell has a 44px target and 4px corners. length is clamped to 1–12; onComplete fires once per distinct complete code until it changes.
 
 ## Classes
 
@@ -7461,6 +11586,11 @@ Forwards `ref` to the `HTMLDivElement`.
 | `defaultMonth` | `Date` |  |  |
 | `weekStart` | `0 \| 1` | `1` | 0 = Sunday, 1 = Monday. |
 | `autoFocus` | `boolean` |  | Move focus to the roving day on mount (a date picker opening). |
+| `min` | `Date` |  |  |
+| `max` | `Date` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `isDateDisabled` | `(date: Date) => boolean` |  |  |
+| `locale` | `string` | `"en"` |  |
 
 ## Keyboard
 
@@ -7472,13 +11602,15 @@ Forwards `ref` to the `HTMLDivElement`.
 | Home, End | First or last day of the week |
 | Page up, Page down | Same day the month before or after |
 | Shift + Page up, Shift + Page down | Same day the year before or after |
-| Enter, Space | Selects the focused day |
+| Enter, Space | Selects the focused available day |
 
 ## Accessibility
 
 - Renders role="grid" labelled by the month title, which is aria-live="polite"; rows are role="row" and weekday headers are role="columnheader" with long names.
 - Days are <button role="gridcell"> with a full-date aria-label, aria-selected, and aria-current="date" on today; one roving tab stop.
 - Previous and next month buttons are labelled. Controlled with value and onValueChange, or uncontrolled with defaultValue.
+- Days and month controls are 44px targets. min, max and isDateDisabled prevent selection; unavailable days expose aria-disabled while remaining discoverable with arrows.
+- locale formats the month, weekdays and full-date labels; weekStart sets Sunday or Monday independently. disabled removes the day grid from the tab order.
 
 ## Classes
 
@@ -7573,6 +11705,10 @@ Forwards `ref` to the `HTMLDivElement`.
 | `placeholder` | `string` | `"Pick a date"` |  |
 | `format` | `(date: Date) => string` | `defaultDateFormat` |  |
 | `disabled` | `boolean` |  |  |
+| `min` | `Date` |  |  |
+| `max` | `Date` |  |  |
+| `isDateDisabled` | `(date: Date) => boolean` |  |  |
+| `locale` | `string` |  |  |
 | `dialogLabel` | `string` | `"Choose a date"` | Accessible name of the calendar dialog. |
 
 ## Keyboard
@@ -7583,12 +11719,13 @@ Forwards `ref` to the `HTMLDivElement`.
 | Arrow keys, Home, End, Page up, Page down | Move through the calendar |
 | Enter, Space | Selects the day and closes |
 | Escape | Closes and returns focus to the trigger |
-| Tab | Leaves the calendar and closes it |
+| Tab | Moves through the calendar controls; leaving the picker closes it |
 
 ## Accessibility
 
 - The trigger is a <button> with aria-haspopup="dialog", aria-expanded, and aria-controls; the calendar sits in a non-modal role="dialog" named by dialogLabel.
 - On open, focus moves to the selected day or today; on close it returns to the trigger.
+- min, max, isDateDisabled and locale pass through to Calendar. The native top-layer panel follows its trigger and flips or clamps to the viewport.
 - Controlled with value and onValueChange, or uncontrolled with defaultValue.
 
 ## Classes
@@ -7606,7 +11743,7 @@ CSS: `packages/core/css/components/date-picker.css`
 
 # Data table
 
-Sorts and presents structured records. Column headers expose aria-sort.
+Sorts, filters and selects structured records. Native controls expose sort and selection state.
 
 Category: content  
 Name: `data-table`  
@@ -7615,13 +11752,13 @@ Page: https://vlak.dev/components/data-table/
 
 ## When to use
 
-- Rows from data with sortable columns and an empty state.
-- render for cells that are not plain values; sortValue for custom sort keys.
+- Rows from data with controlled or default sorting, selection keys and text filtering.
+- render for rich cells, sortValue for sort keys, filterRow for custom filtering, and a stable rowKey to keep selection attached to records.
 
 ## When not to
 
 - Hand-written rows; use Table.
-- Pagination, selection, or editing; compose those around it.
+- Inline editing or pagination; compose those around it. Large datasets need windowing or server-side data management.
 
 ## Install
 
@@ -7681,21 +11818,23 @@ import { DataTable } from "@noorddev/vlak-react";
 
 | Keys | Does |
 | --- | --- |
-| Tab | Moves between the sort buttons |
+| Tab | Moves through the optional filter, sort buttons and selection checkboxes |
 | Enter, Space | Sorts ascending, then descending, then clears |
 
 ## Accessibility
 
 - Sortable headers hold a native <button>; the <th> carries aria-sort while sorted.
-- The empty state is plain text under the table.
+- Filter and sort have value/callback pairs: filter/onFilterChange and sort/onSortChange, with defaultFilter/defaultSort for local state.
+- selectable adds native checkboxes; selectedKeys/onSelectionChange controls selection, with defaultSelectedKeys for local state. Select all affects visible filtered rows and exposes mixed state.
+- A horizontal scroll container keeps the table inside its grid; caption names the data. Empty filtered results are a live status. Interactive targets are at least 44px.
 
 ## Classes
 
-`rs-datatable-sort`, `rs-datatable-empty`, `rs-datatable-sort-icon`, `rs-datatable-sort-icon-on`, `rs-datatable-table`, `rs-datatable-td`, `rs-datatable-td-alt`, `rs-datatable-th`
+`rs-datatable-sort`, `rs-datatable-empty`, `rs-datatable-sort-icon`, `rs-datatable-sort-icon-on`, `rs-datatable-table`, `rs-datatable-td`, `rs-datatable-td-alt`, `rs-datatable-th`, `rs-datatable-scroll`, `rs-datatable-td-selected`
 
 ## Dependencies
 
-Registry dependencies: [table](table.md).  
+Registry dependencies: [table](table.md), [input](input.md), [checkbox](checkbox.md).  
 React: `packages/react/src/components/data-table.tsx`  
 CSS: `packages/core/css/components/data-table.css`
 
@@ -7897,7 +12036,7 @@ CSS: `packages/core/css/components/form.css`
 
 # Workflow card
 
-Builds an ordered pipeline from draggable steps. 1px dashed frame, chips, and ghost add action.
+Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 
 Category: patterns  
 Name: `workflow`  
@@ -7942,7 +12081,7 @@ npx shadcn add https://vlak.dev/r/workflow.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-flow" style="grid-template-columns:184px;width:184px"><div class="rs-flow-step"><span class="rs-flow-num">1</span><h4>Proposal</h4><p>Scope, timeline, and fee on one page.</p><div class="rs-flow-subs"><span>Brief</span><span>Fee</span><span class="rs-flow-sub-add">+</span></div></div><button type="button" class="rs-flow-add"><span class="rs-flow-plus">+</span> Add a step</button></div>
+<div class="rs-flow" style="grid-template-columns:184px;width:184px"><div class="rs-flow-step"><span class="rs-flow-num">1</span><h3 class="rs-flow-title">Proposal</h3><p>Scope, timeline, and fee on one page.</p><div class="rs-flow-subs"><span>Brief</span><span>Fee</span><span class="rs-flow-sub-add">+</span></div></div><button type="button" class="rs-flow-add"><span class="rs-flow-plus">+</span> Add a step</button></div>
 ```
 
 ## Example
@@ -8058,7 +12197,7 @@ No props of its own.
 
 ## Accessibility
 
-- FlowAdd is a native <button>; FlowTitle is an <h4>. FlowSubAdd is a <span>: wrap it in a button when it acts.
+- FlowAdd is a native <button>; FlowTitle is an <h3>. FlowSubAdd is a <span>: wrap it in a button when it acts. FlowStep is presentational and is not draggable by itself.
 
 ## Classes
 
@@ -8126,7 +12265,7 @@ npx shadcn add https://vlak.dev/r/assistant.json
 ## Example
 
 ```tsx
-import { Assistant, AssistantHead, AssistantInput, AssistantMsg, AssistantReply, AssistantSend, AssistantStatus, AssistantTitle, AssistantUserBlock } from "@noorddev/vlak-react";
+import { Assistant, AssistantHead, AssistantMsg, AssistantReply, AssistantStatus, AssistantTitle, AssistantUserBlock, MessageComposer } from "@noorddev/vlak-react";
 
 <Assistant>
   <AssistantHead>
@@ -8137,10 +12276,7 @@ import { Assistant, AssistantHead, AssistantInput, AssistantMsg, AssistantReply,
     <AssistantUserBlock>Make the intro tighter.</AssistantUserBlock>
   </AssistantMsg>
   <AssistantReply>Done. Two sentences, same claim.</AssistantReply>
-  <AssistantInput>
-    <input aria-label="Message" placeholder="Ask anything" />
-    <AssistantSend>Send</AssistantSend>
-  </AssistantInput>
+  <MessageComposer onSend={sendMessage} />
 </Assistant>
 ```
 
@@ -8353,7 +12489,7 @@ Forwards `ref` to the `HTMLButtonElement`.
 ## Accessibility
 
 - A native <button> whose aria-label states the action ("Switch to dark scheme" or "Switch to light scheme").
-- Sets data-theme="dark" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.
+- Sets an explicit data-theme="light" or data-theme="dark" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.
 
 ## Classes
 

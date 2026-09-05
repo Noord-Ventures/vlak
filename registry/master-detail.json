@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "master-detail",
+  "type": "registry:component",
+  "title": "Master detail",
+  "description": "Links selection to a detail panel with a mobile back path.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/master-detail.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface MasterDetailItem { id: string; label: string; description?: string; detail: React.ReactNode }\nexport interface MasterDetailProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  items: MasterDetailItem[];\n  label?: string;\n  value?: string | null;\n  defaultValue?: string | null;\n  onValueChange?: (id: string | null) => void;\n  emptyLabel?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gridTemplateColumns: { default: \"minmax(12rem, 1fr) minmax(0, 2fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"1.25rem\", minWidth: 0, color: vlak.ink },\n  list: { display: \"flex\", flexDirection: \"column\", gap: \"0.25rem\", minWidth: 0 },\n  hideMobile: { display: { default: null, [mq.phone]: \"none\" } },\n  selected: { backgroundColor: vlak.controlFill, fontWeight: 600 },\n  button: { display: \"flex\", flexDirection: \"column\", alignItems: \"flex-start\", gap: \"0.25rem\", minHeight: vlak.hit, padding: \"0.75rem\", borderWidth: 0, borderRadius: vlak.radiusSm, backgroundColor: \"transparent\", color: vlak.ink, fontFamily: \"inherit\", fontSize: \"1rem\", textAlign: \"start\", cursor: \"pointer\", outlineColor: vlak.ink, outlineOffset: -2 },\n  description: { color: vlak.gray, fontSize: \"0.875rem\", lineHeight: 1.45, fontWeight: 400 },\n  detail: { minWidth: 0, overflowWrap: \"anywhere\" },\n  title: { fontSize: \"1.25rem\", lineHeight: 1.2, marginBlock: \"1rem\", outlineColor: vlak.ink, outlineOffset: 2 },\n  back: { display: { default: \"none\", [mq.phone]: \"block\" }, marginBottom: \"1rem\" },\n});\n\n/** List/detail selection with a mobile back path and preserved item focus. */\nexport const MasterDetail = React.forwardRef<HTMLDivElement, MasterDetailProps>(function MasterDetail({ items, label = \"Items\", value, defaultValue = null, onValueChange, emptyLabel = \"Select an item to see its details\", className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const current = value === undefined ? inner : value;\n  const item = items.find(entry => entry.id === current);\n  const heading = React.useRef<HTMLHeadingElement | null>(null);\n  const buttons = React.useRef(new Map<string, HTMLButtonElement>());\n  const focusTarget = React.useRef<string | \"detail\" | null>(null);\n  React.useLayoutEffect(() => { if (focusTarget.current === \"detail\" && item) heading.current?.focus(); else if (focusTarget.current && !item) buttons.current.get(focusTarget.current)?.focus(); focusTarget.current = null; }, [item]);\n  const choose = (id: string | null) => { focusTarget.current = id ? \"detail\" : item?.id ?? null; if (value === undefined) setInner(id); onValueChange?.(id); };\n  const root = rs([\"rs-master-detail\", className], styles.root);\n  const list = rs([\"rs-master-detail-list\", Boolean(item) && \"rs-master-detail-list-hidden\"], styles.list, Boolean(item) && styles.hideMobile);\n  const detail = rs([\"rs-master-detail-panel\", !item && \"rs-master-detail-panel-hidden\"], styles.detail, !item && styles.hideMobile);\n  const title = rs([\"rs-master-detail-title\"], styles.title);\n  const description = rs([\"rs-master-detail-description\"], styles.description);\n  const back = rs([\"rs-master-detail-back\"], styles.back);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}><div {...list} role=\"group\" aria-label={label}>{items.map(entry => { const selected = entry.id === current; const button = rs([\"rs-master-detail-button\", selected && \"rs-master-detail-selected\"], styles.button, selected && styles.selected); return <button type=\"button\" key={entry.id} ref={element => { if (element) buttons.current.set(entry.id, element); else buttons.current.delete(entry.id); }} {...button} aria-pressed={selected} onClick={() => choose(entry.id)}><span>{entry.label}</span>{entry.description && <span {...description}>{entry.description}</span>}</button>; })}{!items.length && <p>No items</p>}</div>\n    <section {...detail} aria-label={item ? `${item.label} details` : \"Details\"}>{item ? <><div {...back}><Button variant=\"ghost\" onClick={() => choose(null)}><Icon name=\"arrow-left\" />Back to {label.toLocaleLowerCase()}</Button></div><h2 ref={heading} tabIndex={-1} {...title}>{item.label}</h2>{item.detail}</> : <p>{emptyLabel}</p>}</section>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/master-detail.tsx"
+    },
+    {
+      "path": "vlak/styles/master-detail.css",
+      "content": "/* ── master-detail: generated from packages/react/src/components/master-detail.tsx ── */\n.rs-master-detail{display:grid;grid-template-columns:minmax(12rem, 1fr) minmax(0, 2fr);gap:1.25rem;min-width:0;color:var(--text)}\n@media (max-width: 640px){.rs-master-detail{grid-template-columns:minmax(0, 1fr)}}\n.rs-master-detail-list{display:flex;flex-direction:column;gap:0.25rem;min-width:0}\n@media (max-width: 640px){.rs-master-detail-list-hidden,.rs-master-detail-panel-hidden{display:none}}\n.rs-master-detail-selected{background-color:var(--control-fill);font-weight:600}\n.rs-master-detail-button{display:flex;flex-direction:column;align-items:flex-start;gap:0.25rem;min-height:var(--hit);padding:0.75rem;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);font-family:inherit;font-size:1rem;text-align:start;cursor:pointer;outline-color:var(--text);outline-offset:-2px}\n.rs-master-detail-description{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;font-weight:400}\n.rs-master-detail-panel{min-width:0;overflow-wrap:anywhere}\n.rs-master-detail-title{font-size:1.25rem;line-height:1.2;margin-block:1rem;outline-color:var(--text);outline-offset:2px}\n.rs-master-detail-back{display:none;margin-bottom:1rem}\n@media (max-width: 640px){.rs-master-detail-back{display:block}}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/master-detail.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-master-detail",
+        "rs-master-detail-list",
+        "rs-master-detail-list-hidden",
+        "rs-master-detail-panel",
+        "rs-master-detail-panel-hidden",
+        "rs-master-detail-title",
+        "rs-master-detail-description",
+        "rs-master-detail-back",
+        "rs-master-detail-button",
+        "rs-master-detail-selected"
+      ],
+      "snippet": "<div class=\"rs-master-detail\"><div class=\"rs-master-detail-list\" role=\"group\" aria-label=\"Studies\"><button class=\"rs-master-detail-button rs-master-detail-selected\" aria-pressed=\"true\">Drive</button></div><section class=\"rs-master-detail-panel\" aria-label=\"Drive details\"><h2 class=\"rs-master-detail-title\">Drive</h2><p>Vehicle controls</p></section></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "MasterDetail"
+      ],
+      "example": "import { MasterDetail } from \"@noorddev/vlak-react\";\n\n<MasterDetail label=\"Studies\" items={[{ id: \"drive\", label: \"Drive\", description: \"Vehicle controls\", detail: <p>Range, energy, and media in one shared grid.</p> }, { id: \"orbit\", label: \"Orbit\", description: \"Observation network\", detail: <p>Track assets and their current passes.</p> }]} />",
+      "usage": {
+        "use": [
+          "Inboxes, asset browsers, and list/detail workspaces."
+        ],
+        "avoid": [
+          "Independent panels without a selection relationship; use Split."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Select an item with its button; focus moves to the detail heading. Mobile Back restores focus to its list item."
+        }
+      ],
+      "a11y": [
+        "Native selected buttons and a named detail region. Mobile layout preserves an explicit return path."
+      ]
+    }
+  }
+}

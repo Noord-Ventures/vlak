@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "date-range-picker",
+  "type": "registry:component",
+  "title": "Date range picker",
+  "description": "Collects start and end dates with two native date editors, shared constraints, and 44px controls.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/field.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/date-range-picker.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useFieldControl } from \"./field\";\nimport { Input } from \"./input\";\n\nexport interface DateRangeValue { start: string; end: string }\nexport interface DateRangePickerProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\"> {\n  /** ISO calendar dates, YYYY-MM-DD; no time zone conversion. */\n  value?: DateRangeValue;\n  defaultValue?: DateRangeValue;\n  onValueChange?: (value: DateRangeValue) => void;\n  label?: React.ReactNode;\n  startLabel?: string;\n  endLabel?: string;\n  min?: string;\n  max?: string;\n  required?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { minWidth: 0, borderWidth: 0, margin: 0, padding: 0 },\n  legend: { fontSize: vlak.controlLabel, color: vlak.gray, marginBottom: \"0.75rem\", padding: 0 },\n  fields: { display: \"grid\", gridTemplateColumns: { default: \"minmax(0, 1fr) minmax(0, 1fr)\", [mq.mobileGrid]: \"minmax(0, 1fr)\" }, gap: \"0.75rem\", minWidth: 0 },\n  input: { minWidth: 0, maxWidth: \"100%\", boxSizing: \"border-box\", colorScheme: \"inherit\" },\n});\n\n/** Two native date editors share bounds; changing the start beyond the end clears the end. */\nexport const DateRangePicker = React.forwardRef<HTMLFieldSetElement, DateRangePickerProps>(function DateRangePicker({\n  value, defaultValue = { start: \"\", end: \"\" }, onValueChange, label = \"Date range\", startLabel = \"Start date\", endLabel = \"End date\", min, max, required, name, disabled, className, style, ...props\n}, ref) {\n  const [current, setValue, fieldRef] = useInputValue<DateRangeValue, HTMLFieldSetElement>(value, defaultValue, onValueChange);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const field = useFieldControl(props);\n  const lower = current.start && (!min || current.start > min) ? current.start : min;\n  const invalid = Boolean(current.start && current.end && current.end < current.start);\n  const root = rs([\"rs-date-range-picker\", className], styles.root);\n  const legend = rs([\"rs-date-range-picker-legend\"], styles.legend);\n  const fields = rs([\"rs-date-range-picker-fields\"], styles.fields);\n  const input = rs([\"rs-date-range-picker-input\"], styles.input);\n  return <fieldset {...props} ref={mergedRef} disabled={disabled} className={root.className} style={{ ...root.style, ...style }} aria-describedby={field[\"aria-describedby\"]} aria-invalid={invalid || field[\"aria-invalid\"] || undefined}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    <div className={fields.className} style={fields.style}>\n      <Input label={startLabel} type=\"date\" name={name ? `${name}[start]` : undefined} value={current.start} min={min} max={max} required={required} disabled={disabled} className={input.className} style={input.style} onChange={(event) => { const start = event.currentTarget.value; setValue({ start, end: start && current.end && current.end < start ? \"\" : current.end }); }} />\n      <Input label={endLabel} type=\"date\" name={name ? `${name}[end]` : undefined} value={current.end} min={lower} max={max} required={required} disabled={disabled} className={input.className} style={input.style} aria-invalid={invalid || undefined} onChange={(event) => setValue({ ...current, end: event.currentTarget.value })} />\n    </div>\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/date-range-picker.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/date-range-picker.css",
+      "content": "/* ── date-range-picker: generated from packages/react/src/components/date-range-picker.tsx ── */\n.rs-date-range-picker{min-width:0;border-width:0;margin:0;padding:0}\n.rs-date-range-picker-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.75rem;padding:0}\n.rs-date-range-picker-fields{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:0.75rem;min-width:0}\n@media (max-width: 480px){.rs-date-range-picker-fields{grid-template-columns:minmax(0, 1fr)}}\n.rs-date-range-picker-input{min-width:0;max-width:100%;box-sizing:border-box;color-scheme:inherit}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/date-range-picker.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-date-range-picker",
+        "rs-date-range-picker-legend",
+        "rs-date-range-picker-fields",
+        "rs-date-range-picker-input"
+      ],
+      "snippet": "<fieldset class=\"rs-date-range-picker\"><legend class=\"rs-date-range-picker-legend\">Stay</legend><div class=\"rs-date-range-picker-fields\"><label>Start date<input class=\"rs-input rs-date-range-picker-input\" type=\"date\" name=\"stay[start]\" value=\"2026-09-08\" /></label><label>End date<input class=\"rs-input rs-date-range-picker-input\" type=\"date\" name=\"stay[end]\" min=\"2026-09-08\" value=\"2026-09-12\" /></label></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "field",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "DateRangePicker",
+        "Date interval",
+        "Start and end dates"
+      ],
+      "example": "import { DateRangePicker } from \"@noorddev/vlak-react\";\n\n<DateRangePicker label=\"Stay\" name=\"stay\" defaultValue={{ start: \"2026-09-08\", end: \"2026-09-12\" }} min=\"2026-09-01\" required />",
+      "usage": {
+        "use": [
+          "A start/end date range that should use the platform's date editor and calendar picker.",
+          "Forms that submit ISO calendar dates without time-zone conversion."
+        ],
+        "avoid": [
+          "A single date; use DatePicker or Calendar.",
+          "Time-of-day selection; use TimeField."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the two native date editors and their platform picker controls."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Edits the active date segment according to the browser's native behavior."
+        }
+      ],
+      "a11y": [
+        "Uses a fieldset/legend and a separately labeled native date input for each endpoint. The browser owns each date popup.",
+        "Values use year-month-day strings, for example 2026-09-06. A new start after the old end clears the end; end's minimum follows the start.",
+        "min, max, and required use native constraint validation. A supplied inverted controlled range is marked invalid.",
+        "With name, form fields are name[start] and name[end]. The ref reaches the fieldset; uncontrolled values reset with the form."
+      ]
+    }
+  }
+}

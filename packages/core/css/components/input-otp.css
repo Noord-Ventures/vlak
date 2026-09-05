@@ -1,9 +1,9 @@
 /* ── input-otp: generated from packages/react/src/components/input-otp.tsx ── */
 .rs-otp{display:flex;gap:0.5rem}
 @media (max-width: 640px){.rs-otp{width:100%}}
-.rs-otp-cell{width:2.5rem;height:3rem;text-align:center;font-size:1.125rem;font-weight:600;font-variant-numeric:tabular-nums;appearance:none;-webkit-appearance:none;color:var(--text);caret-color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);outline-width:0;outline-style:none;outline-color:var(--text);outline-offset:2px;font-family:inherit;padding:0}
+.rs-otp-cell{box-sizing:border-box;width:var(--hit);min-width:var(--hit);height:3rem;text-align:center;font-size:1.125rem;font-weight:600;font-variant-numeric:tabular-nums;appearance:none;-webkit-appearance:none;color:var(--text);caret-color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);outline-width:0;outline-style:none;outline-color:var(--text);outline-offset:2px;font-family:inherit;padding:0}
 .rs-otp-cell:focus{border-color:var(--accent)}
 .rs-otp-cell:focus-visible{outline-width:2px;outline-style:solid}
 .rs-otp-cell:-webkit-autofill{-webkit-text-fill-color:var(--text);caret-color:var(--text);background-color:var(--bg);box-shadow:inset 0 0 0 1000px var(--bg)}
-@media (max-width: 640px){.rs-otp-cell{width:auto;flex-grow:1;min-width:var(--radius-sm);height:var(--hit);min-height:var(--hit);border-radius:0}}
+@media (max-width: 640px){.rs-otp-cell{width:auto;flex-grow:1;min-width:var(--hit);height:var(--hit);min-height:var(--hit);border-radius:var(--radius-sm)}}
 .rs-otp-cell-invalid{border-color:var(--text)}

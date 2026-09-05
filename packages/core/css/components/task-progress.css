@@ -1,0 +1,8 @@
+/* ── task-progress: generated from packages/react/src/components/task-progress.tsx ── */
+.rs-task-progress{display:grid;gap:1rem;color:var(--text);min-width:0;width:100%}
+.rs-task-progress-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45}
+.rs-task-progress-bar{width:100%;height:0.5rem;accent-color:var(--text)}
+.rs-task-progress-detail{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45;font-variant-numeric:tabular-nums}
+.rs-task-progress-phases{margin:0;padding-inline-start:1.5rem;line-height:1.45}
+.rs-task-progress-phase{padding-block:0.5rem}
+.rs-task-progress-actions{display:flex;flex-wrap:wrap;gap:0.5rem}

@@ -76,15 +76,15 @@ const styles = stylex.create({
     position: "fixed",
     bottom: {
       default: "1.25rem",
-      [mq.phone]: vlak.radius,
+      [mq.phone]: "max(0.5rem, env(safe-area-inset-bottom))",
     },
     insetInlineEnd: {
       default: "1.25rem",
-      [mq.phone]: 0,
+      [mq.phone]: "0.5rem",
     },
     insetInlineStart: {
       default: null,
-      [mq.phone]: 0,
+      [mq.phone]: "0.5rem",
     },
     zIndex: vlak.zToast,
     display: "flex",
@@ -95,7 +95,7 @@ const styles = stylex.create({
     },
     gap: {
       default: "0.5rem",
-      [mq.phone]: 0,
+      [mq.phone]: "0.5rem",
     },
   },
   toast: {
@@ -108,7 +108,7 @@ const styles = stylex.create({
     borderColor: vlak.divider,
     borderRadius: {
       default: vlak.radius,
-      [mq.phone]: 0,
+      [mq.phone]: vlak.radiusSm,
     },
     boxShadow: {
       default: "0 8px 24px rgba(0,0,0,0.06)",
@@ -186,11 +186,11 @@ const styles = stylex.create({
       [mq.phone]: "-0.75rem",
     },
     width: {
-      default: "1.75rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     height: {
-      default: "1.75rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     padding: 0,

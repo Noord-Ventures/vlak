@@ -1,6 +1,7 @@
 /* ── data-table: generated from packages/react/src/components/data-table.tsx ── */
-.rs-table.rs-datatable-table{width:calc(100% + 40px);border-collapse:collapse;margin-top:1rem;margin-bottom:1.5rem;margin-inline-start:-1.25rem;margin-inline-end:0;font-size:0.875rem}
-@media (max-width: 640px){.rs-table.rs-datatable-table{width:calc(100% + 2 * var(--pad));margin-inline-start:calc(-1 * var(--pad));margin-inline-end:calc(-1 * var(--pad));font-size:1rem}}
+.rs-datatable-scroll{width:100%;overflow-x:auto}
+.rs-table.rs-datatable-table{width:100%;border-collapse:collapse;margin-top:1rem;margin-bottom:1.5rem;margin-inline-start:0;margin-inline-end:0;font-size:0.875rem}
+@media (max-width: 640px){.rs-table.rs-datatable-table{width:100%;margin-inline-start:0;margin-inline-end:0;font-size:1rem}}
 .rs-datatable-th{text-align:start;font-weight:600;color:var(--text);letter-spacing:-0.01em;padding-top:0.625rem;padding-inline-end:1rem;padding-bottom:0.625rem;padding-inline-start:0.75rem;border-bottom-width:2px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:0.8125rem}
 .rs-datatable-th:last-child{text-align:end;padding-inline-end:20px}
 .rs-datatable-th:first-child{padding-inline-start:20px}
@@ -10,7 +11,8 @@
 .rs-datatable-td:first-child{padding-inline-start:20px}
 @media (max-width: 640px){.rs-datatable-td{padding-top:0.875rem;padding-inline-end:0.75rem;padding-bottom:0.875rem;padding-inline-start:0.75rem;font-size:1rem}.rs-datatable-td:last-child{padding-inline-end:var(--pad)}.rs-datatable-td:first-child{padding-inline-start:var(--pad)}}
 .rs-datatable-td-alt{background-color:var(--table-alt)}
-.rs-datatable-sort{background-color:transparent;border-width:0;border-style:none;padding:0;font-family:inherit;font-size:inherit;font-weight:600;letter-spacing:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:0.3125rem;min-height:1.5rem}
+.rs-datatable-td-selected{background-color:var(--control-fill);color:var(--text)}
+.rs-datatable-sort{background-color:transparent;border-width:0;border-style:none;padding:0;font-family:inherit;font-size:inherit;font-weight:600;letter-spacing:inherit;color:inherit;cursor:pointer;display:inline-flex;align-items:center;gap:0.3125rem;min-height:var(--hit);min-width:var(--hit)}
 .rs-datatable-sort:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 .rs-datatable-sort-icon{color:var(--text-secondary);opacity:1}
 .rs-datatable-sort-icon-on{color:var(--text)}

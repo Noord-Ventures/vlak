@@ -1,10 +1,10 @@
 /* ── slider: generated from packages/react/src/components/slider.tsx ── */
-.rs-slider{position:relative;height:2px;background-color:var(--divider);border-radius:1px;margin-block:0.6875rem;margin-inline:0}
+.rs-slider{position:relative;height:2px;background-color:var(--divider);border-radius:1px;margin-block:1.3125rem;margin-inline:0}
 @media (max-width: 640px){.rs-slider{height:0.25rem;border-radius:1px;margin-block:1.25rem}}
 .rs-slider-fill{position:absolute;inset-inline-start:0;top:0;bottom:0;background-color:var(--text);border-radius:1px;pointer-events:none}
 @media (max-width: 640px){.rs-slider-fill{border-radius:1px}}
 .rs-slider-thumb{position:absolute;top:50%;transform:translate(-50%, -50%);width:0.875rem;height:0.875rem;border-radius:50%;background-color:var(--bg);border-width:1.5px;border-style:solid;border-color:var(--text);box-sizing:border-box;pointer-events:none}
 @media (max-width: 640px){.rs-slider-thumb{width:1.375rem;height:1.375rem;border-radius:50%}}
 .rs-slider-thumb-focused{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
-.rs-slider-range{position:absolute;inset-inline-start:0;inset-inline-end:0;top:-0.6875rem;bottom:-0.6875rem;width:100%;height:auto;opacity:0;cursor:pointer;margin:0}
+.rs-slider-range{position:absolute;inset-inline-start:0;inset-inline-end:0;top:-1.3125rem;bottom:-1.3125rem;width:100%;height:auto;opacity:0;cursor:pointer;margin:0}
 @media (max-width: 640px){.rs-slider-range{top:-1.25rem;bottom:-1.25rem}}

@@ -84,8 +84,9 @@ export const Donut = React.forwardRef<HTMLDivElement, DonutProps>(function Donut
   "aria-labelledby": ariaLabelledBy,
   ...props
 }: DonutProps, ref: React.ForwardedRef<HTMLDivElement>) {
+  const valid = Number.isFinite(value) && Number.isFinite(max) && max > 0 && value >= 0;
   const format = valueFormat ?? ((v: number) => `${Math.round((v / max) * 100)}%`);
-  const pct = Math.max(0, Math.min(1, max === 0 ? 0 : value / max));
+  const pct = valid ? Math.max(0, Math.min(1, value / max)) : 0;
   const caption = typeof label === "string" ? label : undefined;
   const ids = React.useId();
   const valueId = `${ids}-value`;
@@ -94,7 +95,7 @@ export const Donut = React.forwardRef<HTMLDivElement, DonutProps>(function Donut
   const c = size / 2;
   const r = size * 0.375;
   const circumference = 2 * Math.PI * r;
-  const shown = `${format(value)}${unit ? ` ${unit}` : ""}`;
+  const shown = valid ? `${format(value)}${unit ? ` ${unit}` : ""}` : "No data";
   const svg = rs(["rs-chart-plot", "rs-chart-donut"], chartStyles.svg, chartStyles.plot, styles.donut);
   const track = rs(["rs-chart-donut-track"], styles.track);
   const valueSx = rs(["rs-chart-donut-value"], styles.value);
@@ -144,7 +145,7 @@ export const Donut = React.forwardRef<HTMLDivElement, DonutProps>(function Donut
         series={[
           { name: unit ?? "Value", values: [defaultFormat(value, undefined, locale)] },
           { name: "Of", values: [defaultFormat(max, undefined, locale)] },
-          { name: "Share", values: [`${Math.round(pct * 100)}%`] },
+          { name: "Share", values: [valid ? `${Math.round(pct * 100)}%` : "No data"] },
         ]}
       />
     </ChartField>
@@ -163,7 +164,7 @@ export interface ShareProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Share = React.forwardRef<HTMLDivElement, ShareProps>(function Share({
-  slices,
+  slices: inputSlices,
   unit,
   valueFormat,
   className,
@@ -173,6 +174,7 @@ export const Share = React.forwardRef<HTMLDivElement, ShareProps>(function Share
   "aria-labelledby": ariaLabelledBy,
   ...props
 }: ShareProps, ref: React.ForwardedRef<HTMLDivElement>) {
+  const slices = inputSlices.filter((slice) => Number.isFinite(slice.value) && slice.value >= 0);
   const format = valueFormat ?? ((v: number) => defaultFormat(v, unit, locale));
   const total = slices.reduce((s, x) => s + x.value, 0) || 1;
   const percent = (v: number) => `${defaultFormat((v / total) * 100, undefined, locale)}%`;
@@ -184,6 +186,7 @@ export const Share = React.forwardRef<HTMLDivElement, ShareProps>(function Share
       };
   return (
     <ChartField ref={ref} spot={spot} className={className} {...props}>
+      {!slices.some((slice) => slice.value > 0) && <p role="status">No data to display</p>}
       <div className={share.className} style={share.style} role="img" {...name}>
         {slices.map((s, i) => {
           const seg = rs(

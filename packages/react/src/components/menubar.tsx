@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
+import { useOverlayPosition } from "../use-overlay-position";
 import { Icon } from "./icon";
 import { MenuPanel, menuStyles, type DropdownMenuItem, type MenuCloseReason } from "./dropdown-menu";
 
@@ -51,6 +52,10 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
   const triggerRefs = React.useRef<Array<HTMLButtonElement | null>>([]);
   const [focusIndex, setFocusIndex] = React.useState(0);
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const openTrigger = React.useRef<HTMLButtonElement | null>(null);
+  openTrigger.current = openIndex === null ? null : triggerRefs.current[openIndex] ?? null;
+  const placement = useOverlayPosition(openIndex !== null, panelRef, openTrigger);
   const [initial, setInitial] = React.useState<"first" | "last">("first");
   const count = menus.length;
 
@@ -176,7 +181,8 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
                 labelledBy={triggerId}
                 initial={initial}
                 className={menu.className}
-                style={menu.style}
+                panelRef={panelRef}
+                style={{ ...menu.style, ...placement }}
                 onClose={closeMenu}
                 onHorizontal={(dir) => moveTo(index + dir)}
               />

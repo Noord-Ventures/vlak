@@ -1,0 +1,109 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tag-input",
+  "type": "registry:component",
+  "title": "Tag input",
+  "description": "Creates and removes freeform text tokens with paste splitting, duplicate prevention, and validation.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/field.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/tag-input.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useFieldControl } from \"./field\";\nimport { Input } from \"./input\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface TagInputProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\"> {\n  value?: string[];\n  defaultValue?: string[];\n  onValueChange?: (value: string[]) => void;\n  label?: React.ReactNode;\n  name?: string;\n  disabled?: boolean;\n  placeholder?: string;\n  maxTags?: number;\n  /** Return an error for an invalid token, or undefined to accept it. */\n  validate?: (tag: string) => string | undefined;\n  addLabel?: string;\n  removeLabel?: (tag: string) => string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  label: { fontSize: vlak.controlLabel, color: vlak.gray },\n  list: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", padding: 0, margin: 0, listStyle: \"none\" },\n  tag: { display: \"inline-flex\", alignItems: \"center\", gap: \"0.25rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, paddingInlineStart: \"0.75rem\", fontSize: vlak.controlFs },\n  remove: { minWidth: vlak.hit, minHeight: vlak.hit, width: vlak.hit, padding: 0, borderWidth: 0, flexShrink: 0 },\n  row: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", alignItems: \"start\", minWidth: 0 },\n  input: { flex: \"1 1 8rem\", minWidth: vlak.hit },\n  add: { width: \"auto\", flexShrink: 0 },\n  feedback: { color: vlak.gray, fontSize: vlak.controlLabel, margin: 0, lineHeight: 1.45 },\n});\n\nexport const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(function TagInput({\n  value, defaultValue = [], onValueChange, label = \"Tags\", name, disabled, placeholder = \"Add a tag\", maxTags, validate, addLabel = \"Add\", removeLabel = (tag) => `Remove ${tag}`, className, style, ...props\n}, ref) {\n  const [current, setValue, rootRef] = useInputValue<string[], HTMLDivElement>(value, defaultValue, onValueChange, () => { setDraft(\"\"); setError(\"\"); });\n  const [draft, setDraft] = React.useState(\"\");\n  const [error, setError] = React.useState(\"\");\n  const inputRef = React.useRef<HTMLInputElement>(null);\n  const mergedRef = useMergedRefs(ref, inputRef);\n  const removeRefs = React.useRef<Array<HTMLButtonElement | null>>([]);\n  const id = React.useId();\n  const field = useFieldControl(props);\n  const add = (text = draft) => {\n    const candidates = text.split(/[,\\n\\r]+/).map((tag) => tag.trim()).filter(Boolean);\n    if (!candidates.length) return;\n    const next = [...new Set([...current, ...candidates])];\n    const invalid = candidates.map((tag) => validate?.(tag)).find(Boolean);\n    if (invalid || (maxTags != null && next.length > maxTags)) { setError(invalid ?? `Use at most ${maxTags} ${maxTags === 1 ? \"tag\" : \"tags\"}`); return; }\n    setValue(next); setDraft(\"\"); setError(\"\"); inputRef.current?.focus();\n  };\n  const root = rs([\"rs-tag-input\", className], styles.root);\n  const lab = rs([\"rs-tag-input-label\"], styles.label);\n  const list = rs([\"rs-tag-input-list\"], styles.list);\n  const tag = rs([\"rs-tag-input-tag\"], styles.tag);\n  const remove = rs([\"rs-tag-input-remove\"], styles.remove);\n  const row = rs([\"rs-tag-input-row\"], styles.row);\n  const input = rs([\"rs-tag-input-input\"], styles.input);\n  const action = rs([\"rs-tag-input-add\"], styles.add);\n  const feedback = rs([\"rs-tag-input-feedback\"], styles.feedback);\n  return <div {...props} ref={rootRef} className={root.className} style={{ ...root.style, ...style }}>\n    <label htmlFor={id} className={lab.className} style={lab.style}>{label}</label>\n    {current.length > 0 && <ul aria-label=\"Current tags\" className={list.className} style={list.style}>{current.map((item, index) => <li key={item} className={tag.className} style={tag.style}>\n      <span>{item}</span><Button ref={(node) => { removeRefs.current[index] = node; }} variant=\"ghost\" className={remove.className} style={remove.style} disabled={disabled} aria-label={removeLabel(item)} onClick={() => { setValue(current.filter((entry) => entry !== item)); inputRef.current?.focus(); }}><Icon name=\"close\" size={16} /></Button>\n    </li>)}</ul>}\n    <div className={row.className} style={row.style}>\n      <Input ref={mergedRef} id={id} plain value={draft} disabled={disabled} placeholder={placeholder} className={input.className} style={input.style} aria-describedby={[field[\"aria-describedby\"], `${id}-hint`, error ? `${id}-error` : null].filter(Boolean).join(\" \")} aria-invalid={error ? true : field[\"aria-invalid\"]} onChange={(event) => { setDraft(event.currentTarget.value); setError(\"\"); }} onKeyDown={(event) => {\n        if (event.nativeEvent.isComposing) return;\n        if (event.key === \"Enter\" || event.key === \",\") { event.preventDefault(); add(); }\n        if (event.key === \"Escape\") { setDraft(\"\"); setError(\"\"); }\n        if (event.key === \"Backspace\" && !draft) { event.preventDefault(); removeRefs.current[current.length - 1]?.focus(); }\n      }} onPaste={(event) => { const text = event.clipboardData.getData(\"text\"); if (/[,\\n\\r]/.test(text)) { event.preventDefault(); const start = event.currentTarget.selectionStart ?? draft.length; const end = event.currentTarget.selectionEnd ?? start; add(draft.slice(0, start) + text + draft.slice(end)); } }} />\n      <Button variant=\"ghost\" disabled={disabled || !draft.trim()} className={action.className} style={action.style} onClick={() => add()}>{addLabel}</Button>\n    </div>\n    <p id={`${id}-hint`} className={feedback.className} style={feedback.style}>Press Enter or comma to add a tag{maxTags != null ? `, up to ${maxTags}` : \"\"}</p>\n    {error && <p id={`${id}-error`} role=\"alert\" className={feedback.className} style={feedback.style}>{error}</p>}\n    {name && current.map((item) => <input key={item} type=\"hidden\" name={name} value={item} disabled={disabled} />)}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/tag-input.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/tag-input.css",
+      "content": "/* ── tag-input: generated from packages/react/src/components/tag-input.tsx ── */\n.rs-tag-input{display:grid;gap:0.5rem;min-width:0}\n.rs-tag-input-label{font-size:var(--control-label);color:var(--text-secondary)}\n.rs-tag-input-list{display:flex;flex-wrap:wrap;gap:0.5rem;padding:0;margin:0;list-style:none}\n.rs-tag-input-tag{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding-inline-start:0.75rem;font-size:var(--control-fs)}\n.rs-tag-input-remove{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding:0;border-width:0;flex-shrink:0}\n.rs-tag-input-row{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:start;min-width:0}\n.rs-tag-input-input{flex:1 1 8rem;min-width:var(--hit)}\n.rs-tag-input-add{width:auto;flex-shrink:0}\n.rs-tag-input-feedback{color:var(--text-secondary);font-size:var(--control-label);margin:0;line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/tag-input.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-tag-input",
+        "rs-tag-input-label",
+        "rs-tag-input-list",
+        "rs-tag-input-tag",
+        "rs-tag-input-remove",
+        "rs-tag-input-row",
+        "rs-tag-input-input",
+        "rs-tag-input-add",
+        "rs-tag-input-feedback"
+      ],
+      "snippet": "<div class=\"rs-tag-input\"><label class=\"rs-tag-input-label\" for=\"project-tags\">Project tags</label><ul class=\"rs-tag-input-list\" aria-label=\"Current tags\"><li class=\"rs-tag-input-tag\">Design<button class=\"rs-btn-ghost rs-tag-input-remove\" type=\"button\" aria-label=\"Remove Design\">×</button></li></ul><div class=\"rs-tag-input-row\"><input class=\"rs-input rs-tag-input-input\" id=\"project-tags\" placeholder=\"Add a tag\" /><button class=\"rs-btn-ghost rs-tag-input-add\" type=\"button\">Add</button></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "button",
+        "icons",
+        "field",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "TagInput",
+        "Token input",
+        "Chips input",
+        "Freeform tags"
+      ],
+      "example": "import { TagInput } from \"@noorddev/vlak-react\";\n\n<TagInput label=\"Project tags\" name=\"tags\" defaultValue={[\"Research\", \"Design\"]} maxTags={5} validate={(tag) => tag.length > 24 ? \"Use 24 characters or fewer\" : undefined} />",
+      "usage": {
+        "use": [
+          "Short freeform labels, recipients, or keywords.",
+          "Comma-separated or newline-separated pasted values that should become distinct tokens."
+        ],
+        "avoid": [
+          "A fixed vocabulary; use MultiSelect.",
+          "Long prose; use Textarea."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Enter, comma",
+          "does": "Commits a trimmed draft as a tag without submitting the form."
+        },
+        {
+          "keys": "Backspace in an empty input",
+          "does": "Focuses the last tag's remove button."
+        },
+        {
+          "keys": "Escape",
+          "does": "Clears the current draft and its error."
+        },
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Reaches and activates named Add and Remove buttons."
+        }
+      ],
+      "a11y": [
+        "The forwarded ref reaches the text input. Each 44px remove target is named with its tag.",
+        "Exact duplicate tags are ignored; validate and maxTags reject an addition while preserving the draft and exposing an alert.",
+        "Hidden fields submit each tag under name. Form reset restores uncontrolled tags and clears the draft.",
+        "Keyboard composition is respected; Enter does not commit while an input method is composing text."
+      ]
+    }
+  }
+}

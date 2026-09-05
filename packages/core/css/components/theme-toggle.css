@@ -1,5 +1,5 @@
 /* ── theme-toggle: generated from packages/react/src/components/theme-toggle.tsx ── */
-.rs-theme-toggle{transition:var(--transition);position:fixed;top:1.5rem;inset-inline-end:1.25rem;z-index:var(--z-sticky);width:1.5rem;height:1.5rem;padding:0.25rem;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:transparent;border-width:0;border-style:none;border-radius:0;cursor:pointer;color:var(--text-secondary);outline-width:0;outline-style:none;outline-color:transparent;outline-offset:0;filter:drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg))}
+.rs-theme-toggle{transition:var(--transition);position:fixed;top:1.5rem;inset-inline-end:1.25rem;z-index:var(--z-sticky);width:var(--hit);height:var(--hit);padding:0.25rem;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:transparent;border-width:0;border-style:none;border-radius:0;cursor:pointer;color:var(--text-secondary);outline-width:0;outline-style:none;outline-color:transparent;outline-offset:0;filter:drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg))}
 .rs-theme-toggle:hover{color:var(--text)}
 .rs-theme-toggle:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.rs-theme-toggle{transition:none}}

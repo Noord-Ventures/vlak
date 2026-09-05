@@ -146,7 +146,7 @@ describe("StyleX nav/data/display leaves", () => {
     expect(screen.getByRole("separator").className).toContain("rs-split-handle");
   });
 
-  it("keeps calendar day classes and 36px grid", () => {
+  it("keeps calendar day classes and the accessible day grid", () => {
     const onSelect = vi.fn();
     const { container } = render(<Calendar value={new Date(2026, 8, 3)} onSelect={onSelect} />);
     expect(container.querySelector(".rs-cal")?.className).toContain("rs-cal");

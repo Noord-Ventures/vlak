@@ -1,5 +1,3 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   concentricInner,
@@ -9,12 +7,10 @@ import {
 } from "../src/radius";
 
 describe("concentric radius", () => {
-  it("is Steve Ruiz’s innerRadius, not a copied outer radius", () => {
-    const src = readFileSync(join(import.meta.dirname, "../src/radius.ts"), "utf8");
-    expect(src).toContain("Math.hypot");
-    expect(src).toContain("epochs");
-    expect(src).toMatch(/initial guess: the wrong answer/);
-    expect(src).not.toMatch(/return Math\.max\(0,\s*outer\s*-\s*padding\)/);
+  it("uses exact geometry independently of obsolete fit settings", () => {
+    expect(innerRadius(28, 16, { epochs: 0, lr: 0 })).toBe(12);
+    expect(innerRadius(10.75, 0.25)).toBe(10.5);
+    expect(innerRadius(Number.NaN, 2)).toBe(0);
   });
 
   it("fits the −padding isosurface and clamps at 0", () => {

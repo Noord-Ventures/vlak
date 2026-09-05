@@ -1,6 +1,6 @@
 # Data table
 
-Sorts and presents structured records. Column headers expose aria-sort.
+Sorts, filters and selects structured records. Native controls expose sort and selection state.
 
 Category: content  
 Name: `data-table`  
@@ -9,13 +9,13 @@ Page: https://vlak.dev/components/data-table/
 
 ## When to use
 
-- Rows from data with sortable columns and an empty state.
-- render for cells that are not plain values; sortValue for custom sort keys.
+- Rows from data with controlled or default sorting, selection keys and text filtering.
+- render for rich cells, sortValue for sort keys, filterRow for custom filtering, and a stable rowKey to keep selection attached to records.
 
 ## When not to
 
 - Hand-written rows; use Table.
-- Pagination, selection, or editing; compose those around it.
+- Inline editing or pagination; compose those around it. Large datasets need windowing or server-side data management.
 
 ## Install
 
@@ -75,20 +75,22 @@ import { DataTable } from "@noorddev/vlak-react";
 
 | Keys | Does |
 | --- | --- |
-| Tab | Moves between the sort buttons |
+| Tab | Moves through the optional filter, sort buttons and selection checkboxes |
 | Enter, Space | Sorts ascending, then descending, then clears |
 
 ## Accessibility
 
 - Sortable headers hold a native <button>; the <th> carries aria-sort while sorted.
-- The empty state is plain text under the table.
+- Filter and sort have value/callback pairs: filter/onFilterChange and sort/onSortChange, with defaultFilter/defaultSort for local state.
+- selectable adds native checkboxes; selectedKeys/onSelectionChange controls selection, with defaultSelectedKeys for local state. Select all affects visible filtered rows and exposes mixed state.
+- A horizontal scroll container keeps the table inside its grid; caption names the data. Empty filtered results are a live status. Interactive targets are at least 44px.
 
 ## Classes
 
-`rs-datatable-sort`, `rs-datatable-empty`, `rs-datatable-sort-icon`, `rs-datatable-sort-icon-on`, `rs-datatable-table`, `rs-datatable-td`, `rs-datatable-td-alt`, `rs-datatable-th`
+`rs-datatable-sort`, `rs-datatable-empty`, `rs-datatable-sort-icon`, `rs-datatable-sort-icon-on`, `rs-datatable-table`, `rs-datatable-td`, `rs-datatable-td-alt`, `rs-datatable-th`, `rs-datatable-scroll`, `rs-datatable-td-selected`
 
 ## Dependencies
 
-Registry dependencies: [table](table.md).  
+Registry dependencies: [table](table.md), [input](input.md), [checkbox](checkbox.md).  
 React: `packages/react/src/components/data-table.tsx`  
 CSS: `packages/core/css/components/data-table.css`

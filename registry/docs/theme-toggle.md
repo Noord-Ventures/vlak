@@ -80,7 +80,7 @@ Forwards `ref` to the `HTMLButtonElement`.
 ## Accessibility
 
 - A native <button> whose aria-label states the action ("Switch to dark scheme" or "Switch to light scheme").
-- Sets data-theme="dark" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.
+- Sets an explicit data-theme="light" or data-theme="dark" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.
 
 ## Classes
 

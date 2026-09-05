@@ -14,7 +14,7 @@ const styles = stylex.create({
       [mq.phone]: "flex",
     },
     alignItems: "stretch",
-    height: vlak.controlH,
+    minHeight: `calc(${vlak.hit} + 2 * ${vlak.hairline})`,
     width: {
       default: null,
       [mq.phone]: "100%",

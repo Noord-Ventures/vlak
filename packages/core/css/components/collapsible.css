@@ -1,5 +1,5 @@
 /* ── collapsible: generated from packages/react/src/components/collapsible.tsx ── */
-.rs-disclosure-summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:0.4375rem;min-height:1.5rem;font-size:0.84375rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
+.rs-disclosure-summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:0.4375rem;min-height:var(--hit);min-width:var(--hit);font-size:0.84375rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
 .rs-disclosure-summary::-webkit-details-marker{display:none}
 .rs-disclosure-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (max-width: 640px){.rs-disclosure-summary{min-height:var(--hit);font-size:1.0625rem}}

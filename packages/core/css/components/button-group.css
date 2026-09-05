@@ -1,3 +1,3 @@
 /* ── button-group: generated from packages/react/src/components/button-group.tsx ── */
-.rs-btn-group{box-sizing:border-box;display:inline-flex;align-items:stretch;height:var(--control-h);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--divider);gap:1px;overflow:hidden}
+.rs-btn-group{box-sizing:border-box;display:inline-flex;align-items:stretch;min-height:calc(var(--hit) + 2 * 1px);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--divider);gap:1px;overflow:hidden}
 @media (max-width: 640px){.rs-btn-group{display:flex;width:100%;border-radius:var(--radius-sm)}}

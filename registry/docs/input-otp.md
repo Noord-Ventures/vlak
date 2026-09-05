@@ -62,14 +62,20 @@ import { InputOTP } from "@noorddev/vlak-react";
 
 One cell per character. Auto-advance, backspace, paste.
 
-Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
 
 Forwards `ref` to the `HTMLDivElement`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `length` | `number` | `6` |  |
-| `onChange` | `(code: string) => void` |  |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(code: string) => void` |  |  |
+| `name` | `string` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
+| `onChange` | `(code: string) => void` |  | Deprecated. Use onValueChange. |
 | `onComplete` | `(code: string) => void` |  | Called once every cell is filled. |
 | `aria-label` | `string` | `"One-time code"` | Defines a string value that labels the current element. |
 
@@ -87,6 +93,8 @@ Forwards `ref` to the `HTMLDivElement`.
 - Renders role="group" named by aria-label ("One-time code" by default); each cell is an <input> named "Digit n".
 - inputMode="numeric" and autoComplete="one-time-code" on the first cell let phones offer the code.
 - Inside Field, hint and error reach the group and cells through aria-describedby and aria-invalid.
+- Controlled with value and onValueChange, or uncontrolled with defaultValue; name submits one hidden complete-code value. disabled and readOnly apply to every cell.
+- Each cell has a 44px target and 4px corners. length is clamped to 1–12; onComplete fires once per distinct complete code until it changes.
 
 ## Classes
 

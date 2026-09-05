@@ -8,7 +8,7 @@
 @media (max-width: 640px){.rs-dialog-body{font-size:1rem;margin-bottom:1.25rem}}
 .rs-dialog-actions{display:flex;justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:0.5rem}
 @media (max-width: 640px){.rs-dialog-actions{flex-direction:column;align-items:stretch;gap:0.625rem}}
-.rs-dialog-close,.rs-drawer-close,.rs-sheet-close{transition:var(--transition);float:inline-end;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:2rem;height:2rem;margin-top:-0.5rem;margin-inline-end:-0.5rem;margin-inline-start:0.5rem;padding:0;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer}
+.rs-dialog-close,.rs-drawer-close,.rs-sheet-close{transition:var(--transition);float:inline-end;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;width:var(--hit);height:var(--hit);margin-top:-0.5rem;margin-inline-end:-0.5rem;margin-inline-start:0.5rem;padding:0;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer}
 .rs-dialog-close:hover,.rs-drawer-close:hover,.rs-sheet-close:hover{background-color:var(--control-fill)}
 .rs-dialog-close:focus-visible,.rs-drawer-close:focus-visible,.rs-sheet-close:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.rs-dialog-close,.rs-drawer-close,.rs-sheet-close{transition:none}}

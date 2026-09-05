@@ -1,0 +1,72 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "filter-bar",
+  "type": "registry:component",
+  "title": "Filter bar",
+  "description": "Shows active filters with individual removal, reset, and a result count.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/filter-bar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface ActiveFilter { id: string; label: string }\nexport interface FilterBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  value?: ActiveFilter[];\n  defaultValue?: ActiveFilter[];\n  onValueChange?: (filters: ActiveFilter[]) => void;\n  resultCount?: number;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", color: vlak.ink, minWidth: 0 },\n  count: { fontSize: \"0.875rem\", color: vlak.gray, fontVariantNumeric: \"tabular-nums\", lineHeight: 1.45 },\n});\n\n/** Removable active filters and result count. Supply filter editors as children. */\nexport const FilterBar = React.forwardRef<HTMLDivElement, FilterBarProps>(function FilterBar({ value, defaultValue = [], onValueChange, resultCount, label = \"Active filters\", children, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const filters = value ?? inner;\n  const root = rs([\"rs-filter-bar\", className], styles.root);\n  const count = rs([\"rs-filter-bar-count\"], styles.count);\n  const change = (next: ActiveFilter[]) => { if (value === undefined) setInner(next); onValueChange?.(next); };\n  return <div ref={ref} role=\"group\" aria-label={label} tabIndex={-1} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {children}{filters.map(filter => <Button key={filter.id} variant=\"ghost\" style={{ width: \"auto\" }} aria-label={`Remove ${filter.label} filter`} onClick={event => { event.currentTarget.parentElement?.focus(); change(filters.filter(entry => entry.id !== filter.id)); }}>{filter.label}<Icon name=\"close\" size={12} /></Button>)}\n    {!!filters.length && <Button variant=\"ghost\" style={{ width: \"auto\" }} onClick={event => { event.currentTarget.parentElement?.focus(); change([]); }}>Clear filters</Button>}\n    {resultCount != null && <span {...count} role=\"status\">{resultCount} {resultCount === 1 ? \"result\" : \"results\"}</span>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/filter-bar.tsx"
+    },
+    {
+      "path": "vlak/styles/filter-bar.css",
+      "content": "/* ── filter-bar: generated from packages/react/src/components/filter-bar.tsx ── */\n.rs-filter-bar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text);min-width:0}\n.rs-filter-bar-count{font-size:0.875rem;color:var(--text-secondary);font-variant-numeric:tabular-nums;line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/filter-bar.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-filter-bar",
+        "rs-filter-bar-count"
+      ],
+      "snippet": "<div class=\"rs-filter-bar\" role=\"group\" aria-label=\"Active filters\"><button class=\"rs-btn-ghost\" aria-label=\"Remove Alkmaar filter\">Alkmaar ×</button><span class=\"rs-filter-bar-count\" role=\"status\">12 results</span></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "FilterBar"
+      ],
+      "example": "import { FilterBar } from \"@noorddev/vlak-react\";\n\n<FilterBar defaultValue={[{ id: \"city\", label: \"Alkmaar\" }, { id: \"status\", label: \"Published\" }]} resultCount={12} />",
+      "usage": {
+        "use": [
+          "Search results and data views with multiple active filters."
+        ],
+        "avoid": [
+          "Editing complex logic directly; use QueryBuilder."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches remove/reset actions; Enter or Space applies changes and returns focus to the group."
+        }
+      ],
+      "a11y": [
+        "Removal buttons name their filters. Result count is a polite status; children can supply labeled filter editors."
+      ]
+    }
+  }
+}

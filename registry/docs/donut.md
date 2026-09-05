@@ -94,6 +94,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - Donut renders role="img" named by the caption or label and the value text; a visually hidden table carries value and max.
 - Share renders a named group of slices with a hidden table of label and value per slice.
+- Invalid totals do not produce a percentage. Share excludes negative and non-finite slices and explains an empty total.
 
 ## Classes
 

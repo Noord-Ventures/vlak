@@ -5,7 +5,7 @@
 @media (max-width: 640px){.rs-crumbs-list{align-items:center;flex-wrap:wrap;gap:0.375rem}}
 .rs-crumbs-item{display:inline-flex;align-items:baseline;gap:0.5rem}
 @media (max-width: 640px){.rs-crumbs-item{align-items:center;gap:0.375rem}}
-.rs-crumbs-link{transition:var(--transition);color:var(--text-secondary);font-weight:400;text-decoration:none;text-underline-offset:3px;background-color:transparent}
+.rs-crumbs-link{min-width:var(--hit);transition:var(--transition);color:var(--text-secondary);font-weight:400;text-decoration:none;text-underline-offset:3px;background-color:transparent;display:inline-flex;align-items:center;min-height:var(--hit)}
 .rs-crumbs-link:link{color:var(--text-secondary)}
 .rs-crumbs-link:visited{color:var(--text-secondary)}
 .rs-crumbs-link:hover{color:var(--text);text-decoration:underline}

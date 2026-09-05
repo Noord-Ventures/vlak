@@ -1,0 +1,8 @@
+/* ── json-viewer: generated from packages/react/src/components/json-viewer.tsx ── */
+.rs-json-viewer{display:grid;gap:1rem;width:100%;min-width:0;color:var(--text)}
+.rs-json-viewer-tools{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-json-viewer-body{padding:1rem;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45}
+.rs-json-viewer-summary{min-height:var(--hit);align-content:center;cursor:pointer;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}
+.rs-json-viewer-children{padding-inline-start:1rem}
+.rs-json-viewer-value{min-height:2rem;align-content:center;margin:0}
+.rs-json-viewer-note{color:var(--text-secondary);font-family:inherit}

@@ -5,6 +5,8 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { Icon } from "./icon";
+import { Checkbox } from "./checkbox";
+import { Input } from "./input";
 
 export interface DataTableColumn<Row> {
   key: string;
@@ -21,26 +23,40 @@ export interface DataTableProps<Row> extends React.HTMLAttributes<HTMLDivElement
   rows: Row[];
   rowKey?: (row: Row, index: number) => React.Key;
   emptyLabel?: React.ReactNode;
+  caption?: string;
+  sort?: DataTableSort | null;
+  defaultSort?: DataTableSort | null;
+  onSortChange?: (sort: DataTableSort | null) => void;
+  selectable?: boolean;
+  selectedKeys?: React.Key[];
+  defaultSelectedKeys?: React.Key[];
+  onSelectionChange?: (keys: React.Key[]) => void;
+  filterable?: boolean;
+  filter?: string;
+  defaultFilter?: string;
+  onFilterChange?: (filter: string) => void;
+  filterRow?: (row: Row, filter: string) => boolean;
 }
 
-type Dir = "asc" | "desc";
+export interface DataTableSort { key: string; dir: "asc" | "desc" }
 
 const styles = stylex.create({
+  scroll: { width: "100%", overflowX: "auto" },
   table: {
     width: {
-      default: "calc(100% + 40px)",
-      [mq.phone]: `calc(100% + 2 * ${vlak.pad})`,
+      default: "100%",
+      [mq.phone]: "100%",
     },
     borderCollapse: "collapse",
     marginTop: "1rem",
     marginBottom: "1.5rem",
     marginInlineStart: {
-      default: "-1.25rem",
-      [mq.phone]: `calc(-1 * ${vlak.pad})`,
+      default: 0,
+      [mq.phone]: 0,
     },
     marginInlineEnd: {
       default: 0,
-      [mq.phone]: `calc(-1 * ${vlak.pad})`,
+      [mq.phone]: 0,
     },
     fontSize: {
       default: "0.875rem",
@@ -131,6 +147,7 @@ const styles = stylex.create({
   tdAlt: {
     backgroundColor: vlak.tableAlt,
   },
+  selected: { backgroundColor: vlak.controlFill, color: vlak.ink },
   sort: {
     backgroundColor: "transparent",
     borderWidth: 0,
@@ -145,7 +162,8 @@ const styles = stylex.create({
     display: "inline-flex",
     alignItems: "center",
     gap: "0.3125rem",
-    minHeight: "1.5rem",
+    minHeight: vlak.hit,
+    minWidth: vlak.hit,
     outlineWidth: {
       default: null,
       ":focus-visible": 2,
@@ -188,26 +206,57 @@ export const DataTable = React.forwardRef(function DataTable<Row extends Record<
   rows,
   rowKey = (_, i) => i,
   emptyLabel = "Nothing here yet.",
+  caption,
+  sort: controlledSort,
+  defaultSort = null,
+  onSortChange,
+  selectable = false,
+  selectedKeys,
+  defaultSelectedKeys = [],
+  onSelectionChange,
+  filterable = false,
+  filter,
+  defaultFilter = "",
+  onFilterChange,
+  filterRow,
   className,
   style,
   ...props
 }: DataTableProps<Row>, ref: React.ForwardedRef<HTMLDivElement>) {
-  const [sort, setSort] = React.useState<{ key: string; dir: Dir } | null>(null);
-
-  const sorted = React.useMemo(() => {
-    if (!sort) return rows;
-    const column = columns.find((c) => c.key === sort.key);
-    const get = column?.sortValue ?? ((row: Row) => row[sort.key] as string | number);
-    return [...rows].sort((a, b) => {
-      const av = get(a);
-      const bv = get(b);
-      const cmp = typeof av === "number" && typeof bv === "number" ? av - bv : String(av).localeCompare(String(bv));
-      return sort.dir === "asc" ? cmp : -cmp;
-    });
-  }, [rows, sort, columns]);
-
-  const toggle = (key: string) =>
-    setSort((s) => (s?.key === key ? (s.dir === "asc" ? { key, dir: "desc" } : null) : { key, dir: "asc" }));
+  const [innerSort, setInnerSort] = React.useState<DataTableSort | null>(defaultSort);
+  const sort = controlledSort === undefined ? innerSort : controlledSort;
+  const [innerKeys, setInnerKeys] = React.useState<React.Key[]>(defaultSelectedKeys);
+  const selected = new Set(selectedKeys ?? innerKeys);
+  const [innerFilter, setInnerFilter] = React.useState(defaultFilter);
+  const query = filter ?? innerFilter;
+  const getRowKey = (row: Row, index: number): React.Key => {
+    const key = rowKey(row, index);
+    return typeof key === "symbol" ? String(key) : key;
+  };
+  const records: Array<{ row: Row; key: React.Key }> = rows.map((row, index) => ({ row, key: getRowKey(row, index) }));
+  const filtered: Array<{ row: Row; key: React.Key }> = records.filter(({ row }) => !query || (filterRow ? filterRow(row, query) :
+    columns.some((column) => String(row[column.key] ?? "").toLocaleLowerCase().includes(query.toLocaleLowerCase()))));
+  const column = sort ? columns.find((c) => c.key === sort.key && c.sortable) : undefined;
+  const sorted: Array<{ row: Row; key: React.Key }> = column && sort ? [...filtered].sort((a, b) => {
+    const get = column.sortValue ?? ((row: Row) => row[column.key] as string | number);
+    const av = get(a.row);
+    const bv = get(b.row);
+    const cmp = typeof av === "number" && typeof bv === "number" ? av - bv : String(av).localeCompare(String(bv));
+    return sort.dir === "asc" ? cmp : -cmp;
+  }) : filtered;
+  const toggle = (key: string) => {
+    const next: DataTableSort | null = sort?.key === key ? (sort.dir === "asc" ? { key, dir: "desc" } : null) : { key, dir: "asc" };
+    if (controlledSort === undefined) setInnerSort(next);
+    onSortChange?.(next);
+  };
+  const selectKeys = (next: Set<React.Key>) => {
+    const keys = [...next];
+    if (selectedKeys === undefined) setInnerKeys(keys);
+    onSelectionChange?.(keys);
+  };
+  const allSelected = filtered.length > 0 && filtered.every(({ key }) => selected.has(key));
+  const someSelected = filtered.some(({ key }) => selected.has(key));
+  const scroll = rs(["rs-datatable-scroll"], styles.scroll);
 
   const table = rs(["rs-table", "rs-datatable-table"], styles.table);
   const th = rs(["rs-datatable-th"], styles.th);
@@ -215,15 +264,20 @@ export const DataTable = React.forwardRef(function DataTable<Row extends Record<
 
   return (
     <div ref={ref} {...props} className={className} style={style}>
+      {filterable && <Input type="search" aria-label="Filter rows" placeholder="Filter rows" value={query} onChange={(event) => { if (filter === undefined) setInnerFilter(event.target.value); onFilterChange?.(event.target.value); }} />}
+      <div className={scroll.className} style={scroll.style}>
       <table className={table.className} style={table.style}>
+        {caption && <caption>{caption}</caption>}
         <thead>
           <tr>
+            {selectable && <th scope="col" className={th.className} style={th.style}><Checkbox aria-label="Select all visible rows" checked={allSelected} indeterminate={!allSelected && someSelected} disabled={!filtered.length} onCheckedChange={(checked) => { const next = new Set(selected); for (const { key } of filtered) { if (checked) next.add(key); else next.delete(key); } selectKeys(next); }} /></th>}
             {columns.map((column) => {
               const active = sort?.key === column.key;
               const sortBtn = rs(["rs-datatable-sort"], styles.sort);
               const sortIcon = rs(["rs-datatable-sort-icon", active && "rs-datatable-sort-icon-on"], styles.sortIcon, active && styles.sortIconOn);
               return (
                 <th
+                  scope="col"
                   key={column.key}
                   className={th.className}
                   style={th.style}
@@ -254,10 +308,11 @@ export const DataTable = React.forwardRef(function DataTable<Row extends Record<
           </tr>
         </thead>
         <tbody>
-          {sorted.map((row, index) => (
-            <tr key={rowKey(row, index)}>
+          {sorted.map(({ row, key }, index) => (
+            <tr key={key} data-selected={selected.has(key) || undefined}>
+              {selectable && <td className={th.className} style={th.style}><Checkbox aria-label={`Select row ${index + 1}`} checked={selected.has(key)} onCheckedChange={(checked) => { const next = new Set(selected); if (checked) next.add(key); else next.delete(key); selectKeys(next); }} /></td>}
               {columns.map((column) => {
-                const cell = rs(["rs-datatable-td", index % 2 === 1 && "rs-datatable-td-alt"], styles.td, index % 2 === 1 && styles.tdAlt);
+                const cell = rs(["rs-datatable-td", index % 2 === 1 && "rs-datatable-td-alt", selected.has(key) && "rs-datatable-td-selected"], styles.td, index % 2 === 1 && styles.tdAlt, selected.has(key) && styles.selected);
                 return (
                   <td key={column.key} className={cell.className} style={cell.style}>
                     {column.render ? column.render(row) : (row[column.key] as React.ReactNode)}
@@ -268,8 +323,9 @@ export const DataTable = React.forwardRef(function DataTable<Row extends Record<
           ))}
         </tbody>
       </table>
-      {rows.length === 0 && (
-        <div className={empty.className} style={empty.style}>
+      </div>
+      {sorted.length === 0 && (
+        <div role="status" className={empty.className} style={empty.style}>
           {emptyLabel}
         </div>
       )}

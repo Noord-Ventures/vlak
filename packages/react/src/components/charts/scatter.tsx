@@ -44,6 +44,7 @@ export type ScatterChartProps = React.HTMLAttributes<HTMLDivElement> & {
 };
 
 function extent(values: number[], pad = 0.08): [number, number] {
+  if (!values.length) return [0, 1];
   const lo = Math.min(...values);
   const hi = Math.max(...values);
   const span = hi - lo || 1;
@@ -51,7 +52,7 @@ function extent(values: number[], pad = 0.08): [number, number] {
 }
 
 export const ScatterChart = React.forwardRef<HTMLDivElement, ScatterChartProps>(function ScatterChart({
-  points,
+  points: inputPoints,
   height = 204,
   unit,
   xLabel,
@@ -69,6 +70,7 @@ export const ScatterChart = React.forwardRef<HTMLDivElement, ScatterChartProps>(
   "aria-labelledby": ariaLabelledBy,
   ...props
 }: ScatterChartProps, ref: React.ForwardedRef<HTMLDivElement>) {
+  const points = inputPoints.filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y));
   const format = valueFormat ?? ((v: number) => defaultFormat(v, undefined, locale));
   const [hover, setHover] = React.useState<number | null>(null);
   const [canvasRef, W] = useChartWidth<HTMLDivElement>();
@@ -78,8 +80,9 @@ export const ScatterChart = React.forwardRef<HTMLDivElement, ScatterChartProps>(
   const plotH = height - MT - MB;
   const xs = points.map((p) => p.x);
   const ys = points.map((p) => p.y);
-  const [xMin, xMax] = xDomain ?? extent(xs);
-  const [yMin, yMax] = yDomain ?? extent(ys);
+  const safeDomain = (domain: [number, number] | undefined, fallback: [number, number]): [number, number] => domain?.every(Number.isFinite) && domain[0] !== domain[1] ? [Math.min(...domain), Math.max(...domain)] : fallback;
+  const [xMin, xMax] = safeDomain(xDomain, extent(xs));
+  const [yMin, yMax] = safeDomain(yDomain, extent(ys));
   const yTicks = ticksBetween(yMin, yMax, ticks);
   const xTicks = ticksBetween(xMin, xMax, ticks);
   const toX = (x: number) => ML + ((x - xMin) / (xMax - xMin || 1)) * plotW;
@@ -114,6 +117,7 @@ export const ScatterChart = React.forwardRef<HTMLDivElement, ScatterChartProps>(
 
   return (
     <ChartField ref={ref} spot={spot} className={className} {...props}>
+      {!points.length && <p role="status">No data to display</p>}
       {(yLabel || xLabel) && (
         <ChartHead>
           {yLabel ? <ChartTitle id={titleId}>{yLabel}</ChartTitle> : <span />}

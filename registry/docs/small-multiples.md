@@ -9,8 +9,8 @@ Page: https://vlak.dev/components/small-multiples/
 
 ## When to use
 
-- The same measure across places, products, or periods, one small line chart per panel on shared axes.
-- Four to eight panels in a row of 184px columns.
+- The same measure across places, products, or periods, one small line chart per panel on a shared value domain by default.
+- Set sharedDomain=false only for independent trends; it removes direct magnitude comparison.
 
 ## When not to
 
@@ -79,6 +79,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | `grid` | `boolean` | `true` |  |
 | `ticks` | `number` | `3` |  |
 | `spot` | `string \| boolean` |  |  |
+| `sharedDomain` | `boolean` | `true` | Compare panels on one scale by default. Disable only for independent trends. |
 | `locale` | `string` |  | BCP 47 tag for number formatting; undefined is the reader's own. |
 
 ## Keyboard
@@ -94,7 +95,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-chart-multi`
+`rs-chart-multi`, `rs-chart-multi-item`, `rs-chart-multi-cap`
 
 ## Dependencies
 

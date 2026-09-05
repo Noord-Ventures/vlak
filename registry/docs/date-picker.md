@@ -78,6 +78,10 @@ Forwards `ref` to the `HTMLDivElement`.
 | `placeholder` | `string` | `"Pick a date"` |  |
 | `format` | `(date: Date) => string` | `defaultDateFormat` |  |
 | `disabled` | `boolean` |  |  |
+| `min` | `Date` |  |  |
+| `max` | `Date` |  |  |
+| `isDateDisabled` | `(date: Date) => boolean` |  |  |
+| `locale` | `string` |  |  |
 | `dialogLabel` | `string` | `"Choose a date"` | Accessible name of the calendar dialog. |
 
 ## Keyboard
@@ -88,12 +92,13 @@ Forwards `ref` to the `HTMLDivElement`.
 | Arrow keys, Home, End, Page up, Page down | Move through the calendar |
 | Enter, Space | Selects the day and closes |
 | Escape | Closes and returns focus to the trigger |
-| Tab | Leaves the calendar and closes it |
+| Tab | Moves through the calendar controls; leaving the picker closes it |
 
 ## Accessibility
 
 - The trigger is a <button> with aria-haspopup="dialog", aria-expanded, and aria-controls; the calendar sits in a non-modal role="dialog" named by dialogLabel.
 - On open, focus moves to the selected day or today; on close it returns to the trigger.
+- min, max, isDateDisabled and locale pass through to Calendar. The native top-layer panel follows its trigger and flips or clamps to the viewport.
 - Controlled with value and onValueChange, or uncontrolled with defaultValue.
 
 ## Classes

@@ -78,6 +78,11 @@ Forwards `ref` to the `HTMLDivElement`.
 | `defaultMonth` | `Date` |  |  |
 | `weekStart` | `0 \| 1` | `1` | 0 = Sunday, 1 = Monday. |
 | `autoFocus` | `boolean` |  | Move focus to the roving day on mount (a date picker opening). |
+| `min` | `Date` |  |  |
+| `max` | `Date` |  |  |
+| `disabled` | `boolean` | `false` |  |
+| `isDateDisabled` | `(date: Date) => boolean` |  |  |
+| `locale` | `string` | `"en"` |  |
 
 ## Keyboard
 
@@ -89,13 +94,15 @@ Forwards `ref` to the `HTMLDivElement`.
 | Home, End | First or last day of the week |
 | Page up, Page down | Same day the month before or after |
 | Shift + Page up, Shift + Page down | Same day the year before or after |
-| Enter, Space | Selects the focused day |
+| Enter, Space | Selects the focused available day |
 
 ## Accessibility
 
 - Renders role="grid" labelled by the month title, which is aria-live="polite"; rows are role="row" and weekday headers are role="columnheader" with long names.
 - Days are <button role="gridcell"> with a full-date aria-label, aria-selected, and aria-current="date" on today; one roving tab stop.
 - Previous and next month buttons are labelled. Controlled with value and onValueChange, or uncontrolled with defaultValue.
+- Days and month controls are 44px targets. min, max and isDateDisabled prevent selection; unavailable days expose aria-disabled while remaining discoverable with arrows.
+- locale formats the month, weekdays and full-date labels; weekStart sets Sunday or Monday independently. disabled removes the day grid from the tab order.
 
 ## Classes
 

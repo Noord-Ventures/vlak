@@ -1,0 +1,8 @@
+/* ── activity-timeline: generated from packages/react/src/components/activity-timeline.tsx ── */
+.rs-activity-timeline{list-style-type:none;margin:0;padding:0;color:var(--text);width:100%}
+.rs-activity-timeline-event{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 3fr);gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+@media (max-width: 640px){.rs-activity-timeline-event{grid-template-columns:minmax(0, 1fr)}}
+.rs-activity-timeline-time{color:var(--text-secondary);font-size:0.875rem;font-variant-numeric:tabular-nums;line-height:1.45}
+.rs-activity-timeline-title{margin:0;font-weight:600;line-height:1.45}
+.rs-activity-timeline-body{margin-block:0.5rem;line-height:1.45;max-width:66ch;overflow-wrap:anywhere}
+.rs-activity-timeline-summary{min-height:var(--hit);display:list-item;align-content:center;cursor:pointer;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}

@@ -15,7 +15,7 @@ Page: https://vlak.dev/components/inline-form/
 ## When not to
 
 - More than one field; use Form with Field.
-- Actions with side effects that need confirmation; the success state is immediate.
+- Actions needing a separate confirmation step; compose a Dialog before submitting.
 
 ## Install
 
@@ -65,7 +65,7 @@ import { InlineForm } from "@noorddev/vlak-react";
 
 ### InlineForm
 
-One field, one action; the action sits inside the field.
+One field, one action; asynchronous actions only confirm after they resolve.
 
 Extends `Omit<FormHTMLAttributes<HTMLFormElement>, "onSubmit">`: every native attribute, `className`, `style`, and event handler passes through.
 
@@ -76,8 +76,13 @@ Forwards `ref` to the `HTMLFormElement`.
 | `placeholder` | `string` | `"Your e-mail"` |  |
 | `buttonLabel` | `ReactNode` | `"Subscribe"` |  |
 | `successLabel` | `ReactNode` | `"You're on the list"` |  |
+| `pendingLabel` | `ReactNode` | `"Submitting…"` |  |
+| `errorLabel` | `ReactNode` | `"Could not submit. Please try again."` |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(value: string) => void` |  |  |
 | `validate` | `(value: string) => boolean` | `(v) => /.+@.+\..+/.test(v)` | The action only appears once this returns true. Defaults to a loose e-mail check. |
-| `onSubmit` | `(value: string) => void` |  |  |
+| `onSubmit` | `(value: string) => void \| Promise<void>` |  |  |
 | `inputProps` | `InputHTMLAttributes<HTMLInputElement>` |  |  |
 
 ## Keyboard
@@ -89,13 +94,15 @@ Forwards `ref` to the `HTMLFormElement`.
 
 ## Accessibility
 
-- The input has a placeholder only; pass inputProps={{ "aria-label": … }} to name it.
+- The input is named by inputProps aria-label, falling back to the placeholder; use a clear persistent name.
 - The submit button stays out of the tab order (tabIndex -1) until validate returns true.
-- After submit the form is replaced by the successLabel text and a check mark.
+- Submission awaits the onSubmit promise. aria-busy and pendingLabel indicate progress; duplicate submits are ignored, failure is an alert, and retry preserves the value.
+- Success is a live status inside the same form, preserving its ref. Without an onSubmit handler the form cannot claim success.
+- Controlled with value and onValueChange, or uncontrolled with defaultValue; native inputProps onChange is composed with internal state.
 
 ## Classes
 
-`rs-inline-field`, `rs-inline-input`, `rs-inline-btn`, `rs-reveal`, `rs-reveal-in`, `rs-subscribed`, `rs-inline-field-btn`
+`rs-inline-field`, `rs-inline-input`, `rs-inline-btn`, `rs-reveal`, `rs-reveal-in`, `rs-subscribed`, `rs-inline-field-btn`, `rs-inline-error`
 
 ## Dependencies
 

@@ -6,10 +6,13 @@ import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { hidden } from "../hidden.stylex";
 import { Icon } from "./icon";
+import { useMergedRefs } from "../merge-refs";
 
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "type"> {
   label?: React.ReactNode;
+  indeterminate?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 const styles = stylex.create({
@@ -27,9 +30,10 @@ const styles = stylex.create({
     color: vlak.ink,
     letterSpacing: "-0.01em",
     minHeight: {
-      default: "1.5rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
+    minWidth: vlak.hit,
   },
   check: {
     width: {
@@ -76,31 +80,37 @@ const styles = stylex.create({
 
 /** A real native checkbox; the visible 16px box mirrors its state. */
 export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
-  { label, className, style, checked, defaultChecked, onChange, ...props },
+  { label, className, style, checked, defaultChecked, indeterminate = false, onCheckedChange, onChange, ...props },
   ref,
 ) {
   const [inner, setInner] = React.useState(defaultChecked ?? false);
   const isControlled = checked !== undefined;
   const on = isControlled ? checked : inner;
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const mergedRef = useMergedRefs(ref, inputRef);
+  React.useEffect(() => { if (inputRef.current) inputRef.current.indeterminate = indeterminate; }, [indeterminate]);
   const row = rs(["rs-choice", className], styles.choice);
   const sr = rs(["rs-sr"], hidden.sr);
-  const box = rs(["rs-check", on && "rs-check-on"], styles.check, on && styles.on);
+  const filled = on || indeterminate;
+  const box = rs(["rs-check", filled && "rs-check-on"], styles.check, filled && styles.on);
   return (
     <label className={row.className} style={{ ...row.style, ...style }}>
       <input
-        ref={ref}
+        ref={mergedRef}
         type="checkbox"
         className={sr.className}
         style={sr.style}
         checked={on}
         onChange={(e) => {
-          if (!isControlled) setInner(e.target.checked);
           onChange?.(e);
+          if (e.defaultPrevented) return;
+          if (!isControlled) setInner(e.target.checked);
+          onCheckedChange?.(e.target.checked);
         }}
         {...props}
       />
       <span className={box.className} style={box.style} aria-hidden="true">
-        {on && <Icon name="check" size={12} />}
+        {filled && <Icon name={indeterminate ? "minus" : "check"} size={12} />}
       </span>
       {label}
     </label>

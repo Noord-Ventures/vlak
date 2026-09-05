@@ -11,13 +11,53 @@
 import { execFileSync, execSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
+const expectedCatalogueSize = 114;
+const additions = [
+  ["number-field", "NumberField"], ["range-slider", "RangeSlider"], ["multi-select", "MultiSelect"], ["tag-input", "TagInput"], ["date-range-picker", "DateRangePicker"],
+  ["time-field", "TimeField"], ["file-upload", "FileUpload"], ["transfer-list", "TransferList"], ["inline-edit", "InlineEdit"], ["rating", "Rating"],
+  ["description-list", "DescriptionList"], ["metric", "Metric"], ["activity-timeline", "ActivityTimeline"], ["code-block", "CodeBlock"], ["json-viewer", "JSONViewer"],
+  ["diff-viewer", "DiffViewer"], ["error-summary", "ErrorSummary"], ["notification-center", "NotificationCenter"], ["task-progress", "TaskProgress"], ["connection-status", "ConnectionStatus"],
+  ["tree-view", "TreeView"], ["toolbar", "Toolbar"], ["bottom-navigation", "BottomNavigation"], ["overflow-list", "OverflowList"], ["filter-bar", "FilterBar"],
+  ["query-builder", "QueryBuilder"], ["sortable-list", "SortableList"], ["virtual-list", "VirtualList"], ["master-detail", "MasterDetail"], ["property-grid", "PropertyGrid"],
+  ["playback-controls", "PlaybackControls"], ["media-scrubber", "MediaScrubber"], ["media-player", "MediaPlayer"], ["waveform", "Waveform"], ["image-viewer", "ImageViewer"],
+  ["canvas-controls", "CanvasControls"], ["message-composer", "MessageComposer"], ["file-browser", "FileBrowser"], ["kanban-board", "KanbanBoard"], ["scheduler", "Scheduler"],
+];
+// The same fixtures exercise the packed modules under both supported React majors.
+const renderAdditions = `
+const additions = ${JSON.stringify(additions)};
+const fixtureProps = {
+  NumberField: { label: "Count", defaultValue: 3 }, RangeSlider: { label: "Range" }, MultiSelect: { label: "Cities", options: [{ value: "a", label: "Alkmaar" }] }, TagInput: { label: "Tags" },
+  TimeField: { label: "Time" }, TransferList: { options: [{ value: "a", label: "Alkmaar" }] },
+  DescriptionList: { items: [{ id: "range", label: "Range", value: "386 km" }] }, Metric: { label: "Range", value: 386 },
+  ActivityTimeline: { events: [{ id: "event", title: "Published", dateTime: "2026-09-06T09:00:00Z" }] }, CodeBlock: { code: "const count = 3;" }, JSONViewer: { data: { count: 3 } }, DiffViewer: { before: "before", after: "after" },
+  ErrorSummary: { errors: [{ id: "email", message: "Enter an email" }] }, TaskProgress: { label: "Upload", state: "pending" }, ConnectionStatus: { state: "connected" },
+  TreeView: { label: "Files", nodes: [{ id: "file", label: "Readme" }] }, Toolbar: { label: "Actions", actions: [] }, BottomNavigation: { items: [] }, OverflowList: { items: [] }, QueryBuilder: { fields: [] },
+  VirtualList: { label: "Records", items: [] }, MasterDetail: { items: [] }, PropertyGrid: { fields: [] },
+  MediaScrubber: { duration: 60 }, MediaPlayer: { src: "/recording.mp3", label: "Recording" }, Waveform: { samples: [0.2, 0.6], duration: 60 }, ImageViewer: { images: [] },
+  MessageComposer: { onSend() {} }, FileBrowser: { entries: [] }, KanbanBoard: { columns: [] }, Scheduler: { events: [], defaultView: "agenda", defaultValue: new Date("2026-09-06T00:00:00Z"), timeZone: "UTC" },
+};
+let additionHtml = "";
+for (const [name, exported] of additions) {
+  if (!R[exported]) throw new Error("Missing root export: " + exported);
+  const leaf = await import("@noorddev/vlak-react/components/" + name);
+  if (leaf[exported] !== R[exported]) throw new Error("Mismatched leaf export: " + exported);
+  const markup = renderToString(h(R[exported], fixtureProps[exported] ?? {}));
+  if (!markup.includes("rs-")) throw new Error("Empty or unstyled SSR: " + exported);
+  additionHtml += markup;
+}
+console.log("  ✓ all " + additions.length + " new root/leaf exports render, " + additionHtml.length + " chars");
+`;
+
+function sourceFiles(dir) {
+  return readdirSync(dir, { withFileTypes: true }).flatMap(entry => entry.isDirectory() ? sourceFiles(join(dir, entry.name)) : /\.(ts|tsx)$/.test(entry.name) ? [join(dir, entry.name)] : []);
+}
 
 try {
   /* 1. Pack. */
@@ -53,8 +93,11 @@ import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const checks = [];
 checks.push(["tokens", vlakTokens.color.light.paper === "#FAF8F2"]);
-checks.push(["catalogue", catalogComponents.length >= 70]);
+checks.push(["catalogue", catalogComponents.length === ${expectedCatalogueSize}]);
 checks.push(["props json", typeof props.components === "object"]);
+const R = vlak;
+${renderAdditions}
+checks.push(["new component props", additions.every(([name, exported]) => props.components[name]?.exports.some(entry => entry.name === exported))]);
 const html = renderToString(h("div", null,
   h(Button, null, "Hi"),
   h(vlak.Dialog, { open: false, onClose() {} }, h(vlak.DialogTitle, null, "T")),
@@ -90,6 +133,7 @@ import { createElement as h } from "react";
 import * as R from "@noorddev/vlak-react";
 const warnings = new Set();
 console.error = (...a) => { let i = 1; warnings.add(String(a[0]).replace(/%s/g, () => String(a[i++])).slice(0, 120)); };
+${renderAdditions}
 const html = renderToString(h("div", null,
   h(R.Popover, { trigger: "More" }, h(R.PopoverBody, null, "Body")),
   h(R.CrumbBar, { trail: [{ label: "Docs", href: "#" }, { label: "Here" }] }),
@@ -112,12 +156,31 @@ if (bad.length) process.exit(1);
   const app = join(work, "app");
   run(`mkdir -p ${app}`);
   run("npx vlak init", app);
-  run("npx vlak add button dialog bar-chart", app);
-  for (const f of ["styles/vlak.css", "styles/fonts/inter/OFL.txt", "index.html", "vlak.json", "components/vlak/button.tsx", "components/vlak/dialog.tsx", "components/vlak/charts/bar.tsx", "components/vlak/rs.ts"]) {
+  run(`npx vlak add button dialog bar-chart ${additions.map(([name]) => name).join(" ")}`, app);
+  for (const f of ["styles/vlak.css", "styles/fonts/inter/OFL.txt", "index.html", "vlak.json", "components/vlak/button.tsx", "components/vlak/dialog.tsx", "components/vlak/charts/bar.tsx", "components/vlak/rs.ts", "components/vlak/use-input-value.ts", "components/vlak/use-overlay-position.ts", "components/vlak/merge-refs.ts"]) {
     if (!existsSync(join(app, f))) throw new Error(`cli: expected ${f}`);
   }
   const listed = JSON.parse(run("npx vlak list --json", app));
-  if (!Array.isArray(listed) || listed.length < 70) throw new Error("cli: list --json");
+  if (!Array.isArray(listed) || listed.length !== expectedCatalogueSize) throw new Error(`cli: expected ${expectedCatalogueSize} public entries, got ${listed.length}`);
+  const installedCss = readFileSync(join(app, "styles", "vlak.css"), "utf8");
+  for (const [name, exported] of additions) {
+    const file = join(app, "components", "vlak", `${name}.tsx`);
+    if (!existsSync(file)) throw new Error(`cli: missing ${name} source`);
+    if (!new RegExp(`export (?:const|function|class) ${exported}\\b`).test(readFileSync(file, "utf8"))) throw new Error(`cli: missing ${exported} source export`);
+    if (!listed.some(item => item.name === name)) throw new Error(`cli: missing ${name} catalogue entry`);
+    // CLI init ships the complete CSS-first stylesheet; add vendors source only.
+    if (!installedCss.includes(`.rs-${name}`)) throw new Error(`cli: missing ${name} styles in vlak.css`);
+  }
+  const vendored = sourceFiles(join(app, "components", "vlak"));
+  for (const file of vendored) {
+    const source = readFileSync(file, "utf8");
+    for (const match of source.matchAll(/(?:from\s*|import\s*\()(["'])(\.[^"']+)\1/g)) {
+      const target = resolve(dirname(file), match[2]);
+      if (![target, `${target}.ts`, `${target}.tsx`, join(target, "index.ts"), join(target, "index.tsx")].some(candidate => existsSync(candidate))) throw new Error(`cli: unresolved ${match[2]} in ${file}`);
+    }
+    if (/from\s*["']@noorddev\/vlak-react/.test(source)) throw new Error(`cli: vendored source leaked a package dependency in ${file}`);
+  }
+  log(`cli: all 40 additions present, ${vendored.length} source files have complete relative import closure`);
   log(`cli: init + add wrote the tree, list --json has ${listed.length} entries`);
 
   log("ok");

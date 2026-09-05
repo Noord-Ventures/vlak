@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "canvas-controls",
+  "type": "registry:component",
+  "title": "Canvas controls",
+  "description": "Adjusts bounded zoom and exposes fit and reset actions for a canvas.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/canvas-controls.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface CanvasControlsProps extends React.HTMLAttributes<HTMLDivElement> {\n  zoom?: number;\n  defaultZoom?: number;\n  onZoomChange?: (zoom: number) => void;\n  minZoom?: number;\n  maxZoom?: number;\n  step?: number;\n  onFit?: () => void;\n  onReset?: () => void;\n  disabled?: boolean;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", gap: \"0.5rem\", color: vlak.ink },\n  action: { width: \"auto\", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: \"0.75rem\" },\n  value: { minWidth: \"3.75rem\", textAlign: \"center\", fontSize: \"0.8125rem\", fontVariantNumeric: \"tabular-nums\" },\n});\n\n/** Zoom, fit, and reset actions for a canvas. The canvas owns pan and rendering. */\nexport const CanvasControls = React.forwardRef<HTMLDivElement, CanvasControlsProps>(function CanvasControls({ zoom, defaultZoom = 1, onZoomChange, minZoom = 0.25, maxZoom = 4, step = 0.25, onFit, onReset, disabled = false, label = \"Canvas controls\", className, style, ...props }, ref) {\n  const lower = Number.isFinite(minZoom) && minZoom > 0 ? minZoom : 0.25;\n  const upper = Number.isFinite(maxZoom) ? Math.max(lower, maxZoom) : 4;\n  const increment = Number.isFinite(step) && step > 0 ? step : 0.25;\n  const bounded = (n: number) => Math.max(lower, Math.min(upper, Number.isFinite(n) ? n : 1));\n  const [inner, setInner] = React.useState(defaultZoom);\n  const current = bounded(zoom ?? inner);\n  const change = (next: number) => { const result = Number(bounded(next).toFixed(4)); if (zoom === undefined) setInner(result); onZoomChange?.(result); };\n  const root = rs([\"rs-canvas-controls\", className], styles.root);\n  const action = rs([\"rs-canvas-action\"], styles.action);\n  const reading = rs([\"rs-canvas-zoom\"], styles.value);\n  return <div ref={ref} role=\"group\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <Button {...action} variant=\"ghost\" aria-label=\"Zoom out\" disabled={disabled || current <= lower} onClick={() => change(current - increment)}><Icon name=\"minus\" /></Button>\n    <output {...reading} aria-label=\"Zoom level\">{Math.round(current * 100)}%</output>\n    <Button {...action} variant=\"ghost\" aria-label=\"Zoom in\" disabled={disabled || current >= upper} onClick={() => change(current + increment)}><Icon name=\"plus\" /></Button>\n    {onFit && <Button {...action} variant=\"ghost\" disabled={disabled} onClick={onFit}><Icon name=\"expand\" />Fit</Button>}\n    <Button {...action} variant=\"ghost\" disabled={disabled} onClick={() => { change(1); onReset?.(); }}><Icon name=\"refresh\" />Reset</Button>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/canvas-controls.tsx"
+    },
+    {
+      "path": "vlak/styles/canvas-controls.css",
+      "content": "/* ── canvas-controls: generated from packages/react/src/components/canvas-controls.tsx ── */\n.rs-canvas-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;color:var(--text)}\n.rs-canvas-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem}\n.rs-canvas-zoom{min-width:3.75rem;text-align:center;font-size:0.8125rem;font-variant-numeric:tabular-nums}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/canvas-controls.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "actions",
+      "classes": [
+        "rs-canvas-controls",
+        "rs-canvas-action",
+        "rs-canvas-zoom"
+      ],
+      "snippet": "<div class=\"rs-canvas-controls\" role=\"group\" aria-label=\"Canvas controls\"><button class=\"rs-btn-ghost rs-canvas-action\" type=\"button\" aria-label=\"Zoom out\">−</button><output class=\"rs-canvas-zoom\" aria-label=\"Zoom level\">100%</output><button class=\"rs-btn-ghost rs-canvas-action\" type=\"button\" aria-label=\"Zoom in\">+</button></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "CanvasControls",
+        "Zoom controls",
+        "Viewport controls"
+      ],
+      "example": "import { CanvasControls } from \"@noorddev/vlak-react\";\n\n<CanvasControls zoom={zoom} onZoomChange={setZoom} minZoom={0.25} maxZoom={4} onFit={fitCanvas} onReset={resetPan} />",
+      "usage": {
+        "use": [
+          "A canvas, diagram, map, or image with application-owned transforms."
+        ],
+        "avoid": [
+          "Rendering or panning the canvas; these controls emit zoom and action callbacks."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Operates zoom, optional fit, and reset buttons."
+        }
+      ],
+      "a11y": [
+        "Zoom has a visible numeric reading.",
+        "Limits disable the corresponding zoom action.",
+        "All actions keep at least a 44px target."
+      ]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "file-upload",
+  "type": "registry:component",
+  "title": "File upload",
+  "description": "Collects validated files through browse or drop, with optional upload progress, cancellation, and retry.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/progress.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/file-upload.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Button } from \"./button\";\nimport { Progress } from \"./progress\";\n\nexport interface FileUploadRejection { file: File; reason: string }\nexport interface FileUploadContext { signal: AbortSignal; onProgress: (percentage: number) => void }\nexport interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\"> {\n  value?: File[];\n  defaultValue?: File[];\n  onValueChange?: (files: File[]) => void;\n  accept?: string;\n  multiple?: boolean;\n  maxFiles?: number;\n  maxSize?: number;\n  disabled?: boolean;\n  name?: string;\n  label?: string;\n  description?: React.ReactNode;\n  onReject?: (rejections: FileUploadRejection[]) => void;\n  /** Optional transport supplied by the app. Omit to collect files without uploading. */\n  onUpload?: (file: File, context: FileUploadContext) => Promise<void>;\n}\n\ntype UploadState = { status: \"uploading\" | \"complete\" | \"error\" | \"cancelled\"; progress?: number; error?: string };\nconst fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}`;\n\nfunction accepts(file: File, accept?: string) {\n  if (!accept?.trim()) return true;\n  return accept.split(\",\").some((entry) => {\n    const rule = entry.trim().toLowerCase();\n    if (!rule) return false;\n    if (rule.startsWith(\".\")) return file.name.toLowerCase().endsWith(rule);\n    if (rule.endsWith(\"/*\")) return file.type.toLowerCase().startsWith(rule.slice(0, -1));\n    return file.type.toLowerCase() === rule;\n  });\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0 },\n  drop: { position: \"relative\", display: \"grid\", alignContent: \"center\", justifyItems: \"center\", gap: \"0.5rem\", minHeight: \"8.25rem\", padding: \"1.25rem\", boxSizing: \"border-box\", borderWidth: vlak.hairline, borderStyle: \"dashed\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, outlineWidth: { default: null, \":focus-within\": 2 }, outlineStyle: { default: null, \":focus-within\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  drag: { backgroundColor: vlak.controlFill, outline: { default: null, [mq.forcedColors]: \"2px solid Highlight\" } },\n  input: { position: \"absolute\", inset: 0, width: \"100%\", height: \"100%\", opacity: 0, cursor: \"pointer\" },\n  title: { fontSize: vlak.controlFs, fontWeight: 500, textAlign: \"center\" },\n  description: { fontSize: vlak.controlLabel, color: vlak.gray, textAlign: \"center\", lineHeight: 1.45 },\n  list: { display: \"grid\", gap: \"0.5rem\", listStyle: \"none\", margin: 0, padding: 0 },\n  item: { display: \"grid\", gap: \"0.5rem\", padding: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, borderRadius: vlak.radiusSm, minWidth: 0 },\n  row: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", alignItems: \"center\", gap: \"0.5rem\", minWidth: 0 },\n  name: { flex: \"1 1 10rem\", overflowWrap: \"anywhere\", fontSize: vlak.controlFs },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  action: { width: \"auto\" },\n  status: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray },\n});\n\n/** Validated file selection, with an optional cancellable upload transport. */\nexport const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(function FileUpload({\n  value, defaultValue = [], onValueChange, accept, multiple = true, maxFiles, maxSize, disabled, name, label = \"Choose files\", description = \"Drop files here or browse\", onReject, onUpload, className, style, ...props\n}, ref) {\n  const [files, setFiles, inputRef] = useInputValue<File[], HTMLInputElement>(value, defaultValue, onValueChange, () => {\n    for (const controller of controllers.current.values()) controller.abort();\n    controllers.current.clear(); setUploads(new Map()); setRejections([]);\n  });\n  const mergedRef = useMergedRefs(ref, inputRef);\n  const [dragging, setDragging] = React.useState(false);\n  const [rejections, setRejections] = React.useState<FileUploadRejection[]>([]);\n  const [uploads, setUploads] = React.useState<Map<File, UploadState>>(new Map());\n  const controllers = React.useRef(new Map<File, AbortController>());\n  const latest = React.useRef({ files, name, disabled });\n  latest.current = { files, name, disabled };\n  const id = React.useId();\n  React.useEffect(() => {\n    const form = inputRef.current?.form;\n    if (!form) return;\n    const appendFiles = (event: Event) => {\n      const data = (event as FormDataEvent).formData;\n      const state = latest.current;\n      if (data && state.name && !state.disabled) for (const file of state.files) data.append(state.name, file, file.name);\n    };\n    form.addEventListener(\"formdata\", appendFiles);\n    return () => form.removeEventListener(\"formdata\", appendFiles);\n  }, [inputRef]);\n  React.useEffect(() => () => { for (const controller of controllers.current.values()) controller.abort(); }, []);\n  React.useEffect(() => {\n    for (const [file, controller] of controllers.current) if (!files.includes(file)) { controller.abort(); controllers.current.delete(file); }\n    setUploads(previous => {\n      const remaining = [...previous].filter(([file]) => files.includes(file));\n      return remaining.length === previous.size ? previous : new Map(remaining);\n    });\n  }, [files]);\n  const update = (file: File, state: UploadState) => setUploads((previous) => new Map(previous).set(file, state));\n  const upload = async (file: File) => {\n    if (!onUpload || disabled) return;\n    controllers.current.get(file)?.abort();\n    const controller = new AbortController();\n    controllers.current.set(file, controller);\n    update(file, { status: \"uploading\" });\n    try {\n      await onUpload(file, { signal: controller.signal, onProgress: (percentage) => { if (!controller.signal.aborted) update(file, { status: \"uploading\", progress: Math.min(100, Math.max(0, percentage)) }); } });\n      if (!controller.signal.aborted) update(file, { status: \"complete\", progress: 100 });\n    } catch (error) {\n      if (!controller.signal.aborted) update(file, { status: \"error\", error: error instanceof Error ? error.message : \"Upload failed\" });\n    } finally { if (controllers.current.get(file) === controller) controllers.current.delete(file); }\n  };\n  const choose = (incoming: File[]) => {\n    if (disabled) return;\n    const accepted = multiple ? [...files] : [];\n    const added: File[] = [];\n    const rejected: FileUploadRejection[] = [];\n    const limit = multiple ? maxFiles : 1;\n    for (const file of incoming) {\n      if (accepted.some((entry) => fileKey(entry) === fileKey(file))) continue;\n      const reason = !accepts(file, accept) ? \"File type is not accepted\" : maxSize != null && file.size > maxSize ? `File exceeds ${maxSize} bytes` : limit != null && accepted.length >= limit ? `Choose at most ${limit} ${limit === 1 ? \"file\" : \"files\"}` : undefined;\n      if (reason) rejected.push({ file, reason }); else { accepted.push(file); added.push(file); }\n    }\n    setRejections(rejected);\n    if (rejected.length) onReject?.(rejected);\n    if (added.length) { setFiles(accepted); for (const file of added) void upload(file); }\n  };\n  const root = rs([\"rs-file-upload\", className], styles.root);\n  const drop = rs([\"rs-file-upload-drop\", dragging && \"rs-file-upload-drag\"], styles.drop, dragging && styles.drag);\n  const input = rs([\"rs-file-upload-input\"], styles.input);\n  const title = rs([\"rs-file-upload-title\"], styles.title);\n  const desc = rs([\"rs-file-upload-description\"], styles.description);\n  const list = rs([\"rs-file-upload-list\"], styles.list);\n  const item = rs([\"rs-file-upload-item\"], styles.item);\n  const row = rs([\"rs-file-upload-row\"], styles.row);\n  const filename = rs([\"rs-file-upload-name\"], styles.name);\n  const actions = rs([\"rs-file-upload-actions\"], styles.actions);\n  const action = rs([\"rs-file-upload-action\"], styles.action);\n  const status = rs([\"rs-file-upload-status\"], styles.status);\n  return <div {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div className={drop.className} style={drop.style} onDragOver={(event) => { event.preventDefault(); if (!disabled) setDragging(true); }} onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); choose(Array.from(event.dataTransfer.files)); }}>\n      <span className={title.className} style={title.style}>{label}</span>\n      <span id={`${id}-hint`} className={desc.className} style={desc.style}>{description}</span>\n      <input ref={mergedRef} type=\"file\" aria-label={label} aria-describedby={`${id}-hint`} disabled={disabled} accept={accept} multiple={multiple} className={input.className} style={input.style} onChange={(event) => { choose(Array.from(event.currentTarget.files ?? [])); event.currentTarget.value = \"\"; }} />\n    </div>\n    {rejections.length > 0 && <div role=\"alert\">{rejections.map(({ file, reason }) => <p key={fileKey(file)} className={status.className} style={status.style}>{file.name}: {reason}</p>)}</div>}\n    {files.length > 0 && <ul aria-label=\"Selected files\" className={list.className} style={list.style}>{files.map((file) => {\n      const state = uploads.get(file);\n      return <li key={fileKey(file)} className={item.className} style={item.style}>\n        <div className={row.className} style={row.style}><span className={filename.className} style={filename.style}>{file.name}</span><div className={actions.className} style={actions.style}>\n          {state?.status === \"uploading\" && <Button variant=\"ghost\" disabled={disabled} className={action.className} style={action.style} aria-label={`Cancel upload of ${file.name}`} onClick={() => { controllers.current.get(file)?.abort(); update(file, { status: \"cancelled\" }); }}>Cancel</Button>}\n          {(state?.status === \"error\" || state?.status === \"cancelled\") && onUpload && <Button variant=\"ghost\" disabled={disabled} className={action.className} style={action.style} aria-label={`Retry upload of ${file.name}`} onClick={() => void upload(file)}>Retry</Button>}\n          <Button variant=\"ghost\" disabled={disabled} className={action.className} style={action.style} aria-label={`Remove ${file.name}`} onClick={() => { controllers.current.get(file)?.abort(); setFiles(files.filter((entry) => entry !== file)); inputRef.current?.focus(); }}>Remove</Button>\n        </div></div>\n        {state?.status === \"uploading\" && state.progress != null ? <Progress label={`Uploading ${file.name}`} value={state.progress} /> : <p role=\"status\" className={status.className} style={status.style}>{state?.status === \"error\" ? state.error : state?.status === \"complete\" ? \"Uploaded\" : state?.status === \"cancelled\" ? \"Cancelled\" : state?.status === \"uploading\" ? \"Uploading\" : `${file.size.toLocaleString()} bytes · Ready`}</p>}\n      </li>;\n    })}</ul>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/file-upload.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/file-upload.css",
+      "content": "/* ── file-upload: generated from packages/react/src/components/file-upload.tsx ── */\n.rs-file-upload{display:grid;gap:0.75rem;min-width:0}\n.rs-file-upload-drop{position:relative;display:grid;align-content:center;justify-items:center;gap:0.5rem;min-height:8.25rem;padding:1.25rem;box-sizing:border-box;border-width:1px;border-style:dashed;border-color:var(--control-border);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);outline-color:var(--text);outline-offset:2px}\n.rs-file-upload-drop:focus-within{outline-width:2px;outline-style:solid}\n.rs-file-upload-drag{background-color:var(--control-fill)}\n@media (forced-colors: active){.rs-file-upload-drag{outline:2px solid Highlight}}\n.rs-file-upload-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}\n.rs-file-upload-title{font-size:var(--control-fs);font-weight:500;text-align:center}\n.rs-file-upload-description{font-size:var(--control-label);color:var(--text-secondary);text-align:center;line-height:1.45}\n.rs-file-upload-list{display:grid;gap:0.5rem;list-style:none;margin:0;padding:0}\n.rs-file-upload-item{display:grid;gap:0.5rem;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);min-width:0}\n.rs-file-upload-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.5rem;min-width:0}\n.rs-file-upload-name{flex:1 1 10rem;overflow-wrap:anywhere;font-size:var(--control-fs)}\n.rs-file-upload-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-file-upload-action{width:auto}\n.rs-file-upload-status{margin:0;font-size:var(--control-label);color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/file-upload.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-file-upload",
+        "rs-file-upload-drop",
+        "rs-file-upload-drag",
+        "rs-file-upload-input",
+        "rs-file-upload-title",
+        "rs-file-upload-description",
+        "rs-file-upload-list",
+        "rs-file-upload-item",
+        "rs-file-upload-row",
+        "rs-file-upload-name",
+        "rs-file-upload-actions",
+        "rs-file-upload-action",
+        "rs-file-upload-status"
+      ],
+      "snippet": "<div class=\"rs-file-upload\"><div class=\"rs-file-upload-drop\"><span class=\"rs-file-upload-title\">Choose files</span><span class=\"rs-file-upload-description\" id=\"files-hint\">Drop files here or browse</span><input class=\"rs-file-upload-input\" type=\"file\" multiple aria-label=\"Choose files\" aria-describedby=\"files-hint\" /></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "progress",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "FileUpload",
+        "Drop zone",
+        "Attachment upload",
+        "File input"
+      ],
+      "example": "import { FileUpload } from \"@noorddev/vlak-react\";\n\n<FileUpload label=\"Project files\" name=\"attachments\" accept=\".pdf,.txt\" maxFiles={5} maxSize={10 * 1024 * 1024} description=\"PDF or text, up to 10 MB each\" />",
+      "usage": {
+        "use": [
+          "Validated attachment queues with native file browsing and drag-and-drop.",
+          "Provide onUpload when the app has a transport; it receives an AbortSignal and progress callback."
+        ],
+        "avoid": [
+          "Assuming files upload automatically; without onUpload this only collects selected files.",
+          "Client checks as security enforcement; validate uploaded files again on the server."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Reaches the native file picker and labeled Remove, Cancel, and Retry actions."
+        }
+      ],
+      "a11y": [
+        "The native file input covers the drop target, remains keyboard-focusable, and receives the forwarded ref.",
+        "Rejected types, sizes and counts produce readable errors. Upload status is announced; progress bars are named with the file.",
+        "The app supplies onUpload(file, { signal, onProgress }). Cancel aborts the signal; errors retain the file and expose Retry.",
+        "With name, the browser's formdata event appends the accepted queue to native FormData. Use multipart/form-data for native file submission. Disabled queues are omitted.",
+        "Form reset restores uncontrolled files, clears errors and aborts active uploads. Unmount aborts outstanding transports."
+      ]
+    }
+  }
+}

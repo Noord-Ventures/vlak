@@ -1,0 +1,82 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "waveform",
+  "type": "registry:component",
+  "title": "Waveform",
+  "description": "Displays supplied audio amplitudes with optional seeking and editable selection bounds.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/slider.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/waveform.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Slider } from \"./slider\";\n\nexport interface WaveformRegion { start: number; end: number }\nexport interface WaveformProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  /** Amplitudes from zero to one; values are clamped. */\n  samples: readonly number[];\n  label: string;\n  value?: number;\n  defaultValue?: number;\n  onValueChange?: (position: number) => void;\n  disabled?: boolean;\n  region?: WaveformRegion;\n  defaultRegion?: WaveformRegion;\n  onRegionChange?: (region: WaveformRegion) => void;\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", color: vlak.ink, display: \"flex\", flexDirection: \"column\", gap: \"0.5rem\" },\n  stage: { position: \"relative\", minHeight: vlak.hit, height: \"4rem\", borderRadius: vlak.radiusSm, \":focus-within\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n  plot: { display: \"block\", width: \"100%\", height: \"100%\", overflow: \"visible\" },\n  bar: { fill: vlak.gray },\n  played: { fill: vlak.ink },\n  input: { position: \"absolute\", inset: 0, width: \"100%\", height: \"100%\", margin: 0, opacity: 0, cursor: \"pointer\" },\n  region: { position: \"absolute\", top: 0, bottom: 0, backgroundColor: vlak.controlFill, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, pointerEvents: \"none\" },\n  regionControls: { display: \"grid\", gridTemplateColumns: \"repeat(2, minmax(0, 1fr))\", gap: \"1rem\" },\n  label: { fontSize: \"0.75rem\", color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** A waveform from supplied amplitude data, optionally scrubbed through a native range. */\nexport const Waveform = React.forwardRef<HTMLDivElement, WaveformProps>(function Waveform({ samples, label, value, defaultValue = 0, onValueChange, disabled = false, region, defaultRegion = { start: 0, end: 1 }, onRegionChange, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const position = Math.max(0, Math.min(1, Number.isFinite(value ?? inner) ? value ?? inner : 0));\n  const [innerRegion, setInnerRegion] = React.useState(defaultRegion);\n  const rawRegion = region ?? innerRegion;\n  const start = Math.max(0, Math.min(1, Number.isFinite(rawRegion.start) ? rawRegion.start : 0));\n  const end = Math.max(start, Math.min(1, Number.isFinite(rawRegion.end) ? rawRegion.end : 1));\n  const changeRegion = (next: WaveformRegion) => { if (region === undefined) setInnerRegion(next); onRegionChange?.(next); };\n  // Bound the SVG cost while retaining peak energy when input comes from a long recording.\n  const peaks = React.useMemo(() => {\n    const stride = Math.max(1, Math.ceil(samples.length / 240));\n    return Array.from({ length: Math.ceil(samples.length / stride) }, (_, index) => {\n      let peak = 0;\n      for (let at = index * stride; at < Math.min(samples.length, (index + 1) * stride); at++) peak = Math.max(peak, Number.isFinite(samples[at]) ? Math.abs(samples[at]!) : 0);\n      return Math.min(1, peak);\n    });\n  }, [samples]);\n  const root = rs([\"rs-waveform\", className], styles.root);\n  const stage = rs([\"rs-waveform-stage\"], styles.stage);\n  const plot = rs([\"rs-waveform-plot\"], styles.plot);\n  const input = rs([\"rs-waveform-input\"], styles.input);\n  const regionStyle = rs([\"rs-waveform-region\"], styles.region);\n  const regionControls = rs([\"rs-waveform-region-controls\"], styles.regionControls);\n  const regionLabel = rs([\"rs-waveform-label\"], styles.label);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...stage}>\n    {(region || onRegionChange) && <span {...regionStyle} aria-hidden=\"true\" style={{ ...regionStyle.style, insetInlineStart: `${start * 100}%`, width: `${(end - start) * 100}%` }} />}\n    <svg {...plot} viewBox={`0 0 ${Math.max(4, peaks.length * 4)} 48`} preserveAspectRatio=\"none\" role={onValueChange ? undefined : \"img\"} aria-label={onValueChange ? undefined : label} aria-hidden={onValueChange ? true : undefined}>\n      {peaks.map((peak, index) => { const bar = rs([\"rs-waveform-bar\", index / Math.max(1, peaks.length) < position && \"rs-waveform-played\"], styles.bar, index / Math.max(1, peaks.length) < position && styles.played); const height = Math.max(1, peak * 44); return <rect key={index} {...bar} x={index * 4} y={(48 - height) / 2} width={2} height={height} />; })}\n    </svg>\n    {onValueChange && <input {...input} type=\"range\" min={0} max={1} step={0.001} value={position} disabled={disabled || peaks.length === 0} aria-label={label} aria-valuetext={`${Math.round(position * 100)} percent`} onChange={event => { const next = Number(event.target.value); if (value === undefined) setInner(next); onValueChange(next); }} />}\n    </div>\n    {onRegionChange && <div {...regionControls}>\n      <label {...regionLabel}>Selection start · {Math.round(start * 100)}%<Slider min={0} max={end || 0.001} step={0.001} value={start} disabled={disabled || peaks.length === 0} aria-label=\"Selection start\" aria-valuetext={`${Math.round(start * 100)} percent`} onValueChange={next => changeRegion({ start: Math.min(next, end), end })} /></label>\n      <label {...regionLabel}>Selection end · {Math.round(end * 100)}%<Slider min={start} max={1} step={0.001} value={end} disabled={disabled || peaks.length === 0} aria-label=\"Selection end\" aria-valuetext={`${Math.round(end * 100)} percent`} onValueChange={next => changeRegion({ start, end: Math.max(start, next) })} /></label>\n    </div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/waveform.tsx"
+    },
+    {
+      "path": "vlak/styles/waveform.css",
+      "content": "/* ── waveform: generated from packages/react/src/components/waveform.tsx ── */\n.rs-waveform{min-width:0;width:100%;color:var(--text);display:flex;flex-direction:column;gap:0.5rem}\n.rs-waveform-stage{position:relative;min-height:var(--hit);height:4rem;border-radius:var(--radius-sm)}\n.rs-waveform-stage:focus-within{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-waveform-plot{display:block;width:100%;height:100%;overflow:visible}\n.rs-waveform-bar{fill:var(--text-secondary)}\n.rs-waveform-played{fill:var(--text)}\n.rs-waveform-input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}\n.rs-waveform-region{position:absolute;top:0;bottom:0;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--control-border);pointer-events:none}\n.rs-waveform-region-controls{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem}\n.rs-waveform-label{font-size:0.75rem;color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/waveform.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-waveform",
+        "rs-waveform-stage",
+        "rs-waveform-plot",
+        "rs-waveform-input",
+        "rs-waveform-region",
+        "rs-waveform-region-controls",
+        "rs-waveform-label",
+        "rs-waveform-bar",
+        "rs-waveform-played"
+      ],
+      "snippet": "<div class=\"rs-waveform\"><svg class=\"rs-waveform-plot\" viewBox=\"0 0 80 48\" role=\"img\" aria-label=\"Audio waveform\"><path d=\"M0 24 H10 V10 H12 V38 H14 V24 H30 V4 H32 V44 H34 V24 H80\" fill=\"none\" stroke=\"currentColor\" /></svg></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "slider",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Waveform",
+        "Audio waveform",
+        "Audio region"
+      ],
+      "example": "import { Waveform } from \"@noorddev/vlak-react\";\n\n<Waveform samples={[0.2, 0.5, 0.8, 0.3, 0.7, 0.4]} label=\"Interview waveform\" value={position} onValueChange={setPosition} region={region} onRegionChange={setRegion} />",
+      "usage": {
+        "use": [
+          "A supplied waveform for an audio recording.",
+          "Seeking or selecting an interval in normalised zero-to-one coordinates."
+        ],
+        "avoid": [
+          "Generating or decoding audio data; provide amplitude samples."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Arrow keys, Home, End",
+          "does": "Operates the native seek range and optional selection start and end ranges."
+        }
+      ],
+      "a11y": [
+        "Static waveforms have a labelled image role.",
+        "Interactive waveforms announce percentage and selection endpoints.",
+        "Long inputs are reduced to no more than 240 peak bars to bound SVG rendering cost."
+      ]
+    }
+  }
+}

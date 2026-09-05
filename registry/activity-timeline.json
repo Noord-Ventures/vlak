@@ -1,0 +1,72 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "activity-timeline",
+  "type": "registry:component",
+  "title": "Activity timeline",
+  "description": "Lists timestamped events with actors and optional expandable details.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/activity-timeline.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface ActivityEvent {\n  id: string;\n  title: React.ReactNode;\n  dateTime: string;\n  timeLabel?: string;\n  actor?: React.ReactNode;\n  description?: React.ReactNode;\n  details?: React.ReactNode;\n}\nexport interface ActivityTimelineProps extends React.HTMLAttributes<HTMLOListElement> {\n  events: ActivityEvent[];\n  emptyLabel?: string;\n  locale?: string;\n  timeZone?: string;\n}\nconst styles = stylex.create({\n  root: { listStyleType: \"none\", margin: 0, padding: 0, color: vlak.ink, width: \"100%\" },\n  event: { display: \"grid\", gridTemplateColumns: { default: \"minmax(7rem, 1fr) minmax(0, 3fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.5rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  time: { color: vlak.gray, fontSize: \"0.875rem\", fontVariantNumeric: \"tabular-nums\", lineHeight: 1.45 },\n  title: { margin: 0, fontWeight: 600, lineHeight: 1.45 },\n  body: { marginBlock: \"0.5rem\", lineHeight: 1.45, maxWidth: \"66ch\", overflowWrap: \"anywhere\" },\n  summary: { minHeight: vlak.hit, display: \"list-item\", alignContent: \"center\", cursor: \"pointer\", borderRadius: vlak.radiusSm, outlineColor: vlak.ink, outlineOffset: 2 },\n});\n\n/** Chronological events in caller-supplied order, with optional native disclosures. */\nexport const ActivityTimeline = React.forwardRef<HTMLOListElement, ActivityTimelineProps>(function ActivityTimeline({ events, emptyLabel = \"No activity yet\", locale = \"en\", timeZone = \"UTC\", className, style, ...props }, ref) {\n  const root = rs([\"rs-activity-timeline\", className], styles.root);\n  const row = rs([\"rs-activity-timeline-event\"], styles.event);\n  const time = rs([\"rs-activity-timeline-time\"], styles.time);\n  const title = rs([\"rs-activity-timeline-title\"], styles.title);\n  const body = rs([\"rs-activity-timeline-body\"], styles.body);\n  const summary = rs([\"rs-activity-timeline-summary\"], styles.summary);\n  return <ol ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {!events.length && <li {...row}>{emptyLabel}</li>}\n    {events.map(event => { const date = new Date(event.dateTime); return <li key={event.id} {...row}>\n      <time {...time} dateTime={event.dateTime}>{event.timeLabel ?? (Number.isNaN(date.valueOf()) ? event.dateTime : new Intl.DateTimeFormat(locale, { dateStyle: \"medium\", timeStyle: \"short\", timeZone }).format(date))}</time>\n      <div><p {...title}>{event.title}</p>{event.actor != null && <p {...time}>{event.actor}</p>}{event.description != null && <div {...body}>{event.description}</div>}{event.details != null && <details><summary {...summary}>Details</summary><div {...body}>{event.details}</div></details>}</div>\n    </li>; })}\n  </ol>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/activity-timeline.tsx"
+    },
+    {
+      "path": "vlak/styles/activity-timeline.css",
+      "content": "/* ── activity-timeline: generated from packages/react/src/components/activity-timeline.tsx ── */\n.rs-activity-timeline{list-style-type:none;margin:0;padding:0;color:var(--text);width:100%}\n.rs-activity-timeline-event{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 3fr);gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n@media (max-width: 640px){.rs-activity-timeline-event{grid-template-columns:minmax(0, 1fr)}}\n.rs-activity-timeline-time{color:var(--text-secondary);font-size:0.875rem;font-variant-numeric:tabular-nums;line-height:1.45}\n.rs-activity-timeline-title{margin:0;font-weight:600;line-height:1.45}\n.rs-activity-timeline-body{margin-block:0.5rem;line-height:1.45;max-width:66ch;overflow-wrap:anywhere}\n.rs-activity-timeline-summary{min-height:var(--hit);display:list-item;align-content:center;cursor:pointer;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/activity-timeline.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-activity-timeline",
+        "rs-activity-timeline-event",
+        "rs-activity-timeline-time",
+        "rs-activity-timeline-title",
+        "rs-activity-timeline-body",
+        "rs-activity-timeline-summary"
+      ],
+      "snippet": "<ol class=\"rs-activity-timeline\"><li class=\"rs-activity-timeline-event\"><time class=\"rs-activity-timeline-time\" datetime=\"2026-09-05T10:00:00Z\">5 September, 10:00</time><div><p class=\"rs-activity-timeline-title\">Revision published</p></div></li></ol>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ActivityTimeline"
+      ],
+      "example": "import { ActivityTimeline } from \"@noorddev/vlak-react\";\n\n<ActivityTimeline events={[{ id: \"release\", title: \"Revision published\", dateTime: \"2026-09-05T10:00:00Z\", actor: \"Studio\", description: \"Updated the vehicle controls\", details: \"Numeric baselines and playback spacing are now shared.\" }]} />",
+      "usage": {
+        "use": [
+          "Audit history, project activity, and chronological event records."
+        ],
+        "avoid": [
+          "Steps toward a goal; use Stepper or TaskProgress."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches each summary; Enter or Space expands the native disclosure."
+        }
+      ],
+      "a11y": [
+        "An ordered list with machine-readable time elements. Optional details use native disclosure semantics."
+      ]
+    }
+  }
+}

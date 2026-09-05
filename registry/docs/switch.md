@@ -1,6 +1,6 @@
 # Switch
 
-Turns one setting on or off. 32×18px; on fills with ink, off uses a 1px track.
+Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.
 
 Category: forms  
 Name: `switch`  

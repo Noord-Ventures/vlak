@@ -8,7 +8,7 @@ import { hidden } from "../../hidden.stylex";
 
 export interface ChartSeries {
   name: string;
-  values: number[];
+  values: Array<number | null>;
 }
 
 export interface ChartAnnotation {
@@ -232,6 +232,8 @@ const styles = stylex.create({
 export const chartStyles = styles;
 
 export function ticksBetween(min: number, max: number, count = 4): number[] {
+  if (!Number.isFinite(min) || !Number.isFinite(max)) return [];
+  if (min > max) [min, max] = [max, min];
   const span = max - min || 1;
   const step = niceStep(span, count);
   const start = Math.ceil(min / step) * step;
@@ -255,7 +257,7 @@ export const MAX_SERIES = LINE_CLASS.length;
 export const CROUWEL_SPOT = "#E30613";
 
 export function niceMax(raw: number): number {
-  if (raw <= 0) return 1;
+  if (!Number.isFinite(raw) || raw <= 0) return 1;
   const pow = 10 ** Math.floor(Math.log10(raw));
   for (const f of [1, 2, 2.5, 5, 10]) {
     if (f * pow >= raw) return f * pow;
@@ -280,6 +282,7 @@ function numberFormat(locale: string | undefined, options: Intl.NumberFormatOpti
  * decimal. `locale` undefined means the reader's own.
  */
 export function defaultFormat(v: number, unit?: string, locale?: string): string {
+  if (!Number.isFinite(v)) return "No data";
   const n = numberFormat(
     locale,
     Math.abs(v) >= 1000
@@ -290,7 +293,7 @@ export function defaultFormat(v: number, unit?: string, locale?: string): string
 }
 
 export function niceStep(span: number, count = 4): number {
-  const raw = span / Math.max(1, count);
+  const raw = span / (Number.isFinite(count) ? Math.max(1, Math.min(100, count)) : 4);
   if (raw <= 0) return 1;
   const pow = 10 ** Math.floor(Math.log10(raw));
   for (const f of [1, 2, 2.5, 5, 10]) {
@@ -309,10 +312,14 @@ export function ticksFor(max: number, count = 4, inverted = false): number[] {
 export function stackedRows(series: ChartSeries[]): number[][] {
   const n = Math.max(0, ...series.map((s) => s.values.length));
   return Array.from({ length: n }, (_, i) => {
-    let sum = 0;
+    let positive = 0;
+    let negative = 0;
     return series.map((s) => {
-      sum += s.values[i] ?? 0;
-      return sum;
+      const value = s.values[i];
+      if (typeof value !== "number" || !Number.isFinite(value)) return Number.NaN;
+      if (value < 0) { negative += value; return negative; }
+      positive += value;
+      return positive;
     });
   });
 }
@@ -344,7 +351,7 @@ export function scatterMark(spot?: boolean) {
 
 export interface SrSeries {
   name: string;
-  values: Array<number | string>;
+  values: Array<number | string | null>;
 }
 
 /** The data behind a plot, as a screen-reader table. */
@@ -376,7 +383,7 @@ export function SrTable({
           <tr key={i}>
             <th scope="row">{label}</th>
             {series.map((s) => (
-              <td key={s.name}>{s.values[i]}</td>
+              <td key={s.name}>{s.values[i] == null || (typeof s.values[i] === "number" && !Number.isFinite(s.values[i])) ? "No data" : s.values[i]}</td>
             ))}
           </tr>
         ))}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "virtual-list",
+  "type": "registry:component",
+  "title": "Virtual list",
+  "description": "Windows large fixed-height collections while preserving focused rows.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/virtual-list.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface VirtualItem { id: string; label: string; content?: React.ReactNode }\nexport interface VirtualListProps extends React.HTMLAttributes<HTMLDivElement> {\n  items: VirtualItem[];\n  label: string;\n  /** Fixed row height, at least 44px. */\n  rowHeight?: number;\n  height?: number;\n  overscan?: number;\n  emptyLabel?: string;\n}\nconst styles = stylex.create({\n  root: { overflowY: \"auto\", overscrollBehavior: \"contain\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, minWidth: 0, color: vlak.ink, position: \"relative\" },\n  canvas: { position: \"relative\", minWidth: 0 },\n  item: { position: \"absolute\", insetInline: 0, insetBlockStart: 0, boxSizing: \"border-box\", display: \"flex\", alignItems: \"center\", paddingInline: \"0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, outlineColor: vlak.ink, outlineOffset: -2, overflow: \"hidden\" },\n  empty: { padding: \"1rem\", color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** Fixed-height windowing with a retained focused row and keyboard navigation. */\nexport const VirtualList = React.forwardRef<HTMLDivElement, VirtualListProps>(function VirtualList({ items, label, rowHeight = 44, height = 352, overscan = 4, emptyLabel = \"No items\", className, style, onScroll, ...props }, ref) {\n  const rowSize = Math.max(44, Number.isFinite(rowHeight) ? rowHeight : 44);\n  const viewport = Math.max(rowSize, Number.isFinite(height) ? height : 352);\n  const extra = Math.max(0, Math.min(50, Number.isFinite(overscan) ? Math.floor(overscan) : 4));\n  const local = React.useRef<HTMLDivElement | null>(null);\n  const rows = React.useRef(new Map<string, HTMLDivElement>());\n  const [scroll, setScroll] = React.useState(0);\n  const [activeId, setActiveId] = React.useState<string>();\n  const pendingFocus = React.useRef<string | null>(null);\n  const pendingRemoval = React.useRef(false);\n  const lastIndex = React.useRef(0);\n  const indexById = React.useMemo(() => new Map(items.map((item, index) => [item.id, index])), [items]);\n  const latestIndexes = React.useRef(indexById);\n  latestIndexes.current = indexById;\n  const found = activeId == null ? undefined : indexById.get(activeId);\n  const activeIndex = found ?? Math.max(0, Math.min(lastIndex.current, items.length - 1));\n  if (found != null) lastIndex.current = found;\n  const start = Math.max(0, Math.min(Math.max(0, items.length - 1), Math.floor(scroll / rowSize) - extra));\n  const end = Math.min(items.length, start + Math.ceil(viewport / rowSize) + extra * 2);\n  const indexes = new Set(Array.from({ length: end - start }, (_, index) => start + index));\n  if (items.length) indexes.add(activeIndex);\n  const focus = React.useCallback((index: number) => {\n    const item = items[index]; if (!item || !local.current) return;\n    const top = index * rowSize; let nextScroll = local.current.scrollTop;\n    if (top < nextScroll) nextScroll = top; else if (top + rowSize > nextScroll + viewport) nextScroll = top + rowSize - viewport;\n    local.current.scrollTop = nextScroll;\n    const mounted = rows.current.get(item.id);\n    pendingFocus.current = mounted ? null : item.id;\n    setScroll(nextScroll); setActiveId(item.id);\n    mounted?.focus({ preventScroll: true });\n  }, [items, rowSize, viewport]);\n  React.useLayoutEffect(() => {\n    const max = Math.max(0, items.length * rowSize - viewport);\n    if (local.current && local.current.scrollTop > max) { local.current.scrollTop = max; setScroll(max); }\n    if (pendingRemoval.current) {\n      pendingRemoval.current = false;\n      if (items.length) focus(activeIndex); else local.current?.focus();\n    }\n    if (pendingFocus.current) { rows.current.get(pendingFocus.current)?.focus({ preventScroll: true }); pendingFocus.current = null; }\n  }, [items, rowSize, viewport, activeIndex, focus]);\n  const root = rs([\"rs-virtual-list\", className], styles.root);\n  const canvas = rs([\"rs-virtual-list-canvas\"], styles.canvas);\n  const itemStyle = rs([\"rs-virtual-list-item\"], styles.item);\n  const empty = rs([\"rs-virtual-list-empty\"], styles.empty);\n  return <div ref={element => { local.current = element; if (typeof ref === \"function\") ref(element); else if (ref) ref.current = element; }} role=\"list\" aria-label={label} tabIndex={items.length ? undefined : 0} {...props} className={root.className} style={{ ...root.style, height: viewport, ...style }} onScroll={event => { setScroll(event.currentTarget.scrollTop); onScroll?.(event); }}>\n    <div {...canvas} role=\"none\" style={{ ...canvas.style, height: items.length * rowSize }}>{[...indexes].sort((a, b) => a - b).map(index => { const item = items[index]!; return <div key={item.id} ref={element => { if (element) rows.current.set(item.id, element); else { if (!latestIndexes.current.has(item.id) && rows.current.get(item.id)?.contains(document.activeElement)) pendingRemoval.current = true; rows.current.delete(item.id); } }} {...itemStyle} style={{ ...itemStyle.style, height: rowSize, transform: `translateY(${index * rowSize}px)` }} role=\"listitem\" aria-posinset={index + 1} aria-setsize={items.length} tabIndex={index === activeIndex ? 0 : -1} onFocus={() => setActiveId(item.id)} onKeyDown={event => {\n      if (event.target !== event.currentTarget) return;\n      const target = event.key === \"Home\" ? 0 : event.key === \"End\" ? items.length - 1 : event.key === \"ArrowDown\" ? Math.min(items.length - 1, index + 1) : event.key === \"ArrowUp\" ? Math.max(0, index - 1) : -1;\n      if (target >= 0) { event.preventDefault(); focus(target); }\n    }}>{item.content ?? item.label}</div>; })}</div>{!items.length && <div {...empty} role=\"listitem\">{emptyLabel}</div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/virtual-list.tsx"
+    },
+    {
+      "path": "vlak/styles/virtual-list.css",
+      "content": "/* ── virtual-list: generated from packages/react/src/components/virtual-list.tsx ── */\n.rs-virtual-list{overflow-y:auto;overscroll-behavior:contain;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0;color:var(--text);position:relative}\n.rs-virtual-list-canvas{position:relative;min-width:0}\n.rs-virtual-list-item{position:absolute;inset-inline:0;inset-block-start:0;box-sizing:border-box;display:flex;align-items:center;padding-inline:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);outline-color:var(--text);outline-offset:-2px;overflow:hidden}\n.rs-virtual-list-empty{padding:1rem;color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/virtual-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-virtual-list",
+        "rs-virtual-list-canvas",
+        "rs-virtual-list-item",
+        "rs-virtual-list-empty"
+      ],
+      "snippet": "<div class=\"rs-virtual-list\" role=\"list\" aria-label=\"Records\" style=\"height:264px\"><div class=\"rs-virtual-list-canvas\" role=\"none\" style=\"height:44px\"><div class=\"rs-virtual-list-item\" role=\"listitem\" tabindex=\"0\" aria-posinset=\"1\" aria-setsize=\"1\" style=\"height:44px\">Record 1</div></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "VirtualList"
+      ],
+      "example": "import { VirtualList } from \"@noorddev/vlak-react\";\n\n<VirtualList label=\"Records\" height={264} items={Array.from({ length: 200 }, (_, index) => ({ id: String(index), label: `Record ${index + 1}` }))} />",
+      "usage": {
+        "use": [
+          "Large collections where fixed-height rows are an acceptable constraint."
+        ],
+        "avoid": [
+          "Short lists or variable-height content without a fixed row contract."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Arrow up/down, Home, End",
+          "does": "A row enters the Tab sequence; arrows and Home/End scroll and focus rows. Nested controls keep their own keys."
+        }
+      ],
+      "a11y": [
+        "List items expose total size and position. Focused rows are retained when outside the visible window."
+      ]
+    }
+  }
+}

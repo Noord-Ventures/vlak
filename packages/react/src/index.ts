@@ -1,4 +1,34 @@
 export { cx } from "./cx";
+export { NumberField, type NumberFieldProps } from "./components/number-field";
+export { RangeSlider, type RangeSliderProps } from "./components/range-slider";
+export { MultiSelect, type MultiSelectProps } from "./components/multi-select";
+export { TagInput, type TagInputProps } from "./components/tag-input";
+export { DateRangePicker, type DateRangePickerProps } from "./components/date-range-picker";
+export { TimeField, type TimeFieldProps } from "./components/time-field";
+export { FileUpload, type FileUploadProps } from "./components/file-upload";
+export { TransferList, type TransferListProps } from "./components/transfer-list";
+export { InlineEdit, type InlineEditProps } from "./components/inline-edit";
+export { Rating, type RatingProps } from "./components/rating";
+export { PlaybackControls, type PlaybackControlsProps } from "./components/playback-controls";
+export { MediaScrubber, type MediaScrubberProps } from "./components/media-scrubber";
+export { MediaPlayer, type MediaPlayerProps } from "./components/media-player";
+export { Waveform, type WaveformProps } from "./components/waveform";
+export { ImageViewer, type ImageViewerProps } from "./components/image-viewer";
+export { CanvasControls, type CanvasControlsProps } from "./components/canvas-controls";
+export { MessageComposer, type MessageComposerProps } from "./components/message-composer";
+export type { MultiSelectOption } from "./components/multi-select";
+export type { TransferListOption } from "./components/transfer-list";
+export type { DateRangeValue } from "./components/date-range-picker";
+export type { FileUploadRejection, FileUploadContext } from "./components/file-upload";
+export { formatMediaTime } from "./components/media-scrubber";
+export { FileBrowser, type FileBrowserProps, type BrowserEntry } from "./components/file-browser";
+export { KanbanBoard, type KanbanBoardProps, type KanbanColumn, type KanbanCard } from "./components/kanban-board";
+export { Scheduler, type SchedulerProps, type SchedulerView, type SchedulerEvent } from "./components/scheduler";
+export type { MediaChapter } from "./components/media-scrubber";
+export type { MediaTrack } from "./components/media-player";
+export type { WaveformRegion } from "./components/waveform";
+export type { ViewerImage } from "./components/image-viewer";
+export type { ComposedMessage } from "./components/message-composer";
 export { rs } from "./rs";
 export { vlak, phone, mobileGrid, rail, wide, vlakFont, vlakMono } from "./tokens.stylex";
 export {
@@ -137,6 +167,26 @@ export {
   type SidebarItemProps,
 } from "./components/sidebar";
 export { Spinner, type SpinnerProps } from "./components/spinner";
+export { DescriptionList, type DescriptionListProps, type DescriptionItem } from "./components/description-list";
+export { Metric, type MetricProps } from "./components/metric";
+export { ActivityTimeline, type ActivityTimelineProps, type ActivityEvent } from "./components/activity-timeline";
+export { CodeBlock, type CodeBlockProps } from "./components/code-block";
+export { JSONViewer, type JSONViewerProps } from "./components/json-viewer";
+export { DiffViewer, diffLines, type DiffViewerProps, type DiffLine } from "./components/diff-viewer";
+export { ErrorSummary, type ErrorSummaryProps, type FormError } from "./components/error-summary";
+export { NotificationCenter, type NotificationCenterProps, type NotificationItem } from "./components/notification-center";
+export { TaskProgress, type TaskProgressProps, type TaskState, type TaskPhase } from "./components/task-progress";
+export { ConnectionStatus, type ConnectionStatusProps, type ConnectionState } from "./components/connection-status";
+export { TreeView, type TreeViewProps, type TreeNode } from "./components/tree-view";
+export { Toolbar, type ToolbarProps, type ToolbarAction } from "./components/toolbar";
+export { BottomNavigation, type BottomNavigationProps, type BottomNavigationItem } from "./components/bottom-navigation";
+export { OverflowList, type OverflowListProps, type OverflowAction } from "./components/overflow-list";
+export { FilterBar, type FilterBarProps, type ActiveFilter } from "./components/filter-bar";
+export { QueryBuilder, describeQuery, type QueryBuilderProps, type QueryField, type QueryRule, type QueryGroup } from "./components/query-builder";
+export { SortableList, type SortableListProps, type SortableItem } from "./components/sortable-list";
+export { VirtualList, type VirtualListProps, type VirtualItem } from "./components/virtual-list";
+export { MasterDetail, type MasterDetailProps, type MasterDetailItem } from "./components/master-detail";
+export { PropertyGrid, type PropertyGridProps, type PropertyField, type PropertyValues } from "./components/property-grid";
 export {
   Flow,
   FlowStep,

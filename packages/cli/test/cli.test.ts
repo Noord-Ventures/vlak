@@ -66,6 +66,57 @@ describe("init", () => {
 });
 
 describe("add", () => {
+  it("installs all 40 additions and shared helper closures exactly once", async () => {
+    const additions = [
+      "number-field", "range-slider", "multi-select", "tag-input", "date-range-picker", "time-field", "file-upload", "transfer-list", "inline-edit", "rating",
+      "description-list", "metric", "activity-timeline", "code-block", "json-viewer", "diff-viewer", "error-summary", "notification-center", "task-progress", "connection-status",
+      "tree-view", "toolbar", "bottom-navigation", "overflow-list", "filter-bar", "query-builder", "sortable-list", "virtual-list", "master-detail", "property-grid",
+      "playback-controls", "media-scrubber", "media-player", "waveform", "image-viewer", "canvas-controls", "message-composer", "file-browser", "kanban-board", "scheduler",
+    ];
+    init(cwd, { componentsDir: "src/ui" });
+    const { outcomes, unknown } = await add(cwd, additions, { overwrite: true });
+    expect(unknown).toEqual([]);
+    const results = outcomes.flatMap(outcome => outcome.results);
+    expect(new Set(results.map(result => result.path)).size).toBe(results.length);
+    expect(results.every(result => result.status === "written")).toBe(true);
+    for (const name of additions) expect(existsSync(join(cwd, "src/ui", `${name}.tsx`)), name).toBe(true);
+    for (const helper of ["use-input-value.ts", "use-overlay-position.ts", "merge-refs.ts", "rs.ts", "cx.ts"]) {
+      expect(results.filter(result => result.path === `src/ui/${helper}`), helper).toHaveLength(1);
+    }
+    for (const result of results) {
+      const file = join(cwd, result.path);
+      for (const match of readFileSync(file, "utf8").matchAll(/from\s*["'](\.[^"']+)["']/g)) {
+        const base = join(file, "..", match[1]!);
+        expect([`${base}.ts`, `${base}.tsx`, join(base, "index.ts"), join(base, "index.tsx")].some(existsSync), `${result.path}: ${match[1]}`).toBe(true);
+      }
+    }
+    const repeated = await add(cwd, additions);
+    const unchanged = repeated.outcomes.flatMap(outcome => outcome.results);
+    expect(unchanged).toHaveLength(results.length);
+    expect(unchanged.every(result => result.status === "unchanged")).toBe(true);
+  });
+
+  it("rejects conflicting shared files before writing any source, even with overwrite", async () => {
+    init(cwd);
+    const registry = join(cwd, "conflicting-registry");
+    mkdirSync(registry);
+    mkdirSync(join(cwd, "components/vlak"), { recursive: true });
+    writeFileSync(join(cwd, "components/vlak/shared.ts"), "// consumer's helper\n");
+    for (const name of ["first", "second"]) {
+      writeFileSync(join(registry, `${name}.json`), JSON.stringify({
+        name,
+        files: [
+          { path: `vlak/${name}.tsx`, target: `components/vlak/${name}.tsx`, content: "export {};", type: "registry:component" },
+          { path: "vlak/shared.ts", target: name === "first" ? "components/vlak/shared.ts" : "components/vlak/helpers/../shared.ts", content: `// ${name}\n`, type: "registry:file" },
+        ],
+      }));
+    }
+    await expect(add(cwd, ["first", "second"], { registry, overwrite: true })).rejects.toThrow("Registry file conflict at components/vlak/shared.ts: first and second");
+    expect(readFileSync(join(cwd, "components/vlak/shared.ts"), "utf8")).toBe("// consumer's helper\n");
+    expect(existsSync(join(cwd, "components/vlak/first.tsx"))).toBe(false);
+    expect(existsSync(join(cwd, "components/vlak/second.tsx"))).toBe(false);
+  });
+
   it("vendors component source plus the shared lib once", async () => {
     init(cwd);
     const { outcomes, unknown } = await add(cwd, ["button"]);

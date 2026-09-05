@@ -20,9 +20,10 @@ const styles = stylex.create({
     alignItems: "center",
     gap: "0.4375rem",
     minHeight: {
-      default: "1.5rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
+    minWidth: vlak.hit,
     fontSize: {
       default: "0.84375rem",
       [mq.phone]: "1.0625rem",

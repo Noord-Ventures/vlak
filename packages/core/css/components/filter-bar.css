@@ -1,0 +1,3 @@
+/* ── filter-bar: generated from packages/react/src/components/filter-bar.tsx ── */
+.rs-filter-bar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text);min-width:0}
+.rs-filter-bar-count{font-size:0.875rem;color:var(--text-secondary);font-variant-numeric:tabular-nums;line-height:1.45}

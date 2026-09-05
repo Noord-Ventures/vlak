@@ -1,0 +1,16 @@
+/* ── file-upload: generated from packages/react/src/components/file-upload.tsx ── */
+.rs-file-upload{display:grid;gap:0.75rem;min-width:0}
+.rs-file-upload-drop{position:relative;display:grid;align-content:center;justify-items:center;gap:0.5rem;min-height:8.25rem;padding:1.25rem;box-sizing:border-box;border-width:1px;border-style:dashed;border-color:var(--control-border);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);outline-color:var(--text);outline-offset:2px}
+.rs-file-upload-drop:focus-within{outline-width:2px;outline-style:solid}
+.rs-file-upload-drag{background-color:var(--control-fill)}
+@media (forced-colors: active){.rs-file-upload-drag{outline:2px solid Highlight}}
+.rs-file-upload-input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.rs-file-upload-title{font-size:var(--control-fs);font-weight:500;text-align:center}
+.rs-file-upload-description{font-size:var(--control-label);color:var(--text-secondary);text-align:center;line-height:1.45}
+.rs-file-upload-list{display:grid;gap:0.5rem;list-style:none;margin:0;padding:0}
+.rs-file-upload-item{display:grid;gap:0.5rem;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);min-width:0}
+.rs-file-upload-row{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.5rem;min-width:0}
+.rs-file-upload-name{flex:1 1 10rem;overflow-wrap:anywhere;font-size:var(--control-fs)}
+.rs-file-upload-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-file-upload-action{width:auto}
+.rs-file-upload-status{margin:0;font-size:var(--control-label);color:var(--text-secondary)}

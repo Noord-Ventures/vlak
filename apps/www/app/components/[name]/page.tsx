@@ -169,7 +169,7 @@ export default async function ComponentPage({
         <CodeBlock code={packageInstall} />
         <p className="rs-t-body">
           Precompiled React and one stylesheet. No compiler to configure. Per-component imports work
-          too: <code className="rs-code">@noorddev/vlak-react/components/{component.name}</code>.
+          too: <code className="rs-code">@noorddev/vlak-react/{component.react?.replace(/\.tsx?$/, "") ?? `components/${component.name}`}</code>.
         </p>
         <h3 className="docs-sub">2. Vendor the source</h3>
         <CodeBlock code={cliInstall} />

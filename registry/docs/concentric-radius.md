@@ -10,7 +10,7 @@ Page: https://vlak.dev/components/concentric-radius/
 ## When to use
 
 - Nested rounded boxes whose corners must share a centre.
-- innerRadius(outer, pad) when you set radii by hand.
+- innerRadius(outer, pad) computes max(0, outer minus padding) in constant time. Obsolete fit options remain accepted but are ignored.
 
 ## When not to
 
@@ -86,7 +86,7 @@ No props of its own.
 
 - `concentricInner` (function)
 - `concentricOuter` (function)
-- `innerRadius` (function): Steve Ruiz innerRadius: fit a circle to the −padding isosurface of a circular corner SDF. The initial guess R = outerRadius is the wrong answer. Clamp at 0. https://x.com/steveruizok/status/2072651352908370013
+- `innerRadius` (function): The exact inner circle shares its outer circle's center. No iterative fitting is needed.
 
 ## Accessibility
 

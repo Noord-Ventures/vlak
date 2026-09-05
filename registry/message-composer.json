@@ -1,0 +1,94 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "message-composer",
+  "type": "registry:component",
+  "title": "Message composer",
+  "description": "Composes text and optional attachments with submission shortcuts and retained drafts on failure.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/textarea.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/message-composer.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Textarea } from \"./textarea\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface ComposedMessage { text: string; files: File[] }\nexport interface MessageComposerProps extends Omit<React.FormHTMLAttributes<HTMLFormElement>, \"defaultValue\" | \"onSubmit\"> {\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (text: string) => void;\n  onSend: (message: ComposedMessage) => void | Promise<void>;\n  label?: string;\n  placeholder?: string;\n  disabled?: boolean;\n  allowAttachments?: boolean;\n  accept?: string;\n  maxLength?: number;\n  /** Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter. */\n  sendOnEnter?: boolean;\n  /** Application-owned response generation, separate from submission pending state. */\n  generating?: boolean;\n  /** Requests that the application stop generation; does not itself cancel a network request. */\n  onStop?: () => void;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexDirection: \"column\", width: \"100%\", minWidth: 0, gap: \"0.75rem\", color: vlak.ink },\n  actions: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", justifyContent: \"space-between\", gap: \"0.75rem\" },\n  action: { width: \"auto\", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: \"0.875rem\" },\n  files: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", listStyleType: \"none\", padding: 0, margin: 0 },\n  file: { display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", maxWidth: \"100%\", overflowWrap: \"anywhere\", fontSize: \"0.8125rem\" },\n  hint: { margin: 0, fontSize: \"0.75rem\", lineHeight: 1.45, color: vlak.gray },\n  input: { display: \"none\" },\n});\n\n/** A message draft with attachments, IME-safe shortcuts, and retained text after send failures. */\nexport const MessageComposer = React.forwardRef<HTMLTextAreaElement, MessageComposerProps>(function MessageComposer({ value, defaultValue = \"\", onValueChange, onSend, label = \"Message\", placeholder = \"Write a message…\", disabled = false, allowAttachments = false, accept, maxLength, sendOnEnter = false, generating = false, onStop, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const current = value ?? inner;\n  const [files, setFiles] = React.useState<File[]>([]);\n  const [pending, setPending] = React.useState(false);\n  const sending = React.useRef(false);\n  const [status, setStatus] = React.useState(\"\");\n  const areaRef = React.useRef<HTMLTextAreaElement>(null);\n  const mergedRef = useMergedRefs(areaRef, ref);\n  const fileRef = React.useRef<HTMLInputElement>(null);\n  const helpId = React.useId();\n  const blocked = disabled || pending;\n  const change = (next: string) => { if (value === undefined) setInner(next); onValueChange?.(next); };\n  const submit = async () => {\n    if (blocked || generating || sending.current || (!current.trim() && files.length === 0)) return;\n    sending.current = true; setPending(true); setStatus(\"Sending…\");\n    try { await onSend({ text: current.trim(), files: [...files] }); change(\"\"); setFiles([]); setStatus(\"Message sent.\"); }\n    catch { setStatus(\"The message could not be sent. Your draft is still here.\"); }\n    finally { sending.current = false; setPending(false); areaRef.current?.focus(); }\n  };\n  const root = rs([\"rs-message-composer\", className], styles.root);\n  const actions = rs([\"rs-message-composer-actions\"], styles.actions);\n  const action = rs([\"rs-message-composer-action\"], styles.action);\n  const fileList = rs([\"rs-message-composer-files\"], styles.files);\n  const file = rs([\"rs-message-composer-file\"], styles.file);\n  const hint = rs([\"rs-message-composer-hint\"], styles.hint);\n  const input = rs([\"rs-message-composer-input\"], styles.input);\n  return <form aria-label={label} aria-busy={pending || generating} {...props} className={root.className} style={{ ...root.style, ...style }} onSubmit={event => { event.preventDefault(); void submit(); }}>\n    <Textarea ref={mergedRef} label={label} value={current} onChange={event => change(event.target.value)} placeholder={placeholder} disabled={blocked} maxLength={maxLength} aria-describedby={helpId} onKeyDown={event => { if (event.nativeEvent.isComposing || event.key !== \"Enter\") return; if ((sendOnEnter && !event.shiftKey) || event.metaKey || event.ctrlKey) { event.preventDefault(); void submit(); } }} />\n    {files.length > 0 && <ul {...fileList} aria-label=\"Attachments\">{files.map((attachment, index) => <li {...file} key={`${attachment.name}-${index}`}><Icon name=\"attachment\" />{attachment.name}<Button {...action} variant=\"ghost\" aria-label={`Remove ${attachment.name}`} disabled={blocked} onClick={() => setFiles(files.filter((_, at) => at !== index))}><Icon name=\"close\" size={12} /></Button></li>)}</ul>}\n    <div {...actions}>\n      {allowAttachments ? <><input {...input} ref={fileRef} type=\"file\" multiple accept={accept} tabIndex={-1} aria-label=\"Attach files\" disabled={blocked} onChange={event => { setFiles([...files, ...Array.from(event.target.files ?? [])]); event.target.value = \"\"; }} /><Button {...action} variant=\"ghost\" disabled={blocked} onClick={() => fileRef.current?.click()}><Icon name=\"attachment\" />Attach</Button></> : <span />}\n      {generating ? <Button {...action} type=\"button\" disabled={disabled || !onStop} onClick={onStop}><Icon name=\"stop\" />Stop response</Button> : <Button {...action} type=\"submit\" disabled={blocked || (!current.trim() && files.length === 0)}><Icon name=\"send\" />{pending ? \"Sending…\" : \"Send\"}</Button>}\n    </div>\n    <p {...hint} id={helpId}>{sendOnEnter ? \"Enter to send. Shift+Enter for a new line.\" : \"Cmd or Ctrl+Enter to send.\"}</p>\n    <p {...hint} role=\"status\">{status}</p>\n  </form>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/message-composer.tsx"
+    },
+    {
+      "path": "vlak/styles/message-composer.css",
+      "content": "/* ── message-composer: generated from packages/react/src/components/message-composer.tsx ── */\n.rs-message-composer{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}\n.rs-message-composer-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem}\n.rs-message-composer-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.875rem}\n.rs-message-composer-files{display:flex;flex-wrap:wrap;gap:0.5rem;list-style-type:none;padding:0;margin:0}\n.rs-message-composer-file{display:flex;align-items:center;gap:0.5rem;max-width:100%;overflow-wrap:anywhere;font-size:0.8125rem}\n.rs-message-composer-hint{margin:0;font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}\n.rs-message-composer-input{display:none}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/message-composer.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-message-composer",
+        "rs-message-composer-actions",
+        "rs-message-composer-action",
+        "rs-message-composer-files",
+        "rs-message-composer-file",
+        "rs-message-composer-hint",
+        "rs-message-composer-input"
+      ],
+      "snippet": "<form class=\"rs-message-composer\" aria-label=\"Message\"><label>Message<textarea class=\"rs-textarea\" placeholder=\"Write a message…\"></textarea></label><div class=\"rs-message-composer-actions\"><button class=\"rs-btn-primary\" type=\"submit\">Send</button></div></form>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "textarea",
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "MessageComposer",
+        "Chat input",
+        "Comment composer"
+      ],
+      "example": "import { MessageComposer } from \"@noorddev/vlak-react\";\n\n<MessageComposer onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept=\"image/*,.pdf\" />",
+      "usage": {
+        "use": [
+          "Chat, comments, or a support reply.",
+          "Async submission that must preserve a draft when it fails.",
+          "Application-owned response generation with a Stop response action."
+        ],
+        "avoid": [
+          "An arbitrary multi-field form or uploading files without a message."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Cmd+Enter, Ctrl+Enter",
+          "does": "Submits the draft when no send or response generation is in progress."
+        },
+        {
+          "keys": "Enter, Shift+Enter",
+          "does": "With sendOnEnter enabled, Enter submits and Shift+Enter inserts a line; IME composition never submits."
+        },
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Operates attachment, send, and stop actions."
+        }
+      ],
+      "a11y": [
+        "The textarea has a visible label and shortcut description.",
+        "Sending prevents duplicate submission; results are announced.",
+        "Only a successful send clears the draft and attachments; failures retain both.",
+        "generating replaces Send with Stop response but keeps the next draft editable. onStop requests application cancellation; it does not cancel network activity itself."
+      ]
+    }
+  }
+}

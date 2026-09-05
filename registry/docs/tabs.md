@@ -125,6 +125,7 @@ Forwards `ref` to the `HTMLDivElement`.
 - TabList is role="tablist" (aria-orientation when vertical); pass aria-label to name it.
 - Tab is a <button role="tab"> with aria-selected and aria-controls; TabPanel is role="tabpanel" with aria-labelledby, hidden when not selected.
 - One roving tab stop: only the selected tab is in the tab order.
+- Without a default, the first enabled tab is selected. Removing or disabling the active tab reconciles to the first enabled tab; each target is at least 44px.
 - Controlled with value and onValueChange, or uncontrolled with defaultValue.
 
 ## Classes

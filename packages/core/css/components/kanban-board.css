@@ -1,0 +1,9 @@
+/* ── kanban-board: generated from packages/react/src/components/kanban-board.tsx ── */
+.rs-kanban-board{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}
+.rs-kanban-columns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(17rem, 1fr);gap:1rem;overflow-x:auto;padding:0.25rem;scroll-snap-type:x proximity}
+.rs-kanban-column{min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;scroll-snap-align:start}
+.rs-kanban-heading{margin:0;font-size:0.9375rem;font-weight:600;display:flex;justify-content:space-between;gap:0.5rem}
+.rs-kanban-card{display:flex;flex-direction:column;gap:0.625rem;min-width:0;font-size:0.875rem;line-height:1.45}
+.rs-kanban-title{font-weight:600;overflow-wrap:anywhere}
+.rs-kanban-detail{color:var(--text-secondary);overflow-wrap:anywhere}
+.rs-kanban-status{margin:0;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}

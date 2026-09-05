@@ -1,0 +1,7 @@
+/* ── range-slider: generated from packages/react/src/components/range-slider.tsx ── */
+.rs-range-slider{display:grid;gap:0.5rem;min-width:0;border-width:0;margin:0;padding:0;color:var(--text)}
+.rs-range-slider-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.5rem;padding:0}
+.rs-range-slider-row{display:grid;grid-template-columns:minmax(3rem, auto) minmax(0, 1fr) minmax(3rem, auto);gap:0.75rem;align-items:center}
+.rs-range-slider-label{font-size:var(--control-fs)}
+.rs-range-slider-input{width:100%;min-width:var(--hit);height:var(--hit);margin:0;accent-color:var(--text);cursor:pointer;outline-color:var(--text);outline-offset:2px}
+.rs-range-slider-output{font-size:var(--control-fs);font-variant-numeric:tabular-nums;text-align:end}

@@ -104,7 +104,7 @@ Forwards `ref` to the `HTMLSpanElement`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `values` (required) | `number[]` |  |  |
+| `values` (required) | `(number \| null)[]` |  |  |
 | `width` | `number` | `120` |  |
 | `height` | `number` | `28` |  |
 | `spot` | `string \| boolean` |  |  |
@@ -127,6 +127,8 @@ Forwards `ref` to the `HTMLSpanElement`.
 - A visually hidden table carries every value, so the data reads without the picture; the tooltip is role="status".
 - Sparkline is role="img" with a name built from label, the count, and the last value, plus the same hidden table.
 - Numbers format through Intl.NumberFormat; locale picks the reader's own by default. Marks stay visible in forced colors.
+- Null or non-finite samples create gaps instead of fabricated zeros. Missing values read as No data; empty plots announce their state, and an empty Sparkline has no invented last point.
+- Explicit domains generate ticks within their bounds and clip marks to the plot. Without a domain, negative values remain visible.
 
 ## Classes
 

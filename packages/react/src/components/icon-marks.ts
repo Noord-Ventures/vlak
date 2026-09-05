@@ -1,12 +1,12 @@
 /**
  * Vlak icon figures. 16×16 module, optical center 8,8.
- * Vera 28 Aug 2026; third polish 1 Sep 2026; R1 line/filled pairs 1 Sep 2026.
+ * Vera 28 Aug 2026; line/filled pairs 1 Sep 2026; optical detail pass 5 Sep 2026.
  * Stroke 1, currentColor, fill none on the line set, cap butt, join miter, no rx.
  * Filled kinship fills closed geometry of the same figures. A small set of
  * asymmetric marks has a hand-cut filled silhouette so it keeps the same
  * optical weight as the rest of the family instead of looking half-filled.
  * The first five marks keep their original construction unless a measured miss.
- * Chevron left/right: +0.25y optical nudge toward center 8,8. No filled set.
+ * Chevron left/right: +0.25y optical nudge toward center 8,8.
  */
 
 export type MarkEl =
@@ -243,12 +243,10 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   ],
   code: [p("M6 3.5 L3 8 L6 12.5"), p("M10 3.5 L13 8 L10 12.5")],
   "list-ordered": [
-    p("M6.5 4.5 H13"),
-    p("M6.5 8 H13"),
-    p("M6.5 11.5 H13"),
-    p("M3 4.5 H5"),
-    p("M3 8 H5"),
-    p("M3 11.5 H5"),
+    p("M7 4.75 H13.5"),
+    p("M7 11.25 H13.5"),
+    p("M2.75 4 L4 3.25 V6.5 M2.75 6.5 H5.25"),
+    p("M2.75 10 A1.25 1.25 0 0 1 5.25 10 L2.75 12.5 H5.25"),
   ],
 
   /* Communication */
@@ -341,7 +339,11 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   "credit-card": [r(2.5, 4.5, 11, 7), p("M2.5 7 H13.5")],
   tag: [p("M3.5 7 L7 3.5 H13 V9.5 L9.5 13 Z"), o(10.5, 6, 1)],
   dollar: [p("M8 3.5 V12.5"), p("M10.5 5 H6.5 V7.5 H9.5 V10.5 H5.5")],
-  package: [r(3.5, 5.5, 9, 8), p("M3.5 5.5 L8 2.5 L12.5 5.5"), p("M8 2.5 V13.5")],
+  package: [
+    p("M8 2.5 L12.5 5.5 V10.5 L8 13.5 L3.5 10.5 V5.5 Z"),
+    p("M3.5 5.5 L8 8.5 L12.5 5.5"),
+    p("M8 8.5 V13.5"),
+  ],
 
   /* Layout */
   grid: [r(2.5, 2.5, 4.5, 4.5), r(9, 2.5, 4.5, 4.5), r(2.5, 9, 4.5, 4.5), r(9, 9, 4.5, 4.5)],
@@ -562,9 +564,14 @@ export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
     p("M4 4 H12"),
     p("M6.25 4 V2.75 H9.75 V4"),
     p("M4.5 5.5 H11.5 V13 H4.5 Z"),
-    r(6.1, 7.25, 0.55, 4),
-    r(7.725, 7.25, 0.55, 4),
-    r(9.35, 7.25, 0.55, 4),
+    r(5.875, 7.25, 1, 4),
+    r(7.5, 7.25, 1, 4),
+    r(9.125, 7.25, 1, 4),
+  ],
+  save: [
+    p("M3.5 3.5 H10.5 L12.5 5.5 V12.5 H3.5 Z"),
+    r(5.5, 4.5, 4, 2),
+    r(5.5, 8.5, 5, 2.5),
   ],
   download: [p("M3.5 12 V13 H12.5 V12"), p("M8 3.5 V10"), p("M5.5 7.5 L8 10 L10.5 7.5")],
   upload: [p("M3.5 12 V13 H12.5 V12"), p("M8 10 V3.5"), p("M5.5 6 L8 3.5 L10.5 6")],
@@ -577,9 +584,9 @@ export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
   cloud: [p("M4 10.5 H12.5 A2 2 0 0 0 12.5 7 A3 3 0 0 0 6.5 6.5 A2.5 2.5 0 0 0 4 10.5 Z")],
   "folder-open": [p("M2.5 6 V4.5 H6 L7.5 3 H12.5 V6"), p("M2.5 6 H13.5 L12 13 H2.5 Z"), p("M3.5 6 H12.75")],
   clipboard: [r(4, 3.5, 8, 10.5), r(5, 5, 6, 7.5), r(6, 2.5, 4, 2)],
-  archive: [r(2.5, 3.5, 11, 3), p("M3.5 6.5 V13 H12.5 V6.5"), r(6.5, 8.25, 3, 0.75)],
-  duplicate: [p("M5.5 5 V2.5 H13.5 V10.5 H11"), p("M11 5 H3 V13 H11 V5")],
-  files: [p("M5.5 4.5 V2.5 H13 V11.5 H10.5"), p("M10.5 4.5 H3 V13.5 H10.5 V4.5")],
+  archive: [r(2.5, 3.5, 11, 3), p("M3.5 6.5 V13 H12.5 V6.5 Z"), r(6.5, 8.25, 3, 1.5)],
+  duplicate: [p("M5.5 5 V2.5 H13.5 V10.5 H11"), p("M11 5 H3 V13 H11 Z")],
+  files: [p("M5.5 4.5 V2.5 H13 V11.5 H10.5"), p("M10.5 4.5 H3 V13.5 H10.5 Z")],
   key: [o(5.5, 10, 2.75), o(5.5, 10, 1), p("M7.5 8.5 L13.5 2.5"), p("M11 5 L13 7")],
   database: [
     p("M2.5 4.5 A5.5 1.8 0 0 1 13.5 4.5 V11.5 A5.5 1.8 0 0 1 2.5 11.5 Z"),
@@ -646,7 +653,41 @@ export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
     p("M2.5 8 H4.5"),
     p("M11.5 8 H13.5"),
   ],
+  "eye-off": [
+    ...marks.eye,
+    p("M2 11 L11 2 L14 5 L5 14 Z"),
+    p("M3.5 12.5 L12.5 3.5"),
+  ],
+  "volume-off": [
+    marks.volume[0]!,
+    p("M2 11 L11 2 L14 5 L5 14 Z"),
+    p("M3.5 12.5 L12.5 3.5"),
+  ],
+  "mic-off": [
+    ...marks.mic,
+    p("M2 11 L11 2 L14 5 L5 14 Z"),
+    p("M3.5 12.5 L12.5 3.5"),
+  ],
+  "wifi-off": [
+    ...marks.wifi.slice(0, 2),
+    marks.wifi[3]!,
+    p("M2 11 L11 2 L14 5 L5 14 Z"),
+    p("M3.5 12.5 L12.5 3.5"),
+  ],
 };
+
+/** At 12px, two open slots survive rasterization better than three fine cuts. */
+export const smallFilledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
+  trash: [
+    p("M4 4 H12"),
+    p("M6.25 4 V2.75 H9.75 V4"),
+    p("M4.5 5.5 H11.5 V13 H4.5 Z"),
+    r(5.75, 7.25, 1.5, 4),
+    r(8.75, 7.25, 1.5, 4),
+  ],
+};
+
+export const smallFilledCutouts: FilledCutouts = { trash: [3, 4] };
 
 /**
  * Negative-space details for the filled family. These are punched through the
@@ -682,6 +723,9 @@ export const filledCutouts: FilledCutouts = {
   timer: [3],
   eye: [1],
   "eye-off": [1, 2],
+  "volume-off": [1],
+  "mic-off": [4],
+  "wifi-off": [3],
   "credit-card": [1],
   tag: [1],
   package: [1, 2],

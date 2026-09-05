@@ -1,0 +1,4 @@
+/* ── canvas-controls: generated from packages/react/src/components/canvas-controls.tsx ── */
+.rs-canvas-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;color:var(--text)}
+.rs-canvas-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem}
+.rs-canvas-zoom{min-width:3.75rem;text-align:center;font-size:0.8125rem;font-variant-numeric:tabular-nums}

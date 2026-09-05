@@ -1,0 +1,9 @@
+/* ── tree-view: generated from packages/react/src/components/tree-view.tsx ── */
+.rs-tree-view{list-style-type:none;margin:0;padding:0;color:var(--text);min-width:0;width:100%}
+.rs-tree-view-group{list-style-type:none;margin:0;padding-inline-start:1rem}
+.rs-tree-view-item{display:flex;align-items:center;gap:0.5rem;min-height:var(--hit);min-width:var(--hit);padding-inline:0.75rem;box-sizing:border-box;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:-2px;overflow-wrap:anywhere}
+.rs-tree-view-item:focus-visible{outline-width:2px;outline-style:solid}
+.rs-tree-view-selected{background-color:var(--control-fill);font-weight:600}
+.rs-tree-view-disabled{color:var(--text-secondary);cursor:not-allowed}
+.rs-tree-view-spacer{width:var(--hit);flex-shrink:0}
+.rs-tree-view-disclosure{display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer;padding:0}

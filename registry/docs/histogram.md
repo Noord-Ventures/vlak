@@ -96,6 +96,7 @@ Forwards `ref` to the `HTMLDivElement`.
 ## Accessibility
 
 - A focusable, named plot with a visually hidden table of label and count per bin.
+- Counts must be finite and non-negative; invalid bins are excluded, and an empty dataset is announced.
 
 ## Classes
 

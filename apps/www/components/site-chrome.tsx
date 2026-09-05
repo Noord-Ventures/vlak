@@ -23,8 +23,7 @@ function applyScheme(scheme: Scheme) {
   const dark =
     scheme === "dark" ||
     (scheme === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-  if (dark) document.documentElement.dataset.theme = "dark";
-  else delete document.documentElement.dataset.theme;
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
 }
 
 function applyGrid(grid: GridPref) {

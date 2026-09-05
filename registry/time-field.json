@@ -1,0 +1,85 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "time-field",
+  "type": "registry:component",
+  "title": "Time field",
+  "description": "Edits a time using the platform's localized time control with native bounds and second-based steps.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/time-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Input } from \"./input\";\n\nexport interface TimeFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\"> {\n  /** A 24-hour HTML time value, HH:mm or HH:mm:ss. The browser localizes editing. */\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  label?: React.ReactNode;\n  hint?: React.ReactNode;\n  error?: React.ReactNode;\n}\n\nconst styles = stylex.create({ input: { minWidth: 0, fontVariantNumeric: \"tabular-nums\", colorScheme: \"inherit\" } });\n\n/** The platform time editor, including its locale, keyboard and step validation. */\nexport const TimeField = React.forwardRef<HTMLInputElement, TimeFieldProps>(function TimeField({\n  value, defaultValue = \"\", onValueChange, className, style, ...props\n}, ref) {\n  const [current, setValue, inputRef] = useInputValue<string, HTMLInputElement>(value, defaultValue, onValueChange);\n  const mergedRef = useMergedRefs(ref, inputRef);\n  const sx = rs([\"rs-time-field\", className], styles.input);\n  return <Input {...props} ref={mergedRef} type=\"time\" value={current} className={sx.className} style={{ ...sx.style, ...style }} onChange={(event) => setValue(event.currentTarget.value)} />;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/time-field.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/time-field.css",
+      "content": "/* ── time-field: generated from packages/react/src/components/time-field.tsx ── */\n.rs-time-field{min-width:0;font-variant-numeric:tabular-nums;color-scheme:inherit}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/time-field.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-time-field"
+      ],
+      "snippet": "<label>Start time<input class=\"rs-input rs-time-field\" type=\"time\" name=\"start-time\" value=\"09:30\" min=\"09:00\" max=\"18:00\" step=\"900\" /></label>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "TimeField",
+        "Time input",
+        "Time picker"
+      ],
+      "example": "import { TimeField } from \"@noorddev/vlak-react\";\n\n<TimeField label=\"Start time\" name=\"start-time\" defaultValue=\"09:30\" min=\"09:00\" max=\"18:00\" step={900} hint=\"Appointments start every 15 minutes\" />",
+      "usage": {
+        "use": [
+          "A time of day with browser-native locale and keyboard behavior.",
+          "Minutes or seconds, with the native step measured in seconds."
+        ],
+        "avoid": [
+          "An elapsed duration; use NumberField with units.",
+          "A calendar date; use DatePicker."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, arrow keys",
+          "does": "Uses the browser's time segment navigation and native stepping."
+        },
+        {
+          "keys": "Typing",
+          "does": "Edits the active hour, minute, or second segment according to the platform."
+        }
+      ],
+      "a11y": [
+        "Wraps Input, preserving label, hint, error, native form attributes, disabled/readOnly and the forwarded input ref.",
+        "Values use HH:mm or HH:mm:ss; the visible editor follows the browser's locale and 12/24-hour preference.",
+        "No date or time-zone conversion is performed. Controlled/uncontrolled state and form reset are supported."
+      ]
+    }
+  }
+}

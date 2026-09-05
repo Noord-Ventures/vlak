@@ -1,0 +1,101 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "media-player",
+  "type": "registry:component",
+  "title": "Media player",
+  "description": "Connects native audio or video to playback, seeking, captions, speed, volume, and full screen.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/slider.json",
+    "https://vlak.dev/r/native-select.json",
+    "https://vlak.dev/r/playback-controls.json",
+    "https://vlak.dev/r/media-scrubber.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/media-player.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\nimport { NativeSelect } from \"./native-select\";\nimport { Slider } from \"./slider\";\nimport { PlaybackControls } from \"./playback-controls\";\nimport { MediaScrubber } from \"./media-scrubber\";\n\nexport interface MediaTrack { src: string; srcLang: string; label: string; default?: boolean }\nexport interface MediaPlayerProps extends React.HTMLAttributes<HTMLDivElement> {\n  src: string;\n  title: string;\n  kind?: \"audio\" | \"video\";\n  poster?: string;\n  preload?: \"none\" | \"metadata\" | \"auto\";\n  tracks?: readonly MediaTrack[];\n  transcript?: React.ReactNode;\n  onPlayingChange?: (playing: boolean) => void;\n  onTimeChange?: (seconds: number) => void;\n}\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, display: \"flex\", flexDirection: \"column\", gap: \"1rem\" },\n  media: { display: \"block\", width: \"100%\", maxHeight: \"32rem\", backgroundColor: vlak.controlFill },\n  heading: { margin: 0, fontSize: \"1rem\", fontWeight: 600, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  controls: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.75rem\" },\n  action: { width: \"auto\", paddingInline: \"0.75rem\", minWidth: vlak.hit, minHeight: vlak.hit },\n  volume: { flex: \"0 1 8rem\", minWidth: \"5rem\" },\n  status: { margin: 0, fontSize: \"0.875rem\", color: vlak.gray, lineHeight: 1.45 },\n  transcript: { lineHeight: 1.45, maxWidth: \"66ch\" },\n  summary: { minHeight: vlak.hit, cursor: \"pointer\", display: \"flex\", alignItems: \"center\", fontWeight: 500, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n});\n\n/** Native media with Vlak transport, seeking, volume, captions, and recoverable loading errors. */\nexport const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(function MediaPlayer({ src, title, kind = \"video\", poster, preload = \"metadata\", tracks = [], transcript, onPlayingChange, onTimeChange, className, style, ...props }, ref) {\n  const mediaRef = React.useRef<HTMLMediaElement>(null);\n  const containerRef = React.useRef<HTMLDivElement>(null);\n  const mergedRef = useMergedRefs(mediaRef, ref);\n  const [hydrated, setHydrated] = React.useState(false);\n  const [playing, setPlaying] = React.useState(false);\n  const [position, setPosition] = React.useState(0);\n  const [duration, setDuration] = React.useState(0);\n  const [volume, setVolume] = React.useState(1);\n  const [muted, setMuted] = React.useState(false);\n  const [status, setStatus] = React.useState(\"\");\n  const [failed, setFailed] = React.useState(false);\n  const [captions, setCaptions] = React.useState(() => String(tracks.findIndex(track => track.default)));\n  const [canFullscreen, setCanFullscreen] = React.useState(false);\n  const [speed, setSpeed] = React.useState(1);\n  const [buffered, setBuffered] = React.useState(0);\n  const headingId = React.useId();\n  React.useEffect(() => { setHydrated(true); setCanFullscreen(typeof containerRef.current?.requestFullscreen === \"function\"); }, []);\n  React.useEffect(() => { setPlaying(false); setPosition(0); setDuration(0); setBuffered(0); setFailed(false); setStatus(\"\"); }, [src]);\n  const captionsKey = tracks.map(track => `${track.src}:${Boolean(track.default)}`).join(\"\\n\");\n  const defaultCaptions = String(tracks.findIndex(track => track.default));\n  React.useEffect(() => {\n    setCaptions(defaultCaptions);\n    const list = mediaRef.current?.textTracks;\n    if (list) for (let index = 0; index < list.length; index++) list[index]!.mode = index === Number(defaultCaptions) ? \"showing\" : \"disabled\";\n  }, [src, captionsKey, defaultCaptions]);\n  const applyCaptions = (selected: string) => {\n    const list = mediaRef.current?.textTracks;\n    if (list) for (let index = 0; index < list.length; index++) list[index]!.mode = index === Number(selected) ? \"showing\" : \"disabled\";\n  };\n  const toggle = async (next: boolean) => {\n    const media = mediaRef.current;\n    if (!media) return;\n    setFailed(false); setStatus(\"\");\n    if (!next) { media.pause(); return; }\n    try { await media.play(); } catch { setStatus(\"Playback could not start. Try Play again.\"); }\n  };\n  const root = rs([\"rs-media-player\", className], styles.root);\n  const media = rs([\"rs-media-player-media\"], styles.media);\n  const heading = rs([\"rs-media-player-title\"], styles.heading);\n  const controls = rs([\"rs-media-player-controls\"], styles.controls);\n  const action = rs([\"rs-media-player-action\"], styles.action);\n  const volumeStyle = rs([\"rs-media-player-volume\"], styles.volume);\n  const message = rs([\"rs-media-player-status\"], styles.status);\n  const transcriptStyle = rs([\"rs-media-player-transcript\"], styles.transcript);\n  const summary = rs([\"rs-media-player-summary\"], styles.summary);\n  const shared = {\n    ...media, ref: mergedRef, src, preload, controls: !hydrated, \"aria-label\": title,\n    onPlay: () => { setPlaying(true); onPlayingChange?.(true); setStatus(\"\"); },\n    onPause: () => { setPlaying(false); onPlayingChange?.(false); },\n    onEnded: () => { setPlaying(false); onPlayingChange?.(false); },\n    onTimeUpdate: (event: React.SyntheticEvent<HTMLMediaElement>) => { setPosition(event.currentTarget.currentTime); onTimeChange?.(event.currentTarget.currentTime); },\n    onDurationChange: (event: React.SyntheticEvent<HTMLMediaElement>) => setDuration(event.currentTarget.duration),\n    onLoadedMetadata: (event: React.SyntheticEvent<HTMLMediaElement>) => { setDuration(event.currentTarget.duration); setFailed(false); setStatus(\"\"); applyCaptions(captions); },\n    onWaiting: () => setStatus(\"Buffering media…\"),\n    onCanPlay: () => setStatus(\"\"),\n    onVolumeChange: (event: React.SyntheticEvent<HTMLMediaElement>) => { setVolume(event.currentTarget.volume); setMuted(event.currentTarget.muted); },\n    onRateChange: (event: React.SyntheticEvent<HTMLMediaElement>) => setSpeed(event.currentTarget.playbackRate),\n    onProgress: (event: React.SyntheticEvent<HTMLMediaElement>) => { const ranges = event.currentTarget.buffered; setBuffered(ranges.length ? ranges.end(ranges.length - 1) : 0); },\n    onError: () => { setFailed(true); setPlaying(false); setStatus(\"The media could not load. Check the connection and retry.\"); },\n  };\n  return <div ref={containerRef} role=\"region\" aria-labelledby={headingId} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <h3 {...heading} id={headingId}>{title}</h3>\n    {kind === \"video\" ? <video {...shared} poster={poster} playsInline>{tracks.map(track => <track key={track.src} kind=\"captions\" {...track} />)}</video> : <audio {...shared} />}\n    {hydrated && <>\n      <MediaScrubber value={position} duration={duration} buffered={buffered} disabled={failed} onValueChange={next => { const element = mediaRef.current; if (element && Number.isFinite(duration)) { element.currentTime = next; setPosition(next); onTimeChange?.(next); } }} />\n      <div {...controls}>\n        <PlaybackControls playing={playing} disabled={failed} onPlayingChange={next => { void toggle(next); }} />\n        <Button {...action} variant=\"ghost\" aria-label={muted ? \"Unmute\" : \"Mute\"} onClick={() => { if (mediaRef.current) { mediaRef.current.muted = !muted; setMuted(!muted); } }}><Icon name={muted ? \"volume-off\" : \"volume\"} /></Button>\n        <div {...volumeStyle}><Slider aria-label=\"Volume\" min={0} max={1} step={0.05} value={muted ? 0 : volume} onValueChange={next => { if (mediaRef.current) { mediaRef.current.volume = next; mediaRef.current.muted = false; setVolume(next); setMuted(false); } }} /></div>\n        <NativeSelect aria-label=\"Playback speed\" value={String(speed)} onChange={event => { const next = Number(event.target.value); if (mediaRef.current) mediaRef.current.playbackRate = next; setSpeed(next); }}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => <option key={rate} value={String(rate)}>{rate}× speed</option>)}</NativeSelect>\n        {kind === \"video\" && tracks.length > 0 && <NativeSelect aria-label=\"Captions\" value={captions} onChange={event => { setCaptions(event.target.value); applyCaptions(event.target.value); }}><option value=\"-1\">Captions off</option>{tracks.map((track, index) => <option key={track.src} value={String(index)}>{track.label}</option>)}</NativeSelect>}\n        {kind === \"video\" && canFullscreen && <Button {...action} variant=\"ghost\" aria-label=\"Full screen\" onClick={() => { void containerRef.current?.requestFullscreen().catch(() => setStatus(\"Full screen is unavailable in this browser.\")); }}><Icon name=\"expand\" /></Button>}\n      </div>\n    </>}\n    <p {...message} role=\"status\">{status}</p>\n    {failed && <Button {...action} variant=\"ghost\" onClick={() => { setFailed(false); setStatus(\"Loading media…\"); mediaRef.current?.load(); }}>Retry media</Button>}\n    {transcript && <details {...transcriptStyle}><summary {...summary}>Transcript</summary>{transcript}</details>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/media-player.tsx"
+    },
+    {
+      "path": "vlak/styles/media-player.css",
+      "content": "/* ── media-player: generated from packages/react/src/components/media-player.tsx ── */\n.rs-media-player{width:100%;min-width:0;color:var(--text);display:flex;flex-direction:column;gap:1rem}\n.rs-media-player-media{display:block;width:100%;max-height:32rem;background-color:var(--control-fill)}\n.rs-media-player-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45;overflow-wrap:anywhere}\n.rs-media-player-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem}\n.rs-media-player-action{width:auto;padding-inline:0.75rem;min-width:var(--hit);min-height:var(--hit)}\n.rs-media-player-volume{flex:0 1 8rem;min-width:5rem}\n.rs-media-player-status{margin:0;font-size:0.875rem;color:var(--text-secondary);line-height:1.45}\n.rs-media-player-transcript{line-height:1.45;max-width:66ch}\n.rs-media-player-summary{min-height:var(--hit);cursor:pointer;display:flex;align-items:center;font-weight:500}\n.rs-media-player-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/media-player.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-media-player",
+        "rs-media-player-media",
+        "rs-media-player-title",
+        "rs-media-player-controls",
+        "rs-media-player-action",
+        "rs-media-player-volume",
+        "rs-media-player-status",
+        "rs-media-player-transcript",
+        "rs-media-player-summary"
+      ],
+      "snippet": "<div class=\"rs-media-player\" role=\"region\" aria-label=\"Film\"><h3 class=\"rs-media-player-title\">Film</h3><video class=\"rs-media-player-media\" controls aria-label=\"Film\"><track kind=\"captions\" src=\"captions.vtt\" srclang=\"en\" label=\"English\" /></video></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "slider",
+        "native-select",
+        "playback-controls",
+        "media-scrubber",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "MediaPlayer",
+        "Audio player",
+        "Video player"
+      ],
+      "example": "import { MediaPlayer } from \"@noorddev/vlak-react\";\n\n<MediaPlayer src=\"/film.mp4\" title=\"A closer look\" tracks={[{ src: \"/film-en.vtt\", srcLang: \"en\", label: \"English\", default: true }]} transcript={<p>A text transcript of the film.</p>} />",
+      "usage": {
+        "use": [
+          "Playing an actual audio or video source with consistent controls.",
+          "Media with captions and a supplied text transcript."
+        ],
+        "avoid": [
+          "DRM, adaptive streaming protocols, or a video editing timeline."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves through transport, seeking, volume, speed, captions, and available full-screen actions."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates buttons; range and select controls retain native keyboard behavior."
+        },
+        {
+          "keys": "Escape",
+          "does": "Exits browser full screen."
+        }
+      ],
+      "a11y": [
+        "Native controls remain available before hydration.",
+        "Supply caption tracks for spoken video and a transcript where appropriate.",
+        "Load and play failures are announced; retry preserves access to the player.",
+        "Full screen is shown only when the browser supplies the API."
+      ]
+    }
+  }
+}

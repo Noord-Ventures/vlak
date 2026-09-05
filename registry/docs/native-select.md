@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/native-select.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<select class="rs-native-select"><option>Alkmaar</option><option>Amsterdam</option><option>Rotterdam</option></select>
+<div class="rs-native-select-control"><select class="rs-native-select" aria-label="City"><option>Alkmaar</option><option>Amsterdam</option><option>Rotterdam</option></select><svg class="rs-native-select-icon rs-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" transform="rotate(90 8 8)" vector-effect="non-scaling-stroke" /></svg></div>
 ```
 
 ## Example
@@ -89,10 +89,10 @@ Forwards `ref` to the `HTMLSelectElement`.
 
 ## Classes
 
-`rs-native-select`, `rs-native-select-invalid`, `rs-native-select-field`, `rs-native-select-label`
+`rs-native-select`, `rs-native-select-invalid`, `rs-native-select-field`, `rs-native-select-label`, `rs-native-select-control`, `rs-native-select-icon`
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [icons](icons.md).  
 React: `packages/react/src/components/native-select.tsx`  
 CSS: `packages/core/css/components/native-select.css`

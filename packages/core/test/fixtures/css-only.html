@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CSS-only component verification</title>
+  <link rel="stylesheet" href="../../css/vlak.css">
+  <body>
+    <main style="max-width: 20rem; margin: 2rem auto; padding: 1rem">
+      <h1>CSS-only controls</h1>
+      <p>No documentation reset or React stylesheet is loaded.</p>
+      <button type="button" class="rs-toggle" aria-pressed="false">Unselected</button>
+      <button type="button" class="rs-toggle rs-toggle-pressed" aria-pressed="true">Selected</button>
+      <div class="rs-field rs-textarea-field" style="margin-block: 1rem">
+        <label class="rs-field-label rs-textarea-label" for="draft">Draft</label>
+        <textarea class="rs-textarea" id="draft">A contained field, with a visible boundary.</textarea>
+      </div>
+      <button type="button" class="rs-dropdown" aria-haspopup="listbox" aria-expanded="false">Alkmaar</button>
+    </main>
+  </body>
+</html>

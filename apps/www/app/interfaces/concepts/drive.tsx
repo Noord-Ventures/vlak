@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Button, ButtonGroup, Card, CardLabel, Icon, Progress, ToggleGroup } from "@noorddev/vlak-react";
+import { Button, Card, CardLabel, Icon, Progress, ToggleGroup, Metric, NumberField, PlaybackControls, MediaScrubber, ConnectionStatus } from "@noorddev/vlak-react";
 
 type DriveMode = "vehicle" | "journey" | "energy";
 
@@ -21,7 +21,7 @@ export function Drive() {
   const [scheduled, setScheduled] = React.useState(false);
   const [connected, setConnected] = React.useState(true);
   const [chargeLimit, setChargeLimit] = React.useState(90);
-  const [playhead, setPlayhead] = React.useState(38);
+  const [playhead, setPlayhead] = React.useState(90);
 
   function toggleConnection() {
     setConnected((value) => !value);
@@ -33,7 +33,7 @@ export function Drive() {
       <header>
         <span className="cx-ev-time">09:41</span>
         <b>Vehicle systems</b>
-        <span className="cx-ev-connection"><span>18°C</span><Icon name="wifi" size={16} /><span>{connected ? "Connected" : "Offline"}</span></span>
+        <span className="cx-ev-connection"><span>18°C</span><ConnectionStatus state={connected ? "connected" : "offline"} /></span>
       </header>
 
       <section className="cx-ev-vehicle" aria-label="Electric vehicle concept">
@@ -89,33 +89,20 @@ export function Drive() {
 
       <section className="cx-ev-panels" aria-label="Vehicle controls">
         <Card className="cx-ev-card">
-          <CardLabel>Range</CardLabel>
-          <div className="cx-ev-card-content">
-            <div className="cx-ev-value"><strong>386</strong><span>km</span></div>
-            <span className="cx-ev-caption">{navigating ? "355 km after arrival" : "Estimated range"}</span>
-            <span className="cx-ev-footnote"><Icon name="compass" size={12} />{navigating ? "31 km to destination" : "Ready for your next journey"}</span>
-          </div>
+          <Metric label="Range" value={386} unit="km" description={navigating ? "355 km after arrival" : "Estimated range"} comparison={<span className="cx-ev-footnote"><Icon name="compass" size={12} />{navigating ? "31 km to destination" : "Ready for your next journey"}</span>} />
         </Card>
 
         <Card className="cx-ev-card">
-          <CardLabel>Battery</CardLabel>
-          <div className="cx-ev-card-content">
-            <div className="cx-ev-value"><strong>84</strong><span>%</span></div>
+          <Metric label="Battery" value={84} unit="%" />
+          <div className="cx-ev-battery-detail">
             <Progress className="cx-ev-battery" value={84} aria-label="Battery charge" />
             <Button variant="ghost" className="cx-ev-text-control" onClick={() => setChargeLimit((value) => value === 90 ? 100 : 90)} aria-label={`Charge limit ${chargeLimit} percent. Change to ${chargeLimit === 90 ? 100 : 90} percent`}>Limit {chargeLimit}%<Icon name="chevron-right" size={12} /></Button>
           </div>
         </Card>
 
         <Card className="cx-ev-card">
-          <CardLabel>Cabin</CardLabel>
+          <NumberField className="cx-ev-cabin-field" label="Cabin" value={temp} min={16} max={28} step={1} unit="°" controlsPlacement="stacked" incrementLabel="Raise temperature" decrementLabel="Lower temperature" onValueChange={(value) => setTemp(Math.min(28, Math.max(16, value ?? 20)))} />
           <div className="cx-ev-card-content">
-            <div className="cx-ev-temperature">
-              <div className="cx-ev-value"><strong aria-live="polite">{temp}</strong><span>°</span></div>
-              <ButtonGroup className="cx-ev-temp-controls" aria-label="Cabin temperature">
-                <Button variant="ghost" aria-label="Raise temperature" disabled={temp >= 28} onClick={() => setTemp((value) => value + 1)}><Icon name="plus" size={16} /></Button>
-                <Button variant="ghost" aria-label="Lower temperature" disabled={temp <= 16} onClick={() => setTemp((value) => value - 1)}><Icon name="minus" size={16} /></Button>
-              </ButtonGroup>
-            </div>
             <span className="cx-ev-caption">Climate on · both zones</span>
             <span className="cx-ev-footnote"><Icon name="sun" size={12} />Comfort temperature</span>
           </div>
@@ -126,14 +113,10 @@ export function Drive() {
           <div className="cx-ev-card-content">
             <div className="cx-ev-track"><b>Fortress Down</b><span>Loathe</span></div>
             <div className="cx-ev-player">
-              <ButtonGroup className="cx-ev-playback-controls" aria-label="Playback controls">
-                <Button variant="ghost" aria-label="Restart track" disabled={!connected} onClick={() => setPlayhead(0)}><Icon name="skip-back" size={16} /></Button>
-                <Button className="cx-ev-play" aria-label={playing ? "Pause playback" : "Resume playback"} disabled={!connected} aria-pressed={playing && connected} onClick={() => setPlaying((value) => !value)}><Icon name={playing && connected ? "pause" : "play"} size={16} /></Button>
-                <Button variant="ghost" aria-label="Skip ahead" disabled={!connected} onClick={() => setPlayhead((value) => Math.min(100, value + 10))}><Icon name="skip-forward" size={16} /></Button>
-              </ButtonGroup>
+              <PlaybackControls playing={playing && connected} disabled={!connected} onPlayingChange={setPlaying} previousLabel="Restart track" nextLabel="Skip ahead" onPrevious={() => setPlayhead(0)} onNext={() => setPlayhead((value) => Math.min(237, value + 15))} />
               <span className="cx-ev-audio-level" role="img" aria-label={playing && connected ? "Playing" : "Paused"}><i /><i /><i /><i /></span>
             </div>
-            <Progress className="cx-ev-playhead" value={playhead} aria-label="Track progress" />
+            <MediaScrubber className="cx-ev-playhead" duration={237} value={playhead} onValueChange={setPlayhead} disabled={!connected} label="Track position" />
             <Button variant="ghost" className="cx-ev-text-control" onClick={toggleConnection} aria-label={connected ? "Disconnect Mara’s phone" : "Connect Mara’s phone"}><Icon name="smartphone" size={12} />{connected ? "Mara’s phone" : "Connect phone"}</Button>
           </div>
         </Card>

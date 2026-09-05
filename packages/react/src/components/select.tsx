@@ -5,6 +5,7 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
+import { useOverlayPosition } from "../use-overlay-position";
 import { Icon } from "./icon";
 import { menuStyles, typeAheadIndex } from "./dropdown-menu";
 
@@ -73,6 +74,8 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(function Sel
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const activeRef = React.useRef<HTMLDivElement>(null);
   const [open, setOpen] = React.useState(false);
+  const panelRef = React.useRef<HTMLDivElement>(null);
+  const placement = useOverlayPosition(open, panelRef, triggerRef);
   const [inner, setInner] = React.useState(defaultValue);
   const isControlled = value !== undefined;
   const current = isControlled ? value : inner;
@@ -244,7 +247,8 @@ export const Select = React.forwardRef<HTMLDivElement, SelectProps>(function Sel
           tabIndex={-1}
           aria-labelledby={ariaLabelledby ?? triggerId}
           className={menu.className}
-          style={menu.style}
+          ref={panelRef}
+          style={{ ...menu.style, ...placement }}
           onMouseDown={(e) => e.preventDefault()}
         >
           {options.map((option, index) => {

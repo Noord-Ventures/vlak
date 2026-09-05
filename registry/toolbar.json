@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toolbar",
+  "type": "registry:component",
+  "title": "Toolbar",
+  "description": "Groups actions behind one Tab stop with arrow-key navigation.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/toolbar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon, type IconName } from \"./icons\";\n\nexport interface ToolbarAction { id: string; label: string; icon?: IconName; disabled?: boolean; pressed?: boolean; onAction: () => void }\nexport interface ToolbarProps extends React.HTMLAttributes<HTMLDivElement> {\n  label: string;\n  actions: ToolbarAction[];\n  orientation?: \"horizontal\" | \"vertical\";\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", color: vlak.ink },\n  vertical: { flexDirection: \"column\", alignItems: \"stretch\" },\n  pressed: { fontWeight: 600 },\n});\n\n/** Named action collection with one Tab stop and roving keyboard focus. */\nexport const Toolbar = React.forwardRef<HTMLDivElement, ToolbarProps>(function Toolbar({ label, actions, orientation = \"horizontal\", className, style, onKeyDown, ...props }, ref) {\n  const [focused, setFocused] = React.useState<string>();\n  const enabled = actions.filter(action => !action.disabled);\n  const current = enabled.some(action => action.id === focused) ? focused : enabled[0]?.id;\n  const buttons = React.useRef(new Map<string, HTMLButtonElement>());\n  const vertical = orientation === \"vertical\";\n  const root = rs([\"rs-toolbar\", className, vertical && \"rs-toolbar-vertical\"], styles.root, vertical && styles.vertical);\n  const pressed = rs([\"rs-toolbar-pressed\"], styles.pressed);\n  return <div ref={ref} role=\"toolbar\" aria-label={label} aria-orientation={orientation} {...props} className={root.className} style={{ ...root.style, ...style }} onKeyDown={event => {\n    onKeyDown?.(event); if (event.defaultPrevented || !enabled.length) return;\n    const index = enabled.findIndex(action => action.id === current);\n    const rtl = getComputedStyle(event.currentTarget).direction === \"rtl\";\n    const nextKey = vertical ? \"ArrowDown\" : rtl ? \"ArrowLeft\" : \"ArrowRight\";\n    const previousKey = vertical ? \"ArrowUp\" : rtl ? \"ArrowRight\" : \"ArrowLeft\";\n    const next = event.key === \"Home\" ? 0 : event.key === \"End\" ? enabled.length - 1 : event.key === nextKey ? (index + 1) % enabled.length : event.key === previousKey ? (index - 1 + enabled.length) % enabled.length : -1;\n    if (next < 0) return; event.preventDefault(); const action = enabled[next]; if (action) { setFocused(action.id); buttons.current.get(action.id)?.focus(); }\n  }}>{actions.map(action => <Button key={action.id} ref={element => { if (element) buttons.current.set(action.id, element); else buttons.current.delete(action.id); }} variant={action.pressed ? \"primary\" : \"ghost\"} style={{ width: \"auto\", ...(action.pressed ? pressed.style : {}) }} className={action.pressed ? pressed.className : undefined} disabled={action.disabled} tabIndex={action.id === current ? 0 : -1} aria-pressed={action.pressed} onFocus={() => setFocused(action.id)} onClick={action.onAction}>{action.icon && <Icon name={action.icon} />}{action.label}</Button>)}</div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/toolbar.tsx"
+    },
+    {
+      "path": "vlak/styles/toolbar.css",
+      "content": "/* ── toolbar: generated from packages/react/src/components/toolbar.tsx ── */\n.rs-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text)}\n.rs-toolbar-vertical{flex-direction:column;align-items:stretch}\n.rs-toolbar-pressed{font-weight:600}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/toolbar.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "actions",
+      "classes": [
+        "rs-toolbar",
+        "rs-toolbar-vertical",
+        "rs-toolbar-pressed"
+      ],
+      "snippet": "<div class=\"rs-toolbar\" role=\"toolbar\" aria-label=\"Editing\"><button class=\"rs-btn-ghost\" tabindex=\"0\">Copy</button><button class=\"rs-btn-ghost\" tabindex=\"-1\">Undo</button></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Toolbar"
+      ],
+      "example": "import { Toolbar } from \"@noorddev/vlak-react\";\n\n<Toolbar label=\"Editing\" actions={[{ id: \"copy\", label: \"Copy\", icon: \"copy\", onAction: () => {} }, { id: \"undo\", label: \"Undo\", icon: \"undo\", onAction: () => {} }]} />",
+      "usage": {
+        "use": [
+          "Editor commands and collections of related actions."
+        ],
+        "avoid": [
+          "A simple joined visual group with independent Tab stops; use ButtonGroup."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, arrows, Home, End, Enter, Space",
+          "does": "Tab enters once; arrows and Home/End move between enabled actions; Enter/Space activates."
+        }
+      ],
+      "a11y": [
+        "Exposes a named toolbar with orientation and pressed state. Disabled actions are skipped during roving navigation."
+      ]
+    }
+  }
+}

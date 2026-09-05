@@ -1,0 +1,9 @@
+/* ── number-field: generated from packages/react/src/components/number-field.tsx ── */
+.rs-number-field{display:grid;gap:0.5rem;min-width:0}
+.rs-number-field-label{color:var(--text-secondary);font-size:var(--control-label)}
+.rs-number-field-row{display:flex;align-items:center;gap:0.5rem;min-width:0}
+.rs-number-field-input{min-width:0;flex:1 1 5rem;font-variant-numeric:tabular-nums}
+.rs-number-field-unit{color:var(--text-secondary);font-size:var(--control-fs)}
+.rs-number-field-controls{display:flex;gap:0.5rem;flex-shrink:0}
+.rs-number-field-controls-stacked{flex-direction:column}
+.rs-number-field-action{width:var(--hit);min-width:var(--hit);min-height:var(--hit);padding-inline:0;flex:0 0 auto}

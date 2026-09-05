@@ -117,11 +117,11 @@ export const dialogStyles = stylex.create({
     alignItems: "center",
     justifyContent: "center",
     width: {
-      default: "2rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     height: {
-      default: "2rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     marginTop: {

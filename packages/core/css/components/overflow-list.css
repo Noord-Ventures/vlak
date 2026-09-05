@@ -1,0 +1,5 @@
+/* ── overflow-list: generated from packages/react/src/components/overflow-list.tsx ── */
+.rs-overflow-list{position:relative;display:flex;align-items:center;gap:0.5rem;width:100%;min-width:0;color:var(--text)}
+.rs-overflow-list-measure{position:absolute;visibility:hidden;pointer-events:none;display:flex;gap:0.5rem;width:max-content;inset-block-start:0;inset-inline-start:0}
+.rs-overflow-list-sample{display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;border-width:1px;border-style:solid;padding-inline:1.375rem;font-family:inherit;font-size:var(--control-fs);letter-spacing:-0.01em;white-space:nowrap}
+.rs-overflow-list-more{flex-shrink:0;min-width:0}

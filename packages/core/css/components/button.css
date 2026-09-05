@@ -1,5 +1,5 @@
 /* ── button: generated from packages/react/src/components/button.tsx ── */
-.rs-btn-ghost,.rs-btn-primary{box-sizing:border-box;font-family:inherit;letter-spacing:-0.01em;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;height:var(--control-h);font-size:var(--control-fs);padding-inline:1.375rem;border-width:1px;border-style:solid;border-radius:var(--radius-sm);transition:var(--transition);opacity:1}
+.rs-btn-ghost,.rs-btn-primary{box-sizing:border-box;min-width:var(--hit);font-family:inherit;letter-spacing:-0.01em;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;height:var(--control-h);font-size:var(--control-fs);padding-inline:1.375rem;border-width:1px;border-style:solid;border-radius:var(--radius-sm);transition:var(--transition);opacity:1}
 .rs-btn-ghost:disabled,.rs-btn-primary:disabled{cursor:not-allowed;opacity:0.4}
 .rs-btn-ghost:hover,.rs-btn-primary:hover{opacity:0.85}
 .rs-btn-ghost:focus-visible,.rs-btn-primary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
@@ -13,9 +13,9 @@
 .rs-btn-ghost:disabled{background-color:transparent;border-color:var(--divider)}
 @media (prefers-reduced-motion: reduce){.rs-btn-ghost{transition:none}}
 @media (forced-colors: active){.rs-btn-ghost{background-color:ButtonFace;color:ButtonText;border-color:ButtonText}.rs-btn-ghost:disabled{color:GrayText;border-color:GrayText}.rs-btn-ghost:hover{border-color:Highlight}}
-.rs-btn-sm{height:2.25rem;padding-inline:0.875rem;font-size:0.8125rem;min-width:6.5rem}
+.rs-btn-sm{height:var(--hit);padding-inline:0.875rem;font-size:0.8125rem;min-width:6.5rem}
 @media (max-width: 640px){.rs-btn-sm{height:var(--control-h);min-height:var(--hit);padding-inline:1rem;font-size:var(--control-fs);min-width:0}}
-.rs-btn-grouped{height:auto;border-width:0;border-radius:0;margin:0;min-width:0}
+.rs-btn-grouped{height:auto;min-height:var(--hit);border-width:0;border-radius:0;margin:0;min-width:0}
 .rs-btn-grouped:focus-visible{outline-offset:-2px}
 @media (max-width: 640px){.rs-btn-grouped{flex-grow:1;min-width:0}}
 .rs-btn-grouped-ghost{transition:var(--transition);background-color:var(--bg)}

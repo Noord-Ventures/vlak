@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "media-scrubber",
+  "type": "registry:component",
+  "title": "Media scrubber",
+  "description": "Seeks through media in seconds with elapsed time, buffering, chapters, and optional previews.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/slider.json",
+    "https://vlak.dev/r/native-select.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/media-scrubber.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Slider, type SliderProps } from \"./slider\";\nimport { NativeSelect } from \"./native-select\";\n\nexport interface MediaChapter { time: number; label: string }\nexport interface MediaScrubberProps extends Omit<SliderProps, \"min\" | \"max\"> {\n  duration: number;\n  label?: string;\n  showTime?: boolean;\n  /** Last buffered second. */\n  buffered?: number;\n  chapters?: readonly MediaChapter[];\n  /** Thumbnail or other visual preview for the pointed or focused second. */\n  preview?: (seconds: number) => React.ReactNode;\n}\n\n/** Elapsed media time, including hours when needed. Invalid duration is displayed as zero. */\nexport function formatMediaTime(seconds: number): string {\n  const total = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;\n  const hours = Math.floor(total / 3600);\n  const minutes = Math.floor(total / 60) % 60;\n  const rest = String(total % 60).padStart(2, \"0\");\n  return hours ? `${hours}:${String(minutes).padStart(2, \"0\")}:${rest}` : `${minutes}:${rest}`;\n}\n\nconst styles = stylex.create({\n  root: { display: \"flex\", flexDirection: \"column\", minWidth: 0, width: \"100%\", color: vlak.ink },\n  times: { display: \"flex\", justifyContent: \"space-between\", gap: \"1rem\", color: vlak.gray, fontSize: \"0.75rem\", fontVariantNumeric: \"tabular-nums\", lineHeight: 1.45 },\n  track: { position: \"relative\", display: \"flex\", flexDirection: \"column\" },\n  rail: { position: \"absolute\", top: \"calc(50% - 1px)\", insetInlineStart: 0, height: 2, width: \"100%\", backgroundColor: vlak.divider, pointerEvents: \"none\" },\n  buffered: { position: \"absolute\", top: \"calc(50% - 1px)\", insetInlineStart: 0, height: 2, backgroundColor: vlak.gray, pointerEvents: \"none\" },\n  slider: { backgroundColor: \"transparent\" },\n  preview: { position: \"absolute\", bottom: \"100%\", insetInlineStart: 0, maxWidth: \"12rem\", padding: \"0.5rem\", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, borderRadius: vlak.radiusSm, pointerEvents: \"none\", zIndex: 1 },\n  chapters: { marginTop: \"0.75rem\" },\n});\n\n/** A native range in seconds with elapsed and total time. The input remains a 44px target. */\nexport const MediaScrubber = React.forwardRef<HTMLInputElement, MediaScrubberProps>(function MediaScrubber({ value, defaultValue = 0, duration, label = \"Playback position\", showTime = true, step = 1, onValueChange, buffered = 0, chapters = [], preview, className, style, disabled, onFocus, onBlur, onPointerMove, onPointerLeave, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const end = Number.isFinite(duration) ? Math.max(0, duration) : 0;\n  const raw = value ?? inner;\n  const current = Math.min(end, Math.max(0, Number.isFinite(raw) ? raw : 0));\n  const [previewTime, setPreviewTime] = React.useState<number | null>(null);\n  const change = (next: number) => { const bounded = Math.min(end, Math.max(0, next)); if (value === undefined) setInner(bounded); onValueChange?.(bounded); if (previewTime !== null) setPreviewTime(bounded); };\n  const validChapters = chapters.filter(chapter => Number.isFinite(chapter.time) && chapter.time >= 0 && chapter.time <= end).slice().sort((a, b) => a.time - b.time);\n  let chapterIndex = -1;\n  validChapters.forEach((chapter, index) => { if (chapter.time <= current) chapterIndex = index; });\n  const root = rs([\"rs-media-scrubber\", className], styles.root);\n  const times = rs([\"rs-media-scrubber-times\"], styles.times);\n  const track = rs([\"rs-media-scrubber-track\"], styles.track);\n  const rail = rs([\"rs-media-scrubber-rail\"], styles.rail);\n  const buffer = rs([\"rs-media-scrubber-buffered\"], styles.buffered);\n  const slider = rs([\"rs-media-scrubber-slider\"], styles.slider);\n  const previewStyle = rs([\"rs-media-scrubber-preview\"], styles.preview);\n  const chapterStyle = rs([\"rs-media-scrubber-chapters\"], styles.chapters);\n  return <div className={root.className} style={{ ...root.style, ...style }}>\n    <div {...track}>\n      <span {...rail} aria-hidden=\"true\" /><span {...buffer} aria-hidden=\"true\" style={{ ...buffer.style, width: `${end ? Math.max(0, Math.min(100, (Number.isFinite(buffered) ? buffered : 0) / end * 100)) : 0}%` }} />\n      <Slider ref={ref} {...props} {...slider} min={0} max={end || 1} step={step} value={current} disabled={disabled || end === 0} aria-label={props[\"aria-label\"] ?? label} aria-valuetext={`${formatMediaTime(current)} of ${formatMediaTime(end)}`} onValueChange={change}\n        onFocus={event => { onFocus?.(event); setPreviewTime(current); }} onBlur={event => { onBlur?.(event); setPreviewTime(null); }}\n        onPointerMove={event => { onPointerMove?.(event); const box = event.currentTarget.getBoundingClientRect(); if (preview && box.width > 0) setPreviewTime(Math.min(end, Math.max(0, (event.clientX - box.left) / box.width * end))); }} onPointerLeave={event => { onPointerLeave?.(event); setPreviewTime(null); }} />\n      {preview && previewTime !== null && <div {...previewStyle} aria-hidden=\"true\">{preview(previewTime)}</div>}\n    </div>\n    {showTime && <div {...times} aria-hidden=\"true\"><span>{formatMediaTime(current)}</span><span>{formatMediaTime(end)}</span></div>}\n    {validChapters.length > 0 && <div {...chapterStyle}><NativeSelect aria-label=\"Chapter\" value={String(chapterIndex)} disabled={disabled || end === 0} onChange={event => { const chapter = validChapters[Number(event.target.value)]; if (chapter) change(chapter.time); }}><option value=\"-1\" disabled>Select a chapter</option>{validChapters.map((chapter, index) => <option key={`${chapter.time}-${chapter.label}`} value={String(index)}>{chapter.label} · {formatMediaTime(chapter.time)}</option>)}</NativeSelect></div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/media-scrubber.tsx"
+    },
+    {
+      "path": "vlak/styles/media-scrubber.css",
+      "content": "/* ── media-scrubber: generated from packages/react/src/components/media-scrubber.tsx ── */\n.rs-media-scrubber{display:flex;flex-direction:column;min-width:0;width:100%;color:var(--text)}\n.rs-media-scrubber-times{display:flex;justify-content:space-between;gap:1rem;color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45}\n.rs-media-scrubber-track{position:relative;display:flex;flex-direction:column}\n.rs-media-scrubber-rail{position:absolute;top:calc(50% - 1px);inset-inline-start:0;height:2px;width:100%;background-color:var(--divider);pointer-events:none}\n.rs-media-scrubber-buffered{position:absolute;top:calc(50% - 1px);inset-inline-start:0;height:2px;background-color:var(--text-secondary);pointer-events:none}\n.rs-media-scrubber-slider{background-color:transparent}\n.rs-media-scrubber-preview{position:absolute;bottom:100%;inset-inline-start:0;max-width:12rem;padding:0.5rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);pointer-events:none;z-index:1}\n.rs-media-scrubber-chapters{margin-top:0.75rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/media-scrubber.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-media-scrubber",
+        "rs-media-scrubber-times",
+        "rs-media-scrubber-track",
+        "rs-media-scrubber-rail",
+        "rs-media-scrubber-buffered",
+        "rs-media-scrubber-slider",
+        "rs-media-scrubber-preview",
+        "rs-media-scrubber-chapters"
+      ],
+      "snippet": "<div class=\"rs-media-scrubber\"><input type=\"range\" min=\"0\" max=\"240\" value=\"42\" aria-label=\"Playback position\" aria-valuetext=\"0:42 of 4:00\" /><div class=\"rs-media-scrubber-times\"><span>0:42</span><span>4:00</span></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "slider",
+        "native-select",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "MediaScrubber",
+        "Seek bar",
+        "Media timeline"
+      ],
+      "example": "import { MediaScrubber } from \"@noorddev/vlak-react\";\n\n<MediaScrubber value={position} duration={240} buffered={180} onValueChange={setPosition} chapters={[{ time: 0, label: \"Opening\" }, { time: 90, label: \"The detail\" }]} />",
+      "usage": {
+        "use": [
+          "A media timeline where values are seconds.",
+          "Chapter navigation or supplied thumbnail previews."
+        ],
+        "avoid": [
+          "An arbitrary numeric setting; use Slider."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Uses the native range input to seek within the duration."
+        },
+        {
+          "keys": "Tab",
+          "does": "Moves to the optional native chapter selector; selecting a chapter seeks to its start."
+        }
+      ],
+      "a11y": [
+        "The range announces elapsed and total time with aria-valuetext.",
+        "Unknown or invalid duration disables seeking.",
+        "Previews are visual supplements; the native range supplies the equivalent position text."
+      ]
+    }
+  }
+}

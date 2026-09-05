@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tree-view",
+  "type": "registry:component",
+  "title": "Tree view",
+  "description": "Navigates a hierarchy with expansion, single selection, and roving focus.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/tree-view.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Icon } from \"./icons\";\n\nexport interface TreeNode { id: string; label: string; disabled?: boolean; children?: TreeNode[] }\nexport interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLUListElement>, \"defaultValue\" | \"onSelect\"> {\n  nodes: TreeNode[];\n  label: string;\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  expanded?: string[];\n  defaultExpanded?: string[];\n  onExpandedChange?: (ids: string[]) => void;\n}\nconst styles = stylex.create({\n  root: { listStyleType: \"none\", margin: 0, padding: 0, color: vlak.ink, minWidth: 0, width: \"100%\" },\n  group: { listStyleType: \"none\", margin: 0, paddingInlineStart: \"1rem\" },\n  item: { display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", minHeight: vlak.hit, minWidth: vlak.hit, paddingInline: \"0.75rem\", boxSizing: \"border-box\", borderRadius: vlak.radiusSm, cursor: \"pointer\", outlineColor: vlak.ink, outlineOffset: -2, overflowWrap: \"anywhere\", \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\" } },\n  selected: { backgroundColor: vlak.controlFill, fontWeight: 600 },\n  disabled: { color: vlak.gray, cursor: \"not-allowed\" },\n  spacer: { width: vlak.hit, flexShrink: 0 },\n  disclosure: { display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", minWidth: vlak.hit, minHeight: vlak.hit, borderWidth: 0, borderRadius: vlak.radiusSm, backgroundColor: \"transparent\", color: vlak.ink, cursor: \"pointer\", padding: 0 },\n});\nfunction flatten(nodes: TreeNode[], open: Set<string>, parent?: string): Array<{ node: TreeNode; parent?: string }> {\n  return nodes.flatMap(node => [{ node, parent }, ...(node.children && open.has(node.id) ? flatten(node.children, open, node.id) : [])]);\n}\n\n/** Single selection and APG-style roving focus through a hierarchical collection. */\nexport const TreeView = React.forwardRef<HTMLUListElement, TreeViewProps>(function TreeView({ nodes, label, value, defaultValue, onValueChange, expanded, defaultExpanded = [], onExpandedChange, className, style, onKeyDown, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const [innerExpanded, setInnerExpanded] = React.useState(defaultExpanded);\n  const [focused, setFocused] = React.useState<string | undefined>(defaultValue);\n  const current = value ?? inner;\n  const open = new Set(expanded ?? innerExpanded);\n  const visible = flatten(nodes, open);\n  const active = visible.some(item => item.node.id === focused) ? focused : visible[0]?.node.id;\n  const elements = React.useRef(new Map<string, HTMLDivElement>());\n  const typeAhead = React.useRef({ text: \"\", time: 0 });\n  const treeId = React.useId();\n  const expand = (id: string, state: boolean) => { const next = new Set(open); if (state) next.add(id); else next.delete(id); const ids = [...next]; if (expanded === undefined) setInnerExpanded(ids); onExpandedChange?.(ids); };\n  const select = (node: TreeNode) => { if (node.disabled) return; if (value === undefined) setInner(node.id); onValueChange?.(node.id); };\n  const focus = (id?: string) => { if (!id) return; setFocused(id); elements.current.get(id)?.focus(); };\n  const root = rs([\"rs-tree-view\", className], styles.root);\n  const group = rs([\"rs-tree-view-group\"], styles.group);\n  const spacer = rs([\"rs-tree-view-spacer\"], styles.spacer);\n  const disclosure = rs([\"rs-tree-view-disclosure\"], styles.disclosure);\n  const renderNodes = (items: TreeNode[], level: number): React.ReactNode => items.map((node, index) => {\n    const selected = node.id === current;\n    const disabled = Boolean(node.disabled);\n    const row = rs([\"rs-tree-view-item\", selected && \"rs-tree-view-selected\", disabled && \"rs-tree-view-disabled\"], styles.item, selected && styles.selected, disabled && styles.disabled);\n    return <li key={node.id} role=\"none\"><div {...row} ref={element => { if (element) elements.current.set(node.id, element); else elements.current.delete(node.id); }} role=\"treeitem\" aria-label={node.label} aria-owns={node.children?.length && open.has(node.id) ? `${treeId}-${encodeURIComponent(node.id)}` : undefined} aria-level={level} aria-posinset={index + 1} aria-setsize={items.length} aria-selected={selected} aria-disabled={disabled || undefined} aria-expanded={node.children?.length ? open.has(node.id) : undefined} tabIndex={node.id === active ? 0 : -1} onFocus={() => setFocused(node.id)} onClick={() => { focus(node.id); select(node); }} onDoubleClick={() => { if (!disabled && node.children?.length) expand(node.id, !open.has(node.id)); }} onKeyDown={event => {\n      const at = visible.findIndex(item => item.node.id === node.id); let next: string | undefined;\n      if (event.key === \"ArrowDown\") next = visible[Math.min(visible.length - 1, at + 1)]?.node.id;\n      else if (event.key === \"ArrowUp\") next = visible[Math.max(0, at - 1)]?.node.id;\n      else if (event.key === \"Home\") next = visible[0]?.node.id;\n      else if (event.key === \"End\") next = visible.at(-1)?.node.id;\n      else if (event.key === \"ArrowRight\") { if (node.children?.length) { if (!open.has(node.id)) expand(node.id, true); else next = node.children[0]?.id; } }\n      else if (event.key === \"ArrowLeft\") { if (node.children?.length && open.has(node.id)) expand(node.id, false); else next = visible[at]?.parent; }\n      else if (event.key === \"Enter\" || event.key === \" \") select(node);\n      else if (event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey) { const now = Date.now(); typeAhead.current.text = now - typeAhead.current.time < 700 ? typeAhead.current.text + event.key.toLocaleLowerCase() : event.key.toLocaleLowerCase(); typeAhead.current.time = now; const order = [...visible.slice(at + 1), ...visible.slice(0, at + 1)]; next = order.find(item => item.node.label.toLocaleLowerCase().startsWith(typeAhead.current.text))?.node.id; }\n      else return;\n      event.preventDefault(); event.stopPropagation(); if (next) focus(next);\n    }}>{node.children?.length ? <button {...disclosure} type=\"button\" tabIndex={-1} disabled={disabled} aria-label={`${open.has(node.id) ? \"Collapse\" : \"Expand\"} ${node.label}`} onClick={event => { event.stopPropagation(); focus(node.id); expand(node.id, !open.has(node.id)); }}><Icon name=\"chevron-right\" rotate={open.has(node.id) ? 90 : undefined} /></button> : <span {...spacer} aria-hidden=\"true\" />}{node.label}</div>{node.children?.length && open.has(node.id) ? <ul {...group} role=\"group\" id={`${treeId}-${encodeURIComponent(node.id)}`}>{renderNodes(node.children, level + 1)}</ul> : null}</li>;\n  });\n  // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: The APG tree pattern explicitly uses a ul with role=tree and roving treeitems.\n  return <ul ref={ref} role=\"tree\" aria-label={label} {...props} onKeyDown={onKeyDown} className={root.className} style={{ ...root.style, ...style }}>{renderNodes(nodes, 1)}</ul>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/tree-view.tsx"
+    },
+    {
+      "path": "vlak/styles/tree-view.css",
+      "content": "/* ── tree-view: generated from packages/react/src/components/tree-view.tsx ── */\n.rs-tree-view{list-style-type:none;margin:0;padding:0;color:var(--text);min-width:0;width:100%}\n.rs-tree-view-group{list-style-type:none;margin:0;padding-inline-start:1rem}\n.rs-tree-view-item{display:flex;align-items:center;gap:0.5rem;min-height:var(--hit);min-width:var(--hit);padding-inline:0.75rem;box-sizing:border-box;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:-2px;overflow-wrap:anywhere}\n.rs-tree-view-item:focus-visible{outline-width:2px;outline-style:solid}\n.rs-tree-view-selected{background-color:var(--control-fill);font-weight:600}\n.rs-tree-view-disabled{color:var(--text-secondary);cursor:not-allowed}\n.rs-tree-view-spacer{width:var(--hit);flex-shrink:0}\n.rs-tree-view-disclosure{display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer;padding:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/tree-view.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "navigation",
+      "classes": [
+        "rs-tree-view",
+        "rs-tree-view-group",
+        "rs-tree-view-item",
+        "rs-tree-view-selected",
+        "rs-tree-view-disabled",
+        "rs-tree-view-spacer",
+        "rs-tree-view-disclosure"
+      ],
+      "snippet": "<ul class=\"rs-tree-view\" role=\"tree\" aria-label=\"Studies\"><li role=\"none\"><div class=\"rs-tree-view-item rs-tree-view-selected\" role=\"treeitem\" aria-selected=\"true\" aria-level=\"1\" tabindex=\"0\">Drive</div></li></ul>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "TreeView"
+      ],
+      "example": "import { TreeView } from \"@noorddev/vlak-react\";\n\n<TreeView label=\"Studies\" defaultExpanded={[\"studies\"]} defaultValue=\"drive\" nodes={[{ id: \"studies\", label: \"Studies\", children: [{ id: \"drive\", label: \"Drive\" }, { id: \"orbit\", label: \"Orbit\" }] }, { id: \"archive\", label: \"Archive\" }]} />",
+      "usage": {
+        "use": [
+          "File trees, nested assets, and hierarchical selection."
+        ],
+        "avoid": [
+          "A flat list of destination links; use Sidebar."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Arrows, Home, End, Enter, Space, letters",
+          "does": "Arrows navigate and expand/collapse; Enter or Space selects; typing finds a visible label."
+        }
+      ],
+      "a11y": [
+        "One tree item is in the Tab sequence. Level, position, selected, expanded, and disabled state are explicit."
+      ]
+    }
+  }
+}

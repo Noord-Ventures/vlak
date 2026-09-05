@@ -1,6 +1,6 @@
 # Vlak
 
-Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 74 components ship as React, CSS, vendored StyleX source, and machine-readable data.
+Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 114 components ship as React, CSS, vendored StyleX source, and machine-readable data.
 
 [vlak.dev](https://vlak.dev) · [github.com/Noord-Ventures/vlak](https://github.com/Noord-Ventures/vlak)
 

@@ -62,7 +62,7 @@
         "Conversation",
         "Copilot panel"
       ],
-      "example": "import { Assistant, AssistantHead, AssistantInput, AssistantMsg, AssistantReply, AssistantSend, AssistantStatus, AssistantTitle, AssistantUserBlock } from \"@noorddev/vlak-react\";\n\n<Assistant>\n  <AssistantHead>\n    <AssistantTitle>Assistant</AssistantTitle>\n    <AssistantStatus>Ready</AssistantStatus>\n  </AssistantHead>\n  <AssistantMsg user>\n    <AssistantUserBlock>Make the intro tighter.</AssistantUserBlock>\n  </AssistantMsg>\n  <AssistantReply>Done. Two sentences, same claim.</AssistantReply>\n  <AssistantInput>\n    <input aria-label=\"Message\" placeholder=\"Ask anything\" />\n    <AssistantSend>Send</AssistantSend>\n  </AssistantInput>\n</Assistant>",
+      "example": "import { Assistant, AssistantHead, AssistantMsg, AssistantReply, AssistantStatus, AssistantTitle, AssistantUserBlock, MessageComposer } from \"@noorddev/vlak-react\";\n\n<Assistant>\n  <AssistantHead>\n    <AssistantTitle>Assistant</AssistantTitle>\n    <AssistantStatus>Ready</AssistantStatus>\n  </AssistantHead>\n  <AssistantMsg user>\n    <AssistantUserBlock>Make the intro tighter.</AssistantUserBlock>\n  </AssistantMsg>\n  <AssistantReply>Done. Two sentences, same claim.</AssistantReply>\n  <MessageComposer onSend={sendMessage} />\n</Assistant>",
       "usage": {
         "use": [
           "A chat panel with a head, a message thread, and an input row.",

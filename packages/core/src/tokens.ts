@@ -113,11 +113,12 @@ export const vlakTokens = {
     rule: "One token: --radius-sm (4px), the standalone button radius. Toggles share it. Cards are chrome-square (no frame, 0). Callouts are hairline, radius 0. Nested inners follow Steve Ruiz. Chrome stays 0.",
   },
   icons: {
-    sizes: [12, 16],
+    sizes: [12, 16, 24],
+    variants: ["line", "filled"],
     stroke: 1,
     viewBox: 16,
     center: [8, 8],
-    rule: "1px currentColor hairline, butt/miter, no rx, no fill; draw at 12 or 16",
+    rule: "Line: 1px currentColor hairline, butt/miter, no rx. Filled: solid silhouettes with transparent detail cuts. Draw at 12, 16, or 24; 12px uses simplified fine detail",
   },
   motion: {
     duration: "0.1–0.4s",

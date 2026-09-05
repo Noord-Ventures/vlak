@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "image-viewer",
+  "type": "registry:component",
+  "title": "Image viewer",
+  "description": "Inspects an image collection with zoom, navigation, and a native dialog lightbox.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/canvas-controls.json",
+    "https://vlak.dev/r/dialog.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/image-viewer.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\nimport { CanvasControls } from \"./canvas-controls\";\nimport { Dialog, DialogTitle } from \"./dialog\";\n\nexport interface ViewerImage { src: string; alt: string; caption?: string }\nexport interface ImageViewerProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  images: readonly ViewerImage[];\n  value?: number;\n  defaultValue?: number;\n  onValueChange?: (index: number) => void;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexDirection: \"column\", gap: \"1rem\", width: \"100%\", minWidth: 0, color: vlak.ink },\n  canvas: { overflow: \"auto\", height: \"22rem\", backgroundColor: vlak.controlFill, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n  plane: { display: \"grid\", placeItems: \"center\", width: \"max-content\", height: \"max-content\", minWidth: \"100%\", minHeight: \"100%\" },\n  image: { display: \"block\", maxWidth: \"none\", maxHeight: \"none\", objectFit: \"contain\" },\n  controls: { display: \"flex\", justifyContent: \"space-between\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.75rem\" },\n  navigation: { display: \"flex\", gap: \"0.5rem\", alignItems: \"center\" },\n  action: { width: \"auto\", minWidth: vlak.hit, paddingInline: \"0.75rem\" },\n  caption: { margin: 0, color: vlak.gray, fontSize: \"0.875rem\", lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  modal: { width: \"min(64rem, calc(100vw - 2rem))\", maxWidth: \"calc(100vw - 2rem)\" },\n});\n\n/** Inspect a labelled image collection inline or in a native lightbox. */\nexport const ImageViewer = React.forwardRef<HTMLDivElement, ImageViewerProps>(function ImageViewer({ images, value, defaultValue = 0, onValueChange, label = \"Image viewer\", className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const requested = value ?? inner;\n  const index = Math.max(0, Math.min(images.length - 1, Number.isFinite(requested) ? Math.floor(requested) : 0));\n  const selected = images[index];\n  const [zoom, setZoom] = React.useState(1);\n  const [expanded, setExpanded] = React.useState(false);\n  const [failed, setFailed] = React.useState(false);\n  const [intrinsic, setIntrinsic] = React.useState({ src: \"\", width: 0, height: 0 });\n  const [viewports, setViewports] = React.useState([{ width: 0, height: 352 }, { width: 0, height: 352 }]);\n  const canvasRef = React.useRef<HTMLDivElement>(null);\n  const modalCanvasRef = React.useRef<HTMLDivElement>(null);\n  React.useEffect(() => { setZoom(1); setFailed(false); }, [selected?.src]);\n  React.useLayoutEffect(() => {\n    const measure = () => setViewports((previous) => {\n      const next = [canvasRef.current, modalCanvasRef.current].map((element, i) => element?.clientWidth ? { width: element.clientWidth, height: element.clientHeight } : previous[i]!);\n      return next.every((size, i) => size.width === previous[i]!.width && size.height === previous[i]!.height) ? previous : next;\n    });\n    measure();\n    const observer = typeof ResizeObserver === \"undefined\" ? undefined : new ResizeObserver(measure);\n    if (canvasRef.current) observer?.observe(canvasRef.current);\n    if (modalCanvasRef.current) observer?.observe(modalCanvasRef.current);\n    window.addEventListener(\"resize\", measure);\n    return () => { observer?.disconnect(); window.removeEventListener(\"resize\", measure); };\n  }, [expanded]);\n  const choose = (next: number) => { if (next < 0 || next >= images.length) return; if (value === undefined) setInner(next); onValueChange?.(next); };\n  const root = rs([\"rs-image-viewer\", className], styles.root);\n  const canvas = rs([\"rs-image-viewer-canvas\"], styles.canvas);\n  const plane = rs([\"rs-image-viewer-plane\"], styles.plane);\n  const image = rs([\"rs-image-viewer-image\"], styles.image);\n  const controls = rs([\"rs-image-viewer-controls\"], styles.controls);\n  const navigation = rs([\"rs-image-viewer-navigation\"], styles.navigation);\n  const action = rs([\"rs-image-viewer-action\"], styles.action);\n  const caption = rs([\"rs-image-viewer-caption\"], styles.caption);\n  const modal = rs([\"rs-image-viewer-modal\"], styles.modal);\n  const frame = (inModal: boolean) => {\n    const viewport = viewports[inModal ? 1 : 0]!;\n    const known = intrinsic.src === selected?.src && intrinsic.width > 0 && intrinsic.height > 0;\n    const fit = known ? Math.min(1, (viewport.width || intrinsic.width) / intrinsic.width, viewport.height / intrinsic.height) : 1;\n    return <div {...canvas} ref={inModal ? modalCanvasRef : canvasRef} tabIndex={0} role=\"group\" aria-label={`${label} canvas. Use arrow keys to change images.`} onKeyDown={event => { if (event.key === \"ArrowLeft\") { event.preventDefault(); choose(index - 1); } if (event.key === \"ArrowRight\") { event.preventDefault(); choose(index + 1); } }}>\n      <div {...plane}>{selected && !failed ? <img {...image} src={selected.src} alt={selected.alt} draggable={false} style={{ ...image.style, width: known ? intrinsic.width * fit * zoom : \"auto\", height: known ? intrinsic.height * fit * zoom : viewport.height }} onLoad={event => { const img = event.currentTarget; setIntrinsic({ src: selected.src, width: img.naturalWidth, height: img.naturalHeight }); }} onError={() => setFailed(true)} /> : <p {...caption} role=\"status\">{selected ? \"The image could not load.\" : \"No images to show.\"}</p>}</div>\n    </div>;\n  };\n  const toolbar = <div {...controls}>\n    <CanvasControls zoom={zoom} onZoomChange={setZoom} minZoom={0.5} maxZoom={4} disabled={!selected || failed} onFit={() => setZoom(1)} onReset={() => { canvasRef.current?.scrollTo({ left: 0, top: 0 }); modalCanvasRef.current?.scrollTo({ left: 0, top: 0 }); }} />\n    <div {...navigation} role=\"group\" aria-label=\"Image navigation\"><Button {...action} variant=\"ghost\" aria-label=\"Previous image\" disabled={index <= 0} onClick={() => choose(index - 1)}><Icon name=\"chevron-left\" /></Button><span {...caption} aria-live=\"polite\">{images.length ? index + 1 : 0} / {images.length}</span><Button {...action} variant=\"ghost\" aria-label=\"Next image\" disabled={index >= images.length - 1} onClick={() => choose(index + 1)}><Icon name=\"chevron-right\" /></Button></div>\n  </div>;\n  return <div ref={ref} role=\"region\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {frame(false)}{toolbar}\n    <div {...controls}><p {...caption}>{selected?.caption ?? selected?.alt}</p><Button {...action} variant=\"ghost\" disabled={!selected} onClick={() => setExpanded(true)}><Icon name=\"expand\" />Open lightbox</Button></div>\n    <Dialog {...modal} open={expanded} onClose={() => setExpanded(false)} closeLabel=\"Close image viewer\"><DialogTitle>{selected?.caption ?? label}</DialogTitle>{frame(true)}{toolbar}</Dialog>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/image-viewer.tsx"
+    },
+    {
+      "path": "vlak/styles/image-viewer.css",
+      "content": "/* ── image-viewer: generated from packages/react/src/components/image-viewer.tsx ── */\n.rs-image-viewer{display:flex;flex-direction:column;gap:1rem;width:100%;min-width:0;color:var(--text)}\n.rs-image-viewer-canvas{overflow:auto;height:22rem;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-image-viewer-canvas:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-image-viewer-plane{display:grid;place-items:center;width:max-content;height:max-content;min-width:100%;min-height:100%}\n.rs-image-viewer-image{display:block;max-width:none;max-height:none;object-fit:contain}\n.rs-image-viewer-controls{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:0.75rem}\n.rs-image-viewer-navigation{display:flex;gap:0.5rem;align-items:center}\n.rs-image-viewer-action{width:auto;min-width:var(--hit);padding-inline:0.75rem}\n.rs-image-viewer-caption{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere}\n.rs-image-viewer-modal{width:min(64rem, calc(100vw - 2rem));max-width:calc(100vw - 2rem)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/image-viewer.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-image-viewer",
+        "rs-image-viewer-canvas",
+        "rs-image-viewer-plane",
+        "rs-image-viewer-image",
+        "rs-image-viewer-controls",
+        "rs-image-viewer-navigation",
+        "rs-image-viewer-action",
+        "rs-image-viewer-caption",
+        "rs-image-viewer-modal"
+      ],
+      "snippet": "<div class=\"rs-image-viewer\" role=\"region\" aria-label=\"Image viewer\"><div class=\"rs-image-viewer-canvas\"><img class=\"rs-image-viewer-image\" src=\"image.jpg\" alt=\"Describe the image\" /></div><p class=\"rs-image-viewer-caption\">Image caption</p></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "canvas-controls",
+        "dialog",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ImageViewer",
+        "Lightbox",
+        "Image gallery"
+      ],
+      "example": "import { ImageViewer } from \"@noorddev/vlak-react\";\n\n<ImageViewer images={[{ src: \"/front.jpg\", alt: \"Front cover\", caption: \"Front cover\" }, { src: \"/back.jpg\", alt: \"Back cover\", caption: \"Back cover\" }]} />",
+      "usage": {
+        "use": [
+          "Examining a finite collection of labelled images.",
+          "Inline preview with an optional focused lightbox."
+        ],
+        "avoid": [
+          "Editing pixels or drawing annotations; use an image editor."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Arrow left, Arrow right",
+          "does": "Changes images when the image canvas is focused."
+        },
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Operates image navigation and zoom controls."
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the native lightbox and returns focus to its opener."
+        }
+      ],
+      "a11y": [
+        "Each image requires alt text.",
+        "Native dialog supplies modal focus behavior; visible errors replace broken image output.",
+        "Navigation buttons disable at collection boundaries."
+      ]
+    }
+  }
+}

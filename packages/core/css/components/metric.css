@@ -1,0 +1,7 @@
+/* ── metric: generated from packages/react/src/components/metric.tsx ── */
+.rs-metric{display:grid;align-content:start;gap:1rem;min-width:0;color:var(--text)}
+.rs-metric-label{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin:0}
+.rs-metric-reading{display:flex;align-items:baseline;gap:0.5rem;min-height:4rem;min-width:0;font-variant-numeric:tabular-nums;line-height:1}
+.rs-metric-value{font-size:clamp(2.5rem, 5vw, 4rem);letter-spacing:-0.04em;font-weight:500;overflow-wrap:anywhere}
+.rs-metric-unit{font-size:1.125rem;color:var(--text-secondary)}
+.rs-metric-detail{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45}

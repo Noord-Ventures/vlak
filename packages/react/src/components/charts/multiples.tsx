@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak } from "../../tokens.stylex";
 import { rs } from "../../rs";
 import { LineChart, type LineChartProps } from "./line";
+import { niceMax } from "./frame";
 
 const styles = stylex.create({
   multi: {
@@ -10,6 +11,7 @@ const styles = stylex.create({
     gridTemplateColumns: "repeat(auto-fill, minmax(184px, 1fr))",
     gap: "1.25rem",
   },
+  item: { margin: 0, minWidth: 0 },
   cap: {
     marginTop: 0,
     marginInlineEnd: 0,
@@ -35,6 +37,8 @@ export interface SmallMultiplesProps extends React.HTMLAttributes<HTMLDivElement
   grid?: boolean;
   ticks?: number;
   spot?: boolean | string;
+  /** Compare panels on one scale by default. Disable only for independent trends. */
+  sharedDomain?: boolean;
   /** BCP 47 tag for number formatting; undefined is the reader's own. */
   locale?: string;
 }
@@ -47,18 +51,22 @@ export const SmallMultiples = React.forwardRef<HTMLDivElement, SmallMultiplesPro
   ticks = 3,
   className,
   spot,
+  sharedDomain = true,
   locale,
   style,
   ...props
 }, ref) {
   const sx = rs(["rs-chart-multi", className], styles.multi);
+  const item = rs(["rs-chart-multi-item"], styles.item);
+  const values = panels.flatMap((panel) => panel.series.flatMap((series) => series.values)).filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  const domain: [number, number] | undefined = sharedDomain ? [Math.min(0, ...values), niceMax(Math.max(0, ...values))] : undefined;
   const idBase = React.useId();
   return (
     <div ref={ref} {...props} className={sx.className} style={{ ...sx.style, ...style }}>
       {panels.map((p, i) => {
         const capId = `${idBase}-cap-${i}`;
         return (
-          <figure key={p.title} className="rs-chart-multi-item">
+          <figure key={p.title} className={item.className} style={item.style}>
             <figcaption id={capId} {...rs(["rs-chart-multi-cap"], styles.cap)}>
               {p.title}
             </figcaption>
@@ -71,6 +79,7 @@ export const SmallMultiples = React.forwardRef<HTMLDivElement, SmallMultiplesPro
               ticks={ticks}
               spot={spot}
               locale={locale}
+              domain={domain}
               aria-labelledby={capId}
             />
           </figure>

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "kanban-board",
+  "type": "registry:component",
+  "title": "Kanban board",
+  "description": "Moves and reorders cards across named columns with drag and keyboard alternatives.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/native-select.json",
+    "https://vlak.dev/r/sortable-list.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/kanban-board.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { NativeSelect } from \"./native-select\";\nimport { SortableList } from \"./sortable-list\";\n\nexport interface KanbanColumn { id: string; label: string }\nexport interface KanbanCard { id: string; title: string; columnId: string; description?: React.ReactNode; disabled?: boolean }\nexport interface KanbanBoardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  columns: readonly KanbanColumn[];\n  value?: KanbanCard[];\n  defaultValue?: KanbanCard[];\n  onValueChange?: (cards: KanbanCard[]) => void;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexDirection: \"column\", width: \"100%\", minWidth: 0, gap: \"0.75rem\", color: vlak.ink },\n  columns: { display: \"grid\", gridAutoFlow: \"column\", gridAutoColumns: \"minmax(17rem, 1fr)\", gap: \"1rem\", overflowX: \"auto\", padding: \"0.25rem\", scrollSnapType: \"x proximity\" },\n  column: { minWidth: 0, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, padding: \"1rem\", scrollSnapAlign: \"start\" },\n  heading: { margin: 0, fontSize: \"0.9375rem\", fontWeight: 600, display: \"flex\", justifyContent: \"space-between\", gap: \"0.5rem\" },\n  card: { display: \"flex\", flexDirection: \"column\", gap: \"0.625rem\", minWidth: 0, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  title: { fontWeight: 600, overflowWrap: \"anywhere\" },\n  detail: { color: vlak.gray, overflowWrap: \"anywhere\" },\n  status: { margin: 0, color: vlak.gray, fontSize: \"0.75rem\", lineHeight: 1.45 },\n});\n\n/** Movable cards with drag, keyboard reordering, and named destination selectors. */\nexport const KanbanBoard = React.forwardRef<HTMLDivElement, KanbanBoardProps>(function KanbanBoard({ columns, value, defaultValue = [], onValueChange, label = \"Board\", className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const cards = value ?? inner;\n  const [announcement, setAnnouncement] = React.useState(\"\");\n  const dragging = React.useRef<string | null>(null);\n  const destinations = React.useRef(new Map<string, HTMLSelectElement>());\n  const restoreFocus = React.useRef<{ id: string; columnId: string } | null>(null);\n  React.useEffect(() => {\n    const request = restoreFocus.current;\n    if (request && cards.some(card => card.id === request.id && card.columnId === request.columnId)) { destinations.current.get(request.id)?.focus(); restoreFocus.current = null; }\n  }, [cards]);\n  const change = (next: KanbanCard[]) => { if (value === undefined) setInner(next); onValueChange?.(next); };\n  const move = (id: string, columnId: string) => { const item = cards.find(card => card.id === id); const destination = columns.find(column => column.id === columnId); if (!item || item.disabled || !destination || item.columnId === columnId) return; if (document.activeElement === destinations.current.get(id)) restoreFocus.current = { id, columnId }; change([...cards.filter(card => card.id !== id), { ...item, columnId }]); setAnnouncement(`${item.title} moved to ${destination.label}.`); };\n  const root = rs([\"rs-kanban-board\", className], styles.root);\n  const columnGrid = rs([\"rs-kanban-columns\"], styles.columns);\n  const columnStyle = rs([\"rs-kanban-column\"], styles.column);\n  const heading = rs([\"rs-kanban-heading\"], styles.heading);\n  const cardStyle = rs([\"rs-kanban-card\"], styles.card);\n  const title = rs([\"rs-kanban-title\"], styles.title);\n  const detail = rs([\"rs-kanban-detail\"], styles.detail);\n  const status = rs([\"rs-kanban-status\"], styles.status);\n  const id = React.useId();\n  return <div ref={ref} role=\"region\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...columnGrid} onDragStart={event => { const dragged = event.dataTransfer.getData(\"text/plain\"); if (cards.some(card => card.id === dragged && !card.disabled)) dragging.current = dragged; }} onDragEnd={() => { dragging.current = null; }}>\n      {columns.map((column, columnIndex) => { const items = cards.filter(card => card.columnId === column.id); const titleId = `${id}-${columnIndex}`; return <section key={column.id} {...columnStyle} aria-labelledby={titleId} onDragOver={event => { if (dragging.current) event.preventDefault(); }} onDrop={event => { if (dragging.current) { event.preventDefault(); move(dragging.current, column.id); dragging.current = null; } }}>\n        <h3 {...heading} id={titleId}>{column.label}<span>{items.length}</span></h3>\n        <SortableList label={`${column.label} cards`} value={items.map(card => ({ id: card.id, label: card.title, disabled: card.disabled, content: <div {...cardStyle}><span {...title}>{card.title}</span>{card.description && <span {...detail}>{card.description}</span>}<NativeSelect ref={element => { if (element) destinations.current.set(card.id, element); else destinations.current.delete(card.id); }} aria-label={`Move ${card.title} to`} value={card.columnId} disabled={card.disabled} onChange={event => move(card.id, event.target.value)}>{columns.map(destination => <option key={destination.id} value={destination.id}>{destination.label}</option>)}</NativeSelect></div> }))} onValueChange={next => { const ordered = next.map(item => items.find(card => card.id === item.id)!); let at = 0; change(cards.map(card => card.columnId === column.id ? ordered[at++]! : card)); }} />\n        {items.length === 0 && <p {...status}>No cards.</p>}\n      </section>; })}\n    </div>\n    <p {...status} role=\"status\">{announcement}</p>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/kanban-board.tsx"
+    },
+    {
+      "path": "vlak/styles/kanban-board.css",
+      "content": "/* ── kanban-board: generated from packages/react/src/components/kanban-board.tsx ── */\n.rs-kanban-board{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}\n.rs-kanban-columns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(17rem, 1fr);gap:1rem;overflow-x:auto;padding:0.25rem;scroll-snap-type:x proximity}\n.rs-kanban-column{min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;scroll-snap-align:start}\n.rs-kanban-heading{margin:0;font-size:0.9375rem;font-weight:600;display:flex;justify-content:space-between;gap:0.5rem}\n.rs-kanban-card{display:flex;flex-direction:column;gap:0.625rem;min-width:0;font-size:0.875rem;line-height:1.45}\n.rs-kanban-title{font-weight:600;overflow-wrap:anywhere}\n.rs-kanban-detail{color:var(--text-secondary);overflow-wrap:anywhere}\n.rs-kanban-status{margin:0;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/kanban-board.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-kanban-board",
+        "rs-kanban-columns",
+        "rs-kanban-column",
+        "rs-kanban-heading",
+        "rs-kanban-card",
+        "rs-kanban-title",
+        "rs-kanban-detail",
+        "rs-kanban-status"
+      ],
+      "snippet": "<div class=\"rs-kanban-board\" role=\"region\" aria-label=\"Board\"><div class=\"rs-kanban-columns\"><section class=\"rs-kanban-column\"><h3 class=\"rs-kanban-heading\">In progress</h3><p class=\"rs-kanban-card\">Review the proof</p></section></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "native-select",
+        "sortable-list",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "KanbanBoard",
+        "Task board",
+        "Workflow board"
+      ],
+      "example": "import { KanbanBoard } from \"@noorddev/vlak-react\";\n\n<KanbanBoard columns={[{ id: \"todo\", label: \"To do\" }, { id: \"doing\", label: \"In progress\" }, { id: \"done\", label: \"Done\" }]} value={cards} onValueChange={setCards} />",
+      "usage": {
+        "use": [
+          "Finite work items moving through named states.",
+          "Column changes and ordering that should remain keyboard accessible."
+        ],
+        "avoid": [
+          "A large virtualised issue tracker or automatic workflow rules."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Alt+Arrow up, Alt+Arrow down",
+          "does": "Reorders the focused card handle within its column."
+        },
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Operates move up and down buttons and each card's native destination selector."
+        }
+      ],
+      "a11y": [
+        "Every column is a named section; card counts are visible.",
+        "A native destination selector is the keyboard alternative to dragging across columns.",
+        "Moves are announced and disabled cards remain immovable."
+      ]
+    }
+  }
+}

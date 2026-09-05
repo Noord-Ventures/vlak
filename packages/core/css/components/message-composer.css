@@ -1,0 +1,8 @@
+/* ── message-composer: generated from packages/react/src/components/message-composer.tsx ── */
+.rs-message-composer{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}
+.rs-message-composer-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem}
+.rs-message-composer-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.875rem}
+.rs-message-composer-files{display:flex;flex-wrap:wrap;gap:0.5rem;list-style-type:none;padding:0;margin:0}
+.rs-message-composer-file{display:flex;align-items:center;gap:0.5rem;max-width:100%;overflow-wrap:anywhere;font-size:0.8125rem}
+.rs-message-composer-hint{margin:0;font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}
+.rs-message-composer-input{display:none}

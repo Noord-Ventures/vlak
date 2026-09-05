@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "description-list",
+  "type": "registry:component",
+  "title": "Description list",
+  "description": "Aligns semantic labels and values in a responsive description list.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/description-list.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface DescriptionItem {\n  id: string;\n  label: React.ReactNode;\n  value: React.ReactNode;\n}\nexport interface DescriptionListProps extends React.HTMLAttributes<HTMLDListElement> {\n  items: DescriptionItem[];\n}\nconst styles = stylex.create({\n  root: { margin: 0, width: \"100%\", minWidth: 0, color: vlak.ink },\n  row: { display: \"grid\", gridTemplateColumns: { default: \"minmax(8rem, 1fr) minmax(0, 2fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.5rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  label: { margin: 0, color: vlak.gray, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  value: { margin: 0, minWidth: 0, overflowWrap: \"anywhere\", lineHeight: 1.45, fontVariantNumeric: \"tabular-nums\" },\n});\n\n/** Aligned, semantic labels and values without an extra card. */\nexport const DescriptionList = React.forwardRef<HTMLDListElement, DescriptionListProps>(function DescriptionList({ items, className, style, ...props }, ref) {\n  const root = rs([\"rs-description-list\", className], styles.root);\n  const row = rs([\"rs-description-list-row\"], styles.row);\n  const label = rs([\"rs-description-list-label\"], styles.label);\n  const value = rs([\"rs-description-list-value\"], styles.value);\n  return <dl ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {items.map(item => <div key={item.id} {...row}><dt {...label}>{item.label}</dt><dd {...value}>{item.value}</dd></div>)}\n  </dl>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/description-list.tsx"
+    },
+    {
+      "path": "vlak/styles/description-list.css",
+      "content": "/* ── description-list: generated from packages/react/src/components/description-list.tsx ── */\n.rs-description-list{margin:0;width:100%;min-width:0;color:var(--text)}\n.rs-description-list-row{display:grid;grid-template-columns:minmax(8rem, 1fr) minmax(0, 2fr);gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n@media (max-width: 640px){.rs-description-list-row{grid-template-columns:minmax(0, 1fr)}}\n.rs-description-list-label{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45}\n.rs-description-list-value{margin:0;min-width:0;overflow-wrap:anywhere;line-height:1.45;font-variant-numeric:tabular-nums}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/description-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-description-list",
+        "rs-description-list-row",
+        "rs-description-list-label",
+        "rs-description-list-value"
+      ],
+      "snippet": "<dl class=\"rs-description-list\"><div class=\"rs-description-list-row\"><dt class=\"rs-description-list-label\">Estimated range</dt><dd class=\"rs-description-list-value\">386 km</dd></div></dl>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "DescriptionList"
+      ],
+      "example": "import { DescriptionList } from \"@noorddev/vlak-react\";\n\n<DescriptionList items={[{ id: \"range\", label: \"Estimated range\", value: \"386 km\" }, { id: \"battery\", label: \"Battery\", value: \"84%\" }]} />",
+      "usage": {
+        "use": [
+          "Read-only properties, specifications, and account details."
+        ],
+        "avoid": [
+          "Editable properties; use PropertyGrid."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Links or controls supplied as values keep their native keyboard behavior."
+        }
+      ],
+      "a11y": [
+        "Uses dl, dt, and dd; labels and values remain in reading order on small screens."
+      ]
+    }
+  }
+}

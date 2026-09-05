@@ -29,6 +29,7 @@ const styles = stylex.create({
     lineHeight: "16px",
   },
   area: {
+    boxSizing: "border-box",
     borderWidth: vlak.hairline,
     borderStyle: "solid",
     borderColor: {

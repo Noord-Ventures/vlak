@@ -14,6 +14,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 const styles = stylex.create({
   base: {
     boxSizing: "border-box",
+    minWidth: vlak.hit,
     fontFamily: "inherit",
     letterSpacing: "-0.01em",
     display: "inline-flex",
@@ -132,7 +133,7 @@ const styles = stylex.create({
   },
   sm: {
     height: {
-      default: "2.25rem",
+      default: vlak.hit,
       [mq.phone]: vlak.controlH,
     },
     minHeight: {
@@ -154,7 +155,7 @@ const styles = stylex.create({
   },
   grouped: {
     height: "auto",
-    minHeight: null,
+    minHeight: vlak.hit,
     width: {
       default: null,
       [mq.phone]: null,

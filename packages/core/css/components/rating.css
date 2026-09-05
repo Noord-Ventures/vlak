@@ -1,0 +1,10 @@
+/* ── rating: generated from packages/react/src/components/rating.tsx ── */
+.rs-rating{display:grid;gap:0.5rem;min-width:0;border-width:0;padding:0;margin:0}
+.rs-rating-legend{padding:0;margin-bottom:0.5rem;color:var(--text-secondary);font-size:var(--control-label)}
+.rs-rating-choices{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-rating-choice{position:relative;display:inline-grid;place-items:center;width:var(--hit);height:var(--hit);flex-shrink:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);box-sizing:border-box;color:var(--text);background-color:var(--bg);font-size:var(--control-fs);font-variant-numeric:tabular-nums;cursor:pointer;outline-color:var(--text);outline-offset:2px}
+.rs-rating-choice:focus-within{outline-width:2px;outline-style:solid}
+.rs-rating-selected{background-color:var(--text);color:var(--bg)}
+@media (forced-colors: active){.rs-rating-selected{background-color:Highlight;color:HighlightText}}
+.rs-rating-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);opacity:0;margin:0;cursor:inherit}
+.rs-rating-clear{width:auto;justify-self:start}

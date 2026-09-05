@@ -49,7 +49,7 @@ export interface HistogramProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const Histogram = React.forwardRef<HTMLDivElement, HistogramProps>(function Histogram({
-  bins,
+  bins: inputBins,
   height = 204,
   unit,
   yLabel,
@@ -63,6 +63,7 @@ export const Histogram = React.forwardRef<HTMLDivElement, HistogramProps>(functi
   "aria-labelledby": ariaLabelledBy,
   ...props
 }: HistogramProps, ref: React.ForwardedRef<HTMLDivElement>) {
+  const bins = inputBins.filter((bin) => Number.isFinite(bin.count) && bin.count >= 0);
   const format = valueFormat ?? ((v: number) => defaultFormat(v, undefined, locale));
   const tip = valueFormat ?? ((v: number) => defaultFormat(v, unit, locale));
   const [hover, setHover] = React.useState<number | null>(null);
@@ -74,7 +75,7 @@ export const Histogram = React.forwardRef<HTMLDivElement, HistogramProps>(functi
   const max = niceMax(Math.max(...bins.map((b) => b.count), 1));
   const yTicks = ticksFor(max, ticks);
   const gap = 1;
-  const bw = (plotW - gap * Math.max(0, bins.length - 1)) / Math.max(1, bins.length);
+  const bw = Math.max(0, (plotW - gap * Math.max(0, bins.length - 1)) / Math.max(1, bins.length));
   const active = hover != null ? bins[hover] : null;
 
   const svg = rs(["rs-chart-svg"], chartStyles.svg);
@@ -102,6 +103,7 @@ export const Histogram = React.forwardRef<HTMLDivElement, HistogramProps>(functi
 
   return (
     <ChartField ref={ref} spot={spot} className={className} {...props}>
+      {!bins.length && <p role="status">No data to display</p>}
       {yLabel && (
         <ChartHead>
           <ChartTitle id={titleId}>{yLabel}</ChartTitle>

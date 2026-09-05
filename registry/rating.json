@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rating",
+  "type": "registry:component",
+  "title": "Rating",
+  "description": "Collects a discrete numeric score with 44px native radio choices and an optional clear action.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/rating.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Button } from \"./button\";\n\nexport interface RatingProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\"> {\n  value?: number;\n  defaultValue?: number;\n  onValueChange?: (value: number) => void;\n  max?: number;\n  label?: React.ReactNode;\n  getLabel?: (value: number, max: number) => string;\n  clearable?: boolean;\n  clearLabel?: string;\n  required?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0, borderWidth: 0, padding: 0, margin: 0 },\n  legend: { padding: 0, marginBottom: \"0.5rem\", color: vlak.gray, fontSize: vlak.controlLabel },\n  choices: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  choice: { position: \"relative\", display: \"inline-grid\", placeItems: \"center\", width: vlak.hit, height: vlak.hit, flexShrink: 0, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, boxSizing: \"border-box\", color: vlak.ink, backgroundColor: vlak.paper, fontSize: vlak.controlFs, fontVariantNumeric: \"tabular-nums\", cursor: \"pointer\", outlineWidth: { default: null, \":focus-within\": 2 }, outlineStyle: { default: null, \":focus-within\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  // Include the label's hairline so the actual radio matches its 44px target.\n  input: { position: \"absolute\", inset: \"-1px\", width: \"calc(100% + 2px)\", height: \"calc(100% + 2px)\", opacity: 0, margin: 0, cursor: \"inherit\" },\n  clear: { width: \"auto\", justifySelf: \"start\" },\n});\n\n/** A discrete score using native radios; zero means no rating. */\nexport const Rating = React.forwardRef<HTMLFieldSetElement, RatingProps>(function Rating({\n  value, defaultValue = 0, onValueChange, max = 5, label = \"Rating\", getLabel = (score, total) => `${score} of ${total}`, clearable = true, clearLabel = \"Clear rating\", required, name, disabled, className, style, ...props\n}, ref) {\n  const [current, setValue, fieldRef] = useInputValue<number, HTMLFieldSetElement>(value, defaultValue, onValueChange);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const autoName = React.useId();\n  const count = Math.max(1, Math.min(10, Math.floor(max) || 5));\n  const root = rs([\"rs-rating\", className], styles.root);\n  const legend = rs([\"rs-rating-legend\"], styles.legend);\n  const choices = rs([\"rs-rating-choices\"], styles.choices);\n  const input = rs([\"rs-rating-input\"], styles.input);\n  const clear = rs([\"rs-rating-clear\"], styles.clear);\n  return <fieldset {...props} ref={mergedRef} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    <div className={choices.className} style={choices.style}>{Array.from({ length: count }, (_, index) => {\n      const score = index + 1;\n      const selected = current === score;\n      const choice = rs([\"rs-rating-choice\", selected && \"rs-rating-selected\"], styles.choice, selected && styles.selected);\n      return <label key={score} className={choice.className} style={choice.style}><span aria-hidden=\"true\">{score}</span><input type=\"radio\" name={name ?? autoName} value={score} checked={selected} disabled={disabled} required={required} aria-label={getLabel(score, count)} className={input.className} style={input.style} onChange={() => setValue(score)} /></label>;\n    })}</div>\n    {clearable && <Button variant=\"ghost\" disabled={disabled || current === 0} className={clear.className} style={clear.style} onClick={() => setValue(0)}>{clearLabel}</Button>}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/rating.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/rating.css",
+      "content": "/* ── rating: generated from packages/react/src/components/rating.tsx ── */\n.rs-rating{display:grid;gap:0.5rem;min-width:0;border-width:0;padding:0;margin:0}\n.rs-rating-legend{padding:0;margin-bottom:0.5rem;color:var(--text-secondary);font-size:var(--control-label)}\n.rs-rating-choices{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-rating-choice{position:relative;display:inline-grid;place-items:center;width:var(--hit);height:var(--hit);flex-shrink:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);box-sizing:border-box;color:var(--text);background-color:var(--bg);font-size:var(--control-fs);font-variant-numeric:tabular-nums;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-rating-choice:focus-within{outline-width:2px;outline-style:solid}\n.rs-rating-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-rating-selected{background-color:Highlight;color:HighlightText}}\n.rs-rating-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);opacity:0;margin:0;cursor:inherit}\n.rs-rating-clear{width:auto;justify-self:start}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/rating.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-rating",
+        "rs-rating-legend",
+        "rs-rating-choices",
+        "rs-rating-choice",
+        "rs-rating-selected",
+        "rs-rating-input",
+        "rs-rating-clear"
+      ],
+      "snippet": "<fieldset class=\"rs-rating\"><legend class=\"rs-rating-legend\">Usefulness</legend><div class=\"rs-rating-choices\"><label class=\"rs-rating-choice\">1<input class=\"rs-rating-input\" type=\"radio\" name=\"usefulness\" value=\"1\" aria-label=\"1 of 3\" /></label><label class=\"rs-rating-choice rs-rating-selected\">2<input class=\"rs-rating-input\" type=\"radio\" name=\"usefulness\" value=\"2\" aria-label=\"2 of 3\" checked /></label><label class=\"rs-rating-choice\">3<input class=\"rs-rating-input\" type=\"radio\" name=\"usefulness\" value=\"3\" aria-label=\"3 of 3\" /></label></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Rating",
+        "Score input",
+        "Rating group"
+      ],
+      "example": "import { Rating } from \"@noorddev/vlak-react\";\n\n<Rating label=\"How useful was this?\" name=\"usefulness\" max={5} defaultValue={4} getLabel={(value, max) => `${value} out of ${max}`} />",
+      "usage": {
+        "use": [
+          "An explicit score on a short, ordered scale.",
+          "Clearable feedback where no rating is distinct from the lowest score."
+        ],
+        "avoid": [
+          "Unordered choices; use Radio.",
+          "Large or continuous numeric ranges; use Slider or NumberField."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Enters the native radio group at its current choice and reaches Clear."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Moves and selects among the native radio choices."
+        },
+        {
+          "keys": "Space",
+          "does": "Selects a focused radio or activates Clear."
+        }
+      ],
+      "a11y": [
+        "The fieldset legend names the score; getLabel gives each choice a complete name such as 3 of 5.",
+        "Selection changes the full choice surface. Each choice is 44px with a 4px corner and a visible focus outline.",
+        "Zero means no rating. max is limited to 1–10 whole choices. required uses native radio-group validation.",
+        "name submits the selected score. The ref reaches the fieldset; uncontrolled values reset with the form."
+      ]
+    }
+  }
+}

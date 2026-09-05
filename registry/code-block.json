@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "code-block",
+  "type": "registry:component",
+  "title": "Code block",
+  "description": "Shows source text with optional line numbers, wrapping, and copy feedback.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/code-block.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface CodeBlockProps extends React.HTMLAttributes<HTMLElement> {\n  code: string;\n  language?: string;\n  lineNumbers?: boolean;\n  wrap?: boolean;\n  copyable?: boolean;\n  onCopyCode?: (code: string) => void | Promise<void>;\n}\nconst styles = stylex.create({\n  root: { margin: 0, width: \"100%\", minWidth: 0, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, color: vlak.ink, backgroundColor: vlak.paper },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", justifyContent: \"space-between\", gap: \"0.5rem\", padding: \"0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  pre: { margin: 0, overflowX: \"auto\", padding: \"1rem\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", fontSize: \"0.875rem\", lineHeight: 1.45, tabSize: 2, outlineColor: vlak.ink, outlineOffset: -2 },\n  wrap: { whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\" },\n  line: { display: \"block\", minHeight: \"1.45em\" },\n  number: { display: \"inline-block\", userSelect: \"none\", color: vlak.gray, minWidth: \"3ch\", marginInlineEnd: \"2ch\", textAlign: \"end\" },\n  status: { fontSize: \"0.875rem\", color: vlak.gray },\n});\n\n/** Plain source with optional numbering and honest asynchronous copy feedback. */\nexport const CodeBlock = React.forwardRef<HTMLElement, CodeBlockProps>(function CodeBlock({ code, language = \"Text\", lineNumbers = false, wrap = false, copyable = true, onCopyCode, className, style, ...props }, ref) {\n  const [copyState, setCopyState] = React.useState<\"idle\" | \"pending\" | \"done\" | \"error\">(\"idle\");\n  const request = React.useRef(0);\n  React.useEffect(() => { request.current++; setCopyState(\"idle\"); return () => { request.current++; }; }, [code]);\n  const copy = async () => {\n    const id = ++request.current;\n    setCopyState(\"pending\");\n    try { if (onCopyCode) await onCopyCode(code); else await navigator.clipboard.writeText(code); if (id === request.current) setCopyState(\"done\"); }\n    catch { if (id === request.current) setCopyState(\"error\"); }\n  };\n  const root = rs([\"rs-code-block\", className], styles.root);\n  const header = rs([\"rs-code-block-header\"], styles.header);\n  const pre = rs([\"rs-code-block-pre\", wrap && \"rs-code-block-wrap\"], styles.pre, wrap && styles.wrap);\n  const line = rs([\"rs-code-block-line\"], styles.line);\n  const number = rs([\"rs-code-block-number\"], styles.number);\n  const status = rs([\"rs-code-block-status\"], styles.status);\n  const lines = code.split(\"\\n\");\n  return <figure ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <figcaption {...header}><span>{language}</span>{copyable && <Button variant=\"ghost\" disabled={copyState === \"pending\"} onClick={copy}>{copyState === \"done\" ? \"Copied\" : copyState === \"pending\" ? \"Copying\" : \"Copy code\"}</Button>}<span {...status} role=\"status\">{copyState === \"error\" ? \"Could not copy. Select and copy the code.\" : copyState === \"done\" ? \"Code copied\" : \"\"}</span></figcaption>\n    <pre {...pre} tabIndex={0} aria-label={`${language} source`}><code>{lineNumbers ? lines.map((text, index) => <span key={`${index}:${text}`} {...line}><span {...number} aria-hidden=\"true\">{index + 1}</span>{text}{index < lines.length - 1 ? \"\\n\" : \"\"}</span>) : code}</code></pre>\n  </figure>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/code-block.tsx"
+    },
+    {
+      "path": "vlak/styles/code-block.css",
+      "content": "/* ── code-block: generated from packages/react/src/components/code-block.tsx ── */\n.rs-code-block{margin:0;width:100%;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);color:var(--text);background-color:var(--bg)}\n.rs-code-block-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-code-block-pre{margin:0;overflow-x:auto;padding:1rem;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;tab-size:2;outline-color:var(--text);outline-offset:-2px}\n.rs-code-block-wrap{white-space:pre-wrap;overflow-wrap:anywhere}\n.rs-code-block-line{display:block;min-height:1.45em}\n.rs-code-block-number{display:inline-block;user-select:none;color:var(--text-secondary);min-width:3ch;margin-inline-end:2ch;text-align:end}\n.rs-code-block-status{font-size:0.875rem;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/code-block.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-code-block",
+        "rs-code-block-header",
+        "rs-code-block-pre",
+        "rs-code-block-wrap",
+        "rs-code-block-line",
+        "rs-code-block-number",
+        "rs-code-block-status"
+      ],
+      "snippet": "<figure class=\"rs-code-block\"><figcaption class=\"rs-code-block-header\">TypeScript</figcaption><pre class=\"rs-code-block-pre\" tabindex=\"0\" aria-label=\"TypeScript source\"><code>const range = 386;</code></pre></figure>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "CodeBlock"
+      ],
+      "example": "import { CodeBlock } from \"@noorddev/vlak-react\";\n\n<CodeBlock language=\"TypeScript\" code={\"const range = 386;\\nconst unit = \\\"km\\\";\"} lineNumbers />",
+      "usage": {
+        "use": [
+          "Installation commands, code samples, and technical documents."
+        ],
+        "avoid": [
+          "Comparing revisions; use DiffViewer."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches the copy action and scrollable source; Enter or Space copies."
+        }
+      ],
+      "a11y": [
+        "Line numbers are decorative. Copy completion and failure are announced only after the operation resolves."
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "error-summary",
+  "type": "registry:component",
+  "title": "Error summary",
+  "description": "Summarizes invalid fields and moves focus to their inputs.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/error-summary.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface FormError { id: string; message: string }\nexport interface ErrorSummaryProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"title\"> {\n  errors: FormError[];\n  title?: React.ReactNode;\n  /** Move focus to the summary after a failed submission, not while typing. */\n  autoFocus?: boolean;\n}\nconst styles = stylex.create({\n  root: { borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.ink, padding: \"1rem\", color: vlak.ink, outlineColor: vlak.ink, outlineOffset: 2 },\n  title: { fontSize: \"1rem\", fontWeight: 600, marginBlock: \"0 0.5rem\", lineHeight: 1.45 },\n  list: { margin: 0, paddingInlineStart: \"1.25rem\" },\n  link: { display: \"inline-flex\", alignItems: \"center\", minHeight: vlak.hit, minWidth: vlak.hit, color: vlak.ink, textDecoration: \"underline\", textUnderlineOffset: \"0.2em\", lineHeight: 1.45, outlineColor: vlak.ink, outlineOffset: 2 },\n});\n\n/** A form-wide summary linking each message to the field that needs attention. */\nexport const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(function ErrorSummary({ errors, title = \"Check the following fields\", autoFocus = false, className, style, ...props }, ref) {\n  const local = React.useRef<HTMLDivElement | null>(null);\n  const titleId = React.useId();\n  const hasErrors = errors.length > 0;\n  React.useEffect(() => { if (autoFocus && hasErrors) local.current?.focus(); }, [autoFocus, hasErrors]);\n  const root = rs([\"rs-error-summary\", className], styles.root);\n  const heading = rs([\"rs-error-summary-title\"], styles.title);\n  const list = rs([\"rs-error-summary-list\"], styles.list);\n  const link = rs([\"rs-error-summary-link\"], styles.link);\n  if (!hasErrors) return null;\n  return <div ref={node => { local.current = node; if (typeof ref === \"function\") ref(node); else if (ref) ref.current = node; }} role=\"alert\" aria-labelledby={titleId} tabIndex={-1} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <h2 id={titleId} {...heading}>{title}</h2><ul {...list}>{errors.map((error, index) => <li key={`${error.id}:${index}`}><a {...link} href={`#${encodeURIComponent(error.id)}`} onClick={event => { const field = document.getElementById(error.id); if (field) { event.preventDefault(); field.focus(); field.scrollIntoView?.({ block: \"nearest\" }); } }}>{error.message}</a></li>)}</ul>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/error-summary.tsx"
+    },
+    {
+      "path": "vlak/styles/error-summary.css",
+      "content": "/* ── error-summary: generated from packages/react/src/components/error-summary.tsx ── */\n.rs-error-summary{border-width:1px;border-style:solid;border-color:var(--text);padding:1rem;color:var(--text);outline-color:var(--text);outline-offset:2px}\n.rs-error-summary-title{font-size:1rem;font-weight:600;margin-block:0 0.5rem;line-height:1.45}\n.rs-error-summary-list{margin:0;padding-inline-start:1.25rem}\n.rs-error-summary-link{display:inline-flex;align-items:center;min-height:var(--hit);min-width:var(--hit);color:var(--text);text-decoration:underline;text-underline-offset:0.2em;line-height:1.45;outline-color:var(--text);outline-offset:2px}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/error-summary.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "feedback",
+      "classes": [
+        "rs-error-summary",
+        "rs-error-summary-title",
+        "rs-error-summary-list",
+        "rs-error-summary-link"
+      ],
+      "snippet": "<div class=\"rs-error-summary\" role=\"alert\" aria-labelledby=\"error-title\" tabindex=\"-1\"><h2 id=\"error-title\" class=\"rs-error-summary-title\">Check the following fields</h2><ul class=\"rs-error-summary-list\"><li><a class=\"rs-error-summary-link\" href=\"#email\">Enter an email address</a></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ErrorSummary"
+      ],
+      "example": "import { ErrorSummary } from \"@noorddev/vlak-react\";\n\n<ErrorSummary errors={[{ id: \"email\", message: \"Enter an email address\" }]} />",
+      "usage": {
+        "use": [
+          "Failed form submissions with errors across several fields."
+        ],
+        "avoid": [
+          "Validation on every keystroke; keep inline field feedback nearby."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches each field link; Enter focuses the corresponding input."
+        }
+      ],
+      "a11y": [
+        "Uses role alert with a heading. autoFocus is opt-in for failed submission, not continuous validation."
+      ]
+    }
+  }
+}

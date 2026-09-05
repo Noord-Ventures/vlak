@@ -133,6 +133,10 @@ const styles = stylex.create({
     },
   },
   root: {
+    display: "inline-flex",
+    alignItems: "center",
+    minHeight: vlak.hit,
+    minWidth: vlak.hit,
     flexShrink: 0,
     color: {
       default: vlak.ink,
@@ -163,6 +167,7 @@ const styles = stylex.create({
     },
   },
   link: {
+    minWidth: vlak.hit,
     transition: {
       default: vlak.transition,
       [mq.reduce]: "none",
@@ -199,15 +204,15 @@ const styles = stylex.create({
       ":focus-visible": 2,
     },
     display: {
-      default: null,
+      default: "inline-flex",
       [mq.phone]: "inline-flex",
     },
     alignItems: {
-      default: null,
+      default: "center",
       [mq.phone]: "center",
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
   },

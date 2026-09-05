@@ -1,0 +1,9 @@
+/* ── media-scrubber: generated from packages/react/src/components/media-scrubber.tsx ── */
+.rs-media-scrubber{display:flex;flex-direction:column;min-width:0;width:100%;color:var(--text)}
+.rs-media-scrubber-times{display:flex;justify-content:space-between;gap:1rem;color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45}
+.rs-media-scrubber-track{position:relative;display:flex;flex-direction:column}
+.rs-media-scrubber-rail{position:absolute;top:calc(50% - 1px);inset-inline-start:0;height:2px;width:100%;background-color:var(--divider);pointer-events:none}
+.rs-media-scrubber-buffered{position:absolute;top:calc(50% - 1px);inset-inline-start:0;height:2px;background-color:var(--text-secondary);pointer-events:none}
+.rs-media-scrubber-slider{background-color:transparent}
+.rs-media-scrubber-preview{position:absolute;bottom:100%;inset-inline-start:0;max-width:12rem;padding:0.5rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);pointer-events:none;z-index:1}
+.rs-media-scrubber-chapters{margin-top:0.75rem}

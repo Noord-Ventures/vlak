@@ -20,7 +20,7 @@ const styles = stylex.create({
     justifyContent: "center",
     gap: "0.375rem",
     height: {
-      default: "2rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     minHeight: {
@@ -28,7 +28,7 @@ const styles = stylex.create({
       [mq.phone]: vlak.hit,
     },
     minWidth: {
-      default: "2rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     paddingBlock: 0,
@@ -108,10 +108,7 @@ const styles = stylex.create({
     },
     alignItems: "stretch",
     boxSizing: "border-box",
-    height: {
-      default: "2rem",
-      [mq.phone]: vlak.hit,
-    },
+    minHeight: `calc(${vlak.hit} + 2 * ${vlak.hairline})`,
     width: {
       default: null,
       [mq.phone]: "100%",
@@ -131,6 +128,7 @@ const styles = stylex.create({
   },
   grouped: {
     height: "auto",
+    minHeight: vlak.hit,
     flexGrow: {
       default: null,
       [mq.phone]: 1,
@@ -217,7 +215,7 @@ export const ToggleGroup = React.forwardRef<HTMLDivElement, ToggleGroupProps>(fu
     <div ref={ref} role="group" {...props} className={group.className} style={{ ...group.style, ...nest, ...style }}>
       {options.map((option) => {
         const on = option.value === current;
-        const btn = rs(["rs-toggle", on && "rs-toggle-pressed", on && "rs-toggle-grouped-on"], styles.toggle, styles.grouped, on && styles.pressed, on && styles.groupedOn);
+        const btn = rs(["rs-toggle", "rs-toggle-grouped", on && "rs-toggle-pressed", on && "rs-toggle-grouped-on"], styles.toggle, styles.grouped, on && styles.pressed, on && styles.groupedOn);
         return (
           <button
             key={option.value}

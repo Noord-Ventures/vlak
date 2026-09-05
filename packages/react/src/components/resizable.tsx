@@ -32,7 +32,7 @@ const styles = stylex.create({
   handle: {
     flexShrink: 0,
     width: {
-      default: "0.5625rem",
+      default: vlak.hit,
       [mq.phone]: "auto",
     },
     height: {
@@ -48,11 +48,11 @@ const styles = stylex.create({
       [mq.phone]: "-0.25rem",
     },
     marginInlineStart: {
-      default: "-0.25rem",
+      default: "-1.34375rem",
       [mq.phone]: 0,
     },
     marginInlineEnd: {
-      default: "-0.25rem",
+      default: "-1.34375rem",
       [mq.phone]: 0,
     },
     position: "relative",
@@ -86,7 +86,7 @@ const styles = stylex.create({
       content: '""',
       position: "absolute",
       insetInlineStart: {
-        default: "0.25rem",
+        default: "1.34375rem",
         [mq.phone]: 0,
       },
       insetInlineEnd: {

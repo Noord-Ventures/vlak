@@ -7,14 +7,22 @@
  */
 
 import type { VlakComponent } from "./schema";
+import { dataAdditions } from "./registry-data-additions.ts";
+import { navigationAdditions } from "./registry-navigation-additions.ts";
+import { inputAdditions } from "./registry-input-additions.ts";
+import { mediaAdditions } from "./registry-media-additions.ts";
 
 export type { VlakComponent } from "./schema";
 
 export const vlakComponents: VlakComponent[] = [
+  ...dataAdditions,
+  ...navigationAdditions,
+  ...inputAdditions,
+  ...mediaAdditions,
   {
     name: "button",
     title: "Button",
-    description: "Triggers an action. Solid primary or 1px ghost; 40px tall, 36px small.",
+    description: "Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.",
     category: "actions",
     classes: ["rs-btn-primary", "rs-btn-ghost", "rs-btn-sm", "rs-btn-grouped", "rs-btn-grouped-ghost"],
     css: ["components/button.css"],
@@ -219,10 +227,11 @@ export const vlakComponents: VlakComponent[] = [
     title: "Native select",
     description: "Presents browser-native options inside a 1px control border.",
     category: "forms",
-    classes: ["rs-native-select", "rs-native-select-invalid", "rs-native-select-field", "rs-native-select-label"],
+    classes: ["rs-native-select", "rs-native-select-invalid", "rs-native-select-field", "rs-native-select-label", "rs-native-select-control", "rs-native-select-icon"],
     css: ["components/native-select.css"],
     react: "components/native-select.tsx",
-    snippet: `<select class="rs-native-select"><option>Alkmaar</option><option>Amsterdam</option><option>Rotterdam</option></select>`,
+    registryDependencies: ["icons"],
+    snippet: `<div class="rs-native-select-control"><select class="rs-native-select" aria-label="City"><option>Alkmaar</option><option>Amsterdam</option><option>Rotterdam</option></select><svg class="rs-native-select-icon rs-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" transform="rotate(90 8 8)" vector-effect="non-scaling-stroke" /></svg></div>`,
     example: `import { NativeSelect } from "@noorddev/vlak-react";
 
 <NativeSelect label="City" defaultValue="alkmaar">
@@ -250,7 +259,7 @@ export const vlakComponents: VlakComponent[] = [
     title: "Inline form",
     description: "Pairs one field with an embedded submit action. The button appears after validation.",
     category: "patterns",
-    classes: ["rs-inline-field", "rs-inline-input", "rs-inline-btn", "rs-reveal", "rs-reveal-in", "rs-subscribed", "rs-inline-field-btn"],
+    classes: ["rs-inline-field", "rs-inline-input", "rs-inline-btn", "rs-reveal", "rs-reveal-in", "rs-subscribed", "rs-inline-field-btn", "rs-inline-error"],
     css: ["components/inline-form.css"],
     react: "components/inline-form.tsx",
     registryDependencies: ["button"],
@@ -265,16 +274,18 @@ export const vlakComponents: VlakComponent[] = [
 />`,
     usage: {
       use: ["One value and one action: newsletter, invite by e-mail, join a waitlist.", "validate to decide when the action appears; the default is a loose e-mail check."],
-      avoid: ["More than one field; use Form with Field.", "Actions with side effects that need confirmation; the success state is immediate."],
+      avoid: ["More than one field; use Form with Field.", "Actions needing a separate confirmation step; compose a Dialog before submitting."],
     },
     keyboard: [
       { keys: "Enter", does: "Submits once the value validates" },
       { keys: "Tab", does: "Reaches the button only after the value validates" },
     ],
     a11y: [
-      "The input has a placeholder only; pass inputProps={{ \"aria-label\": … }} to name it.",
+      "The input is named by inputProps aria-label, falling back to the placeholder; use a clear persistent name.",
       "The submit button stays out of the tab order (tabIndex -1) until validate returns true.",
-      "After submit the form is replaced by the successLabel text and a check mark.",
+      "Submission awaits the onSubmit promise. aria-busy and pendingLabel indicate progress; duplicate submits are ignored, failure is an alert, and retry preserves the value.",
+      "Success is a live status inside the same form, preserving its ref. Without an onSubmit handler the form cannot claim success.",
+      "Controlled with value and onValueChange, or uncontrolled with defaultValue; native inputProps onChange is composed with internal state.",
     ],
     aliases: ["Inline form", "Newsletter form", "Subscribe form", "Single-field form"],
   },
@@ -315,7 +326,7 @@ const [plan, setPlan] = useState("monthly");
   {
     name: "checkbox",
     title: "Checkbox",
-    description: "Selects any number of options. 16px box, 3px radius, ink fill when checked.",
+    description: "Selects any number of options. A 44px target surrounds the check mark; indeterminate uses a minus.",
     category: "forms",
     classes: ["rs-choice", "rs-check", "rs-check-on"],
     css: ["components/checkbox.css"],
@@ -339,14 +350,14 @@ const [opted, setOpted] = useState(false);
     a11y: [
       "A native <input type=\"checkbox\"> hidden from view inside a <label>; the 16px box mirrors its state.",
       "label is the accessible name. Without one, pass aria-label.",
-      "Controlled with checked and onChange, or uncontrolled with defaultChecked.",
+      "Controlled with checked and onCheckedChange or native onChange, or uncontrolled with defaultChecked. indeterminate sets the native mixed state.",
     ],
     aliases: ["Checkbox", "Check box", "Tick box"],
   },
   {
     name: "switch",
     title: "Switch",
-    description: "Turns one setting on or off. 32×18px; on fills with ink, off uses a 1px track.",
+    description: "Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.",
     category: "forms",
     classes: ["rs-switch", "rs-switch-on", "rs-switch-thumb", "rs-switch-thumb-on"],
     css: ["components/switch.css"],
@@ -376,7 +387,7 @@ const [enabled, setEnabled] = useState(false);
   {
     name: "slider",
     title: "Slider",
-    description: "Selects one value from a range. 2px track, 14px thumb, 24px hit area.",
+    description: "Selects one value from a range. A fine track sits inside a 44px hit area.",
     category: "forms",
     classes: ["rs-slider", "rs-slider-fill", "rs-slider-thumb", "rs-slider-thumb-focused", "rs-slider-range"],
     css: ["components/slider.css"],
@@ -401,7 +412,7 @@ const [volume, setVolume] = useState(62);
     a11y: [
       "A native <input type=\"range\"> drives the ink track; the platform exposes value, min, and max.",
       "It has no visible text; pass aria-label or aria-labelledby.",
-      "The 14px thumb sits on a 24px hit area and shows a focus ring on :focus-visible.",
+      "The visible thumb sits on a 44px hit area and shows a focus ring on :focus-visible.",
     ],
     aliases: ["Slider", "Range", "Range input"],
   },
@@ -463,6 +474,7 @@ const [volume, setVolume] = useState(62);
       "TabList is role=\"tablist\" (aria-orientation when vertical); pass aria-label to name it.",
       "Tab is a <button role=\"tab\"> with aria-selected and aria-controls; TabPanel is role=\"tabpanel\" with aria-labelledby, hidden when not selected.",
       "One roving tab stop: only the selected tab is in the tab order.",
+      "Without a default, the first enabled tab is selected. Removing or disabling the active tab reconciles to the first enabled tab; each target is at least 44px.",
       "Controlled with value and onValueChange, or uncontrolled with defaultValue.",
     ],
     aliases: ["Tabs", "Tab list", "Tab bar"],
@@ -733,7 +745,7 @@ const [open, setOpen] = useState(false);
 
 innerRadius(28, 16); // 12`,
     usage: {
-      use: ["Nested rounded boxes whose corners must share a centre.", "innerRadius(outer, pad) when you set radii by hand."],
+      use: ["Nested rounded boxes whose corners must share a centre.", "innerRadius(outer, pad) computes max(0, outer minus padding) in constant time. Obsolete fit options remain accepted but are ignored."],
       avoid: ["Square chrome; surfaces are 0 or 4px and rarely nest."],
     },
     a11y: [
@@ -1168,7 +1180,7 @@ toast("Saved", { description: "Your changes are live." });`,
     title: "Dropdown menu",
     description: "Presents a compact list of actions. Menu roles and arrow-key navigation are built in.",
     category: "actions",
-    classes: ["rs-menu", "rs-dropdown", "rs-menu-item", "rs-menu-item-active", "rs-menu-item-disabled", "rs-menu-sep"],
+    classes: ["rs-menu", "rs-dropdown", "rs-menu-item", "rs-menu-item-active", "rs-menu-item-disabled", "rs-menu-sep", "rs-menu-nested"],
     css: ["components/dropdown-menu.css"],
     react: "components/dropdown-menu.tsx",
     registryDependencies: ["button"],
@@ -1193,6 +1205,7 @@ toast("Saved", { description: "Your changes are live." });`,
       { keys: "Arrow down, Enter, Space", does: "Opens the menu on the first item" },
       { keys: "Arrow up", does: "Opens the menu on the last item" },
       { keys: "Arrow down, Arrow up", does: "Moves between items and wraps" },
+      { keys: "Arrow right, Arrow left", does: "Opens a child menu or returns to its parent; directions reverse in RTL" },
       { keys: "Home, End", does: "First or last item" },
       { keys: "Type letters", does: "Moves to the next item starting with them" },
       { keys: "Enter, Space", does: "Selects the item and closes" },
@@ -1203,6 +1216,7 @@ toast("Saved", { description: "Your changes are live." });`,
       "The trigger is a <button> with aria-haspopup=\"menu\", aria-expanded, and aria-controls; label is its name.",
       "The panel is role=\"menu\" labelled by the trigger; items are <button role=\"menuitem\"> with one roving tab stop.",
       "Disabled items carry aria-disabled and are skipped; separators are <hr>. A click outside closes without moving focus.",
+      "items opens a named nested menu. checked and onCheckedChange expose controlled menuitemcheckbox state. Escape returns to the immediate parent before closing the root menu.",
     ],
     aliases: ["Dropdown menu", "Menu", "Action menu", "Overflow menu"],
   },
@@ -1443,6 +1457,8 @@ const [open, setOpen] = useState(false);
       "A visually hidden table carries every value, so the data reads without the picture; the tooltip is role=\"status\".",
       "Sparkline is role=\"img\" with a name built from label, the count, and the last value, plus the same hidden table.",
       "Numbers format through Intl.NumberFormat; locale picks the reader's own by default. Marks stay visible in forced colors.",
+      "Null or non-finite samples create gaps instead of fabricated zeros. Missing values read as No data; empty plots announce their state, and an empty Sparkline has no invented last point.",
+      "Explicit domains generate ticks within their bounds and clip marks to the plot. Without a domain, negative values remain visible.",
     ],
     aliases: ["Chart", "Line chart", "Sparkline", "Trend line"],
   },
@@ -1477,7 +1493,7 @@ const [open, setOpen] = useState(false);
   stacked
 />`,
     usage: {
-      use: ["Comparing categories; data for one series, series plus labels for several.", "stacked when the series share a field; orientation=\"horizontal\" for long labels."],
+      use: ["Comparing categories; data for one series, series plus labels for up to four grouped series.", "stacked separates positive and negative totals; orientation=\"horizontal\" and inverted work with either grouping mode."],
       avoid: ["Continuous time; use LineChart.", "Parts of one whole; use Donut or Share."],
     },
     keyboard: [
@@ -1489,6 +1505,7 @@ const [open, setOpen] = useState(false);
     a11y: [
       "The plot is a focusable <svg role=\"group\"> with aria-roledescription=\"interactive chart\", named by aria-label, aria-labelledby, yLabel, or the series names.",
       "A visually hidden table carries every value; the legend is aria-hidden because the table names the series.",
+      "Every series renders. Null and non-finite bars are omitted and read as No data; signed bars retain nonzero geometry when inverted.",
     ],
     aliases: ["Bar chart", "Column chart", "Stacked bar chart", "Horizontal bar chart"],
   },
@@ -1546,7 +1563,7 @@ const [open, setOpen] = useState(false);
   annotations={[{ at: 40, label: "204" }]}
 />`,
     usage: {
-      use: ["Two numeric variables per point; group on a point to split series.", "xDomain and yDomain to pin the axes."],
+      use: ["Two numeric variables per point; group annotates the legend and accessible data table, not a separate visual mark style.", "xDomain and yDomain pin valid numeric axes; invalid or equal domains fall back to the data extent."],
       avoid: ["Ordered categories; use BarChart.", "Thousands of points; aggregate first."],
     },
     keyboard: [
@@ -1557,6 +1574,7 @@ const [open, setOpen] = useState(false);
     ],
     a11y: [
       "A focusable, named plot with a visually hidden table of x and y per point.",
+      "Non-finite coordinates are excluded. Empty datasets display No data to display without invalid SVG coordinates.",
     ],
     aliases: ["Scatter chart", "Scatter plot", "Dot plot", "XY chart"],
   },
@@ -1581,6 +1599,7 @@ const [open, setOpen] = useState(false);
     a11y: [
       "Donut renders role=\"img\" named by the caption or label and the value text; a visually hidden table carries value and max.",
       "Share renders a named group of slices with a hidden table of label and value per slice.",
+      "Invalid totals do not produce a percentage. Share excludes negative and non-finite slices and explains an empty total.",
     ],
     aliases: ["Donut", "Donut chart", "Ring chart", "Pie chart", "Share strip"],
   },
@@ -1617,6 +1636,7 @@ const [open, setOpen] = useState(false);
     ],
     a11y: [
       "A focusable, named plot with a visually hidden table of label and count per bin.",
+      "Counts must be finite and non-negative; invalid bins are excluded, and an empty dataset is announced.",
     ],
     aliases: ["Histogram", "Distribution chart", "Frequency chart"],
   },
@@ -1625,7 +1645,7 @@ const [open, setOpen] = useState(false);
     title: "Small multiples",
     description: "Compares repeated charts on shared axes. Each panel occupies one 184px column.",
     category: "charts",
-    classes: ["rs-chart-multi"],
+    classes: ["rs-chart-multi", "rs-chart-multi-item", "rs-chart-multi-cap"],
     css: ["components/chart.css"],
     react: "components/chart.tsx",
     registryDependencies: ["chart"],
@@ -1641,7 +1661,7 @@ const [open, setOpen] = useState(false);
   unit="sheets"
 />`,
     usage: {
-      use: ["The same measure across places, products, or periods, one small line chart per panel on shared axes.", "Four to eight panels in a row of 184px columns."],
+      use: ["The same measure across places, products, or periods, one small line chart per panel on a shared value domain by default.", "Set sharedDomain=false only for independent trends; it removes direct magnitude comparison."],
       avoid: ["Panels with different units; they no longer compare.", "One series; use LineChart."],
     },
     keyboard: [
@@ -1755,6 +1775,8 @@ const [open, setOpen] = useState(false);
       "Renders role=\"group\" named by aria-label (\"One-time code\" by default); each cell is an <input> named \"Digit n\".",
       "inputMode=\"numeric\" and autoComplete=\"one-time-code\" on the first cell let phones offer the code.",
       "Inside Field, hint and error reach the group and cells through aria-describedby and aria-invalid.",
+      "Controlled with value and onValueChange, or uncontrolled with defaultValue; name submits one hidden complete-code value. disabled and readOnly apply to every cell.",
+      "Each cell has a 44px target and 4px corners. length is clamped to 1–12; onComplete fires once per distinct complete code until it changes.",
     ],
     aliases: ["One-time code", "OTP input", "InputOTP", "PIN input", "Verification code"],
   },
@@ -2084,12 +2106,14 @@ const [date, setDate] = useState<Date>();
       { keys: "Home, End", does: "First or last day of the week" },
       { keys: "Page up, Page down", does: "Same day the month before or after" },
       { keys: "Shift + Page up, Shift + Page down", does: "Same day the year before or after" },
-      { keys: "Enter, Space", does: "Selects the focused day" },
+      { keys: "Enter, Space", does: "Selects the focused available day" },
     ],
     a11y: [
       "Renders role=\"grid\" labelled by the month title, which is aria-live=\"polite\"; rows are role=\"row\" and weekday headers are role=\"columnheader\" with long names.",
       "Days are <button role=\"gridcell\"> with a full-date aria-label, aria-selected, and aria-current=\"date\" on today; one roving tab stop.",
       "Previous and next month buttons are labelled. Controlled with value and onValueChange, or uncontrolled with defaultValue.",
+      "Days and month controls are 44px targets. min, max and isDateDisabled prevent selection; unavailable days expose aria-disabled while remaining discoverable with arrows.",
+      "locale formats the month, weekdays and full-date labels; weekStart sets Sunday or Monday independently. disabled removes the day grid from the tab order.",
     ],
     aliases: ["Calendar", "Date grid", "Month view", "Day picker"],
   },
@@ -2118,11 +2142,12 @@ const [date, setDate] = useState<Date>();
       { keys: "Arrow keys, Home, End, Page up, Page down", does: "Move through the calendar" },
       { keys: "Enter, Space", does: "Selects the day and closes" },
       { keys: "Escape", does: "Closes and returns focus to the trigger" },
-      { keys: "Tab", does: "Leaves the calendar and closes it" },
+      { keys: "Tab", does: "Moves through the calendar controls; leaving the picker closes it" },
     ],
     a11y: [
       "The trigger is a <button> with aria-haspopup=\"dialog\", aria-expanded, and aria-controls; the calendar sits in a non-modal role=\"dialog\" named by dialogLabel.",
       "On open, focus moves to the selected day or today; on close it returns to the trigger.",
+      "min, max, isDateDisabled and locale pass through to Calendar. The native top-layer panel follows its trigger and flips or clamps to the viewport.",
       "Controlled with value and onValueChange, or uncontrolled with defaultValue.",
     ],
     aliases: ["Date picker", "DatePicker", "Date input", "Date field"],
@@ -2130,12 +2155,12 @@ const [date, setDate] = useState<Date>();
   {
     name: "data-table",
     title: "Data table",
-    description: "Sorts and presents structured records. Column headers expose aria-sort.",
+    description: "Sorts, filters and selects structured records. Native controls expose sort and selection state.",
     category: "content",
-    classes: ["rs-datatable-sort", "rs-datatable-empty", "rs-datatable-sort-icon", "rs-datatable-sort-icon-on", "rs-datatable-table", "rs-datatable-td", "rs-datatable-td-alt", "rs-datatable-th"],
+    classes: ["rs-datatable-sort", "rs-datatable-empty", "rs-datatable-sort-icon", "rs-datatable-sort-icon-on", "rs-datatable-table", "rs-datatable-td", "rs-datatable-td-alt", "rs-datatable-th", "rs-datatable-scroll", "rs-datatable-td-selected"],
     css: ["components/data-table.css"],
     react: "components/data-table.tsx",
-    registryDependencies: ["table"],
+    registryDependencies: ["table", "input", "checkbox"],
     snippet: `<table class="rs-table"><thead><tr><th><button class="rs-datatable-sort">Phase</button></th><th>Weeks</th></tr></thead><tbody><tr><td>Identity</td><td>4</td></tr><tr><td>Strategy</td><td>2</td></tr></tbody></table>`,
     example: `import { DataTable } from "@noorddev/vlak-react";
 
@@ -2150,16 +2175,18 @@ const [date, setDate] = useState<Date>();
   emptyLabel="No phases yet."
 />`,
     usage: {
-      use: ["Rows from data with sortable columns and an empty state.", "render for cells that are not plain values; sortValue for custom sort keys."],
-      avoid: ["Hand-written rows; use Table.", "Pagination, selection, or editing; compose those around it."],
+      use: ["Rows from data with controlled or default sorting, selection keys and text filtering.", "render for rich cells, sortValue for sort keys, filterRow for custom filtering, and a stable rowKey to keep selection attached to records."],
+      avoid: ["Hand-written rows; use Table.", "Inline editing or pagination; compose those around it. Large datasets need windowing or server-side data management."],
     },
     keyboard: [
-      { keys: "Tab", does: "Moves between the sort buttons" },
+      { keys: "Tab", does: "Moves through the optional filter, sort buttons and selection checkboxes" },
       { keys: "Enter, Space", does: "Sorts ascending, then descending, then clears" },
     ],
     a11y: [
       "Sortable headers hold a native <button>; the <th> carries aria-sort while sorted.",
-      "The empty state is plain text under the table.",
+      "Filter and sort have value/callback pairs: filter/onFilterChange and sort/onSortChange, with defaultFilter/defaultSort for local state.",
+      "selectable adds native checkboxes; selectedKeys/onSelectionChange controls selection, with defaultSelectedKeys for local state. Select all affects visible filtered rows and exposes mixed state.",
+      "A horizontal scroll container keeps the table inside its grid; caption names the data. Empty filtered results are a live status. Interactive targets are at least 44px.",
     ],
     aliases: ["Data table", "Sortable table", "Grid"],
   },
@@ -2225,12 +2252,12 @@ const [date, setDate] = useState<Date>();
   {
     name: "workflow",
     title: "Workflow card",
-    description: "Builds an ordered pipeline from draggable steps. 1px dashed frame, chips, and ghost add action.",
+    description: "Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.",
     category: "patterns",
     classes: ["rs-flow", "rs-flow-step", "rs-flow-num", "rs-flow-subs", "rs-flow-sub-add", "rs-flow-add", "rs-flow-plus", "rs-flow-body", "rs-flow-sub", "rs-flow-title"],
     css: ["components/workflow.css"],
     react: "components/flow.tsx",
-    snippet: `<div class="rs-flow" style="grid-template-columns:184px;width:184px"><div class="rs-flow-step"><span class="rs-flow-num">1</span><h4>Proposal</h4><p>Scope, timeline, and fee on one page.</p><div class="rs-flow-subs"><span>Brief</span><span>Fee</span><span class="rs-flow-sub-add">+</span></div></div><button type="button" class="rs-flow-add"><span class="rs-flow-plus">+</span> Add a step</button></div>`,
+    snippet: `<div class="rs-flow" style="grid-template-columns:184px;width:184px"><div class="rs-flow-step"><span class="rs-flow-num">1</span><h3 class="rs-flow-title">Proposal</h3><p>Scope, timeline, and fee on one page.</p><div class="rs-flow-subs"><span>Brief</span><span>Fee</span><span class="rs-flow-sub-add">+</span></div></div><button type="button" class="rs-flow-add"><span class="rs-flow-plus">+</span> Add a step</button></div>`,
     example: `import { Flow, FlowAdd, FlowBody, FlowNum, FlowStep, FlowSub, FlowSubAdd, FlowSubs, FlowTitle } from "@noorddev/vlak-react";
 
 <Flow>
@@ -2255,7 +2282,7 @@ const [date, setDate] = useState<Date>();
       { keys: "Enter, Space", does: "Activates it" },
     ],
     a11y: [
-      "FlowAdd is a native <button>; FlowTitle is an <h4>. FlowSubAdd is a <span>: wrap it in a button when it acts.",
+      "FlowAdd is a native <button>; FlowTitle is an <h3>. FlowSubAdd is a <span>: wrap it in a button when it acts. FlowStep is presentational and is not draggable by itself.",
     ],
     aliases: ["Workflow", "Pipeline", "Flow card", "Process steps"],
   },
@@ -2268,7 +2295,7 @@ const [date, setDate] = useState<Date>();
     css: ["components/assistant.css"],
     react: "components/assistant.tsx",
     snippet: `<div class="rs-ai"><div class="rs-ai-msg rs-ai-user"><div class="rs-ai-user-block">Make the intro tighter.</div></div><p class="rs-ai-reply">Done. Two sentences, same claim.</p></div>`,
-    example: `import { Assistant, AssistantHead, AssistantInput, AssistantMsg, AssistantReply, AssistantSend, AssistantStatus, AssistantTitle, AssistantUserBlock } from "@noorddev/vlak-react";
+    example: `import { Assistant, AssistantHead, AssistantMsg, AssistantReply, AssistantStatus, AssistantTitle, AssistantUserBlock, MessageComposer } from "@noorddev/vlak-react";
 
 <Assistant>
   <AssistantHead>
@@ -2279,10 +2306,7 @@ const [date, setDate] = useState<Date>();
     <AssistantUserBlock>Make the intro tighter.</AssistantUserBlock>
   </AssistantMsg>
   <AssistantReply>Done. Two sentences, same claim.</AssistantReply>
-  <AssistantInput>
-    <input aria-label="Message" placeholder="Ask anything" />
-    <AssistantSend>Send</AssistantSend>
-  </AssistantInput>
+  <MessageComposer onSend={sendMessage} />
 </Assistant>`,
     usage: {
       use: ["A chat panel with a head, a message thread, and an input row.", "AssistantCard and AssistantTag for a suggestion the reply proposes."],
@@ -2315,7 +2339,7 @@ const [date, setDate] = useState<Date>();
     ],
     a11y: [
       "A native <button> whose aria-label states the action (\"Switch to dark scheme\" or \"Switch to light scheme\").",
-      "Sets data-theme=\"dark\" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.",
+      "Sets an explicit data-theme=\"light\" or data-theme=\"dark\" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.",
     ],
     aliases: ["Theme toggle", "Dark mode toggle", "Color scheme switch", "Mode toggle"],
   },

@@ -47,6 +47,7 @@
 .rs-chart-share-seg-spot{background-color:var(--rs-chart-spot)}
 .rs-chart-hist{fill:var(--divider);stroke:none;border-radius:0}
 .rs-chart-multi{display:grid;grid-template-columns:repeat(auto-fill, minmax(184px, 1fr));gap:1.25rem}
+.rs-chart-multi-item{margin:0;min-width:0}
 .rs-chart-multi-cap{margin-top:0;margin-inline-end:0;margin-bottom:0.5rem;margin-inline-start:0;font-size:0.75rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
 .rs-spark{display:inline-block;vertical-align:middle}
 .rs-chart-svg{display:block;overflow:visible}

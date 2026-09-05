@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "task-progress",
+  "type": "registry:component",
+  "title": "Task progress",
+  "description": "Tracks long-running work with phases, honest progress, cancellation, and retry.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/task-progress.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport type TaskState = \"pending\" | \"running\" | \"paused\" | \"complete\" | \"error\" | \"cancelled\";\nexport interface TaskPhase { id: string; label: string; state: \"pending\" | \"active\" | \"complete\" | \"error\" }\nexport interface TaskProgressProps extends React.HTMLAttributes<HTMLElement> {\n  label: string;\n  state: TaskState;\n  /** Percentage, omit while the amount of work is unknown. */\n  value?: number;\n  phases?: TaskPhase[];\n  description?: React.ReactNode;\n  elapsedSeconds?: number;\n  remainingSeconds?: number;\n  onCancel?: () => void | Promise<void>;\n  onRetry?: () => void | Promise<void>;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"1rem\", color: vlak.ink, minWidth: 0, width: \"100%\" },\n  title: { margin: 0, fontSize: \"1rem\", fontWeight: 600, lineHeight: 1.45 },\n  progress: { width: \"100%\", height: \"0.5rem\", accentColor: vlak.ink },\n  detail: { margin: 0, color: vlak.gray, fontSize: \"0.875rem\", lineHeight: 1.45, fontVariantNumeric: \"tabular-nums\" },\n  phases: { margin: 0, paddingInlineStart: \"1.5rem\", lineHeight: 1.45 },\n  phase: { paddingBlock: \"0.5rem\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\nfunction duration(seconds: number) { const safe = Math.max(0, Math.round(Number.isFinite(seconds) ? seconds : 0)); return safe < 60 ? `${safe}s` : `${Math.floor(safe / 60)}m ${safe % 60}s`; }\n\n/** Honest long-running task state, including unknown progress and action failures. */\nexport const TaskProgress = React.forwardRef<HTMLElement, TaskProgressProps>(function TaskProgress({ label, state, value, phases = [], description, elapsedSeconds, remainingSeconds, onCancel, onRetry, className, style, ...props }, ref) {\n  const id = React.useId();\n  const [busy, setBusy] = React.useState(false);\n  const [actionError, setActionError] = React.useState(\"\");\n  const request = React.useRef(0);\n  React.useEffect(() => { request.current++; setBusy(false); setActionError(\"\"); return () => { request.current++; }; }, [state]);\n  const run = async (action: () => void | Promise<void>) => { if (busy) return; const current = ++request.current; setBusy(true); setActionError(\"\"); try { await action(); } catch { if (current === request.current) setActionError(\"The action failed. Try again.\"); } finally { if (current === request.current) setBusy(false); } };\n  const percentage = value != null && Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : undefined;\n  const root = rs([\"rs-task-progress\", className], styles.root);\n  const title = rs([\"rs-task-progress-title\"], styles.title);\n  const progress = rs([\"rs-task-progress-bar\"], styles.progress);\n  const detail = rs([\"rs-task-progress-detail\"], styles.detail);\n  const list = rs([\"rs-task-progress-phases\"], styles.phases);\n  const phase = rs([\"rs-task-progress-phase\"], styles.phase);\n  const actions = rs([\"rs-task-progress-actions\"], styles.actions);\n  const states: Record<TaskState, string> = { pending: \"Waiting to start\", running: \"In progress\", paused: \"Paused\", complete: \"Complete\", error: \"Failed\", cancelled: \"Cancelled\" };\n  return <section ref={ref} aria-labelledby={id} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <h2 id={id} {...title}>{label}</h2><p role=\"status\" {...detail}>{states[state]}</p>\n    <progress {...progress} aria-label={`${label} progress`} max={100} value={state === \"complete\" ? 100 : percentage} />\n    {description != null && <div {...detail}>{description}</div>}\n    {(elapsedSeconds != null || remainingSeconds != null) && <p {...detail}>{elapsedSeconds != null ? `${duration(elapsedSeconds)} elapsed` : \"\"}{elapsedSeconds != null && remainingSeconds != null ? \" · \" : \"\"}{remainingSeconds != null ? `About ${duration(remainingSeconds)} remaining` : \"\"}</p>}\n    {!!phases.length && <ol {...list}>{phases.map(item => <li key={item.id} {...phase} aria-current={item.state === \"active\" ? \"step\" : undefined}>{item.label} · {item.state}</li>)}</ol>}\n    <div {...actions}>{onCancel && [\"pending\", \"running\", \"paused\"].includes(state) && <Button variant=\"ghost\" disabled={busy} onClick={() => run(onCancel)}>Cancel task</Button>}{onRetry && [\"error\", \"cancelled\"].includes(state) && <Button variant=\"ghost\" disabled={busy} onClick={() => run(onRetry)}>Retry task</Button>}</div>\n    {actionError && <p role=\"alert\" {...detail}>{actionError}</p>}\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/task-progress.tsx"
+    },
+    {
+      "path": "vlak/styles/task-progress.css",
+      "content": "/* ── task-progress: generated from packages/react/src/components/task-progress.tsx ── */\n.rs-task-progress{display:grid;gap:1rem;color:var(--text);min-width:0;width:100%}\n.rs-task-progress-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45}\n.rs-task-progress-bar{width:100%;height:0.5rem;accent-color:var(--text)}\n.rs-task-progress-detail{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45;font-variant-numeric:tabular-nums}\n.rs-task-progress-phases{margin:0;padding-inline-start:1.5rem;line-height:1.45}\n.rs-task-progress-phase{padding-block:0.5rem}\n.rs-task-progress-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/task-progress.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "feedback",
+      "classes": [
+        "rs-task-progress",
+        "rs-task-progress-title",
+        "rs-task-progress-bar",
+        "rs-task-progress-detail",
+        "rs-task-progress-phases",
+        "rs-task-progress-phase",
+        "rs-task-progress-actions"
+      ],
+      "snippet": "<section class=\"rs-task-progress\" aria-label=\"Exporting study\"><h2 class=\"rs-task-progress-title\">Exporting study</h2><p role=\"status\">In progress</p><progress class=\"rs-task-progress-bar\" aria-label=\"Export progress\" max=\"100\" value=\"42\"></progress></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "TaskProgress"
+      ],
+      "example": "import { TaskProgress } from \"@noorddev/vlak-react\";\n\n<TaskProgress label=\"Exporting study\" state=\"running\" value={42} elapsedSeconds={12} phases={[{ id: \"prepare\", label: \"Prepare\", state: \"complete\" }, { id: \"render\", label: \"Render\", state: \"active\" }, { id: \"package\", label: \"Package\", state: \"pending\" }]} />",
+      "usage": {
+        "use": [
+          "Exports, uploads, background processing, and recoverable operations."
+        ],
+        "avoid": [
+          "A brief loading indicator; use Spinner."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches cancel or retry when supplied; Enter or Space invokes the callback."
+        }
+      ],
+      "a11y": [
+        "Native progress supports unknown completion when value is omitted. State changes are announced, elapsed seconds are not repeatedly announced."
+      ]
+    }
+  }
+}

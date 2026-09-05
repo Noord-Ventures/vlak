@@ -158,10 +158,10 @@ export const interfaces = [
     use: "Rotate the model → show the mesh → compare materials",
     field: "Full toolbar chrome around a dominant visual viewport.",
     note: "The licensed 204,461-triangle vehicle model loads through Sketchfab and needs an internet connection and WebGL. Body paint is adapted in the viewer. Geometry editing and production rendering are outside this study's scope.",
-    components: ["Button", "Icon"],
+    components: ["Button", "Icon", "Tree view", "Property grid", "Description list"],
     modifications: [
       "Ghost Buttons become equal square tool cells. Centered Icons and a high-contrast selected state identify auto-rotation, mesh view, and camera reset.",
-      "The viewport and properties pane are custom layouts. Shared borders connect the header, tool rail, and inspector without nested card frames.",
+      "Tree view selects the inspector section. Property grid edits the real material, mesh, and rotation settings; Description list aligns the mesh metadata.",
       "The vehicle model runs in an embedded Sketchfab viewer. Vlak controls use its camera, wireframe, and material APIs; loading, retry, and attribution remain visible parts of the workspace.",
     ],
   },
@@ -178,11 +178,11 @@ export const interfaces = [
     use: "Choose a vehicle view → adjust the cabin → control media",
     field: "Vehicle profile above four equal status and control fields.",
     note: "The vehicle silhouette connects the study to the Vlak films. Vehicle settings, journey details, and electric-system data are fictional. The player shows Fortress Down by Loathe; playback controls are simulated and do not stream audio.",
-    components: ["Button", "Button group", "Card", "Icon", "Progress", "Toggle group"],
+    components: ["Button", "Card", "Icon", "Progress", "Toggle group", "Metric", "Number field", "Playback controls", "Media scrubber", "Connection status"],
     modifications: [
-      "Four Cards share borders beneath the vehicle illustration. Each label is pinned to the top left, with values and controls grouped at the bottom left using equal insets. Narrow layouts keep every panel in a scrollable grid.",
+      "Four Cards share borders beneath the vehicle illustration. Metrics and the numeric cabin input share the same label and value tracks. Narrow layouts stack the panels without clipping their controls.",
       "Toggle group switches Vehicle, Journey, and Energy views. Buttons and Icons handle local vehicle settings, climate, and media, retaining the small control radius and centered icon geometry.",
-      "Button group and Buttons provide the standard playback cluster; Progress becomes its track indicator and the battery meter. The silver vehicle artwork uses screen blending against charcoal, removing the image's rectangular background without adding another card frame.",
+      "Playback controls and Media scrubber provide reusable transport and seeking with space before the track. Number field stacks temperature actions at the top right. Connection status aligns the icon and text in the header.",
     ],
   },
   {
@@ -198,11 +198,11 @@ export const interfaces = [
     use: "Select an asset → compare display layers → queue a capture",
     field: "Asset rail, dominant orbital image, telemetry and pass detail.",
     note: "Asset selection, display layers, and the capture queue work locally. Satellites and telemetry are fictional; the map uses an illustrative image.",
-    components: ["Badge", "Button", "Card", "Icon", "Item", "Progress", "Toggle group"],
+    components: ["Badge", "Button", "Card", "Icon", "Item", "Progress", "Toggle group", "Canvas controls"],
     modifications: [
       "Button supplies the capture action and asset selection. Selected assets use a full-surface fill, never a leading bar or inset edge stripe.",
       "Card, Card label, Card title, Item, Progress, and Badge compose the pass inspector. Compact Item rows align telemetry labels and values; Progress shows cloud cover; Badge reports queue state.",
-      "Toggle group switches map layers. Track lines and target markers remain custom overlays, with their motion disabled when the visitor requests reduced animation.",
+      "Toggle group switches map layers and Canvas controls zooms or resets the observation image. Track lines and target markers remain custom overlays, with their motion disabled when the visitor requests reduced animation.",
     ],
   },
   {

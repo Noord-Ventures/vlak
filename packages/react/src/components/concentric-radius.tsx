@@ -5,62 +5,15 @@ import * as stylex from "@stylexjs/stylex";
 import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
 
-/**
- * Steve Ruiz innerRadius: fit a circle to the −padding isosurface of a
- * circular corner SDF. The initial guess R = outerRadius is the wrong answer.
- * Clamp at 0. https://x.com/steveruizok/status/2072651352908370013
- */
+/** The exact inner circle shares its outer circle's center. No iterative fitting is needed. */
 export function innerRadius(
   outerRadius: number,
   padding: number,
-  { lr = 0.1, epochs = 5000 }: { lr?: number; epochs?: number } = {},
-): number {
-  const key = `${outerRadius}:${padding}:${lr}:${epochs}`;
-  const hit = innerRadiusCache.get(key);
-  if (hit != null) return hit;
-  const result = computeInnerRadius(outerRadius, padding, lr, epochs);
-  innerRadiusCache.set(key, result);
-  return result;
-}
-
-const innerRadiusCache = new Map<string, number>();
-
-function computeInnerRadius(
-  outerRadius: number,
-  padding: number,
-  lr: number,
-  epochs: number,
+  _options: { lr?: number; epochs?: number } = {},
 ): number {
   if (!Number.isFinite(outerRadius) || outerRadius <= 0) return 0;
-  if (!Number.isFinite(padding) || padding <= 0) return Math.max(0, outerRadius);
-  if (padding >= outerRadius) return 0;
-
-  const sdf = (x: number, y: number) => Math.hypot(x - outerRadius, y - outerRadius) - outerRadius;
-  const targets: Array<[number, number]> = [];
-  for (let t = Math.PI; t <= 1.5 * Math.PI; t += 0.01) {
-    let r = outerRadius;
-    for (let i = 0; i < 100; i++) {
-      const x = outerRadius + r * Math.cos(t);
-      const y = outerRadius + r * Math.sin(t);
-      r -= sdf(x, y) + padding;
-    }
-    targets.push([outerRadius + r * Math.cos(t), outerRadius + r * Math.sin(t)]);
-  }
-
-  let R = outerRadius; // initial guess: the wrong answer
-  const n = targets.length;
-  for (let e = 0; e < epochs; e++) {
-    let grad = 0;
-    for (const [x, y] of targets) {
-      const d = Math.hypot(x - outerRadius, y - outerRadius);
-      grad += 2 * (R - d);
-    }
-    R -= lr * (grad / n);
-  }
-  if (!Number.isFinite(R) || R <= 0) return 0;
-  const rounded = Math.round(R * 1e6) / 1e6;
-  const nearest = Math.round(rounded);
-  return Math.abs(rounded - nearest) < 1e-4 ? nearest : rounded;
+  if (!Number.isFinite(padding) || padding <= 0) return outerRadius;
+  return Math.max(0, outerRadius - padding);
 }
 
 export function concentricInner(outer: number, padding: number): number {

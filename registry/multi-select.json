@@ -1,0 +1,106 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "multi-select",
+  "type": "registry:component",
+  "title": "Multi-select",
+  "description": "Selects multiple predefined options from a searchable native disclosure with named checkboxes.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/checkbox.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/field.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/multi-select.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useFieldControl } from \"./field\";\nimport { Checkbox } from \"./checkbox\";\nimport { Input } from \"./input\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface MultiSelectOption { value: string; label: string; disabled?: boolean }\nexport interface MultiSelectProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\"> {\n  options: MultiSelectOption[];\n  value?: string[];\n  defaultValue?: string[];\n  onValueChange?: (value: string[]) => void;\n  label?: React.ReactNode;\n  placeholder?: string;\n  searchable?: boolean;\n  searchLabel?: string;\n  emptyLabel?: React.ReactNode;\n  clearLabel?: string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0, borderWidth: 0, margin: 0, padding: 0 },\n  legend: { padding: 0, marginBottom: \"0.5rem\", fontSize: vlak.controlLabel, color: vlak.gray },\n  trigger: { display: \"flex\", justifyContent: \"space-between\", alignItems: \"center\", gap: \"0.75rem\", boxSizing: \"border-box\", minHeight: vlak.hit, padding: \"0.625rem 0.75rem\", color: vlak.ink, backgroundColor: vlak.paper, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, fontSize: vlak.controlFs, cursor: \"pointer\", listStyle: \"none\", \"::-webkit-details-marker\": { display: \"none\" }, outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  panel: { display: \"grid\", gap: \"0.5rem\", marginTop: \"0.5rem\", padding: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper },\n  options: { display: \"grid\", gap: \"0.25rem\", maxHeight: \"16.5rem\", overflowY: \"auto\", overscrollBehavior: \"contain\" },\n  option: { minHeight: vlak.hit, paddingInline: \"0.5rem\", borderRadius: vlak.radiusSm },\n  selected: { backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.ink, [mq.forcedColors]: \"HighlightText\" } },\n  empty: { margin: 0, paddingBlock: \"0.75rem\", color: vlak.gray, fontSize: vlak.controlFs },\n  clear: { justifySelf: \"start\", width: \"auto\" },\n});\n\n/** A native disclosure containing named checkboxes; selections remain visible when collapsed. */\nexport const MultiSelect = React.forwardRef<HTMLFieldSetElement, MultiSelectProps>(function MultiSelect({\n  options, value, defaultValue = [], onValueChange, label = \"Options\", placeholder = \"Select options\", searchable = true, searchLabel = \"Filter options\", emptyLabel = \"No matching options\", clearLabel = \"Clear selection\", name, disabled, className, style, onKeyDown, ...props\n}, ref) {\n  const [current, setValue, fieldRef] = useInputValue<string[], HTMLFieldSetElement>(value, defaultValue, onValueChange, () => setQuery(\"\"));\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const [query, setQuery] = React.useState(\"\");\n  const detailsRef = React.useRef<HTMLDetailsElement>(null);\n  const summaryRef = React.useRef<HTMLElement>(null);\n  const field = useFieldControl(props);\n  const availableOptions: MultiSelectOption[] = [...options, ...current.filter((item) => !options.some((option) => option.value === item)).map((item) => ({ value: item, label: `${item} (unavailable)` }))];\n  const selected = availableOptions.filter((option) => current.includes(option.value));\n  const shown = availableOptions.filter((option) => option.label.toLocaleLowerCase().includes(query.toLocaleLowerCase()));\n  const summary = selected.length ? `${selected.slice(0, 2).map((option) => option.label).join(\", \")}${selected.length > 2 ? ` +${selected.length - 2}` : \"\"}` : placeholder;\n  const root = rs([\"rs-multi-select\", className], styles.root);\n  const legend = rs([\"rs-multi-select-legend\"], styles.legend);\n  const trigger = rs([\"rs-multi-select-trigger\"], styles.trigger);\n  const panel = rs([\"rs-multi-select-panel\"], styles.panel);\n  const list = rs([\"rs-multi-select-options\"], styles.options);\n  const empty = rs([\"rs-multi-select-empty\"], styles.empty);\n  const clear = rs([\"rs-multi-select-clear\"], styles.clear);\n  return <fieldset {...props} ref={mergedRef} disabled={disabled} className={root.className} style={{ ...root.style, ...style }} aria-describedby={field[\"aria-describedby\"]} aria-invalid={field[\"aria-invalid\"]} onKeyDown={(event) => {\n    onKeyDown?.(event);\n    if (!event.defaultPrevented && event.key === \"Escape\" && detailsRef.current?.open) { event.preventDefault(); detailsRef.current.open = false; summaryRef.current?.focus(); }\n  }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    <details ref={detailsRef}>\n      <summary ref={summaryRef} aria-disabled={disabled || undefined} tabIndex={disabled ? -1 : undefined} className={trigger.className} style={trigger.style} onClick={(event) => { if (disabled) event.preventDefault(); }}><span>{summary}</span><Icon name=\"chevron-down\" size={16} /></summary>\n      <div className={panel.className} style={panel.style}>\n        {searchable && <Input plain aria-label={searchLabel} value={query} onChange={(event) => setQuery(event.currentTarget.value)} type=\"search\" disabled={disabled} />}\n        <div className={list.className} style={list.style}>\n          {shown.map((option) => {\n            const checked = current.includes(option.value);\n            const row = rs([\"rs-multi-select-option\", checked && \"rs-multi-select-selected\"], styles.option, checked && styles.selected);\n            return <div key={option.value} className={row.className} style={row.style}><Checkbox label={option.label} checked={checked} disabled={disabled || option.disabled} onChange={(event) => setValue(event.currentTarget.checked ? [...current, option.value] : current.filter((item) => item !== option.value))} /></div>;\n          })}\n          {!shown.length && <p role=\"status\" className={empty.className} style={empty.style}>{emptyLabel}</p>}\n        </div>\n      </div>\n    </details>\n    {current.length > 0 && <Button variant=\"ghost\" disabled={disabled || selected.every((option) => option.disabled)} className={clear.className} style={clear.style} onClick={() => setValue(current.filter((item) => options.find((option) => option.value === item)?.disabled))}>{clearLabel}</Button>}\n    {name && current.map((item) => <input key={item} type=\"hidden\" name={name} value={item} disabled={disabled} />)}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/multi-select.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/multi-select.css",
+      "content": "/* ── multi-select: generated from packages/react/src/components/multi-select.tsx ── */\n.rs-multi-select{display:grid;gap:0.5rem;min-width:0;border-width:0;margin:0;padding:0}\n.rs-multi-select-legend{padding:0;margin-bottom:0.5rem;font-size:var(--control-label);color:var(--text-secondary)}\n.rs-multi-select-trigger{display:flex;justify-content:space-between;align-items:center;gap:0.75rem;box-sizing:border-box;min-height:var(--hit);padding:0.625rem 0.75rem;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:var(--control-fs);cursor:pointer;list-style:none;outline-color:var(--text);outline-offset:2px}\n.rs-multi-select-trigger::-webkit-details-marker{display:none}\n.rs-multi-select-trigger:focus-visible{outline-width:2px;outline-style:solid}\n.rs-multi-select-panel{display:grid;gap:0.5rem;margin-top:0.5rem;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg)}\n.rs-multi-select-options{display:grid;gap:0.25rem;max-height:16.5rem;overflow-y:auto;overscroll-behavior:contain}\n.rs-multi-select-option{min-height:var(--hit);padding-inline:0.5rem;border-radius:var(--radius-sm)}\n.rs-multi-select-selected{background-color:var(--control-fill);color:var(--text)}\n@media (forced-colors: active){.rs-multi-select-selected{background-color:Highlight;color:HighlightText}}\n.rs-multi-select-empty{margin:0;padding-block:0.75rem;color:var(--text-secondary);font-size:var(--control-fs)}\n.rs-multi-select-clear{justify-self:start;width:auto}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/multi-select.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-multi-select",
+        "rs-multi-select-legend",
+        "rs-multi-select-trigger",
+        "rs-multi-select-panel",
+        "rs-multi-select-options",
+        "rs-multi-select-option",
+        "rs-multi-select-selected",
+        "rs-multi-select-empty",
+        "rs-multi-select-clear"
+      ],
+      "snippet": "<fieldset class=\"rs-multi-select\"><legend class=\"rs-multi-select-legend\">Cities</legend><details><summary class=\"rs-multi-select-trigger\">Select options</summary><div class=\"rs-multi-select-panel\"><label class=\"rs-multi-select-option\"><input type=\"checkbox\" name=\"cities\" value=\"alkmaar\" /> Alkmaar</label><label class=\"rs-multi-select-option\"><input type=\"checkbox\" name=\"cities\" value=\"bergen\" /> Bergen</label></div></details></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "button",
+        "checkbox",
+        "icons",
+        "field",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "MultiSelect",
+        "Multiple select",
+        "Checkbox picker"
+      ],
+      "example": "import { MultiSelect } from \"@noorddev/vlak-react\";\n\n<MultiSelect label=\"Cities\" name=\"cities\" options={[{ value: \"alkmaar\", label: \"Alkmaar\" }, { value: \"bergen\", label: \"Bergen\" }, { value: \"castricum\", label: \"Castricum\" }]} defaultValue={[\"alkmaar\"]} />",
+      "usage": {
+        "use": [
+          "Multiple values from a known option set.",
+          "A compact summary that expands to filterable checkbox choices."
+        ],
+        "avoid": [
+          "Freeform values; use TagInput.",
+          "One option only; use Select or NativeSelect."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Enter, Space",
+          "does": "Opens or closes the native summary, or toggles the focused checkbox."
+        },
+        {
+          "keys": "Tab",
+          "does": "Moves through search, available checkboxes, and clear selection."
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the disclosure and returns focus to its summary."
+        }
+      ],
+      "a11y": [
+        "Uses native details and checkboxes instead of exposing an incomplete listbox interaction.",
+        "The legend names the field; each checkbox has its own visible name. Selected rows change fill across the full surface.",
+        "Disabled options cannot change; clear preserves disabled selections. Empty search results are announced politely.",
+        "With name, selected values are submitted as repeated fields. The ref reaches the fieldset; uncontrolled selections reset with the form."
+      ]
+    }
+  }
+}

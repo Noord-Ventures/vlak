@@ -15,7 +15,7 @@ const styles = stylex.create({
 });
 
 export interface SparklineProps extends React.HTMLAttributes<HTMLSpanElement> {
-  values: number[];
+  values: Array<number | null>;
   width?: number;
   height?: number;
   spot?: boolean | string;
@@ -40,13 +40,20 @@ export const Sparkline = React.forwardRef<HTMLSpanElement, SparklineProps>(funct
   "aria-labelledby": ariaLabelledBy,
   ...props
 }, ref) {
-  const max = Math.max(...values);
-  const min = Math.min(...values);
+  const finite = values.filter((v): v is number => typeof v === "number" && Number.isFinite(v));
+  const max = finite.length ? Math.max(...finite) : 1;
+  const min = finite.length ? Math.min(...finite) : 0;
   const span = max - min || 1;
   const x = (i: number) => (i / Math.max(values.length - 1, 1)) * (width - 4) + 2;
   const y = (v: number) => 2 + (1 - (v - min) / span) * (height - 4);
-  const d = values.map((v, i) => `${i === 0 ? "M" : "L"}${x(i)} ${y(v)}`).join(" ");
-  const last = values[values.length - 1] ?? 0;
+  let penDown = false;
+  const d = values.map((v, i) => {
+    if (typeof v !== "number" || !Number.isFinite(v)) { penDown = false; return ""; }
+    const command = `${penDown ? "L" : "M"}${x(i)} ${y(v)}`;
+    penDown = true;
+    return command;
+  }).join(" ");
+  const last = values[values.length - 1];
   const color = spot === true ? CROUWEL_SPOT : typeof spot === "string" ? spot : undefined;
   const sx = rs(["rs-spark", className], styles.spark);
   const svg = rs(["rs-chart-svg"], styles.svg);
@@ -57,7 +64,7 @@ export const Sparkline = React.forwardRef<HTMLSpanElement, SparklineProps>(funct
     : {
         "aria-label":
           ariaLabel ??
-          `${label ? `${label}: ` : ""}trend of ${values.length} values ending at ${defaultFormat(last, unit, locale)}`,
+          (finite.length ? `${label ? `${label}: ` : ""}trend of ${finite.length} values ending at ${last != null ? defaultFormat(last, unit, locale) : "No data"}` : `${label ? `${label}: ` : ""}No data to display`),
       };
   return (
     <span
@@ -79,8 +86,8 @@ export const Sparkline = React.forwardRef<HTMLSpanElement, SparklineProps>(funct
         role="img"
         {...name}
       >
-        <path className={line.className} style={line.style} d={d} />
-        <circle className={dot.className} style={dot.style} cx={x(values.length - 1)} cy={y(last)} r={2} />
+        {finite.length > 0 && <path className={line.className} style={line.style} d={d} />}
+        {last != null && Number.isFinite(last) && <circle className={dot.className} style={dot.style} cx={x(values.length - 1)} cy={y(last)} r={2} />}
       </svg>
       <SrTable
         caption={label ?? "Trend"}

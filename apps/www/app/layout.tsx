@@ -18,7 +18,7 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-const themeInit = `(function(){try{var r=document.documentElement,t=localStorage.getItem("vlak-theme");var dark=t==="dark"||((!t||t==="auto")&&matchMedia("(prefers-color-scheme: dark)").matches);if(dark)r.dataset.theme="dark";else delete r.dataset.theme;if(localStorage.getItem("vlak-grid")==="off")r.setAttribute("data-grid","off");var s=localStorage.getItem("vlak-text-scale");if(s!=null){var n=parseFloat(s);if(isFinite(n)&&n>0){if(n>3)n=n/100;r.style.setProperty("--text-scale",String(n));r.setAttribute("data-text-scale",String(Math.round(n*100)))}}}catch(e){}})()`;
+const themeInit = `(function(){try{var r=document.documentElement,t=localStorage.getItem("vlak-theme");var dark=t==="dark"||((!t||t==="auto")&&matchMedia("(prefers-color-scheme: dark)").matches);r.dataset.theme=dark?"dark":"light";if(localStorage.getItem("vlak-grid")==="off")r.setAttribute("data-grid","off");var s=localStorage.getItem("vlak-text-scale");if(s!=null){var n=parseFloat(s);if(isFinite(n)&&n>0){if(n>3)n=n/100;r.style.setProperty("--text-scale",String(n));r.setAttribute("data-text-scale",String(Math.round(n*100)))}}}catch(e){}})()`;
 
 /* First paint: hide desktop crumb labels so “Vlak” cannot sit on
    Components. The bar itself stays full-bleed (no width clip). Phone

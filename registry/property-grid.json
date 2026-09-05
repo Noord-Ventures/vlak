@@ -1,0 +1,83 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "property-grid",
+  "type": "registry:component",
+  "title": "Property grid",
+  "description": "Aligns editable labels, values, units, and hints in an inspector.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/native-select.json",
+    "https://vlak.dev/r/switch.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/property-grid.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Input } from \"./input\";\nimport { NativeSelect } from \"./native-select\";\nimport { Switch } from \"./switch\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface PropertyField { id: string; label: string; type?: \"text\" | \"number\" | \"select\" | \"switch\"; unit?: string; options?: Array<{ value: string; label: string }>; min?: number; max?: number; step?: number; disabled?: boolean; description?: string }\nexport type PropertyValues = Record<string, string | number | boolean>;\nexport interface PropertyGridProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  fields: PropertyField[];\n  value?: PropertyValues;\n  defaultValue?: PropertyValues;\n  onValueChange?: (values: PropertyValues) => void;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { color: vlak.ink, width: \"100%\", minWidth: 0 },\n  row: { display: \"grid\", gridTemplateColumns: { default: \"minmax(7rem, 1fr) minmax(0, 2fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, alignItems: \"center\", gap: \"0.75rem\", paddingBlock: \"0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  label: { lineHeight: 1.45, fontSize: \"0.875rem\" },\n  control: { display: \"flex\", gap: \"0.5rem\", alignItems: \"center\", minWidth: 0 },\n  note: { color: vlak.gray, fontSize: \"0.875rem\", lineHeight: 1.45, marginBlock: \"0.5rem 0\" },\n});\n\n/** Editable property rows with shared label/value/unit alignment. */\nexport const PropertyGrid = React.forwardRef<HTMLDivElement, PropertyGridProps>(function PropertyGrid({ fields, value, defaultValue = {}, onValueChange, label = \"Properties\", className, style, ...props }, ref) {\n  const [values, setValues, localRef] = useInputValue<PropertyValues, HTMLDivElement>(value, defaultValue, onValueChange);\n  const mergedRef = useMergedRefs(ref, localRef);\n  const id = React.useId();\n  const set = (field: string, next: string | number | boolean) => setValues({ ...values, [field]: next });\n  const root = rs([\"rs-property-grid\", className], styles.root);\n  const row = rs([\"rs-property-grid-row\"], styles.row);\n  const lab = rs([\"rs-property-grid-label\"], styles.label);\n  const control = rs([\"rs-property-grid-control\"], styles.control);\n  const note = rs([\"rs-property-grid-note\"], styles.note);\n  return <div ref={mergedRef} role=\"group\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>{fields.map(field => { const fieldId = `${id}-${field.id}`; const hint = [field.description ? `${fieldId}-hint` : null, field.unit ? `${fieldId}-unit` : null].filter(Boolean).join(\" \") || undefined; return <div key={field.id} {...row}><label {...lab} htmlFor={fieldId}>{field.label}</label><div><div {...control}>\n    {field.type === \"switch\" ? <><Switch id={fieldId} aria-label={field.label} aria-describedby={hint} checked={Boolean(values[field.id])} disabled={field.disabled} onCheckedChange={next => set(field.id, next)} /><input type=\"hidden\" name={field.id} value={String(Boolean(values[field.id]))} disabled={field.disabled} /></> : field.type === \"select\" ? <NativeSelect id={fieldId} name={field.id} aria-label={field.label} aria-describedby={hint} value={String(values[field.id] ?? \"\")} disabled={field.disabled} onChange={event => set(field.id, event.target.value)}><option value=\"\">Select {field.label.toLocaleLowerCase()}</option>{field.options?.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</NativeSelect> : <Input plain id={fieldId} name={field.id} aria-describedby={hint} type={field.type === \"number\" ? \"number\" : \"text\"} min={field.min} max={field.max} step={field.step} disabled={field.disabled} value={String(values[field.id] ?? \"\")} onChange={event => set(field.id, field.type === \"number\" && event.target.value !== \"\" && Number.isFinite(event.target.valueAsNumber) ? event.target.valueAsNumber : event.target.value)} />}\n    {field.unit && <span {...note} id={`${fieldId}-unit`}>{field.unit}</span>}</div>{field.description && <p {...note} id={`${fieldId}-hint`}>{field.description}</p>}</div></div>; })}</div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/property-grid.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/property-grid.css",
+      "content": "/* ── property-grid: generated from packages/react/src/components/property-grid.tsx ── */\n.rs-property-grid{color:var(--text);width:100%;min-width:0}\n.rs-property-grid-row{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 2fr);align-items:center;gap:0.75rem;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n@media (max-width: 640px){.rs-property-grid-row{grid-template-columns:minmax(0, 1fr)}}\n.rs-property-grid-label{line-height:1.45;font-size:0.875rem}\n.rs-property-grid-control{display:flex;gap:0.5rem;align-items:center;min-width:0}\n.rs-property-grid-note{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin-block:0.5rem 0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/property-grid.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "patterns",
+      "classes": [
+        "rs-property-grid",
+        "rs-property-grid-row",
+        "rs-property-grid-label",
+        "rs-property-grid-control",
+        "rs-property-grid-note"
+      ],
+      "snippet": "<div class=\"rs-property-grid\" role=\"group\" aria-label=\"Properties\"><div class=\"rs-property-grid-row\"><label class=\"rs-property-grid-label\" for=\"property-name\">Name</label><div class=\"rs-property-grid-control\"><input class=\"rs-input\" id=\"property-name\" value=\"Drive\" /></div></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "native-select",
+        "switch",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "PropertyGrid"
+      ],
+      "example": "import { PropertyGrid } from \"@noorddev/vlak-react\";\n\n<PropertyGrid defaultValue={{ name: \"Drive\", range: 386, enabled: true }} fields={[{ id: \"name\", label: \"Name\" }, { id: \"range\", label: \"Range\", type: \"number\", unit: \"km\", min: 0 }, { id: \"enabled\", label: \"Connected\", type: \"switch\" }]} />",
+      "usage": {
+        "use": [
+          "Inspector panels and dense settings with mixed field types."
+        ],
+        "avoid": [
+          "Read-only facts; use DescriptionList."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, native field keys, Space",
+          "does": "Native text/number/select fields keep their editing keys; Space toggles a switch."
+        }
+      ],
+      "a11y": [
+        "Each row labels its actual control and associates its hint. Native numeric constraints remain available to forms."
+      ]
+    }
+  }
+}

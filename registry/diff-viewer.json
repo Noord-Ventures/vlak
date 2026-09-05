@@ -1,0 +1,76 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "diff-viewer",
+  "type": "registry:component",
+  "title": "Diff viewer",
+  "description": "Compares text revisions in unified or split rows with explicit change labels.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/diff-viewer.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface DiffLine { kind: \"same\" | \"removed\" | \"added\"; text: string; before?: number; after?: number }\n/** Line LCS with bounded memory. Large changes use a truthful coarse replacement. */\nexport function diffLines(before: string, after: string): DiffLine[] {\n  const a = before === \"\" ? [] : before.split(\"\\n\");\n  const b = after === \"\" ? [] : after.split(\"\\n\");\n  const result: DiffLine[] = [];\n  let start = 0;\n  while (start < a.length && start < b.length && a[start] === b[start]) { result.push({ kind: \"same\", text: a[start]!, before: start + 1, after: start + 1 }); start++; }\n  let endA = a.length; let endB = b.length;\n  while (endA > start && endB > start && a[endA - 1] === b[endB - 1]) { endA--; endB--; }\n  const n = endA - start; const m = endB - start;\n  if ((n + 1) * (m + 1) > 1_000_000) {\n    for (let i = start; i < endA; i++) result.push({ kind: \"removed\", text: a[i]!, before: i + 1 });\n    for (let j = start; j < endB; j++) result.push({ kind: \"added\", text: b[j]!, after: j + 1 });\n  } else {\n    const lcs = new Uint32Array((n + 1) * (m + 1));\n    const at = (i: number, j: number) => i * (m + 1) + j;\n    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) lcs[at(i, j)] = a[start + i] === b[start + j] ? 1 + lcs[at(i + 1, j + 1)]! : Math.max(lcs[at(i + 1, j)]!, lcs[at(i, j + 1)]!);\n    let i = 0; let j = 0;\n    while (i < n || j < m) {\n      if (i < n && j < m && a[start + i] === b[start + j]) { result.push({ kind: \"same\", text: a[start + i]!, before: start + i + 1, after: start + j + 1 }); i++; j++; }\n      else if (i < n && (j === m || lcs[at(i + 1, j)]! >= lcs[at(i, j + 1)]!)) { result.push({ kind: \"removed\", text: a[start + i]!, before: start + i + 1 }); i++; }\n      else { result.push({ kind: \"added\", text: b[start + j]!, after: start + j + 1 }); j++; }\n    }\n  }\n  for (let i = endA, j = endB; i < a.length; i++, j++) result.push({ kind: \"same\", text: a[i]!, before: i + 1, after: j + 1 });\n  return result;\n}\nexport interface DiffViewerProps extends React.HTMLAttributes<HTMLDivElement> {\n  before: string;\n  after: string;\n  label?: string;\n  view?: \"unified\" | \"split\";\n  defaultView?: \"unified\" | \"split\";\n  onViewChange?: (view: \"unified\" | \"split\") => void;\n  /** Maximum rendered rows per page, clamped to 1–1000. */\n  pageSize?: number;\n}\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", justifyContent: \"space-between\", gap: \"0.5rem\", marginBottom: \"1rem\" },\n  tools: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  scroll: { overflowX: \"auto\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, outlineColor: vlak.ink, outlineOffset: 2 },\n  table: { width: \"100%\", borderCollapse: \"collapse\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", fontSize: \"0.875rem\", lineHeight: 1.45, textAlign: \"start\" },\n  cell: { paddingBlock: \"0.25rem\", paddingInline: \"0.75rem\", whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\", verticalAlign: \"top\", textAlign: \"start\" },\n  change: { backgroundColor: vlak.controlFill, fontWeight: 500 },\n  number: { color: vlak.gray, width: \"3ch\", paddingInline: \"0.5rem\", verticalAlign: \"top\", fontVariantNumeric: \"tabular-nums\", textAlign: \"end\" },\n});\n\n/** Monochrome before/after comparison with explicit change labels, never color alone. */\nexport const DiffViewer = React.forwardRef<HTMLDivElement, DiffViewerProps>(function DiffViewer({ before, after, label = \"Changes\", view, defaultView = \"unified\", onViewChange, pageSize = 200, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultView);\n  const current = view ?? inner;\n  const lines = React.useMemo(() => diffLines(before, after), [before, after]);\n  const limit = Math.max(1, Math.min(1000, Number.isFinite(pageSize) ? Math.floor(pageSize) : 200));\n  const [pagination, setPagination] = React.useState({ lines, page: 0 });\n  const lastPage = Math.max(0, Math.ceil(lines.length / limit) - 1);\n  const page = pagination.lines === lines ? Math.min(pagination.page, lastPage) : 0;\n  const start = page * limit;\n  const visible = lines.slice(start, start + limit);\n  const added = lines.filter(line => line.kind === \"added\").length;\n  const removed = lines.filter(line => line.kind === \"removed\").length;\n  const root = rs([\"rs-diff-viewer\", className], styles.root);\n  const header = rs([\"rs-diff-viewer-header\"], styles.header);\n  const tools = rs([\"rs-diff-viewer-tools\"], styles.tools);\n  const scroll = rs([\"rs-diff-viewer-scroll\"], styles.scroll);\n  const table = rs([\"rs-diff-viewer-table\"], styles.table);\n  const cell = rs([\"rs-diff-viewer-cell\"], styles.cell);\n  const number = rs([\"rs-diff-viewer-number\"], styles.number);\n  const change = rs([\"rs-diff-viewer-change\"], styles.change);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...header}><span>{added} added, {removed} removed</span><div {...tools} role=\"group\" aria-label=\"Diff layout\">{([\"unified\", \"split\"] as const).map(mode => <Button key={mode} variant={current === mode ? \"primary\" : \"ghost\"} aria-pressed={current === mode} onClick={() => { if (view === undefined) setInner(mode); onViewChange?.(mode); }}>{mode === \"unified\" ? \"Unified\" : \"Split\"}</Button>)}</div></div>\n    <div {...scroll} tabIndex={0} role=\"region\" aria-label={label}><table {...table}><caption>{label}</caption><thead><tr><th {...cell} scope=\"col\">Change</th><th {...cell} scope=\"col\">Before</th><th {...cell} scope=\"col\">After</th>{current === \"unified\" && <th {...cell} scope=\"col\">Content</th>}</tr></thead><tbody>\n      {visible.map((line, index) => <tr key={`${start + index}:${line.kind}`} {...(line.kind !== \"same\" ? change : {})}><th {...cell} scope=\"row\">{line.kind === \"same\" ? \"Unchanged\" : line.kind === \"added\" ? \"Added\" : \"Removed\"}</th>{current === \"unified\" ? <><td {...number}>{line.before ?? \"\"}</td><td {...number}>{line.after ?? \"\"}</td><td {...cell}>{line.text || \" \"}</td></> : <><td {...cell}>{line.kind !== \"added\" ? line.text || \" \" : \"\"}</td><td {...cell}>{line.kind !== \"removed\" ? line.text || \" \" : \"\"}</td></>}</tr>)}\n      {!lines.length && <tr><td {...cell} colSpan={current === \"unified\" ? 4 : 3}>No content to compare</td></tr>}\n    </tbody></table></div>\n    {lines.length > limit && <nav {...header} aria-label=\"Diff pages\"><p role=\"status\">Lines {start + 1}–{Math.min(start + limit, lines.length)} of {lines.length}</p><div {...tools}><Button variant=\"ghost\" disabled={page === 0} onClick={() => setPagination({ lines, page: page - 1 })}>Previous lines</Button><Button variant=\"ghost\" disabled={page === lastPage} onClick={() => setPagination({ lines, page: page + 1 })}>Next lines</Button></div></nav>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/diff-viewer.tsx"
+    },
+    {
+      "path": "vlak/styles/diff-viewer.css",
+      "content": "/* ── diff-viewer: generated from packages/react/src/components/diff-viewer.tsx ── */\n.rs-diff-viewer{width:100%;min-width:0;color:var(--text)}\n.rs-diff-viewer-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:1rem}\n.rs-diff-viewer-tools{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-diff-viewer-scroll{overflow-x:auto;border-width:1px;border-style:solid;border-color:var(--divider);outline-color:var(--text);outline-offset:2px}\n.rs-diff-viewer-table{width:100%;border-collapse:collapse;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;text-align:start}\n.rs-diff-viewer-cell{padding-block:0.25rem;padding-inline:0.75rem;white-space:pre-wrap;overflow-wrap:anywhere;vertical-align:top;text-align:start}\n.rs-diff-viewer-change{background-color:var(--control-fill);font-weight:500}\n.rs-diff-viewer-number{color:var(--text-secondary);width:3ch;padding-inline:0.5rem;vertical-align:top;font-variant-numeric:tabular-nums;text-align:end}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/diff-viewer.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-diff-viewer",
+        "rs-diff-viewer-header",
+        "rs-diff-viewer-tools",
+        "rs-diff-viewer-scroll",
+        "rs-diff-viewer-table",
+        "rs-diff-viewer-cell",
+        "rs-diff-viewer-change",
+        "rs-diff-viewer-number"
+      ],
+      "snippet": "<div class=\"rs-diff-viewer\"><div class=\"rs-diff-viewer-scroll\" tabindex=\"0\" role=\"region\" aria-label=\"Changes\"><table class=\"rs-diff-viewer-table\"><caption>Changes</caption><thead><tr><th scope=\"col\">Change</th><th scope=\"col\">Content</th></tr></thead><tbody><tr class=\"rs-diff-viewer-change\"><th scope=\"row\">Added</th><td class=\"rs-diff-viewer-cell\">range: 386</td></tr></tbody></table></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "DiffViewer"
+      ],
+      "example": "import { DiffViewer } from \"@noorddev/vlak-react\";\n\n<DiffViewer label=\"Configuration changes\" before={\"range: 368\\nbattery: 84\"} after={\"range: 386\\nbattery: 84\"} />",
+      "usage": {
+        "use": [
+          "Reviewing configuration, document, or code changes."
+        ],
+        "avoid": [
+          "Rich document editing or merging conflicts."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches layout buttons, the scrollable comparison, and page controls; Enter or Space switches layout or moves between line pages."
+        }
+      ],
+      "a11y": [
+        "Table headers and explicit Added/Removed labels communicate changes without color. Large replacements use a bounded coarse diff. At most 200 rows render per page by default; pageSize is capped at 1000, with page ranges announced and all lines reachable through navigation."
+      ]
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "playback-controls",
+  "type": "registry:component",
+  "title": "Playback controls",
+  "description": "Groups named play, pause, previous, next, and stop controls with 44px targets.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/playback-controls.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface PlaybackControlsProps extends React.HTMLAttributes<HTMLDivElement> {\n  playing?: boolean;\n  defaultPlaying?: boolean;\n  onPlayingChange?: (playing: boolean) => void;\n  onPrevious?: () => void;\n  onNext?: () => void;\n  onStop?: () => void;\n  disabled?: boolean;\n  previousDisabled?: boolean;\n  nextDisabled?: boolean;\n  previousLabel?: string;\n  nextLabel?: string;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", gap: \"0.5rem\", paddingBottom: \"0.75rem\", color: vlak.ink },\n  action: { width: vlak.hit, minWidth: vlak.hit, height: vlak.hit, padding: 0, flexShrink: 0 },\n});\n\n/** Named, keyboard-operable transport buttons. Playback state may be owned by a media element. */\nexport const PlaybackControls = React.forwardRef<HTMLDivElement, PlaybackControlsProps>(function PlaybackControls({ playing, defaultPlaying = false, onPlayingChange, onPrevious, onNext, onStop, disabled = false, previousDisabled = false, nextDisabled = false, previousLabel = \"Previous track\", nextLabel = \"Next track\", label = \"Playback controls\", className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultPlaying);\n  const active = playing ?? inner;\n  const change = (next: boolean) => { if (playing === undefined) setInner(next); onPlayingChange?.(next); };\n  const root = rs([\"rs-playback-controls\", className], styles.root);\n  const action = rs([\"rs-playback-action\"], styles.action);\n  return <div ref={ref} role=\"group\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {onPrevious && <Button {...action} variant=\"ghost\" disabled={disabled || previousDisabled} aria-label={previousLabel} onClick={onPrevious}><Icon name=\"skip-back\" /></Button>}\n    <Button {...action} disabled={disabled} aria-label={active ? \"Pause\" : \"Play\"} onClick={() => change(!active)}><Icon name={active ? \"pause\" : \"play\"} /></Button>\n    {onNext && <Button {...action} variant=\"ghost\" disabled={disabled || nextDisabled} aria-label={nextLabel} onClick={onNext}><Icon name=\"skip-forward\" /></Button>}\n    {onStop && <Button {...action} variant=\"ghost\" disabled={disabled} aria-label=\"Stop\" onClick={() => { change(false); onStop(); }}><Icon name=\"stop\" /></Button>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/playback-controls.tsx"
+    },
+    {
+      "path": "vlak/styles/playback-controls.css",
+      "content": "/* ── playback-controls: generated from packages/react/src/components/playback-controls.tsx ── */\n.rs-playback-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;padding-bottom:0.75rem;color:var(--text)}\n.rs-playback-action{width:var(--hit);min-width:var(--hit);height:var(--hit);padding:0;flex-shrink:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/playback-controls.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "actions",
+      "classes": [
+        "rs-playback-controls",
+        "rs-playback-action"
+      ],
+      "snippet": "<div class=\"rs-playback-controls\" role=\"group\" aria-label=\"Playback controls\"><button class=\"rs-btn-primary rs-playback-action\" type=\"button\" aria-label=\"Play\">Play</button></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "PlaybackControls",
+        "Transport controls",
+        "Media controls"
+      ],
+      "example": "import { PlaybackControls } from \"@noorddev/vlak-react\";\n\n<PlaybackControls playing={playing} onPlayingChange={setPlaying} onPrevious={restartTrack} previousLabel=\"Restart track\" onNext={skipAhead} nextLabel=\"Skip ahead\" />",
+      "usage": {
+        "use": [
+          "Transport controls beside media metadata or inside a player.",
+          "Custom previous and next labels when actions restart or seek."
+        ],
+        "avoid": [
+          "A media source by itself; use MediaPlayer to bind to audio or video."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves between enabled transport buttons."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused transport action."
+        }
+      ],
+      "a11y": [
+        "Every icon button has a state-aware accessible name.",
+        "Optional previous, next, and stop actions render only when supplied.",
+        "The containing group has a customisable label; disabled actions use native disabled buttons."
+      ]
+    }
+  }
+}

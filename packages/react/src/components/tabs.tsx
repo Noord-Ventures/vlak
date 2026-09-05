@@ -4,6 +4,7 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
+import { useMergedRefs } from "../merge-refs";
 
 interface TabsContextValue {
   value: string;
@@ -12,6 +13,7 @@ interface TabsContextValue {
   /** Panels currently mounted, so a tab only claims aria-controls for one that exists. */
   panels: ReadonlySet<string>;
   registerPanel: (value: string) => () => void;
+  registerTab: (value: string, element: HTMLButtonElement, disabled: boolean) => () => void;
 }
 
 const TabsContext = React.createContext<TabsContextValue | null>(null);
@@ -93,9 +95,10 @@ const styles = stylex.create({
       [mq.phone]: "center",
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
+    minWidth: vlak.hit,
     paddingBlock: {
       default: "0.5rem",
       [mq.phone]: 0,
@@ -191,15 +194,30 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     });
   }, []);
   const [inner, setInner] = React.useState(defaultValue ?? "");
+  const [tabs, setTabs] = React.useState<ReadonlyMap<string, { element: HTMLButtonElement; disabled: boolean }>>(() => new Map());
+  const registerTab = React.useCallback((v: string, element: HTMLButtonElement, disabled: boolean) => {
+    setTabs((prev) => new Map(prev).set(v, { element, disabled }));
+    return () => setTabs((prev) => {
+      const next = new Map(prev);
+      next.delete(v);
+      return next;
+    });
+  }, []);
   const isControlled = value !== undefined;
-  const current = isControlled ? value : inner;
+  const requested = isControlled ? value : inner;
+  const enabled = [...tabs].filter(([, tab]) => !tab.disabled).sort(([, a], [, b]) =>
+    a.element.compareDocumentPosition(b.element) & 4 ? -1 : 1);
+  const current = enabled.some(([v]) => v === requested) ? requested : enabled[0]?.[0] ?? requested;
+  React.useEffect(() => {
+    if (!isControlled && enabled.length && current !== inner) setInner(current);
+  }, [isControlled, enabled.length, current, inner]);
   const setValue = (next: string) => {
     if (!isControlled) setInner(next);
     onValueChange?.(next);
   };
   return (
     <div ref={ref} {...props}>
-      <TabsContext.Provider value={{ value: current, setValue, idBase, panels, registerPanel }}>
+      <TabsContext.Provider value={{ value: current, setValue, idBase, panels, registerPanel, registerTab }}>
         {children}
       </TabsContext.Provider>
     </div>
@@ -259,24 +277,29 @@ export interface TabProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
 }
 
 export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(function Tab(
-  { value, className, style, onClick, ...props },
+  { value, className, style, onClick, disabled = false, ...props },
   ref,
 ) {
   const ctx = useTabsContext("Tab");
+  const element = React.useRef<HTMLButtonElement>(null);
+  const mergedRef = useMergedRefs(ref, element);
+  const registerTab = ctx.registerTab;
+  React.useEffect(() => element.current ? registerTab(value, element.current, disabled) : undefined, [registerTab, value, disabled]);
   const selected = ctx.value === value;
   const sx = rs(["rs-tab", selected && "rs-tab-active", className], styles.tab, selected && styles.active);
   return (
     <button
-      ref={ref}
+      ref={mergedRef}
       type="button"
       role="tab"
+      disabled={disabled}
       id={`${ctx.idBase}-tab-${value}`}
       aria-selected={selected}
       aria-controls={ctx.panels.has(value) ? `${ctx.idBase}-panel-${value}` : undefined}
       tabIndex={selected ? 0 : -1}
       onClick={(e) => {
-        ctx.setValue(value);
         onClick?.(e);
+        if (!e.defaultPrevented) ctx.setValue(value);
       }}
       {...props}
       className={sx.className}

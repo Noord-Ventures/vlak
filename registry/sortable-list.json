@@ -1,0 +1,75 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sortable-list",
+  "type": "registry:component",
+  "title": "Sortable list",
+  "description": "Reorders items with drag handles, move buttons, and keyboard shortcuts.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/sortable-list.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface SortableItem { id: string; label: string; content?: React.ReactNode; disabled?: boolean }\nexport interface SortableListProps extends Omit<React.HTMLAttributes<HTMLOListElement>, \"defaultValue\"> {\n  value?: SortableItem[];\n  defaultValue?: SortableItem[];\n  onValueChange?: (items: SortableItem[]) => void;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { listStyleType: \"none\", margin: 0, padding: 0, width: \"100%\", color: vlak.ink },\n  item: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.75rem\", paddingBlock: \"0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  content: { flex: \"1 1 10rem\", minWidth: 0, overflowWrap: \"anywhere\", lineHeight: 1.45 },\n  actions: { display: \"flex\", gap: \"0.25rem\" },\n  status: { position: \"absolute\", width: 1, height: 1, overflow: \"hidden\", clipPath: \"inset(50%)\", whiteSpace: \"nowrap\" },\n});\n\n/** Reordering through drag, named move buttons, or Alt and the arrow keys. */\nexport const SortableList = React.forwardRef<HTMLOListElement, SortableListProps>(function SortableList({ value, defaultValue = [], onValueChange, label = \"Reorder items\", className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const items = value ?? inner;\n  const [announcement, setAnnouncement] = React.useState(\"\");\n  const dragging = React.useRef<string | null>(null);\n  const handles = React.useRef(new Map<string, HTMLButtonElement>());\n  const pending = React.useRef<{ id: string; order: string[] } | null>(null);\n  React.useLayoutEffect(() => {\n    const request = pending.current;\n    if (!request || request.order.length !== items.length || !request.order.every((id, index) => items[index]?.id === id)) return;\n    pending.current = null;\n    const index = items.findIndex(item => item.id === request.id);\n    const item = items[index];\n    if (item) { setAnnouncement(`${item.label}, position ${index + 1} of ${items.length}`); handles.current.get(item.id)?.focus(); }\n  }, [items]);\n  const move = (id: string, destination: number) => {\n    const source = items.findIndex(item => item.id === id); const item = items[source];\n    if (!item || item.disabled || destination < 0 || destination >= items.length || destination === source) return;\n    const next = [...items]; next.splice(source, 1); next.splice(destination, 0, item);\n    pending.current = { id, order: next.map(entry => entry.id) };\n    if (value === undefined) setInner(next); onValueChange?.(next);\n  };\n  const root = rs([\"rs-sortable-list\", className], styles.root);\n  const row = rs([\"rs-sortable-list-item\"], styles.item);\n  const content = rs([\"rs-sortable-list-content\"], styles.content);\n  const actions = rs([\"rs-sortable-list-actions\"], styles.actions);\n  const status = rs([\"rs-sortable-list-status\"], styles.status);\n  const helpId = React.useId();\n  return <><span {...status} id={helpId}>Use move buttons, or focus an item handle and press Alt with Arrow up or Arrow down.</span><ol ref={ref} aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {items.map((item, index) => <li key={item.id} {...row} onDragOver={event => { if (dragging.current) event.preventDefault(); }} onDrop={event => { event.preventDefault(); if (dragging.current) move(dragging.current, index); dragging.current = null; }}>\n      <Button ref={element => { if (element) handles.current.set(item.id, element); else handles.current.delete(item.id); }} variant=\"ghost\" style={{ width: \"auto\", paddingInline: \"0.75rem\" }} draggable={!item.disabled} disabled={item.disabled} aria-label={`Move ${item.label}`} aria-describedby={helpId} onDragStart={event => { dragging.current = item.id; event.dataTransfer.effectAllowed = \"move\"; event.dataTransfer.setData(\"text/plain\", item.id); }} onDragEnd={() => { dragging.current = null; }} onKeyDown={event => { if (event.altKey && [\"ArrowUp\", \"ArrowDown\"].includes(event.key)) { event.preventDefault(); move(item.id, index + (event.key === \"ArrowUp\" ? -1 : 1)); } }}><Icon name=\"grip\" /></Button>\n      <div {...content}>{item.content ?? item.label}</div><div {...actions}><Button variant=\"ghost\" style={{ width: \"auto\", paddingInline: \"0.75rem\" }} disabled={item.disabled || index === 0} aria-label={`Move ${item.label} up`} onClick={() => move(item.id, index - 1)}><Icon name=\"arrow-up\" /></Button><Button variant=\"ghost\" style={{ width: \"auto\", paddingInline: \"0.75rem\" }} disabled={item.disabled || index === items.length - 1} aria-label={`Move ${item.label} down`} onClick={() => move(item.id, index + 1)}><Icon name=\"arrow-down\" /></Button></div>\n    </li>)}\n  </ol><span {...status} role=\"status\">{announcement}</span></>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/sortable-list.tsx"
+    },
+    {
+      "path": "vlak/styles/sortable-list.css",
+      "content": "/* ── sortable-list: generated from packages/react/src/components/sortable-list.tsx ── */\n.rs-sortable-list{list-style-type:none;margin:0;padding:0;width:100%;color:var(--text)}\n.rs-sortable-list-item{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:0.75rem;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-sortable-list-content{flex:1 1 10rem;min-width:0;overflow-wrap:anywhere;line-height:1.45}\n.rs-sortable-list-actions{display:flex;gap:0.25rem}\n.rs-sortable-list-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/sortable-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "content",
+      "classes": [
+        "rs-sortable-list",
+        "rs-sortable-list-item",
+        "rs-sortable-list-content",
+        "rs-sortable-list-actions",
+        "rs-sortable-list-status"
+      ],
+      "snippet": "<ol class=\"rs-sortable-list\" aria-label=\"Reorder items\"><li class=\"rs-sortable-list-item\"><div class=\"rs-sortable-list-content\">Research</div><div class=\"rs-sortable-list-actions\"><button class=\"rs-btn-ghost\" aria-label=\"Move Research down\">Move down</button></div></li></ol>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "SortableList"
+      ],
+      "example": "import { SortableList } from \"@noorddev/vlak-react\";\n\n<SortableList defaultValue={[{ id: \"research\", label: \"Research\" }, { id: \"design\", label: \"Design\" }, { id: \"build\", label: \"Build\" }]} />",
+      "usage": {
+        "use": [
+          "Ordering tasks, workflow steps, and priority lists."
+        ],
+        "avoid": [
+          "Cross-column status changes alone; use KanbanBoard."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space, Alt+Arrow up/down",
+          "does": "Move buttons work with Enter/Space; Alt with Up/Down on a handle changes its position."
+        }
+      ],
+      "a11y": [
+        "Each move action names the item; position changes are announced and focus stays with the moved item."
+      ]
+    }
+  }
+}

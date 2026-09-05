@@ -6,7 +6,9 @@ import { join } from "node:path";
 const root = fileURLToPath(new URL("../../..", import.meta.url));
 const examples = join(root, "apps/www/components/examples");
 const registry = readFileSync(join(root, "packages/core/src/registry.ts"), "utf8");
-const names = [...registry.matchAll(/^\s+name:\s+"([a-z0-9-]+)"/gm)].map((m) => m[1]);
+const registrySources = [registry, ...[...registry.matchAll(/from "\.\/(registry-[a-z-]+\.ts)"/g)]
+  .map((match) => readFileSync(join(root, "packages/core/src", match[1]), "utf8"))];
+const names = registrySources.flatMap((source) => [...source.matchAll(/^\s+(?:name|"name"):\s+"([a-z0-9-]+)"/gm)].map((match) => match[1]));
 
 if (names.length === 0) {
   console.error("No component names found in registry.ts");
@@ -29,7 +31,8 @@ if (extras.length) {
 }
 
 const slot = readFileSync(join(examples, "use-slot.tsx"), "utf8");
-const unmapped = names.filter((name) => !slot.includes(`"${name}"`) && !new RegExp(`(?:^|\\n)\\s+${name}:`, "m").test(slot));
+const mappings = slot + (slot.includes("additions[name]") ? readFileSync(join(examples, "additions.tsx"), "utf8") : "");
+const unmapped = names.filter((name) => !mappings.includes(`"${name}"`) && !new RegExp(`(?:^|\\n)\\s+${name}:`, "m").test(mappings));
 if (unmapped.length) {
   console.error("use-slot.tsx missing imports:\n" + unmapped.map((n) => `  ${n}`).join("\n"));
   process.exit(1);

@@ -1,0 +1,73 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "connection-status",
+  "type": "registry:component",
+  "title": "Connection status",
+  "description": "Communicates connecting, connected, offline, and reconnecting states.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/connection-status.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport type ConnectionState = \"connecting\" | \"connected\" | \"offline\" | \"reconnecting\";\nexport interface ConnectionStatusProps extends React.HTMLAttributes<HTMLDivElement> {\n  state: ConnectionState;\n  label?: string;\n  description?: React.ReactNode;\n  onRetry?: () => void | Promise<void>;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.75rem\", color: vlak.ink, minWidth: 0 },\n  status: { display: \"inline-flex\", alignItems: \"center\", gap: \"0.5rem\", lineHeight: 1.45 },\n  detail: { color: vlak.gray, fontSize: \"0.875rem\", lineHeight: 1.45, margin: 0 },\n});\n\n/** Application-supplied connection state. A successful retry does not assume reconnection. */\nexport const ConnectionStatus = React.forwardRef<HTMLDivElement, ConnectionStatusProps>(function ConnectionStatus({ state, label, description, onRetry, className, style, ...props }, ref) {\n  const [busy, setBusy] = React.useState(false);\n  const [error, setError] = React.useState(\"\");\n  const generation = React.useRef(0);\n  React.useEffect(() => { generation.current++; setBusy(false); setError(\"\"); return () => { generation.current++; }; }, [state]);\n  const retry = async () => { if (!onRetry || busy) return; const id = ++generation.current; setBusy(true); setError(\"\"); try { await onRetry(); } catch { if (id === generation.current) setError(\"Could not reconnect. Try again.\"); } finally { if (id === generation.current) setBusy(false); } };\n  const root = rs([\"rs-connection-status\", className], styles.root);\n  const status = rs([\"rs-connection-status-label\"], styles.status);\n  const detail = rs([\"rs-connection-status-detail\"], styles.detail);\n  const names: Record<ConnectionState, string> = { connecting: \"Connecting\", connected: \"Connected\", offline: \"Offline\", reconnecting: \"Reconnecting\" };\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <span {...status} role=\"status\"><Icon name={state === \"offline\" ? \"wifi-off\" : \"wifi\"} size={16} />{label ?? names[state]}</span>{description != null && <span {...detail}>{description}</span>}{onRetry && state === \"offline\" && <Button variant=\"ghost\" disabled={busy} onClick={retry}>{busy ? \"Retrying\" : \"Retry connection\"}</Button>}{error && <p {...detail} role=\"alert\">{error}</p>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/connection-status.tsx"
+    },
+    {
+      "path": "vlak/styles/connection-status.css",
+      "content": "/* ── connection-status: generated from packages/react/src/components/connection-status.tsx ── */\n.rs-connection-status{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;color:var(--text);min-width:0}\n.rs-connection-status-label{display:inline-flex;align-items:center;gap:0.5rem;line-height:1.45}\n.rs-connection-status-detail{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/connection-status.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "feedback",
+      "classes": [
+        "rs-connection-status",
+        "rs-connection-status-label",
+        "rs-connection-status-detail"
+      ],
+      "snippet": "<div class=\"rs-connection-status\"><span class=\"rs-connection-status-label\" role=\"status\">Connected</span><span class=\"rs-connection-status-detail\">Changes are synchronized</span></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ConnectionStatus"
+      ],
+      "example": "import { ConnectionStatus } from \"@noorddev/vlak-react\";\n\n<ConnectionStatus state=\"connected\" description=\"Changes are synchronized\" />",
+      "usage": {
+        "use": [
+          "Network-dependent controls and synchronization status."
+        ],
+        "avoid": [
+          "Inferring server connectivity from browser online status alone."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Tab reaches retry when offline and a callback is supplied; Enter or Space retries."
+        }
+      ],
+      "a11y": [
+        "State is visible text announced politely. Retry completion does not assume the connection recovered."
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+/* ── media-player: generated from packages/react/src/components/media-player.tsx ── */
+.rs-media-player{width:100%;min-width:0;color:var(--text);display:flex;flex-direction:column;gap:1rem}
+.rs-media-player-media{display:block;width:100%;max-height:32rem;background-color:var(--control-fill)}
+.rs-media-player-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45;overflow-wrap:anywhere}
+.rs-media-player-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem}
+.rs-media-player-action{width:auto;padding-inline:0.75rem;min-width:var(--hit);min-height:var(--hit)}
+.rs-media-player-volume{flex:0 1 8rem;min-width:5rem}
+.rs-media-player-status{margin:0;font-size:0.875rem;color:var(--text-secondary);line-height:1.45}
+.rs-media-player-transcript{line-height:1.45;max-width:66ch}
+.rs-media-player-summary{min-height:var(--hit);cursor:pointer;display:flex;align-items:center;font-weight:500}
+.rs-media-player-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}

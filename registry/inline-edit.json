@@ -1,0 +1,98 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "inline-edit",
+  "type": "registry:component",
+  "title": "Inline edit",
+  "description": "Switches a text value into an editor with explicit save and cancel, validation, and optional async persistence.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/inline-edit.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Button } from \"./button\";\nimport { Input } from \"./input\";\n\nexport interface InlineEditProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"onChange\" | \"defaultValue\"> {\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  label?: string;\n  name?: string;\n  disabled?: boolean;\n  placeholder?: string;\n  validate?: (value: string) => string | undefined;\n  /** Resolves before the value is committed. Rejections leave the draft editable. */\n  onSave?: (value: string) => void | Promise<void>;\n  editLabel?: string;\n  saveLabel?: string;\n  cancelLabel?: string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  row: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", gap: \"0.5rem\", minWidth: 0 },\n  label: { fontSize: vlak.controlLabel, color: vlak.gray },\n  value: { minWidth: 0, flex: \"1 1 10rem\", fontSize: vlak.controlFs, overflowWrap: \"anywhere\" },\n  input: { minWidth: 0, flex: \"1 1 10rem\" },\n  action: { width: \"auto\" },\n  error: { margin: 0, color: vlak.ink, fontSize: vlak.controlLabel },\n});\n\nexport const InlineEdit = React.forwardRef<HTMLDivElement, InlineEditProps>(function InlineEdit({\n  value, defaultValue = \"\", onValueChange, label = \"Value\", name, disabled, placeholder = \"Not set\", validate, onSave, editLabel = \"Edit\", saveLabel = \"Save\", cancelLabel = \"Cancel\", className, style, ...props\n}, ref) {\n  const [current, setValue, rootRef] = useInputValue<string, HTMLDivElement>(value, defaultValue, onValueChange, () => { saveVersion.current++; setEditing(false); setError(\"\"); setPending(false); });\n  const mergedRef = useMergedRefs(ref, rootRef);\n  const [editing, setEditing] = React.useState(false);\n  const [draft, setDraft] = React.useState(\"\");\n  const [pending, setPending] = React.useState(false);\n  const [error, setError] = React.useState(\"\");\n  const inputRef = React.useRef<HTMLInputElement>(null);\n  const triggerRef = React.useRef<HTMLButtonElement>(null);\n  const wasEditing = React.useRef(false);\n  const mounted = React.useRef(true);\n  const saveVersion = React.useRef(0);\n  const id = React.useId();\n  React.useEffect(() => { mounted.current = true; return () => { mounted.current = false; }; }, []);\n  React.useEffect(() => {\n    if (editing) { inputRef.current?.focus(); inputRef.current?.select(); }\n    else if (wasEditing.current) triggerRef.current?.focus();\n    wasEditing.current = editing;\n  }, [editing]);\n  const cancel = () => { if (!pending) { setEditing(false); setError(\"\"); } };\n  const save = async () => {\n    if (pending || disabled) return;\n    const validation = validate?.(draft);\n    if (validation) { setError(validation); inputRef.current?.focus(); return; }\n    const version = ++saveVersion.current;\n    setPending(true); setError(\"\");\n    try {\n      await onSave?.(draft);\n      if (mounted.current && version === saveVersion.current) { setValue(draft); setEditing(false); }\n    } catch (reason) { if (mounted.current && version === saveVersion.current) setError(reason instanceof Error ? reason.message : \"Could not save. Try again.\"); }\n    finally { if (mounted.current && version === saveVersion.current) setPending(false); }\n  };\n  const root = rs([\"rs-inline-edit\", className], styles.root);\n  const row = rs([\"rs-inline-edit-row\"], styles.row);\n  const lab = rs([\"rs-inline-edit-label\"], styles.label);\n  const text = rs([\"rs-inline-edit-value\"], styles.value);\n  const input = rs([\"rs-inline-edit-input\"], styles.input);\n  const action = rs([\"rs-inline-edit-action\"], styles.action);\n  const feedback = rs([\"rs-inline-edit-error\"], styles.error);\n  return <div {...props} ref={mergedRef} className={root.className} style={{ ...root.style, ...style }} aria-busy={pending || undefined}>\n    <span id={`${id}-label`} className={lab.className} style={lab.style}>{label}</span>\n    <div className={row.className} style={row.style}>{editing ? <>\n      <Input ref={inputRef} plain value={draft} aria-labelledby={`${id}-label`} aria-describedby={error ? `${id}-error` : undefined} aria-invalid={Boolean(error)} disabled={disabled || pending} className={input.className} style={input.style} onChange={(event) => { setDraft(event.currentTarget.value); setError(\"\"); }} onKeyDown={(event) => {\n        if (event.nativeEvent.isComposing) return;\n        if (event.key === \"Enter\") { event.preventDefault(); void save(); }\n        if (event.key === \"Escape\") { event.preventDefault(); cancel(); }\n      }} />\n      <Button disabled={disabled || pending} className={action.className} style={action.style} onClick={() => void save()}>{pending ? \"Saving…\" : saveLabel}</Button>\n      <Button variant=\"ghost\" disabled={pending} className={action.className} style={action.style} onClick={cancel}>{cancelLabel}</Button>\n    </> : <><span className={text.className} style={text.style}>{current || placeholder}</span><Button ref={triggerRef} variant=\"ghost\" disabled={disabled} className={action.className} style={action.style} aria-label={`${editLabel} ${label}`} onClick={() => { setDraft(current); setEditing(true); setError(\"\"); }}>{editLabel}</Button></>}</div>\n    {error && <p id={`${id}-error`} role=\"alert\" className={feedback.className} style={feedback.style}>{error}</p>}\n    {name && <input type=\"hidden\" name={name} value={current} disabled={disabled} />}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/inline-edit.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/inline-edit.css",
+      "content": "/* ── inline-edit: generated from packages/react/src/components/inline-edit.tsx ── */\n.rs-inline-edit{display:grid;gap:0.5rem;min-width:0}\n.rs-inline-edit-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;min-width:0}\n.rs-inline-edit-label{font-size:var(--control-label);color:var(--text-secondary)}\n.rs-inline-edit-value{min-width:0;flex:1 1 10rem;font-size:var(--control-fs);overflow-wrap:anywhere}\n.rs-inline-edit-input{min-width:0;flex:1 1 10rem}\n.rs-inline-edit-action{width:auto}\n.rs-inline-edit-error{margin:0;color:var(--text);font-size:var(--control-label)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/inline-edit.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "forms",
+      "classes": [
+        "rs-inline-edit",
+        "rs-inline-edit-row",
+        "rs-inline-edit-label",
+        "rs-inline-edit-value",
+        "rs-inline-edit-input",
+        "rs-inline-edit-action",
+        "rs-inline-edit-error"
+      ],
+      "snippet": "<div class=\"rs-inline-edit\"><span class=\"rs-inline-edit-label\">Project name</span><div class=\"rs-inline-edit-row\"><span class=\"rs-inline-edit-value\">Field study</span><button class=\"rs-btn-ghost rs-inline-edit-action\" type=\"button\" aria-label=\"Edit Project name\">Edit</button></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "InlineEdit",
+        "Editable text",
+        "Click to edit"
+      ],
+      "example": "import { InlineEdit } from \"@noorddev/vlak-react\";\n\n<InlineEdit label=\"Project name\" name=\"project\" defaultValue=\"Field study\" validate={(value) => value.trim() ? undefined : \"Enter a project name\"} />",
+      "usage": {
+        "use": [
+          "A short text value edited in its reading context.",
+          "Provide onSave to await persistence before committing a new value."
+        ],
+        "avoid": [
+          "Long-form writing; use Textarea.",
+          "Implicit save-on-blur flows; this requires an explicit save."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Enter, Space on Edit",
+          "does": "Opens the editor, focuses the input and selects its text."
+        },
+        {
+          "keys": "Enter in the editor",
+          "does": "Validates and saves without submitting the enclosing form."
+        },
+        {
+          "keys": "Escape in the editor",
+          "does": "Discards the draft and returns focus to Edit."
+        }
+      ],
+      "a11y": [
+        "The input is named by the visible label. Save errors preserve the draft and appear as alerts.",
+        "Successful save and cancel return focus to Edit. Pending saves disable duplicate actions and expose aria-busy.",
+        "Hidden name submits only the committed value. Form reset restores uncontrolled defaults and discards drafts; late pending responses do not reapply them.",
+        "The forwarded ref reaches the root div. No nested form is introduced."
+      ]
+    }
+  }
+}

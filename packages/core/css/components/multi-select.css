@@ -1,0 +1,13 @@
+/* ── multi-select: generated from packages/react/src/components/multi-select.tsx ── */
+.rs-multi-select{display:grid;gap:0.5rem;min-width:0;border-width:0;margin:0;padding:0}
+.rs-multi-select-legend{padding:0;margin-bottom:0.5rem;font-size:var(--control-label);color:var(--text-secondary)}
+.rs-multi-select-trigger{display:flex;justify-content:space-between;align-items:center;gap:0.75rem;box-sizing:border-box;min-height:var(--hit);padding:0.625rem 0.75rem;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:var(--control-fs);cursor:pointer;list-style:none;outline-color:var(--text);outline-offset:2px}
+.rs-multi-select-trigger::-webkit-details-marker{display:none}
+.rs-multi-select-trigger:focus-visible{outline-width:2px;outline-style:solid}
+.rs-multi-select-panel{display:grid;gap:0.5rem;margin-top:0.5rem;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg)}
+.rs-multi-select-options{display:grid;gap:0.25rem;max-height:16.5rem;overflow-y:auto;overscroll-behavior:contain}
+.rs-multi-select-option{min-height:var(--hit);padding-inline:0.5rem;border-radius:var(--radius-sm)}
+.rs-multi-select-selected{background-color:var(--control-fill);color:var(--text)}
+@media (forced-colors: active){.rs-multi-select-selected{background-color:Highlight;color:HighlightText}}
+.rs-multi-select-empty{margin:0;padding-block:0.75rem;color:var(--text-secondary);font-size:var(--control-fs)}
+.rs-multi-select-clear{justify-self:start;width:auto}

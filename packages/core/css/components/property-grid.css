@@ -1,0 +1,7 @@
+/* ── property-grid: generated from packages/react/src/components/property-grid.tsx ── */
+.rs-property-grid{color:var(--text);width:100%;min-width:0}
+.rs-property-grid-row{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 2fr);align-items:center;gap:0.75rem;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+@media (max-width: 640px){.rs-property-grid-row{grid-template-columns:minmax(0, 1fr)}}
+.rs-property-grid-label{line-height:1.45;font-size:0.875rem}
+.rs-property-grid-control{display:flex;gap:0.5rem;align-items:center;min-width:0}
+.rs-property-grid-note{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin-block:0.5rem 0}

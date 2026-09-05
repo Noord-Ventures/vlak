@@ -1,0 +1,6 @@
+/* ── sortable-list: generated from packages/react/src/components/sortable-list.tsx ── */
+.rs-sortable-list{list-style-type:none;margin:0;padding:0;width:100%;color:var(--text)}
+.rs-sortable-list-item{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:0.75rem;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-sortable-list-content{flex:1 1 10rem;min-width:0;overflow-wrap:anywhere;line-height:1.45}
+.rs-sortable-list-actions{display:flex;gap:0.25rem}
+.rs-sortable-list-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

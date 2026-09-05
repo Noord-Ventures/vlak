@@ -1,0 +1,7 @@
+/* ── query-builder: generated from packages/react/src/components/query-builder.tsx ── */
+.rs-query-builder{display:grid;gap:1rem;width:100%;min-width:0;color:var(--text)}
+.rs-query-builder-group{border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;margin:0;min-width:0;display:grid;gap:0.75rem}
+.rs-query-builder-legend{font-weight:600;font-size:0.875rem;padding-inline:0.25rem}
+.rs-query-builder-rule{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.5rem;align-items:end}
+.rs-query-builder-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-query-builder-summary{margin:0;max-width:66ch;overflow-wrap:anywhere;font-size:0.875rem;line-height:1.45;color:var(--text-secondary)}

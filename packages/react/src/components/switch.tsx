@@ -17,24 +17,24 @@ const styles = stylex.create({
     display: "inline-flex",
     boxSizing: "border-box",
     width: {
-      default: "2rem",
+      default: "4rem",
       [mq.phone]: "4rem",
     },
     height: {
-      default: "1.125rem",
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     minWidth: {
-      default: null,
+      default: "4rem",
       [mq.phone]: "4rem",
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     borderRadius: {
-      default: 9,
-      [mq.phone]: 9,
+      default: "1.375rem",
+      [mq.phone]: "1.375rem",
     },
     borderWidth: 1.5,
     borderStyle: "solid",
@@ -67,15 +67,6 @@ const styles = stylex.create({
       default: null,
       ":focus-visible": 2,
     },
-    /* The visible track stays 32×18; the hit area grows to 24px tall. */
-    "::before": {
-      content: '""',
-      position: "absolute",
-      top: "-0.1875rem",
-      bottom: "-0.1875rem",
-      insetInlineStart: 0,
-      insetInlineEnd: 0,
-    },
   },
   on: {
     backgroundColor: {
@@ -91,19 +82,19 @@ const styles = stylex.create({
   thumb: {
     position: "absolute",
     top: {
-      default: "0.09375rem",
-      [mq.phone]: "0.25rem",
+      default: "0.15625rem",
+      [mq.phone]: "0.15625rem",
     },
     insetInlineStart: {
-      default: "0.09375rem",
-      [mq.phone]: "0.25rem",
+      default: "0.15625rem",
+      [mq.phone]: "0.15625rem",
     },
     width: {
-      default: "0.75rem",
+      default: "2.25rem",
       [mq.phone]: "2.25rem",
     },
     height: {
-      default: "0.75rem",
+      default: "2.25rem",
       [mq.phone]: "2.25rem",
     },
     borderRadius: {
@@ -126,7 +117,7 @@ const styles = stylex.create({
       [mq.forcedColors]: "HighlightText",
     },
     transform: {
-      default: "translateX(14px)",
+      default: "translateX(20px)",
       [mq.phone]: "translateX(20px)",
     },
   },

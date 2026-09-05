@@ -1,0 +1,11 @@
+/* ── image-viewer: generated from packages/react/src/components/image-viewer.tsx ── */
+.rs-image-viewer{display:flex;flex-direction:column;gap:1rem;width:100%;min-width:0;color:var(--text)}
+.rs-image-viewer-canvas{overflow:auto;height:22rem;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--divider)}
+.rs-image-viewer-canvas:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+.rs-image-viewer-plane{display:grid;place-items:center;width:max-content;height:max-content;min-width:100%;min-height:100%}
+.rs-image-viewer-image{display:block;max-width:none;max-height:none;object-fit:contain}
+.rs-image-viewer-controls{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:center;gap:0.75rem}
+.rs-image-viewer-navigation{display:flex;gap:0.5rem;align-items:center}
+.rs-image-viewer-action{width:auto;min-width:var(--hit);padding-inline:0.75rem}
+.rs-image-viewer-caption{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere}
+.rs-image-viewer-modal{width:min(64rem, calc(100vw - 2rem));max-width:calc(100vw - 2rem)}

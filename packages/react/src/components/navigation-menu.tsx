@@ -23,16 +23,17 @@ const styles = stylex.create({
     },
   },
   link: {
+    minWidth: vlak.hit,
     display: {
-      default: null,
+      default: "inline-flex",
       [mq.phone]: "inline-flex",
     },
     alignItems: {
-      default: null,
+      default: "center",
       [mq.phone]: "center",
     },
     minHeight: {
-      default: null,
+      default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
     paddingInline: {
