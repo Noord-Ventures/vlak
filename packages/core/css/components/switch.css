@@ -10,6 +10,6 @@
 .rs-switch-thumb{position:absolute;top:0.84375rem;inset-inline-start:0.21875rem;width:1.0625rem;height:1.0625rem;border-radius:50%;background-color:var(--text-secondary);forced-color-adjust:none;transition:transform var(--duration) var(--ease)}
 @media (forced-colors: active){.rs-switch-thumb{background-color:ButtonText}}
 @media (prefers-reduced-motion: reduce){.rs-switch-thumb{transition:none}}
-.rs-switch-thumb-on{background-color:var(--bg);transform:translateX(20px)}
-.rs-switch-thumb-on:dir(rtl){transform:translateX(-20px)}
+.rs-switch-thumb-on{background-color:var(--bg);transform:translateX(1.25rem)}
+.rs-switch-thumb-on:dir(rtl){transform:translateX(-1.25rem)}
 @media (forced-colors: active){.rs-switch-thumb-on{background-color:HighlightText}}

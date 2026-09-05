@@ -102,8 +102,8 @@ const styles = stylex.create({
       [mq.forcedColors]: "HighlightText",
     },
     transform: {
-      default: "translateX(20px)",
-      ":dir(rtl)": "translateX(-20px)",
+      default: "translateX(1.25rem)",
+      ":dir(rtl)": "translateX(-1.25rem)",
     },
   },
 });

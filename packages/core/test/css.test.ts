@@ -77,7 +77,8 @@ describe("generated vlak.css", () => {
     expect(hit).toContain("min-height:var(--hit)");
     expect(rail).toContain("width:2.75rem");
     expect(rail).toContain("height:1.5rem");
-    expect(css).toContain(".rs-switch-thumb-on:dir(rtl){transform:translateX(-20px)}");
+    expect(css).toContain(".rs-switch-thumb-on{background-color:var(--bg);transform:translateX(1.25rem)}");
+    expect(css).toContain(".rs-switch-thumb-on:dir(rtl){transform:translateX(-1.25rem)}");
   });
 
   it("gives toggle segments breathing room", () => {
