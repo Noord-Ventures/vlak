@@ -68,6 +68,9 @@ for (const path of pages) {
   }
   for (const e of errors) fail(`${path}: page error ${e}`);
   if ((await desk.locator("main").count()) !== 1) fail(`${path}: expected exactly one <main>`);
+  if ((await desk.locator('.preview-box .rs-use, .preview-box [data-use], .gallery .rs-use, .gallery [data-use]').count()) !== 0) {
+    fail(`${path}: Preview contains an In action composition`);
+  }
 }
 
 /* Skip link. */
@@ -94,11 +97,50 @@ await desk.close();
 
 /* Phone. */
 const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-for (const path of ["/", "/docs/", "/components/", "/components/button/", "/components/select/", "/components/data-table/", "/about/", "/interfaces/evening/"]) {
+for (const path of ["/", "/docs/", "/components/", "/about/", "/interfaces/evening/", ...catalogComponents.map(c => `/components/${c.name}/`)]) {
   await phone.goto(base + path, { waitUntil: "networkidle" });
   const overflow = await phone.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   if (overflow > 0) fail(`${path}: horizontal overflow of ${overflow}px at 390px`);
 }
+await phone.goto(`${base}/components/switch/`, { waitUntil: "networkidle" });
+const breadcrumbSpacing = await phone.evaluate(() => {
+  const trail = document.querySelector(".site-crumb-bar .rs-crumbs");
+  const link = trail.querySelector(".rs-crumbs-link").getBoundingClientRect();
+  const slash = trail.querySelector(".rs-crumbs-sep").getBoundingClientRect();
+  const title = trail.querySelector(".rs-crumbs-here").getBoundingClientRect();
+  return { before: slash.left - link.right, after: title.left - slash.right, linkHeight: link.height };
+});
+if (breadcrumbSpacing.before < 4 || breadcrumbSpacing.after < 4 || breadcrumbSpacing.linkHeight < 44) {
+  fail(`phone: breadcrumb needs space around / and a 44px link target: ${JSON.stringify(breadcrumbSpacing)}`);
+}
+const switchSize = await phone.evaluate(() => {
+  const control = document.querySelector('.preview-box [role="switch"]');
+  const hit = control.getBoundingClientRect();
+  const rail = getComputedStyle(control, "::before");
+  return { width: hit.width, height: hit.height, railWidth: rail.width, railHeight: rail.height };
+});
+if (switchSize.width < 44 || switchSize.height < 44 || switchSize.railWidth !== "44px" || switchSize.railHeight !== "24px") {
+  fail(`phone: switch must have a 44px hit area and slim 44×24px rail: ${JSON.stringify(switchSize)}`);
+}
+await phone.setViewportSize({ width: 320, height: 844 });
+await phone.goto(`${base}/components/notification-center/`, { waitUntil: "networkidle" });
+const longBreadcrumb = await phone.evaluate(() => {
+  const title = document.querySelector(".site-crumb-bar .rs-crumbs-here");
+  const trail = title.parentElement.getBoundingClientRect();
+  const box = title.getBoundingClientRect();
+  return {
+    overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    fits: box.right <= trail.right + 1 && box.width > 0,
+    ellipsis: getComputedStyle(title).textOverflow,
+  };
+});
+if (longBreadcrumb.overflow > 0 || !longBreadcrumb.fits || longBreadcrumb.ellipsis !== "ellipsis") {
+  fail(`phone: long breadcrumb must fit the grid and truncate at 320px: ${JSON.stringify(longBreadcrumb)}`);
+}
+await phone.setViewportSize({ width: 390, height: 844 });
+await phone.goto(`${base}/components/toggle-group/`, { waitUntil: "networkidle" });
+const narrowToggles = await phone.locator('.preview-box .rs-toggle').evaluateAll(controls => controls.filter(control => Number.parseFloat(getComputedStyle(control).paddingInlineStart) < 20).length);
+if (narrowToggles) fail("phone: toggle segments must keep 20px horizontal padding");
 await phone.goto(`${base}/components/select/`, { waitUntil: "networkidle" });
 const mobileSelect = await phone.evaluate(() => {
   const preview = document.querySelector('.preview-box [role="combobox"]').getBoundingClientRect();

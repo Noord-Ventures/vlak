@@ -1,6 +1,6 @@
 # Switch
 
-Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.
+Turns one setting on or off. A slim 44×24px track sits inside a 44px touch target.
 
 Category: forms  
 Name: `switch`  
@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/switch.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<span class="rs-switch rs-switch-on"><i></i></span>
+<button type="button" class="rs-switch rs-switch-on" role="switch" aria-checked="true" aria-label="Notifications"><i class="rs-switch-thumb rs-switch-thumb-on" aria-hidden="true"></i></button>
 ```
 
 ## Example

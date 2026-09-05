@@ -5341,7 +5341,7 @@
         {
           "name": "ThemeToggle",
           "kind": "component",
-          "description": "One mark. Moon on paper, sun on black. The button sets data-theme=\"dark\" on <html> and persists the choice. Apps pin it top-right; catalog and previews use the inline modifier. The name states the action (\"Switch to dark scheme\"), so it changes with the state.",
+          "description": "One filled family mark on a 24px square, about 18–20px of drawn ink. Moon on paper, sun on black. The button sets data-theme=\"dark\" on <html> and persists the choice. Apps pin it top-right; catalog and previews use the inline modifier. The name states the action (\"Switch to dark scheme\"), so it changes with the state.",
           "extends": "Omit<ButtonHTMLAttributes<HTMLButtonElement>, \"onChange\">",
           "ref": "HTMLButtonElement",
           "props": [

@@ -33,8 +33,8 @@ const styles = stylex.create({
     },
     paddingBlock: 0,
     paddingInline: {
-      default: "0.625rem",
-      [mq.phone]: "0.875rem",
+      default: "1.25rem",
+      [mq.phone]: "1.25rem",
     },
     fontSize: {
       default: "0.8125rem",

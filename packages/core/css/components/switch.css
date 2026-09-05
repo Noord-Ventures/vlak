@@ -1,15 +1,15 @@
 /* ── switch: generated from packages/react/src/components/switch.tsx ── */
-.rs-switch{display:inline-flex;box-sizing:border-box;width:4rem;height:var(--hit);min-width:4rem;min-height:var(--hit);border-radius:1.375rem;border-width:1.5px;border-style:solid;border-color:var(--control-border);position:relative;flex-shrink:0;padding:0;background-color:transparent;cursor:pointer;transition:background-color var(--duration) var(--ease), border-color var(--duration) var(--ease)}
+.rs-switch{display:inline-flex;box-sizing:border-box;width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);border-radius:var(--radius-sm);border-width:0;position:relative;flex-shrink:0;padding:0;background-color:transparent;cursor:pointer}
+.rs-switch::before{content:"";box-sizing:border-box;position:absolute;top:0.625rem;inset-inline-start:0;width:2.75rem;height:1.5rem;border-radius:0.75rem;border-width:1.5px;border-style:solid;border-color:var(--control-border);background-color:transparent;transition:background-color var(--duration) var(--ease), border-color var(--duration) var(--ease)}
 .rs-switch:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
-@media (max-width: 640px){.rs-switch{width:4rem;height:var(--hit);min-width:4rem;min-height:var(--hit);border-radius:1.375rem}}
-@media (forced-colors: active){.rs-switch{border-color:ButtonText}}
-@media (prefers-reduced-motion: reduce){.rs-switch{transition:none}}
-.rs-switch-on{background-color:var(--text);border-color:var(--text);forced-color-adjust:none}
-@media (forced-colors: active){.rs-switch-on{background-color:Highlight;border-color:Highlight}}
-.rs-switch-thumb{position:absolute;top:0.15625rem;inset-inline-start:0.15625rem;width:2.25rem;height:2.25rem;border-radius:50%;background-color:var(--text-secondary);forced-color-adjust:none;transition:transform var(--duration) var(--ease)}
-@media (max-width: 640px){.rs-switch-thumb{top:0.15625rem;inset-inline-start:0.15625rem;width:2.25rem;height:2.25rem;border-radius:50%}}
+@media (forced-colors: active){.rs-switch::before{border-color:ButtonText}}
+@media (prefers-reduced-motion: reduce){.rs-switch::before{transition:none}}
+.rs-switch-on::before{background-color:var(--text);border-color:var(--text)}
+.rs-switch-on{forced-color-adjust:none}
+@media (forced-colors: active){.rs-switch-on::before{background-color:Highlight;border-color:Highlight}}
+.rs-switch-thumb{position:absolute;top:0.84375rem;inset-inline-start:0.21875rem;width:1.0625rem;height:1.0625rem;border-radius:50%;background-color:var(--text-secondary);forced-color-adjust:none;transition:transform var(--duration) var(--ease)}
 @media (forced-colors: active){.rs-switch-thumb{background-color:ButtonText}}
 @media (prefers-reduced-motion: reduce){.rs-switch-thumb{transition:none}}
 .rs-switch-thumb-on{background-color:var(--bg);transform:translateX(20px)}
+.rs-switch-thumb-on:dir(rtl){transform:translateX(-20px)}
 @media (forced-colors: active){.rs-switch-thumb-on{background-color:HighlightText}}
-@media (max-width: 640px){.rs-switch-thumb-on{transform:translateX(20px)}}

@@ -26,26 +26,11 @@ const styles = stylex.create({
       [mq.mobileGrid]: "1.5625rem",
     },
     zIndex: vlak.zSticky,
-    width: {
-      default: vlak.hit,
-      [mq.phone]: vlak.hit,
-    },
-    height: {
-      default: vlak.hit,
-      [mq.phone]: vlak.hit,
-    },
-    minWidth: {
-      default: null,
-      [mq.phone]: vlak.hit,
-    },
-    minHeight: {
-      default: null,
-      [mq.phone]: vlak.hit,
-    },
-    padding: {
-      default: "0.25rem",
-      [mq.phone]: "0.75rem",
-    },
+    width: vlak.hit,
+    height: vlak.hit,
+    minWidth: vlak.hit,
+    minHeight: vlak.hit,
+    padding: "0.625rem",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -53,7 +38,7 @@ const styles = stylex.create({
     backgroundColor: "transparent",
     borderWidth: 0,
     borderStyle: "none",
-    borderRadius: 0,
+    borderRadius: vlak.radiusSm,
     cursor: "pointer",
     color: {
       default: vlak.gray,
@@ -85,15 +70,16 @@ const styles = stylex.create({
     filter: "none",
   },
   mark: {
-    width: "1rem",
-    height: "1rem",
+    width: "1.5rem",
+    height: "1.5rem",
     display: "block",
     flexShrink: 0,
   },
 });
 
 /**
- * One mark. Moon on paper, sun on black. The button sets
+ * One filled family mark on a 24px square, about 18–20px of drawn ink.
+ * Moon on paper, sun on black. The button sets
  * data-theme="dark" on <html> and persists the choice.
  * Apps pin it top-right; catalog and previews use the inline modifier.
  * The name states the action ("Switch to dark scheme"), so it changes with the state.
@@ -153,7 +139,7 @@ export const ThemeToggle = React.forwardRef<HTMLButtonElement, ThemeToggleProps>
       className={sx.className}
       style={{ ...sx.style, ...style }}
     >
-      <Icon name={dark ? "sun" : "moon"} size={16} className={mark.className} style={mark.style} />
+      <Icon name={dark ? "sun" : "moon"} variant="filled" size={24} className={mark.className} style={mark.style} />
     </button>
   );
 });

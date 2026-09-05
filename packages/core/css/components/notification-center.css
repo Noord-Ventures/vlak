@@ -5,5 +5,5 @@
 .rs-notification-center-list{list-style-type:none;margin:0;padding:0}
 .rs-notification-center-item{padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);overflow-wrap:anywhere}
 .rs-notification-center-unread{background-color:var(--control-fill)}
-.rs-notification-center-detail{margin-block:0.5rem;color:var(--text-secondary);line-height:1.45}
+.rs-notification-center-detail{margin-block:0.5rem;color:var(--text);line-height:1.45}
 .rs-notification-center-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}

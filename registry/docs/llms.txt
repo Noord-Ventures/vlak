@@ -25,7 +25,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Toggle](https://vlak.dev/docs/toggle.md): Turns one persistent option on or off. Pressed fills with ink and exposes aria-pressed.
 - [Toggle group](https://vlak.dev/docs/toggle-group.md): Selects one option from joined toggles. The active option fills with ink.
 - [Context menu](https://vlak.dev/docs/context-menu.md): Opens actions at the pointer or with Shift+F10. Escape and outside click close the menu.
-- [Menubar](https://vlak.dev/docs/menubar.md): Groups application menus in one row of dropdowns with a 1px frame.
+- [Menubar](https://vlak.dev/docs/menubar.md): Groups application menus in a compact 1px frame. Text-only triggers keep 44px targets and wrap to fit.
 - [Command](https://vlak.dev/docs/command.md): Finds and runs commands in a native dialog. Filter by typing; navigate with arrows and Enter.
 - [Theme toggle](https://vlak.dev/docs/theme-toggle.md): Switches between light and dark schemes. The icon changes and the choice persists locally.
 
@@ -49,7 +49,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Native select](https://vlak.dev/docs/native-select.md): Presents browser-native options inside a 1px control border.
 - [Radio](https://vlak.dev/docs/radio.md): Selects one option from a group. The selected dot fills with ink.
 - [Checkbox](https://vlak.dev/docs/checkbox.md): Selects any number of options. A 44px target surrounds the check mark; indeterminate uses a minus.
-- [Switch](https://vlak.dev/docs/switch.md): Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.
+- [Switch](https://vlak.dev/docs/switch.md): Turns one setting on or off. A slim 44×24px track sits inside a 44px touch target.
 - [Slider](https://vlak.dev/docs/slider.md): Selects one value from a range. A fine track sits inside a 44px hit area.
 - [Select](https://vlak.dev/docs/select.md): Selects one option from an overlay. The closed trigger carries a chevron.
 - [Textarea](https://vlak.dev/docs/textarea.md): Collects multiple lines of text. Resizes vertically only.

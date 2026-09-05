@@ -1,6 +1,6 @@
 # Menubar
 
-Groups application menus in one row of dropdowns with a 1px frame.
+Groups application menus in a compact 1px frame. Text-only triggers keep 44px targets and wrap to fit.
 
 Category: actions  
 Name: `menubar`  
@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/menubar.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-menubar" role="menubar"><button class="rs-dropdown" role="menuitem" aria-haspopup="menu"><span>File</span></button><button class="rs-dropdown" role="menuitem" aria-haspopup="menu"><span>Edit</span></button><button class="rs-dropdown" role="menuitem" aria-haspopup="menu"><span>View</span></button></div>
+<div class="rs-menubar" role="menubar" aria-label="Application menus"><div class="rs-menubar-wrap"><button type="button" class="rs-menubar-trigger" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="0">File</button></div><div class="rs-menubar-wrap"><button type="button" class="rs-menubar-trigger" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="-1">Edit</button></div><div class="rs-menubar-wrap"><button type="button" class="rs-menubar-trigger" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="-1">View</button></div></div>
 ```
 
 ## Example
@@ -54,6 +54,7 @@ npx shadcn add https://vlak.dev/r/menubar.json
 import { Menubar } from "@noorddev/vlak-react";
 
 <Menubar
+  aria-label="Application menus"
   menus={[
     { label: "File", items: [{ label: "New", onSelect: create }, { label: "Open…", onSelect: open }] },
     { label: "Edit", items: [{ label: "Undo", onSelect: undo }, { label: "Redo", onSelect: redo }] },
@@ -90,10 +91,12 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - Renders role="menubar"; each trigger is a <button role="menuitem"> with aria-haspopup="menu", aria-expanded, and aria-controls.
 - Open panels are role="menu" labelled by their trigger, with the same keyboard model as DropdownMenu.
+- Text-only triggers have 44px minimum hit targets and wrap inside the bar. The open trigger uses a full-surface fill, never a leading stripe.
+- The markup snippet shows the closed appearance only. Use the React component for opening, placement, roving focus, and keyboard interaction.
 
 ## Classes
 
-`rs-menubar`
+`rs-menubar`, `rs-menubar-wrap`, `rs-menubar-trigger`, `rs-menubar-trigger-open`, `rs-menubar-panel`
 
 ## Dependencies
 

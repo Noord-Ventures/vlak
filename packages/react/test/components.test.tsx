@@ -345,7 +345,7 @@ describe("Icon", () => {
     const moon = container.querySelector("svg");
     expect(moon?.classList.contains("rs-icon")).toBe(true);
     const crescent = container.querySelector("path");
-    expect(crescent?.getAttribute("d")).toBe("M10.75 3 A5.5 5.5 0 1 0 10.75 13 A4.25 4.25 0 1 1 10.75 3 Z");
+    expect(crescent?.getAttribute("d")).toBe("M13.5 8.5 A5.5 5.5 0 1 1 7.5 2.5 A4.5 4.5 0 0 0 13.5 8.5 Z");
     expect(crescent?.getAttribute("d")).not.toMatch(/M13\.5 9\.5A5\.5/);
     expect(crescent?.getAttribute("stroke-width")).toBe("1");
     expect(crescent?.getAttribute("stroke-linecap")).toBe("butt");

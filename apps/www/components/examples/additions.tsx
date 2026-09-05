@@ -42,7 +42,7 @@ import { Use as VirtualList } from "./virtual-list/use";
 import { Use as MasterDetail } from "./master-detail/use";
 import { Use as PropertyGrid } from "./property-grid/use";
 
-/** The same real controls power previews and interactive examples. */
+/** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
   "playback-controls": PlaybackControls,
   "media-scrubber": MediaScrubber,

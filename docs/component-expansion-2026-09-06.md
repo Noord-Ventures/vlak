@@ -2,6 +2,31 @@
 
 Date: 6 September 2026
 
+## Preview and control-craft follow-up
+
+The initial gallery reused the forty contextual examples as raw previews. That
+boundary is now explicit: `components/previews/` owns the interactive specimens,
+and `components/examples/` owns In action. The source check follows local imports
+and rejects editorial wrappers in Preview; the browser suite checks the rendered
+boundary and every component page at 390px.
+
+- Switch: 44×24px visual rail inside a 44×44px target, including mirrored motion
+  for right-to-left layouts. Toggle segments use 20px horizontal padding.
+- Menus: one separator, no row borders, rounded full-surface keyboard focus.
+  Menubar has compact text triggers and correct anchoring when switching menus.
+- Theme toggle: filled Vlak sun/moon at 24px, corrected shared crescent geometry,
+  and a 44px target. Mobile breadcrumbs have space on both sides of the slash.
+- Distinct preview landmarks, instance-specific nested file/detail labels, and
+  readable notification details address the initial deployment's accessibility
+  failures.
+
+Local verification: 590 unit/integrity tests pass; package typechecks, lint,
+production site build, size budgets, and React 18/19 tarball consumer checks pass.
+In-browser checks covered all forty raw previews at 390px with no page overflow,
+plus optical and keyboard checks for the reported controls. CI/deployment status
+is reported separately after the push; these checks are not accessibility
+certification.
+
 Status: implementation and local release verification complete. Forty additions bring the public catalog to 114 components. This report records local checks, not an npm publication or proof of production deployment.
 
 ## Scope

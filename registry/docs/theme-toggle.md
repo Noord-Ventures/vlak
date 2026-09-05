@@ -44,7 +44,7 @@ npx shadcn add https://vlak.dev/r/theme-toggle.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<button class="rs-theme-toggle rs-theme-toggle-inline" aria-label="Toggle color scheme"><svg class="rs-theme-moon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M10.5 3.5 A5.5 5.5 0 1 0 10.5 12.5 A4 4 0 1 1 10.5 3.5" vector-effect="non-scaling-stroke"/></svg></button>
+<button type="button" class="rs-theme-toggle rs-theme-toggle-inline" aria-label="Switch to dark scheme"><svg class="rs-icon rs-theme-moon" aria-hidden="true" viewBox="0 0 16 16" width="24" height="24" fill="currentColor" stroke="none"><path d="M13.5 8.5 A5.5 5.5 0 1 1 7.5 2.5 A4.5 4.5 0 0 0 13.5 8.5 Z"/></svg></button>
 ```
 
 ## Example
@@ -59,7 +59,7 @@ import { ThemeToggle } from "@noorddev/vlak-react";
 
 ### ThemeToggle
 
-One mark. Moon on paper, sun on black. The button sets data-theme="dark" on <html> and persists the choice. Apps pin it top-right; catalog and previews use the inline modifier. The name states the action ("Switch to dark scheme"), so it changes with the state.
+One filled family mark on a 24px square, about 18–20px of drawn ink. Moon on paper, sun on black. The button sets data-theme="dark" on <html> and persists the choice. Apps pin it top-right; catalog and previews use the inline modifier. The name states the action ("Switch to dark scheme"), so it changes with the state.
 
 Extends `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
 
@@ -80,6 +80,7 @@ Forwards `ref` to the `HTMLButtonElement`.
 ## Accessibility
 
 - A native <button> whose aria-label states the action ("Switch to dark scheme" or "Switch to light scheme").
+- The target mode is shown with the filled Vlak moon or sun, on a 24px icon square inside a 44px target.
 - Sets an explicit data-theme="light" or data-theme="dark" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.
 
 ## Classes
@@ -88,6 +89,6 @@ Forwards `ref` to the `HTMLButtonElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [icons](icons.md).  
 React: `packages/react/src/components/theme-toggle.tsx`  
 CSS: `packages/core/css/components/theme-toggle.css`

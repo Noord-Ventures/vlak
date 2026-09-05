@@ -357,12 +357,12 @@ const [opted, setOpted] = useState(false);
   {
     name: "switch",
     title: "Switch",
-    description: "Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.",
+    description: "Turns one setting on or off. A slim 44×24px track sits inside a 44px touch target.",
     category: "forms",
     classes: ["rs-switch", "rs-switch-on", "rs-switch-thumb", "rs-switch-thumb-on"],
     css: ["components/switch.css"],
     react: "components/switch.tsx",
-    snippet: `<span class="rs-switch rs-switch-on"><i></i></span>`,
+    snippet: `<button type="button" class="rs-switch rs-switch-on" role="switch" aria-checked="true" aria-label="Notifications"><i class="rs-switch-thumb rs-switch-thumb-on" aria-hidden="true"></i></button>`,
     example: `import { useState } from "react";
 import { Switch } from "@noorddev/vlak-react";
 
@@ -1815,16 +1815,17 @@ const [open, setOpen] = useState(false);
   {
     name: "menubar",
     title: "Menubar",
-    description: "Groups application menus in one row of dropdowns with a 1px frame.",
+    description: "Groups application menus in a compact 1px frame. Text-only triggers keep 44px targets and wrap to fit.",
     category: "actions",
-    classes: ["rs-menubar"],
+    classes: ["rs-menubar", "rs-menubar-wrap", "rs-menubar-trigger", "rs-menubar-trigger-open", "rs-menubar-panel"],
     css: ["components/menubar.css"],
     react: "components/menubar.tsx",
     registryDependencies: ["dropdown-menu"],
-    snippet: `<div class="rs-menubar" role="menubar"><button class="rs-dropdown" role="menuitem" aria-haspopup="menu"><span>File</span></button><button class="rs-dropdown" role="menuitem" aria-haspopup="menu"><span>Edit</span></button><button class="rs-dropdown" role="menuitem" aria-haspopup="menu"><span>View</span></button></div>`,
+    snippet: `<div class="rs-menubar" role="menubar" aria-label="Application menus"><div class="rs-menubar-wrap"><button type="button" class="rs-menubar-trigger" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="0">File</button></div><div class="rs-menubar-wrap"><button type="button" class="rs-menubar-trigger" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="-1">Edit</button></div><div class="rs-menubar-wrap"><button type="button" class="rs-menubar-trigger" role="menuitem" aria-haspopup="menu" aria-expanded="false" tabindex="-1">View</button></div></div>`,
     example: `import { Menubar } from "@noorddev/vlak-react";
 
 <Menubar
+  aria-label="Application menus"
   menus={[
     { label: "File", items: [{ label: "New", onSelect: create }, { label: "Open…", onSelect: open }] },
     { label: "Edit", items: [{ label: "Undo", onSelect: undo }, { label: "Redo", onSelect: redo }] },
@@ -1845,6 +1846,8 @@ const [open, setOpen] = useState(false);
     a11y: [
       "Renders role=\"menubar\"; each trigger is a <button role=\"menuitem\"> with aria-haspopup=\"menu\", aria-expanded, and aria-controls.",
       "Open panels are role=\"menu\" labelled by their trigger, with the same keyboard model as DropdownMenu.",
+      "Text-only triggers have 44px minimum hit targets and wrap inside the bar. The open trigger uses a full-surface fill, never a leading stripe.",
+      "The markup snippet shows the closed appearance only. Use the React component for opening, placement, roving focus, and keyboard interaction.",
     ],
     aliases: ["Menubar", "Menu bar", "Application menu"],
   },
@@ -2325,7 +2328,8 @@ const [date, setDate] = useState<Date>();
     classes: ["rs-theme-toggle", "rs-theme-toggle-inline", "rs-theme-sun", "rs-theme-moon"],
     css: ["components/theme-toggle.css"],
     react: "components/theme-toggle.tsx",
-    snippet: `<button class="rs-theme-toggle rs-theme-toggle-inline" aria-label="Toggle color scheme"><svg class="rs-theme-moon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M10.5 3.5 A5.5 5.5 0 1 0 10.5 12.5 A4 4 0 1 1 10.5 3.5" vector-effect="non-scaling-stroke"/></svg></button>`,
+    registryDependencies: ["icons"],
+    snippet: `<button type="button" class="rs-theme-toggle rs-theme-toggle-inline" aria-label="Switch to dark scheme"><svg class="rs-icon rs-theme-moon" aria-hidden="true" viewBox="0 0 16 16" width="24" height="24" fill="currentColor" stroke="none"><path d="M13.5 8.5 A5.5 5.5 0 1 1 7.5 2.5 A4.5 4.5 0 0 0 13.5 8.5 Z"/></svg></button>`,
     example: `import { ThemeToggle } from "@noorddev/vlak-react";
 
 <ThemeToggle storageKey="vlak-theme" onThemeChange={(dark) => track(dark)} />`,
@@ -2339,6 +2343,7 @@ const [date, setDate] = useState<Date>();
     ],
     a11y: [
       "A native <button> whose aria-label states the action (\"Switch to dark scheme\" or \"Switch to light scheme\").",
+      "The target mode is shown with the filled Vlak moon or sun, on a 24px icon square inside a 44px target.",
       "Sets an explicit data-theme=\"light\" or data-theme=\"dark\" on <html> and stores the choice under storageKey; read it early in your document to avoid a flash.",
     ],
     aliases: ["Theme toggle", "Dark mode toggle", "Color scheme switch", "Mode toggle"],

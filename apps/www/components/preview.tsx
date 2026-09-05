@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { additions } from "./examples/additions";
+import { additionPreviews } from "./previews/additions";
 import {
   Accordion,
   Assistant,
@@ -834,7 +834,7 @@ export const demos: Record<string, () => React.ReactNode> = {
 };
 
 export function Preview({ name, snippet }: { name: string; snippet: string }) {
-  const Addition = additions[name];
+  const Addition = additionPreviews[name];
   if (Addition) return <Addition />;
   const demo = demos[name];
   if (demo) return <>{demo()}</>;

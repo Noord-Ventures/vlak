@@ -15,7 +15,7 @@
 - [Toggle](toggle.md): Turns one persistent option on or off. Pressed fills with ink and exposes aria-pressed.
 - [Toggle group](toggle-group.md): Selects one option from joined toggles. The active option fills with ink.
 - [Context menu](context-menu.md): Opens actions at the pointer or with Shift+F10. Escape and outside click close the menu.
-- [Menubar](menubar.md): Groups application menus in one row of dropdowns with a 1px frame.
+- [Menubar](menubar.md): Groups application menus in a compact 1px frame. Text-only triggers keep 44px targets and wrap to fit.
 - [Command](command.md): Finds and runs commands in a native dialog. Filter by typing; navigate with arrows and Enter.
 - [Theme toggle](theme-toggle.md): Switches between light and dark schemes. The icon changes and the choice persists locally.
 
@@ -39,7 +39,7 @@
 - [Native select](native-select.md): Presents browser-native options inside a 1px control border.
 - [Radio](radio.md): Selects one option from a group. The selected dot fills with ink.
 - [Checkbox](checkbox.md): Selects any number of options. A 44px target surrounds the check mark; indeterminate uses a minus.
-- [Switch](switch.md): Turns one setting on or off. A 64×44px target contains the moving thumb and ink-filled track.
+- [Switch](switch.md): Turns one setting on or off. A slim 44×24px track sits inside a 44px touch target.
 - [Slider](slider.md): Selects one value from a range. A fine track sits inside a 44px hit area.
 - [Select](select.md): Selects one option from an overlay. The closed trigger carries a chevron.
 - [Textarea](textarea.md): Collects multiple lines of text. Resizes vertically only.

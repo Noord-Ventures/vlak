@@ -69,6 +69,22 @@ beforeAll(() => {
 });
 
 describe("generated vlak.css", () => {
+  it("keeps the switch rail slim without shrinking its hit area", () => {
+    const css = readFileSync(join(pkgDir, "css/components/switch.css"), "utf8");
+    const hit = css.match(/\.rs-switch\{([^}]+)\}/)?.[1];
+    const rail = css.match(/\.rs-switch::before\{([^}]+)\}/)?.[1];
+    expect(hit).toContain("min-width:var(--hit)");
+    expect(hit).toContain("min-height:var(--hit)");
+    expect(rail).toContain("width:2.75rem");
+    expect(rail).toContain("height:1.5rem");
+    expect(css).toContain(".rs-switch-thumb-on:dir(rtl){transform:translateX(-20px)}");
+  });
+
+  it("gives toggle segments breathing room", () => {
+    const css = readFileSync(join(pkgDir, "css/components/toggle.css"), "utf8");
+    expect(css).toContain("padding-inline:1.25rem");
+  });
+
   it("defines every custom property it uses", () => {
     const used = new Set([...vlakCss.matchAll(/var\((--[a-z-]+)[,)]/g)].map((m) => m[1]!));
     const defined = new Set([...vlakCss.matchAll(/(--[a-z-]+)\s*:/g)].map((m) => m[1]!));

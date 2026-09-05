@@ -16,40 +16,38 @@ const styles = stylex.create({
   track: {
     display: "inline-flex",
     boxSizing: "border-box",
-    width: {
-      default: "4rem",
-      [mq.phone]: "4rem",
-    },
-    height: {
-      default: vlak.hit,
-      [mq.phone]: vlak.hit,
-    },
-    minWidth: {
-      default: "4rem",
-      [mq.phone]: "4rem",
-    },
-    minHeight: {
-      default: vlak.hit,
-      [mq.phone]: vlak.hit,
-    },
-    borderRadius: {
-      default: "1.375rem",
-      [mq.phone]: "1.375rem",
-    },
-    borderWidth: 1.5,
-    borderStyle: "solid",
-    borderColor: {
-      default: vlak.controlBorder,
-      [mq.forcedColors]: "ButtonText",
-    },
+    width: vlak.hit,
+    height: vlak.hit,
+    minWidth: vlak.hit,
+    minHeight: vlak.hit,
+    borderRadius: vlak.radiusSm,
+    borderWidth: 0,
     position: "relative",
     flexShrink: 0,
     padding: 0,
     backgroundColor: "transparent",
     cursor: "pointer",
-    transition: {
-      default: `background-color ${vlak.duration} ${vlak.ease}, border-color ${vlak.duration} ${vlak.ease}`,
-      [mq.reduce]: "none",
+    // The visible rail is slim; the transparent button keeps a 44px hit area.
+    "::before": {
+      content: '""',
+      boxSizing: "border-box",
+      position: "absolute",
+      top: "0.625rem",
+      insetInlineStart: 0,
+      width: "2.75rem",
+      height: "1.5rem",
+      borderRadius: "0.75rem",
+      borderWidth: 1.5,
+      borderStyle: "solid",
+      borderColor: {
+        default: vlak.controlBorder,
+        [mq.forcedColors]: "ButtonText",
+      },
+      backgroundColor: "transparent",
+      transition: {
+        default: `background-color ${vlak.duration} ${vlak.ease}, border-color ${vlak.duration} ${vlak.ease}`,
+        [mq.reduce]: "none",
+      },
     },
     outlineWidth: {
       default: null,
@@ -69,38 +67,25 @@ const styles = stylex.create({
     },
   },
   on: {
-    backgroundColor: {
-      default: vlak.ink,
-      [mq.forcedColors]: "Highlight",
-    },
-    borderColor: {
-      default: vlak.ink,
-      [mq.forcedColors]: "Highlight",
+    "::before": {
+      backgroundColor: {
+        default: vlak.ink,
+        [mq.forcedColors]: "Highlight",
+      },
+      borderColor: {
+        default: vlak.ink,
+        [mq.forcedColors]: "Highlight",
+      },
     },
     forcedColorAdjust: "none",
   },
   thumb: {
     position: "absolute",
-    top: {
-      default: "0.15625rem",
-      [mq.phone]: "0.15625rem",
-    },
-    insetInlineStart: {
-      default: "0.15625rem",
-      [mq.phone]: "0.15625rem",
-    },
-    width: {
-      default: "2.25rem",
-      [mq.phone]: "2.25rem",
-    },
-    height: {
-      default: "2.25rem",
-      [mq.phone]: "2.25rem",
-    },
-    borderRadius: {
-      default: "50%",
-      [mq.phone]: "50%",
-    },
+    top: "0.84375rem",
+    insetInlineStart: "0.21875rem",
+    width: "1.0625rem",
+    height: "1.0625rem",
+    borderRadius: "50%",
     backgroundColor: {
       default: vlak.gray,
       [mq.forcedColors]: "ButtonText",
@@ -118,7 +103,7 @@ const styles = stylex.create({
     },
     transform: {
       default: "translateX(20px)",
-      [mq.phone]: "translateX(20px)",
+      ":dir(rtl)": "translateX(-20px)",
     },
   },
 });
@@ -148,7 +133,7 @@ export const Switch = React.forwardRef<HTMLButtonElement, SwitchProps>(function 
       }}
       {...props}
     >
-      <i className={knob.className} style={knob.style} />
+      <i aria-hidden="true" className={knob.className} style={knob.style} />
     </button>
   );
 });

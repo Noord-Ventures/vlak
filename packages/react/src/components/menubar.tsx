@@ -6,7 +6,6 @@ import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
 import { useOverlayPosition } from "../use-overlay-position";
-import { Icon } from "./icon";
 import { MenuPanel, menuStyles, type DropdownMenuItem, type MenuCloseReason } from "./dropdown-menu";
 
 export interface MenubarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -17,8 +16,11 @@ const styles = stylex.create({
   bar: {
     boxSizing: "border-box",
     display: "inline-flex",
+    flexWrap: "wrap",
     alignItems: "center",
     gap: 2,
+    minWidth: 0,
+    maxWidth: "100%",
     width: {
       default: null,
       [mq.phone]: "100%",
@@ -30,10 +32,46 @@ const styles = stylex.create({
       default: vlak.radiusSm,
       [mq.phone]: vlak.radiusSm,
     },
-    padding: {
-      default: 2,
-      [mq.phone]: 0,
-    },
+    padding: 2,
+  },
+  wrap: {
+    position: "relative",
+    display: "flex",
+    flex: "0 1 auto",
+    minWidth: 0,
+    maxWidth: "100%",
+  },
+  trigger: {
+    boxSizing: "border-box",
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: vlak.hit,
+    minHeight: vlak.hit,
+    maxWidth: "100%",
+    padding: "0.5rem 0.75rem",
+    borderWidth: 0,
+    borderRadius: vlak.radiusSm,
+    fontFamily: "inherit",
+    fontSize: vlak.controlFs,
+    lineHeight: 1.25,
+    color: vlak.ink,
+    backgroundColor: { default: "transparent", ":hover": vlak.controlFill },
+    overflowWrap: "anywhere",
+    cursor: "pointer",
+    outlineWidth: { default: null, ":focus-visible": 2 },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: vlak.ink,
+    outlineOffset: -2,
+  },
+  open: {
+    backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: "Highlight" },
+    color: { default: vlak.ink, [mq.forcedColors]: "HighlightText" },
+  },
+  panel: {
+    minWidth: "10rem",
+    width: "max-content",
+    maxWidth: "calc(100vw - 16px)",
   },
 });
 
@@ -53,8 +91,10 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
   const [focusIndex, setFocusIndex] = React.useState(0);
   const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   const panelRef = React.useRef<HTMLDivElement>(null);
-  const openTrigger = React.useRef<HTMLButtonElement | null>(null);
-  openTrigger.current = openIndex === null ? null : triggerRefs.current[openIndex] ?? null;
+  // Changing the open menu must also reposition the newly mounted panel.
+  const openTrigger = React.useMemo(() => ({
+    current: openIndex === null ? null : triggerRefs.current[openIndex] ?? null,
+  }), [openIndex]);
   const placement = useOverlayPosition(openIndex !== null, panelRef, openTrigger);
   const [initial, setInitial] = React.useState<"first" | "last">("first");
   const count = menus.length;
@@ -134,9 +174,9 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
   };
 
   const bar = rs(["rs-menubar", className], styles.bar);
-  const wrap = rs(["rs-select"], menuStyles.select);
-  const trigger = rs(["rs-dropdown"], menuStyles.dropdown);
+  const wrap = rs(["rs-menubar-wrap"], styles.wrap);
   const menu = rs(["rs-menu"], menuStyles.menu, menuStyles.menuOverlay);
+  const panel = rs(["rs-menubar-panel"], styles.panel);
   return (
     <div
       ref={setRootRef}
@@ -150,6 +190,7 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
         const triggerId = `${idBase}-trigger-${index}`;
         const menuId = `${idBase}-menu-${index}`;
         const isOpen = openIndex === index;
+        const trigger = rs(["rs-menubar-trigger", isOpen && "rs-menubar-trigger-open"], styles.trigger, isOpen && styles.open);
         return (
           <div key={index} className={wrap.className} style={wrap.style}>
             <button
@@ -171,8 +212,7 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
                 if (openIndex !== null && openIndex !== index) openMenu(index);
               }}
             >
-              <span>{entry.label}</span>
-              <Icon name="chevron-right" rotate={90} />
+              {entry.label}
             </button>
             {isOpen && (
               <MenuPanel
@@ -180,9 +220,9 @@ export const Menubar = React.forwardRef<HTMLDivElement, MenubarProps>(function M
                 items={entry.items}
                 labelledBy={triggerId}
                 initial={initial}
-                className={menu.className}
+                className={`${menu.className} ${panel.className}`}
                 panelRef={panelRef}
-                style={{ ...menu.style, ...placement }}
+                style={{ ...menu.style, ...panel.style, ...placement }}
                 onClose={closeMenu}
                 onHorizontal={(dir) => moveTo(index + dir)}
               />

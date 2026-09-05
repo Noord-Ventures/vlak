@@ -29,7 +29,7 @@ const styles = stylex.create({
   list: { listStyleType: "none", margin: 0, padding: 0 },
   item: { padding: "1rem", borderBottomWidth: vlak.hairline, borderBottomStyle: "solid", borderBottomColor: vlak.divider, overflowWrap: "anywhere" },
   unread: { backgroundColor: vlak.controlFill },
-  detail: { marginBlock: "0.5rem", color: vlak.gray, lineHeight: 1.45 },
+  detail: { marginBlock: "0.5rem", color: vlak.ink, lineHeight: 1.45 },
   actions: { display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.75rem" },
 });
 

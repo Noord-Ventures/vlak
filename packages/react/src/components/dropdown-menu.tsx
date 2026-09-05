@@ -98,6 +98,7 @@ export const menuStyles = stylex.create({
   },
   menu: {
     boxSizing: "border-box",
+    padding: "0.25rem",
     borderWidth: vlak.hairline,
     borderStyle: "solid",
     borderColor: vlak.divider,
@@ -164,46 +165,44 @@ export const menuStyles = stylex.create({
       default: "0.875rem",
       [mq.phone]: vlak.controlFs,
     },
-    color: vlak.ink,
-    letterSpacing: "-0.01em",
-    borderBottomWidth: {
-      default: vlak.hairline,
-      ":last-child": 0,
+    color: {
+      default: vlak.ink,
+      ":focus-visible": vlak.paper,
+      [mq.forcedColors]: { default: "CanvasText", ":focus-visible": "HighlightText" },
     },
-    borderBottomStyle: "solid",
-    borderBottomColor: vlak.divider,
-    borderInlineStartWidth: 0,
-    borderInlineEndWidth: 0,
-    borderTopWidth: 0,
+    letterSpacing: "-0.01em",
+    borderWidth: 0,
+    borderRadius: vlak.radiusSm,
     width: "100%",
     textAlign: "start",
     cursor: "pointer",
-    backgroundColor: "transparent",
+    backgroundColor: {
+      default: "transparent",
+      ":focus-visible": vlak.ink,
+      [mq.forcedColors]: { default: "Canvas", ":focus-visible": "Highlight" },
+    },
     fontFamily: "inherit",
     minHeight: {
       default: vlak.hit,
       [mq.phone]: vlak.hit,
     },
-    /* The menu clips at its edge, so the ring sits inside the row. */
+    /* Full-surface focus avoids framing each action as a separate button.
+       Forced colors retain an explicit outline alongside system-color fill. */
     outlineWidth: {
-      default: null,
-      ":focus-visible": 2,
+      default: 0,
+      [mq.forcedColors]: { default: 0, ":focus-visible": 2 },
     },
     outlineStyle: {
-      default: null,
-      ":focus-visible": "solid",
+      default: "none",
+      [mq.forcedColors]: { default: "none", ":focus-visible": "solid" },
     },
-    outlineColor: {
-      default: null,
-      ":focus-visible": vlak.ink,
-    },
-    outlineOffset: {
-      default: null,
-      ":focus-visible": -2,
-    },
+    outlineColor: "HighlightText",
+    outlineOffset: -2,
+    forcedColorAdjust: "none",
   },
   itemActive: {
-    backgroundColor: vlak.dividerSubtle,
+    backgroundColor: { default: vlak.dividerSubtle, ":focus-visible": vlak.ink, [mq.forcedColors]: "Highlight" },
+    color: { default: vlak.ink, ":focus-visible": vlak.paper, [mq.forcedColors]: "HighlightText" },
   },
   itemDisabled: {
     color: vlak.gray,
@@ -215,7 +214,7 @@ export const menuStyles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: vlak.divider,
     marginBlock: "0.25rem",
-    marginInline: 0,
+    marginInline: "0.5rem",
   },
 });
 

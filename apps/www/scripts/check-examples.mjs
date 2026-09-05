@@ -1,7 +1,7 @@
 // Every catalog name owns one Use file. No shared dump.
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 
 const root = fileURLToPath(new URL("../../..", import.meta.url));
 const examples = join(root, "apps/www/components/examples");
@@ -56,6 +56,39 @@ if (!catalog.includes("Preview") || catalog.includes("UseSlot") || catalog.inclu
   process.exit(1);
 }
 
+// Follow the actual renderer graph: checking only page order missed a shared
+// renderer that quietly imported all forty editorial examples into Preview.
+const previewFiles = new Set();
+function checkPreview(file) {
+  if (previewFiles.has(file)) return;
+  previewFiles.add(file);
+  const source = readFileSync(file, "utf8");
+  if (/\b(?:UseField|UseSlot|UseType|InAction)\b|rs-use(?:-|\b)|data-use=/.test(source)) {
+    throw new Error(`Preview contains an editorial composition: ${file}`);
+  }
+  const imports = /(?:from\s+|import\s*\(\s*|require\s*\(\s*|import\s*)["']([^"']+)["']/g;
+  for (const [, specifier] of source.matchAll(imports)) {
+    if (!specifier.startsWith(".") && !specifier.startsWith("@/")) continue;
+    const path = specifier.startsWith("@/")
+      ? resolve(root, "apps/www", specifier.slice(2))
+      : resolve(dirname(file), specifier);
+    if (!/\.[jt]sx?$/.test(path) && /\.[a-z]+$/.test(path)) continue;
+    const dependency = [path, `${path}.tsx`, `${path}.ts`].find(existsSync);
+    if (!dependency) throw new Error(`Missing preview dependency: ${path}`);
+    if (dependency.startsWith(examples + "/")) throw new Error(`Preview imports In action: ${dependency}`);
+    checkPreview(dependency);
+  }
+}
+checkPreview(join(root, "apps/www/components/preview.tsx"));
+const additions = readFileSync(join(examples, "additions.tsx"), "utf8");
+const additionNames = [...additions.matchAll(/^\s+(?:"([a-z0-9-]+)"|([a-z][a-z0-9]*)):\s*[A-Z]/gm)].map(m => m[1] ?? m[2]);
+const rawSources = [...previewFiles].map(file => readFileSync(file, "utf8")).join("\n");
+for (const name of additionNames) {
+  if (!new RegExp(`^\\s+(?:"${name}"|${name}):`, "m").test(rawSources)) {
+    throw new Error(`Missing raw preview for ${name}`);
+  }
+}
+
 const useCss = readFileSync(join(examples, "use.css"), "utf8");
 const useSx = readFileSync(join(examples, "use.stylex.ts"), "utf8");
 const site = readFileSync(join(root, "apps/www/app/site.css"), "utf8");
@@ -74,4 +107,4 @@ if (site.includes(".rs-scene .rs-input-group") || site.includes(".rs-use .rs-inp
   process.exit(1);
 }
 
-console.log(`ok: ${names.length} isolated Use files`);
+console.log(`ok: ${names.length} isolated Use files; ${additionNames.length} separate addition previews; no editorial imports in Preview`);

@@ -1,9 +1,8 @@
 /* ── theme-toggle: generated from packages/react/src/components/theme-toggle.tsx ── */
-.rs-theme-toggle{transition:var(--transition);position:fixed;top:1.5rem;inset-inline-end:1.25rem;z-index:var(--z-sticky);width:var(--hit);height:var(--hit);padding:0.25rem;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:transparent;border-width:0;border-style:none;border-radius:0;cursor:pointer;color:var(--text-secondary);outline-width:0;outline-style:none;outline-color:transparent;outline-offset:0;filter:drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg))}
+.rs-theme-toggle{transition:var(--transition);position:fixed;top:1.5rem;inset-inline-end:1.25rem;z-index:var(--z-sticky);width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);padding:0.625rem;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:transparent;border-width:0;border-style:none;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary);outline-width:0;outline-style:none;outline-color:transparent;outline-offset:0;filter:drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg))}
 .rs-theme-toggle:hover{color:var(--text)}
 .rs-theme-toggle:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.rs-theme-toggle{transition:none}}
 @media (max-width: 480px){.rs-theme-toggle{inset-inline-end:1.5625rem}}
-@media (max-width: 640px){.rs-theme-toggle{width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);padding:0.75rem}}
 .rs-theme-toggle-inline{position:relative;top:auto;inset-inline-end:auto;z-index:1;filter:none}
-.rs-theme-sun,.rs-theme-moon{width:1rem;height:1rem;display:block;flex-shrink:0}
+.rs-theme-sun,.rs-theme-moon{width:1.5rem;height:1.5rem;display:block;flex-shrink:0}
