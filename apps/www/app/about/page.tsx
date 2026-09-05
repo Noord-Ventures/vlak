@@ -281,11 +281,10 @@ export default function AboutPage() {
           <Kicker>Colophon</Kicker>
           <div {...sx("field-colophon", about.colophon)}>
             <p {...sx("", about.colophonP)}>
-              {noord.heading} · {noord.span}
+              <a href={noord.url} {...sx("", about.link)}>{noord.heading}</a> · {noord.span}
             </p>
-            <p {...sx("", about.colophonP)}>{noord.what}</p>
             <p {...sx("", about.colophonP)}>
-              {noord.built} {noord.who}
+              {noord.built} <a href={person.url} {...sx("", about.link)}>{person.heading}</a>.
             </p>
             <p {...sx("", about.colophonP)}>
               Vlak logo designed by <a href="https://www.liannedias.com" {...sx("", about.link)}>Li-Anne Dias</a>.

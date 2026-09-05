@@ -386,10 +386,9 @@ export const typeface = {
 
 export const noord = {
   heading: "Noord Frontier Design Lab",
+  url: "https://noord.dev/",
   span: "Alkmaar",
-  what: "Vlak was designed and built at Noord Frontier Design Lab in Alkmaar.",
   built: "Design and development:",
-  who: "Renato Valdés Olmos.",
   door: DOOR,
   host: vlakTokens.meta.url,
   packages: ["@noorddev/vlak", "@noorddev/vlak-react", "@noorddev/vlak-cli"] as const,
@@ -398,6 +397,7 @@ export const noord = {
 
 export const person = {
   heading: "Renato Valdés Olmos",
+  url: "https://www.renatovaldes.com/",
   copyright: "MIT © Noord / Renato Valdés-Olmos",
   year: "2026",
   repo: "https://github.com/Noord-Ventures/vlak",
