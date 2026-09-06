@@ -1,0 +1,3 @@
+# These are pinned upstream sources, not this repository's build output.
+!dist/
+!dist/**

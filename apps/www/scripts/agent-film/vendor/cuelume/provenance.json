@@ -1,0 +1,16 @@
+{
+  "name": "cuelume",
+  "version": "0.2.2",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Daniel Belyi",
+  "homepage": "https://cuelume.dev/",
+  "repository": "https://github.com/Danilaa1/cuelume",
+  "gitHead": "b879b72c01f3b3fa74c45c9b20bbd064baffb282",
+  "tarball": "https://registry.npmjs.org/cuelume/-/cuelume-0.2.2.tgz",
+  "integrity": "sha512-TiNzJRjhddjC4jy4M7sv63V/86VaFhdIs6iHUCrc4CKhqypaxRBv1aedCBGebrz/cO7nroPkEfqHe/P7fOE2GQ==",
+  "files": {
+    "LICENSE": "c0d53cbcf3b4e9cfa23c0ce575a1568d34f763eaf74917fb525a61d5624752ca",
+    "dist/audio/engine.js": "f1bbaf5f1c51fe286834be809ca3394a86d267a2acf8b9eb881344351de9d173",
+    "dist/sounds/recipes.js": "67186934646dbf68c1677b6fad4559c66e6e5944c1ca9fa02c6995aa4bfb78fe"
+  }
+}

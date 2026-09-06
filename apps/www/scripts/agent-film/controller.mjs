@@ -1,4 +1,5 @@
 import { flushSync } from "react-dom";
+import { actionTimes as at } from "./timeline.mjs";
 
 const normalText = (value) => value?.replace(/\s+/g, " ").trim() ?? "";
 
@@ -23,21 +24,21 @@ export const agentFilmEvents = Object.freeze(
 		{
 			id: "show-output",
 			kind: "click",
-			time: 6.4,
+			time: at.output,
 			label: "Output",
 			selector: ".am-view-filter button",
 		},
 		{
 			id: "approve-review",
 			kind: "click",
-			time: 10.7,
+			time: at.approve,
 			label: "Approve review",
 			selector: ".am-detail-actions button",
 		},
 		{
 			id: "select-task-014",
 			kind: "click",
-			time: 14.3,
+			time: at.select,
 			label: "Refine account settings",
 			selector: ".am-task",
 			taskId: "014",
@@ -45,21 +46,21 @@ export const agentFilmEvents = Object.freeze(
 		{
 			id: "pause-task",
 			kind: "click",
-			time: 16.4,
+			time: at.pause,
 			label: "Pause",
 			selector: ".am-detail-actions button",
 		},
 		{
 			id: "resume-task",
 			kind: "click",
-			time: 18,
+			time: at.resume,
 			label: "Resume",
 			selector: ".am-detail-actions button",
 		},
 		{
 			id: "new-task",
 			kind: "click",
-			time: 20,
+			time: at.compose,
 			label: "New task",
 			selector: ".am-new-task",
 		},
@@ -67,29 +68,29 @@ export const agentFilmEvents = Object.freeze(
 			"task-name",
 			"Task name",
 			"Test the search flow",
-			20.7,
-			22,
+			at.titleStart,
+			at.titleEnd,
 			".am-compose input",
 		),
 		...typing(
 			"task-brief",
 			"Brief",
 			"Check keyboard navigation and clear empty states.",
-			22.15,
-			24.4,
+			at.briefStart,
+			at.briefEnd,
 			".am-compose textarea",
 		),
 		{
 			id: "queue-task",
 			kind: "click",
-			time: 25.1,
+			time: at.queue,
 			label: "Queue task",
 			selector: ".am-compose-actions button",
 		},
 		{
 			id: "start-task",
 			kind: "click",
-			time: 26.1,
+			time: at.start,
 			label: "Start task",
 			selector: ".am-detail-actions button",
 		},

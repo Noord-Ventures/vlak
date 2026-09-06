@@ -12,7 +12,14 @@ import { homedir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { chromium } from "playwright";
-import { writeScore, scoreCuts, landingCues } from "./agent-film/sound.mjs";
+import {
+	writeScore,
+	scoreCuts,
+	landingCues,
+	soundSource,
+} from "./agent-film/sound.mjs";
+
+import { filmDuration } from "./agent-film/timeline.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const filmRoot = path.join(directory, "agent-film");
@@ -46,15 +53,15 @@ const bundled = await build({
 	logLevel: "silent",
 });
 const output = path.resolve(
-	process.env.VLAK_VIDEO_OUTPUT ?? path.join(homedir(), "Movies/Vlak"),
+	process.env.VLAK_VIDEO_OUTPUT ??
+		path.join(homedir(), "Movies/Vlak/agent-assembly"),
 );
 const proof = process.argv.includes("--proof");
 const stills = process.argv.includes("--stills");
 const sound = process.argv.includes("--sound") && !stills;
 const width = proof ? 960 : 1920,
 	height = proof ? 540 : 1080;
-const fps = 30,
-	filmDuration = 34;
+const fps = 30;
 const limitIndex = process.argv.findIndex(
 	(arg) => arg === "--limit-frames" || arg.startsWith("--limit-frames="),
 );
@@ -65,7 +72,9 @@ const limit =
 				process.argv[limitIndex].split("=")[1] ?? process.argv[limitIndex + 1],
 			);
 if (!Number.isInteger(limit) || limit < 1 || limit > fps * filmDuration)
-	throw new Error("--limit-frames must be an integer from 1 to 1020");
+	throw new Error(
+		`--limit-frames must be an integer from 1 to ${fps * filmDuration}`,
+	);
 const frames = limit,
 	duration = frames / fps;
 const partial = frames < fps * filmDuration;
@@ -78,8 +87,9 @@ const silentFile = sound ? path.join(output, name + "-silent.mp4") : null;
 const scoreFile = sound ? path.join(output, name + "-score.wav") : null;
 const ffmpeg = process.env.VLAK_FFMPEG ?? "ffmpeg";
 const checkpointTimes = [
-	0.7, 1.5, 2.8, 4.6, 5.8, 6.8, 8.2, 10.5, 11.2, 12.6, 14.8, 16.7, 18.4, 20.4,
-	21.5, 22.4, 24.6, 25.5, 26.6, 28.5, 30.5, 33.7,
+	0.4, 0.65, 0.9, 1.3, 2, 2.8, 3.4, 4.15, 4.55, 5.2, 5.8, 6.3, 6.9, 7.6, 8.1,
+	9.4, 9.8, 10.05, 10.5, 11.5, 13.9, 16.3, 17.4, 18.8, 20.5, 23.3, 23.8, 24.3,
+	24.8, 27.5, 29.35, 29.7, 30.05, 30.6, 31.6, 34.5, 36.2, 37.2, 39.7,
 ];
 const checkpoints = [
 	...new Set(
@@ -378,7 +388,8 @@ try {
 			? {
 					file: scoreFile,
 					source: "apps/www/scripts/agent-film/sound.mjs",
-					original: true,
+					original: false,
+					soundSource,
 					sampleRate: 48000,
 					channels: 2,
 					codec: "aac",
