@@ -14,6 +14,15 @@ export const beats = Object.freeze({
 	payoff: 31.875,
 	resolve: 37.5,
 });
+// Two complete light/dark cycles across the whole payoff, shared with Cuelume.
+export const themeChanges = Object.freeze([
+	{ time: 31.875, theme: "dark" },
+	{ time: 32.4375, theme: "light" },
+	{ time: 33, theme: "dark" },
+	{ time: 33.5625, theme: "light" },
+]);
+export const themeAt = (time) =>
+	themeChanges.filter((change) => time >= change.time).at(-1)?.theme ?? "light";
 const mapping = [
 	{ film: 9.375, source: 0 },
 	{ film: 13.125, source: 8.15 },

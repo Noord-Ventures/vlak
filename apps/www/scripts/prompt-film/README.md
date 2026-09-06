@@ -2,7 +2,10 @@
 
 A 40-second, 1080p film using Vlak's native Textarea, Button, Spinner, Card,
 Callout, icons, and the original AgentsBoard. The opening is an unbranded native
-form containing only the prompt field and send button. The browser frame uses
+form containing only the prompt field and send button. On submission, that same
+textarea becomes a solid, read-only message bubble, retaining its value, position,
+size and typography. Thinking and the reply share the former Send row.
+The browser frame uses
 the shared Vlak Button, Input, and InputGroup composition. Film motion changes geometry and
 timing; the components retain their original paint and native state transitions.
 
@@ -11,6 +14,9 @@ replying, assembles the workspace in 3.75 seconds, and walks through reviewing
 output, pausing an agent, and creating a task. The browser and its controls move
 together through every camera zoom. The closing copy, “Generate instant interface with Vlak.dev”, intentionally
 overprints the interface in huge left-aligned type with short irregular flashes.
+All lines share one native CardTitle, font size, weight, and line-height (1.08).
+Two complete light/dark cycles change the full scene through Vlak’s native theme
+tokens; `themeChanges` supplies both the visual cuts and Cuelume timing.
 This is a choreographed product film; the assistant response is scripted and no
 generation backend is called.
 
@@ -46,9 +52,15 @@ arpeggios, melodic hooks, drumbeats, or sampled recordings.
 `sound.mjs` maps the original Cuelume 0.2.2 effects to the retimed native
 interactions and component contacts. Prompt typing cues correspond to actual
 character changes at 30 fps. The Cuelume stem has no tonal bed; the final mix
-uses fixed gains and a peak limiter to preserve the music's crescendo.
+uses fixed gains and a peak limiter to preserve the music's crescendo. A native
+Cuelume release marks the prompt-to-bubble change. Four toggle/page cues follow
+the light/dark changes, with measured levels audible under the drone. All 195
+effects use the verified, unmodified Cuelume recipes.
 See `../agent-film/vendor/cuelume/provenance.json` for the MIT source provenance.
 
 Full renders exercise the original interface assertions and submit the native
-form. Proofs expose the same deterministic film clock and support rewind. Verify the closing text and frame spacing in the saved review PNGs,
+form. Reports retain the bubble’s node identity and geometry, the payoff’s
+uniform computed typography, and all four theme changes. Film capture disables
+wall-clock CSS transitions so theme switches occur on the exact frame.
+Proofs expose the same deterministic film clock and support rewind. Verify the closing text and frame spacing in the saved review PNGs,
 and fully decode the final MP4 before publishing it to the film collection.

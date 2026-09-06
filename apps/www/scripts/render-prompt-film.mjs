@@ -93,8 +93,9 @@ const musicFile =
 	process.env.VLAK_MUSIC ?? path.join(output, "vlak-prompt-music.wav");
 if (sound) await stat(musicFile);
 const checkpointTimes = [
-	0.5, 2, 3.9, 4.55, 4.8, 5.5, 6.6, 7.5, 8.7, 9.45, 10, 10.8, 11.7, 12.7, 13.5,
-	15.5, 18.5, 20.5, 23.5, 26, 29, 31, 32.5, 34, 36, 39.7,
+	0.5, 2, 3.9, 4.55, 4.7, 4.8, 5.5, 6.6, 7.5, 8.7, 9.45, 10, 10.8, 11.7, 12.7,
+	13.5, 15.5, 18.5, 20.5, 23.5, 26, 29, 31, 31.9, 32.2, 32.5, 33.2, 33.7, 34,
+	36, 39.7,
 ];
 const checkpoints = [
 	...new Set(
@@ -109,7 +110,8 @@ await stat(path.join(filmRoot, "film.jsx"));
 
 const html = `<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><title>Vlak · Agent management</title>
 <link rel="stylesheet" href="/css/vlak-react.css"><link rel="stylesheet" href="/core-components.css"><link rel="stylesheet" href="/agent-scene.css"><style>
-html::before{display:none}html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
+html::before{display:none}html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:var(--bg);transition:none}
+#world,#world *{transition:none}
 #world{position:absolute;left:0;top:0;width:${reel ? 1080 : 1920}px;height:${reel ? 1920 : 1080}px;transform-origin:0 0}
 #agent-camera{position:absolute;left:0;top:0;transform-origin:0 0}
 #agent-interface{width:1180px;height:772px;zoom:3;container-type:inline-size;transform-origin:0 0}

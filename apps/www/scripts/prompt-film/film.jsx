@@ -1,4 +1,3 @@
-import { useLayoutEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import {
@@ -6,13 +5,10 @@ import {
 	CardBody,
 	CardLabel,
 	CardTitle,
-	Callout,
 	Icon,
-	Textarea,
-	Button,
-	Spinner,
 } from "@noorddev/vlak-react";
 import "../agent-film/film.jsx";
+import { Conversation } from "./conversation.jsx";
 import { agentFilmEvents } from "../agent-film/controller.mjs";
 import {
 	beats,
@@ -22,6 +18,8 @@ import {
 	storyToSource,
 	sourceToStory,
 	walkthrough,
+	themeAt,
+	themeChanges,
 } from "./timeline.mjs";
 
 const clamp = (value) => Math.max(0, Math.min(1, value));
@@ -48,12 +46,10 @@ function layer(name) {
 }
 const chat = layer("prompt-chat"),
 	tour = layer("prompt-tour"),
-	payoffLabel = layer("prompt-payoff-label"),
 	payoff = layer("prompt-payoff"),
 	cursor = layer("prompt-cursor");
 const chatRoot = createRoot(chat),
 	tourRoot = createRoot(tour),
-	labelRoot = createRoot(payoffLabel),
 	payoffRoot = createRoot(payoff),
 	cursorRoot = createRoot(cursor);
 let controls,
@@ -66,65 +62,6 @@ let controls,
 	tourIndex = -2,
 	responseCount = -1;
 const events = [];
-function Conversation() {
-	const [draft, setDraft] = useState(""),
-		[submitted, setSubmitted] = useState(""),
-		[reply, setReply] = useState("");
-	useLayoutEffect(() => {
-		controls = { setReply };
-	}, []);
-	return (
-		<Card style={{ width: 560, maxWidth: "none" }}>
-			{!submitted ? (
-				<form
-					aria-label="Message"
-					style={{ display: "flex", flexDirection: "column", gap: 12 }}
-					onSubmit={(event) => {
-						event.preventDefault();
-						if (!draft.trim()) return;
-						setSubmitted(draft.trim());
-						events.push({
-							id: "send-prompt",
-							time: beats.send,
-							text: draft.trim(),
-						});
-					}}
-				>
-					<Textarea
-						aria-label="Message"
-						value={draft}
-						onChange={(event) => setDraft(event.target.value)}
-						placeholder=""
-					/>
-					<Button
-						type="submit"
-						disabled={!draft.trim()}
-						style={{ alignSelf: "flex-end", width: "auto", paddingInline: 14 }}
-					>
-						<Icon name="send" />
-						Send
-					</Button>
-				</form>
-			) : (
-				<>
-					<Callout>
-						<CardBody>{submitted}</CardBody>
-					</Callout>
-					<div style={{ marginTop: 24 }}>
-						{!reply ? (
-							<div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-								<Spinner label="Thinking" />
-								<CardBody>Thinking through the interface…</CardBody>
-							</div>
-						) : (
-							<CardBody>{reply}</CardBody>
-						)}
-					</div>
-				</>
-			)}
-		</Card>
-	);
-}
 
 function nativeType(value) {
 	const textarea = chat.querySelector("textarea");
@@ -212,11 +149,24 @@ async function mountChat() {
 	responseCount = -1;
 	tourIndex = -2;
 	events.length = 0;
-	flushSync(() => chatRoot.render(<Conversation key={generation++} />));
+	flushSync(() =>
+		chatRoot.render(
+			<Conversation
+				key={generation++}
+				onReady={(api) => {
+					controls = api;
+				}}
+				onSubmit={(text) =>
+					events.push({ id: "send-prompt", time: beats.send, text })
+				}
+			/>,
+		),
+	);
 	await raf();
 }
 async function step(frame) {
 	time = frame / 30;
+	document.documentElement.dataset.theme = themeAt(time);
 	if (time < last) await mountChat();
 	await agentFilm.step(storyToSource(time) * 30);
 	world.style.transform = `scale(${innerWidth / frameWidth})`;
@@ -248,8 +198,13 @@ async function step(frame) {
 		sent = true;
 		await Promise.resolve();
 		await raf();
-		if (!chat.textContent.includes(prompt))
-			throw Error("Prompt was not submitted");
+		const bubble = chat.querySelector("textarea");
+		if (
+			bubble?.value !== prompt ||
+			!bubble.readOnly ||
+			!controls.inspect().sameTextarea
+		)
+			throw Error("Prompt did not become a message bubble in the same field");
 	}
 	const replyLength =
 		time >= beats.reply
@@ -352,10 +307,8 @@ async function step(frame) {
 		titleTime < 0.68
 			? [0, -8, 6, 0][Math.floor(Math.max(0, titleTime) * 30) % 4]
 			: 0;
-	const textScale = reel ? 7.8 : 10.2;
-	payoffLabel.style.transform = `translate(${(reel ? 60 : 64) + jitter}px,${reel ? 320 : 165}px) scale(${textScale})`;
-	payoff.style.transform = `translate(${(reel ? 53 : 55) - jitter}px,${reel ? 1220 : 595}px) scale(${reel ? 13.1 : 23})`;
-	sceneOpacity(payoffLabel, flash);
+	const textScale = reel ? 12.8 : 13.4;
+	payoff.style.transform = `translate(${(reel ? 60 : 64) + jitter}px,${reel ? 320 : 156}px) scale(${textScale})`;
 	sceneOpacity(payoff, flash);
 	pointer(time);
 	document.activeElement?.blur?.();
@@ -373,19 +326,20 @@ window.film = { ready: false, error: null };
 		}
 		agentFilm = window.agentFilm;
 		flushSync(() => {
-			labelRoot.render(
-				<div>
+			payoffRoot.render(
+				<CardTitle
+					style={{ whiteSpace: "nowrap", margin: 0, lineHeight: 1.08 }}
+				>
 					{(reel
-						? ["Generate", "instant", "interface", "with"]
-						: ["Generate instant", "interface with"]
+						? ["Generate", "instant", "interface", "with", "Vlak.dev"]
+						: ["Generate instant", "interface with", "Vlak.dev"]
 					).map((line) => (
-						<CardTitle key={line} style={{ whiteSpace: "nowrap" }}>
+						<span key={line} style={{ display: "block" }}>
 							{line}
-						</CardTitle>
+						</span>
 					))}
-				</div>,
+				</CardTitle>,
 			);
-			payoffRoot.render(<CardTitle>Vlak.dev</CardTitle>);
 			cursorRoot.render(
 				<Icon
 					name="send"
@@ -411,23 +365,37 @@ window.film = { ready: false, error: null };
 				format: reel ? "reel" : "landscape",
 				wholeBrowserCamera: true,
 				visiblePromptLabels: false,
+				uniformPayoffTypography: true,
+				themeChanges,
 				constructionSeconds: beats.assembled - beats.construct,
 			},
 			inspect: () => ({
 				time,
+				theme: themeAt(time),
+				conversation: controls.inspect(),
+				payoffTypography: [...payoff.querySelectorAll("span")].map((line) => {
+					const paint = getComputedStyle(line);
+					return {
+						text: line.textContent,
+						fontFamily: paint.fontFamily,
+						fontSize: paint.fontSize,
+						fontWeight: paint.fontWeight,
+						lineHeight: paint.lineHeight,
+					};
+				}),
 				promptSubmitted: sent,
 				typedPrompt: prompt,
 				response,
 				events,
 				agentInterface: agentFilm.inspect(),
 				payoff: "Generate instant interface with Vlak.dev",
-				payoffStyle: "Oversized left-aligned flashing overprint",
+				payoffStyle:
+					"Uniform left-aligned overprint with equal line height and light/dark switches",
 			}),
 			dispose: () => {
 				agentFilm.dispose?.();
 				chatRoot.unmount();
 				tourRoot.unmount();
-				labelRoot.unmount();
 				payoffRoot.unmount();
 				cursorRoot.unmount();
 			},

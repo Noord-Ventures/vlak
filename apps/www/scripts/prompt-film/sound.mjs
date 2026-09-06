@@ -12,6 +12,7 @@ import {
 	duration as filmDuration,
 	prompt,
 	sourceToStory,
+	themeChanges,
 } from "./timeline.mjs";
 
 const fps = 30;
@@ -33,7 +34,16 @@ export const soundSource = Object.freeze({
 	...agentSoundSource,
 	tonalBed: false,
 	timing:
-		"Native prompt frames and the agent interface source-to-story mapping",
+		"Native prompt frames, the agent interface source-to-story mapping, and shared theme-change timestamps",
+	themeTransitions: Object.freeze(
+		themeChanges.map(({ time, theme }) =>
+			Object.freeze({
+				time: round(time),
+				theme,
+				recipe: theme === "dark" ? "toggle" : "page",
+			}),
+		),
+	),
 });
 
 const interfaceCues = agentCues.map((event) => ({
@@ -71,9 +81,10 @@ for (let frame = 0; frame <= Math.ceil(beats.typeEnd * fps); frame++) {
 }
 
 export const narrativeCues = [
-	cue(beats.send, "Send prompt", "release", 0.24, {
+	cue(beats.send, "Prompt becomes message bubble", "release", 0.24, {
 		kind: "action",
 		id: "send-prompt",
+		transition: "composer-to-message-bubble",
 	}),
 	cue(4.85, "AI thinking", "loading", 0.1, { kind: "state", id: "thinking" }),
 	cue(beats.reply, "AI response", "ready", 0.16, {
@@ -84,17 +95,28 @@ export const narrativeCues = [
 		kind: "transition",
 		id: "construct",
 	}),
-	cue(
-		beats.payoff,
-		"Generate instant interface with Vlak.dev",
-		"success",
-		0.18,
-		{
-			kind: "transition",
-			id: "payoff",
-		},
-	),
 ];
+
+// The first theme change is also the payoff contact. One original recipe
+// supplies that moment, avoiding an overlapping success chime and toggle.
+export const themeCues = Object.freeze(
+	themeChanges.map(({ time, theme }, index) =>
+		Object.freeze(
+			cue(
+				time,
+				`Payoff changes to ${theme} theme`,
+				theme === "dark" ? "toggle" : "page",
+				theme === "dark" ? 0.55 : 0.42,
+				{
+					kind: "theme-change",
+					id: `payoff-theme-${index + 1}-${theme}`,
+					theme,
+					payoffContact: time === beats.payoff,
+				},
+			),
+		),
+	),
+);
 
 export const landingCues = interfaceCues.filter(
 	(event) => event.kind === "landing",
@@ -103,6 +125,7 @@ export const cuelumeCues = [
 	...typingCues,
 	...narrativeCues,
 	...interfaceCues,
+	...themeCues,
 ].sort((a, b) => a.time - b.time);
 
 // Editorial metadata only; transitions do not introduce independent effects.
@@ -117,6 +140,7 @@ export const scoreCuts = [
 			.filter((time) => time > 0)
 			.map((time) => round(sourceToStory(time))),
 		beats.payoff,
+		...themeChanges.map(({ time }) => round(time)),
 		beats.resolve,
 	]),
 ].sort((a, b) => a - b);
