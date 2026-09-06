@@ -8,6 +8,9 @@ import "@/components/examples/use.css";
 import { CrumbBar } from "@/components/crumb-bar";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
+import { SiteAnalytics } from "@/components/site-analytics";
+import { catalogComponents } from "@noorddev/vlak";
+import { publicSitePaths } from "@/lib/site-analytics";
 import { social } from "./social";
 
 export const metadata: Metadata = social;
@@ -38,6 +41,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <CrumbBar />
         {children}
         <SiteFooter />
+        <SiteAnalytics publicPaths={[
+          ...publicSitePaths,
+          ...catalogComponents.map(({ name }) => `/components/${name}`),
+        ]} />
       </body>
     </html>
   );

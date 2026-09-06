@@ -23,3 +23,4 @@ packages/react/.build-components/
 coverage/
 .vercel
 .env*.local
+.env*
