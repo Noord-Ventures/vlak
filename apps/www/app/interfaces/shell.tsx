@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { chrome } from "@/app/site.stylex";
 import { sx } from "@/lib/sx";
-import { type InterfaceSlug, interfaceBySlug, interfaces as catalog } from "./catalog";
+import { type InterfaceSlug, interfaceBySlug, interfaces as catalog, mobilePatterns } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { InterfacesNav } from "./nav";
 import { StartBuilding } from "./start-building";
@@ -52,7 +52,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
           <section className="if-modifications" aria-labelledby={`${slug}-modifications`}>
             <h2 id={`${slug}-modifications`}>Component modifications</h2>
             <ul>
-              {proto.modifications.map((modification) => (
+              {[...proto.modifications, mobilePatterns[slug]].map((modification) => (
                 <li key={modification}>{modification}</li>
               ))}
             </ul>

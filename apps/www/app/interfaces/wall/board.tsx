@@ -1,10 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Card, Icon } from "@noorddev/vlak-react";
+import { Button, Card, Icon, Input } from "@noorddev/vlak-react";
 import { Brand } from "../mark";
 import { Face, type FaceId } from "../people";
-import { PhoneV1Chrome } from "../v1-chrome";
 import { interfaceBySlug } from "../catalog";
 import { InspectorClose } from "../inspector-close";
 
@@ -117,23 +116,67 @@ const COMMENTS: Record<string, { who: FaceId; name: string; text: string }[]> = 
 export function Board() {
   const [post, setPost] = React.useState("m1");
   const [inspect, setInspect] = React.useState<Inspect>(null);
-  const item = FEED.find((row) => row.id === post) ?? FEED[0]!;
+  const [phonePane, setPhonePane] = React.useState<"feed" | "people">("feed");
+  const [liked, setLiked] = React.useState<string[]>([]);
+  const [comments, setComments] = React.useState(COMMENTS);
+  const [draft, setDraft] = React.useState("");
+  const board = React.useRef<HTMLElement>(null);
+  const history = React.useRef<{ inspect: Inspect; trigger: HTMLElement | null }[]>([]);
+  const commentList = React.useRef<HTMLDivElement>(null);
+  const item = FEED.find((row) => row.id === (inspect?.kind === "post" ? inspect.id : post)) ?? FEED[0]!;
   const personId = inspect?.kind === "profile" ? inspect.who : item.who;
   const person = PEOPLE.find((row) => row.id === personId) ?? PEOPLE[0]!;
-  const notes = COMMENTS[inspect?.kind === "post" ? inspect.id : post] ?? [];
+  const notes = comments[inspect?.kind === "post" ? inspect.id : post] ?? [];
+
+  function openInspector(next: Exclude<Inspect, null>) {
+    history.current.push({ inspect, trigger: document.activeElement instanceof HTMLElement ? document.activeElement : null });
+    setInspect(next);
+    requestAnimationFrame(() => {
+      const back = board.current?.querySelector<HTMLButtonElement>(".sc-wall-mobile-back");
+      if (back?.getClientRects().length) back.focus();
+    });
+  }
+
+  function closeInspector() {
+    const previous = history.current.pop();
+    setInspect(previous?.inspect ?? null);
+    requestAnimationFrame(() => {
+      if (previous?.trigger?.isConnected) previous.trigger.focus();
+      else {
+        const key = previous?.trigger?.dataset.focusKey;
+        if (key) board.current?.querySelector<HTMLButtonElement>(`[data-focus-key="${key}"]`)?.focus();
+      }
+    });
+  }
+
+  function addComment(event: React.FormEvent) {
+    event.preventDefault();
+    if (!draft.trim()) return;
+    setComments((current) => ({ ...current, [item.id]: [...(current[item.id] ?? []), { who: "jenny", name: "You", text: draft.trim() }] }));
+    setDraft("");
+    requestAnimationFrame(() => commentList.current?.scrollTo({ top: commentList.current.scrollHeight }));
+  }
 
   function openPost(id: string) {
     setPost(id);
-    setInspect({ kind: "post", id });
+    setDraft("");
+    openInspector({ kind: "post", id });
   }
 
   function openProfile(id: FaceId) {
-    setInspect({ kind: "profile", who: id });
+    openInspector({ kind: "profile", who: id });
   }
 
   return (
-    <section className="if-board sc-wall" aria-label={WHAT}>
-      <PhoneV1Chrome heading="Social feed" action="Latest post" onAction={() => openPost("m1")} />
+    <section ref={board} className="if-board sc-wall" data-pane={phonePane} data-inspecting={Boolean(inspect)} aria-label={WHAT}>
+      <header className="sc-wall-mobile-head">
+        {inspect ? <Button variant="ghost" className="sc-wall-mobile-back" style={{ width: "auto", padding: "0 8px" }} onClick={closeInspector}>
+          <Icon name="arrow-left" size={16} />Back
+        </Button> : null}
+        <div><h2>{inspect ? inspect.kind === "post" ? "Comments" : person.name : phonePane === "feed" ? "Studio journal" : "People"}</h2>
+          {!inspect ? <p>{phonePane === "feed" ? "Work in progress, shared together" : "Four people in your studio"}</p> : null}
+        </div>
+      </header>
       <aside className="sc-wall-rail" aria-label="People">
         <div className="sc-wall-brand">
           <Brand slug="wall" />
@@ -187,7 +230,7 @@ export function Board() {
           {FEED.map((row) => (
             <article key={row.id}>
               <Card className={`sc-wall-card${post === row.id ? " is-on" : ""}${["m1", "m3", "m4", "m5"].includes(row.id) ? " sc-wall-v1" : ""}`}>
-              <button type="button" className="sc-wall-open" onClick={() => openPost(row.id)}>
+              <button type="button" className="sc-wall-open" aria-label={`Read ${row.name}’s post and comments`} onClick={() => openPost(row.id)}>
                 {row.photo ? <img src={row.photo} alt="" loading="lazy" decoding="async" /> : null}
                 <span className="sc-wall-v1-line">
                   {row.name} · {row.when}
@@ -201,36 +244,28 @@ export function Board() {
                   </i>
                 </span>
                 <p>{row.text}</p>
-                <em className="sc-wall-meta">
-                  <span className="if-ico-row">
-                    <Icon name="thumbs-up" size={12} />
-                    {row.likes} likes
-                  </span>
-                  <span className="if-ico-row">
-                    <Icon name="message" size={12} />
-                    {(COMMENTS[row.id] ?? []).length} {(COMMENTS[row.id] ?? []).length === 1 ? "comment" : "comments"}
-                  </span>
-                  {row.photo ? (
-                    <span className="if-ico-row">
-                      <Icon name="image" size={12} />
-                      Photo
-                    </span>
-                  ) : (
-                    <span className="if-ico-row">
-                      <Icon name="quote" size={12} />
-                      Note
-                    </span>
-                  )}
-                </em>
               </button>
+              <div className="sc-wall-actions">
+                <Button variant="ghost" aria-label={`Like ${row.name}’s post`} aria-pressed={liked.includes(row.id)} style={{ width: "auto", padding: "0 10px" }} onClick={() => setLiked((current) => current.includes(row.id) ? current.filter((id) => id !== row.id) : [...current, row.id])}>
+                  <Icon name="thumbs-up" size={16} />{row.likes + Number(liked.includes(row.id))}
+                </Button>
+                <Button variant="ghost" aria-label={`Comments on ${row.name}’s post`} style={{ width: "auto", padding: "0 10px" }} onClick={() => openPost(row.id)}>
+                  <Icon name="message" size={16} />{(comments[row.id] ?? []).length}<span>comments</span>
+                </Button>
+              </div>
               </Card>
             </article>
           ))}
         </div>
       </section>
 
+      <nav className="sc-wall-mobile-tabs" aria-label="Journal sections">
+        <Button variant="ghost" aria-pressed={phonePane === "feed"} style={{ width: "auto" }} onClick={() => setPhonePane("feed")}><Icon name="rows" size={16} />Feed</Button>
+        <Button variant="ghost" aria-pressed={phonePane === "people"} style={{ width: "auto" }} onClick={() => setPhonePane("people")}><Icon name="users" size={16} />People</Button>
+      </nav>
+
       <aside className={`if-inspect${inspect ? " is-open" : ""}`} aria-label={inspect?.kind === "profile" ? "Profile" : "Comments"}>
-        {inspect ? <InspectorClose onClick={() => setInspect(null)} /> : null}
+        {inspect ? <InspectorClose onClick={closeInspector} /> : null}
         {inspect?.kind === "profile" ? (
           <div key={person.id} className="sc-wall-inspect sc-fresh">
             <p className="sc-wall-label if-ico-row">
@@ -245,20 +280,33 @@ export function Board() {
             <p>{person.name} shares work in progress and updates from the studio.</p>
           </div>
         ) : inspect?.kind === "post" ? (
-          <div key={item.id} className="sc-wall-inspect sc-fresh">
+          <div key={item.id} className="sc-wall-comments sc-fresh">
+          <div className="sc-wall-inspect" ref={commentList}>
             <p className="sc-wall-label if-ico-row">
               <Icon name="message" size={12} />
               Comments
             </p>
-            {notes.map((row) => (
-              <button key={row.text} type="button" className="sc-wall-note" onClick={() => openProfile(row.who)}>
+            <article className="sc-wall-original">
+              <b>{item.name}</b>
+              <p>{item.text}</p>
+              {item.photo ? <img src={item.photo} alt="Printed poster composition" /> : null}
+            </article>
+            <div className="sc-wall-note-list" aria-live="polite" aria-relevant="additions">
+            {notes.map((row, index) => (
+              <article key={`${row.name}-${index}`} className="sc-wall-note">
                 <Face who={row.who} />
                 <span>
-                  <b>{row.name}</b>
+                  {row.name === "You" ? <b>You</b> : <button type="button" className="sc-wall-note-author" data-focus-key={`comment-${index}`} onClick={() => openProfile(row.who)}>{row.name}</button>}
                   {row.text}
                 </span>
-              </button>
+              </article>
             ))}
+            </div>
+          </div>
+          <form className="sc-wall-comment-dock" onSubmit={addComment}>
+            <Input value={draft} aria-label="Add a comment" placeholder="Add a comment" enterKeyHint="send" onChange={(event) => setDraft(event.target.value)} />
+            <Button type="submit" style={{ width: 44, padding: 0 }} aria-label="Post comment" disabled={!draft.trim()}><Icon name="send" size={16} /></Button>
+          </form>
           </div>
         ) : null}
       </aside>

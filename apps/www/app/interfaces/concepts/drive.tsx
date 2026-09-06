@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button, Card, CardLabel, Icon, Progress, ToggleGroup, Metric, NumberField, PlaybackControls, MediaScrubber, ConnectionStatus } from "@noorddev/vlak-react";
+import { MobileStudyNav } from "./mobile-navigation";
 
 type DriveMode = "vehicle" | "journey" | "energy";
 
@@ -12,6 +13,7 @@ const views = [
 ];
 
 export function Drive() {
+  const [mobileView, setMobileView] = React.useState("vehicle");
   const [mode, setMode] = React.useState<DriveMode>("vehicle");
   const [temp, setTemp] = React.useState(20);
   const [playing, setPlaying] = React.useState(true);
@@ -29,7 +31,7 @@ export function Drive() {
   }
 
   return (
-    <div className="cx cx-drive" data-view={mode} data-playing={playing && connected}>
+    <div className="cx cx-drive" data-view={mode} data-mobile-view={mobileView} data-playing={playing && connected}>
       <header>
         <span className="cx-ev-time">09:41</span>
         <b>Vehicle systems</b>
@@ -121,6 +123,7 @@ export function Drive() {
           </div>
         </Card>
       </section>
+      <MobileStudyNav label="Vehicle workspace" value={mobileView} onValueChange={setMobileView} options={[{ value: "vehicle", label: "Vehicle", icon: "truck" }, { value: "controls", label: "Controls", icon: "settings" }, { value: "media", label: "Media", icon: "play" }]}/>
     </div>
   );
 }

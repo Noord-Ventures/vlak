@@ -155,11 +155,11 @@ export const interfaces = stylex.create({
     marginTop: 0,
     height: {
       default: 612,
-      [phone]: 680,
+      [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
     },
     minHeight: {
       default: null,
-      [phone]: 612,
+      [phone]: 480,
     },
     backgroundColor: "var(--bg)",
     borderWidth: 1,
@@ -172,7 +172,7 @@ export const interfaces = stylex.create({
   vehicleSpecimen: {
     height: {
       default: 720,
-      [phone]: 680,
+      [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
     },
   },
   matter: {

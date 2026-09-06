@@ -4,7 +4,6 @@ import * as React from "react";
 import { Button, Icon, Input, InputGroup } from "@noorddev/vlak-react";
 import { Brand } from "../mark";
 import { Face, type FaceId } from "../people";
-import { PhoneV1Chrome } from "../v1-chrome";
 import { interfaceBySlug } from "../catalog";
 import { InspectorClose } from "../inspector-close";
 
@@ -61,12 +60,71 @@ export function Board() {
   const [draft, setDraft] = React.useState("");
   const [extra, setExtra] = React.useState<Record<string, Msg[]>>({});
   const [phonePane, setPhonePane] = React.useState<"channels" | "chat">("channels");
+  const [threadDraft, setThreadDraft] = React.useState("");
+  const [threadExtra, setThreadExtra] = React.useState<typeof THREAD>({});
+  const board = React.useRef<HTMLElement>(null);
+  const lines = React.useRef<HTMLDivElement>(null);
+  const replyList = React.useRef<HTMLDivElement>(null);
+  const history = React.useRef<{ pane: typeof pane; line: string; who: FaceId; trigger: HTMLElement | null }[]>([]);
   const box = React.useRef<HTMLInputElement>(null);
   const room = CHANNELS.find((row) => row.id === channel) ?? CHANNELS[0]!;
   const messages = [...(LINES[channel] ?? LINES.desk!), ...(extra[channel] ?? [])];
   const person = PEOPLE.find((row) => row.id === who) ?? PEOPLE[0]!;
   const selected = messages.find((row) => row.id === line) ?? messages[0]!;
-  const replies = THREAD[line] ?? [];
+  const replies = [...(THREAD[line] ?? []), ...(threadExtra[line] ?? [])];
+
+  function focusMobileBack() {
+    requestAnimationFrame(() => {
+      const back = board.current?.querySelector<HTMLButtonElement>(".sc-room-mobile-back");
+      if (back?.getClientRects().length) back.focus();
+    });
+  }
+
+  function openPane(next: "thread" | "person", personId?: FaceId) {
+    history.current.push({ pane, line, who, trigger: document.activeElement instanceof HTMLElement ? document.activeElement : null });
+    setPane(next);
+    if (personId) setWho(personId);
+    focusMobileBack();
+  }
+
+  function closePane() {
+    const previous = history.current.pop();
+    setPane(previous?.pane ?? "none");
+    if (previous) {
+      setWho(previous.who);
+      setLine(previous.line);
+    }
+    requestAnimationFrame(() => {
+      if (previous?.trigger?.isConnected) previous.trigger.focus();
+      else {
+        const key = previous?.trigger?.dataset.focusKey;
+        if (key) board.current?.querySelector<HTMLButtonElement>(`[data-focus-key="${key}"]`)?.focus();
+      }
+    });
+  }
+
+  function openChannel(id: string, compose = false) {
+    setChannel(id);
+    setPane("none");
+    setLine((LINES[id] ?? LINES.desk!)[0]!.id);
+    setPhonePane("chat");
+    history.current = [];
+    if (compose) requestAnimationFrame(() => box.current?.focus());
+    else focusMobileBack();
+  }
+
+  function backToChannels() {
+    setPhonePane("channels");
+    requestAnimationFrame(() => board.current?.querySelector<HTMLButtonElement>(`[data-channel="${channel}"]`)?.focus());
+  }
+
+  function sendReply(event: React.FormEvent) {
+    event.preventDefault();
+    if (!threadDraft.trim()) return;
+    setThreadExtra((current) => ({ ...current, [line]: [...(current[line] ?? []), { who: "jenny", name: "You", text: threadDraft.trim() }] }));
+    setThreadDraft("");
+    requestAnimationFrame(() => replyList.current?.scrollTo({ top: replyList.current.scrollHeight }));
+  }
 
   function send() {
     const text = draft.trim();
@@ -82,20 +140,18 @@ export function Board() {
     };
     setExtra((map) => ({ ...map, [channel]: [...(map[channel] ?? []), msg] }));
     setLine(msg.id);
+    requestAnimationFrame(() => lines.current?.scrollTo({ top: lines.current.scrollHeight }));
   }
 
   return (
-    <section className="if-board sc-room" data-pane={phonePane} aria-label={WHAT}>
-      <PhoneV1Chrome
-        heading="Team chat"
-        action="New"
-        onAction={() => {
-          setChannel("desk");
-          setPane("none");
-          setPhonePane("channels");
-          box.current?.focus();
-        }}
-      />
+    <section ref={board} className="if-board sc-room" data-pane={phonePane} data-inspecting={pane !== "none"} aria-label={WHAT}>
+      <header className="sc-room-mobile-head">
+        {pane !== "none" || phonePane === "chat" ? <Button variant="ghost" className="sc-room-mobile-back" style={{ width: 44, padding: 0 }} aria-label={pane !== "none" ? "Back to conversation" : "Back to channels"} onClick={pane !== "none" ? closePane : backToChannels}><Icon name="arrow-left" size={16} /></Button> : null}
+        <div><h2>{pane === "person" ? person.name : pane === "thread" ? "Thread" : phonePane === "chat" ? `#${room.name}` : "Studio workspace"}</h2>
+          <p>{pane === "person" ? person.state : pane === "thread" ? `#${room.name} · ${replies.length} ${replies.length === 1 ? "reply" : "replies"}` : phonePane === "chat" ? `${room.count} members` : "Channels and people"}</p>
+        </div>
+        {pane === "none" && phonePane === "channels" ? <Button variant="ghost" style={{ width: 44, padding: 0 }} aria-label="Message studio" onClick={() => openChannel("desk", true)}><Icon name="edit" size={16} /></Button> : null}
+      </header>
       <aside className="sc-room-rail" aria-label="People">
         <div className="sc-room-brand">
           <Brand slug="room" />
@@ -108,15 +164,11 @@ export function Board() {
         {CHANNELS.map((row) => (
           <button
             key={row.id}
+            data-channel={row.id}
             type="button"
             className="sc-room-ch"
             aria-current={channel === row.id && pane !== "person"}
-            onClick={() => {
-              setChannel(row.id);
-              setPane("none");
-              setLine((LINES[row.id] ?? LINES.desk!)[0]!.id);
-              setPhonePane("chat");
-            }}
+            onClick={() => openChannel(row.id)}
           >
             <b className="if-ico-row">
               <Icon name="hash" size={16} />
@@ -137,10 +189,7 @@ export function Board() {
             type="button"
             className={`sc-room-person${row.extra ? " sc-room-extra" : ""}`}
             aria-current={who === row.id && pane === "person"}
-            onClick={() => {
-              setWho(row.id);
-              setPane("person");
-            }}
+            onClick={() => openPane("person", row.id)}
           >
             <Face who={row.id} />
             <span>
@@ -165,17 +214,18 @@ export function Board() {
             {room.count} members
           </span>
         </header>
-        <div className="sc-room-lines">
+        <div className="sc-room-lines" ref={lines}>
           {messages.map((row) => (
             <button
               key={row.id}
               type="button"
               className="sc-room-msg"
               aria-current={line === row.id && pane === "thread"}
+              aria-label={`Open thread from ${row.name}: ${row.text}`}
               onClick={() => {
                 setLine(row.id);
-                setWho(row.who);
-                setPane("thread");
+                setThreadDraft("");
+                openPane("thread", row.who);
               }}
             >
               <Face who={row.who} />
@@ -188,12 +238,10 @@ export function Board() {
                   </em>
                 </b>
                 {row.text}
-                {row.replies ? (
-                  <i className="if-ico-row">
+                  <i className={`if-ico-row${row.replies + (threadExtra[row.id]?.length ?? 0) === 0 ? " sc-room-start-reply" : ""}`}>
                     <Icon name="reply" size={12} />
-                    {row.replies} {row.replies === 1 ? "reply" : "replies"}
+                    {row.replies + (threadExtra[row.id]?.length ?? 0) || "Reply"} {row.replies + (threadExtra[row.id]?.length ?? 0) > 0 ? row.replies + (threadExtra[row.id]?.length ?? 0) === 1 ? "reply" : "replies" : ""}
                   </i>
-                ) : null}
               </span>
             </button>
           ))}
@@ -214,6 +262,7 @@ export function Board() {
             value={draft}
             placeholder={`Message #${room.name}`}
             aria-label="Message"
+            enterKeyHint="send"
             onChange={(event) => setDraft(event.target.value)}
           />
         </InputGroup>
@@ -223,54 +272,33 @@ export function Board() {
         </Button>
       </form>
 
-      <nav className="if-thumb" aria-label={WHAT}>
-        <button
-          type="button"
-          aria-current={phonePane === "channels"}
-          onClick={() => {
-            setPhonePane("channels");
-            setPane("none");
-          }}
-        >
-          <Icon name="hash" size={16} />
-          Channels
-        </button>
-        <button
-          type="button"
-          aria-current={phonePane === "chat"}
-          onClick={() => setPhonePane("chat")}
-        >
-          <Icon name="message" size={16} />
-          Conversation
-        </button>
-      </nav>
-
       <aside className={`if-inspect${pane !== "none" ? " is-open" : ""}`} aria-label="Thread">
-        {pane !== "none" ? <InspectorClose onClick={() => setPane("none")} /> : null}
+        {pane !== "none" ? <InspectorClose onClick={closePane} /> : null}
         {pane === "thread" ? (
-          <div key={selected.id} className="sc-room-inspect sc-fresh">
+          <div key={selected.id} className="sc-room-thread sc-fresh">
+          <div className="sc-room-inspect" ref={replyList}>
             <p className="sc-room-label if-ico-row">
               <Icon name="reply" size={12} />
               Thread
             </p>
-            <p className="sc-room-lead">{selected.text}</p>
-            {replies.map((row) => (
-              <button
-                key={row.text}
-                type="button"
-                className="sc-room-reply"
-                onClick={() => {
-                  setWho(row.who);
-                  setPane("person");
-                }}
-              >
+            <article className="sc-room-thread-original"><b>{selected.name}</b><p className="sc-room-lead">{selected.text}</p></article>
+            <div className="sc-room-reply-list" aria-live="polite" aria-relevant="additions">
+            {replies.length === 0 ? <p className="sc-room-no-replies">No replies yet. Start the conversation below.</p> : null}
+            {replies.map((row, index) => (
+              <article key={`${row.name}-${index}`} className="sc-room-reply">
                 <Face who={row.who} />
                 <span>
-                  <b>{row.name}</b>
+                  {row.name === "You" ? <b>You</b> : <button type="button" className="sc-room-reply-author" data-focus-key={`reply-${index}`} onClick={() => openPane("person", row.who)}>{row.name}</button>}
                   {row.text}
                 </span>
-              </button>
+              </article>
             ))}
+            </div>
+          </div>
+          <form className="sc-room-reply-dock" onSubmit={sendReply}>
+            <Input value={threadDraft} aria-label="Reply in thread" placeholder="Reply in thread" enterKeyHint="send" onChange={(event) => setThreadDraft(event.target.value)} />
+            <Button type="submit" style={{ width: 44, padding: 0 }} aria-label="Send reply" disabled={!threadDraft.trim()}><Icon name="send" size={16} /></Button>
+          </form>
           </div>
         ) : null}
         {pane === "person" ? (

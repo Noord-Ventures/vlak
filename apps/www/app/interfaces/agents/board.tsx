@@ -90,9 +90,9 @@ export function AgentsBoard() {
   }
 
   return (
-    <section className="if-board am" data-mobile-detail={mobileDetail} aria-label="Agent workspace">
+    <section className="am" data-mobile-detail={mobileDetail} data-mobile-screen={composing ? "compose" : mobileDetail ? "detail" : "queue"} aria-label="Agent workspace">
       <header className="am-header">
-        <div className="am-workspace"><span className="am-workspace-mark"><Icon name="layers" size={16} /></span><div><strong>Website release</strong><span>Shared workspace</span></div></div>
+        <div className="am-workspace"><span className="am-workspace-mark"><Icon name="layers" size={16} /></span><div><strong>Website release</strong><span className="am-desktop-context">Shared workspace</span><span className="am-mobile-context">{active} working · {reviews} to review</span></div></div>
         <Button variant="ghost" size="sm" ref={newTaskButton} className="am-new-task" onClick={() => { setComposing(true); setMobileDetail(true); }}><Icon name="plus" size={16} /><span>New task</span></Button>
       </header>
 
@@ -113,16 +113,18 @@ export function AgentsBoard() {
             </button>)}
             {visible.length === 0 ? <div className="am-empty"><Icon name="check" size={24} /><h3>{filter === "review" ? "Nothing waiting for review" : "No active tasks"}</h3><p>{filter === "review" ? "Tasks will appear here when an agent needs your decision." : "Start a queued task to put an agent to work."}</p><Button variant="ghost" size="sm" onClick={() => changeFilter("all")}>View all tasks</Button></div> : null}
           </div>
-          <div className="am-queue-count">{visible.length} {visible.length === 1 ? "task" : "tasks"}<span>{tasks.filter((task) => task.status === "complete").length} complete</span></div>
+          <div className="am-queue-count">{visible.length} {visible.length === 1 ? "task" : "tasks"}<span className="am-desktop-context">{tasks.filter((task) => task.status === "complete").length} complete</span><span className="am-mobile-context">Local demo</span></div>
         </aside>
 
         <section className="am-detail" aria-label={composing ? "New task" : "Task detail"}>
           {composing ? <form className="am-compose" onSubmit={queueTask}>
             <div className="am-compose-heading"><h2>Give an agent a task</h2><Button variant="ghost" size="sm" className="am-icon-button" aria-label="Cancel new task" onClick={closeDetail}><Icon name="x" size={16} /></Button></div>
+            <div className="am-compose-fields">
             <p>Describe the outcome and any boundaries. The builder agent will keep its work in this workspace.</p>
             <Input label="Task name" autoFocus required maxLength={80} value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Improve the search experience" />
             <Textarea label="Brief" required rows={3} maxLength={1200} value={brief} onChange={(event) => setBrief(event.target.value)} placeholder="What should change, and how will we know it is ready?" />
             <div className="am-compose-assignee"><span className="am-agent-avatar"><Icon name="code" size={16} /></span><span><strong>Builder agent</strong><small>Assigned when you queue this task</small></span></div>
+            </div>
             <div className="am-compose-actions"><Button type="submit" size="sm" disabled={!title.trim() || !brief.trim()}>Queue task<Icon name="arrow-right" size={16} /></Button><Button variant="ghost" size="sm" onClick={closeDetail}>Cancel</Button></div>
           </form> : selected ? <>
             <div className="am-detail-head">
@@ -143,6 +145,11 @@ export function AgentsBoard() {
       </div>
 
       <footer className="am-footer"><span><Icon name="terminal" size={12} />Local demo</span><span>Changes stay in this tab</span></footer>
+      <div className="am-mobile-nav" role="group" aria-label="Filter tasks">
+        <Button variant="ghost" aria-label="All tasks" aria-pressed={filter === "all"} onClick={() => changeFilter("all")}><Icon name="list" size={16} /><span>Tasks</span></Button>
+        <Button variant="ghost" aria-pressed={filter === "active"} onClick={() => changeFilter("active")}><Icon name="activity" size={16} /><span>Active</span></Button>
+        <Button variant="ghost" aria-label="Review" aria-pressed={filter === "review"} onClick={() => changeFilter("review")}><Icon name="user-check" size={16} /><span>Review{reviews ? ` · ${reviews}` : ""}</span></Button>
+      </div>
       <span className="am-announcement" role="status" aria-live="polite">{announcement}</span>
     </section>
   );

@@ -1,6 +1,8 @@
 /* One quiet operations surface. Cards join the grid; controls retain Vlak's radius. */
 .am {
   display: grid;
+  height: 100%;
+  min-height: 0;
   grid-template-rows: 64px 84px minmax(0, 1fr) 30px;
   min-width: 0;
   overflow: hidden;
@@ -99,7 +101,8 @@
 .am-compose-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .am-compose h2 { font-size: 20px; line-height: 1.2; font-weight: 500; letter-spacing: -.025em; }
 .am .am-icon-button { width: 44px; padding: 0; }
-.am-compose > p { color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
+.am-compose-fields { display: grid; gap: 18px; }
+.am-compose-fields > p { color: var(--text-secondary); font-size: 12px; line-height: 1.45; }
 .am-compose .rs-field { min-width: 0; }
 .am-compose .rs-field-label { font-size: 12px; font-weight: 400; line-height: 1.35; }
 .am-compose .rs-input { min-height: 44px; height: 44px; font-size: 13px; }
@@ -114,6 +117,7 @@
 .am-detail-empty { grid-row: 1 / -1; align-content: center; padding: 24px; }
 .am-footer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 0 16px; border-top: 1px solid var(--divider); color: var(--text-secondary); font-size: 10px; }
 .am-footer > span:first-child { display: inline-flex; gap: 6px; align-items: center; }
+.am-mobile-nav, .am .am-mobile-context { display: none; }
 .am-announcement { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 @container (max-width: 799px) {
   .am-body { grid-template-columns: 256px minmax(0, 1fr); }
@@ -121,43 +125,60 @@
   .am-summary-card > span { font-size: 11px; }
   .am-agent-scope { display: none; }
 }
-@container (max-width: 639px) {
-  .am { grid-template-rows: 64px 78px minmax(0, 1fr) 30px; }
-  .am-header { padding-inline: 16px; }
-  .am-workspace-mark { display: none; }
-  .am .am-summary-card { padding: 14px 16px; gap: 8px; flex-direction: column; align-items: flex-start; }
-  .am-summary-card > span { font-size: 11px; white-space: nowrap; }
-  .am-summary-card > strong { font-size: 25px; }
-  .am-running-dot { display: none; }
+/* Compact workspaces have their own navigation and one active screen. */
+@container (max-width: 640px) {
+  .am { grid-template-rows: 72px minmax(0, 1fr) auto; }
+  .am-header { padding: 12px 16px; }
+  .am-workspace strong { font-size: 16px; }
+  .am-workspace > div > span { font-size: 12px; }
+  .am .am-mobile-context { display: block; }
+  .am .am-desktop-context, .am-workspace-mark, .am-summary, .am-footer, .am-queue-controls { display: none; }
   .am-body { grid-template-columns: minmax(0, 1fr); }
-  .am-queue { border-right: 0; }
+  .am-queue { grid-template-rows: minmax(0, 1fr) 36px; border-right: 0; }
   .am-detail { display: none; }
-  .am[data-mobile-detail="true"] .am-queue { display: none; }
+  .am-task { min-height: 112px; padding: 16px; gap: 10px; }
+  .am-task strong { font-size: 16px; line-height: 1.35; }
+  .am-task-meta, .am-task-foot, .am-task .am-status { font-size: 13px; }
+  .am-queue-count { font-size: 12px; }
+  .am-mobile-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 6px 8px max(6px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--divider); background: var(--bg); }
+  .am .am-mobile-nav button { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 100%; height: 52px; padding: 6px; border: 0; font-size: 12px; }
+  .am .am-mobile-nav button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  .am[data-mobile-detail="true"] { grid-template-rows: minmax(0, 1fr); }
+  .am[data-mobile-detail="true"] .am-header, .am[data-mobile-detail="true"] .am-mobile-nav, .am[data-mobile-detail="true"] .am-queue { display: none; }
   .am[data-mobile-detail="true"] .am-detail { display: grid; }
-  .am .am-back { display: inline-flex; padding-inline: 10px; margin: -6px 0 -6px -6px; border-color: transparent; }
+  .am-detail-head { padding: 12px 16px 20px; }
+  .am .am-back { display: inline-flex; padding-inline: 8px; margin-left: -8px; border-color: transparent; font-size: 15px; }
   .am-detail-id { display: none; }
-  .am-detail-head { padding-top: 12px; padding-bottom: 14px; }
-  .am-detail-topline { margin-bottom: 16px; }
-  .am-detail-head h2 { font-size: 21px; }
-  .am-agent-line { margin-top: 10px; }
-  .am-detail-actions { padding: 12px 16px; gap: 12px; }
-  .am-detail-actions .rs-btn-primary { padding-inline: 10px; font-size: 12px; }
-  .am-detail-actions > div > span { max-width: 18ch; }
-  .am-task { min-height: 94px; padding: 13px 16px; }
-  .am-task strong { font-size: 14px; }
-  .am-task-meta, .am-task-foot { font-size: 12px; }
-  .am-task .am-status { font-size: 12px; }
-  .am-queue-controls { padding-inline: 16px; }
+  .am-detail-topline { min-height: 44px; margin-bottom: 16px; }
+  .am-detail-topline .am-status { font-size: 12px; }
+  .am-detail-head h2 { font-size: 25px; line-height: 1.2; }
+  .am-agent-line { margin-top: 16px; font-size: 13px; }
+  .am-detail-scroll { padding: 20px 16px; }
+  .am-brief, .am-activity p, .am-output-empty, .am-empty p { font-size: 15px; line-height: 1.45; }
+  .am-activity time, .am-output-file p, .am-output-heading { font-size: 13px; }
+  .am-output-file strong { font-size: 15px; }
+  .am .am-view-filter .rs-toggle { font-size: 14px; min-width: 80px; }
+  .am-activity { margin-top: 24px; }
+  .am-activity li { padding-bottom: 24px; }
   .am-progress-label { display: none; }
+  .am-detail-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 16px 16px max(16px, env(safe-area-inset-bottom, 0px)); }
+  .am-detail-actions > div > span { font-size: 12px; }
+  .am-detail-actions strong { font-size: 14px; }
+  .am-detail-actions .rs-btn-primary, .am-detail-actions .rs-btn-ghost { width: 100%; height: 48px; font-size: 15px; }
+  .am-run-progress .rs-progress-head { font-size: 13px; }
+  .am .am-new-task { font-size: 13px; padding-inline: 10px; }
+  .am-compose { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: 0; gap: 0; overflow: hidden; }
+  .am-compose-heading { padding: 16px; border-bottom: 1px solid var(--divider); }
+  .am-compose h2 { font-size: 23px; }
+  .am-compose-fields { display: flex; flex-direction: column; gap: 24px; min-height: 0; padding: 24px 16px; overflow-y: auto; overscroll-behavior: contain; }
+  .am-compose-fields > p { font-size: 15px; }
+  .am-compose .rs-field-label, .am-compose-assignee strong { font-size: 14px; }
+  .am-compose-assignee small { font-size: 13px; }
   .am-compose .rs-input, .am-compose .rs-textarea { font-size: 16px; }
-}
-@container (max-width: 359px) {
-  .am-header { padding-inline: 12px; }
-  .am .am-summary-card { padding-inline: 12px; }
-  .am-summary-card > span { font-size: 10px; }
-  .am-detail-actions { flex-wrap: wrap; }
-  .am-detail-actions > .am-run-progress { flex-basis: 120px; }
-  .am-detail-head, .am-detail-scroll, .am-compose { padding-inline: 16px; }
+  .am-compose .rs-textarea { min-height: 144px; }
+  .am-compose-actions { display: grid; grid-template-columns: minmax(0, 1fr); padding: 16px 16px max(16px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--divider); background: var(--bg); }
+  .am-compose-actions .rs-btn-primary { width: 100%; height: 48px; font-size: 15px; }
+  .am-compose-actions .rs-btn-ghost { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .am-task { transition: none; }

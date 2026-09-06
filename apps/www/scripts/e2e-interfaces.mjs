@@ -47,6 +47,7 @@ try {
           links: Array.from(document.querySelectorAll(".if-component-list a"), el => el.getAttribute("href")),
           controlRadii: Array.from(document.querySelectorAll(".cx-graphics > header button, .cx-graphics > aside > button, .cx-graphics textarea, .cx-segments"), el => getComputedStyle(el).borderRadius),
           clippedFormats: Array.from(document.querySelectorAll(".cx-format-label")).filter(label => {
+            if (!label.getClientRects().length) return false;
             const button = label.closest("button").getBoundingClientRect();
             const text = label.getBoundingClientRect();
             return text.left < button.left + 6 || text.right > button.right - 6;

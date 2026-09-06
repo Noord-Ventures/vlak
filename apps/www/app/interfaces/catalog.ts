@@ -55,7 +55,7 @@ export const interfaces = [
     use: "Browse posts → read comments → view a contributor",
     field: "People in the rail, masonry feed in the center, context on the right.",
     note: "Open a post or contributor to explore the side pane. The people, posts, and comments are fictional sample content.",
-    components: ["Avatar", "Button", "Card", "Icon"],
+    components: ["Avatar", "Button", "Card", "Icon", "Input"],
     modifications: [
       "Card provides each post's outer frame. Custom content places photography above the author, update, and discussion counts, with square edges and inset text.",
       "Avatar is shared between posts, comments, and profiles. Names sit beside the small version; profiles use the larger size.",
@@ -76,7 +76,7 @@ export const interfaces = [
     use: "Scan fleet → select a vehicle → inspect its trip",
     field: "Status rail, city-scale map, and an on-demand detail pane.",
     note: "Select a van and open its trip. The city scene is animated; vehicle positions and routes are sample data.",
-    components: ["Button", "Icon"],
+    components: ["Button", "Card", "Icon"],
     modifications: [
       "Icons give vehicle, status, and location labels a consistent size. The fleet rows themselves are custom buttons with shared dividers.",
       "The trip action uses Button; the pane uses its ghost variant with a close Icon in the top-right corner.",
@@ -97,7 +97,7 @@ export const interfaces = [
     use: "Filter kitchens → choose a dish → review the bag",
     field: "Search and filters above an image-led market; details open alongside it.",
     note: "Filter the kitchens, open a menu, and add dishes to the bag. Orders stay in the demo; there is no checkout or payment.",
-    components: ["Button", "Icon", "Input", "Input group", "Toggle group"],
+    components: ["Button", "Card", "Icon", "Input", "Input group", "Toggle group"],
     modifications: [
       "Input group pairs the search Icon with Input, keeping the icon fixed while the search field fills the available space.",
       "Toggle groups handle delivery, diet, and price filters. Their selected backgrounds provide a consistent state across all three groups.",
@@ -258,7 +258,7 @@ export const interfaces = [
     use: "Compare the same itinerary, actions, and states across platforms",
     field: "Two complete phone frames shown at equal scale.",
     note: "Switch tabs, save the trip, and open the profile on either device. Each web preview keeps its own local state.",
-    components: ["Card", "Icon"],
+    components: ["Button", "Card", "Icon", "Toggle group"],
     modifications: [
       "Both devices reuse the same Vlak Icons for Plan, Today, and You, keeping destinations recognizable across the two layouts.",
       "Card holds the train summary in both devices. Local spacing and colors adapt it to each platform while retaining the same departure, route, and status.",
@@ -274,3 +274,20 @@ export const INTERFACE_SLUGS = interfaces.map((item) => item.slug);
 export function interfaceBySlug(slug: string) {
   return interfaces.find((item) => item.slug === slug);
 }
+
+/** Each compact workspace changes its flow, not just its column widths. */
+export const mobilePatterns: Record<InterfaceSlug, string> = {
+  agents: "On mobile, bottom navigation switches Tasks, Active, and Review. Opening a task replaces the workspace header and summaries with a full-height detail screen. Approvals and new-task submission stay in a bottom action area while the content scrolls.",
+  line: "On mobile, the chat list opens into a full-width conversation with a pinned composer. Conversation information and response details use their own screen with Back navigation. Text entry stays at 16px and focus returns to the control that opened the screen.",
+  room: "On mobile, channels open into a conversation, and a message opens into a separate thread screen with its own reply field. A contextual header replaces the desktop rail, and Back preserves the current channel and conversation.",
+  wall: "On mobile, Feed and People sit in bottom navigation. A post opens into a full-width comments screen with a pinned reply field; profiles use the same focused navigation. The feed remains one readable column.",
+  press: "On mobile, Overview, Jobs, and Invoices become separate destinations in bottom navigation. The overview prioritizes output and jobs needing attention. A job opens into a full-screen production brief with a Back action.",
+  night: "On mobile, Fleet and Map are separate views. Selecting a vehicle opens its map and a compact vehicle card. Trip details replace the map with a readable itinerary, with Back and Show on map actions.",
+  evening: "On mobile, browsing, filters, the restaurant menu, dish details, and the bag use focused screens. A bottom bag action keeps the order within reach, while Back navigation preserves the current restaurant and filters.",
+  graphics: "On mobile, Preview and Direction replace the desktop control rail. One composition fills the preview, with a three-option picker below it. Generate returns to the preview; the full set of canvas, seed, variation, and export controls remains available.",
+  render: "On mobile, Viewport and Inspector are separate destinations. The model keeps the full working width, its tools move into a horizontal bar, and the inspector provides scrollable material, mesh, and rotation controls without covering the model.",
+  drive: "On mobile, Vehicle, Controls, and Media replace the four-column dashboard. Vehicle keeps the illustration and journey actions in focus; settings become readable control rows, and media gets a dedicated playback screen. State is shared between views.",
+  orbit: "On mobile, Map, Assets, and Pass details replace the side rails. The observation fills the map view, assets become full-width selection rows, and all telemetry remains available in a separate scrollable inspector.",
+  frontier: "On mobile, a disclosure menu replaces the desktop navigation row. Selecting a section closes the menu and moves to a single-column reading layout. The menu supports Escape and returns focus to its trigger.",
+  platforms: "On mobile, an iOS/Android picker shows one full-width handset at a time instead of shrinking two phones side by side. Both keep their own saved-trip and navigation state, with a scrollable content area and persistent platform-specific navigation.",
+};

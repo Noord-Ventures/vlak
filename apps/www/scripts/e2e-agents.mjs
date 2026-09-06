@@ -39,15 +39,25 @@ async function checkLayout(page, label) {
 
 try {
   for (const colorScheme of ["light", "dark"]) {
-    for (const width of [320, 390, 768, 1024, 1440, 2082]) {
-      const page = await browser.newPage({ viewport: { width, height: 960 }, colorScheme, reducedMotion: "reduce" });
+    for (const [width, height] of [[320, 568], [390, 844], [768, 960], [1024, 960], [1440, 960], [2082, 1100]]) {
+      const page = await browser.newPage({ viewport: { width, height }, colorScheme, reducedMotion: "reduce" });
       page.on("pageerror", error => failures.push(error.message));
       const response = await page.goto(`${base}/interfaces/agents/`, { waitUntil: "networkidle" });
       assert(response.ok());
       const board = page.locator(".am");
+      const compact = await board.evaluate(el => el.clientWidth <= 640);
       await checkLayout(page, `${colorScheme} ${width}px queue`);
+      if (compact) {
+        assert(await board.locator(".am-mobile-nav").isVisible(), "Compact workspace needs its task navigation bar");
+        assert(!(await board.locator(".am-summary").isVisible()), "Desktop summary cards must not shrink into the mobile queue");
+      }
       await board.locator(".am-task").filter({ hasText: "Audit keyboard navigation" }).click();
       assert(await board.getByRole("heading", { name: "Audit keyboard navigation" }).isVisible());
+      if (compact) {
+        assert(!(await board.locator(".am-header").isVisible()), "Task detail replaces workspace chrome on mobile");
+        assert(!(await board.locator(".am-queue").isVisible()), "Only the focused mobile task should be visible");
+        assert(!(await board.locator(".am-mobile-nav").isVisible()), "Detail uses Back rather than competing bottom navigation");
+      }
       await checkLayout(page, `${colorScheme} ${width}px detail`);
       await board.getByRole("button", { name: /^Output/ }).click();
       assert(await board.getByText("navigation/menu.tsx", { exact: true }).isVisible());
@@ -65,6 +75,7 @@ try {
       assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), "Resume");
       await page.keyboard.press("Enter");
       assert.equal(await page.evaluate(() => document.activeElement?.textContent?.trim()), "Pause");
+      if (compact) await board.getByRole("button", { name: "Tasks", exact: true }).click();
       await board.getByRole("button", { name: "New task", exact: true }).click();
       await board.getByLabel("Task name", { exact: true }).fill("Test the search flow");
       await board.getByLabel("Brief", { exact: true }).fill("Check that search works by keyboard at narrow widths.");

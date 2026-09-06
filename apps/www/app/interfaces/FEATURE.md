@@ -21,12 +21,12 @@ Each app has two to three levels of use: list → detail → one level deeper. I
 | Surface | Route | Click path | Done |
 | --- | --- | --- | --- |
 | Interfaces index | `/interfaces` | Corner → Interfaces | Lists the studies. Title occupies a 204 cell. At scroll 0 the H1 top shares the rail first-row line. Each card is a poster crop on the 204, then the English name. Index tiles are chrome-square (radius 0), same lock as Components `.rs-card`. Vertical gap is two gutters so the stack is looser than a flush cage. The field under the title and around the crops reads as the module. |
-| Line | `/interfaces/line` | Interfaces → Line | AI chat. List → chat → a line. Centered measure. Composer in the pane, aligned. Site 204s run around the box. On the phone: five-chat inbox plus composer (V1 still), not a squeezed three-pane. |
-| Press | `/interfaces/press` | Interfaces → Press | Dashboard. Floor → job → sheet. Hue in the rail. One Crouwel spot. On the phone: 38 / 12 / 4 metrics and four jobs, not a 204 rail stacked on the floor. |
-| Wall | `/interfaces/wall` | Interfaces → Wall | Social feed. Feed → post → profile. Masonry on desktop, a text stream on the phone. All people and portraits are fictional mock users created for the interface studies. |
-| Fleet management | `/interfaces/night` | Interfaces → Fleet management | List → unit → trip. A neighborhood at city scale with readable streets and a selected route. On phones, switch between the van list and map; trip details open in a dismissible sheet. |
-| Food ordering | `/interfaces/evening` | Interfaces → Food ordering | Search and filter restaurants → store → bag. Image-led cards adapt to phones. The bag is a sheet; no order is submitted. |
-| Room | `/interfaces/room` | Interfaces → Room | Team chat. Channel → message → thread. People in the rail. Not Wall. On the phone: channels and people list plus composer, not a 204 rail stacked on the thread. |
+| AI chat | `/interfaces/line` | Interfaces → AI chat | Inbox → conversation → response or information. A full-width reading screen and pinned composer replace the desktop panes on mobile. |
+| Dashboard | `/interfaces/press` | Interfaces → Dashboard | Overview → jobs or invoices → brief. Bottom navigation and a focused production overview replace the desktop dashboard on mobile. |
+| Social feed | `/interfaces/wall` | Interfaces → Social feed | Feed → comments → profile. Feed and People have bottom navigation; comments get their own reply screen. All portraits are fictional mock users. |
+| Fleet management | `/interfaces/night` | Interfaces → Fleet management | Vehicles → map → trip. A compact vehicle card anchors the map; the itinerary uses a full reading screen with Back and Show on map actions. |
+| Food ordering | `/interfaces/evening` | Interfaces → Food ordering | Kitchens → menu → dish → bag. Filters and ordering use focused mobile screens with a bottom action. The confirmation is local; no order or payment is submitted. |
+| Team chat | `/interfaces/room` | Interfaces → Team chat | Channels → conversation → thread. Each mobile level gets a contextual header and Back action. Conversations and threads have their own pinned composers. |
 | Agent management | `/interfaces/agents` | Interfaces → Agent management | Queue → task → activity or output. Create local tasks, pause or resume a run, and approve a review. Narrow panels use list-to-detail navigation. No model or external agent service is connected. |
 | Wallpaper generator | `/interfaces/graphics` | Interfaces → Wallpaper generator | Direction → generate → select → export. Geometric compositions run locally in-browser. Export produces a PNG with a 6,144px long edge; no image API is required. |
 | 3D workspace | `/interfaces/render` | Interfaces → 3D workspace | Live WebGL car model, modeling tools, selected panel, render timeline. Drag rotates the model. |
@@ -37,5 +37,23 @@ Each app has two to three levels of use: list → detail → one level deeper. I
 | Phone | ≤430 | Contents picker | Rail hides under 900. A stacked 44pt picker lists all studies. Scene controls use the 44pt phone scale. Each boxed demo is a mobile composition, not the desktop scene scaled down. |
 
 Routes are derived from `catalog.ts`; CI fails if a catalog route disappears.
+
+## Mobile composition contract
+
+The specimen container, not only the browser width, determines the layout. At 640px and below, replace desktop information architecture with focused screens. A narrow specimen next to the documentation rail must receive the same mobile treatment. Desktop remains multi-pane above that threshold.
+
+- Agent management uses Tasks, Active, and Review bottom navigation. Task details and new-task forms replace the queue and header, with a pinned primary action and independently scrolling content.
+- Wallpaper generation separates Preview from Direction. Show one selected result, keep a three-result picker, and return to Preview after generation. All format and export controls remain reachable.
+- The 3D workspace separates Viewport from Inspector and puts modeling tools in a horizontal toolbar.
+- Vehicle controls separate Vehicle, Controls, and Media. Keep the artwork, settings, and playback at a usable scale without competing for the same screen.
+- Satellite operations separate Map, Assets, and Pass details. Do not hide telemetry to make the map fit.
+- The frontier company uses a disclosure menu and a single-column reading flow, with Escape and focus return.
+- Mobile platforms show one full-width handset behind an iOS/Android picker. Both preserve their own navigation and saved-trip state.
+
+Use Vlak Button, Card, Icon, Input, InputGroup, and ToggleGroup where applicable. Keep structural regions flush and controls at the 4px radius. Body copy is 15–16px on phones, text inputs are at least 16px, and targets are at least 44 × 44px. Selection changes the full control surface. Do not add simulated device status bars outside the explicit platform comparison.
+
+Headers, bottom navigation, and primary actions must remain separate from the scrolling content. Back preserves the selected item and restores focus. Phone specimen height follows the stable viewport, with a 480px minimum; long details scroll inside their screen. Reduced motion must preserve every transition's end state. Each detail page documents its mobile component adaptation in `mobilePatterns`.
+
+`scripts/e2e-mobile-interfaces.mjs` exercises all 13 flows at 320 × 568, 390 × 844, 430 × 932, and a narrow specimen inside a 1024px desktop page. It checks touch targets, duplicated chrome, overflow, reachable navigation, and the main state-changing journey. `scripts/e2e-agents.mjs` covers task creation, approvals, pause/resume, focus, and accessibility. `scripts/e2e-interfaces.mjs` covers the shared gallery, detail pages, and desktop regressions.
 
 Before shipping, check all study routes at phone and desktop widths, including 320px. Verify one main landmark and page heading, no horizontal page overflow, primary local interactions, clipboard feedback, design-guide URL, component links, and the build anchor. Scope container queries to the owning study. Run the site typecheck and production build.

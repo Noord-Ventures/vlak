@@ -198,3 +198,65 @@
   .sc-night-unit,
   .sc-night-ghost { transition: none; }
 }
+
+.sc-night-mobile-header, .sc-night-mobile-intro, .sc-night-mobile-vehicle, .sc-night-mobile-nav, .sc-night-mobile-trip-heading, .sc-night-mobile-itinerary { display: none; }
+.sc-night-map { position: relative; }
+.sc-night-map-label { position: absolute; inset: 12px auto auto 12px; padding: 6px 8px; color: #171716; background: #f3f1eb; font-size: 11px; line-height: 1.4; pointer-events: none; }
+@container (max-width: 640px) {
+  .if-board.sc-night { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: 60px minmax(0, 1fr) 64px; }
+  .sc-night *, .sc-night *::before, .sc-night *::after { box-sizing: border-box; }
+  .sc-night .rs-btn-primary, .sc-night .rs-btn-ghost { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; width: auto; height: auto; padding: 10px 14px; border-radius: 4px; font-size: 15px; line-height: 1.3; }
+  .sc-night .sc-night-mobile-header { grid-row: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--divider); }
+  .sc-night-mobile-header > span:first-child { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 500; }
+  .sc-night-mobile-header > span:last-child { font-size: 14px; font-weight: 400; color: var(--text-secondary); }
+  .sc-night .sc-night-field, .sc-night .sc-night-rail { grid-row: 2; }
+  .sc-night .sc-night-mobile-intro { display: block; padding: 24px 20px; border-bottom: 1px solid var(--divider); }
+  .sc-night-mobile-intro > p { margin: 0 0 8px; font-size: 14px; color: var(--text-secondary); }
+  .sc-night-mobile-intro h2 { margin: 0; font-size: 25px; line-height: 1.2; letter-spacing: -.035em; font-weight: 500; }
+  .sc-night-mobile-intro > div { display: flex; gap: 24px; margin-top: 24px; }
+  .sc-night-mobile-intro > div > span { display: flex; align-items: baseline; gap: 8px; color: var(--text-secondary); font-size: 14px; }
+  .sc-night-mobile-intro strong { font-size: 28px; font-weight: 400; color: var(--text); line-height: 1; }
+  .sc-night .sc-night-unit { min-height: 104px; padding: 20px; gap: 10px; font-size: 17px; }
+  .sc-night-unit b { font-weight: 500; }
+  .sc-night .sc-night-unit em { font-size: 15px; }
+  .sc-night .sc-night-unit .rs-icon { display: block; }
+  .sc-night .sc-night-unit .sc-night-desk-state { display: none; }
+  .sc-night-v1-mid { font-weight: 400; font-size: 14px; color: var(--text-secondary); }
+  .sc-night .sc-night-unit[aria-current="true"] { background: var(--text); color: var(--bg); }
+  .sc-night .sc-night-unit[aria-current="true"] em, .sc-night .sc-night-unit[aria-current="true"] .sc-night-v1-mid { color: inherit; }
+  .sc-night-unit:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
+  .sc-night .sc-night-head { display: none; }
+  .sc-night .sc-night-map { min-height: 110px; overflow: hidden; }
+  .sc-night .sc-night-mobile-vehicle { display: grid; gap: 12px; width: 100%; max-width: none; flex: none; padding: 16px 20px; border-top: 1px solid var(--divider); }
+  .sc-night-mobile-vehicle > div { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+  .sc-night-mobile-vehicle h2 { margin: 0; font-size: 22px; font-weight: 500; line-height: 1.2; }
+  .sc-night-mobile-vehicle h2:focus { outline: none; }
+  .sc-night-mobile-vehicle > div > span { display: inline-flex; gap: 6px; align-items: center; font-size: 14px; color: var(--text-secondary); }
+  .sc-night-mobile-vehicle p { display: flex; align-items: center; gap: 8px; margin: 0; font-size: 15px; color: var(--text-secondary); }
+  .sc-night-mobile-vehicle .rs-btn-primary { width: 100%; }
+  .sc-night .sc-night-mobile-nav { display: grid; grid-template-columns: 1fr 1fr; grid-row: 3; gap: 4px; padding: 4px 8px; border-top: 1px solid var(--divider); background: var(--bg); }
+  .sc-night-mobile-nav .rs-btn-ghost { display: flex; flex-direction: column; gap: 4px; height: 55px; padding: 5px 4px; border: 0; font-size: 12px; }
+  .sc-night-mobile-nav .rs-btn-ghost[aria-current="true"] { background: var(--control-fill); }
+  .if-board.sc-night[data-trip="true"] > .sc-night-rail, .if-board.sc-night[data-trip="true"] > .sc-night-field { display: none; }
+  .if-board.sc-night > .if-inspect { display: none; }
+  .if-board.sc-night > .if-inspect.is-open { display: block; grid-row: 2; position: static; inset: auto; width: 100%; max-width: none; height: auto; max-height: none; min-height: 0; border: 0; overflow: auto; padding: 0; opacity: 1; }
+  .sc-night > .if-inspect > .if-inspect-close { display: none; }
+  .sc-night .sc-night-inspect { width: 100%; padding: 24px 20px; gap: 24px; }
+  .sc-night-inspect > .sc-night-label, .sc-night-inspect > .sc-night-trip, .sc-night-inspect > p { display: none; }
+  .sc-night .sc-night-mobile-trip-heading { display: block; padding: 0; }
+  .sc-night-mobile-trip-heading > p { font-size: 14px; margin-bottom: 8px; }
+  .sc-night-mobile-trip-heading h2 { margin: 0; font-size: 25px; font-weight: 500; letter-spacing: -.035em; line-height: 1.2; }
+  .sc-night-mobile-trip-heading h2:focus { outline: none; }
+  .sc-night-inspect dl > div { padding: 14px 0; font-size: 15px; align-items: baseline; }
+  .sc-night-inspect dd { max-width: 60%; }
+  .sc-night .sc-night-mobile-itinerary { display: block; }
+  .sc-night-mobile-itinerary h3 { margin: 0 0 20px; font-size: 16px; font-weight: 500; }
+  .sc-night-mobile-itinerary ol { list-style: none; margin: 0 0 24px; padding: 0; }
+  .sc-night-mobile-itinerary li { position: relative; padding: 0 0 24px 26px; }
+  .sc-night-mobile-itinerary li::before { content: ""; position: absolute; top: 5px; left: 2px; width: 8px; height: 8px; border: 1px solid var(--text); border-radius: 50%; background: var(--bg); }
+  .sc-night-mobile-itinerary li:not(:last-child)::after { content: ""; position: absolute; left: 6px; top: 17px; bottom: 1px; width: 1px; background: var(--divider); }
+  .sc-night-mobile-itinerary li > span { display: block; margin-bottom: 5px; font-size: 13px; color: var(--text-secondary); }
+  .sc-night-mobile-itinerary li > strong { font-size: 16px; font-weight: 500; }
+  .sc-night-mobile-itinerary li > p { margin-top: 5px; font-size: 15px; }
+  .sc-night-mobile-itinerary .rs-btn-ghost { width: 100%; }
+}

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button, Icon, Textarea, ToggleGroup } from "@noorddev/vlak-react";
+import { MobileStudyNav, focusMobileMode } from "./mobile-navigation";
 
 type Format = "widescreen" | "desktop" | "phone";
 
@@ -151,6 +152,8 @@ function drawWallpaper(context: CanvasRenderingContext2D, wallpaper: Wallpaper, 
 }
 
 export function WallpaperGenerator() {
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const [mobileView, setMobileView] = React.useState("preview");
   const [selected, setSelected] = React.useState(0);
   const [prompt, setPrompt] = React.useState("A quiet geometric field for focused work, with one cobalt signal.");
   const [format, setFormat] = React.useState<Format>("widescreen");
@@ -160,12 +163,18 @@ export function WallpaperGenerator() {
   const [exporting, setExporting] = React.useState(false);
   const [results, setResults] = React.useState(() => makeWallpapers(prompt, variation, generation));
 
+  React.useEffect(() => {
+    if (rootRef.current && rootRef.current.clientWidth <= 640) setFormat("phone");
+  }, []);
+
   function generate() {
     const next = generation + 1;
     setGeneration(next);
     setResults(makeWallpapers(prompt, variation, next));
     setSelected(0);
     setStatus("Three new wallpapers ready.");
+    setMobileView("preview");
+    focusMobileMode(rootRef.current, "preview");
   }
 
   function exportSelected() {
@@ -199,20 +208,21 @@ export function WallpaperGenerator() {
     }, "image/png");
   }
 
-  return <div className="cx cx-graphics">
+  return <div ref={rootRef} className="cx cx-graphics" data-mobile-view={mobileView}>
     <header><span>Three compositions, one starting point</span><Button className="cx-export-action" variant="ghost" size="sm" style={{ borderRadius: "var(--radius-sm)" }} disabled={exporting} onClick={exportSelected}>{exporting ? "Exporting…" : "Export 6K"}</Button></header>
-    <aside>
+    <aside aria-label="Composition direction">
       <p className="cx-label">Direction</p>
       <div className="cx-direction"><Textarea label="Variation seed" style={{ borderRadius: "var(--radius-sm)", minHeight: 0 }} value={prompt} onChange={(event) => setPrompt(event.target.value)} /></div>
       <div className="cx-format-field">
         <p className="cx-label">Canvas</p>
-        <ToggleGroup className="cx-segments" aria-label="Canvas format" style={{ borderRadius: "var(--radius-sm)", height: "auto" }} value={format} onValueChange={(value) => setFormat(value as Format)} options={(Object.keys(formats) as Format[]).map(value => ({ value, label: <span className="cx-format-label">{formats[value].label}</span> }))} />
+        <ToggleGroup className="cx-segments" aria-label="Canvas format" style={{ borderRadius: "var(--radius-sm)", height: "auto" }} value={format} onValueChange={(value) => setFormat(value as Format)} options={(Object.keys(formats) as Format[]).map(value => ({ value, label: <span className="cx-format-label">{value === "widescreen" ? <><span className="cx-desktop-only">Widescreen</span><span className="cx-mobile-only">Wide</span></> : formats[value].label}</span> }))} />
         <small className="cx-output-size">{formats[format].width} × {formats[format].height} · PNG</small>
       </div>
       <label className="cx-variation">Variation<input type="range" min="0" max="100" value={variation} onChange={(event) => setVariation(Number(event.target.value))} /></label>
       <Button style={{ borderRadius: "var(--radius-sm)" }} onClick={generate}><Icon name="image" size={16}/>Generate</Button>
       <p className="cx-generation-status" aria-live="polite">{status}</p>
     </aside>
-    <div className="cx-workspace"><div className="cx-results">{results.map((wallpaper, index) => <button type="button" key={wallpaper.id} className={selected === index ? "on" : ""} aria-pressed={selected === index} onClick={() => setSelected(index)}><WallpaperArt wallpaper={wallpaper} format={format}/><span>{String(index + 1).padStart(2, "0")} · {wallpaper.name}</span></button>)}</div></div>
+    <div className="cx-workspace" role="region" aria-label="Wallpaper previews"><div className="cx-results">{results.map((wallpaper, index) => <button type="button" key={wallpaper.id} className={selected === index ? "on" : ""} aria-pressed={selected === index} onClick={() => setSelected(index)}><WallpaperArt wallpaper={wallpaper} format={format}/><span>{String(index + 1).padStart(2, "0")} · {wallpaper.name}</span></button>)}</div><div className="cx-mobile-compositions"><span>Composition</span><ToggleGroup aria-label="Choose composition" value={String(selected)} onValueChange={(value) => setSelected(Number(value))} options={results.map((wallpaper, index) => ({ value: String(index), label: String(index + 1), "aria-label": wallpaper.name }))}/></div></div>
+    <MobileStudyNav label="Wallpaper workspace" value={mobileView} onValueChange={setMobileView} options={[{ value: "preview", label: "Preview", icon: "image" }, { value: "direction", label: "Direction", icon: "settings" }]}/>
   </div>;
 }

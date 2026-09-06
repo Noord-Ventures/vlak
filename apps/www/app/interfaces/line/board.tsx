@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Button, Icon, Input, InputGroup } from "@noorddev/vlak-react";
-import { PhoneV1Chrome } from "../v1-chrome";
 import { interfaceBySlug } from "../catalog";
 import { InspectorClose } from "../inspector-close";
 
@@ -77,32 +76,67 @@ export function Board() {
   const [pending, setPending] = React.useState(false);
   const [inspect, setInspect] = React.useState<Inspect>(null);
   const [phonePane, setPhonePane] = React.useState<"inbox" | "thread">("inbox");
+  const board = React.useRef<HTMLElement>(null);
+  const returnTarget = React.useRef<HTMLElement | null>(null);
+  const replyTimer = React.useRef<number | undefined>(undefined);
+  const saved = React.useRef<Record<string, Msg[]>>({ ...STARTED });
   const thread = React.useRef<HTMLDivElement>(null);
   const box = React.useRef<HTMLInputElement>(null);
-  const piece = CHATS.find((item) => item.id === chat)?.title ?? "New chat";
+  const newMessages = chat === "new" ? messages : saved.current.new;
+  const chats = newMessages?.length ? [{ id: "new", title: "New listening note", preview: newMessages.find((message) => message.role === "you")?.text ?? "Your latest conversation", when: "Now" }, ...CHATS] : CHATS;
+  const piece = chats.find((item) => item.id === chat)?.title ?? "New chat";
   const looked = inspect?.kind === "line" ? messages.find((msg) => msg.id === inspect.id) : null;
 
   React.useEffect(() => {
+    saved.current[chat] = messages;
     if (thread.current) thread.current.scrollTop = thread.current.scrollHeight;
-  }, [messages, pending]);
+  }, [chat, messages, pending]);
+
+  React.useEffect(() => () => window.clearTimeout(replyTimer.current), []);
+
+  function openInspector(next: Exclude<Inspect, null>, trigger: HTMLElement) {
+    returnTarget.current = trigger;
+    setInspect(next);
+    requestAnimationFrame(() => {
+      const back = board.current?.querySelector<HTMLButtonElement>(".sc-ai-inspector-back");
+      if (back?.getClientRects().length) back.focus();
+    });
+  }
+
+  function closeInspector() {
+    setInspect(null);
+    requestAnimationFrame(() => returnTarget.current?.focus());
+  }
+
+  function backToChats() {
+    setPhonePane("inbox");
+    setInspect(null);
+    requestAnimationFrame(() => board.current?.querySelector<HTMLButtonElement>(`[data-chat="${chat}"]`)?.focus());
+  }
 
   function openChat(id: string) {
+    window.clearTimeout(replyTimer.current);
     setChat(id);
-    setMessages(STARTED[id] ?? []);
+    setMessages(saved.current[id] ?? []);
     setDraft("");
     setPending(false);
     setInspect(null);
     setPhonePane("thread");
+    requestAnimationFrame(() => {
+      const back = board.current?.querySelector<HTMLButtonElement>(".sc-ai-mobile-back");
+      if (back?.getClientRects().length) back.focus();
+    });
   }
 
   function fresh() {
+    window.clearTimeout(replyTimer.current);
     setChat("new");
     setMessages([]);
     setDraft("");
     setPending(false);
     setInspect(null);
     setPhonePane("thread");
-    box.current?.focus();
+    requestAnimationFrame(() => box.current?.focus());
   }
 
   function send(text?: string) {
@@ -112,7 +146,7 @@ export function Board() {
     const you: Msg = { id: `y-${Date.now()}`, role: "you", text: value, fresh: true };
     setMessages((rows) => [...rows, you]);
     setPending(true);
-    window.setTimeout(() => {
+    replyTimer.current = window.setTimeout(() => {
       const reply = REPLIES[value.length % REPLIES.length]!;
       setMessages((rows) => [
         ...rows,
@@ -123,21 +157,38 @@ export function Board() {
   }
 
   return (
-    <section className="if-board sc-ai" data-pane={phonePane} aria-label={WHAT}>
-      <PhoneV1Chrome heading="AI chat" action="New" onAction={fresh} />
+    <section ref={board} className="if-board sc-ai" data-pane={phonePane} data-inspecting={Boolean(inspect)} aria-label={WHAT}>
+      <header className="sc-ai-mobile-head">
+        {inspect ? (
+          <Button variant="ghost" className="sc-ai-inspector-back" style={{ width: "auto", padding: "0 8px" }} onClick={closeInspector}>
+            <Icon name="arrow-left" size={16} />Back
+          </Button>
+        ) : phonePane === "thread" ? (
+          <Button variant="ghost" className="sc-ai-mobile-back" style={{ width: 44, padding: 0 }} aria-label="Back to chats" onClick={backToChats}>
+            <Icon name="arrow-left" size={16} />
+          </Button>
+        ) : null}
+        <div><h2>{inspect ? inspect.kind === "settings" ? "Conversation info" : "Close reading" : phonePane === "inbox" ? "Listening notes" : piece}</h2>
+          {!inspect && phonePane === "inbox" ? <p>Deftones · Your conversations</p> : null}
+        </div>
+        {!inspect ? <Button variant="ghost" style={{ width: 44, padding: 0 }} aria-label={phonePane === "inbox" ? "New chat" : "Conversation info"} onClick={(event) => phonePane === "inbox" ? fresh() : openInspector({ kind: "settings" }, event.currentTarget)}>
+          <Icon name={phonePane === "inbox" ? "edit" : "sliders"} size={16} />
+        </Button> : null}
+      </header>
       <aside className="sc-ai-rail" aria-label="Chats">
         <div className="sc-ai-brand">
           <p className="if-app">AI chat</p>
           <p className="sc-ai-voice">Deftones listening notes</p>
         </div>
-        <button type="button" className="rs-btn-ghost sc-ai-new" onClick={fresh}>
+        <Button type="button" variant="ghost" className="sc-ai-new" style={{ width: "calc(100% - 40px)", flexShrink: 0 }} onClick={fresh}>
           New chat
-        </button>
+        </Button>
         <p className="sc-ai-label">Chats</p>
         <div className="sc-ai-chats">
-          {CHATS.map((item) => (
+          {chats.map((item) => (
             <button
               key={item.id}
+              data-chat={item.id}
               type="button"
               className="sc-ai-chat"
               aria-current={chat === item.id}
@@ -153,7 +204,7 @@ export function Board() {
 
       <section className="sc-ai-stage" aria-label="Chat">
         <header className="sc-ai-head">
-          <button type="button" className="sc-ai-back" onClick={() => setPhonePane("inbox")}>
+          <button type="button" className="sc-ai-back" onClick={backToChats}>
             <Icon name="arrow-left" size={16} />
             Chats
           </button>
@@ -165,7 +216,7 @@ export function Board() {
             type="button"
             className="sc-ai-gear"
             aria-pressed={inspect?.kind === "settings"}
-            onClick={() => setInspect((cur) => (cur?.kind === "settings" ? null : { kind: "settings" }))}
+            onClick={(event) => inspect?.kind === "settings" ? closeInspector() : openInspector({ kind: "settings" }, event.currentTarget)}
           >
             <Icon name="sliders" size={16} />
             Settings
@@ -199,11 +250,7 @@ export function Board() {
                       type="button"
                       className="sc-ai-open"
                       aria-pressed={inspect?.kind === "line" && inspect.id === msg.id}
-                      onClick={() =>
-                        setInspect((cur) =>
-                          cur?.kind === "line" && cur.id === msg.id ? null : { kind: "line", id: msg.id },
-                        )
-                      }
+                      onClick={(event) => inspect?.kind === "line" && inspect.id === msg.id ? closeInspector() : openInspector({ kind: "line", id: msg.id }, event.currentTarget)}
                     >
                       <Icon name="expand" size={12} />
                       Explore response
@@ -238,6 +285,7 @@ export function Board() {
                 placeholder="Ask about a song"
                 aria-label="Message"
                 autoComplete="off"
+                enterKeyHint="send"
                 onChange={(event) => setDraft(event.target.value)}
               />
               <Button type="submit" grouped className="sc-ai-send" style={{ width: "auto" }} disabled={!draft.trim() || pending}>
@@ -248,30 +296,8 @@ export function Board() {
           </form>
         </div>
 
-      <nav className="if-thumb" aria-label={WHAT}>
-        <button
-          type="button"
-          aria-current={phonePane === "inbox"}
-          onClick={() => {
-            setPhonePane("inbox");
-            setInspect(null);
-          }}
-        >
-          <Icon name="inbox" size={16} />
-          Chats
-        </button>
-        <button
-          type="button"
-          aria-current={phonePane === "thread"}
-          onClick={() => setPhonePane("thread")}
-        >
-          <Icon name="message" size={16} />
-          Conversation
-        </button>
-      </nav>
-
       <aside className={`if-inspect${inspect ? " is-open" : ""}`} aria-label="Inspector">
-        {inspect ? <InspectorClose onClick={() => setInspect(null)} /> : null}
+        {inspect ? <InspectorClose onClick={closeInspector} /> : null}
         <div className="sc-ai-inspect">
           {inspect?.kind === "settings" ? (
             <div key="settings" className="sc-fresh">
@@ -303,7 +329,7 @@ export function Board() {
                 type="button"
                 onClick={() => {
                   send("Take that reading further.");
-                  setInspect(null);
+                  closeInspector();
                 }}
               >
                 <Icon name="edit" size={12} />

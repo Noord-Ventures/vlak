@@ -476,3 +476,190 @@
 @media (prefers-reduced-motion: reduce) {
   .cx *, .cx *::before, .cx *::after { animation: none; transition: none; scroll-behavior: auto; }
 }
+
+/* On a phone, each tool becomes a focused app with persistent, reachable modes.
+   Controls are moved, never removed, and desktop and phone share the same state. */
+.cx-mobile-nav, .cx-mobile-heading, .cx-mobile-only, .cx-mobile-compositions,
+.cx-platform-switch, .cx-frontier .cx-frontier-menu-toggle { display: none; }
+.cx-frontier header nav .rs-btn-ghost { min-height: 44px; height: 44px; border: 0; border-bottom: 1px solid transparent; border-radius: 0; }
+.cx-frontier header nav .rs-btn-ghost.on { border-bottom-color: var(--text); }
+
+@container (min-width: 641px) and (max-width: 820px) {
+  .cx-orbit { grid-template-columns: 136px minmax(0, 1fr) 176px; }
+  .cx-orbit > .cx-orbit-inspector { display: block; padding: 12px; }
+}
+
+@container (max-width: 640px) {
+  .cx { font-size: 16px; }
+  .cx > header { padding: 8px 16px; min-height: 60px; }
+  .cx > header > b, .cx > header > span { font-size: 14px; line-height: 1.35; }
+  .cx .rs-btn-primary, .cx .rs-btn-ghost { min-width: 44px; min-height: 44px; height: 44px; font-size: 15px; line-height: 1.3; }
+  .cx .cx-label, .cx .cx-panel-hint, .cx .rs-card-label, .cx .rs-card-body { font-size: 15px; line-height: 1.45; }
+  .cx .cx-mobile-nav { grid-column: 1 / -1; grid-row: -2 / -1; z-index: 6; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 4px; min-height: 68px; padding: 6px 8px; border-top: 1px solid var(--divider); background: var(--bg); }
+  .cx .cx-mobile-nav .rs-btn-ghost { display: flex; flex-direction: column; justify-content: center; gap: 4px; height: 56px; min-width: 0; padding: 4px; border: 0; border-radius: 4px; color: var(--text-secondary); font-size: 13px; font-weight: 400; line-height: 1.2; transition: none; }
+  .cx .cx-mobile-nav .rs-btn-ghost[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+  .cx .cx-mobile-nav .rs-icon { display: block; margin: 0; }
+  .cx-mobile-heading { display: block; margin: 0 0 8px; font-size: 22px; font-weight: 500; letter-spacing: -.025em; }
+  .cx-mobile-only { display: inline; }
+  .cx-desktop-only { display: none; }
+
+  /* Wallpaper: a full composition first, editing in a dedicated screen. */
+  .cx-graphics { grid-template: 60px minmax(0, 1fr) 68px / minmax(0, 1fr); }
+  .cx-graphics > header { grid-row: 1; }
+  .cx-graphics > aside, .cx-graphics > .cx-workspace { grid-area: 2 / 1; min-height: 0; }
+  .cx-graphics[data-mobile-view="preview"] > aside,
+  .cx-graphics[data-mobile-view="direction"] > .cx-workspace { display: none; }
+  .cx-graphics > aside { display: grid; gap: 20px; padding: 20px; border: 0; align-content: start; overscroll-behavior: contain; }
+  .cx-graphics > aside > .cx-label { display: block; color: var(--text); font-size: 22px; }
+  .cx-graphics label, .cx-format-label { font-size: 15px; }
+  .cx-graphics textarea { height: 136px; font-size: 16px; }
+  .cx-graphics .cx-variation { display: grid; }
+  .cx-graphics .cx-variation input { min-height: 44px; }
+  .cx-graphics .cx-output-size, .cx-graphics .cx-generation-status { font-size: 14px; line-height: 1.45; }
+  .cx-graphics .cx-segments { flex-wrap: nowrap; height: auto; }
+  .cx-graphics .cx-segments .rs-toggle { flex: 1 1 0; min-width: 0; padding: 0 6px; }
+  .cx-graphics > .cx-workspace { display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 16px; padding: 16px; overflow: hidden; }
+  .cx-graphics .cx-results { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); height: 100%; min-height: 0; }
+  .cx-graphics .cx-results > button { display: none; }
+  .cx-graphics .cx-results > button.on { display: grid; grid-template-rows: minmax(0, 1fr) auto; grid-area: 1 / 1; }
+  .cx-graphics .cx-results span { padding: 12px; font-size: 15px; }
+  .cx-mobile-compositions { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--text-secondary); font-size: 14px; }
+  .cx-mobile-compositions .rs-toggle-group { width: auto; height: 44px; border-radius: 4px; }
+  .cx-mobile-compositions .rs-toggle { width: 44px; min-width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 15px; }
+
+  /* Modeler: canvas and property editor are peers, with a horizontal tool dock. */
+  .cx-render { grid-template: 60px minmax(0, 1fr) 52px 68px / minmax(0, 1fr); }
+  .cx-render > header { grid-row: 1; }
+  .cx-render > .cx-workspace { grid-area: 2 / 1; }
+  .cx-render > nav { grid-area: 3 / 1; display: flex; align-items: center; justify-content: space-evenly; padding: 4px 16px; border: 0; border-top: 1px solid var(--divider); }
+  .cx-render > nav .rs-btn-ghost { width: 60px; border: 0; border-radius: 4px; }
+  .cx-render > aside { display: grid; grid-area: 2 / 1 / 4 / 2; gap: 20px; padding: 20px; border: 0; overscroll-behavior: contain; }
+  .cx-render[data-mobile-view="viewport"] > aside,
+  .cx-render[data-mobile-view="inspector"] > .cx-workspace,
+  .cx-render[data-mobile-view="inspector"] > nav { display: none; }
+  .cx-render-meta { flex-direction: row; padding: 10px 16px; font-size: 13px; }
+  .cx-render .cx-timeline { font-size: 13px; }
+  .cx-render .cx-vehicle-credit { font-size: 12px; }
+  .cx-render aside .rs-tree-view, .cx-render aside .rs-property-grid,
+  .cx-render aside .rs-description-list, .cx-render aside dt, .cx-render aside dd { font-size: 15px; }
+  .cx-render aside .rs-property-grid-row { grid-template-columns: minmax(0, 1fr) minmax(120px, 1fr); }
+  .cx-render aside .rs-property-grid input, .cx-render aside .rs-property-grid select { min-height: 44px; font-size: 16px; }
+
+  /* Vehicle: a remote-control app, not four miniature dashboard columns. */
+  .cx-drive { grid-template: 60px minmax(0, 1fr) 68px / minmax(0, 1fr); overflow: hidden; }
+  .cx-drive > header { grid-area: 1 / 1; position: static; }
+  .cx-drive > header > b { font-size: 14px; text-align: center; }
+  .cx-drive > header > span { font-size: 13px; }
+  .cx-drive .cx-ev-connection > span:last-child { display: inline-flex; }
+  .cx-drive .cx-ev-connection .rs-connection-status-label { display: none; }
+  .cx-drive .cx-ev-vehicle { grid-area: 2 / 1; min-height: 0; padding: 20px 16px; grid-template-rows: auto minmax(150px, 1fr) auto; overflow-y: auto; overscroll-behavior: contain; }
+  .cx-drive .cx-ev-illustration { position: relative; grid-row: 2; min-height: 150px; }
+  .cx-drive .cx-ev-map-hud { bottom: 8px; left: 0; right: 0; }
+  .cx-drive .cx-ev-map-destination { top: 8%; right: 0; }
+  .cx-drive .cx-ev-energy-readout { top: 5%; left: 0; }
+  .cx-drive .cx-ev-model b { font-size: 24px; }
+  .cx-drive .cx-ev-model > span, .cx-drive .cx-ev-state span:not(.cx-ev-status-dot) { font-size: 14px; }
+  .cx-drive .cx-ev-modes .rs-toggle { font-size: 15px; }
+  .cx-drive .cx-ev-state b { font-size: 17px; }
+  .cx-drive .cx-ev-view-detail { gap: 16px; }
+  .cx-drive .cx-ev-view-actions .rs-btn-ghost, .cx-drive .cx-ev-view-action { font-size: 15px; }
+  .cx-drive .cx-ev-panels { display: block; grid-area: 2 / 1; overflow-y: auto; border: 0; overscroll-behavior: contain; }
+  .cx-drive[data-mobile-view="vehicle"] .cx-ev-panels,
+  .cx-drive:not([data-mobile-view="vehicle"]) .cx-ev-vehicle,
+  .cx-drive[data-mobile-view="controls"] .cx-ev-media,
+  .cx-drive[data-mobile-view="media"] .cx-ev-panels > .rs-card:not(.cx-ev-media) { display: none; }
+  .cx-drive .cx-ev-panels > .rs-card { min-height: 164px; padding: 24px; border-right: 0; border-bottom: 1px solid var(--divider); }
+  .cx-drive .cx-ev-panels > .rs-card:nth-last-child(-n+2) { border-bottom: 1px solid var(--divider); }
+  .cx-drive .rs-metric-label, .cx-drive .rs-number-field-label, .cx-drive .cx-ev-caption,
+  .cx-drive .cx-ev-footnote, .cx-drive .cx-ev-card > .rs-card-label, .cx-drive .rs-metric-detail,
+  .cx-drive .cx-ev-text-control { font-size: 15px; line-height: 1.4; }
+  .cx-drive .rs-metric-value, .cx-drive .rs-number-field-input { font-size: 44px; }
+  .cx-drive .cx-ev-cabin-field .rs-number-field-controls { top: 24px; right: 24px; }
+  .cx-drive .cx-ev-panels > .cx-ev-media { min-height: 100%; border: 0; }
+  .cx-drive .cx-ev-media > .cx-ev-card-content { flex: 1; justify-content: center; gap: 20px; padding-top: 24px; }
+  .cx-drive .cx-ev-track { gap: 8px; }
+  .cx-drive .cx-ev-track b { font-size: 32px; letter-spacing: -.025em; }
+  .cx-drive .cx-ev-track > span { font-size: 18px; }
+  .cx-drive .cx-ev-player { justify-content: center; padding-block: 20px; }
+  .cx-drive .cx-ev-player .rs-playback-controls { gap: 20px; }
+  .cx-drive .cx-ev-player .rs-btn-primary { width: 60px; height: 60px; }
+  .cx-drive .cx-ev-map-destination small, .cx-drive .cx-ev-map-hud span,
+  .cx-drive .cx-ev-energy-readout small, .cx-drive .cx-ev-energy-readout p { font-size: 12px; }
+  .cx-drive .cx-ev-map-destination b { font-size: 15px; }
+
+  /* Observation: map, asset selection, and the complete pass inspector. */
+  .cx-orbit { grid-template: 68px minmax(0, 1fr) 68px / minmax(0, 1fr); }
+  .cx-orbit > header { grid-row: 1; }
+  .cx-orbit > header > span { font-size: 13px; }
+  .cx-orbit > header > .rs-btn-primary { padding-inline: 10px; font-size: 14px; }
+  .cx-orbit > .cx-workspace, .cx-orbit > aside, .cx-orbit > .cx-orbit-inspector { grid-area: 2 / 1; }
+  .cx-orbit > aside { display: block; padding: 20px 0 0; border: 0; overflow-y: auto; }
+  .cx-orbit > aside > .cx-label { display: block; padding: 0 20px 20px; font-size: 22px; color: var(--text); }
+  .cx.cx-orbit > aside .cx-orbit-asset { width: 100%; min-height: 92px; height: auto; padding: 20px; gap: 8px; border: 0; border-top: 1px solid var(--divider); }
+  .cx-orbit > aside button span { font-size: 17px; }
+  .cx-orbit > aside small { font-size: 14px; }
+  .cx-orbit > .cx-orbit-inspector { display: block; padding: 24px; border: 0; overflow-y: auto; }
+  .cx-orbit-inspector .rs-card-title { font-size: 28px; margin: 8px 0 24px; }
+  .cx-orbit-telemetry .rs-item { min-height: 52px; }
+  .cx-orbit-telemetry .rs-item-title, .cx-orbit-telemetry .rs-item-meta { font-size: 15px; }
+  .cx-orbit .cx-coords { font-size: 13px; }
+  .cx-orbit .cx-layers { width: calc(100% - 24px); }
+  .cx-orbit .cx-layers .rs-toggle { flex: 1 1 0; min-width: 0; padding: 0 6px; font-size: 13px; }
+  .cx-orbit[data-mobile-view="map"] > aside, .cx-orbit[data-mobile-view="map"] > .cx-orbit-inspector,
+  .cx-orbit[data-mobile-view="assets"] > .cx-workspace, .cx-orbit[data-mobile-view="assets"] > .cx-orbit-inspector,
+  .cx-orbit[data-mobile-view="pass"] > aside, .cx-orbit[data-mobile-view="pass"] > .cx-workspace { display: none; }
+
+  /* The company page uses a disclosure menu and a normal single-column read. */
+  .cx-frontier { display: block; overflow-y: auto; overscroll-behavior: contain; }
+  .cx-frontier > header { position: sticky; top: 0; z-index: 5; flex-wrap: wrap; background: var(--bg); }
+  .cx-frontier > header > b { font-size: 18px; }
+  .cx-frontier .cx-frontier-menu-toggle { display: grid; place-items: center; padding: 0; width: 44px; margin-left: auto; }
+  .cx-frontier .cx-frontier-header-action { display: none; }
+  .cx-frontier header nav { display: none; flex: 1 0 100%; flex-direction: column; gap: 0; padding-top: 8px; }
+  .cx-frontier[data-menu-open="true"] header nav { display: flex; }
+  .cx-frontier header nav .rs-btn-ghost { justify-content: space-between; width: 100%; min-height: 56px; height: 56px; padding-inline: 4px; border: 0; border-top: 1px solid var(--divider); font-size: 17px; }
+  .cx-frontier header nav .rs-btn-ghost.on { padding-inline: 12px; background: var(--text); color: var(--bg); }
+  .cx-frontier > .cx-workspace { min-height: 480px; padding: 32px 24px; }
+  .cx-frontier .cx-workspace > p { font-size: 14px; }
+  .cx-frontier .cx-workspace > h2 { font-size: clamp(34px, 9cqi, 48px); line-height: 1.08; }
+  .cx-frontier .cx-workspace > .cx-frontier-intro { font-size: 16px; line-height: 1.45; }
+  .cx-frontier .cx-workspace > div:not(.cx-frontier-graphic) { width: 100%; display: grid; gap: 8px; }
+  .cx-frontier .cx-text-link { min-height: 48px; text-align: left; font-size: 15px; }
+  .cx-frontier .rs-card-title { font-size: 22px; }
+  .cx-frontier > section > .rs-card { padding: 24px; }
+  .cx-frontier > section:focus-visible { outline: 2px solid var(--text); outline-offset: -3px; }
+  .cx-frontier > footer { font-size: 13px; line-height: 1.45; }
+
+  /* A platform picker replaces sideways-scrolling miniature handsets. */
+  .cx-platforms { grid-template-rows: 60px 60px minmax(0, 1fr); }
+  .cx-platform-switch { display: flex; padding: 4px 16px 12px; }
+  .cx-platform-switch .rs-toggle-group { width: 100%; height: 44px; border-radius: 4px; }
+  .cx-platform-switch .rs-toggle { flex: 1; min-height: 44px; font-size: 15px; }
+  .cx-platforms > .cx-workspace { padding: 0 12px 12px; display: block; overflow: hidden; }
+  .cx-platforms > .cx-workspace > div { height: 100%; width: 100%; }
+  .cx-platforms > .cx-workspace > div > p { display: none; }
+  .cx-platforms[data-platform="ios"] [data-phone="android"],
+  .cx-platforms[data-platform="android"] [data-phone="ios"] { display: none; }
+  .cx-platforms .cx-phone { width: 100%; max-width: 390px; height: 100%; margin-inline: auto; grid-template-rows: 30px 84px minmax(0, 1fr) 62px; border-width: 5px; border-radius: 28px; box-shadow: none; }
+  .cx-platforms .cx-phone.android { grid-template-rows: 30px 72px minmax(0, 1fr) 62px 14px; border-radius: 20px; }
+  .cx-phone-status { padding: 9px 16px 0; font-size: 12px; }
+  .cx-phone > header, .cx-phone.android > header { padding-inline: 16px; gap: 4px; }
+  .cx-phone > header small { font-size: 12px; line-height: 1.3; }
+  .cx-phone > header b { font-size: 28px; line-height: 1.25; }
+  .cx-phone.android > header b { font-size: 22px; }
+  .cx-phone > .cx-phone-content, .cx-phone.android > .cx-phone-content { padding: 12px 16px 24px; overscroll-behavior: contain; }
+  .cx-phone .cx-trip-card { grid-template-columns: 1fr; gap: 6px; padding: 16px; }
+  .cx-trip-card > span { font-size: 20px; }
+  .cx-trip-card b { font-size: 16px; }
+  .cx-trip-card p { font-size: 14px; line-height: 1.4; }
+  .cx-trip-card em { grid-column: 1; font-size: 13px; }
+  .cx-phone h2 { font-size: 20px; margin: 24px 0 12px; }
+  .cx-agenda { grid-template-columns: 46px minmax(0, 1fr); gap: 10px; padding-block: 16px; font-size: 14px; }
+  .cx-phone.android .cx-agenda { grid-template-columns: 18px 44px minmax(0, 1fr); gap: 8px; }
+  .cx-agenda b { font-size: 15px; line-height: 1.4; }
+  .cx-agenda small { font-size: 13px; }
+  .cx-phone > nav { padding: 4px 12px; }
+  .cx-phone > nav button { font-size: 12px; min-height: 52px; gap: 5px; }
+  .cx-phone-options button, .cx-phone-profile button { min-height: 48px; padding: 12px; font-size: 15px; }
+  .cx-phone-profile p, .cx-phone-note { font-size: 15px; line-height: 1.45; }
+}

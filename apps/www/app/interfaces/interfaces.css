@@ -30,6 +30,7 @@ body:has(.if-index) {
   .if-index { max-width: 1244px; }
 }
 @media (max-width: 899px) {
+  html:has(.if-index) { scroll-padding-top: calc(124px + env(safe-area-inset-top, 0px)); }
   .if-index {
     flex-direction: column;
     padding-top: calc(72px + env(safe-area-inset-top, 0px));
@@ -41,6 +42,7 @@ body:has(.if-index) {
   }
 }
 @media (max-width: 640px) {
+  html:has(.if-index) { scroll-padding-top: calc(108px + env(safe-area-inset-top, 0px)); }
   .if-index { padding-top: calc(56px + env(safe-area-inset-top, 0px)); }
 }
 

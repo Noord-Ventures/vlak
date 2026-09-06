@@ -289,3 +289,65 @@
   .sc-dash-job,
   .sc-dash-detail button { transition: none; }
 }
+
+/* On a phone the overview, queue, and job brief are separate destinations. */
+.sc-dash-mobile { display: none; }
+@container (max-width: 640px) {
+  .if-board.sc-dash { display: block; }
+  .if-board.sc-dash > :not(.sc-dash-mobile) { display: none; }
+  .sc-dash .sc-dash-mobile { display: grid; grid-template-rows: 60px minmax(0, 1fr) 64px; height: 100%; min-height: 0; background: var(--bg); color: var(--text); font-size: 16px; line-height: 1.45; }
+  .sc-dash-mobile *, .sc-dash-mobile *::before, .sc-dash-mobile *::after { box-sizing: border-box; }
+  .sc-dash-mobile h2, .sc-dash-mobile h3, .sc-dash-mobile p { margin: 0; }
+  .sc-dash-mobile .rs-card { min-width: 0; max-width: none; }
+  .sc-dash-mobile .rs-btn-primary, .sc-dash-mobile .rs-btn-ghost { display: inline-flex; align-items: center; justify-content: center; width: auto; min-width: 44px; min-height: 44px; height: auto; padding: 10px 14px; border-radius: 4px; font-size: 15px; line-height: 1.3; }
+  .sc-dash-mobile-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--divider); }
+  .sc-dash-mobile-header > span:last-child { font-size: 14px; color: var(--text-secondary); }
+  .sc-dash-mobile-workspace { display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 500; }
+  .sc-dash-mobile-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+  .sc-dash-mobile-intro, .sc-dash-mobile-detail { padding: 24px 20px; }
+  .sc-dash-mobile .sc-dash-mobile-eyebrow { color: var(--text-secondary); font-size: 14px; margin-bottom: 8px; }
+  .sc-dash-mobile h2 { font-size: 25px; line-height: 1.2; letter-spacing: -.035em; font-weight: 500; }
+  .sc-dash-mobile h2:focus { outline: none; }
+  .sc-dash-mobile-intro > p:last-child { color: var(--text-secondary); margin-top: 12px; font-size: 16px; }
+  .sc-dash-mobile-intro .rs-toggle-group { margin-top: 20px; display: flex; width: 100%; }
+  .sc-dash-mobile-intro .rs-toggle { flex: 1; min-width: 44px; min-height: 44px; padding: 8px; font-size: 15px; }
+  .sc-dash-mobile-intro .rs-toggle[aria-pressed="true"] { color: var(--bg); background: var(--text); }
+  .sc-dash-mobile .sc-dash-mobile-output { display: grid; grid-template-columns: 1fr 1fr; align-items: end; gap: 8px 20px; padding: 0 20px 24px; }
+  .sc-dash-mobile-output > span { color: var(--text-secondary); font-size: 14px; }
+  .sc-dash-mobile-output > span:first-child { grid-column: 1; }
+  .sc-dash-mobile-output > strong { grid-column: 1; font-size: 56px; font-weight: 400; letter-spacing: -.05em; line-height: 1; }
+  .sc-dash-mobile-output > span:last-child { grid-column: 1 / -1; font-size: 13px; }
+  .sc-dash-mobile-bars { grid-column: 2; grid-row: 1 / 3; display: flex; align-items: end; gap: 5px; height: 72px; padding-bottom: 2px; }
+  .sc-dash-mobile-bars i { display: block; flex: 1; background: var(--text); min-height: 4px; }
+  .sc-dash-mobile-metrics { display: grid; grid-template-columns: 1fr 1fr; border-block: 1px solid var(--divider); }
+  .sc-dash-mobile-metrics .rs-card { padding: 16px 20px; display: grid; gap: 12px; }
+  .sc-dash-mobile-metrics .rs-card + .rs-card { border-left: 1px solid var(--divider); }
+  .sc-dash-mobile-metrics span { font-size: 14px; color: var(--text-secondary); }
+  .sc-dash-mobile-metrics strong { font-size: 28px; line-height: 1; font-weight: 400; }
+  .sc-dash-mobile-section { padding: 24px 20px 12px; display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+  .sc-dash-mobile-section h3 { font-size: 16px; font-weight: 500; }
+  .sc-dash-mobile-section > span { color: var(--text-secondary); font-size: 13px; }
+  .sc-dash-mobile-job { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; min-height: 92px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; padding: 16px 20px; background: transparent; color: var(--text); font: inherit; text-align: left; cursor: pointer; }
+  .sc-dash-mobile-job > span:first-child { display: grid; gap: 6px; min-width: 0; }
+  .sc-dash-mobile-job strong { font-size: 16px; font-weight: 500; line-height: 1.35; }
+  .sc-dash-mobile-job > span:first-child > span { color: var(--text-secondary); font-size: 14px; }
+  .sc-dash-mobile-state { display: flex; align-items: center; gap: 8px; flex: none; font-size: 13px; }
+  .sc-dash-mobile-job:hover { background: var(--control-fill); }
+  .sc-dash-mobile-job:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
+  .sc-dash-mobile-more { padding: 20px; }
+  .sc-dash-mobile-more .rs-btn-ghost { width: 100%; }
+  .sc-dash-mobile-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 4px 8px; border-top: 1px solid var(--divider); background: var(--bg); }
+  .sc-dash-mobile-nav .rs-btn-ghost { flex-direction: column; gap: 4px; min-width: 0; height: 55px; padding: 5px 4px; font-size: 12px; border: 0; }
+  .sc-dash-mobile-nav .rs-btn-ghost[aria-current="page"] { color: var(--text); background: var(--control-fill); }
+  .sc-dash-mobile-detail .sc-dash-mobile-lead { margin-top: 18px; font-size: 16px; color: var(--text-secondary); }
+  .sc-dash-mobile-detail .sc-dash-mobile-brief { padding-block: 24px; margin-top: 24px; border-block: 1px solid var(--divider); }
+  .sc-dash-mobile-brief h3 { margin: 0 0 12px; padding: 0; font-size: 16px; font-weight: 500; color: var(--text); }
+  .sc-dash-mobile-brief p { font-size: 16px; color: var(--text-secondary); }
+  .sc-dash-mobile-facts { margin: 0; }
+  .sc-dash-mobile-facts > div { display: flex; justify-content: space-between; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--divider); }
+  .sc-dash-mobile-facts dt { color: var(--text-secondary); font-size: 15px; }
+  .sc-dash-mobile-facts dd { margin: 0; font-size: 15px; }
+  .sc-dash-mobile-review { padding-top: 24px; display: grid; gap: 16px; }
+  .sc-dash-mobile-review p { font-size: 15px; color: var(--text-secondary); }
+  .sc-dash-mobile-review .rs-btn-primary, .sc-dash-mobile-review .rs-btn-ghost { width: 100%; }
+}

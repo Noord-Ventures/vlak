@@ -3,7 +3,7 @@
 import * as React from "react";
 import { Card, Icon, ToggleGroup } from "@noorddev/vlak-react";
 import { Brand } from "../mark";
-import { PhoneV1Chrome } from "../v1-chrome";
+import { MobileDashboard } from "./mobile";
 import { interfaceBySlug } from "../catalog";
 import { InspectorClose } from "../inspector-close";
 
@@ -44,7 +44,6 @@ export function Board() {
 
   return (
     <section className="if-board sc-dash" data-page={page} aria-label={WHAT} style={{ ["--if-spot" as string]: "#E30613" }}>
-      <PhoneV1Chrome heading="Dashboard" action="Overview" onAction={() => { setPage("overview"); setSheet(false); }} />
       <aside className="sc-dash-rail" aria-label="Floor">
         <div className="sc-dash-brand">
           <Brand slug="press" />
@@ -211,6 +210,7 @@ export function Board() {
           ) : null}
         </div>
       </aside>
+      <MobileDashboard range={range} onRangeChange={(value) => setRange(value)} data={data} jobs={JOBS} />
     </section>
   );
 }

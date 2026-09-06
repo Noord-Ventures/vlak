@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Badge, Button, Card, CardBody, CardLabel, CardTitle, Icon, Item, Progress, ToggleGroup, CanvasControls, TreeView, PropertyGrid, DescriptionList } from "@noorddev/vlak-react";
 import { WallpaperGenerator } from "./wallpaper-generator";
 import { Drive } from "./drive";
+import { MobileStudyNav } from "./mobile-navigation";
 
 const CarViewport = dynamic(
   () => import("./car-viewport").then((module) => module.CarViewport),
@@ -12,6 +13,7 @@ const CarViewport = dynamic(
 );
 
 function Render() {
+  const [mobileView, setMobileView] = React.useState("viewport");
   const [rotating, setRotating] = React.useState(true);
   const [wireframe, setWireframe] = React.useState(false);
   const [material, setMaterial] = React.useState<"clay" | "graphite">("clay");
@@ -28,7 +30,7 @@ function Render() {
   }, []);
   const ready = status === "ready";
   const playing = ready && rotating && !reducedMotion;
-  return <div className="cx cx-render">
+  return <div className="cx cx-render" data-mobile-view={mobileView}>
     <header><span>Production vehicle</span><span className="cx-header-note">204,461 triangles</span></header>
     <nav aria-label="Viewport tools">
       <Button variant="ghost" disabled={!ready || reducedMotion} className={playing ? "on" : ""} aria-label="Auto-rotate model" aria-pressed={playing} onClick={() => setRotating(!rotating)} title="Auto-rotate"><Icon name="refresh" size={16}/></Button>
@@ -40,12 +42,14 @@ function Render() {
       <CarViewport rotating={playing} wireframe={wireframe} material={material} resetKey={view} onStatusChange={setStatus}/>
       <div className="cx-timeline"><Button variant="ghost" disabled={!ready || reducedMotion} aria-label={playing ? "Pause turntable" : "Play turntable"} onClick={() => setRotating(!rotating)}><Icon name={playing ? "pause" : "play"} size={12}/></Button><span>Turntable</span><i/><span>{status === "loading" ? "Loading model" : status === "error" ? "Unavailable" : reducedMotion ? "Reduced motion" : playing ? "Playing" : "Paused"}</span></div>
     </div>
-    <aside>
+    <aside aria-label="Vehicle inspector">
+      <h2 className="cx-mobile-heading">Inspect the model</h2>
       <TreeView label="Model inspector" value={inspector} onValueChange={setInspector} defaultExpanded={["vehicle"]} nodes={[{ id: "vehicle", label: "Vehicle study 01", children: [{ id: "surface", label: "Surface" }, { id: "viewport", label: "Viewport" }] }]} />
       <DescriptionList items={[{ id: "triangles", label: "Triangles", value: "204,461" }, { id: "vertices", label: "Vertices", value: "114,716" }, { id: "materials", label: "Materials", value: "21" }]} />
       <PropertyGrid label={inspector === "viewport" ? "Viewport" : "Surface"} value={{ material, wireframe, rotating }} onValueChange={(values) => { setMaterial(values.material === "graphite" ? "graphite" : "clay"); setWireframe(Boolean(values.wireframe)); setRotating(Boolean(values.rotating)); }} fields={inspector === "viewport" ? [{ id: "wireframe", label: "Show mesh", type: "switch", disabled: !ready }, { id: "rotating", label: "Auto-rotate", type: "switch", disabled: !ready || reducedMotion }] : [{ id: "material", label: "Body material", type: "select", disabled: !ready, options: [{ value: "clay", label: "Warm clay" }, { value: "graphite", label: "Graphite" }] }]} />
       <p className="cx-panel-hint">Inspect the full vehicle mesh, change the paint, or drag to orbit. The turntable pauses while you use the viewer.</p>
     </aside>
+    <MobileStudyNav label="Model workspace" value={mobileView} onValueChange={setMobileView} options={[{ value: "viewport", label: "Viewport", icon: "grid" }, { value: "inspector", label: "Inspector", icon: "settings" }]}/>
   </div>;
 }
 
@@ -58,13 +62,14 @@ const assets = [
 const layers = ["True colour", "Moisture", "Thermal"] as const;
 
 function Orbit() {
+  const [mobileView, setMobileView] = React.useState("map");
   const [zoom, setZoom] = React.useState(1);
   const [layer, setLayer] = React.useState<(typeof layers)[number]>("True colour");
   const [selected, setSelected] = React.useState(0);
   const [queued, setQueued] = React.useState<string[]>([]);
   const asset = assets[selected]!;
   const isQueued = queued.includes(asset.name);
-  return <div className="cx cx-orbit">
+  return <div className="cx cx-orbit" data-mobile-view={mobileView}>
     <header><span>European Observation Network</span><Button size="sm" disabled={isQueued} onClick={() => setQueued([...queued, asset.name])}><Icon name={isQueued ? "check" : "camera"} size={12}/>{isQueued ? "Capture queued" : "Queue capture"}</Button></header>
     <aside aria-label="Observation assets"><p className="cx-label">Assets</p>{assets.map((item, index) => <Button variant="ghost" aria-pressed={selected === index} className={`cx-orbit-asset${selected === index ? " on" : ""}`} key={item.name} onClick={() => setSelected(index)}><span><i className={selected === index ? "live" : ""}/>{item.name}</span><small>{queued.includes(item.name) ? "Capture queued" : item.region}</small></Button>)}</aside>
     <div className="cx-workspace" data-layer={layer.toLowerCase().replace(" ", "-")} data-asset={selected}>
@@ -76,7 +81,7 @@ function Orbit() {
       <ToggleGroup className="cx-layers" aria-label="Observation layer" value={layer} onValueChange={(value) => setLayer(value as (typeof layers)[number])} options={layers.map((value) => ({ value, label: value }))}/>
       <CanvasControls className="cx-orbit-controls" zoom={zoom} onZoomChange={setZoom} minZoom={1} maxZoom={2.5} step={0.25} label="Observation view controls" />
     </div>
-    <Card className="cx-orbit-inspector" role="region" aria-label={`${asset.name} pass details`}>
+    <Card className="cx-orbit-inspector" role="region" tabIndex={0} aria-label={`${asset.name} pass details`}>
       <CardLabel>{asset.name}</CardLabel>
       <CardTitle>{asset.region}</CardTitle>
       <CardBody>Acquisition window<br/><b>{asset.window} CET</b></CardBody>
@@ -84,6 +89,7 @@ function Orbit() {
       <Progress className="cx-orbit-progress" value={Number.parseInt(asset.cloud, 10)} label="Cloud cover"/>
       <Badge className="cx-status" variant={isQueued ? "solid" : "outline"} aria-live="polite">{isQueued ? "Capture queued" : "Telemetry nominal"}</Badge>
     </Card>
+    <MobileStudyNav label="Observation workspace" value={mobileView} onValueChange={setMobileView} options={[{ value: "map", label: "Map", icon: "map" }, { value: "assets", label: "Assets", icon: "layers" }, { value: "pass", label: "Pass details", icon: "activity" }]}/>
   </div>;
 }
 
@@ -96,13 +102,19 @@ const frontierContent: Record<FrontierSection, [string, string, string][]> = {
 
 function Frontier() {
   const [section, setSection] = React.useState<FrontierSection>("Models");
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<HTMLButtonElement>(null);
   const contentRef = React.useRef<HTMLElement>(null);
   function reveal(value: FrontierSection) {
     setSection(value);
-    contentRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    setMenuOpen(false);
+    requestAnimationFrame(() => {
+      contentRef.current?.scrollIntoView({ block: "nearest", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      if (menuRef.current?.getClientRects().length) contentRef.current?.focus({ preventScroll: true });
+    });
   }
-  return <div className="cx cx-frontier">
-    <header><b>Aster Labs</b><nav aria-label="Company sections">{(["Models", "Research", "Company"] as const).map(value => <button type="button" key={value} aria-pressed={section === value} className={section === value ? "on" : ""} onClick={() => reveal(value)}>{value}</button>)}</nav><Button size="sm" onClick={() => reveal("Models")}>Explore models</Button></header>
+  return <div className="cx cx-frontier" data-menu-open={menuOpen} onKeyDown={(event) => { if (event.key === "Escape" && menuOpen) { setMenuOpen(false); menuRef.current?.focus(); } }}>
+    <header><b>Aster Labs</b><Button ref={menuRef} className="cx-frontier-menu-toggle" variant="ghost" aria-expanded={menuOpen} aria-controls="cx-company-navigation" aria-label={menuOpen ? "Close company menu" : "Open company menu"} onClick={() => setMenuOpen(!menuOpen)}><Icon name={menuOpen ? "close" : "menu"} size={16}/></Button><nav id="cx-company-navigation" aria-label="Company sections">{(["Models", "Research", "Company"] as const).map(value => <Button variant="ghost" key={value} aria-pressed={section === value} className={section === value ? "on" : ""} onClick={() => reveal(value)}>{value}<span className="cx-mobile-only" aria-hidden="true">→</span></Button>)}</nav><Button className="cx-frontier-header-action" size="sm" onClick={() => reveal("Models")}>Explore models</Button></header>
     <div className="cx-workspace">
       <div className="cx-frontier-graphic" aria-hidden="true">
         <span className="cx-frontier-glow"/>
@@ -116,7 +128,7 @@ function Frontier() {
       </div>
       <p>Built in Europe. Available everywhere.</p><h2>Reasoning models for research and engineering.</h2><p className="cx-frontier-intro">Work through complex questions with your documents, data, and code in view.</p><div><Button onClick={() => reveal("Models")}>Explore Aster 2</Button><button type="button" className="cx-text-link" onClick={() => reveal("Research")}>Read the system card <span aria-hidden="true">→</span></button></div>
     </div>
-    <section ref={contentRef} aria-label={section}>{frontierContent[section].map(([label, title, body]) => <Card key={label}><CardLabel>{label}</CardLabel><CardTitle>{title}</CardTitle><CardBody>{body}</CardBody></Card>)}</section>
+    <section ref={contentRef} tabIndex={-1} aria-label={section}>{frontierContent[section].map(([label, title, body]) => <Card key={label}><CardLabel>{label}</CardLabel><CardTitle>{title}</CardTitle><CardBody>{body}</CardBody></Card>)}</section>
     <footer><span>Aster Labs is a fictional company</span><span>Interface study · Vlak</span></footer>
   </div>;
 }
@@ -132,7 +144,7 @@ function Phone({ platform }: { platform: "iOS" | "Android" }) {
     {!android && <span className="cx-ios-island" aria-hidden="true" />}
     <div className="cx-phone-status"><span>9:41</span><i>{android ? "5G · 82%" : "● ● ▰"}</i></div>
     <header>{android && <button type="button" aria-label="Back to today" onClick={() => setTab("Today")}><Icon name="chevron-left" size={16}/></button>}<div><small>{android ? "Travel plan" : "Saturday, 12 September"}</small><b>{tab === "You" ? "Your profile" : "Rotterdam"}</b></div><button type="button" aria-label="More options" aria-expanded={options} onClick={() => setOptions(!options)}>{android ? "⋮" : "•••"}</button></header>
-    <div className="cx-phone-content">
+    <div className="cx-phone-content" tabIndex={0} role="region" aria-label={`${platform} ${tab === "You" ? "profile" : "travel plan"}`}>
       {options && <div className="cx-phone-options"><button type="button" onClick={() => { setSaved(!saved); setOptions(false); }}>{saved ? "Remove saved trip" : "Save this trip"}</button></div>}
       {tab === "You" ? <div className="cx-phone-profile"><Icon name="user" size={24}/><h2>Mara</h2><p>{saved ? "Rotterdam trip saved" : "No saved trips yet"}</p><button type="button" onClick={() => setTab("Today")}>View today’s plan →</button></div> : <>
         <Card className="cx-trip-card"><span>10:24</span><div><b>Intercity 1135</b><p>Amsterdam Centraal → Rotterdam Centraal</p></div><em>On time{saved ? " · Saved" : ""}</em></Card>
@@ -148,7 +160,8 @@ function Phone({ platform }: { platform: "iOS" | "Android" }) {
 }
 
 function Platforms() {
-  return <div className="cx cx-platforms"><header><b>One trip, two platforms</b><span>The same content in native patterns</span></header><div className="cx-workspace"><div><p>iOS <span>Large titles · tab bar</span></p><Phone platform="iOS"/></div><div><p>Android <span>App bar · navigation bar</span></p><Phone platform="Android"/></div></div></div>;
+  const [platform, setPlatform] = React.useState("ios");
+  return <div className="cx cx-platforms" data-platform={platform}><header><b>One trip, two platforms</b><span>The same content in native patterns</span></header><div className="cx-platform-switch"><ToggleGroup aria-label="Mobile platform" value={platform} onValueChange={setPlatform} options={[{ value: "ios", label: "iOS" }, { value: "android", label: "Android" }]}/></div><div className="cx-workspace"><div data-phone="ios"><p>iOS <span>Large titles · tab bar</span></p><Phone platform="iOS"/></div><div data-phone="android"><p>Android <span>App bar · navigation bar</span></p><Phone platform="Android"/></div></div></div>;
 }
 
 export function ConceptBoard({ kind }: { kind: "graphics" | "render" | "drive" | "orbit" | "frontier" | "platforms" }) {

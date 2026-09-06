@@ -3,17 +3,17 @@
 import * as React from "react";
 import { Icon, Input, InputGroup, ToggleGroup } from "@noorddev/vlak-react";
 import { Brand } from "../mark";
-import { PhoneV1Chrome } from "../v1-chrome";
+import { MobileFood } from "./mobile";
 import { interfaceBySlug } from "../catalog";
 import { InspectorClose } from "../inspector-close";
 
 const WHAT = interfaceBySlug("evening")!.what;
 
-type Method = "delivery" | "pickup";
-type Diet = "any" | "veg" | "fish";
-type Inspect = { kind: "item"; id: string } | { kind: "bag" } | null;
+export type Method = "delivery" | "pickup";
+export type Diet = "any" | "veg" | "fish";
+export type Inspect = { kind: "item"; id: string } | { kind: "bag" } | null;
 
-type Store = {
+export type Store = {
   id: string;
   name: string;
   area: string;
@@ -27,7 +27,7 @@ type Store = {
   dish: string;
 };
 
-type Item = {
+export type Item = {
   id: string;
   name: string;
   note: string;
@@ -36,7 +36,7 @@ type Item = {
   cat: string;
 };
 
-type Line = { key: string; id: string; store: string; name: string; price: number };
+export type Line = { key: string; id: string; store: string; name: string; price: number };
 
 const STORES: Store[] = [
   { id: "buren", name: "De Buren", area: "Alkmaar", photo: "/interfaces/food/de-buren-v2.jpg", rating: "4.8", fee: "€2.40", eta: "22 min", method: "delivery", diet: "any", price: 2, dish: "Roast chicken, tonight" },
@@ -109,21 +109,16 @@ export function Board() {
     setInspect(null);
   }
 
-  function addItem(row: Item) {
+  function addItem(row: Item, openBag = true) {
     setBag((lines) => [
       ...lines,
       { key: `${row.id}-${Date.now()}`, id: row.id, store: store.name, name: row.name, price: row.price },
     ]);
-    setInspect({ kind: "bag" });
+    setInspect(openBag ? { kind: "bag" } : null);
   }
 
   return (
     <section className="if-board sc-evening" data-page={page} aria-label={`${WHAT} application`}>
-      <PhoneV1Chrome
-        heading="Order out"
-        action="Bag"
-        onAction={() => setInspect((cur) => (cur?.kind === "bag" ? null : { kind: "bag" }))}
-      />
       <section className="sc-evening-stage">
         <header className="sc-evening-bar">
           <Brand slug="evening" />
@@ -349,6 +344,7 @@ export function Board() {
           </div>
         ) : null}
       </aside>
+      <MobileFood page={page} setPage={setPage} store={store} menu={menu} rooms={rooms} method={method} setMethod={setMethod} diet={diet} setDiet={setDiet} band={band} setBand={setBand} query={query} setQuery={setQuery} inspect={inspect} setInspect={setInspect} bag={bag} setBag={setBag} openStore={openStore} addItem={(row) => addItem(row, false)} />
     </section>
   );
 }
