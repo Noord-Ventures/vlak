@@ -11,7 +11,8 @@ timing; the components retain their original paint and native state transitions.
 
 The sequence types and submits a prompt, shows the assistant thinking and
 replying, assembles the workspace in 3.75 seconds, and walks through reviewing
-output, pausing an agent, and creating a task. The browser and its controls move
+output, pausing an agent, and creating a task through native interactions, without
+bottom assistant captions. The browser and its controls move
 together through every camera zoom. The closing copy, “Generate instant interface with Vlak.dev”, intentionally
 overprints the interface in huge left-aligned type with short irregular flashes.
 All lines share one native CardTitle, font size, weight, and line-height (1.08).
@@ -38,7 +39,7 @@ selects the existing music WAV. The renderer retains a silent master, the
 effects stem, review frames, a cover, and a JSON report beside the final MP4.
 
 The Reel master is composed at 1080×1920 in 9:16. The prompt, attached browser
-camera, captions, and closing type have independent portrait positions and
+camera and closing type have independent portrait positions and
 sizes. It is not a cropped or letterboxed copy of the landscape export.
 
 ## Sound

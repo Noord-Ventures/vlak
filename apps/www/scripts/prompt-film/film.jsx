@@ -1,12 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
-import {
-	Card,
-	CardBody,
-	CardLabel,
-	CardTitle,
-	Icon,
-} from "@noorddev/vlak-react";
+import { CardTitle, Icon } from "@noorddev/vlak-react";
 import "../agent-film/film.jsx";
 import { Conversation } from "./conversation.jsx";
 import { agentFilmEvents } from "../agent-film/controller.mjs";
@@ -17,7 +11,6 @@ import {
 	response,
 	storyToSource,
 	sourceToStory,
-	walkthrough,
 	themeAt,
 	themeChanges,
 } from "./timeline.mjs";
@@ -45,11 +38,9 @@ function layer(name) {
 	return element;
 }
 const chat = layer("prompt-chat"),
-	tour = layer("prompt-tour"),
 	payoff = layer("prompt-payoff"),
 	cursor = layer("prompt-cursor");
 const chatRoot = createRoot(chat),
-	tourRoot = createRoot(tour),
 	payoffRoot = createRoot(payoff),
 	cursorRoot = createRoot(cursor);
 let controls,
@@ -59,7 +50,6 @@ let controls,
 	sent = false,
 	typed = 0,
 	generation = 0,
-	tourIndex = -2,
 	responseCount = -1;
 const events = [];
 
@@ -147,7 +137,6 @@ async function mountChat() {
 	typed = 0;
 	sent = false;
 	responseCount = -1;
-	tourIndex = -2;
 	events.length = 0;
 	flushSync(() =>
 		chatRoot.render(
@@ -240,53 +229,6 @@ async function step(frame) {
 		spinner.style.animation = "none";
 		spinner.style.transform = `rotate(${((time - beats.send) / 0.7) * 360}deg)`;
 	}
-	const index = walkthrough.findIndex(
-		(item) => time >= item.start && time < item.end,
-	);
-	if (index !== tourIndex) {
-		flushSync(() =>
-			tourRoot.render(
-				index < 0 ? null : (
-					<Card
-						style={{
-							width: reel ? 360 : 1280,
-							maxWidth: "none",
-							display: reel ? "block" : "flex",
-							alignItems: "center",
-							gap: 16,
-						}}
-					>
-						<CardLabel
-							style={{
-								display: "flex",
-								gap: 8,
-								alignItems: "center",
-								marginBottom: reel ? 6 : 0,
-								flexShrink: 0,
-							}}
-						>
-							<Icon name="message" size={12} /> Vlak assistant
-						</CardLabel>
-						<CardBody>{walkthrough[index].text}</CardBody>
-					</Card>
-				),
-			),
-		);
-		tourIndex = index;
-	}
-	if (index >= 0) {
-		const item = walkthrough[index],
-			fade =
-				ease((time - item.start) / 0.25) *
-				(1 - ease((time - (item.end - 0.22)) / 0.22));
-		center(
-			tour,
-			reel ? 2 : 1.2,
-			frameWidth / 2,
-			(reel ? 1570 : 1058) + 8 * (1 - fade),
-		);
-		sceneOpacity(tour, fade);
-	} else sceneOpacity(tour, 0);
 	// The closing words intentionally overprint the whole interface. Short,
 	// irregular cut-ins give the payoff a graphic flash, then a readable hold.
 	const titleTime = time - beats.payoff;
@@ -365,6 +307,7 @@ window.film = { ready: false, error: null };
 				format: reel ? "reel" : "landscape",
 				wholeBrowserCamera: true,
 				visiblePromptLabels: false,
+				walkthroughCaptions: false,
 				uniformPayoffTypography: true,
 				themeChanges,
 				constructionSeconds: beats.assembled - beats.construct,
@@ -395,7 +338,6 @@ window.film = { ready: false, error: null };
 			dispose: () => {
 				agentFilm.dispose?.();
 				chatRoot.unmount();
-				tourRoot.unmount();
 				payoffRoot.unmount();
 				cursorRoot.unmount();
 			},

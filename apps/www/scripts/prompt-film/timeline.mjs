@@ -44,20 +44,3 @@ function map(value, from, to) {
 }
 export const storyToSource = (time) => map(time, "film", "source");
 export const sourceToStory = (time) => map(time, "source", "film");
-export const walkthrough = [
-	{
-		start: 13.125,
-		end: 19.1,
-		text: "Review the task queue. Inspect the output, then approve it.",
-	},
-	{
-		start: 19.1,
-		end: 24.3,
-		text: "Pause and resume an agent with its context intact.",
-	},
-	{
-		start: 24.3,
-		end: 31.3,
-		text: "Give the next task a name and a brief. Queue it, then start.",
-	},
-];
