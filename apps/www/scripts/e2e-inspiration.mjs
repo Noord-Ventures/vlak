@@ -28,6 +28,25 @@ async function check(name, fn) {
 }
 const pause = (page, ms = 1100) => page.waitForTimeout(ms);
 const selected = (page) => page.locator(".inspiration-thumbnail[aria-pressed='true']");
+async function stageControls(page) {
+  const stage = page.locator(".inspiration-stage");
+  const controls = stage.getByRole("group", { name: "Object controls", exact: true });
+  assert.equal(await controls.count(), 1, "the entire object controls group belongs inside the scene");
+  assert.equal(await page.getByRole("group", { name: "Object controls", exact: true }).count(), 1);
+  for (const name of ["Rotate object left", "Rotate object right", "Reset"]) {
+    assert.equal(await controls.getByRole("button", { name, exact: true }).isVisible(), true);
+  }
+  assert.equal(await controls.getByRole("slider", { name: "Object scale", exact: true }).isVisible(), true);
+  assert.equal(await controls.locator("label[for='inspiration-scale']").innerText(), "Scale");
+  assert.equal(await controls.locator("output[for='inspiration-scale']").isVisible(), true);
+  const outside = await stage.locator(".inspiration-controls, .inspiration-controls button, .inspiration-controls input, .inspiration-controls label, .inspiration-controls output").evaluateAll((elements) => elements.filter((element) => {
+    const box = element.getBoundingClientRect();
+    const scene = element.closest(".inspiration-stage").getBoundingClientRect();
+    return !box.width || !box.height || box.left < scene.left - 1 || box.top < scene.top - 1 || box.right > scene.right + 1 || box.bottom > scene.bottom + 1;
+  }).map((element) => element.getAttribute("aria-label") ?? element.textContent));
+  assert.deepEqual(outside, [], "rotation, reset, scale and its value stay within the scene bounds");
+  return controls;
+}
 async function ready(page) {
   await page.locator(".inspiration-stage[data-ready='true']").waitFor({ timeout: 30000 });
   await pause(page);
@@ -55,12 +74,22 @@ try {
   await check("desktop starts with all local assets ready", async () => {
     await open(desktop);
     assert.equal(await desktop.locator(".inspiration-thumbnail").count(), studies.length);
+    assert.equal(await desktop.locator(".inspiration-caption").count(), 0, "work metadata belongs in the tiles, not a separate caption row");
+    await stageControls(desktop);
     for (let i = 0; i < studies.length; i++) {
       await desktop.locator(`#study-select-${i}`).click();
       await ready(desktop);
       assert.equal(await selected(desktop).getAttribute("id"), `study-select-${i}`);
       assert.equal(await desktop.locator(".inspiration-fallback").count(), 0);
-      assert.equal(await desktop.locator(".inspiration-caption").getAttribute("data-work-id"), studies[i].id);
+      assert.equal(await desktop.locator(".inspiration-stage").getAttribute("data-work-id"), studies[i].id);
+      const tile = desktop.locator(`#study-select-${i}`);
+      assert.equal(await tile.getAttribute("data-work-id"), studies[i].id);
+      assert.equal(await tile.locator(".reference-tile-artist").innerText(), studies[i].artist);
+      const work = await tile.locator(".reference-tile-work").innerText();
+      assert.ok(work.includes(studies[i].title) && work.includes(studies[i].year));
+      assert.equal(await tile.locator(".reference-tile-description").innerText(), studies[i].description);
+      assert.equal(await tile.locator(".reference-tile-kind").innerText(), studies[i].model ? "Spatial study" : "From the archive");
+      assert.equal(await tile.locator(".reference-tile-material").innerText(), studies[i].material);
       if (["bruynzeel-kitchen", "gertrud-kurz", "schiphol-signage", "vught-memorial", "sdap-nvv"].includes(studies[i].id)) {
         await desktop.locator(".inspiration-canvas canvas").screenshot({ path: `${screenshots}/${studies[i].id}.png` });
       }
@@ -117,12 +146,13 @@ try {
   });
   await check("turn, rotation buttons, scale and reset alter the render", async () => {
     await desktop.locator("#study-select-0").click(); await ready(desktop);
+    const controls = await stageControls(desktop);
     await desktop.getByRole("button", { name: "Turn object", exact: true }).click();
     assert.equal(await desktop.locator(".inspiration-stage").getAttribute("data-interaction"), "turn");
     await desktop.locator(".inspiration-stage").scrollIntoViewIfNeeded();
     const canvas = desktop.locator(".inspiration-canvas canvas");
     const before = await canvas.screenshot();
-    await desktop.getByRole("button", { name: "Rotate object right", exact: true }).click();
+    await controls.getByRole("button", { name: "Rotate object right", exact: true }).click();
     await pause(desktop, 1600);
     assert.equal((await canvas.screenshot()).equals(before), false);
     const box = await canvas.boundingBox();
@@ -133,11 +163,14 @@ try {
     await pause(desktop, 140); await desktop.mouse.up(); await pause(desktop, 1600);
     assert.equal((await canvas.screenshot()).equals(afterButton), false);
     assert.equal(await selected(desktop).getAttribute("id"), "study-select-0");
-    const scale = desktop.getByRole("slider", { name: "Object scale" });
+    const scale = controls.getByRole("slider", { name: "Object scale", exact: true });
+    const scaleOutput = controls.locator("output[for='inspiration-scale']");
     await scale.focus(); await desktop.keyboard.press("ArrowRight");
     assert.equal(await scale.inputValue(), "1.01");
-    await desktop.getByRole("button", { name: "Reset", exact: true }).click();
+    assert.equal(await scaleOutput.innerText(), "101%");
+    await controls.getByRole("button", { name: "Reset", exact: true }).click();
     assert.equal(await scale.inputValue(), "1");
+    assert.equal(await scaleOutput.innerText(), "100%");
     await pause(desktop, 1600);
     await desktop.getByRole("button", { name: "Auto rotate", exact: true }).click();
     const rotating = await canvas.screenshot(); await pause(desktop, 600);
@@ -164,7 +197,13 @@ try {
   const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   await check("phone has no document overflow and 44px interaction targets", async () => {
     await open(phone);
+    await stageControls(phone);
     assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
+    const clippedMetadata = await phone.locator(".inspiration-thumbnail [class*='reference-tile-']").evaluateAll((elements) => elements.filter((element) => {
+      const style = getComputedStyle(element);
+      return style.display === "none" || style.visibility === "hidden" || style.textOverflow === "ellipsis" || (element.clientHeight > 0 && element.scrollHeight > element.clientHeight + 1 && style.overflowY === "hidden");
+    }).map((element) => element.textContent));
+    assert.deepEqual(clippedMetadata, [], "phone tiles keep the work metadata visible without truncation");
     await phone.screenshot({ path: `${screenshots}/phone-daylight.png`, fullPage: true });
     const small = await phone.locator(".inspiration-page button, .inspiration-page a, .inspiration-page input").evaluateAll((elements) => elements
       .filter((el) => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden")
@@ -181,7 +220,7 @@ try {
     const still = await canvas.screenshot(); await pause(reduced, 450);
     assert.equal((await canvas.screenshot()).equals(still), true);
     assert.equal(await reduced.getByRole("button", { name: "Automatic rotation disabled by reduced motion preference", exact: true }).isDisabled(), true);
-    await reduced.getByRole("button", { name: "Rotate object right", exact: true }).click();
+    await reduced.locator(".inspiration-stage .inspiration-controls").getByRole("button", { name: "Rotate object right", exact: true }).click();
     const requested = await canvas.screenshot(); await pause(reduced, 600);
     assert.equal((await canvas.screenshot()).equals(requested), true);
     await reduced.screenshot({ path: `${screenshots}/reduced-motion.png`, fullPage: true });

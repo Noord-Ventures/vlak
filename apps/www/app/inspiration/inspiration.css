@@ -24,9 +24,9 @@ html:has(.inspiration-page)::after { display: none; }
 .inspiration-canvas:active { cursor: grabbing; }
 .inspiration-canvas canvas { display: block; width: 100%; height: 100%; }
 .inspiration-stage-top { position: absolute; z-index: 2; top: 20px; left: 20px; right: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; pointer-events: none; }
-.inspiration-stage-paper { background: var(--bg); }
+.inspiration-stage-paper { background: var(--bg); border-radius: var(--radius-sm); }
 .inspiration-stage :is(button, input) { pointer-events: auto; }
-.inspiration-stage-arrow { position: absolute; z-index: 3; top: 50%; transform: translateY(-50%); }
+.inspiration-stage-arrow { position: absolute; z-index: 3; top: 50%; transform: translateY(-50%); display: flex; }
 .inspiration-stage-arrow-prev { left: 20px; }
 .inspiration-stage-arrow-next { right: 20px; }
 .inspiration-fallback { position: absolute; inset: 80px; z-index: 1; display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: center; text-align: center; }
@@ -35,14 +35,11 @@ html:has(.inspiration-page)::after { display: none; }
 .inspiration-stage-bottom .inspiration-stage-paper { min-width: 0; border-radius: var(--radius-sm); }
 .inspiration-stage-bottom button { width: 100%; min-height: var(--hit); height: auto; padding-block: 8px; }
 .inspiration-gesture { justify-self: center; padding: 8px 12px; text-align: center; }
-.inspiration-caption { display: grid; grid-template-columns: repeat(3, 1fr); align-items: start; gap: 20px; padding-block: 24px; min-height: 136px; }
-.inspiration-caption-description { max-width: 45ch; }
-.inspiration-caption-kind { justify-self: end; }
-.inspiration-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 20px; padding-block: 0 20px; }
-.inspiration-zoom { display: flex; align-items: center; gap: 16px; min-height: var(--hit); }
+.inspiration-controls { position: absolute; z-index: 3; top: 20px; left: 100px; right: 20px; display: flex; align-items: center; justify-content: flex-end; gap: 12px 20px; pointer-events: none; }
+.inspiration-zoom { display: flex; align-items: center; gap: 16px; min-height: var(--hit); padding-inline: 12px; pointer-events: auto; }
 .inspiration-zoom-slider { width: 120px; }
 .inspiration-zoom output { min-width: 4ch; font-variant-numeric: tabular-nums; }
-.inspiration-collection-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-bottom: 16px; }
+.inspiration-collection-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-block: 20px 16px; }
 .inspiration-filmstrip { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 204px; gap: 1px; overflow-x: auto; border-block: 1px solid var(--divider); background: var(--divider); scrollbar-width: thin; scroll-snap-type: x mandatory; }
 .inspiration-thumbnail-cell { background: var(--bg); scroll-snap-align: start; }
 .inspiration-embed .inspiration-filmstrip { margin-inline: -20px; grid-auto-columns: 100%; }
@@ -59,8 +56,7 @@ html:has(.inspiration-page)::after { display: none; }
 @media (min-width: 1224px) { .inspiration-embed .inspiration-filmstrip { grid-auto-columns: calc((100% - 5px) / 6); } }
 @media (max-width: 1000px) {
   .inspiration-page { padding-inline: 20px; }
-  .inspiration-caption, .inspiration-notes { grid-template-columns: repeat(2, 1fr); }
-  .inspiration-caption-kind { justify-self: start; }
+  .inspiration-notes { grid-template-columns: repeat(2, 1fr); }
   .inspiration-notes a { grid-column: 2; justify-self: start; }
 }
 @media (max-width: 640px) {
@@ -71,12 +67,12 @@ html:has(.inspiration-page)::after { display: none; }
   .inspiration-stage-top { top: 12px; left: 12px; right: 12px; }
   .inspiration-stage-arrow-prev { left: 8px; }
   .inspiration-stage-arrow-next { right: 8px; }
-  .inspiration-fallback { inset: 80px 50px 128px; }
+  .inspiration-fallback { inset: 128px 50px; }
   .inspiration-fallback img { max-width: 100%; }
   .inspiration-stage-bottom { bottom: 12px; left: 12px; right: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
   .inspiration-gesture { grid-row: 2; grid-column: 1 / -1; }
-  .inspiration-caption, .inspiration-notes { grid-template-columns: 1fr; gap: 16px; }
-  .inspiration-controls > :first-child { flex: 1 1 100%; }
+  .inspiration-notes { grid-template-columns: 1fr; gap: 16px; }
+  .inspiration-controls { top: 12px; left: 12px; right: 12px; display: grid; grid-template-columns: minmax(0, 1fr); justify-items: end; gap: 12px; }
   .inspiration-zoom { width: 100%; }
   .inspiration-zoom-slider { flex: 1; }
   .inspiration-notes a { grid-column: 1; }

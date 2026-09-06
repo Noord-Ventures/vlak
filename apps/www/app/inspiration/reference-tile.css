@@ -1,0 +1,9 @@
+/* Tile layout only; Vlak Toggle and CardLabel provide the interface paint. */
+.reference-tile-identity,
+.reference-tile-details,
+.reference-tile-materials { display: grid; min-width: 0; }
+.reference-tile-identity,
+.reference-tile-materials { gap: 4px; }
+.reference-tile-details { gap: 12px; }
+.reference-tile-materials { margin-block-start: auto; }
+.reference-tile-copy { display: block; max-width: 66ch; }

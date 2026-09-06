@@ -1,11 +1,10 @@
 "use client";
 
-import { Badge, Button, ButtonGroup, Card, CardBody, CardLabel, CardTitle, Icon, Label, Link, Select, Slider, Toggle } from "@noorddev/vlak-react";
+import { Badge, Button, ButtonGroup, CardBody, CardLabel, Icon, Label, Link, Select, Slider, Toggle } from "@noorddev/vlak-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VlakMark } from "@/components/vlak-mark";
-import { sx } from "@/lib/sx";
-import { about } from "../about/about.stylex";
 import type { ReferenceCaption } from "../about/reference-captions";
+import { ReferenceTile } from "./reference-tile";
 import { studies } from "./collection";
 import { wrapIndex } from "./dynamics";
 import type { GalleryScene, Lighting, Interaction } from "./scene";
@@ -28,7 +27,6 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
   const settings = useRef({ active, lighting, rotating, interaction, reduced, zoom });
   settings.current = { active, lighting, rotating, interaction, reduced, zoom };
   const study = studies[active]!;
-  const caption = captions[study.image];
   const ready = statuses[active] === "ready" && !failed;
   const unavailable = statuses[active] === "error" || failed;
   const Container = embedded ? "div" : "main";
@@ -137,9 +135,22 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
           <CardBody className="inspiration-intro-copy">A few things that shaped the way we see.<br />An open collection of Vlak’s influences.</CardBody>
         </div>}
 
-        <div className="inspiration-stage" data-ready={ready} data-interaction={interaction}>
+        <div className="inspiration-stage" data-ready={ready} data-interaction={interaction} data-work-id={study.id}>
           <div className="inspiration-stage-top">
-            <div className="inspiration-stage-paper"><Badge>{String(active + 1).padStart(2, "0")} / {String(studies.length).padStart(2, "0")}</Badge></div>
+            <div className="inspiration-stage-paper" role="status" aria-label={`${active + 1} of ${studies.length}: ${study.title}, ${study.artist}`}><Badge>{String(active + 1).padStart(2, "0")} / {String(studies.length).padStart(2, "0")}</Badge></div>
+          </div>
+
+          <div className="inspiration-controls" role="group" aria-label="Object controls">
+            <ButtonGroup aria-label="Object view" style={{ width: "auto" }}>
+              <Button variant="ghost" style={iconButtonLayout} disabled={!ready} aria-label="Rotate object left" onClick={() => engine.current?.rotateBy(-Math.PI / 8)}><Icon name="undo" /></Button>
+              <Button variant="ghost" style={iconButtonLayout} disabled={!ready} aria-label="Rotate object right" onClick={() => engine.current?.rotateBy(Math.PI / 8)}><Icon name="redo" /></Button>
+              <Button variant="ghost" disabled={!ready} onClick={() => { setZoom(1); engine.current?.reset(); }}>Reset</Button>
+            </ButtonGroup>
+            <div className="inspiration-zoom inspiration-stage-paper">
+              <Label htmlFor="inspiration-scale">Scale</Label>
+              <div className="inspiration-zoom-slider"><Slider id="inspiration-scale" min={0.8} max={1.35} step={0.01} value={zoom} disabled={!ready} aria-label="Object scale" onValueChange={(value) => { setZoom(value); engine.current?.setZoom(value); }} /></div>
+              <output htmlFor="inspiration-scale">{Math.round(zoom * 100)}%</output>
+            </div>
           </div>
 
           <div ref={host} className="inspiration-canvas" aria-hidden="true" />
@@ -164,29 +175,6 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
           </div>
         </div>
 
-        <div className="inspiration-caption" aria-live="polite" aria-atomic="true" data-work-id={study.id}>
-          <Card style={{ maxWidth: "none", display: "grid", gap: "20px" }}>
-            <div {...sx("field-kicker", about.kicker)}><CardLabel style={{ fontSize: "inherit", color: "inherit", margin: 0 }}>{caption ? `${caption.years} · ${caption.place}` : `${study.kind} · ${study.year}`}</CardLabel></div>
-            <div {...sx("field-name", about.name)}><CardTitle style={{ fontSize: "inherit", letterSpacing: "inherit", lineHeight: "inherit", margin: 0 }}>{caption?.name ?? study.artist}</CardTitle></div>
-            <div {...sx("field-mark", about.mark)}><CardBody style={{ fontSize: "inherit", lineHeight: "inherit" }}>{study.title}, {study.year}.{caption?.mark.startsWith(`${study.title}, ${study.year}.`) ? <><br />{caption.mark.slice(`${study.title}, ${study.year}.`.length).trim()}</> : null}</CardBody></div>
-          </Card>
-          <CardBody className="inspiration-caption-description">{study.description}</CardBody>
-          <Card className="inspiration-caption-kind"><CardLabel>{study.model ? "Spatial study" : "From the archive"}</CardLabel><CardBody>{study.material}</CardBody></Card>
-        </div>
-
-        <div className="inspiration-controls" role="group" aria-label="Object controls">
-          <ButtonGroup aria-label="Object view">
-            <Button variant="ghost" style={iconButtonLayout} disabled={!ready} aria-label="Rotate object left" onClick={() => engine.current?.rotateBy(-Math.PI / 8)}><Icon name="undo" /></Button>
-            <Button variant="ghost" style={iconButtonLayout} disabled={!ready} aria-label="Rotate object right" onClick={() => engine.current?.rotateBy(Math.PI / 8)}><Icon name="redo" /></Button>
-            <Button variant="ghost" disabled={!ready} onClick={() => { setZoom(1); engine.current?.reset(); }}>Reset</Button>
-          </ButtonGroup>
-          <div className="inspiration-zoom">
-            <Label htmlFor="inspiration-scale">Scale</Label>
-            <div className="inspiration-zoom-slider"><Slider id="inspiration-scale" min={0.8} max={1.35} step={0.01} value={zoom} disabled={!ready} aria-label="Object scale" onValueChange={(value) => { setZoom(value); engine.current?.setZoom(value); }} /></div>
-            <output htmlFor="inspiration-scale">{Math.round(zoom * 100)}%</output>
-          </div>
-        </div>
-
         <div className="inspiration-collection-nav">
           <CardLabel>{studies.length} works</CardLabel>
           <Select aria-label="Jump to a work" value={study.id} options={studies.map((item) => ({ value: item.id, label: `${item.title} · ${item.artist}` }))} onValueChange={(id) => select(studies.findIndex((item) => item.id === id))} style={{ width: "min(100%, 24rem)", minWidth: 0 }} />
@@ -202,11 +190,7 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
           select(next);
           document.getElementById(`study-select-${next}`)?.focus({ preventScroll: true });
         }}>
-          {studies.map((item, index) => <div key={item.id} className="inspiration-thumbnail-cell"><Toggle id={`study-select-${index}`} className="inspiration-thumbnail" style={{ height: "100%", width: "100%", minWidth: 0, padding: "20px", flexDirection: "column", alignItems: "stretch", justifyContent: "flex-start", textAlign: "left", borderWidth: 0, borderRadius: 0, outlineOffset: "-2px" }} aria-label={`${index + 1}. ${item.title}, ${item.artist}`} pressed={active === index} onPressedChange={() => select(index)}>
-            <span className="inspiration-thumbnail-meta"><span>{String(index + 1).padStart(2, "0")}</span><span>{item.year}</span></span>
-            <span className="inspiration-thumbnail-image"><img src={item.poster ?? item.image} alt="" loading="lazy" onError={(event) => { if (event.currentTarget.getAttribute("src") !== item.image) event.currentTarget.src = item.image; }} /></span>
-            <span>{item.title}</span>
-          </Toggle></div>)}
+          {studies.map((item, index) => <ReferenceTile key={item.id} study={item} caption={captions[item.image]} index={index} selected={active === index} onSelect={select} />)}
         </div>
       </section>
 

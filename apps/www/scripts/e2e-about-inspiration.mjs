@@ -32,14 +32,45 @@ try {
   assert.equal(await page.getByRole("button", { name: /^(Daylight|Gallery)$/ }).count(), 0);
   const customControls = await page.locator(".inspiration-embed button, .inspiration-embed input, .inspiration-embed a").evaluateAll((elements) => elements.filter((el) => !Array.from(el.classList).some((name) => name.startsWith("rs-"))).map((el) => el.outerHTML));
   assert.deepEqual(customControls, [], "gallery controls must use Vlak components");
-  assert.equal(await page.locator(".inspiration-caption h3").innerText(), "Paul Schuitema");
-  assert.equal(await page.locator(".inspiration-caption .field-kicker").innerText(), "1897–1973 · Rotterdam");
+  assert.equal(await page.locator(".inspiration-caption").count(), 0, "work metadata belongs in the tiles, not a separate caption row");
+  for (const [index, study] of studies.entries()) {
+    const tile = page.locator(`#study-select-${index}`);
+    assert.equal(await tile.getAttribute("data-work-id"), study.id);
+    assert.equal(await tile.locator(".reference-tile-artist").isVisible(), true);
+    assert.notEqual((await tile.locator(".reference-tile-artist").innerText()).trim(), "");
+    const work = await tile.locator(".reference-tile-work").innerText();
+    assert.ok(work.includes(study.title) && work.includes(study.year), `work and year are visible within ${study.id}'s tile`);
+    assert.equal(await tile.locator(".reference-tile-description").innerText(), study.description);
+    assert.equal(await tile.locator(".reference-tile-kind").innerText(), study.model ? "Spatial study" : "From the archive");
+    assert.equal(await tile.locator(".reference-tile-material").innerText(), study.material);
+  }
+  assert.equal(await page.locator("#study-select-0 .reference-tile-artist").innerText(), "Paul Schuitema");
+  assert.equal(await page.locator("#study-select-0 .reference-tile-dates").innerText(), "1897–1973 · Rotterdam");
   console.log("PASS existing About shell and lazy scene loading");
 
   const cell = page.locator("#reference-collection");
   await cell.scrollIntoViewIfNeeded();
   await page.locator(".inspiration-stage[data-ready='true']").waitFor();
   const stage = page.locator(".inspiration-stage");
+  assert.equal(await stage.getAttribute("data-work-id"), studies[0].id);
+  const objectControls = stage.getByRole("group", { name: "Object controls", exact: true });
+  assert.equal(await objectControls.count(), 1, "the complete object controls group belongs inside the 3D stage");
+  assert.equal(await page.getByRole("group", { name: "Object controls", exact: true }).count(), 1);
+  for (const name of ["Rotate object left", "Rotate object right", "Reset"]) {
+    assert.equal(await objectControls.getByRole("button", { name, exact: true }).isVisible(), true);
+  }
+  const scale = objectControls.getByRole("slider", { name: "Object scale", exact: true });
+  const scaleOutput = objectControls.locator("output[for='inspiration-scale']");
+  assert.equal(await scale.isVisible(), true);
+  assert.equal(await objectControls.locator("label[for='inspiration-scale']").innerText(), "Scale");
+  assert.equal(await scaleOutput.innerText(), "100%");
+  await scale.focus();
+  await page.keyboard.press("ArrowRight");
+  assert.equal(await scale.inputValue(), "1.01");
+  assert.equal(await scaleOutput.innerText(), "101%");
+  await objectControls.getByRole("button", { name: "Reset", exact: true }).click();
+  assert.equal(await scale.inputValue(), "1");
+  assert.equal(await scaleOutput.innerText(), "100%");
   const turn = stage.getByRole("button", { name: "Turn object", exact: true });
   assert.equal(await turn.count(), 1);
   assert.equal(await page.getByRole("button", { name: "Browse", exact: true }).count(), 0);
@@ -66,15 +97,17 @@ try {
   assert.ok(Math.abs(strip.x - bounds.x) < 1 && Math.abs(strip.width - bounds.width) < 1, "thumbnail strip must meet the About field edges");
   assert.equal(await page.locator(".inspiration-filmstrip").evaluate((el) => getComputedStyle(el).columnGap), "1px");
   assert.equal(await page.locator("#study-select-0").evaluate((el) => getComputedStyle(el).borderRadius), "0px");
-  assert.equal(await page.locator(".inspiration-caption h3").evaluate((el) => getComputedStyle(el).fontSize), "40px");
   await page.getByRole("button", { name: "Next work", exact: true }).click();
   await page.waitForTimeout(900);
   assert.equal(await page.locator(".inspiration-thumbnail[aria-pressed='true']").getAttribute("id"), "study-select-1");
+  assert.equal(await stage.getAttribute("data-work-id"), studies[1].id);
   await page.locator("#study-select-0").focus();
   await page.keyboard.press("End");
   assert.equal(await page.locator(".inspiration-thumbnail[aria-pressed='true']").getAttribute("id"), `study-select-${studies.length - 1}`);
+  assert.equal(await stage.getAttribute("data-work-id"), studies.at(-1).id);
   await page.keyboard.press("Home");
   await page.waitForTimeout(900);
+  assert.equal(await stage.getAttribute("data-work-id"), studies[0].id);
   const isSelectedVisible = () => page.locator(".inspiration-thumbnail[aria-pressed='true']").evaluate((el) => { const item = el.getBoundingClientRect(); const rail = el.closest(".inspiration-filmstrip").getBoundingClientRect(); return item.left >= rail.left - 1 && item.right <= rail.right + 1; });
   assert.equal(await isSelectedVisible(), true, "rapid End/Home must reveal the current work");
   await cell.screenshot({ path: `${output}/about-gallery-daylight.png` });
@@ -103,12 +136,17 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `overflow at ${width}px`);
     const small = await page.locator(".inspiration-embed button, .inspiration-embed input").evaluateAll((elements) => elements.filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 43.9 || r.height < 43.9); }).map((el) => ({ label: el.getAttribute("aria-label") ?? el.textContent, rect: el.getBoundingClientRect().toJSON() })));
     assert.deepEqual(small, [], `targets at ${width}px`);
-    const outsideStage = await stage.locator(".inspiration-stage-bottom button, .inspiration-gesture").evaluateAll((elements) => elements.filter((element) => {
+    const outsideStage = await stage.locator(".inspiration-controls, .inspiration-controls button, .inspiration-controls input, .inspiration-controls label, .inspiration-controls output, .inspiration-stage-bottom button, .inspiration-gesture").evaluateAll((elements) => elements.filter((element) => {
       const box = element.getBoundingClientRect();
       const parent = element.closest(".inspiration-stage").getBoundingClientRect();
-      return box.width === 0 || box.height === 0 || box.left < parent.left || box.top < parent.top || box.right > parent.right || box.bottom > parent.bottom;
+      return box.width === 0 || box.height === 0 || box.left < parent.left - 1 || box.top < parent.top - 1 || box.right > parent.right + 1 || box.bottom > parent.bottom + 1;
+    }).map((element) => element.getAttribute("aria-label") ?? element.textContent));
+    assert.deepEqual(outsideStage, [], `the complete object controls row, carousel controls and drag hint stay visible inside the scene at ${width}px`);
+    const clippedMetadata = await page.locator(".inspiration-thumbnail [class*='reference-tile-']").evaluateAll((elements) => elements.filter((element) => {
+      const style = getComputedStyle(element);
+      return style.display === "none" || style.visibility === "hidden" || style.textOverflow === "ellipsis" || (element.clientHeight > 0 && element.scrollHeight > element.clientHeight + 1 && style.overflowY === "hidden");
     }).map((element) => element.textContent));
-    assert.deepEqual(outsideStage, [], `carousel controls and drag hint stay visible on the scene at ${width}px`);
+    assert.deepEqual(clippedMetadata, [], `tile metadata remains visible without truncation at ${width}px`);
     if (width === 390) {
       await page.evaluate(() => { document.documentElement.dataset.theme = "light"; });
       await page.waitForTimeout(700);
