@@ -24,7 +24,7 @@ export type { IconName, IconRotate };
 export type { DrawnName, IconAlias, IconGroup } from "./icon-marks";
 
 /**
- * Vlak chrome marks. Vera 28 Aug 2026; optical detail pass 5 Sep 2026.
+ * Vlak chrome marks. Vera 28 Aug 2026; arrow endpoint pass 6 Sep 2026.
  *
  * 16×16 module, optical center 8,8. Line: stroke 1, fill none.
  * Filled: same figures, solid closed geometry, currentColor. Select open
@@ -32,6 +32,8 @@ export type { DrawnName, IconAlias, IconGroup } from "./icon-marks";
  * Cap butt, join miter, no rx. Line hairlines stay 1 CSS px at 12, 16, and 24.
  * Filled geometry and its strokes scale together; small detail cuts stay at
  * least 1 CSS px. Dense silhouettes have a dedicated 12px optical cut.
+ * Arrowheads have equal 90° wings; the shaft meets the apex without turning
+ * into a wing. Both live in one compound path to avoid overlapping paint.
  * Copied is check. Accordion down is chevron-right rotated 90°.
  * The first five marks keep their original construction; copy has a tighter
  * measured overlap and L/R chevrons take a +0.25y optical nudge toward 8,8.

@@ -7,6 +7,9 @@
  * optical weight as the rest of the family instead of looking half-filled.
  * The first five marks keep their original construction unless a measured miss.
  * Chevron left/right: +0.25y optical nudge toward center 8,8.
+ * Arrow endpoints: balanced 90° heads with an uninterrupted wing–tip–wing
+ * subpath. The shaft meets that apex in the same painted path; it never
+ * turns into a head wing, which would create an acute miter spur.
  */
 
 export type MarkEl =
@@ -191,14 +194,14 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   close: [p("M4.5 4.5 L11.5 11.5"), p("M11.5 4.5 L4.5 11.5")],
 
   /* Navigation — optical box ~3.5–12.5, center 8,8 */
-  "arrow-left": [p("M12.5 8 H3.5"), p("M7.5 4.5 L3.5 8 L7.5 11.5")],
-  "arrow-right": [p("M3.5 8 H12.5"), p("M8.5 4.5 L12.5 8 L8.5 11.5")],
-  "arrow-up": [p("M8 12.5 V3.5"), p("M4.5 7.5 L8 3.5 L11.5 7.5")],
-  "arrow-down": [p("M8 3.5 V12.5"), p("M4.5 8.5 L8 12.5 L11.5 8.5")],
+  "arrow-left": [p("M12.5 8 H3.5 M7 4.5 L3.5 8 L7 11.5")],
+  "arrow-right": [p("M3.5 8 H12.5 M9 4.5 L12.5 8 L9 11.5")],
+  "arrow-up": [p("M8 12.5 V3.5 M4.5 7 L8 3.5 L11.5 7")],
+  "arrow-down": [p("M8 3.5 V12.5 M4.5 9 L8 12.5 L11.5 9")],
   menu: [p("M3.5 4.5 H12.5"), p("M3.5 8 H12.5"), p("M3.5 11.5 H12.5")],
   more: [o(8, 4.5, 1), o(8, 8, 1), o(8, 11.5, 1)],
   "more-h": [o(4.5, 8, 1), o(8, 8, 1), o(11.5, 8, 1)],
-  external: [r(2.5, 5.5, 8, 8), p("M8.5 2.5 H13.5 V7.5"), p("M13.5 2.5 L8 8")],
+  external: [r(2.5, 5.5, 8, 8), p("M8 8 L13.5 2.5 M8.5 2.5 H13.5 V7.5")],
   home: [p("M3.5 8 L8 3.5 L12.5 8"), p("M5 8 V12.5 H7 V10 H9 V12.5 H11 V8")],
   "chevrons-left": [p("M8.5 3.5 L3.5 8 L8.5 12.5"), p("M12.5 3.5 L7.5 8 L12.5 12.5")],
   "chevrons-right": [p("M3.5 3.5 L8.5 8 L3.5 12.5"), p("M7.5 3.5 L12.5 8 L7.5 12.5")],
@@ -223,11 +226,11 @@ export const marks: Record<DrawnName, MarkEl[]> = {
     p("M9.5 7.5 V11"),
   ],
   share: [o(4, 8, 1), o(12, 4.5, 1), o(12, 11.5, 1), l(4.8, 7.4, 11.2, 5.1), l(4.8, 8.6, 11.2, 10.9)],
-  download: [p("M3.5 11.5 V13 H12.5 V11.5"), p("M8 3.5 V10.5"), p("M5.5 8 L8 10.5 L10.5 8")],
-  upload: [p("M3.5 11.5 V13 H12.5 V11.5"), p("M8 10.5 V3.5"), p("M5.5 6 L8 3.5 L10.5 6")],
-  refresh: [p("M8.5 5.5 L10.5 3.5 H8 A4.5 4.5 0 1 0 12.5 8")],
-  undo: [p("M7.5 5.5 H5 V8 A4 4 0 1 0 8 4.5")],
-  redo: [p("M8.5 5.5 H11 V8 A4 4 0 1 1 8 4.5")],
+  download: [p("M3.5 11.5 V13 H12.5 V11.5"), p("M8 3.5 V10.5 M5.5 8 L8 10.5 L10.5 8")],
+  upload: [p("M3.5 11.5 V13 H12.5 V11.5"), p("M8 10.5 V3.5 M5.5 6 L8 3.5 L10.5 6")],
+  refresh: [p("M12 8.5 A4 4 0 1 1 8 4.5 H11 M9 2.5 L11 4.5 L9 6.5")],
+  undo: [p("M12.5 11.5 V9 A4.5 4.5 0 0 0 8 4.5 H3.5 M5.5 2.5 L3.5 4.5 L5.5 6.5")],
+  redo: [p("M3.5 11.5 V9 A4.5 4.5 0 0 1 8 4.5 H12.5 M10.5 2.5 L12.5 4.5 L10.5 6.5")],
   save: [p("M3.5 3.5 H10.5 L12.5 5.5 V12.5 H3.5 Z"), r(5.5, 3.5, 5, 3), r(5.5, 8.5, 5, 4)],
   "zoom-in": [o(6.5, 6.5, 4), p("M9.5 9.5 L13.5 13.5"), p("M6.5 4.5 V8.5"), p("M4.5 6.5 H8.5")],
   "zoom-out": [o(6.5, 6.5, 4), p("M9.5 9.5 L13.5 13.5"), p("M4.5 6.5 H8.5")],
@@ -255,7 +258,7 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   bell: [p("M8 2.5 L10.5 5 V8.5 L12 11.5 H4 L5.5 8.5 V5 Z"), p("M6.5 12.5 H9.5")],
   send: [p("M2.5 3.5 L13.5 8 L2.5 12.5 L5.5 8 Z"), p("M5.5 8 H13.5")],
   inbox: [p("M3.5 6.5 V12.5 H12.5 V6.5"), p("M3.5 6.5 L6.5 10 H9.5 L12.5 6.5")],
-  reply: [p("M8 3.5 L3.5 8 L8 12.5"), p("M3.5 8 H11.5 V5")],
+  reply: [p("M11.5 5 V8 H3.5 M7 4.5 L3.5 8 L7 11.5")],
 
   /* People */
   user: [o(8, 5, 2), p("M4 13.5 V10.75 L8 8.75 L12 10.75 V13.5")],
@@ -310,7 +313,7 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   /* Time */
   calendar: [r(3, 4.5, 10, 9), p("M3 7.5 H13"), p("M6 3 V5.5"), p("M10 3 V5.5")],
   clock: [o(8, 8, 5.5), p("M8 8 L8 5"), p("M8 8 L11 9.5")],
-  history: [p("M4.5 8 A3.5 3.5 0 1 0 8 4.5"), p("M4.5 8 L4.5 5.5 L7.5 5.5")],
+  history: [p("M8 12.5 C10.5 12.5 12.5 10.5 12.5 8 C12.5 5.5 10.5 3.5 8 3.5 C6 3.5 4.5 4.5 3.5 5.5 M3.5 2.5 V5.5 H6.5")],
   timer: [p("M6.5 2.5 H9.5"), p("M8 2.5 V4"), o(8, 8.5, 4.5), p("M8 8.5 L10 7")],
 
   /* Settings */
@@ -389,8 +392,8 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   phone: [r(5, 2.5, 6, 11), p("M6.5 12 H9.5")],
   printer: [r(5.5, 2.5, 5, 5.5), p("M3.5 8 H12.5 V11.5 H3.5 Z"), p("M6 10.5 H10"), r(5.5, 11.5, 5, 2.5)],
   terminal: [r(2.5, 3.5, 11, 9), p("M4.5 6.5 L6.5 8 L4.5 9.5"), p("M8 10 H11.5")],
-  "log-in": [p("M8.5 3.5 H13.5 V12.5 H8.5"), p("M2.5 8 H9.5"), p("M7 5.5 L9.5 8 L7 10.5")],
-  "log-out": [p("M7.5 3.5 H2.5 V12.5 H7.5"), p("M6.5 8 H13.5"), p("M11 5.5 L13.5 8 L11 10.5")],
+  "log-in": [p("M8.5 3.5 H13.5 V12.5 H8.5"), p("M2.5 8 H9.5 M7 5.5 L9.5 8 L7 10.5")],
+  "log-out": [p("M7.5 3.5 H2.5 V12.5 H7.5"), p("M6.5 8 H13.5 M11 5.5 L13.5 8 L11 10.5")],
   grip: [o(5.5, 4, 0.9), o(10.5, 4, 0.9), o(5.5, 8, 0.9), o(10.5, 8, 0.9), o(5.5, 12, 0.9), o(10.5, 12, 0.9)],
   power: [p("M8 3.5 V8"), p("M5 5.5 A4.5 4.5 0 1 0 11 5.5")],
   cloud: [p("M4 10.5 H12.5 A2 2 0 0 0 12.5 7 A3 3 0 0 0 6.5 6.5 A2.5 2.5 0 0 0 4 10.5")],
@@ -414,12 +417,7 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   ],
   duplicate: [r(3, 5, 8, 8), r(5.5, 2.5, 8, 8)],
   move: [
-    p("M8 2.5 V13.5"),
-    p("M2.5 8 H13.5"),
-    p("M5.5 4.5 L8 2.5 L10.5 4.5"),
-    p("M5.5 11.5 L8 13.5 L10.5 11.5"),
-    p("M4.5 5.5 L2.5 8 L4.5 10.5"),
-    p("M11.5 5.5 L13.5 8 L11.5 10.5"),
+    p("M8 2.5 V13.5 M2.5 8 H13.5 M6 4.5 L8 2.5 L10 4.5 M6 11.5 L8 13.5 L10 11.5 M4.5 6 L2.5 8 L4.5 10 M11.5 6 L13.5 8 L11.5 10"),
   ],
   unlink: [r(2.5, 6, 5, 4), r(8.5, 6, 5, 4), p("M4 12 L12 4")],
   crop: [p("M4.5 2.5 V11.5 H13.5"), p("M2.5 4.5 H11.5 V13.5")],
@@ -467,8 +465,8 @@ export const marks: Record<DrawnName, MarkEl[]> = {
     p("M3.5 10.5 L8 13 L12.5 10.5"),
   ],
   window: [r(2.5, 3.5, 11, 9), p("M2.5 6.5 H13.5")],
-  "trending-up": [p("M2.5 11.5 L6.5 7.5 L9 10 L13.5 4.5 H10.5 M13.5 4.5 V7.5")],
-  "trending-down": [p("M2.5 4.5 L6.5 8.5 L9 6 L13.5 11.5 H10.5 M13.5 11.5 V8.5")],
+  "trending-up": [p("M2.5 10.5 L6.5 6.5 L9 9 L13.5 4.5 M10.5 4.5 H13.5 V7.5")],
+  "trending-down": [p("M2.5 5.5 L6.5 9.5 L9 7 L13.5 11.5 M10.5 11.5 H13.5 V8.5")],
   compass: [o(8, 8, 5.5), p("M8 3.5 L10.25 11.5 L8 9.75 L5.75 11.5 Z"), p("M8 3.5 V9.75")],
   map: [
     p("M2.5 4.5 L6 3.5 L10 5 L13.5 3.5 V12.5 L10 13.5 L6 12 L2.5 13.5 Z"),
@@ -516,6 +514,8 @@ export const marks: Record<DrawnName, MarkEl[]> = {
  * Every other mark continues to derive its fill directly from `marks`.
  */
 export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
+  // Keep the fold inside the paper plane so its pointed endpoint stays solid.
+  send: [marks.send[0]!, p("M5.5 8 H10.5")],
   link: [r(2.25, 5.5, 6.5, 5), r(3.75, 7, 3.5, 2), r(7.25, 5.5, 6.5, 5), r(8.75, 7, 3.5, 2)],
   unlink: [
     r(2.25, 5.5, 6.5, 5),
@@ -573,8 +573,8 @@ export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
     r(5.5, 4.5, 4, 2),
     r(5.5, 8.5, 5, 2.5),
   ],
-  download: [p("M3.5 12 V13 H12.5 V12"), p("M8 3.5 V10"), p("M5.5 7.5 L8 10 L10.5 7.5")],
-  upload: [p("M3.5 12 V13 H12.5 V12"), p("M8 10 V3.5"), p("M5.5 6 L8 3.5 L10.5 6")],
+  download: [p("M3.5 12 V13 H12.5 V12"), p("M8 3.5 V10 M5.5 7.5 L8 10 L10.5 7.5")],
+  upload: [p("M3.5 12 V13 H12.5 V12"), p("M8 10 V3.5 M5.5 6 L8 3.5 L10.5 6")],
   cart: [p("M3 4 H4.5 L6 11 H12 L13.5 6 H5.5 Z"), o(6.5, 13, 1), o(11.5, 13, 1)],
   flag: [p("M4.5 2.5 V13.5"), p("M4.5 2.5 H12.5 L10.5 5.5 L12.5 8.5 H4.5 Z")],
   "map-pin": [
