@@ -3,7 +3,11 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "outDir": "dist",
-    "declaration": true
+    "declaration": true,
+    "paths": {
+      "@noorddev/vlak": ["../core/src/index.ts"],
+      "@noorddev/vlak-react": ["./src/index.ts"]
+    }
   },
   "include": ["src", "test"]
 }

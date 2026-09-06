@@ -35,6 +35,9 @@ and exposed through the CLI and the `vlak://docs/health` MCP resource.
 - Package builds, package/site typechecks, and lint pass. Existing lint warnings
   remain; two unrelated labeled generic containers received group roles to
   restore the full lint check.
+- Fresh-checkout package typechecking resolves workspace imports from source,
+  including existing tests that import website files, without requiring built
+  `dist` directories.
 - All 739 unit and integrity tests pass, including native refs and attributes
   for every new component, registry completeness, keyboard interaction, missing
   data, controlled updates, form reset, and accessibility semantics.
