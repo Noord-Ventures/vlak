@@ -20,6 +20,8 @@ boundary and every component page at 390px.
 - Theme toggle: filled Vlak sun/moon at 24px, corrected shared crescent geometry,
   and a 44px target. Mobile breadcrumbs have space on both sides of the slash.
 - Tag remove buttons sit inside a 4px inset without shrinking their 44px target.
+  Compact tag and file-view actions own their native-button styles so the base
+  button's full-width phone rule cannot stretch them.
   Error summaries use quieter rounded framing, regular-weight action text, and
   proper separation from the field they link to.
 - File-browser navigation uses compact unboxed breadcrumbs, single-line tree
@@ -32,7 +34,7 @@ boundary and every component page at 390px.
   readable notification details address the initial deployment's accessibility
   failures.
 
-Local verification: 611 unit/integrity tests pass; package typechecks, lint,
+Local verification: 612 unit/integrity tests pass; package typechecks, lint,
 production site build, size budgets, and React 18/19 tarball consumer checks pass.
 In-browser checks covered all forty raw previews at 390px with no page overflow,
 plus optical and keyboard checks for the reported controls. CI/deployment status

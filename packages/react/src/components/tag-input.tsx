@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
-import { vlak } from "../tokens.stylex";
+import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
 import { useInputValue } from "../use-input-value";
@@ -31,7 +31,22 @@ const styles = stylex.create({
   label: { fontSize: vlak.controlLabel, color: vlak.gray },
   list: { display: "flex", flexWrap: "wrap", gap: "0.5rem", padding: 0, margin: 0, listStyle: "none" },
   tag: { display: "inline-flex", alignItems: "center", gap: "0.25rem", borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, paddingBlock: "0.25rem", paddingInlineStart: "0.75rem", paddingInlineEnd: "0.25rem", fontSize: vlak.controlFs },
-  remove: { minWidth: vlak.hit, minHeight: vlak.hit, width: vlak.hit, padding: 0, borderWidth: 0, borderRadius: vlak.radiusSm, flexShrink: 0 },
+  remove: {
+    boxSizing: "border-box", display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+    width: vlak.hit, minWidth: vlak.hit, height: vlak.hit, minHeight: vlak.hit, padding: 0, margin: 0,
+    appearance: "none", fontFamily: "inherit", fontSize: "inherit", lineHeight: 1,
+    borderWidth: vlak.hairline, borderStyle: "solid", borderRadius: vlak.radiusSm,
+    borderColor: { default: "transparent", [mq.forcedColors]: { default: "ButtonText", ":disabled": "GrayText" } },
+    backgroundColor: { default: "transparent", ":hover": vlak.controlFill, ":disabled": "transparent", [mq.forcedColors]: { default: "ButtonFace", ":hover": "Highlight", ":disabled": "ButtonFace" } },
+    color: { default: vlak.ink, [mq.forcedColors]: { default: "ButtonText", ":hover": "HighlightText", ":disabled": "GrayText" } },
+    cursor: { default: "pointer", ":disabled": "not-allowed" },
+    opacity: { default: 1, ":disabled": 0.4, [mq.forcedColors]: { default: 1, ":disabled": 1 } },
+    transition: { default: vlak.transition, [mq.reduce]: "none" },
+    outlineWidth: { default: null, ":focus-visible": 2 },
+    outlineStyle: { default: null, ":focus-visible": "solid" },
+    outlineColor: { default: vlak.ink, [mq.forcedColors]: "Highlight" },
+    outlineOffset: 2,
+  },
   row: { display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "start", minWidth: 0 },
   input: { flex: "1 1 8rem", minWidth: vlak.hit },
   add: { width: "auto", flexShrink: 0 },
@@ -69,7 +84,7 @@ export const TagInput = React.forwardRef<HTMLInputElement, TagInputProps>(functi
   return <div {...props} ref={rootRef} className={root.className} style={{ ...root.style, ...style }}>
     <label htmlFor={id} className={lab.className} style={lab.style}>{label}</label>
     {current.length > 0 && <ul aria-label="Current tags" className={list.className} style={list.style}>{current.map((item, index) => <li key={item} className={tag.className} style={tag.style}>
-      <span>{item}</span><Button ref={(node) => { removeRefs.current[index] = node; }} variant="ghost" className={remove.className} style={remove.style} disabled={disabled} aria-label={removeLabel(item)} onClick={() => { setValue(current.filter((entry) => entry !== item)); inputRef.current?.focus(); }}><Icon name="close" size={16} /></Button>
+      <span>{item}</span><button type="button" ref={(node) => { removeRefs.current[index] = node; }} className={remove.className} style={remove.style} disabled={disabled} aria-label={removeLabel(item)} onClick={() => { setValue(current.filter((entry) => entry !== item)); inputRef.current?.focus(); }}><Icon name="close" size={16} /></button>
     </li>)}</ul>}
     <div className={row.className} style={row.style}>
       <Input ref={mergedRef} id={id} plain value={draft} disabled={disabled} placeholder={placeholder} className={input.className} style={input.style} aria-describedby={[field["aria-describedby"], `${id}-hint`, error ? `${id}-error` : null].filter(Boolean).join(" ")} aria-invalid={error ? true : field["aria-invalid"]} onChange={(event) => { setDraft(event.currentTarget.value); setError(""); }} onKeyDown={(event) => {

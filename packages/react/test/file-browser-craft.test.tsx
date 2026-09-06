@@ -66,6 +66,33 @@ describe("File browser and tree craft", () => {
     expect(getComputedStyle(label).textOverflow).toBe("ellipsis");
   });
 
+  it("owns compact action sizing without inheriting the full-width mobile Button variant", async () => {
+    const user = userEvent.setup();
+    const open = vi.fn();
+    render(<FileBrowser entries={entries} defaultFolder="images" onOpen={open} />);
+    const toolbar = screen.getByRole("group", { name: "File view" });
+    for (const action of within(toolbar).getAllByRole("button")) {
+      expect(action.classList.contains("rs-file-browser-action")).toBe(true);
+      expect(action.className).not.toContain("rs-btn");
+      expect(action.getAttribute("type")).toBe("button");
+      expect(getComputedStyle(action).width).toBe("auto");
+    }
+    const openButton = within(toolbar).getByRole("button", { name: "Open selected" }) as HTMLButtonElement;
+    expect(openButton.disabled).toBe(true);
+    await user.click(openButton);
+    expect(open).not.toHaveBeenCalled();
+    const grid = within(toolbar).getByRole("button", { name: "Grid" });
+    grid.focus();
+    await user.keyboard(" ");
+    expect(grid.getAttribute("aria-pressed")).toBe("true");
+    expect(document.activeElement).toBe(grid);
+    await user.click(screen.getByRole("button", { name: `${fileName} File` }));
+    expect(openButton.disabled).toBe(false);
+    openButton.focus();
+    await user.keyboard("{Enter}");
+    expect(open).toHaveBeenCalledWith(entries[0]!.children![0]);
+  });
+
   it("keeps the composed browser accessible with a custom visible root name", async () => {
     const { container } = render(<FileBrowser label="Asset browser" rootLabel="Library" entries={entries} defaultFolder="images" />);
     const result = await axe(container, { rules: { "color-contrast": { enabled: false } } });

@@ -3115,7 +3115,6 @@
       "registryDependencies": [
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
-        "https://vlak.dev/r/button.json",
         "https://vlak.dev/r/icons.json",
         "https://vlak.dev/r/input.json",
         "https://vlak.dev/r/tree-view.json",
@@ -3156,7 +3155,6 @@
           "snippet": "<div class=\"rs-file-browser\" role=\"region\" aria-label=\"Files\"><nav aria-label=\"Folder breadcrumbs\">Files</nav><ul class=\"rs-file-browser-list\"><li><button class=\"rs-file-browser-item\" type=\"button\" aria-pressed=\"false\">Cover.pdf</button></li></ul></div>",
           "cssOnly": false,
           "registryDependencies": [
-            "button",
             "icons",
             "input",
             "tree-view",

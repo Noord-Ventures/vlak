@@ -150,7 +150,7 @@ const kanbanCards = await desk.locator(".preview-box .rs-kanban-card").evaluateA
   const destination = card.querySelector("select").getBoundingClientRect();
   return { leftOffset: Math.abs(title.left - destination.left), overflow: card.scrollWidth - card.clientWidth, radius: getComputedStyle(card).borderRadius };
 }));
-if (kanbanCards.length !== 2 || kanbanCards.some(card => card.leftOffset > 1 || card.overflow > 0 || card.radius !== "4px")) {
+if (kanbanCards.length !== 3 || kanbanCards.some(card => card.leftOffset > 1 || card.overflow > 0 || card.radius !== "4px")) {
   fail(`kanban: card titles and controls need one aligned grid: ${JSON.stringify(kanbanCards)}`);
 }
 await desk.close();
@@ -242,6 +242,8 @@ const fileBrowserStack = await phone.locator(".preview-box .rs-file-browser").ev
   return { gap: content.top - tree.bottom, leftOffset: Math.abs(content.left - tree.left) };
 });
 if (fileBrowserStack.gap < 16 || fileBrowserStack.leftOffset > 1) fail(`phone: file browser tree and content must stack on a shared edge: ${JSON.stringify(fileBrowserStack)}`);
+const fileViewActions = await phone.locator('.preview-box .rs-file-browser-toolbar[role="group"] .rs-file-browser-action').evaluateAll(actions => actions.slice(0, 2).map(action => ({ width: action.getBoundingClientRect().width, height: action.getBoundingClientRect().height, available: action.parentElement.getBoundingClientRect().width })));
+if (fileViewActions.length !== 2 || fileViewActions.some(action => action.width >= action.available / 2 || action.width < 44 || action.height < 44)) fail(`phone: file-view actions must remain compact with full-size targets: ${JSON.stringify(fileViewActions)}`);
 await phone.goto(`${base}/components/select/`, { waitUntil: "networkidle" });
 const mobileSelect = await phone.evaluate(() => {
   const preview = document.querySelector('.preview-box [role="combobox"]').getBoundingClientRect();

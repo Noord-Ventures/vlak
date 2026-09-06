@@ -98,6 +98,6 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Dependencies
 
-Registry dependencies: [button](button.md), [icons](icons.md), [input](input.md), [tree-view](tree-view.md).  
+Registry dependencies: [icons](icons.md), [input](input.md), [tree-view](tree-view.md).  
 React: `packages/react/src/components/file-browser.tsx`  
 CSS: `packages/core/css/components/file-browser.css`

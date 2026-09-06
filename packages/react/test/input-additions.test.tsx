@@ -112,7 +112,8 @@ describe("MultiSelect", () => {
 
 describe("TagInput", () => {
   it("insets the remove control inside the tag without shrinking its target", async () => {
-    render(<TagInput defaultValue={["Research"]} />);
+    const submit = vi.fn((event: React.FormEvent) => event.preventDefault());
+    render(<form onSubmit={submit}><TagInput defaultValue={["Research"]} /></form>);
     const remove = screen.getByRole("button", { name: "Remove Research" });
     const tag = getComputedStyle(remove.closest("li")!);
     const button = getComputedStyle(remove);
@@ -121,12 +122,19 @@ describe("TagInput", () => {
     expect(tag.borderRadius).toBe(vlak.radiusSm);
     expect(button.minWidth).toBe(vlak.hit);
     expect(button.minHeight).toBe(vlak.hit);
+    expect(button.width).toBe(vlak.hit);
+    expect(button.height).toBe(vlak.hit);
+    expect(button.padding).toBe("0px");
+    expect(button.boxSizing).toBe("border-box");
     expect(button.borderRadius).toBe(vlak.radiusSm);
     expect(button.flexShrink).toBe("0");
+    expect(remove.getAttribute("type")).toBe("button");
+    expect(remove.className).not.toContain("rs-btn-");
     remove.focus();
     await userEvent.keyboard("{Enter}");
     expect(screen.queryByRole("button", { name: "Remove Research" })).toBeNull();
     expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Tags" }));
+    expect(submit).not.toHaveBeenCalled();
   });
   it("adds unique tags, parses pasted lists and offers keyboard removal", async () => {
     const user = userEvent.setup();

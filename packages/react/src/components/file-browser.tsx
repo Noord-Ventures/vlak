@@ -4,7 +4,6 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
-import { Button } from "./button";
 import { Icon } from "./icon";
 import { Input } from "./input";
 import { TreeView, type TreeNode } from "./tree-view";
@@ -31,8 +30,23 @@ const styles = stylex.create({
   crumbItem: { display: "flex", alignItems: "center", gap: "0.25rem", minWidth: 0, maxWidth: "100%" },
   crumb: { display: "inline-flex", alignItems: "center", minWidth: vlak.hit, minHeight: vlak.hit, maxWidth: "min(16rem, 100%)", paddingBlock: 0, paddingInline: "0.375rem", boxSizing: "border-box", borderWidth: 0, borderRadius: vlak.radiusSm, backgroundColor: { default: "transparent", ":hover": vlak.controlFill }, color: { default: vlak.gray, ":hover": vlak.ink }, fontFamily: "inherit", fontSize: "0.875rem", fontWeight: 400, lineHeight: 1.45, cursor: "pointer", ":focus-visible": { outlineWidth: 2, outlineStyle: "solid", outlineColor: vlak.ink, outlineOffset: -2 } },
   crumbCurrent: { color: vlak.ink, fontWeight: 500 },
-  action: { width: "auto", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: "0.75rem" },
-  active: { backgroundColor: vlak.controlFill, fontWeight: 600 },
+  action: {
+    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: "0.5rem",
+    width: "auto", minWidth: vlak.hit, minHeight: vlak.hit, boxSizing: "border-box",
+    paddingBlock: "0.5rem", paddingInline: "0.75rem",
+    fontFamily: "inherit", fontSize: "0.875rem", fontWeight: 500, lineHeight: 1.45, whiteSpace: "nowrap",
+    borderWidth: vlak.hairline, borderStyle: "solid", borderRadius: vlak.radiusSm,
+    borderColor: { default: vlak.controlBorder, [mq.forcedColors]: "ButtonText" },
+    backgroundColor: { default: "transparent", ":hover": vlak.controlFill, ":disabled": "transparent", [mq.forcedColors]: "ButtonFace" },
+    color: { default: vlak.ink, ":disabled": vlak.gray, [mq.forcedColors]: { default: "ButtonText", ":disabled": "GrayText" } },
+    cursor: { default: "pointer", ":disabled": "not-allowed" },
+    transition: { default: vlak.transition, [mq.reduce]: "none" },
+    outlineWidth: { default: 0, ":focus-visible": 2 },
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineColor: { default: vlak.ink, [mq.forcedColors]: "Highlight" },
+    outlineOffset: 2,
+  },
+  active: { backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: "Highlight" }, color: { default: vlak.ink, [mq.forcedColors]: "HighlightText" }, fontWeight: 600 },
   body: { display: "flex", flexWrap: "wrap", alignItems: "flex-start", gap: vlak.gutter, minWidth: 0 },
   tree: { flexBasis: { default: "11.5rem", [mq.phone]: "100%" }, flexGrow: 0, flexShrink: 1, minWidth: 0, maxWidth: "100%" },
   content: { flex: "1 1 18rem", minWidth: 0, display: "flex", flexDirection: "column", gap: "0.75rem" },
@@ -94,7 +108,7 @@ export const FileBrowser = React.forwardRef<HTMLDivElement, FileBrowserProps>(fu
       <aside {...tree} aria-label={`${label} folders`}><TreeView nodes={[{ id: rootId, label: rootLabel, children: folderNodes(entries) }]} label={`${label} folder tree`} value={currentFolder?.id ?? rootId} expanded={expandedIds} onExpandedChange={setExpandedIds} onValueChange={id => navigate(id === rootId ? null : id)} /></aside>
       <div {...content}>
         <Input type="search" aria-label="Search this folder" placeholder="Search this folder" value={query} onChange={event => setQuery(event.target.value)} />
-        <div {...toolbar} role="group" aria-label="File view">{(["list", "grid"] as const).map(mode => { const choice = rs(["rs-file-browser-action", view === mode && "rs-file-browser-view-active"], styles.action, view === mode && styles.active); return <Button key={mode} {...choice} variant="ghost" aria-pressed={view === mode} onClick={() => setView(mode)}><Icon name={mode} />{mode === "list" ? "List" : "Grid"}</Button>; })}{onOpen && <Button {...action} variant="ghost" disabled={!chosen || chosen.disabled} onClick={() => { if (chosen && !chosen.disabled) onOpen(chosen); }}>Open selected</Button>}</div>
+        <div {...toolbar} role="group" aria-label="File view">{(["list", "grid"] as const).map(mode => { const choice = rs(["rs-file-browser-action", view === mode && "rs-file-browser-view-active"], styles.action, view === mode && styles.active); return <button key={mode} {...choice} type="button" aria-pressed={view === mode} onClick={() => setView(mode)}><Icon name={mode} />{mode === "list" ? "List" : "Grid"}</button>; })}{onOpen && <button {...action} type="button" disabled={!chosen || chosen.disabled} onClick={() => { if (chosen && !chosen.disabled) onOpen(chosen); }}>Open selected</button>}</div>
         <ul {...list} aria-label={currentFolder?.name ?? label}>{visible.map(entry => { const selectedFile = entry.kind === "file" && entry.id === selected; const row = rs(["rs-file-browser-item", view === "grid" && "rs-file-browser-tile", selectedFile && "rs-file-browser-selected"], styles.item, view === "grid" && styles.tile, selectedFile && styles.selected); return <li key={entry.id}><button {...row} type="button" disabled={entry.disabled} aria-pressed={entry.kind === "file" ? selectedFile : undefined} onClick={() => select(entry)} onDoubleClick={() => { if (!entry.disabled && entry.kind === "file") onOpen?.(entry); }}><Icon name={entry.kind === "folder" ? "folder" : "file"} size={view === "grid" ? 24 : 16} /><span {...name} title={entry.name}>{entry.name}</span><span {...meta}>{entry.kind === "folder" ? "Folder" : entry.size ?? "File"}{entry.modified ? ` · ${entry.modified}` : ""}</span></button></li>; })}</ul>
         {visible.length === 0 && <p {...empty} role="status">{query ? "No files match this search." : "This folder is empty."}</p>}
       </div>

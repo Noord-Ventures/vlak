@@ -396,7 +396,6 @@ export const mediaAdditions: VlakComponent[] = [
     "description": "Explores a supplied file hierarchy through folders, breadcrumbs, search, and list or grid views.",
     "category": "patterns",
     "registryDependencies": [
-      "button",
       "icons",
       "input",
       "tree-view"
