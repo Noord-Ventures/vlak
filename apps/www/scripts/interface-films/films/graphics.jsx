@@ -1,0 +1,238 @@
+import { ConceptBoard } from "../../../app/interfaces/concepts/board";
+
+const cue = (id, selector, start, from = {}, index, sound = "tick") => ({
+	id,
+	selector,
+	start,
+	from,
+	index,
+	sound,
+	volume: sound ? 0.14 : 0,
+});
+const previews = (start, prefix) =>
+	Array.from({ length: 3 }, (_, index) => [
+		{
+			...cue(
+				`${prefix}-surface-${index}`,
+				".cx-results > button",
+				start + index * 0.14,
+				{},
+				index,
+				null,
+			),
+			surface: true,
+		},
+		cue(
+			`${prefix}-art-${index}`,
+			".cx-results > button > svg",
+			start + 0.07 + index * 0.14,
+			{ y: 20, scale: 0.95 },
+			index,
+			"release",
+		),
+		cue(
+			`${prefix}-caption-${index}`,
+			".cx-results > button > span",
+			start + 0.2 + index * 0.14,
+			{ y: 12 },
+			index,
+		),
+	]).flat();
+
+export default {
+	slug: "graphics",
+	title: "Wallpaper generator",
+	Component: ConceptBoard,
+	props: { kind: "graphics" },
+	rootSelector: ".cx-graphics",
+	width: 1180,
+	height: 772,
+	duration: 40,
+	hero: { selector: ".cx-results > button", index: 0, scale: 1.05 },
+	intro: [
+		{
+			...cue(
+				"primary-surface",
+				".cx-results > button",
+				0.15,
+				{ scale: 0.88, rotate: -2 },
+				0,
+				"press",
+			),
+			surface: true,
+		},
+		cue(
+			"primary-art",
+			".cx-results > button > svg",
+			0.42,
+			{ y: 30, scale: 0.95 },
+			0,
+			"release",
+		),
+		cue("primary-caption", ".cx-results > button > span", 0.92, { y: 18 }, 0),
+		{
+			...cue("header", ".cx-graphics > header", 3.2, {}, undefined, null),
+			surface: true,
+		},
+		cue("header-copy", ".cx-graphics > header > span", 3.34, { x: -24 }),
+		cue(
+			"export",
+			".cx-export-action",
+			3.54,
+			{ x: 28, scale: 0.9 },
+			undefined,
+			"release",
+		),
+		{
+			...cue(
+				"direction-surface",
+				".cx-graphics > aside",
+				3.7,
+				{},
+				undefined,
+				null,
+			),
+			surface: true,
+		},
+		cue("direction-label", ".cx-graphics > aside > .cx-label", 3.78, {
+			x: -18,
+		}),
+		cue(
+			"direction-field",
+			".cx-direction",
+			3.94,
+			{ y: 28, scale: 0.95 },
+			undefined,
+			"release",
+		),
+		cue("canvas", ".cx-format-field > .cx-label", 4.13, { x: -18 }),
+		...Array.from({ length: 3 }, (_, index) =>
+			cue(
+				`format-${index}`,
+				".cx-graphics .cx-segments button",
+				4.28 + index * 0.12,
+				{ y: 18, scale: 0.9 },
+				index,
+			),
+		),
+		cue("dimensions", ".cx-output-size", 4.7, { x: -14 }),
+		cue("variation", ".cx-variation", 4.86, { y: 20 }),
+		cue(
+			"generate",
+			".cx-graphics > aside > button",
+			5.08,
+			{ y: 26, scale: 0.88 },
+			undefined,
+			"release",
+		),
+		cue("status", ".cx-generation-status", 5.28, { y: 12 }, undefined, null),
+		...previews(5.5, "alternates").filter((item) => item.index !== 0),
+	],
+	shots: [
+		{ start: 9, end: 12.3, selector: ".cx-direction", scale: 2.6 },
+		{ start: 12.5, end: 14.5, selector: ".cx-variation", scale: 3.2 },
+		{
+			start: 29.6,
+			end: 32,
+			selector: ".cx-results > button",
+			index: 2,
+			scale: 1.65,
+		},
+	],
+	actions: [
+		{
+			id: "direction",
+			time: 9.4,
+			end: 11.6,
+			kind: "type",
+			selector: ".cx-direction textarea",
+			value: "An architectural grid, warm paper, and one vermilion signal.",
+			sound: "tick",
+			volume: 0.08,
+		},
+		{
+			id: "variation",
+			time: 13,
+			kind: "range",
+			selector: ".cx-variation input",
+			value: "67",
+			sound: "release",
+			volume: 0.22,
+		},
+		{
+			id: "generate",
+			time: 16,
+			kind: "click",
+			selector: ".cx-graphics > aside > button",
+			sound: "press",
+			volume: 0.3,
+			assert: {
+				selector: ".cx-generation-status",
+				text: "Three new wallpapers ready.",
+			},
+		},
+		{
+			id: "open-structure",
+			time: 20,
+			kind: "click",
+			selector: ".cx-results > button",
+			index: 1,
+			sound: "press",
+			volume: 0.24,
+			assert: {
+				selector: ".cx-results > button[aria-pressed=true]",
+				text: "Open structure",
+			},
+		},
+		{
+			id: "desktop-format",
+			time: 24,
+			kind: "click",
+			selector: ".cx-graphics .cx-segments button",
+			index: 1,
+			sound: "press",
+			volume: 0.24,
+			assert: { selector: ".cx-output-size", text: "3840" },
+		},
+		{
+			id: "generate-again",
+			time: 27,
+			kind: "click",
+			selector: ".cx-graphics > aside > button",
+			sound: "press",
+			volume: 0.3,
+			assert: {
+				selector: ".cx-generation-status",
+				text: "Three new wallpapers ready.",
+			},
+		},
+		{
+			id: "signal-study",
+			time: 30,
+			kind: "click",
+			selector: ".cx-results > button",
+			index: 2,
+			sound: "press",
+			volume: 0.24,
+			assert: {
+				selector: ".cx-results > button[aria-pressed=true]",
+				text: "Signal study",
+			},
+		},
+	],
+	rebuilds: [
+		{ after: "generate", cues: previews(16.05, "first-generation") },
+		{ after: "generate-again", cues: previews(27.05, "second-generation") },
+	],
+	inspect(root) {
+		return {
+			direction: root.querySelector("textarea")?.value,
+			variation: root.querySelector("input[type=range]")?.value,
+			dimensions: root.querySelector(".cx-output-size")?.textContent,
+			selected: root.querySelector(
+				".cx-results > button[aria-pressed=true] > span",
+			)?.textContent,
+			status: root.querySelector(".cx-generation-status")?.textContent,
+		};
+	},
+};

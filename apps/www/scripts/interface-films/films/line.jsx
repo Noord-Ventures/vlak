@@ -1,0 +1,323 @@
+import { Board } from "../../../app/interfaces/line/board";
+
+const cue = (id, selector, start, from = {}, extra = {}) => ({
+	id,
+	selector,
+	start,
+	from,
+	sound: "tick",
+	volume: 0.13,
+	...extra,
+});
+const reading = (start) => [
+	cue(
+		"reading-surface",
+		".if-inspect.is-open",
+		start,
+		{},
+		{ surface: true, sound: null },
+	),
+	cue(
+		"reading-close",
+		".if-inspect-close",
+		start + 0.05,
+		{ scale: 0.65, rotate: -25 },
+		{ sound: "release" },
+	),
+	cue("reading-title", ".sc-ai-inspect h2", start + 0.14, { y: 18 }),
+	cue("reading-copy", ".sc-ai-inspect p", start + 0.26, { x: 20 }),
+	cue(
+		"reading-deeper",
+		".sc-ai-inspect button",
+		start + 0.42,
+		{ y: 24, scale: 0.85 },
+		{ sound: "release" },
+	),
+];
+
+export default {
+	slug: "line",
+	title: "AI chat",
+	Component: Board,
+	rootSelector: ".sc-ai",
+	width: 1180,
+	height: 772,
+	duration: 40,
+	hero: { selector: ".sc-ai-msg-line", index: 0, scale: 1.8 },
+	shots: [
+		{ start: 9.8, end: 12.7, selector: ".sc-ai-inspect > div", scale: 2.3 },
+		{ start: 20, end: 23.05, selector: ".sc-ai-composer", scale: 2.15 },
+		{ start: 24, end: 26.5, selector: ".sc-ai-measure", scale: 2 },
+	],
+	intro: [
+		cue(
+			"hero-response",
+			".sc-ai-msg-line",
+			0.15,
+			{},
+			{ index: 0, surface: true, sound: null },
+		),
+		cue("hero-assistant", ".sc-ai-who", 0.42, { y: -18 }, { index: 0 }),
+		cue(
+			"hero-reading",
+			".sc-ai-reply",
+			0.7,
+			{ y: 28 },
+			{ index: 0, sound: "release", volume: 0.24 },
+		),
+		cue(
+			"hero-explore",
+			".sc-ai-open",
+			1.08,
+			{ x: -26, scale: 0.8 },
+			{ index: 0, sound: "release" },
+		),
+		cue("rail-surface", ".sc-ai-rail", 3.2, {}, { surface: true, sound: null }),
+		cue("brand", ".sc-ai-brand .if-app", 3.25, { x: -35 }),
+		cue("brand-context", ".sc-ai-voice", 3.42, { y: 16 }),
+		cue(
+			"new-chat",
+			".sc-ai-new",
+			3.58,
+			{ y: 24, scale: 0.85 },
+			{ sound: "release" },
+		),
+		cue("chats-label", ".sc-ai-label", 3.78, { x: -24 }),
+		...Array.from({ length: 5 }, (_, i) => [
+			cue(
+				`chat-surface-${i}`,
+				".sc-ai-chat",
+				3.9 + i * 0.18,
+				{},
+				{ index: i, surface: true, sound: null },
+			),
+			cue(
+				`chat-title-${i}`,
+				".sc-ai-chat-title",
+				3.95 + i * 0.18,
+				{ x: -35 },
+				{ index: i },
+			),
+			cue(
+				`chat-preview-${i}`,
+				".sc-ai-chat-preview",
+				4.03 + i * 0.18,
+				{ x: -25 },
+				{ index: i, sound: null },
+			),
+			cue(
+				`chat-time-${i}`,
+				".sc-ai-chat-when",
+				4.12 + i * 0.18,
+				{ y: 12 },
+				{ index: i, sound: null },
+			),
+		]).flat(),
+		cue("chat-header", ".sc-ai-head", 4.05, {}, { surface: true, sound: null }),
+		cue("chat-title", ".sc-ai-head h2", 4.2, { y: -20 }),
+		cue(
+			"chat-settings",
+			".sc-ai-gear",
+			4.38,
+			{ x: 28, scale: 0.8 },
+			{ sound: "release" },
+		),
+		cue(
+			"first-question",
+			".sc-ai-msg-you",
+			4.6,
+			{ x: 44, scale: 0.96 },
+			{ index: 0, sound: "release" },
+		),
+		cue(
+			"followup-question",
+			".sc-ai-msg-you",
+			5.15,
+			{ x: 40, scale: 0.96 },
+			{ index: 1, sound: "release" },
+		),
+		cue(
+			"second-response",
+			".sc-ai-msg-line",
+			5.4,
+			{},
+			{ index: 1, surface: true, sound: null },
+		),
+		cue("second-assistant", ".sc-ai-who", 5.45, { y: 18 }, { index: 1 }),
+		cue(
+			"second-reading",
+			".sc-ai-reply",
+			5.65,
+			{ y: 25 },
+			{ index: 1, sound: "release" },
+		),
+		cue("second-explore", ".sc-ai-open", 5.9, { x: -25 }, { index: 1 }),
+		cue(
+			"dock-surface",
+			".sc-ai-dock",
+			6.05,
+			{},
+			{ surface: true, sound: null },
+		),
+		cue(
+			"composer-border",
+			".sc-ai-composer",
+			6.1,
+			{},
+			{ surface: true, sound: "press", volume: 0.2 },
+		),
+		cue(
+			"composer-mark",
+			".sc-ai-composer-mark",
+			6.22,
+			{ rotate: -35, scale: 0.5 },
+			{ sound: "release" },
+		),
+		cue("composer-input", ".sc-ai-composer input", 6.4, { x: 25 }),
+		cue(
+			"composer-send",
+			".sc-ai-send",
+			6.62,
+			{ y: 24, scale: 0.65 },
+			{ sound: "release", volume: 0.2 },
+		),
+	],
+	// The original Board supplies the response through its 700ms local preset
+	// timer. The shared film clock must advance that native timer deterministically.
+	actions: [
+		{
+			id: "first-reading",
+			time: 9.6,
+			kind: "click",
+			selector: ".sc-ai-open",
+			index: 0,
+			sound: "press",
+			assert: { selector: ".sc-ai-inspect h2", text: "Close reading" },
+		},
+		{
+			id: "close-reading",
+			time: 13.2,
+			kind: "click",
+			selector: ".if-inspect-close",
+			label: "Close pane",
+			sound: "press",
+			assert: { selector: ".if-inspect:not(.is-open)" },
+		},
+		{
+			id: "new-chat",
+			time: 16.2,
+			kind: "click",
+			selector: ".sc-ai-new",
+			label: "New chat",
+			sound: "press",
+			assert: {
+				selector: ".sc-ai-hello",
+				text: "Which Deftones song would you like to discuss?",
+			},
+		},
+		{
+			id: "write-question",
+			time: 20.2,
+			end: 21.8,
+			kind: "type",
+			selector: '.sc-ai-composer input[aria-label="Message"]',
+			value: "How does Rosemary build its sense of scale?",
+			sound: "tick",
+			volume: 0.08,
+		},
+		{
+			id: "send-question",
+			time: 23.2,
+			kind: "click",
+			selector: ".sc-ai-send",
+			label: "Send",
+			sound: "press",
+			assert: {
+				selector: ".sc-ai-msg-you .sc-ai-bubble",
+				text: "How does Rosemary build its sense of scale?",
+			},
+		},
+		{
+			id: "new-reading",
+			time: 27,
+			kind: "click",
+			selector: ".sc-ai-open",
+			index: 0,
+			sound: "press",
+			assert: { selector: ".sc-ai-inspect h2", text: "Close reading" },
+		},
+		{
+			id: "return-to-chat",
+			time: 30.5,
+			kind: "click",
+			selector: ".if-inspect-close",
+			label: "Close pane",
+			sound: "press",
+			assert: { selector: ".if-inspect:not(.is-open)" },
+		},
+	],
+	rebuilds: [
+		{ after: "first-reading", cues: reading(9.65) },
+		{
+			after: "new-chat",
+			cues: [
+				cue("new-title", ".sc-ai-head h2", 16.25, { y: 18 }),
+				cue(
+					"new-prompt",
+					".sc-ai-hello",
+					16.42,
+					{ y: 35, scale: 0.96 },
+					{ sound: "release", volume: 0.2 },
+				),
+				...Array.from({ length: 3 }, (_, i) =>
+					cue(
+						`new-hint-${i}`,
+						".sc-ai-hint",
+						16.7 + i * 0.17,
+						{ y: 26, scale: 0.85 },
+						{ index: i, sound: "release" },
+					),
+				),
+			],
+		},
+		{
+			after: "send-question",
+			cues: [
+				cue(
+					"sent-question",
+					".sc-ai-msg-you",
+					23.24,
+					{ y: 20 },
+					{ sound: "release", volume: 0.19 },
+				),
+				cue("new-chat-row", '.sc-ai-chat[data-chat="new"]', 23.35, { x: -28 }),
+				cue("preset-assistant", ".sc-ai-who", 23.91, { y: 15 }),
+				cue(
+					"preset-response",
+					".sc-ai-reply",
+					24.03,
+					{ y: 26 },
+					{ sound: "release", volume: 0.19 },
+				),
+				cue("preset-explore", ".sc-ai-open", 24.25, { x: -20 }),
+			],
+		},
+		{ after: "new-reading", cues: reading(27.05) },
+	],
+	inspect(root) {
+		return {
+			chat:
+				root
+					.querySelector('.sc-ai-chat[aria-current="true"]')
+					?.getAttribute("data-chat") ?? "new",
+			title: root.querySelector(".sc-ai-head h2")?.textContent.trim(),
+			messages: [...root.querySelectorAll(".sc-ai-bubble,.sc-ai-reply")].map(
+				(el) => el.textContent.trim(),
+			),
+			pending: Boolean(root.querySelector(".sc-ai-pending")),
+			inspector:
+				root.querySelector(".if-inspect.is-open h2")?.textContent.trim() ??
+				null,
+		};
+	},
+};
