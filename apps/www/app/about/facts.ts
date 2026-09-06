@@ -201,10 +201,10 @@ export const field = [
     name: "Shizuko Yoshikawa",
     years: "1934–2019",
     place: "Ulm · Zurich",
-    mark: "Japanische Plakate heute, 1978. Müller-Brockmann studio.",
+    mark: "Japanische Plakate heute, 1979. Müller-Brockmann studio.",
     work: {
       src: "/about/yoshikawa-japanische-plakate-heute.webp",
-      alt: "Japanische Plakate heute, 1978",
+      alt: "Japanische Plakate heute, 1979",
     },
   },
   {
@@ -233,7 +233,7 @@ export const field = [
     place: "Amsterdam",
     mark: "SDAP. Stadsdrukkerij Amsterdam.",
     work: {
-      src: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Cohen_fre_sdap_nvv_poster_1926.png",
+      src: "/about/cohen-sdap-nvv.webp",
       alt: "SDAP / NVV poster, 1926",
     },
   },

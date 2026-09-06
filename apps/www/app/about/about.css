@@ -45,28 +45,7 @@ html:has(.field-page) .site-footer {
     "flush"
     "grot"
     "hist"
-    "jmb"
-    "wc"
-    "n01"
-    "n02"
-    "n03"
-    "n04"
-    "n05"
-    "n06"
-    "n07"
-    "n08"
-    "n09"
-    "n10"
-    "n11"
-    "n12"
-    "n13"
-    "n14"
-    "n15"
-    "n16"
-    "n17"
-    "n18"
-    "n19"
-    "n20"
+    "inspiration"
     "faq"
     "colo";
   grid-auto-rows: minmax(204px, auto);
@@ -114,28 +93,6 @@ html:has(.field-page) .site-footer {
   justify-content: flex-start;
   min-height: 408px;
 }
-.field-cell-jmb { grid-area: jmb; min-height: 408px; }
-.field-cell-wc { grid-area: wc; min-height: 408px; }
-.field-cell-n01 { grid-area: n01; }
-.field-cell-n02 { grid-area: n02; }
-.field-cell-n03 { grid-area: n03; }
-.field-cell-n04 { grid-area: n04; }
-.field-cell-n05 { grid-area: n05; }
-.field-cell-n06 { grid-area: n06; }
-.field-cell-n07 { grid-area: n07; }
-.field-cell-n08 { grid-area: n08; }
-.field-cell-n09 { grid-area: n09; }
-.field-cell-n10 { grid-area: n10; }
-.field-cell-n11 { grid-area: n11; }
-.field-cell-n12 { grid-area: n12; }
-.field-cell-n13 { grid-area: n13; }
-.field-cell-n14 { grid-area: n14; }
-.field-cell-n15 { grid-area: n15; }
-.field-cell-n16 { grid-area: n16; }
-.field-cell-n17 { grid-area: n17; }
-.field-cell-n18 { grid-area: n18; }
-.field-cell-n19 { grid-area: n19; }
-.field-cell-n20 { grid-area: n20; }
 .field-cell-mod { grid-area: mod; }
 .field-cell-hair { grid-area: hair; }
 .field-cell-flush { grid-area: flush; }
@@ -147,6 +104,7 @@ html:has(.field-page) .site-footer {
   gap: 20px;
 }
 .field-cell-hist { grid-area: hist; }
+.field-cell-inspiration { grid-area: inspiration; scroll-margin-top: 112px; }
 .field-cell-faq {
   grid-area: faq;
   justify-content: flex-start;
@@ -177,12 +135,6 @@ html:has(.field-page) .site-footer {
   letter-spacing: -.035em;
   line-height: 1.12;
   text-wrap: balance;
-}
-
-.field-name-feature {
-  font-size: clamp(2.5rem, 7vw, 7rem);
-  letter-spacing: -.045em;
-  line-height: 1.05;
 }
 
 .field-kicker {
@@ -284,41 +236,6 @@ html:has(.field-page) .site-footer {
   height: 32px;
   min-width: 32px;
   min-height: 32px;
-}
-
-.field-cell:has(> .field-name) {
-  gap: 20px;
-}
-
-/* Gallery prints: intact work in a consistent museum matte. Never cover. */
-.field-cell-has-work {
-  padding: 20px;
-  gap: 20px;
-  min-height: 408px;
-  justify-content: flex-start;
-}
-
-.field-work {
-  position: relative;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 4 / 3;
-  min-height: 0;
-  padding: 20px;
-  overflow: hidden;
-  background: var(--table-alt);
-  box-shadow: inset 0 0 0 1px var(--divider);
-}
-
-.field-work img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  object-position: center;
 }
 
 .field-matter {
@@ -492,30 +409,13 @@ html:has(.field-page) .site-footer {
       "mod hair"
       "flush grot"
       "hist hist"
-      "jmb jmb"
-      "wc wc"
-      "n01 n02"
-      "n03 n04"
-      "n05 n06"
-      "n07 n08"
-      "n09 n10"
-      "n11 n12"
-      "n13 n14"
-      "n15 n16"
-      "n17 n18"
-      "n19 n20"
+      "inspiration inspiration"
       "faq faq"
       "colo colo";
   }
 }
 
 @media (min-width: 816px) {
-  .field-name-feature {
-    font-size: clamp(1.75rem, 3.2vw, 3.25rem);
-    letter-spacing: -.04em;
-    line-height: 1.1;
-  }
-
   .field {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-areas:
@@ -527,17 +427,7 @@ html:has(.field-page) .site-footer {
       "mod mod hair hair"
       "flush flush grot grot"
       "hist hist hist hist"
-      "jmb jmb wc wc"
-      "n01 n01 n02 n02"
-      "n03 n03 n04 n04"
-      "n05 n05 n06 n06"
-      "n07 n07 n08 n08"
-      "n09 n09 n10 n10"
-      "n11 n11 n12 n12"
-      "n13 n13 n14 n14"
-      "n15 n15 n16 n16"
-      "n17 n17 n18 n18"
-      "n19 n19 n20 n20"
+      "inspiration inspiration inspiration inspiration"
       "faq faq faq faq"
       "colo colo colo colo";
   }
@@ -553,14 +443,7 @@ html:has(.field-page) .site-footer {
       "free free spec spec spec spec"
       "mod mod hair hair flush flush"
       "grot grot grot hist hist hist"
-      "jmb jmb jmb wc wc wc"
-      "n01 n01 n02 n02 n03 n03"
-      "n04 n04 n05 n05 n06 n06"
-      "n07 n07 n08 n08 n09 n09"
-      "n10 n10 n11 n11 n12 n12"
-      "n13 n13 n14 n14 n15 n15"
-      "n16 n16 n17 n17 n18 n18"
-      "n19 n19 n20 n20 n20 n20"
+      "inspiration inspiration inspiration inspiration inspiration inspiration"
       "faq faq faq faq faq faq"
       "colo colo colo colo colo colo";
   }

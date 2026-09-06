@@ -1,0 +1,83 @@
+/* Layout and the WebGL surface only. Vlak components own the interface paint. */
+body:has(.inspiration-page) .logo-wrap,
+body:has(.inspiration-page) .corner-nav,
+body:has(.inspiration-page) .site-crumb-bar,
+body:has(.inspiration-page) .site-footer,
+body:has(.inspiration-page) .settings,
+body:has(.inspiration-page) .nav-toggle,
+body:has(.inspiration-page) .nav-panel { display: none; visibility: hidden; pointer-events: none; }
+html:has(.inspiration-page)::before,
+html:has(.inspiration-page)::after { display: none; }
+.inspiration-surface { min-width: 0; background: var(--bg); color: var(--text); isolation: isolate; }
+.inspiration-page { min-height: 100svh; padding-inline: 40px; }
+.inspiration-header { display: flex; align-items: center; gap: 40px; min-height: 88px; border-bottom: 1px solid var(--divider); }
+.inspiration-brand, .inspiration-back { display: inline-flex; align-items: center; gap: 12px; min-height: var(--hit); }
+.inspiration-brand svg { width: 24px; height: 24px; }
+.inspiration-back { margin-left: auto; }
+.inspiration-intro { display: flex; justify-content: space-between; align-items: end; gap: 20px; padding-block: 40px 24px; }
+.inspiration-intro h1 { margin: 0; font-size: clamp(2.5rem, 5vw, 4.75rem); line-height: 1.05; letter-spacing: -.05em; }
+.inspiration-intro-copy { max-width: 40ch; }
+.inspiration-stage { position: relative; height: clamp(408px, 40vw, 612px); overflow: hidden; background: #ededed; }
+[data-lighting="gallery"] .inspiration-stage { background: #222; }
+.inspiration-canvas { position: absolute; inset: 0; opacity: 0; transition: opacity var(--duration-deliberate); touch-action: pan-y; cursor: grab; }
+[data-ready="true"] .inspiration-canvas { opacity: 1; }
+.inspiration-canvas:active { cursor: grabbing; }
+.inspiration-canvas canvas { display: block; width: 100%; height: 100%; }
+.inspiration-stage-top { position: absolute; z-index: 2; top: 20px; left: 20px; right: 20px; display: flex; align-items: center; justify-content: space-between; gap: 12px; pointer-events: none; }
+.inspiration-stage-paper { background: var(--bg); }
+.inspiration-stage :is(button, input) { pointer-events: auto; }
+.inspiration-stage-arrow { position: absolute; z-index: 3; top: 50%; transform: translateY(-50%); }
+.inspiration-stage-arrow-prev { left: 20px; }
+.inspiration-stage-arrow-next { right: 20px; }
+.inspiration-fallback { position: absolute; inset: 80px; z-index: 1; display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: center; text-align: center; }
+.inspiration-fallback img { max-height: 80%; max-width: 75%; object-fit: contain; }
+.inspiration-stage-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-block: 20px; border-bottom: 1px solid var(--divider); }
+.inspiration-caption { display: grid; grid-template-columns: repeat(3, 1fr); align-items: start; gap: 20px; padding-block: 24px; min-height: 136px; }
+.inspiration-caption-description { max-width: 45ch; }
+.inspiration-caption-kind { justify-self: end; }
+.inspiration-controls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 20px; padding-block: 0 20px; }
+.inspiration-zoom { display: flex; align-items: center; gap: 16px; min-height: var(--hit); }
+.inspiration-zoom-slider { width: 120px; }
+.inspiration-zoom output { min-width: 4ch; font-variant-numeric: tabular-nums; }
+.inspiration-collection-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-bottom: 16px; }
+.inspiration-filmstrip { position: relative; display: grid; grid-auto-flow: column; grid-auto-columns: 204px; gap: 1px; overflow-x: auto; border-block: 1px solid var(--divider); background: var(--divider); scrollbar-width: thin; scroll-snap-type: x mandatory; }
+.inspiration-thumbnail-cell { background: var(--bg); scroll-snap-align: start; }
+.inspiration-embed .inspiration-filmstrip { margin-inline: -20px; grid-auto-columns: 100%; }
+.inspiration-thumbnail-meta { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.inspiration-thumbnail-image { height: 100px; display: flex; align-items: center; justify-content: center; margin-block: 8px; }
+.inspiration-thumbnail-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.inspiration-notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding-top: 24px; }
+.inspiration-notes a { align-self: start; justify-self: end; display: inline-flex; align-items: center; gap: 12px; min-height: var(--hit); }
+.inspiration-page .inspiration-notes { padding-bottom: 40px; }
+.inspiration-embed { width: 100%; }
+@media (min-width: 1700px) { .inspiration-page { padding-inline: max(40px, calc((100vw - 1600px) / 2)); } }
+@media (min-width: 481px) { .inspiration-embed .inspiration-filmstrip { grid-auto-columns: calc((100% - 1px) / 2); } }
+@media (min-width: 816px) { .inspiration-embed .inspiration-filmstrip { grid-auto-columns: calc((100% - 3px) / 4); } }
+@media (min-width: 1224px) { .inspiration-embed .inspiration-filmstrip { grid-auto-columns: calc((100% - 5px) / 6); } }
+@media (max-width: 1000px) {
+  .inspiration-page { padding-inline: 20px; }
+  .inspiration-caption, .inspiration-notes { grid-template-columns: repeat(2, 1fr); }
+  .inspiration-caption-kind { justify-self: start; }
+  .inspiration-notes a { grid-column: 2; justify-self: start; }
+  .inspiration-gesture { display: none; }
+}
+@media (max-width: 640px) {
+  .inspiration-header { min-height: 72px; }
+  .inspiration-location { display: none; }
+  .inspiration-intro { display: grid; padding-block: 24px; }
+  .inspiration-stage { height: 408px; }
+  .inspiration-stage-top { top: 12px; left: 12px; right: 12px; }
+  .inspiration-stage-arrow-prev { left: 8px; }
+  .inspiration-stage-arrow-next { right: 8px; }
+  .inspiration-fallback { inset: 80px 50px; }
+  .inspiration-fallback img { max-width: 100%; }
+  .inspiration-stage-bottom > :first-child { flex: 1 1 100%; }
+  .inspiration-stage-bottom .inspiration-rotation { margin-left: auto; }
+  .inspiration-caption, .inspiration-notes { grid-template-columns: 1fr; gap: 16px; }
+  .inspiration-controls > :first-child { flex: 1 1 100%; }
+  .inspiration-zoom { width: 100%; }
+  .inspiration-zoom-slider { flex: 1; }
+  .inspiration-notes a { grid-column: 1; }
+}
+@media (prefers-reduced-motion: reduce) { .inspiration-canvas { transition: none; } }
+@media (forced-colors: active) { .inspiration-canvas { forced-color-adjust: none; } }

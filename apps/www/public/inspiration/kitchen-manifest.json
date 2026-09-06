@@ -1,0 +1,18 @@
+{
+  "id": "kitchen",
+  "file": "kitchen.glb",
+  "dimensions": {
+    "x": 3.3,
+    "y": 1.876,
+    "z": 1.06
+  },
+  "bytes": 678064,
+  "meshes": 11,
+  "interpretation": "Original monochrome study after the complete 1938 Piet Zwart Bruynzeel kitchen arrangement. Scale and materials are interpretive, not archival measurements.",
+  "referenceImage": "/about/zwart-bruynzeel.webp",
+  "sources": [
+    "https://www.kunstmuseum.nl/nl/tentoonstellingen/piet-zwart-1885-1977",
+    "https://webwinkel.bruynzeelkeukens.nl/geschiedenis",
+    "https://kennis.cultureelerfgoed.nl/index.php/Keukens"
+  ]
+}

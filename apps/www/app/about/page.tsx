@@ -3,10 +3,10 @@ import type { ReactNode } from "react";
 import { CopyControl } from "@/components/code-block";
 import { sx } from "@/lib/sx";
 import { DOOR } from "../specimen";
+import { Gallery } from "../inspiration/gallery";
+import "../inspiration/inspiration.css";
 import {
   era,
-  featured,
-  field,
   history,
   lead,
   license,
@@ -19,6 +19,7 @@ import {
 } from "./facts";
 import { AboutNotes } from "./about-notes";
 import { about } from "./about.stylex";
+import { referenceCaptions } from "./reference-captions";
 import "./about.css";
 
 export const metadata: Metadata = {
@@ -49,14 +50,6 @@ function CopyP({ children }: { children: ReactNode }) {
 
 function Mark({ children }: { children: ReactNode }) {
   return <p {...sx("field-mark", about.mark)}>{children}</p>;
-}
-
-function WorkStill({ src, alt }: { src: string; alt: string }) {
-  return (
-    <div {...sx("field-work", about.work)}>
-      <img src={src} alt={alt} loading="lazy" decoding="async" {...sx("", about.workImg)} />
-    </div>
-  );
 }
 
 export default function AboutPage() {
@@ -205,70 +198,10 @@ export default function AboutPage() {
           </Copy>
         </section>
 
-        {featured.map((figure) => (
-          <section
-            key={figure.id}
-            {...sx(
-              `field-cell field-cell-${figure.id}${figure.work ? " field-cell-has-work" : ""}`,
-              about.cell,
-              figure.work ? about.cellWork : null,
-            )}
-            aria-label={figure.name}
-          >
-            {figure.work ? <WorkStill src={figure.work.src} alt={figure.work.alt} /> : null}
-            {figure.work ? (
-              <div {...sx("field-matter", about.matter)}>
-                <Kicker>
-                  {figure.years} · {figure.place}
-                </Kicker>
-                <h2 {...sx("field-name field-name-feature", about.name, about.nameFeature)}>{figure.name}</h2>
-                <Mark>{figure.mark}</Mark>
-              </div>
-            ) : (
-              <>
-                <Kicker>
-                  {figure.years} · {figure.place}
-                </Kicker>
-                <h2 {...sx("field-name field-name-feature", about.name, about.nameFeature)}>{figure.name}</h2>
-                <Mark>{figure.mark}</Mark>
-              </>
-            )}
-          </section>
-        ))}
-
-        {field.map((entry, i) => {
-          const work = "work" in entry ? entry.work : undefined;
-          return (
-            <section
-              key={entry.name}
-              {...sx(
-                `field-cell field-cell-n${String(i + 1).padStart(2, "0")}${work ? " field-cell-has-work" : ""}`,
-                about.cell,
-                work ? about.cellWork : null,
-              )}
-              aria-label={entry.name}
-            >
-              {work ? <WorkStill src={work.src} alt={work.alt} /> : null}
-              {work ? (
-                <div {...sx("field-matter", about.matter)}>
-                  <Kicker>
-                    {entry.years} · {entry.place}
-                  </Kicker>
-                  <h2 {...sx("field-name", about.name)}>{entry.name}</h2>
-                  <Mark>{entry.mark}</Mark>
-                </div>
-              ) : (
-                <>
-                  <Kicker>
-                    {entry.years} · {entry.place}
-                  </Kicker>
-                  <h2 {...sx("field-name", about.name)}>{entry.name}</h2>
-                  <Mark>{entry.mark}</Mark>
-                </>
-              )}
-            </section>
-          );
-        })}
+        <section id="reference-collection" {...sx("field-cell field-cell-inspiration", about.cell, about.cellStart)} aria-label="Reference collection">
+          <Kicker>Reference collection</Kicker>
+          <Gallery embedded captions={referenceCaptions} />
+        </section>
 
         <section {...sx("field-cell field-cell-faq", about.cell, about.cellStart)} aria-labelledby="notes-heading">
           <Kicker id="notes-heading">Practical notes</Kicker>
