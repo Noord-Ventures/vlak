@@ -34,3 +34,15 @@ ABOUT_URL=http://localhost:3101/about/ node apps/www/scripts/e2e-about-inspirati
 ```
 
 The browser suite uses installed Chrome by default; `PLAYWRIGHT_EXECUTABLE_PATH` can select another Chromium executable. It checks all 22 works, coverage of every About reference, Vlak controls, cyclic navigation and focus, keyboard selection of the kitchen, pointer browse/turn, rotation and lighting pixel changes, scale/reset, phone layout and target sizes, axe accessibility, reduced motion, and WebGL failure/retry.
+
+## Social film
+
+`scripts/render-inspiration-video.mjs` renders the actual scene on a private local server without any site UI. The 27.5-second edit visits all 22 works in carousel order, holds longer on the spatial models, and ends with a frame-wide **Vlak.dev** overlay in the site's Inter 580. Simulation runs in exact 60 Hz steps and exports 30 fps frames, so machine capture speed does not change the motion.
+
+```sh
+# Requires Chrome and FFmpeg with libx264. No website server is needed.
+VLAK_FFMPEG=/path/to/ffmpeg node apps/www/scripts/render-inspiration-video.mjs --proof
+VLAK_FFMPEG=/path/to/ffmpeg node apps/www/scripts/render-inspiration-video.mjs
+```
+
+The proof is 960×540; the master is 1920×1080, H.264 High, yuv420p, Rec.709, silent MP4 with fast start. The maximum video rate is 10 Mbps. MP4, cover, sampled frames, and an encoding manifest go to `~/Movies/Vlak`; set `VLAK_VIDEO_OUTPUT` to change that directory. The renderer uses the existing TypeScript and Playwright dependencies and does not change the application scene.
