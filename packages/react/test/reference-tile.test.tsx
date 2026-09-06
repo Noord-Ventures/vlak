@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -22,7 +22,7 @@ describe("Reference carousel tiles", () => {
     const tile = screen.getByRole("button", { name: "1. Chair no. 35, Paul Schuitema" });
     expect(tile.id).toBe("study-select-0");
     expect(tile.getAttribute("data-work-id")).toBe(study.id);
-    for (const content of [caption.name, "1897–1973 · Rotterdam", "Chair no. 35, 1934", study.description, "A construction kept visible.", "Spatial study", study.material, study.kind]) {
+    for (const content of [caption.name, "1897–1973 · Rotterdam", "Chair no. 35, 1934", study.description, "A construction kept visible.", "Spatial study", study.material, study.kind, "About this work", study.relation]) {
       expect(tile.contains(screen.getByText(content))).toBe(true);
     }
     expect(screen.getAllByText("Chair no. 35, 1934")).toHaveLength(1);
@@ -67,5 +67,43 @@ describe("Reference carousel tiles", () => {
     const { container } = render(<ReferenceTile study={study} caption={alternateCaption} index={0} selected={false} onSelect={() => {}} />);
     expect(screen.getAllByText(`${study.title}, ${study.year}`)).toHaveLength(1);
     expect(container.querySelector(".reference-tile-caption-note")).toBeNull();
+  });
+
+  it("keeps every work's relation and source in its own cell without nesting the link in the toggle", () => {
+    render(studies.map((item, index) => <ReferenceTile key={item.id} study={item} index={index} selected={index === 0} onSelect={() => {}} />));
+    for (const [index, item] of studies.entries()) {
+      const tile = document.getElementById(`study-select-${index}`)!;
+      const cell = tile.closest<HTMLElement>(".inspiration-thumbnail-cell")!;
+      const source = within(cell).getByRole("link", { name: item.sourceLabel });
+      expect(tile.querySelector(".reference-tile-relation")?.textContent).toContain(item.relation);
+      expect(tile.contains(source)).toBe(false);
+      expect(source.classList.contains("reference-tile-source")).toBe(true);
+      expect(source.getAttribute("href")).toBe(item.source);
+      expect(source.getAttribute("target")).toBe("_blank");
+      expect(source.getAttribute("rel")).toMatch(/(?:^|\s)(?:noreferrer|noopener)(?:\s|$)/);
+      expect(cell.querySelectorAll("a")).toHaveLength(1);
+    }
+  });
+
+  it("gives the source its own tab stop and does not select the work when the link activates", async () => {
+    const onSelect = vi.fn();
+    render(<>
+      <ReferenceTile study={study} index={0} selected={false} onSelect={onSelect} />
+      <ReferenceTile study={studies[1]!} index={1} selected onSelect={onSelect} />
+    </>);
+    const tile = document.getElementById("study-select-0")!;
+    const source = screen.getByRole("link", { name: study.sourceLabel });
+    source.addEventListener("click", (event) => event.preventDefault());
+    tile.focus();
+    await userEvent.tab();
+    expect(document.activeElement).toBe(source);
+    await userEvent.keyboard("{Enter}");
+    await userEvent.click(source);
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(tile.getAttribute("aria-pressed")).toBe("false");
+    await userEvent.tab();
+    expect(document.activeElement).toBe(document.getElementById("study-select-1"));
+    await userEvent.tab({ shift: true });
+    expect(document.activeElement).toBe(source);
   });
 });

@@ -75,6 +75,9 @@ try {
     await open(desktop);
     assert.equal(await desktop.locator(".inspiration-thumbnail").count(), studies.length);
     assert.equal(await desktop.locator(".inspiration-caption").count(), 0, "work metadata belongs in the tiles, not a separate caption row");
+    assert.equal(await desktop.locator(".inspiration-notes").count(), 0, "relations and sources belong in their own tiles");
+    assert.equal(await desktop.locator(".inspiration-collection-nav").count(), 0, "the extra work-count and jump-selector row is redundant");
+    assert.equal(await desktop.getByRole("combobox", { name: "Jump to a work", exact: true }).count(), 0);
     await stageControls(desktop);
     for (let i = 0; i < studies.length; i++) {
       await desktop.locator(`#study-select-${i}`).click();
@@ -90,6 +93,12 @@ try {
       assert.equal(await tile.locator(".reference-tile-description").innerText(), studies[i].description);
       assert.equal(await tile.locator(".reference-tile-kind").innerText(), studies[i].model ? "Spatial study" : "From the archive");
       assert.equal(await tile.locator(".reference-tile-material").innerText(), studies[i].material);
+      assert.ok((await tile.locator(".reference-tile-relation").innerText()).includes(studies[i].relation));
+      const source = tile.locator("..").locator("a.reference-tile-source");
+      assert.equal(await source.count(), 1);
+      assert.equal(await source.innerText(), studies[i].sourceLabel);
+      assert.equal(await source.getAttribute("href"), studies[i].source);
+      assert.equal(await tile.locator("a").count(), 0, "a source link must not be inside a selection button");
       if (["bruynzeel-kitchen", "gertrud-kurz", "schiphol-signage", "vught-memorial", "sdap-nvv"].includes(studies[i].id)) {
         await desktop.locator(".inspiration-canvas canvas").screenshot({ path: `${screenshots}/${studies[i].id}.png` });
       }
@@ -118,14 +127,33 @@ try {
     }
     assert.notEqual(await selected(desktop).evaluate((el) => getComputedStyle(el).outlineStyle), "none");
   });
-  await check("Vlak quick selection reaches the full kitchen by keyboard", async () => {
-    const chooser = desktop.getByRole("combobox", { name: "Jump to a work" });
-    await chooser.focus();
-    await desktop.keyboard.press("b");
+  await check("tile keyboard activation reaches the full kitchen without a duplicate selector", async () => {
+    const kitchen = studies.findIndex((study) => study.id === "bruynzeel-kitchen");
+    await desktop.locator(`#study-select-${kitchen}`).focus();
     await desktop.keyboard.press("Enter");
     await ready(desktop);
-    assert.equal(await selected(desktop).getAttribute("id"), `study-select-${studies.findIndex((study) => study.id === "bruynzeel-kitchen")}`);
+    assert.equal(await selected(desktop).getAttribute("id"), `study-select-${kitchen}`);
     await desktop.locator("#study-select-0").click();
+    await ready(desktop);
+  });
+  await check("source links activate independently and retain native keyboard behavior", async () => {
+    const tile = desktop.locator("#study-select-1");
+    const source = tile.locator("..").locator("a.reference-tile-source");
+    await source.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault()));
+    await tile.focus();
+    await desktop.keyboard.press("Tab");
+    assert.equal(await source.evaluate((element) => document.activeElement === element), true);
+    await desktop.keyboard.press("Enter");
+    await source.click();
+    for (const key of ["ArrowRight", "ArrowLeft", "Home", "End"]) {
+      await desktop.keyboard.press(key);
+      assert.equal(await source.evaluate((element) => document.activeElement === element), true, `${key} must not be intercepted on a source link`);
+      assert.equal(await selected(desktop).getAttribute("id"), "study-select-0", "activating a source never selects its work");
+    }
+    await desktop.keyboard.press("Tab");
+    assert.equal(await desktop.locator("#study-select-2").evaluate((element) => document.activeElement === element), true);
+    await desktop.locator("#study-select-0").focus();
+    await desktop.keyboard.press("Home");
     await ready(desktop);
   });
   await check("drag browsing changes the selected work", async () => {
@@ -199,7 +227,7 @@ try {
     await open(phone);
     await stageControls(phone);
     assert.equal(await phone.evaluate(() => document.documentElement.scrollWidth <= innerWidth), true);
-    const clippedMetadata = await phone.locator(".inspiration-thumbnail [class*='reference-tile-']").evaluateAll((elements) => elements.filter((element) => {
+    const clippedMetadata = await phone.locator(".inspiration-thumbnail-cell [class*='reference-tile-']").evaluateAll((elements) => elements.filter((element) => {
       const style = getComputedStyle(element);
       return style.display === "none" || style.visibility === "hidden" || style.textOverflow === "ellipsis" || (element.clientHeight > 0 && element.scrollHeight > element.clientHeight + 1 && style.overflowY === "hidden");
     }).map((element) => element.textContent));

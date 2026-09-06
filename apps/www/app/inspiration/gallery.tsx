@@ -1,6 +1,6 @@
 "use client";
 
-import { Badge, Button, ButtonGroup, CardBody, CardLabel, Icon, Label, Link, Select, Slider, Toggle } from "@noorddev/vlak-react";
+import { Badge, Button, ButtonGroup, CardBody, CardLabel, Icon, Label, Link, Slider, Toggle } from "@noorddev/vlak-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VlakMark } from "@/components/vlak-mark";
 import type { ReferenceCaption } from "../about/reference-captions";
@@ -175,11 +175,8 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
           </div>
         </div>
 
-        <div className="inspiration-collection-nav">
-          <CardLabel>{studies.length} works</CardLabel>
-          <Select aria-label="Jump to a work" value={study.id} options={studies.map((item) => ({ value: item.id, label: `${item.title} · ${item.artist}` }))} onValueChange={(id) => select(studies.findIndex((item) => item.id === id))} style={{ width: "min(100%, 24rem)", minWidth: 0 }} />
-        </div>
         <div className="inspiration-filmstrip" role="group" aria-label="Choose a work" onKeyDown={(event) => {
+          if (!(event.target instanceof HTMLElement) || !event.target.closest(".inspiration-thumbnail")) return;
           let next: number;
           if (event.key === "ArrowRight") next = wrapIndex(active + 1, studies.length);
           else if (event.key === "ArrowLeft") next = wrapIndex(active - 1, studies.length);
@@ -194,11 +191,6 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
         </div>
       </section>
 
-      <footer className="inspiration-notes">
-        <CardLabel>About this work</CardLabel>
-        <CardBody>{study.relation}</CardBody>
-        <Link href={study.source} target="_blank" rel="noreferrer">{study.sourceLabel} <Icon name="external" /></Link>
-      </footer>
     </Container>
   );
 }

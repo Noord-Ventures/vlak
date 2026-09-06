@@ -33,6 +33,9 @@ try {
   const customControls = await page.locator(".inspiration-embed button, .inspiration-embed input, .inspiration-embed a").evaluateAll((elements) => elements.filter((el) => !Array.from(el.classList).some((name) => name.startsWith("rs-"))).map((el) => el.outerHTML));
   assert.deepEqual(customControls, [], "gallery controls must use Vlak components");
   assert.equal(await page.locator(".inspiration-caption").count(), 0, "work metadata belongs in the tiles, not a separate caption row");
+  assert.equal(await page.locator(".inspiration-notes").count(), 0, "the relation and source belong to each tile, not a gallery footer");
+  assert.equal(await page.locator(".inspiration-collection-nav").count(), 0, "the extra work-count and jump-selector row is redundant");
+  assert.equal(await page.getByRole("combobox", { name: "Jump to a work", exact: true }).count(), 0);
   for (const [index, study] of studies.entries()) {
     const tile = page.locator(`#study-select-${index}`);
     assert.equal(await tile.getAttribute("data-work-id"), study.id);
@@ -43,6 +46,12 @@ try {
     assert.equal(await tile.locator(".reference-tile-description").innerText(), study.description);
     assert.equal(await tile.locator(".reference-tile-kind").innerText(), study.model ? "Spatial study" : "From the archive");
     assert.equal(await tile.locator(".reference-tile-material").innerText(), study.material);
+    assert.ok((await tile.locator(".reference-tile-relation").innerText()).includes(study.relation));
+    const source = tile.locator("..").locator("a.reference-tile-source");
+    assert.equal(await source.count(), 1);
+    assert.equal(await source.innerText(), study.sourceLabel);
+    assert.equal(await source.getAttribute("href"), study.source);
+    assert.equal(await tile.locator("a").count(), 0, "source links must not be nested in the selection button");
   }
   assert.equal(await page.locator("#study-select-0 .reference-tile-artist").innerText(), "Paul Schuitema");
   assert.equal(await page.locator("#study-select-0 .reference-tile-dates").innerText(), "1897–1973 · Rotterdam");
@@ -110,6 +119,24 @@ try {
   assert.equal(await stage.getAttribute("data-work-id"), studies[0].id);
   const isSelectedVisible = () => page.locator(".inspiration-thumbnail[aria-pressed='true']").evaluate((el) => { const item = el.getBoundingClientRect(); const rail = el.closest(".inspiration-filmstrip").getBoundingClientRect(); return item.left >= rail.left - 1 && item.right <= rail.right + 1; });
   assert.equal(await isSelectedVisible(), true, "rapid End/Home must reveal the current work");
+  const unselectedTile = page.locator("#study-select-1");
+  const source = unselectedTile.locator("..").locator("a.reference-tile-source");
+  await source.evaluate((element) => element.addEventListener("click", (event) => event.preventDefault()));
+  await unselectedTile.focus();
+  await page.keyboard.press("Tab");
+  assert.equal(await source.evaluate((element) => document.activeElement === element), true, "each source has a separate tab stop after its tile");
+  await page.keyboard.press("Enter");
+  await source.click();
+  for (const key of ["ArrowRight", "ArrowLeft", "Home", "End"]) {
+    await page.keyboard.press(key);
+    assert.equal(await source.evaluate((element) => document.activeElement === element), true, `the filmstrip does not intercept ${key} on a source link`);
+    assert.equal(await stage.getAttribute("data-work-id"), studies[0].id, "source activation never selects its work");
+  }
+  await page.keyboard.press("Tab");
+  assert.equal(await page.locator("#study-select-2").evaluate((element) => document.activeElement === element), true);
+  await page.locator("#study-select-0").focus();
+  await page.keyboard.press("Home");
+  await page.waitForTimeout(900);
   await cell.screenshot({ path: `${output}/about-gallery-daylight.png` });
   console.log("PASS full-width field, carousel navigation and keyboard focus");
 
@@ -134,7 +161,7 @@ try {
     await page.waitForTimeout(250);
     await page.waitForFunction(() => { const item = document.querySelector(".inspiration-thumbnail[aria-pressed='true']").getBoundingClientRect(); const rail = document.querySelector(".inspiration-filmstrip").getBoundingClientRect(); return item.left >= rail.left - 1 && item.right <= rail.right + 1; });
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `overflow at ${width}px`);
-    const small = await page.locator(".inspiration-embed button, .inspiration-embed input").evaluateAll((elements) => elements.filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 43.9 || r.height < 43.9); }).map((el) => ({ label: el.getAttribute("aria-label") ?? el.textContent, rect: el.getBoundingClientRect().toJSON() })));
+    const small = await page.locator(".inspiration-embed button, .inspiration-embed input, .inspiration-embed a").evaluateAll((elements) => elements.filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 43.9 || r.height < 43.9); }).map((el) => ({ label: el.getAttribute("aria-label") ?? el.textContent, rect: el.getBoundingClientRect().toJSON() })));
     assert.deepEqual(small, [], `targets at ${width}px`);
     const outsideStage = await stage.locator(".inspiration-controls, .inspiration-controls button, .inspiration-controls input, .inspiration-controls label, .inspiration-controls output, .inspiration-stage-bottom button, .inspiration-gesture").evaluateAll((elements) => elements.filter((element) => {
       const box = element.getBoundingClientRect();
@@ -142,7 +169,7 @@ try {
       return box.width === 0 || box.height === 0 || box.left < parent.left - 1 || box.top < parent.top - 1 || box.right > parent.right + 1 || box.bottom > parent.bottom + 1;
     }).map((element) => element.getAttribute("aria-label") ?? element.textContent));
     assert.deepEqual(outsideStage, [], `the complete object controls row, carousel controls and drag hint stay visible inside the scene at ${width}px`);
-    const clippedMetadata = await page.locator(".inspiration-thumbnail [class*='reference-tile-']").evaluateAll((elements) => elements.filter((element) => {
+    const clippedMetadata = await page.locator(".inspiration-thumbnail-cell [class*='reference-tile-']").evaluateAll((elements) => elements.filter((element) => {
       const style = getComputedStyle(element);
       return style.display === "none" || style.visibility === "hidden" || style.textOverflow === "ellipsis" || (element.clientHeight > 0 && element.scrollHeight > element.clientHeight + 1 && style.overflowY === "hidden");
     }).map((element) => element.textContent));

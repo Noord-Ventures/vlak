@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { CardLabel, Toggle } from "@noorddev/vlak-react";
+import { CardLabel, Icon, Link, Toggle } from "@noorddev/vlak-react";
 import type { ReferenceCaption } from "../about/reference-captions";
 import type { Study } from "./collection";
 import "./reference-tile.css";
@@ -61,7 +61,14 @@ export function ReferenceTile({ study, caption, index, selected, onSelect }: Ref
           <CardLabel className="reference-tile-kind" style={metaType}>{study.model ? "Spatial study" : "From the archive"}</CardLabel>
           <span className="reference-tile-material reference-tile-copy" style={bodyType}>{study.material}</span>
         </span>
+        <span className="reference-tile-context">
+          <CardLabel style={{ ...metaType, fontWeight: 600 }}>About this work</CardLabel>
+          <span className="reference-tile-relation reference-tile-copy" style={bodyType}>{study.relation}</span>
+        </span>
       </Toggle>
+      <Link className="reference-tile-source" href={study.source} target="_blank" rel="noreferrer">
+        <span>{study.sourceLabel}</span><Icon name="external" />
+      </Link>
     </div>
   );
 }

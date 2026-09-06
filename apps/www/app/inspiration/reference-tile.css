@@ -1,9 +1,15 @@
-/* Tile layout only; Vlak Toggle and CardLabel provide the interface paint. */
+/* Tile layout only; Vlak Toggle, CardLabel and Link provide the interface paint. */
+.inspiration-thumbnail-cell { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-width: 0; }
 .reference-tile-identity,
 .reference-tile-details,
-.reference-tile-materials { display: grid; min-width: 0; }
+.reference-tile-materials,
+.reference-tile-context { display: grid; min-width: 0; }
 .reference-tile-identity,
-.reference-tile-materials { gap: 4px; }
+.reference-tile-materials,
+.reference-tile-context { gap: 4px; }
 .reference-tile-details { gap: 12px; }
 .reference-tile-materials { margin-block-start: auto; }
 .reference-tile-copy { display: block; max-width: 66ch; }
+.reference-tile-source { display: flex; align-items: center; gap: 8px; min-height: var(--hit); margin: 0 20px 20px; padding-block: 8px; }
+.reference-tile-source span { flex: 1; min-width: 0; overflow-wrap: anywhere; text-wrap: pretty; }
+.reference-tile-source svg { flex-shrink: 0; }
