@@ -5,7 +5,7 @@ export const interfaces = [
     voice: "Keep long conversations easy to read and return to.",
     law: "A music discussion with a chat list, reading column, and reply inspector.",
     story:
-      "An assistant for discussing Deftones songs. A compact conversation list leaves room for longer replies, while an inspect pane lets readers revisit a response without losing their place. On mobile, the list and conversation become separate views.",
+      "An assistant for discussing music. A compact conversation list leaves room for longer replies, while an inspect pane lets readers revisit a response without losing their place. On mobile, the list and conversation become separate views.",
     what: "AI chat",
     type: "Chat list, conversation, reply inspector",
     module: "Grid system",
