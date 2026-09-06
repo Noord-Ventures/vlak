@@ -1,5 +1,5 @@
 /* ── error-summary: generated from packages/react/src/components/error-summary.tsx ── */
-.rs-error-summary{border-width:1px;border-style:solid;border-color:var(--text);padding:1rem;color:var(--text);outline-color:var(--text);outline-offset:2px}
-.rs-error-summary-title{font-size:1rem;font-weight:600;margin-block:0 0.5rem;line-height:1.45}
-.rs-error-summary-list{margin:0;padding-inline-start:1.25rem}
-.rs-error-summary-link{display:inline-flex;align-items:center;min-height:var(--hit);min-width:var(--hit);color:var(--text);text-decoration:underline;text-underline-offset:0.2em;line-height:1.45;outline-color:var(--text);outline-offset:2px}
+.rs-error-summary{box-sizing:border-box;min-width:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding:1rem;background-color:var(--bg);color:var(--text);outline-color:var(--text);outline-offset:2px}
+.rs-error-summary-title{font-size:0.875rem;font-weight:600;margin:0 0 0.25rem;line-height:1.45}
+.rs-error-summary-list{margin:0;padding:0;list-style:none}
+.rs-error-summary-link{display:inline-flex;align-items:center;min-height:var(--hit);min-width:var(--hit);max-width:100%;font-size:0.875rem;font-weight:400;color:var(--text);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.2em;line-height:1.45;overflow-wrap:anywhere;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}

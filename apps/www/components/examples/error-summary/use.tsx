@@ -1,9 +1,14 @@
 "use client";
 
-import { ErrorSummary, Input } from "@noorddev/vlak-react";
+import { ErrorSummary, Form, Input } from "@noorddev/vlak-react";
 import { useId } from "react";
 
 export function Use() {
   const emailId = useId();
-  return <div className="rs-use-stack"><ErrorSummary errors={[{ id: emailId, message: "Enter an email address" }]} /><Input id={emailId} label="Email" type="email" error="Enter an email address" /></div>;
+  return (
+    <Form onSubmit={(event) => event.preventDefault()}>
+      <ErrorSummary title="Check your details" errors={[{ id: emailId, message: "Enter an email address" }]} />
+      <Input id={emailId} label="Email" type="email" error="Enter an email address" />
+    </Form>
+  );
 }

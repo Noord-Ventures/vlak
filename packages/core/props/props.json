@@ -2039,6 +2039,13 @@
               "default": "\"Files\""
             },
             {
+              "name": "rootLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Files\"",
+              "description": "Visible root-folder name, separate from the accessible browser label."
+            },
+            {
               "name": "value",
               "type": "string",
               "required": false

@@ -119,6 +119,7 @@ import {
   Textarea,
   toast,
   Toaster,
+  Toggle,
   ToggleGroup,
   Tooltip,
   Popover,
@@ -772,14 +773,7 @@ export const demos: Record<string, () => React.ReactNode> = {
     />
   ),
   toggle: () => (
-    <ToggleGroup
-      options={[
-        { value: "left", label: "Left" },
-        { value: "center", label: "Center" },
-        { value: "right", label: "Right" },
-      ]}
-      defaultValue="left"
-    />
+    <Toggle defaultPressed>Bold</Toggle>
   ),
   popover: () => (
     <Popover trigger="Details">

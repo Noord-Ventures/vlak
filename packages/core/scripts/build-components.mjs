@@ -414,7 +414,6 @@ for (const [key, obj] of tables) {
 /* Structural rules for root classes that carry no paint of their own. */
 const STRUCTURAL = {
   collapsible: ".rs-disclosure{display:block}\n",
-  command: ".rs-command{display:flex;flex-direction:column;min-width:0}\n",
   "input-group": ".rs-input-group-end .rs-input-addon{border-inline-start-width:1px;border-inline-end-width:0}\n",
 };
 for (const [name, rule] of Object.entries(STRUCTURAL)) cssByComponent.set(name, (cssByComponent.get(name) ?? "") + rule);

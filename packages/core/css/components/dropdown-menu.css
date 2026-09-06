@@ -10,10 +10,12 @@
 .rs-menu.rs-context-menu-pin,.rs-menu-nested{position:fixed;z-index:var(--z-float);margin-top:0;min-width:10rem}
 .rs-menu.rs-date-picker-cal-menu{inset-inline-end:auto;padding:0.75rem}
 .rs-menu{position:absolute;top:100%;inset-inline-start:0;inset-inline-end:0;z-index:var(--z-float);max-height:15rem;overflow-y:auto}
-.rs-menu-item{box-sizing:border-box;display:block;padding-block:0.5625rem;padding-inline:0.75rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;border-width:0;border-radius:var(--radius-sm);width:100%;text-align:start;cursor:pointer;background-color:transparent;font-family:inherit;min-height:var(--hit);outline-width:0;outline-style:none;outline-color:HighlightText;outline-offset:-2px;forced-color-adjust:none}
+.rs-menu-item{box-sizing:border-box;display:flex;align-items:center;gap:0.5rem;padding-block:0.5625rem;padding-inline:0.75rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;border-width:0;border-radius:var(--radius-sm);width:100%;text-align:start;cursor:pointer;background-color:transparent;font-family:inherit;min-height:var(--hit);outline-width:0;outline-style:none;outline-color:HighlightText;outline-offset:-2px;forced-color-adjust:none}
 .rs-menu-item:focus-visible{color:var(--bg);background-color:var(--text)}
-@media (max-width: 640px){.rs-menu-item{display:flex;align-items:center;padding-block:0.75rem;padding-inline:0.875rem;font-size:var(--control-fs);min-height:var(--hit)}}
+@media (max-width: 640px){.rs-menu-item{padding-block:0.75rem;padding-inline:0.875rem;font-size:var(--control-fs);min-height:var(--hit)}}
 @media (forced-colors: active){.rs-menu-item{color:CanvasText;background-color:Canvas;outline-width:0;outline-style:none}.rs-menu-item:focus-visible{color:HighlightText;background-color:Highlight;outline-width:2px;outline-style:solid}}
+.rs-menu-item-indicator{display:inline-flex;align-items:center;justify-content:center;flex:0 0 1rem;width:1rem;height:1rem}
+.rs-menu-item-label{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 .rs-menu-item-active{background-color:var(--divider-subtle);color:var(--text)}
 .rs-menu-item-active:focus-visible{background-color:var(--text);color:var(--bg)}
 @media (forced-colors: active){.rs-menu-item-active{background-color:Highlight;color:HighlightText}}

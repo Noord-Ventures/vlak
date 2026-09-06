@@ -1,4 +1,5 @@
 /* ── command: generated from packages/react/src/components/command.tsx ── */
+.rs-command{display:flex;flex-direction:column;min-width:0}
 .rs-command-dialog{width:480px;max-width:90vw;padding:0;overflow:hidden}
 @media (max-width: 640px){.rs-command-dialog{width:100%;max-width:100%}}
 .rs-command-input{box-sizing:border-box;width:100%;border-width:0;border-bottom-width:1px;border-style:solid;border-color:var(--divider);background-color:transparent;font-family:inherit;font-size:0.875rem;letter-spacing:-0.01em;color:var(--text);padding-block:0.875rem;padding-inline:1rem;outline-width:0;outline-style:none;min-height:var(--hit)}
@@ -14,4 +15,3 @@
 .rs-command-hint{font-size:0.6875rem;color:var(--text-secondary)}
 .rs-command-empty{padding:1.25rem;text-align:center;font-size:0.8125rem;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-command-empty{padding:1.5rem;font-size:0.9375rem}}
-.rs-command{display:flex;flex-direction:column;min-width:0}

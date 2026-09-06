@@ -13,7 +13,8 @@ export const navigationAdditions: VlakComponent[] = [
       "rs-tree-view-selected",
       "rs-tree-view-disabled",
       "rs-tree-view-spacer",
-      "rs-tree-view-disclosure"
+      "rs-tree-view-disclosure",
+      "rs-tree-view-label"
     ],
     "css": [
       "components/tree-view.css"

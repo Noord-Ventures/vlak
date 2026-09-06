@@ -145,14 +145,9 @@ export const menuStyles = stylex.create({
   },
   item: {
     boxSizing: "border-box",
-    display: {
-      default: "block",
-      [mq.phone]: "flex",
-    },
-    alignItems: {
-      default: null,
-      [mq.phone]: "center",
-    },
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
     paddingBlock: {
       default: "0.5625rem",
       [mq.phone]: "0.75rem",
@@ -199,6 +194,19 @@ export const menuStyles = stylex.create({
     outlineColor: "HighlightText",
     outlineOffset: -2,
     forcedColorAdjust: "none",
+  },
+  itemIndicator: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flex: "0 0 1rem",
+    width: "1rem",
+    height: "1rem",
+  },
+  itemLabel: {
+    flex: "1 1 auto",
+    minWidth: 0,
+    overflowWrap: "anywhere",
   },
   itemActive: {
     backgroundColor: { default: vlak.dividerSubtle, ":focus-visible": vlak.ink, [mq.forcedColors]: "Highlight" },
@@ -380,6 +388,8 @@ export function MenuPanel({
   };
 
   let actionIndex = -1;
+  const indicator = rs(["rs-menu-item-indicator"], menuStyles.itemIndicator);
+  const label = rs(["rs-menu-item-label"], menuStyles.itemLabel);
   return (
     <div
       ref={panelRef}
@@ -426,9 +436,9 @@ export function MenuPanel({
             onFocus={() => { if (!item.disabled) setActive(current); }}
             onClick={() => choose(item)}
           >
-            {item.checked && <Icon name="check" />}
-            {item.label}
-            {item.items?.length ? <Icon name="chevron-right" style={{ float: "inline-end", marginInlineStart: 16 }} /> : null}
+            {item.checked !== undefined && <span {...indicator} aria-hidden="true">{item.checked ? <Icon name="check" size={16} /> : null}</span>}
+            <span {...label}>{item.label}</span>
+            {item.items?.length ? <span {...indicator} aria-hidden="true"><Icon name="chevron-right" size={16} /></span> : null}
           </button>
         );
       })}

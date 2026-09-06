@@ -424,6 +424,7 @@ export const mediaAdditions: VlakComponent[] = [
     ],
     "a11y": [
       "Folder tree, breadcrumbs, search, and file collection each have names.",
+      "label names the region and its landmarks; rootLabel supplies the visible root folder name.",
       "Selected files use aria-pressed and a full surface change.",
       "Files can be opened by an explicit keyboard-operable action as well as double click."
     ],
@@ -435,7 +436,11 @@ export const mediaAdditions: VlakComponent[] = [
     "classes": [
       "rs-file-browser",
       "rs-file-browser-toolbar",
+      "rs-file-browser-breadcrumbs",
       "rs-file-browser-path",
+      "rs-file-browser-crumb-item",
+      "rs-file-browser-crumb",
+      "rs-file-browser-crumb-current",
       "rs-file-browser-action",
       "rs-file-browser-body",
       "rs-file-browser-tree",
@@ -462,7 +467,8 @@ export const mediaAdditions: VlakComponent[] = [
     "category": "patterns",
     "registryDependencies": [
       "native-select",
-      "sortable-list"
+      "button",
+      "icons"
     ],
     "snippet": "<div class=\"rs-kanban-board\" role=\"region\" aria-label=\"Board\"><div class=\"rs-kanban-columns\"><section class=\"rs-kanban-column\"><h3 class=\"rs-kanban-heading\">In progress</h3><p class=\"rs-kanban-card\">Review the proof</p></section></div></div>",
     "example": "import { KanbanBoard } from \"@noorddev/vlak-react\";\n\n<KanbanBoard columns={[{ id: \"todo\", label: \"To do\" }, { id: \"doing\", label: \"In progress\" }, { id: \"done\", label: \"Done\" }]} value={cards} onValueChange={setCards} />",
@@ -500,10 +506,17 @@ export const mediaAdditions: VlakComponent[] = [
       "rs-kanban-columns",
       "rs-kanban-column",
       "rs-kanban-heading",
+      "rs-kanban-list",
       "rs-kanban-card",
+      "rs-kanban-card-header",
       "rs-kanban-title",
       "rs-kanban-detail",
-      "rs-kanban-status"
+      "rs-kanban-controls",
+      "rs-kanban-destination",
+      "rs-kanban-reorder",
+      "rs-kanban-action",
+      "rs-kanban-status",
+      "rs-kanban-help"
     ],
     "css": [
       "components/kanban-board.css"

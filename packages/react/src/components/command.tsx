@@ -27,6 +27,11 @@ export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const styles = stylex.create({
+  root: {
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+  },
   palette: {
     width: {
       default: 480,
@@ -254,6 +259,7 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
     }
   };
 
+  const root = rs(["rs-command", className], styles.root);
   const input = rs(["rs-command-input"], styles.input);
   const list = rs(["rs-command-list"], styles.list);
   const empty = rs(["rs-command-empty"], styles.empty);
@@ -262,7 +268,7 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
 
   let cursor = -1;
   return (
-    <div ref={ref} className={className} style={style} {...props}>
+    <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>
       <input
         id={inputId}
         className={input.className}
@@ -363,7 +369,7 @@ export const CommandDialog = React.forwardRef<HTMLDialogElement, CommandDialogPr
       onClose={onClose}
       aria-label={ariaLabelledBy ? undefined : ariaLabel}
       aria-labelledby={ariaLabelledBy}
-      className={["rs-command", "rs-command-dialog", className].filter(Boolean).join(" ")}
+      className={["rs-command-dialog", className].filter(Boolean).join(" ")}
       extraStyles={[styles.palette]}
     >
       {open && <Command onDone={onClose} {...props} />}

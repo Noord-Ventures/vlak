@@ -8,6 +8,7 @@ import {
   DescriptionList,
   DiffViewer,
   ErrorSummary,
+  Form,
   Input,
   JSONViewer,
   Metric,
@@ -18,10 +19,10 @@ import {
 function ErrorSummaryPreview() {
   const emailId = useId();
   return (
-    <div>
+    <Form onSubmit={(event) => event.preventDefault()}>
       <ErrorSummary title="Check this field" errors={[{ id: emailId, message: "Enter your email address" }]} />
       <Input id={emailId} label="Email" type="email" aria-invalid="true" />
-    </div>
+    </Form>
   );
 }
 

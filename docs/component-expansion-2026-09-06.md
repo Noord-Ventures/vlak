@@ -14,13 +14,25 @@ boundary and every component page at 390px.
   for right-to-left layouts. Toggle segments use 20px horizontal padding.
 - Menus: one separator, no row borders, rounded full-surface keyboard focus.
   Menubar has compact text triggers and correct anchoring when switching menus.
+  Checked and unchecked menu items reserve one aligned inline indicator slot.
+- Toggle previews one persistent button, not a Toggle Group. Closed command
+  dialogs no longer inherit the inner panel's flex display or paint stray lines.
 - Theme toggle: filled Vlak sun/moon at 24px, corrected shared crescent geometry,
   and a 44px target. Mobile breadcrumbs have space on both sides of the slash.
+- Tag remove buttons sit inside a 4px inset without shrinking their 44px target.
+  Error summaries use quieter rounded framing, regular-weight action text, and
+  proper separation from the field they link to.
+- File-browser navigation uses compact unboxed breadcrumbs, single-line tree
+  labels, and a layout that stacks when its container is narrow. Visible root
+  names are independent of accessible landmark labels.
+- Kanban cards have a dedicated title/handle row and aligned destination and
+  reorder controls. Dragging and keyboard alternatives retain focus and announce
+  accepted moves; narrow boards scroll inside their own container.
 - Distinct preview landmarks, instance-specific nested file/detail labels, and
   readable notification details address the initial deployment's accessibility
   failures.
 
-Local verification: 590 unit/integrity tests pass; package typechecks, lint,
+Local verification: 611 unit/integrity tests pass; package typechecks, lint,
 production site build, size budgets, and React 18/19 tarball consumer checks pass.
 In-browser checks covered all forty raw previews at 390px with no page overflow,
 plus optical and keyboard checks for the reported controls. CI/deployment status

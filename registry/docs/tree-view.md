@@ -87,7 +87,7 @@ Forwards `ref` to the `HTMLUListElement`.
 
 ## Classes
 
-`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`
+`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`, `rs-tree-view-label`
 
 ## Dependencies
 

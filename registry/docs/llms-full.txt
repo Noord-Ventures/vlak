@@ -1440,7 +1440,7 @@ Forwards `ref` to the `HTMLUListElement`.
 
 ## Classes
 
-`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`
+`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`, `rs-tree-view-label`
 
 ## Dependencies
 
@@ -4222,6 +4222,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | --- | --- | --- | --- |
 | `entries` (required) | `BrowserEntry[]` |  |  |
 | `label` | `string` | `"Files"` |  |
+| `rootLabel` | `string` | `"Files"` | Visible root-folder name, separate from the accessible browser label. |
 | `value` | `string` |  |  |
 | `defaultValue` | `string` |  |  |
 | `onValueChange` | `(id: string) => void` |  |  |
@@ -4240,12 +4241,13 @@ Forwards `ref` to the `HTMLDivElement`.
 ## Accessibility
 
 - Folder tree, breadcrumbs, search, and file collection each have names.
+- label names the region and its landmarks; rootLabel supplies the visible root folder name.
 - Selected files use aria-pressed and a full surface change.
 - Files can be opened by an explicit keyboard-operable action as well as double click.
 
 ## Classes
 
-`rs-file-browser`, `rs-file-browser-toolbar`, `rs-file-browser-path`, `rs-file-browser-action`, `rs-file-browser-body`, `rs-file-browser-tree`, `rs-file-browser-content`, `rs-file-browser-list`, `rs-file-browser-grid`, `rs-file-browser-name`, `rs-file-browser-meta`, `rs-file-browser-empty`, `rs-file-browser-view-active`, `rs-file-browser-item`, `rs-file-browser-tile`, `rs-file-browser-selected`
+`rs-file-browser`, `rs-file-browser-toolbar`, `rs-file-browser-breadcrumbs`, `rs-file-browser-path`, `rs-file-browser-crumb-item`, `rs-file-browser-crumb`, `rs-file-browser-crumb-current`, `rs-file-browser-action`, `rs-file-browser-body`, `rs-file-browser-tree`, `rs-file-browser-content`, `rs-file-browser-list`, `rs-file-browser-grid`, `rs-file-browser-name`, `rs-file-browser-meta`, `rs-file-browser-empty`, `rs-file-browser-view-active`, `rs-file-browser-item`, `rs-file-browser-tile`, `rs-file-browser-selected`
 
 ## Dependencies
 
@@ -4346,11 +4348,11 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-kanban-board`, `rs-kanban-columns`, `rs-kanban-column`, `rs-kanban-heading`, `rs-kanban-card`, `rs-kanban-title`, `rs-kanban-detail`, `rs-kanban-status`
+`rs-kanban-board`, `rs-kanban-columns`, `rs-kanban-column`, `rs-kanban-heading`, `rs-kanban-list`, `rs-kanban-card`, `rs-kanban-card-header`, `rs-kanban-title`, `rs-kanban-detail`, `rs-kanban-controls`, `rs-kanban-destination`, `rs-kanban-reorder`, `rs-kanban-action`, `rs-kanban-status`, `rs-kanban-help`
 
 ## Dependencies
 
-Registry dependencies: [native-select](native-select.md), [sortable-list](sortable-list.md).  
+Registry dependencies: [native-select](native-select.md), [button](button.md), [icons](icons.md).  
 React: `packages/react/src/components/kanban-board.tsx`  
 CSS: `packages/core/css/components/kanban-board.css`
 
@@ -8609,7 +8611,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`, `rs-menu-nested`
+`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-indicator`, `rs-menu-item-label`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`, `rs-menu-nested`
 
 ## Dependencies
 
@@ -8667,7 +8669,7 @@ npx shadcn add https://vlak.dev/r/toggle.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-toggle-group"><button class="rs-toggle" aria-pressed="true">Left</button><button class="rs-toggle" aria-pressed="false">Center</button><button class="rs-toggle" aria-pressed="false">Right</button></div>
+<button class="rs-toggle" aria-pressed="true">Bold</button>
 ```
 
 ## Example

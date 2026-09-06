@@ -13,6 +13,7 @@ import { FileUpload, type FileUploadContext } from "../src/components/file-uploa
 import { TransferList } from "../src/components/transfer-list";
 import { InlineEdit } from "../src/components/inline-edit";
 import { Rating } from "../src/components/rating";
+import { vlak } from "../src/tokens.stylex";
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 const options = [{ value: "a", label: "Alkmaar" }, { value: "b", label: "Bergen" }, { value: "c", label: "Castricum", disabled: true }];
@@ -110,6 +111,23 @@ describe("MultiSelect", () => {
 });
 
 describe("TagInput", () => {
+  it("insets the remove control inside the tag without shrinking its target", async () => {
+    render(<TagInput defaultValue={["Research"]} />);
+    const remove = screen.getByRole("button", { name: "Remove Research" });
+    const tag = getComputedStyle(remove.closest("li")!);
+    const button = getComputedStyle(remove);
+    expect(tag.paddingBlock).toMatch(/^0?\.25rem$/);
+    expect(tag.paddingInlineEnd).toMatch(/^0?\.25rem$/);
+    expect(tag.borderRadius).toBe(vlak.radiusSm);
+    expect(button.minWidth).toBe(vlak.hit);
+    expect(button.minHeight).toBe(vlak.hit);
+    expect(button.borderRadius).toBe(vlak.radiusSm);
+    expect(button.flexShrink).toBe("0");
+    remove.focus();
+    await userEvent.keyboard("{Enter}");
+    expect(screen.queryByRole("button", { name: "Remove Research" })).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("textbox", { name: "Tags" }));
+  });
   it("adds unique tags, parses pasted lists and offers keyboard removal", async () => {
     const user = userEvent.setup();
     const { container } = render(<form><TagInput name="tags" label="Tags" /></form>);

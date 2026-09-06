@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/toggle.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-toggle-group"><button class="rs-toggle" aria-pressed="true">Left</button><button class="rs-toggle" aria-pressed="false">Center</button><button class="rs-toggle" aria-pressed="false">Right</button></div>
+<button class="rs-toggle" aria-pressed="true">Bold</button>
 ```
 
 ## Example

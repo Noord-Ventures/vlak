@@ -2,8 +2,8 @@
 .rs-tag-input{display:grid;gap:0.5rem;min-width:0}
 .rs-tag-input-label{font-size:var(--control-label);color:var(--text-secondary)}
 .rs-tag-input-list{display:flex;flex-wrap:wrap;gap:0.5rem;padding:0;margin:0;list-style:none}
-.rs-tag-input-tag{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding-inline-start:0.75rem;font-size:var(--control-fs)}
-.rs-tag-input-remove{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding:0;border-width:0;flex-shrink:0}
+.rs-tag-input-tag{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding-block:0.25rem;padding-inline-start:0.75rem;padding-inline-end:0.25rem;font-size:var(--control-fs)}
+.rs-tag-input-remove{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding:0;border-width:0;border-radius:var(--radius-sm);flex-shrink:0}
 .rs-tag-input-row{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:start;min-width:0}
 .rs-tag-input-input{flex:1 1 8rem;min-width:var(--hit)}
 .rs-tag-input-add{width:auto;flex-shrink:0}

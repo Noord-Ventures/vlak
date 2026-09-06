@@ -851,7 +851,8 @@
             "rs-tree-view-selected",
             "rs-tree-view-disabled",
             "rs-tree-view-spacer",
-            "rs-tree-view-disclosure"
+            "rs-tree-view-disclosure",
+            "rs-tree-view-label"
           ],
           "snippet": "<ul class=\"rs-tree-view\" role=\"tree\" aria-label=\"Studies\"><li role=\"none\"><div class=\"rs-tree-view-item rs-tree-view-selected\" role=\"treeitem\" aria-selected=\"true\" aria-level=\"1\" tabindex=\"0\">Drive</div></li></ul>",
           "cssOnly": false,
@@ -3133,7 +3134,11 @@
           "classes": [
             "rs-file-browser",
             "rs-file-browser-toolbar",
+            "rs-file-browser-breadcrumbs",
             "rs-file-browser-path",
+            "rs-file-browser-crumb-item",
+            "rs-file-browser-crumb",
+            "rs-file-browser-crumb-current",
             "rs-file-browser-action",
             "rs-file-browser-body",
             "rs-file-browser-tree",
@@ -3184,6 +3189,7 @@
           ],
           "a11y": [
             "Folder tree, breadcrumbs, search, and file collection each have names.",
+            "label names the region and its landmarks; rootLabel supplies the visible root folder name.",
             "Selected files use aria-pressed and a full surface change.",
             "Files can be opened by an explicit keyboard-operable action as well as double click."
           ]
@@ -3212,7 +3218,8 @@
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
         "https://vlak.dev/r/native-select.json",
-        "https://vlak.dev/r/sortable-list.json",
+        "https://vlak.dev/r/button.json",
+        "https://vlak.dev/r/icons.json",
         "https://vlak.dev/r/vlak-lib.json"
       ],
       "dependencies": [
@@ -3230,16 +3237,24 @@
             "rs-kanban-columns",
             "rs-kanban-column",
             "rs-kanban-heading",
+            "rs-kanban-list",
             "rs-kanban-card",
+            "rs-kanban-card-header",
             "rs-kanban-title",
             "rs-kanban-detail",
-            "rs-kanban-status"
+            "rs-kanban-controls",
+            "rs-kanban-destination",
+            "rs-kanban-reorder",
+            "rs-kanban-action",
+            "rs-kanban-status",
+            "rs-kanban-help"
           ],
           "snippet": "<div class=\"rs-kanban-board\" role=\"region\" aria-label=\"Board\"><div class=\"rs-kanban-columns\"><section class=\"rs-kanban-column\"><h3 class=\"rs-kanban-heading\">In progress</h3><p class=\"rs-kanban-card\">Review the proof</p></section></div></div>",
           "cssOnly": false,
           "registryDependencies": [
             "native-select",
-            "sortable-list",
+            "button",
+            "icons",
             "vlak-lib"
           ],
           "aliases": [
@@ -6417,6 +6432,8 @@
             "rs-menu",
             "rs-dropdown",
             "rs-menu-item",
+            "rs-menu-item-indicator",
+            "rs-menu-item-label",
             "rs-menu-item-active",
             "rs-menu-item-disabled",
             "rs-menu-sep",
@@ -6537,7 +6554,7 @@
             "rs-toggle-grouped-on",
             "rs-toggle-pressed"
           ],
-          "snippet": "<div class=\"rs-toggle-group\"><button class=\"rs-toggle\" aria-pressed=\"true\">Left</button><button class=\"rs-toggle\" aria-pressed=\"false\">Center</button><button class=\"rs-toggle\" aria-pressed=\"false\">Right</button></div>",
+          "snippet": "<button class=\"rs-toggle\" aria-pressed=\"true\">Bold</button>",
           "cssOnly": false,
           "registryDependencies": [
             "vlak-lib"

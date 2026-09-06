@@ -92,7 +92,7 @@ const styles = stylex.create({
     },
     forcedColorAdjust: "none",
     transition: {
-      default: `transform ${vlak.duration} ${vlak.ease}`,
+      default: `inset-inline-start ${vlak.duration} ${vlak.ease}`,
       [mq.reduce]: "none",
     },
   },
@@ -101,10 +101,7 @@ const styles = stylex.create({
       default: vlak.paper,
       [mq.forcedColors]: "HighlightText",
     },
-    transform: {
-      default: "translateX(1.25rem)",
-      ":dir(rtl)": "translateX(-1.25rem)",
-    },
+    insetInlineStart: "1.46875rem",
   },
 });
 

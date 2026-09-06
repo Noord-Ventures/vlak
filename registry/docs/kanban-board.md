@@ -88,10 +88,10 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-kanban-board`, `rs-kanban-columns`, `rs-kanban-column`, `rs-kanban-heading`, `rs-kanban-card`, `rs-kanban-title`, `rs-kanban-detail`, `rs-kanban-status`
+`rs-kanban-board`, `rs-kanban-columns`, `rs-kanban-column`, `rs-kanban-heading`, `rs-kanban-list`, `rs-kanban-card`, `rs-kanban-card-header`, `rs-kanban-title`, `rs-kanban-detail`, `rs-kanban-controls`, `rs-kanban-destination`, `rs-kanban-reorder`, `rs-kanban-action`, `rs-kanban-status`, `rs-kanban-help`
 
 ## Dependencies
 
-Registry dependencies: [native-select](native-select.md), [sortable-list](sortable-list.md).  
+Registry dependencies: [native-select](native-select.md), [button](button.md), [icons](icons.md).  
 React: `packages/react/src/components/kanban-board.tsx`  
 CSS: `packages/core/css/components/kanban-board.css`

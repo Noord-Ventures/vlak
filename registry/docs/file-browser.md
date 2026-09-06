@@ -69,6 +69,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | --- | --- | --- | --- |
 | `entries` (required) | `BrowserEntry[]` |  |  |
 | `label` | `string` | `"Files"` |  |
+| `rootLabel` | `string` | `"Files"` | Visible root-folder name, separate from the accessible browser label. |
 | `value` | `string` |  |  |
 | `defaultValue` | `string` |  |  |
 | `onValueChange` | `(id: string) => void` |  |  |
@@ -87,12 +88,13 @@ Forwards `ref` to the `HTMLDivElement`.
 ## Accessibility
 
 - Folder tree, breadcrumbs, search, and file collection each have names.
+- label names the region and its landmarks; rootLabel supplies the visible root folder name.
 - Selected files use aria-pressed and a full surface change.
 - Files can be opened by an explicit keyboard-operable action as well as double click.
 
 ## Classes
 
-`rs-file-browser`, `rs-file-browser-toolbar`, `rs-file-browser-path`, `rs-file-browser-action`, `rs-file-browser-body`, `rs-file-browser-tree`, `rs-file-browser-content`, `rs-file-browser-list`, `rs-file-browser-grid`, `rs-file-browser-name`, `rs-file-browser-meta`, `rs-file-browser-empty`, `rs-file-browser-view-active`, `rs-file-browser-item`, `rs-file-browser-tile`, `rs-file-browser-selected`
+`rs-file-browser`, `rs-file-browser-toolbar`, `rs-file-browser-breadcrumbs`, `rs-file-browser-path`, `rs-file-browser-crumb-item`, `rs-file-browser-crumb`, `rs-file-browser-crumb-current`, `rs-file-browser-action`, `rs-file-browser-body`, `rs-file-browser-tree`, `rs-file-browser-content`, `rs-file-browser-list`, `rs-file-browser-grid`, `rs-file-browser-name`, `rs-file-browser-meta`, `rs-file-browser-empty`, `rs-file-browser-view-active`, `rs-file-browser-item`, `rs-file-browser-tile`, `rs-file-browser-selected`
 
 ## Dependencies
 

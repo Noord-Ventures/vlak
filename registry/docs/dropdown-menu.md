@@ -103,7 +103,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`, `rs-menu-nested`
+`rs-menu`, `rs-dropdown`, `rs-menu-item`, `rs-menu-item-indicator`, `rs-menu-item-label`, `rs-menu-item-active`, `rs-menu-item-disabled`, `rs-menu-sep`, `rs-menu-nested`
 
 ## Dependencies
 

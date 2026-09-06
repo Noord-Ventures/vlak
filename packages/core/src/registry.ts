@@ -1180,7 +1180,7 @@ toast("Saved", { description: "Your changes are live." });`,
     title: "Dropdown menu",
     description: "Presents a compact list of actions. Menu roles and arrow-key navigation are built in.",
     category: "actions",
-    classes: ["rs-menu", "rs-dropdown", "rs-menu-item", "rs-menu-item-active", "rs-menu-item-disabled", "rs-menu-sep", "rs-menu-nested"],
+    classes: ["rs-menu", "rs-dropdown", "rs-menu-item", "rs-menu-item-indicator", "rs-menu-item-label", "rs-menu-item-active", "rs-menu-item-disabled", "rs-menu-sep", "rs-menu-nested"],
     css: ["components/dropdown-menu.css"],
     react: "components/dropdown-menu.tsx",
     registryDependencies: ["button"],
@@ -1228,7 +1228,7 @@ toast("Saved", { description: "Your changes are live." });`,
     classes: ["rs-toggle", "rs-toggle-group", "rs-toggle-grouped-on", "rs-toggle-pressed"],
     css: ["components/toggle.css"],
     react: "components/toggle.tsx",
-    snippet: `<div class="rs-toggle-group"><button class="rs-toggle" aria-pressed="true">Left</button><button class="rs-toggle" aria-pressed="false">Center</button><button class="rs-toggle" aria-pressed="false">Right</button></div>`,
+    snippet: `<button class="rs-toggle" aria-pressed="true">Bold</button>`,
     example: `import { useState } from "react";
 import { Toggle } from "@noorddev/vlak-react";
 

@@ -54,10 +54,10 @@
 .rs-diff-viewer-number{color:var(--text-secondary);width:3ch;padding-inline:0.5rem;vertical-align:top;font-variant-numeric:tabular-nums;text-align:end}
 
 /* ── error-summary: generated from packages/react/src/components/error-summary.tsx ── */
-.rs-error-summary{border-width:1px;border-style:solid;border-color:var(--text);padding:1rem;color:var(--text);outline-color:var(--text);outline-offset:2px}
-.rs-error-summary-title{font-size:1rem;font-weight:600;margin-block:0 0.5rem;line-height:1.45}
-.rs-error-summary-list{margin:0;padding-inline-start:1.25rem}
-.rs-error-summary-link{display:inline-flex;align-items:center;min-height:var(--hit);min-width:var(--hit);color:var(--text);text-decoration:underline;text-underline-offset:0.2em;line-height:1.45;outline-color:var(--text);outline-offset:2px}
+.rs-error-summary{box-sizing:border-box;min-width:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding:1rem;background-color:var(--bg);color:var(--text);outline-color:var(--text);outline-offset:2px}
+.rs-error-summary-title{font-size:0.875rem;font-weight:600;margin:0 0 0.25rem;line-height:1.45}
+.rs-error-summary-list{margin:0;padding:0;list-style:none}
+.rs-error-summary-link{display:inline-flex;align-items:center;min-height:var(--hit);min-width:var(--hit);max-width:100%;font-size:0.875rem;font-weight:400;color:var(--text);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.2em;line-height:1.45;overflow-wrap:anywhere;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}
 
 /* ── notification-center: generated from packages/react/src/components/notification-center.tsx ── */
 .rs-notification-center{color:var(--text);width:100%;min-width:0}
@@ -84,14 +84,15 @@
 .rs-connection-status-detail{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin:0}
 
 /* ── tree-view: generated from packages/react/src/components/tree-view.tsx ── */
-.rs-tree-view{list-style-type:none;margin:0;padding:0;color:var(--text);min-width:0;width:100%}
-.rs-tree-view-group{list-style-type:none;margin:0;padding-inline-start:1rem}
-.rs-tree-view-item{display:flex;align-items:center;gap:0.5rem;min-height:var(--hit);min-width:var(--hit);padding-inline:0.75rem;box-sizing:border-box;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:-2px;overflow-wrap:anywhere}
+.rs-tree-view{list-style-type:none;margin:0;padding:0;color:var(--text);min-width:0;width:100%;box-sizing:border-box;font-size:0.875rem;line-height:1.45}
+.rs-tree-view-group{list-style-type:none;margin:0;padding-inline-start:1rem;min-width:0;box-sizing:border-box}
+.rs-tree-view-item{display:flex;align-items:center;gap:0.25rem;min-height:var(--hit);min-width:var(--hit);width:100%;padding-inline:0.25rem;box-sizing:border-box;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:-2px}
 .rs-tree-view-item:focus-visible{outline-width:2px;outline-style:solid}
+.rs-tree-view-label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .rs-tree-view-selected{background-color:var(--control-fill);font-weight:600}
 .rs-tree-view-disabled{color:var(--text-secondary);cursor:not-allowed}
 .rs-tree-view-spacer{width:var(--hit);flex-shrink:0}
-.rs-tree-view-disclosure{display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer;padding:0}
+.rs-tree-view-disclosure{display:inline-flex;align-items:center;justify-content:center;width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);flex-shrink:0;box-sizing:border-box;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer;padding:0}
 
 /* ── toolbar: generated from packages/react/src/components/toolbar.tsx ── */
 .rs-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text)}
@@ -192,8 +193,8 @@
 .rs-tag-input{display:grid;gap:0.5rem;min-width:0}
 .rs-tag-input-label{font-size:var(--control-label);color:var(--text-secondary)}
 .rs-tag-input-list{display:flex;flex-wrap:wrap;gap:0.5rem;padding:0;margin:0;list-style:none}
-.rs-tag-input-tag{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding-inline-start:0.75rem;font-size:var(--control-fs)}
-.rs-tag-input-remove{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding:0;border-width:0;flex-shrink:0}
+.rs-tag-input-tag{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding-block:0.25rem;padding-inline-start:0.75rem;padding-inline-end:0.25rem;font-size:var(--control-fs)}
+.rs-tag-input-remove{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding:0;border-width:0;border-radius:var(--radius-sm);flex-shrink:0}
 .rs-tag-input-row{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:start;min-width:0}
 .rs-tag-input-input{flex:1 1 8rem;min-width:var(--hit)}
 .rs-tag-input-add{width:auto;flex-shrink:0}
@@ -327,13 +328,19 @@
 /* ── file-browser: generated from packages/react/src/components/file-browser.tsx ── */
 .rs-file-browser{display:flex;flex-direction:column;width:100%;min-width:0;gap:1rem;color:var(--text)}
 .rs-file-browser-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.rs-file-browser-breadcrumbs{min-width:0;max-width:100%}
 .rs-file-browser-path{display:flex;align-items:center;flex-wrap:wrap;gap:0.25rem;list-style-type:none;padding:0;margin:0}
+.rs-file-browser-crumb-item{display:flex;align-items:center;gap:0.25rem;min-width:0;max-width:100%}
+.rs-file-browser-crumb{display:inline-flex;align-items:center;min-width:var(--hit);min-height:var(--hit);max-width:min(16rem, 100%);padding-block:0;padding-inline:0.375rem;box-sizing:border-box;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text-secondary);font-family:inherit;font-size:0.875rem;font-weight:400;line-height:1.45;cursor:pointer}
+.rs-file-browser-crumb:hover{background-color:var(--control-fill);color:var(--text)}
+.rs-file-browser-crumb:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+.rs-file-browser-crumb-current{color:var(--text);font-weight:500}
 .rs-file-browser-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem}
 .rs-file-browser-view-active{background-color:var(--control-fill);font-weight:600}
-.rs-file-browser-body{display:grid;grid-template-columns:minmax(10rem, 1fr) minmax(0, 3fr);gap:1rem;min-width:0}
-@media (max-width: 640px){.rs-file-browser-body{grid-template-columns:minmax(0, 1fr)}}
-.rs-file-browser-tree{min-width:0;border-inline-end-width:1px;border-inline-end-style:solid;border-inline-end-color:var(--divider);padding-inline-end:0.75rem}
-.rs-file-browser-content{min-width:0;display:flex;flex-direction:column;gap:0.75rem}
+.rs-file-browser-body{display:flex;flex-wrap:wrap;align-items:flex-start;gap:var(--gutter);min-width:0}
+.rs-file-browser-tree{flex-basis:11.5rem;flex-grow:0;flex-shrink:1;min-width:0;max-width:100%}
+@media (max-width: 640px){.rs-file-browser-tree{flex-basis:100%}}
+.rs-file-browser-content{flex:1 1 18rem;min-width:0;display:flex;flex-direction:column;gap:0.75rem}
 .rs-file-browser-list{list-style-type:none;padding:0;margin:0;display:grid;grid-template-columns:minmax(0, 1fr);gap:0.5rem}
 .rs-file-browser-grid{grid-template-columns:repeat(auto-fill, minmax(8rem, 1fr))}
 .rs-file-browser-item{display:flex;gap:0.75rem;align-items:center;width:100%;min-width:0;min-height:var(--hit);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding:0.75rem;background-color:transparent;color:var(--text);text-align:start;font-family:inherit;font-size:0.875rem;cursor:pointer}
@@ -341,19 +348,26 @@
 .rs-file-browser-item:disabled{color:var(--text-secondary);cursor:not-allowed}
 .rs-file-browser-tile{flex-direction:column;align-items:flex-start;min-height:7.5rem}
 .rs-file-browser-selected{background-color:var(--control-fill);font-weight:600}
-.rs-file-browser-name{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
-.rs-file-browser-meta{color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45}
+.rs-file-browser-name{flex:1 1 auto;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-file-browser-meta{color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
 .rs-file-browser-empty{margin:0;padding-block:1rem;color:var(--text-secondary);line-height:1.45}
 
 /* ── kanban-board: generated from packages/react/src/components/kanban-board.tsx ── */
 .rs-kanban-board{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}
-.rs-kanban-columns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(17rem, 1fr);gap:1rem;overflow-x:auto;padding:0.25rem;scroll-snap-type:x proximity}
-.rs-kanban-column{min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;scroll-snap-align:start}
-.rs-kanban-heading{margin:0;font-size:0.9375rem;font-weight:600;display:flex;justify-content:space-between;gap:0.5rem}
-.rs-kanban-card{display:flex;flex-direction:column;gap:0.625rem;min-width:0;font-size:0.875rem;line-height:1.45}
+.rs-kanban-columns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(min(100%, 17rem), 1fr);gap:1rem;width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow-x:auto;overscroll-behavior-x:contain;padding:0.25rem;scroll-padding-inline:0.25rem;scroll-snap-type:x proximity;outline-color:var(--text);outline-offset:-2px}
+.rs-kanban-column{display:flex;flex-direction:column;align-self:start;gap:0.75rem;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);padding:0.5rem;scroll-snap-align:start}
+.rs-kanban-heading{margin:0;padding-inline:0.75rem;min-height:var(--hit);font-size:0.9375rem;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;overflow-wrap:anywhere}
+.rs-kanban-list{display:grid;gap:0.75rem;list-style-type:none;margin:0;padding:0;min-width:0}
+.rs-kanban-card{display:grid;gap:0.75rem;min-width:0;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+.rs-kanban-card-header{display:grid;grid-template-columns:minmax(0, 1fr) var(--hit);align-items:center;gap:0.5rem;min-width:0}
 .rs-kanban-title{font-weight:600;overflow-wrap:anywhere}
 .rs-kanban-detail{color:var(--text-secondary);overflow-wrap:anywhere}
-.rs-kanban-status{margin:0;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}
+.rs-kanban-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;min-width:0}
+.rs-kanban-destination{flex:1 1 8rem;min-width:0}
+.rs-kanban-reorder{display:flex;gap:0.25rem;margin-inline-start:auto;flex-shrink:0}
+.rs-kanban-action{width:var(--hit);min-width:var(--hit);height:var(--hit);min-height:var(--hit);padding:0;flex-shrink:0;border-radius:var(--radius-sm)}
+.rs-kanban-status{margin:0;padding-inline:0.75rem;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}
+.rs-kanban-help{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
 /* ── scheduler: generated from packages/react/src/components/scheduler.tsx ── */
 .rs-scheduler{display:flex;flex-direction:column;gap:1rem;width:100%;min-width:0;color:var(--text)}
@@ -520,11 +534,10 @@
 .rs-switch-on::before{background-color:var(--text);border-color:var(--text)}
 .rs-switch-on{forced-color-adjust:none}
 @media (forced-colors: active){.rs-switch-on::before{background-color:Highlight;border-color:Highlight}}
-.rs-switch-thumb{position:absolute;top:0.84375rem;inset-inline-start:0.21875rem;width:1.0625rem;height:1.0625rem;border-radius:50%;background-color:var(--text-secondary);forced-color-adjust:none;transition:transform var(--duration) var(--ease)}
+.rs-switch-thumb{position:absolute;top:0.84375rem;inset-inline-start:0.21875rem;width:1.0625rem;height:1.0625rem;border-radius:50%;background-color:var(--text-secondary);forced-color-adjust:none;transition:inset-inline-start var(--duration) var(--ease)}
 @media (forced-colors: active){.rs-switch-thumb{background-color:ButtonText}}
 @media (prefers-reduced-motion: reduce){.rs-switch-thumb{transition:none}}
-.rs-switch-thumb-on{background-color:var(--bg);transform:translateX(1.25rem)}
-.rs-switch-thumb-on:dir(rtl){transform:translateX(-1.25rem)}
+.rs-switch-thumb-on{background-color:var(--bg);inset-inline-start:1.46875rem}
 @media (forced-colors: active){.rs-switch-thumb-on{background-color:HighlightText}}
 
 /* ── slider: generated from packages/react/src/components/slider.tsx ── */
@@ -830,10 +843,12 @@
 .rs-menu.rs-context-menu-pin,.rs-menu-nested{position:fixed;z-index:var(--z-float);margin-top:0;min-width:10rem}
 .rs-menu.rs-date-picker-cal-menu{inset-inline-end:auto;padding:0.75rem}
 .rs-menu{position:absolute;top:100%;inset-inline-start:0;inset-inline-end:0;z-index:var(--z-float);max-height:15rem;overflow-y:auto}
-.rs-menu-item{box-sizing:border-box;display:block;padding-block:0.5625rem;padding-inline:0.75rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;border-width:0;border-radius:var(--radius-sm);width:100%;text-align:start;cursor:pointer;background-color:transparent;font-family:inherit;min-height:var(--hit);outline-width:0;outline-style:none;outline-color:HighlightText;outline-offset:-2px;forced-color-adjust:none}
+.rs-menu-item{box-sizing:border-box;display:flex;align-items:center;gap:0.5rem;padding-block:0.5625rem;padding-inline:0.75rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;border-width:0;border-radius:var(--radius-sm);width:100%;text-align:start;cursor:pointer;background-color:transparent;font-family:inherit;min-height:var(--hit);outline-width:0;outline-style:none;outline-color:HighlightText;outline-offset:-2px;forced-color-adjust:none}
 .rs-menu-item:focus-visible{color:var(--bg);background-color:var(--text)}
-@media (max-width: 640px){.rs-menu-item{display:flex;align-items:center;padding-block:0.75rem;padding-inline:0.875rem;font-size:var(--control-fs);min-height:var(--hit)}}
+@media (max-width: 640px){.rs-menu-item{padding-block:0.75rem;padding-inline:0.875rem;font-size:var(--control-fs);min-height:var(--hit)}}
 @media (forced-colors: active){.rs-menu-item{color:CanvasText;background-color:Canvas;outline-width:0;outline-style:none}.rs-menu-item:focus-visible{color:HighlightText;background-color:Highlight;outline-width:2px;outline-style:solid}}
+.rs-menu-item-indicator{display:inline-flex;align-items:center;justify-content:center;flex:0 0 1rem;width:1rem;height:1rem}
+.rs-menu-item-label{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 .rs-menu-item-active{background-color:var(--divider-subtle);color:var(--text)}
 .rs-menu-item-active:focus-visible{background-color:var(--text);color:var(--bg)}
 @media (forced-colors: active){.rs-menu-item-active{background-color:Highlight;color:HighlightText}}
@@ -1060,6 +1075,7 @@
 @media (max-width: 640px){.rs-combobox-empty{padding:0.875rem;font-size:0.9375rem}}
 
 /* ── command: generated from packages/react/src/components/command.tsx ── */
+.rs-command{display:flex;flex-direction:column;min-width:0}
 .rs-command-dialog{width:480px;max-width:90vw;padding:0;overflow:hidden}
 @media (max-width: 640px){.rs-command-dialog{width:100%;max-width:100%}}
 .rs-command-input{box-sizing:border-box;width:100%;border-width:0;border-bottom-width:1px;border-style:solid;border-color:var(--divider);background-color:transparent;font-family:inherit;font-size:0.875rem;letter-spacing:-0.01em;color:var(--text);padding-block:0.875rem;padding-inline:1rem;outline-width:0;outline-style:none;min-height:var(--hit)}
@@ -1075,7 +1091,6 @@
 .rs-command-hint{font-size:0.6875rem;color:var(--text-secondary)}
 .rs-command-empty{padding:1.25rem;text-align:center;font-size:0.8125rem;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-command-empty{padding:1.5rem;font-size:0.9375rem}}
-.rs-command{display:flex;flex-direction:column;min-width:0}
 
 /* ── calendar: generated from packages/react/src/components/calendar.tsx ── */
 .rs-cal{width:19.25rem;max-width:100%;overflow-x:auto}

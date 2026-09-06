@@ -13,10 +13,10 @@ export interface ErrorSummaryProps extends Omit<React.HTMLAttributes<HTMLDivElem
   autoFocus?: boolean;
 }
 const styles = stylex.create({
-  root: { borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.ink, padding: "1rem", color: vlak.ink, outlineColor: vlak.ink, outlineOffset: 2 },
-  title: { fontSize: "1rem", fontWeight: 600, marginBlock: "0 0.5rem", lineHeight: 1.45 },
-  list: { margin: 0, paddingInlineStart: "1.25rem" },
-  link: { display: "inline-flex", alignItems: "center", minHeight: vlak.hit, minWidth: vlak.hit, color: vlak.ink, textDecoration: "underline", textUnderlineOffset: "0.2em", lineHeight: 1.45, outlineColor: vlak.ink, outlineOffset: 2 },
+  root: { boxSizing: "border-box", minWidth: 0, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, padding: "1rem", backgroundColor: vlak.paper, color: vlak.ink, outlineColor: vlak.ink, outlineOffset: 2 },
+  title: { fontSize: "0.875rem", fontWeight: 600, margin: "0 0 0.25rem", lineHeight: 1.45 },
+  list: { margin: 0, padding: 0, listStyle: "none" },
+  link: { display: "inline-flex", alignItems: "center", minHeight: vlak.hit, minWidth: vlak.hit, maxWidth: "100%", fontSize: "0.875rem", fontWeight: 400, color: vlak.ink, textDecoration: "underline", textDecorationThickness: vlak.hairline, textUnderlineOffset: "0.2em", lineHeight: 1.45, overflowWrap: "anywhere", borderRadius: vlak.radiusSm, outlineColor: vlak.ink, outlineOffset: 2 },
 });
 
 /** A form-wide summary linking each message to the field that needs attention. */
@@ -31,6 +31,8 @@ export const ErrorSummary = React.forwardRef<HTMLDivElement, ErrorSummaryProps>(
   const link = rs(["rs-error-summary-link"], styles.link);
   if (!hasErrors) return null;
   return <div ref={node => { local.current = node; if (typeof ref === "function") ref(node); else if (ref) ref.current = node; }} role="alert" aria-labelledby={titleId} tabIndex={-1} {...props} className={root.className} style={{ ...root.style, ...style }}>
-    <h2 id={titleId} {...heading}>{title}</h2><ul {...list}>{errors.map((error, index) => <li key={`${error.id}:${index}`}><a {...link} href={`#${encodeURIComponent(error.id)}`} onClick={event => { const field = document.getElementById(error.id); if (field) { event.preventDefault(); field.focus(); field.scrollIntoView?.({ block: "nearest" }); } }}>{error.message}</a></li>)}</ul>
+    <h2 id={titleId} {...heading}>{title}</h2>
+    {/* biome-ignore lint/a11y/noRedundantRoles: Retain list semantics in Safari when list-style is none. */}
+    <ul role="list" {...list}>{errors.map((error, index) => <li key={`${error.id}:${index}`}><a {...link} href={`#${encodeURIComponent(error.id)}`} onClick={event => { const field = document.getElementById(error.id); if (field) { event.preventDefault(); field.focus(); field.scrollIntoView?.({ block: "nearest" }); } }}>{error.message}</a></li>)}</ul>
   </div>;
 });

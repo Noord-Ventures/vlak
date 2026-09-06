@@ -39,7 +39,7 @@
         "rs-toggle-grouped-on",
         "rs-toggle-pressed"
       ],
-      "snippet": "<div class=\"rs-toggle-group\"><button class=\"rs-toggle\" aria-pressed=\"true\">Left</button><button class=\"rs-toggle\" aria-pressed=\"false\">Center</button><button class=\"rs-toggle\" aria-pressed=\"false\">Right</button></div>",
+      "snippet": "<button class=\"rs-toggle\" aria-pressed=\"true\">Bold</button>",
       "cssOnly": false,
       "registryDependencies": [
         "vlak-lib"

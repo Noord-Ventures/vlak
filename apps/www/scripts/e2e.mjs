@@ -93,6 +93,66 @@ for (const [part, border] of Object.entries({ preview: selectBorders.preview, tr
     fail(`select ${part}: expected a 1px solid control-border box, got ${border.width} ${border.style} ${border.color}`);
   }
 }
+/* Closed command dialogs must never paint their empty border in the page. */
+await desk.goto(`${base}/components/command/`, { waitUntil: "networkidle" });
+const checkClosedCommands = async (when) => {
+  const dialogs = await desk.locator("dialog.rs-command-dialog").evaluateAll(elements => elements.map(element => {
+    const rect = element.getBoundingClientRect();
+    return { open: element.open, display: getComputedStyle(element).display, width: rect.width, height: rect.height };
+  }));
+  if (dialogs.length !== 2 || dialogs.some(dialog => dialog.open || dialog.display !== "none" || dialog.width !== 0 || dialog.height !== 0)) {
+    fail(`command ${when}: closed dialogs paint in the page: ${JSON.stringify(dialogs)}`);
+  }
+};
+await checkClosedCommands("initially");
+const commandTrigger = desk.locator(".preview-box").getByRole("button", { name: /Open command/ });
+await commandTrigger.click();
+const commandDialog = desk.locator("dialog.rs-command-dialog[open]");
+await commandDialog.waitFor({ state: "visible" });
+if (!(await commandDialog.getByRole("combobox").evaluate(element => element === document.activeElement))) {
+  fail("command: opening does not focus the search input");
+}
+await desk.keyboard.press("Escape");
+await commandDialog.waitFor({ state: "hidden" });
+await checkClosedCommands("after Escape");
+if (!(await commandTrigger.evaluate(element => element === document.activeElement))) fail("command: closing does not restore trigger focus");
+/* Checkable menu rows reserve the same inline slot in both states. */
+await desk.goto(`${base}/components/dropdown-menu/`, { waitUntil: "networkidle" });
+const exportMenu = desk.getByRole("button", { name: "Export", exact: true });
+await exportMenu.click();
+const notes = desk.getByRole("menuitemcheckbox", { name: "Include notes", exact: true });
+const checkRow = () => notes.evaluate(row => {
+  const icon = row.querySelector(".rs-menu-item-indicator").getBoundingClientRect();
+  const label = row.querySelector(".rs-menu-item-label").getBoundingClientRect();
+  return { offset: Math.abs(icon.top + icon.height / 2 - label.top - label.height / 2), labelLeft: label.left };
+});
+const checkedRow = await checkRow();
+await notes.click();
+await exportMenu.click();
+const uncheckedRow = await checkRow();
+if (checkedRow.offset > 1 || uncheckedRow.offset > 1 || checkedRow.labelLeft !== uncheckedRow.labelLeft) {
+  fail(`menu checkmark must align inline without moving its label: ${JSON.stringify({ checkedRow, uncheckedRow })}`);
+}
+await notes.press("Escape");
+await desk.goto(`${base}/components/file-browser/`, { waitUntil: "networkidle" });
+const folderLabels = await desk.locator(".preview-box .rs-tree-view-label").evaluateAll(labels => labels.map(label => {
+  const style = getComputedStyle(label);
+  return { text: label.textContent, height: label.getBoundingClientRect().height, lineHeight: Number.parseFloat(style.lineHeight), whiteSpace: style.whiteSpace, overflow: style.textOverflow };
+}));
+if (folderLabels.length < 2 || folderLabels.some(label => label.whiteSpace !== "nowrap" || label.overflow !== "ellipsis" || label.height > label.lineHeight + 1)) {
+  fail(`file browser: folder labels must stay on a single line: ${JSON.stringify(folderLabels)}`);
+}
+const boxedCrumbs = await desk.locator(".preview-box .rs-file-browser-crumb").evaluateAll(crumbs => crumbs.filter(crumb => getComputedStyle(crumb).borderTopWidth !== "0px" || crumb.getBoundingClientRect().height < 44).length);
+if (boxedCrumbs) fail("file browser: breadcrumbs need unboxed text actions with 44px targets");
+await desk.goto(`${base}/components/kanban-board/`, { waitUntil: "networkidle" });
+const kanbanCards = await desk.locator(".preview-box .rs-kanban-card").evaluateAll(cards => cards.map(card => {
+  const title = card.querySelector(".rs-kanban-title").getBoundingClientRect();
+  const destination = card.querySelector("select").getBoundingClientRect();
+  return { leftOffset: Math.abs(title.left - destination.left), overflow: card.scrollWidth - card.clientWidth, radius: getComputedStyle(card).borderRadius };
+}));
+if (kanbanCards.length !== 2 || kanbanCards.some(card => card.leftOffset > 1 || card.overflow > 0 || card.radius !== "4px")) {
+  fail(`kanban: card titles and controls need one aligned grid: ${JSON.stringify(kanbanCards)}`);
+}
 await desk.close();
 
 /* Phone. */
@@ -138,9 +198,50 @@ if (longBreadcrumb.overflow > 0 || !longBreadcrumb.fits || longBreadcrumb.ellips
   fail(`phone: long breadcrumb must fit the grid and truncate at 320px: ${JSON.stringify(longBreadcrumb)}`);
 }
 await phone.setViewportSize({ width: 390, height: 844 });
+await phone.goto(`${base}/components/toggle/`, { waitUntil: "networkidle" });
+const standaloneToggle = phone.locator(".preview-box .rs-toggle");
+if (await standaloneToggle.count() !== 1 || await phone.locator(".preview-box .rs-toggle-group").count() !== 0) {
+  fail("phone: Toggle preview must render one standalone Toggle, not ToggleGroup");
+} else {
+  const before = await standaloneToggle.getAttribute("aria-pressed");
+  await standaloneToggle.click();
+  if (await standaloneToggle.getAttribute("aria-pressed") === before) fail("phone: standalone Toggle preview does not change pressed state");
+}
 await phone.goto(`${base}/components/toggle-group/`, { waitUntil: "networkidle" });
+if (await phone.locator(".preview-box .rs-toggle-group .rs-toggle").count() !== 3) fail("phone: Toggle group preview must retain its three grouped options");
 const narrowToggles = await phone.locator('.preview-box .rs-toggle').evaluateAll(controls => controls.filter(control => Number.parseFloat(getComputedStyle(control).paddingInlineStart) < 20).length);
 if (narrowToggles) fail("phone: toggle segments must keep 20px horizontal padding");
+await phone.goto(`${base}/components/tag-input/`, { waitUntil: "networkidle" });
+const tagRemoveSpacing = await phone.locator(".preview-box .rs-tag-input-remove").evaluateAll(buttons => buttons.map(button => {
+  const hit = button.getBoundingClientRect();
+  const tag = button.closest(".rs-tag-input-tag").getBoundingClientRect();
+  return { width: hit.width, height: hit.height, top: hit.top - tag.top, bottom: tag.bottom - hit.bottom, end: tag.right - hit.right };
+}));
+if (tagRemoveSpacing.length !== 2 || tagRemoveSpacing.some(hit => hit.width < 44 || hit.height < 44 || hit.top < 4 || hit.bottom < 4 || hit.end < 4)) {
+  fail(`phone: tag remove controls need inset padding and 44px targets: ${JSON.stringify(tagRemoveSpacing)}`);
+}
+await phone.getByRole("button", { name: "Remove Research", exact: true }).first().click();
+if (await phone.locator(".preview-box .rs-tag-input-tag").count() !== 1) fail("phone: tag remove control does not remove its tag");
+if (!(await phone.locator(".preview-box .rs-tag-input-input").evaluate(input => input === document.activeElement))) fail("phone: removing a tag does not return focus to its input");
+await phone.goto(`${base}/components/error-summary/`, { waitUntil: "networkidle" });
+const errorSummarySpacing = await phone.locator(".preview-box .rs-error-summary").evaluate(summary => {
+  const link = summary.querySelector("a");
+  const input = document.getElementById(decodeURIComponent(link.hash.slice(1)));
+  const field = input.closest(".rs-field") ?? input;
+  return { radius: getComputedStyle(summary).borderRadius, gap: field.getBoundingClientRect().top - summary.getBoundingClientRect().bottom, targetHeight: link.getBoundingClientRect().height };
+});
+if (errorSummarySpacing.radius !== "4px" || errorSummarySpacing.gap < 16 || errorSummarySpacing.targetHeight < 44) {
+  fail(`phone: error summary needs rounded framing, field spacing, and a usable link: ${JSON.stringify(errorSummarySpacing)}`);
+}
+await phone.locator(".preview-box .rs-error-summary-link").click();
+if (!(await phone.locator('.preview-box input[type="email"]').evaluate(input => input === document.activeElement))) fail("phone: error summary link does not focus its field");
+await phone.goto(`${base}/components/file-browser/`, { waitUntil: "networkidle" });
+const fileBrowserStack = await phone.locator(".preview-box .rs-file-browser").evaluate(browser => {
+  const tree = browser.querySelector(".rs-file-browser-tree").getBoundingClientRect();
+  const content = browser.querySelector(".rs-file-browser-content").getBoundingClientRect();
+  return { gap: content.top - tree.bottom, leftOffset: Math.abs(content.left - tree.left) };
+});
+if (fileBrowserStack.gap < 16 || fileBrowserStack.leftOffset > 1) fail(`phone: file browser tree and content must stack on a shared edge: ${JSON.stringify(fileBrowserStack)}`);
 await phone.goto(`${base}/components/select/`, { waitUntil: "networkidle" });
 const mobileSelect = await phone.evaluate(() => {
   const preview = document.querySelector('.preview-box [role="combobox"]').getBoundingClientRect();
