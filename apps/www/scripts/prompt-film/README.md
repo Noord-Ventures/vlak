@@ -1,9 +1,9 @@
 # Prompt to interface film
 
-A 40-second, 1080p film using Vlak's native Textarea, Button, Spinner, Card,
+A 40-second, 1080p film using Vlak's native Input, Button, Spinner, Card,
 Callout, icons, and the original AgentsBoard. The opening is an unbranded native
 form containing only the prompt field and send button. On submission, that same
-textarea becomes a solid, read-only message bubble, retaining its value, position,
+input becomes a solid, read-only message bubble, retaining its value, position,
 size and typography. Thinking and the reply share the former Send row.
 The browser frame uses
 the shared Vlak Button, Input, and InputGroup composition. Film motion changes geometry and
@@ -53,7 +53,9 @@ arpeggios, melodic hooks, drumbeats, or sampled recordings.
 `sound.mjs` maps the original Cuelume 0.2.2 effects to the retimed native
 interactions and component contacts. Prompt typing cues correspond to actual
 character changes at 30 fps. The Cuelume stem has no tonal bed; the final mix
-uses fixed gains and a peak limiter to preserve the music's crescendo. A native
+sets music to 0.4× (−8 dB) and effects to 3× (+9.5 dB), making interface contacts
+clear above the drone. These fixed gains and a peak limiter preserve the music's
+crescendo. A native
 Cuelume release marks the prompt-to-bubble change. Four toggle/page cues follow
 the light/dark changes, with measured levels audible under the drone. All 195
 effects use the verified, unmodified Cuelume recipes.

@@ -54,14 +54,14 @@ let controls,
 const events = [];
 
 function nativeType(value) {
-	const textarea = chat.querySelector("textarea");
-	if (!textarea) throw Error("Native Vlak prompt missing");
+	const field = chat.querySelector("input");
+	if (!field) throw Error("Native Vlak prompt missing");
 	flushSync(() => {
 		Object.getOwnPropertyDescriptor(
-			HTMLTextAreaElement.prototype,
+			HTMLInputElement.prototype,
 			"value",
-		).set.call(textarea, value);
-		textarea.dispatchEvent(
+		).set.call(field, value);
+		field.dispatchEvent(
 			new InputEvent("input", {
 				bubbles: true,
 				inputType: "insertText",
@@ -187,11 +187,11 @@ async function step(frame) {
 		sent = true;
 		await Promise.resolve();
 		await raf();
-		const bubble = chat.querySelector("textarea");
+		const bubble = chat.querySelector("input");
 		if (
 			bubble?.value !== prompt ||
 			!bubble.readOnly ||
-			!controls.inspect().sameTextarea
+			!controls.inspect().sameField
 		)
 			throw Error("Prompt did not become a message bubble in the same field");
 	}
@@ -307,6 +307,7 @@ window.film = { ready: false, error: null };
 				format: reel ? "reel" : "landscape",
 				wholeBrowserCamera: true,
 				visiblePromptLabels: false,
+				openingPromptLines: 1,
 				walkthroughCaptions: false,
 				uniformPayoffTypography: true,
 				themeChanges,

@@ -4,8 +4,8 @@ import {
 	Card,
 	CardBody,
 	Icon,
+	Input,
 	Spinner,
-	Textarea,
 } from "@noorddev/vlak-react";
 
 // The editable prompt becomes the submitted bubble without replacing its DOM
@@ -15,16 +15,16 @@ export function Conversation({ onReady, onSubmit }) {
 		[submitted, setSubmitted] = useState(false),
 		[reply, setReply] = useState("");
 	const card = useRef(null),
-		textarea = useRef(null),
-		originalTextarea = useRef(null),
+		promptField = useRef(null),
+		originalField = useRef(null),
 		current = useRef({ draft, submitted, reply });
 	current.current = { draft, submitted, reply };
 	useLayoutEffect(() => {
-		originalTextarea.current ??= textarea.current;
+		originalField.current ??= promptField.current;
 		onReady?.({
 			setReply,
 			inspect() {
-				const field = textarea.current,
+				const field = promptField.current,
 					container = card.current;
 				if (!field || !container) return { mounted: false };
 				const bounds = field.getBoundingClientRect(),
@@ -34,7 +34,8 @@ export function Conversation({ onReady, onSubmit }) {
 				return {
 					mounted: true,
 					...current.current,
-					sameTextarea: field === originalTextarea.current,
+					sameField: field === originalField.current,
+					fieldType: field.tagName.toLowerCase(),
 					value: field.value,
 					readOnly: field.readOnly,
 					disabled: field.disabled,
@@ -70,8 +71,9 @@ export function Conversation({ onReady, onSubmit }) {
 					onSubmit?.(draft);
 				}}
 			>
-				<Textarea
-					ref={textarea}
+				<Input
+					ref={promptField}
+					plain
 					aria-label="Message"
 					value={draft}
 					readOnly={submitted}
@@ -97,7 +99,6 @@ export function Conversation({ onReady, onSubmit }) {
 									color: "var(--bg)",
 									borderColor: "var(--text)",
 									caretColor: "transparent",
-									resize: "none",
 								}
 							: undefined
 					}
