@@ -37,7 +37,7 @@ The browser suite uses installed Chrome by default; `PLAYWRIGHT_EXECUTABLE_PATH`
 
 ## Social film
 
-`scripts/render-inspiration-video.mjs` renders the actual scene on a private local server without any site UI. The 27.5-second edit visits all 22 works in carousel order, holds longer on the spatial models, and ends with a frame-wide **Vlak.dev** overlay in the site's Inter 580. Simulation runs in exact 60 Hz steps and exports 30 fps frames, so machine capture speed does not change the motion.
+`scripts/render-inspiration-video.mjs` renders the actual scene on a private local server without any site UI. The 35.1-second edit visits all 22 works in carousel order. Each work receives a prominent designer credit in Inter 580, followed by its title and year; names appear once the incoming object reaches the center. Spatial models and shared designer credits receive longer holds. A 2.2-second **Vlak.dev** ending uses three rough-print impressions, monochrome grain, slight registration shifts, and two spaced palette cuts. Simulation runs in exact 60 Hz steps and exports 30 fps frames, so machine capture speed does not change the motion.
 
 ```sh
 # Requires Chrome and FFmpeg with libx264. No website server is needed.
@@ -45,4 +45,4 @@ VLAK_FFMPEG=/path/to/ffmpeg node apps/www/scripts/render-inspiration-video.mjs -
 VLAK_FFMPEG=/path/to/ffmpeg node apps/www/scripts/render-inspiration-video.mjs
 ```
 
-The proof is 960×540; the master is 1920×1080, H.264 High, yuv420p, Rec.709, silent MP4 with fast start. The maximum video rate is 10 Mbps. MP4, cover, sampled frames, and an encoding manifest go to `~/Movies/Vlak`; set `VLAK_VIDEO_OUTPUT` to change that directory. The renderer uses the existing TypeScript and Playwright dependencies and does not change the application scene.
+The proof is 960×540; the master is 1920×1080, H.264 High, yuv420p, Rec.709, silent MP4 with fast start. The maximum video rate is 10 Mbps. MP4, cover, a still for every designer credit and ending impression, and an encoding manifest go to `~/Movies/Vlak`; set `VLAK_VIDEO_OUTPUT` to change that directory. Previous movies are retained in its `backups` directory after a new edit encodes successfully. The renderer uses the existing TypeScript and Playwright dependencies and does not change the application scene.
