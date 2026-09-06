@@ -2,7 +2,7 @@
 
 A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
 
-Category: science  
+Category: microbiology  
 Name: `well-plate`  
 Also known as: Microplate, Plate map, Microtiter plate, Sample plate, Assay plate, Well grid  
 Page: https://vlak.dev/components/well-plate/

@@ -18,6 +18,11 @@ export const vlakCategories = [
   "civic",
   "science",
   "creative",
+  "engineering",
+  "geospatial",
+  "robotics",
+  "electronics",
+  "microbiology",
 ] as const;
 
 export type VlakCategory = (typeof vlakCategories)[number];

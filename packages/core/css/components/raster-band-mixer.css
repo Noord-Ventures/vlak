@@ -1,0 +1,10 @@
+/* ── raster-band-mixer: generated from packages/react/src/components/raster-band-mixer.tsx ── */
+.rs-raster-band-mixer{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-raster-band-mixer-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
+.rs-raster-band-mixer-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.75rem;min-width:0}
+@media (max-width: 640px){.rs-raster-band-mixer-fields{grid-template-columns:minmax(0, 1fr)}}
+.rs-raster-band-mixer-channel{display:grid;gap:0.75rem;min-width:0;padding:0.875rem;border-width:1px;border-style:solid;border-color:var(--divider)}
+.rs-raster-band-mixer-title{margin:0;font-size:var(--control-fs);font-weight:600}
+.rs-raster-band-mixer-label{display:grid;align-content:start;gap:0.375rem;min-width:0;font-size:var(--control-label)}
+.rs-raster-band-mixer-control{min-width:0;width:100%;min-height:var(--hit)}
+.rs-raster-band-mixer-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}

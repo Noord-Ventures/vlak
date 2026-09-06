@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 146 components in 13 categories: actions (14), forms (27), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), health (13), civic (5), science (5), creative (9). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 166 components in 18 categories: actions (14), forms (27), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), health (13), civic (5), science (9), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 
@@ -89,7 +89,7 @@ Conventions that hold across the catalogue:
 - Reading: body copy stays between 45 and 90 characters per line, with 66 characters as the default measure. Body line-height stays between 1.2 and 1.45 times its font size; Vlak defaults to 1.45.
 - Controlled and uncontrolled: `value` / `defaultValue` / `onValueChange` (Select, Combobox, Tabs, RadioGroup, ToggleGroup, Slider, Calendar, DatePicker); `checked` / `defaultChecked` / `onCheckedChange` (Switch); `pressed` / `defaultPressed` / `onPressedChange` (Toggle); `open` / `onClose` (Dialog, AlertDialog, Sheet, Drawer, CommandDialog). Checkbox and Radio are native inputs and use `checked` / `onChange`.
 - `className` and `style` merge with the component's own; native attributes and event handlers pass through to the root element (the props tables say which attribute set each component extends).
-- Refs: 219 of 220 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
+- Refs: 239 of 240 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
 - Names: components that render no visible label take `aria-label` or `aria-labelledby` (Select, Combobox, Switch, Slider, ButtonGroup, ToggleGroup, RadioGroup, ScrollArea, Carousel, Split). Dialogs are named by their Title part.
 - Platform first: `<dialog>`, `<details>`, the Popover API, scroll snap, and native inputs do the work. Where the platform has nothing, the APG pattern applies (listbox, menu, grid, tabs) with full keyboard support, listed on each page.
 - Sentence case everywhere. No all caps. Copy is short and matter-of-fact.
@@ -394,7 +394,7 @@ Collect a check-in, record a routine, review a sleep period, and follow personal
 - [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
-- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
+- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with a staggered entrance, gentle rotating encouragement, named progress and explicit missing-data states.
 
 ## Care workflows
 
@@ -498,24 +498,42 @@ npx @noorddev/vlak-cli add identity-document
 
 # Science
 
-Components for measurements, physical quantities, laboratory plates, experimental procedures, and spectra.
+Components for measurements, physical quantities, microscopy acquisition, sequence inspection, experimental procedures, and spectra.
 
 ## Measurements and quantities
 
 Keep a measured value with its unit, uncertainty, and source. Capture quantities without silently converting them.
 
 - [Measurement value](https://vlak.dev/docs/measurement-value.md): A supplied scientific reading with units, symmetric uncertainty, optional scientific notation and explicit availability.
-- [Quantity field](https://vlak.dev/docs/quantity-field.md): A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
+- [Quantity field](https://vlak.dev/docs/quantity-field.md): A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.
 
 ## Experimental work
 
 Select a sample position, follow an experimental run, and inspect a spectrum alongside the underlying values.
 
-- [Well plate](https://vlak.dev/docs/well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
 - [Experiment run](https://vlak.dev/docs/experiment-run.md): Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.
 - [Spectrum plot](https://vlak.dev/docs/spectrum-plot.md): A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.
 
+## Microscopy
+
+Navigate supplied stack positions and edit an acquisition sequence with explicit channel, exposure, time and depth units.
+
+- [Stack navigator](https://vlak.dev/docs/stack-navigator.md): Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.
+- [Acquisition sequencer](https://vlak.dev/docs/acquisition-sequencer.md): Edits supplied capture steps, exact exposure, time, depth and channel values, and distinguishes requested actions from recorded run state.
+
+## Genomics
+
+Enter a genomic region, inspect supplied sequence alignments and compare exact coverage counts.
+
+- [Genomic region field](https://vlak.dev/docs/genomic-region-field.md): Collects a reference, contig and validated integer interval with an explicit one-based inclusive coordinate convention and native form submission.
+- [Sequence alignment](https://vlak.dev/docs/sequence-alignment.md): Displays a bounded window of already aligned reference and read strings, with supplied genomic positions, gaps and keyboard region selection.
+- [Coverage inspector](https://vlak.dev/docs/coverage-inspector.md): Shows supplied per-locus depth, base and strand counts with an exact position selector, bounded plot and complete depth table.
+
 ## Data and action contracts
+
+### Keep coordinate conventions explicit
+
+Genomic regions and supplied loci use 1-based inclusive coordinates. Alignment selections use 1-based aligned columns, including supplied gap columns. Stack values are zero-based indexes into supplied positions; the displayed ordinal starts at one. The host owns coordinate conversion and reference identity.
 
 ### Preserve measurement meaning
 
@@ -555,6 +573,7 @@ Read channel levels, adjust gain and pan, and control a named parameter with nat
 - [Audio meter](https://vlak.dev/docs/audio-meter.md): Shows supplied channel levels and peaks in decibels, with bounded native meters and explicit missing readings.
 - [Channel strip](https://vlak.dev/docs/channel-strip.md): Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.
 - [Parameter knob](https://vlak.dev/docs/parameter-knob.md): Displays a rotary parameter over a native horizontal range input, with named values, units, and a 64px control.
+- [Patchbay](https://vlak.dev/docs/patchbay.md): Connects supplied source and destination ports through a keyboard-navigable matrix, with signal types, channel groups, and blocked-route reasons.
 
 ## Video
 
@@ -572,7 +591,17 @@ Select, hide, and lock layers; inspect a colour; and edit independent or linked 
 - [Color inspector](https://vlak.dev/docs/color-inspector.md): Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.
 - [Spacing control](https://vlak.dev/docs/spacing-control.md): Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.
 
+## Typography
+
+Compare supplied baseline kerning with per-pair draft offsets in declared font units.
+
+- [Kerning pair editor](https://vlak.dev/docs/kerning-pair-editor.md): Edits supplied glyph-pair offsets in font units, with baseline and edited previews, bounded keyboard nudging, and one-step undo.
+
 ## Data and action contracts
+
+### Respect routing and typography context
+
+Patchbay edits a matrix of compatible supplied source and destination ports; the host supplies additional block reasons and confirmed routing. KerningPairEditor keeps missing baseline values distinct from zero and previews only the supplied glyph pair with an additional offset, without rewriting the font or its shaping tables.
 
 ### Connect controls to an engine
 
@@ -596,6 +625,210 @@ Parameter controls retain native input semantics. Timeline clips have separate a
 npm install @noorddev/vlak-react
 # Or vendor an individual component
 npx @noorddev/vlak-cli add audio-meter
+```
+
+
+---
+
+# Industrial
+
+Controls for operator alarms and machining coordinate records.
+
+## Industrial operations
+
+Review alarm lifecycle fields and prepare fixture offsets alongside actual controller readings.
+
+- [Alarm panel](https://vlak.dev/docs/alarm-panel.md): Industrial alarm records with independent condition, acknowledgement and shelving states, explicit filters and host-confirmed actions.
+- [Work offset panel](https://vlak.dev/docs/work-offset-panel.md): Reported machine and work coordinates alongside editable draft offsets, explicit axis units and a host-owned apply request.
+
+## Data and action contracts
+
+### Preserve independent states
+
+Alarm condition, acknowledgement and shelving are independent. Unknown states remain distinct from inactive states.
+
+### Separate drafts from controller readings
+
+WorkOffsetPanel shows host-supplied machine and work coordinates, active system and offset state. Changing a draft does not infer new positions, activate another system or zero suspended offsets. The host supplies offsets for each selected system.
+
+### Confirm actions in the host
+
+Callbacks request alarm actions or an offset update. The application owns permissions, controller access, machine interlocks, audit records, persistence and confirmed results. These examples use local state and supplied fictional readings.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+# Or vendor an individual component
+npx @noorddev/vlak-cli add alarm-panel
+```
+
+
+---
+
+# Geospatial
+
+Controls for coordinate reference assignment, datum transformation selection and raster band configuration.
+
+## Coordinates and transformations
+
+Keep coordinate values, axis order and reference identity together; select a supplied transformation with its accuracy and grid availability.
+
+- [Coordinate reference field](https://vlak.dev/docs/coordinate-reference-field.md): Two or three numeric coordinate axes with supplied units and a reference selector that preserves entered values when assigning a reference.
+- [Datum transform picker](https://vlak.dev/docs/datum-transform-picker.md): A Vlak transformation selector with source and destination references, supplied accuracy and area, and visible support-grid availability.
+
+## Raster display
+
+Assign source bands to display channels and edit explicit stretch bounds without modifying source pixels.
+
+- [Raster band mixer](https://vlak.dev/docs/raster-band-mixer.md): A raster configuration editor with source-band mapping, single or three-channel modes, supplied stretch bounds and explicit missing-data metadata.
+
+## Data and action contracts
+
+### Assignment is distinct from reprojection
+
+Changing the selected reference leaves entered coordinates unchanged. The host owns validated reprojection, axis-order conversion, reference lookup and any transformation grid files.
+
+### Explain unavailable transformations
+
+Supply source and destination references, candidate operations, accuracy labels, area-of-use context and grid availability. Missing prerequisites remain visible with reasons rather than silently selecting a fallback.
+
+### Keep rendering in the host
+
+RasterBandMixer emits band and stretch configuration. The application loads pixels, handles no-data values, computes statistics and renders the image. Unit changes and displayed limits never imply a conversion of source values.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+# Or vendor an individual component
+npx @noorddev/vlak-cli add coordinate-reference-field
+```
+
+
+---
+
+# Robotics
+
+Controls for robot joint targets, recorded poses and mission plans.
+
+## State and targets
+
+Inspect independently reported poses and joint readings while editing explicit target values.
+
+- [Joint panel](https://vlak.dev/docs/joint-panel.md): Pairs host-reported joint positions with independent draft targets, supplied units and limits, and an explicit request action.
+- [Robot pose](https://vlak.dev/docs/robot-pose.md): Displays exact Cartesian translation and explicitly named orientation components for a selected supplied pose, with frame, time, and recorded status.
+
+## Mission planning
+
+Order supplied mission steps and request actions without inventing execution status.
+
+- [Robot mission queue](https://vlak.dev/docs/robot-mission-queue.md): Shows supplied mission order and recorded step states, with keyboard reorder requests and explicit host actions separate from pending and confirmed records.
+
+## Data and action contracts
+
+### Keep coordinate frames explicit
+
+Every pose belongs to a supplied frame, timestamp and orientation representation. Components display exact values and do not transform frames, normalize quaternions or infer an orientation convention.
+
+### Keep reported state separate from targets
+
+Joint targets do not update reported positions. The application supplies joint limits, accepts or rejects target requests and returns confirmed state. Missing limits or readings remain visible.
+
+### Execute in the controller
+
+The host owns robot connectivity, permissions, motion planning, collision checks, interlocks and mission execution. Reordering a plan or requesting an action is not evidence that a robot moved.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+# Or vendor an individual component
+npx @noorddev/vlak-cli add joint-panel
+```
+
+
+---
+
+# Circuitry
+
+Controls for board pad inspection, design-rule results and assembly variants.
+
+## Board inspection
+
+Keep pad identity, nets, layers and geometry together; inspect supplied rule violations with their recorded status.
+
+- [Pad inspector](https://vlak.dev/docs/pad-inspector.md): Circuit-board pad selection with supplied footprint references, net and layer records, pad types and a dimension table with explicit units.
+- [Design rule results](https://vlak.dev/docs/design-rule-results.md): Supplied board-check violations with severity and status filters, object and location details, and host-confirmed selection and resolution actions.
+
+## Assembly variants
+
+Inspect population, bill-of-materials inclusion and placement inclusion independently for every reference and variant.
+
+- [Assembly variant matrix](https://vlak.dev/docs/assembly-variant-matrix.md): Edits independent population, bill-of-materials, and placement flags per reference and assembly variant, preserving unspecified choices.
+
+## Data and action contracts
+
+### Preserve independent assembly flags
+
+Population, bill-of-materials inclusion and placement inclusion are separate supplied flags. An unspecified state is not false and no flag silently rewrites another.
+
+### Read geometry without inferring connectivity
+
+Pad numbers, net assignments, layer names, shapes and dimensions come from the board model. Missing data remains explicit; these views do not run a netlist, router or geometry engine.
+
+### Keep rule results tied to their source
+
+The host provides violation severity, status, location and available resolution actions. A resolve request does not establish that a board passes its rules; return confirmed results after the board model changes and checks rerun.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+# Or vendor an individual component
+npx @noorddev/vlak-cli add pad-inspector
+```
+
+
+---
+
+# Microbiology
+
+Components for well plates, supplied colony annotations and culture observation records.
+
+## Plates and annotations
+
+Select a supplied well or colony marker while retaining exact recorded sample and source-count context.
+
+- [Well plate](https://vlak.dev/docs/well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Colony plate](https://vlak.dev/docs/colony-plate.md): A bounded plate diagram and keyboard-selectable list of supplied colony markers, with the source count kept separate from annotation totals.
+
+## Culture observations
+
+Keep sample identity, supplied medium and condition labels, dated observations and recording actions together.
+
+- [Culture log](https://vlak.dev/docs/culture-log.md): A culture and sample record with supplied medium, conditions, chronological observations and host-owned recording actions.
+
+## Data and action contracts
+
+### Distinguish annotations from source counts
+
+A colony marker is an annotation, not a detected organism. The supplied source count remains separate from marker totals. Missing coordinates or counts are not zero, and no segmentation or colony detection runs in the view.
+
+### Preserve observation provenance
+
+The host supplies sample and culture identity, observation timestamps, status and conditions. Sorting requires explicit timestamp offsets; unknown times remain explicit. These components do not infer contamination, species or culture outcomes.
+
+### Record through the host
+
+Actions request application work. The host owns recording, audit history and confirmed status. Example cultures and conditions are supplied display records, not laboratory procedures or recommendations.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+# Or vendor an individual component
+npx @noorddev/vlak-cli add well-plate
 ```
 
 
@@ -5192,7 +5425,7 @@ npx shadcn add https://vlak.dev/r/check-in.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-check-in"><legend class="rs-check-in-legend">How is your energy?</legend><p class="rs-check-in-description">Choose the answer that fits right now.</p><div class="rs-check-in-choices"><label class="rs-check-in-choice"><span>Low</span><input class="rs-check-in-input" type="radio" name="energy" value="low" /></label><label class="rs-check-in-choice rs-check-in-selected"><span>Steady</span><input class="rs-check-in-input" type="radio" name="energy" value="steady" checked /></label><label class="rs-check-in-choice"><span>High</span><input class="rs-check-in-input" type="radio" name="energy" value="high" /></label></div></fieldset>
+<fieldset class="rs-check-in"><legend class="rs-check-in-legend">How is your energy?</legend><p class="rs-check-in-description">Choose the answer that fits right now.</p><div class="rs-check-in-choices"><label class="rs-check-in-choice"><span>Low</span><input class="rs-check-in-input" type="radio" name="energy" value="low" /></label><label class="rs-check-in-choice rs-check-in-selected"><span>Steady</span><input class="rs-check-in-input" type="radio" name="energy" value="steady" checked /></label><label class="rs-check-in-choice"><span>High</span><input class="rs-check-in-input" type="radio" name="energy" value="high" /></label></div><button class="rs-btn-ghost rs-btn-sm rs-check-in-clear" type="button">Clear answer</button></fieldset>
 ```
 
 ## Example
@@ -5237,7 +5470,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 ## Accessibility
 
 - A fieldset and legend name the answer group; native radios use visible text labels and share a name.
-- Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection.
+- Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection. Vlak Button supplies the optional clear action.
 - Descriptions reach the group and each answer. Read-only controls retain the submitted value and announce their unavailable state.
 - Disabled controls do not submit; required uses native radio validation. Form reset restores uncontrolled defaults and preserves controlled values.
 - The forwarded ref reaches the fieldset; native fieldset attributes, className, and style pass through.
@@ -5248,7 +5481,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/check-in.tsx`  
 CSS: `packages/core/css/components/check-in.css`
 
@@ -5573,7 +5806,7 @@ CSS: `packages/core/css/components/activity-goal.css`
 
 # Activity rings
 
-Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
+Shows one to six personal goals as concentric rings with a staggered entrance, gentle rotating encouragement, named progress and explicit missing-data states.
 
 Category: health  
 Name: `activity-rings`  
@@ -5585,6 +5818,8 @@ Page: https://vlak.dev/components/activity-rings/
 - One activity ring or a compact set of personal movement, routine, or wellness goals.
 - Supply goals in outer-to-inner order, with unique ids, labels, amounts, targets, and units.
 - Pair with ActivityGoal for a linear progress view of the same data.
+- Rings sweep into their supplied values on first view and ease into later updates. Set animate to false for an instant graphic.
+- Encouragement picks a different line every ten seconds while visible. Supply your own encouragement strings, one string for a static line, or false to hide it. The first line stays deterministic during server rendering.
 
 ## When not to
 
@@ -5649,17 +5884,28 @@ Forwards `ref` to the `HTMLElement`.
 | `label` (required) | `string` |  |  |
 | `goals` (required) | `readonly ActivityRingGoal[]` |  | One to six goals are drawn from the outside inward. Every goal retains a text record. |
 | `description` | `ReactNode` |  |  |
+| `animate` | `boolean` | `true` | Sweep each ring into its supplied value on first view. Reduced motion stays instant. |
+| `encouragement` | `false \| readonly string[]` | `defaultEncouragement` | Gentle lines rotate every ten seconds without immediate repetition. false hides the line. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves to the encouragement pause control when rotation is available. |
+| Enter, Space | Pauses or resumes encouraging text rotation. |
 
 ## Accessibility
 
 - Every valid goal has a named native progress element and an explicit amount, target, and unit.
 - Concentric geometry is decorative. Visible numbering and outer-to-inner order connect the rings with their text records without relying on hue.
 - Zero stays empty, amounts above target retain their actual value, and missing or invalid data has no progress arc.
-- The figure forwards its native attributes and ref. Static rings have no animation or extra tab stops and remain visible in forced colors.
+- The figure forwards its native attributes and ref, and rings remain visible in forced colors. Actual readings and native progress values update immediately throughout the decorative entrance.
+- Reduced motion makes ring fills instant and keeps encouragement static. Rotation also pauses while the figure is offscreen or the document is hidden.
+- A 44px keyboard-accessible control pauses or resumes rotation. Encouragement has no automatic live announcement; text remains available in the reading order.
 
 ## Classes
 
-`rs-activity-rings`, `rs-activity-rings-caption`, `rs-activity-rings-body`, `rs-activity-rings-graphic`, `rs-activity-rings-track`, `rs-activity-rings-arc`, `rs-activity-rings-list`, `rs-activity-rings-item`, `rs-activity-rings-index`, `rs-activity-rings-label`, `rs-activity-rings-value`, `rs-activity-rings-target`, `rs-activity-rings-note`, `rs-activity-rings-description`, `rs-activity-rings-progress`
+`rs-activity-rings`, `rs-activity-rings-caption`, `rs-activity-rings-body`, `rs-activity-rings-graphic`, `rs-activity-rings-track`, `rs-activity-rings-arc`, `rs-activity-rings-list`, `rs-activity-rings-item`, `rs-activity-rings-index`, `rs-activity-rings-label`, `rs-activity-rings-value`, `rs-activity-rings-target`, `rs-activity-rings-note`, `rs-activity-rings-description`, `rs-activity-rings-progress`, `rs-activity-rings-motion`, `rs-activity-rings-waiting`, `rs-activity-rings-encouragement`, `rs-activity-rings-encouragement-text`, `rs-activity-rings-pause`, `rs-activity-rings-pause-icon`
 
 ## Dependencies
 
@@ -6726,7 +6972,7 @@ CSS: `packages/core/css/components/measurement-value.css`
 
 # Quantity field
 
-A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
+A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.
 
 Category: science  
 Name: `quantity-field`  
@@ -6773,7 +7019,7 @@ npx shadcn add https://vlak.dev/r/quantity-field.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-quantity-field"><legend class="rs-quantity-field-legend">Sample volume</legend><div class="rs-quantity-field-row"><label class="rs-quantity-field-label">Amount<input class="rs-quantity-field-control" name="volume" type="number" step="any" value="250" /></label><label class="rs-quantity-field-label">Unit<select class="rs-quantity-field-control" name="volume.unit"><option value="ul">µL</option><option value="ml">mL</option></select></label></div></fieldset>
+<fieldset class="rs-quantity-field"><legend class="rs-quantity-field-legend">Sample volume</legend><div class="rs-quantity-field-row"><label class="rs-quantity-field-label">Amount<input class="rs-input rs-input-full rs-quantity-field-control" name="volume" type="number" step="any" value="250" /></label><div class="rs-quantity-field-label"><span id="quantity-unit-label">Unit</span><div class="rs-select rs-select-fluid"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="quantity-unit-label" aria-expanded="false" aria-haspopup="listbox"><span>µL</span></button></div></div></div></fieldset>
 ```
 
 ## Example
@@ -6817,11 +7063,11 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 | Keys | Does |
 | --- | --- |
 | Tab | Moves between the amount input and unit selector. |
-| Arrow keys | Uses native number stepping or select navigation on the focused control. |
+| Arrow keys | Uses native number stepping or opens and navigates the Vlak unit selector. Enter or Space confirms a unit; Escape closes its menu. |
 
 ## Accessibility
 
-- A fieldset and legend name the quantity; both native controls have visible labels, descriptions and 44px targets.
+- A fieldset and legend name the quantity. Vlak Input and Select have visible labels, descriptions and 44px targets.
 - Required, min, max and step use native validation. Invalid supplied numbers and unknown units have explicit text states.
 - Native form reset restores uncontrolled defaults and leaves controlled values with the application.
 - Read-only quantities preserve the submitted amount and unit while preventing edits. Disabled quantities do not submit.
@@ -6833,7 +7079,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md), [select](select.md), [dropdown-menu](dropdown-menu.md).  
 React: `packages/react/src/components/quantity-field.tsx`  
 CSS: `packages/core/css/components/quantity-field.css`
 
@@ -6844,7 +7090,7 @@ CSS: `packages/core/css/components/quantity-field.css`
 
 A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
 
-Category: science  
+Category: microbiology  
 Name: `well-plate`  
 Also known as: Microplate, Plate map, Microtiter plate, Sample plate, Assay plate, Well grid  
 Page: https://vlak.dev/components/well-plate/
@@ -7060,7 +7306,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/experiment-run.tsx`  
 CSS: `packages/core/css/components/experiment-run.css`
 
@@ -7173,7 +7419,7 @@ Forwards `ref` to the `HTMLElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/spectrum-plot.tsx`  
 CSS: `packages/core/css/components/spectrum-plot.css`
 
@@ -7260,7 +7506,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - Each native meter has a channel name, minimum, maximum, and decibel value text.
 - Supplied peaks are visible text; absent and invalid readings suppress the meter.
-- Monochrome native meter styles retain boundaries in forced colors.
+- Native meter styles remove browser gradients so the track and fill remain monochrome. System colors retain visible fill and boundaries in forced colors.
 - The ref and native attributes reach the root div.
 
 ## Classes
@@ -7324,7 +7570,7 @@ npx shadcn add https://vlak.dev/r/channel-strip.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-channel-strip"><legend class="rs-channel-strip-label">Dialogue</legend><label class="rs-channel-strip-field">Gain<input class="rs-channel-strip-range" type="range" min="-60" max="12" step="any" value="0" /></label><label class="rs-channel-strip-field">Pan<input class="rs-channel-strip-range" type="range" min="-100" max="100" step="any" value="0" /></label><div class="rs-channel-strip-actions"><button class="rs-channel-strip-button" type="button" aria-pressed="false">Mute</button><button class="rs-channel-strip-button" type="button" aria-pressed="false">Solo</button></div></fieldset>
+<fieldset class="rs-channel-strip"><legend class="rs-channel-strip-label">Dialogue</legend><label class="rs-channel-strip-field">Gain<input class="rs-channel-strip-range" type="range" min="-60" max="12" step="any" value="0" /></label><label class="rs-channel-strip-field">Pan<input class="rs-channel-strip-range" type="range" min="-100" max="100" step="any" value="0" /></label><div class="rs-channel-strip-actions"><button class="rs-btn-ghost rs-btn-sm rs-channel-strip-button" type="button" aria-pressed="false">Mute</button><button class="rs-btn-ghost rs-btn-sm rs-channel-strip-button" type="button" aria-pressed="false">Solo</button></div></fieldset>
 ```
 
 ## Example
@@ -7366,7 +7612,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 ## Accessibility
 
 - A fieldset and legend name the channel; native sliders expose gain and pan bounds and descriptive value text. In-range values retain their supplied precision.
-- Mute and solo have stable names and aria-pressed; their entire surface changes on selection.
+- Vlak Button supplies mute and solo actions with stable names and aria-pressed; their entire surface changes on selection.
 - All controls meet the 44px target size. Disabled or read-only controls cannot edit the channel.
 - Uncontrolled form reset restores the supplied default; named read-only channels retain all valid values in form submissions. Disabled channels and out-of-range sliders are omitted. The ref reaches the fieldset.
 
@@ -7376,7 +7622,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/channel-strip.tsx`  
 CSS: `packages/core/css/components/channel-strip.css`
 
@@ -7538,7 +7784,7 @@ npx shadcn add https://vlak.dev/r/timecode-field.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-timecode-field"><label class="rs-timecode-field-label" for="in-point">In point</label><input class="rs-timecode-field-input" id="in-point" type="text" value="00:01:24:12" pattern="[0-9]{2}:[0-5][0-9]:[0-5][0-9]:[0-9]{2}" aria-describedby="in-point-hint" /><p class="rs-timecode-field-hint" id="in-point-hint">24 fps, non-drop. Hours:minutes:seconds:frames.</p></div>
+<div class="rs-timecode-field"><label class="rs-timecode-field-label" for="in-point">In point</label><input class="rs-input rs-input-full rs-timecode-field-input" id="in-point" type="text" value="00:01:24:12" pattern="[0-9]{2}:[0-5][0-9]:[0-5][0-9]:[0-9]{2}" aria-describedby="in-point-hint" /><p class="rs-timecode-field-hint" id="in-point-hint">24 fps, non-drop. Hours:minutes:seconds:frames.</p></div>
 ```
 
 ## Example
@@ -7587,7 +7833,7 @@ Forwards `ref` to the `HTMLInputElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md).  
 React: `packages/react/src/components/timecode-field.tsx`  
 CSS: `packages/core/css/components/timecode-field.css`
 
@@ -7801,7 +8047,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/render-queue.tsx`  
 CSS: `packages/core/css/components/render-queue.css`
 
@@ -7896,7 +8142,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 | Keys | Does |
 | --- | --- |
-| Tab | Moves through available selection, visibility, lock, and move actions. |
+| Tab | Moves through available layer selection and Vlak visibility, lock, and move buttons. |
 | Enter, Space | Requests the focused action; move buttons reorder one position when allowed. |
 
 ## Accessibility
@@ -7908,11 +8154,11 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-layer-stack`, `rs-layer-stack-label`, `rs-layer-stack-list`, `rs-layer-stack-row`, `rs-layer-stack-actions`, `rs-layer-stack-button`, `rs-layer-stack-selected`, `rs-layer-stack-note`
+`rs-layer-stack`, `rs-layer-stack-label`, `rs-layer-stack-list`, `rs-layer-stack-row`, `rs-layer-stack-actions`, `rs-layer-stack-action`, `rs-layer-stack-button`, `rs-layer-stack-selected`, `rs-layer-stack-note`
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/layer-stack.tsx`  
 CSS: `packages/core/css/components/layer-stack.css`
 
@@ -7967,7 +8213,7 @@ npx shadcn add https://vlak.dev/r/color-inspector.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-color-inspector"><legend class="rs-color-inspector-label">Fill</legend><div class="rs-color-inspector-preview" aria-hidden="true"><span class="rs-color-inspector-swatch" style="background-color:#808080;opacity:0.5"></span></div><div class="rs-color-inspector-fields"><label class="rs-color-inspector-field">Hex<input class="rs-color-inspector-input" type="text" value="#808080" pattern="#[0-9a-fA-F]{6}" required /></label><label class="rs-color-inspector-field">Alpha<input class="rs-color-inspector-input" type="number" value="0.5" min="0" max="1" step="any" required /></label></div></fieldset>
+<fieldset class="rs-color-inspector"><legend class="rs-color-inspector-label">Fill</legend><div class="rs-color-inspector-preview" aria-hidden="true"><span class="rs-color-inspector-swatch" style="background-color:#808080;opacity:0.5"></span></div><div class="rs-color-inspector-fields"><label class="rs-color-inspector-field">Hex<input class="rs-input rs-input-full rs-color-inspector-input" type="text" value="#808080" pattern="#[0-9a-fA-F]{6}" required /></label><label class="rs-color-inspector-field">Alpha<input class="rs-input rs-input-full rs-color-inspector-input" type="number" value="0.5" min="0" max="1" step="any" required /></label></div></fieldset>
 ```
 
 ## Example
@@ -8016,7 +8262,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md).  
 React: `packages/react/src/components/color-inspector.tsx`  
 CSS: `packages/core/css/components/color-inspector.css`
 
@@ -8071,7 +8317,7 @@ npx shadcn add https://vlak.dev/r/spacing-control.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-spacing-control"><legend class="rs-spacing-control-label">Padding</legend><div class="rs-spacing-control-fields"><label class="rs-spacing-control-field">Top (px)<input class="rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Right (px)<input class="rs-spacing-control-input" type="number" value="24" /></label><label class="rs-spacing-control-field">Bottom (px)<input class="rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Left (px)<input class="rs-spacing-control-input" type="number" value="24" /></label></div></fieldset>
+<fieldset class="rs-spacing-control"><legend class="rs-spacing-control-label">Padding</legend><div class="rs-spacing-control-fields"><label class="rs-spacing-control-field">Top (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Right (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="24" /></label><label class="rs-spacing-control-field">Bottom (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Left (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="24" /></label></div></fieldset>
 ```
 
 ## Example
@@ -8128,9 +8374,2341 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md), [button](button.md).  
 React: `packages/react/src/components/spacing-control.tsx`  
 CSS: `packages/core/css/components/spacing-control.css`
+
+
+---
+
+# Coordinate reference field
+
+Two or three numeric coordinate axes with supplied units and a reference selector that preserves entered values when assigning a reference.
+
+Category: geospatial  
+Name: `coordinate-reference-field`  
+Also known as: Coordinate input, Reference system selector, Survey point field, Projected coordinate, Latitude longitude field  
+Page: https://vlak.dev/components/coordinate-reference-field/
+
+## When to use
+
+- Survey points and imported coordinates whose reference, axis order and units are supplied by the application.
+- Supply two or three axes in coordinate order with unique, non-empty identifiers; reference values must also be unique and non-empty.
+- Use value and onValueChange for application-owned conversion. Changing the reference requests only a new identifier and preserves the numeric coordinates.
+- name submits reference as name.reference and each axis as name.coordinates followed by its identifier. null represents a missing coordinate or reference.
+
+## When not to
+
+- Inferring a reference from numeric ranges, treating a reference assignment as reprojection or guessing axis units.
+- Using a latitude or longitude bound for a projected axis unless the application supplies that constraint.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CoordinateReferenceField } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add coordinate-reference-field
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/coordinate-reference-field.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-coordinate-reference-field"><legend class="rs-coordinate-reference-field-legend">Survey point</legend><p class="rs-coordinate-reference-field-note">Assigning a reference keeps the entered coordinates.</p><div class="rs-coordinate-reference-field-label"><span id="geo-coordinate-reference-label">Coordinate reference</span><div class="rs-select rs-select-fluid rs-coordinate-reference-field-control"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="geo-coordinate-reference-label" aria-expanded="false" aria-haspopup="listbox">Site grid</button></div></div><div class="rs-coordinate-reference-field-axes"><label class="rs-coordinate-reference-field-label">Easting (m)<input class="rs-input rs-input-full rs-coordinate-reference-field-control" name="point.coordinates.east" type="number" step="any" value="120.5" /></label><label class="rs-coordinate-reference-field-label">Northing (m)<input class="rs-input rs-input-full rs-coordinate-reference-field-control" name="point.coordinates.north" type="number" step="any" value="48.25" /></label></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { CoordinateReferenceField } from "@noorddev/vlak-react";
+
+<CoordinateReferenceField
+  label="Recorded survey point"
+  name="point"
+  axes={[{ id: "east", label: "Easting", unit: "m" }, { id: "north", label: "Northing", unit: "m" }]}
+  references={[{ value: "site", label: "Site grid" }, { value: "project", label: "Project grid" }]}
+  defaultValue={{ reference: "site", coordinates: { east: 120.5, north: 48.25 } }}
+/>
+```
+
+## Props
+
+### CoordinateReferenceField
+
+Numeric coordinates and an explicitly assigned reference, without implicit conversion.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `axes` (required) | `readonly CoordinateReferenceAxis[]` |  | Two or three axes in the supplied coordinate order. Units are never inferred. |
+| `references` (required) | `readonly CoordinateReferenceOption[]` |  |  |
+| `value` | `CoordinateReferenceValue` |  |  |
+| `defaultValue` | `CoordinateReferenceValue` | `initial` |  |
+| `onValueChange` | `(value: CoordinateReferenceValue) => void` |  | Assigning a reference preserves every numeric value. The host owns reprojection. |
+| `description` | `ReactNode` |  |  |
+| `referenceLabel` | `string` | `"Coordinate reference"` |  |
+| `unknownReferenceLabel` | `string` | `"Unknown reference"` |  |
+| `required` | `boolean` |  |  |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through the reference selector and coordinate inputs in supplied axis order. |
+| Arrow keys, Home, End | Opens and navigates the Vlak selector. Enter or Space chooses a reference without converting numeric values; Escape closes the menu. |
+| Typing | Edits numeric coordinates using the native number inputs. |
+
+## Accessibility
+
+- The fieldset legend names the coordinate group. Vlak Select and Input provide shared control paint; every numeric input has a visible axis label, supplied unit and 44px target.
+- Unknown references, missing coordinates and non-finite numbers have explicit text. Zero is retained. Invalid supplied values participate in native form validation.
+- Required and supplied axis bounds use native validation. No geographic constraints are inferred.
+- Uncontrolled values follow native form reset, including external forms; controlled values remain with the application.
+- Read-only valid values still submit. Disabled fields do not submit. The fieldset ref, native attributes, className and style pass through.
+
+## Classes
+
+`rs-coordinate-reference-field`, `rs-coordinate-reference-field-legend`, `rs-coordinate-reference-field-axes`, `rs-coordinate-reference-field-label`, `rs-coordinate-reference-field-control`, `rs-coordinate-reference-field-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [input](input.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/coordinate-reference-field.tsx`  
+CSS: `packages/core/css/components/coordinate-reference-field.css`
+
+
+---
+
+# Datum transform picker
+
+A Vlak transformation selector with source and destination references, supplied accuracy and area, and visible support-grid availability.
+
+Category: geospatial  
+Name: `datum-transform-picker`  
+Also known as: Datum transformation, Coordinate operation, Projection operation picker, Support grid selector, Reprojection choice  
+Page: https://vlak.dev/components/datum-transform-picker/
+
+## When to use
+
+- Comparing operations supplied by a projection engine or survey provider before the application transforms coordinates.
+- Supply unique, non-empty operation identifiers and explicit available values. false or null disables an operation; listed grids must all be available.
+- Use an empty grids array to state that no support grids are required. Omit grids when the requirements were not supplied.
+- null means no operation selected. Unknown current identifiers stay visible as unavailable. The application owns candidate generation, accuracy, compatibility and persistence.
+
+## When not to
+
+- Automatically picking the smallest reported error, assuming an unlisted grid is installed or silently falling back to a different operation.
+- Presenting illustrative accuracy or area labels as calculated guarantees.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { DatumTransformPicker } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add datum-transform-picker
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/datum-transform-picker.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-datum-transform-picker"><legend class="rs-datum-transform-picker-legend">Coordinate operation</legend><dl class="rs-datum-transform-picker-context"><div><dt class="rs-datum-transform-picker-term">Source reference</dt><dd class="rs-datum-transform-picker-detail">Site grid</dd></div><div><dt class="rs-datum-transform-picker-term">Destination reference</dt><dd class="rs-datum-transform-picker-detail">Project grid</dd></div></dl><div class="rs-datum-transform-picker-label"><span id="geo-transformation-label">Transformation</span><div class="rs-select rs-select-fluid rs-datum-transform-picker-control"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="geo-transformation-label" aria-expanded="false" aria-haspopup="listbox">Parameter transform</button></div></div><ul class="rs-datum-transform-picker-list"><li class="rs-datum-transform-picker-item rs-datum-transform-picker-selected"><p class="rs-datum-transform-picker-title">Parameter transform · Selected</p><p class="rs-datum-transform-picker-note">Available</p><dl class="rs-datum-transform-picker-context"><div><dt class="rs-datum-transform-picker-term">Reported accuracy</dt><dd class="rs-datum-transform-picker-detail">1.5 m</dd></div><div><dt class="rs-datum-transform-picker-term">Area of use</dt><dd class="rs-datum-transform-picker-detail">Project extent</dd></div></dl><p class="rs-datum-transform-picker-note">Support grids: None required</p></li></ul></fieldset>
+```
+
+## Example
+
+```tsx
+import { DatumTransformPicker } from "@noorddev/vlak-react";
+
+<DatumTransformPicker
+  label="Coordinate operation"
+  sourceReference="Site grid"
+  destinationReference="Project grid"
+  name="operation"
+  defaultValue="parameter"
+  transformations={[
+    { id: "grid", label: "Grid correction", available: true, accuracy: "0.05 m", area: "Site survey extent", grids: [{ id: "site", label: "Site correction grid", available: false }], unavailableReason: "Attach the supplied grid" },
+    { id: "parameter", label: "Parameter transform", available: true, accuracy: "1.5 m", area: "Project extent", grids: [] },
+  ]}
+/>
+```
+
+## Props
+
+### DatumTransformPicker
+
+Compares host-supplied operations and keeps unavailable alternatives visible.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `sourceReference` (required) | `ReactNode` |  |  |
+| `destinationReference` (required) | `ReactNode` |  |  |
+| `transformations` (required) | `readonly DatumTransformation[]` |  |  |
+| `value` | `string \| null` |  | null means no operation selected; an unknown identifier stays explicitly unavailable. |
+| `defaultValue` | `string \| null` | `null` |  |
+| `onValueChange` | `(value: string \| null) => void` |  |  |
+| `description` | `ReactNode` |  |  |
+| `selectionLabel` | `string` | `"Transformation"` |  |
+| `noneLabel` | `string` | `"No transformation selected"` |  |
+| `required` | `boolean` |  |  |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the Vlak transformation selector. |
+| Arrow keys, Home, End | Navigates the Vlak selector. Enter or Space chooses an available operation or the no-selection option; Escape closes the menu. Unavailable alternatives are skipped. |
+
+## Accessibility
+
+- Source and destination references have visible labels; null references are explicitly unknown.
+- Every candidate retains visible accuracy, area, grid requirements and availability text, including disabled alternatives.
+- The selected candidate uses a full-surface fill and a visible Selected label; forced colors retain a distinct border.
+- A currently unavailable operation is marked invalid and fails native validation. Required selection uses the native required attribute.
+- Vlak Select supplies the 44px trigger, menu, disabled choices and native form value. Read-only valid selections submit through a hidden value; disabled selections do not submit.
+- Uncontrolled state follows native form reset, including external forms. Controlled state, native fieldset attributes, ref and consumer styles remain with the caller.
+
+## Classes
+
+`rs-datum-transform-picker`, `rs-datum-transform-picker-legend`, `rs-datum-transform-picker-context`, `rs-datum-transform-picker-term`, `rs-datum-transform-picker-detail`, `rs-datum-transform-picker-label`, `rs-datum-transform-picker-control`, `rs-datum-transform-picker-list`, `rs-datum-transform-picker-item`, `rs-datum-transform-picker-selected`, `rs-datum-transform-picker-title`, `rs-datum-transform-picker-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/datum-transform-picker.tsx`  
+CSS: `packages/core/css/components/datum-transform-picker.css`
+
+
+---
+
+# Raster band mixer
+
+A raster configuration editor with source-band mapping, single or three-channel modes, supplied stretch bounds and explicit missing-data metadata.
+
+Category: geospatial  
+Name: `raster-band-mixer`  
+Also known as: Band composition, Multiband raster, Satellite band selector, Raster stretch, Single-band renderer settings  
+Page: https://vlak.dev/components/raster-band-mixer/
+
+## When to use
+
+- Mapping supplied raster bands to red, green and blue display channels or a single band.
+- Choose no enhancement, stretch, clipping or both. Each active channel keeps its own supplied minimum and maximum; band changes do not calculate new ranges.
+- Use unique, non-empty band identifiers. noDataValue undefined means unknown, null means no sentinel, and zero remains a supplied missing-data value.
+- The name prefix submits mode, stretch and active channel fields such as name.red.band and name.red.minimum. Inactive mappings remain in state but do not submit; ranges only submit when enhancement uses them.
+
+## When not to
+
+- Treating the component as a raster renderer, deriving a histogram or assuming a missing-data value from the image appearance.
+- Reusing display ranges across different bands without application review. No automatic statistics or unit conversion runs here.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { RasterBandMixer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add raster-band-mixer
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/raster-band-mixer.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-raster-band-mixer"><legend class="rs-raster-band-mixer-legend">Band mapping</legend><p class="rs-raster-band-mixer-note">The application renders the image from this configuration.</p><div class="rs-raster-band-mixer-fields"><div class="rs-raster-band-mixer-label"><span id="geo-rendering-mode-label">Rendering mode</span><div class="rs-select rs-select-fluid rs-raster-band-mixer-control"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="geo-rendering-mode-label" aria-expanded="false" aria-haspopup="listbox">Single band</button></div></div><div class="rs-raster-band-mixer-label"><span id="geo-range-treatment-label">Range treatment</span><div class="rs-select rs-select-fluid rs-raster-band-mixer-control"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="geo-range-treatment-label" aria-expanded="false" aria-haspopup="listbox">No enhancement</button></div></div></div><div class="rs-raster-band-mixer-channel"><p class="rs-raster-band-mixer-title">Single band</p><div class="rs-raster-band-mixer-label"><span id="geo-single-band-source-label">Single band source</span><div class="rs-select rs-select-fluid rs-raster-band-mixer-control"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="geo-single-band-source-label" aria-expanded="false" aria-haspopup="listbox">Band 1</button></div></div><p class="rs-raster-band-mixer-note">Missing-data value: 0. Unit: counts</p></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { RasterBandMixer } from "@noorddev/vlak-react";
+import type { RasterBandConfiguration } from "@noorddev/vlak-react";
+
+const configuration: RasterBandConfiguration = {
+  mode: "rgb", stretch: "none",
+  red: { bandId: "b3", minimum: 0, maximum: 255 },
+  green: { bandId: "b2", minimum: 0, maximum: 255 },
+  blue: { bandId: "b1", minimum: 0, maximum: 255 },
+  single: { bandId: "b1", minimum: 0, maximum: 255 },
+};
+
+<RasterBandMixer label="Band mapping" name="raster" defaultValue={configuration} bands={[
+  { id: "b1", label: "Band 1", unit: "counts", noDataValue: 0 },
+  { id: "b2", label: "Band 2", unit: "counts", noDataValue: null },
+  { id: "b3", label: "Band 3", unit: "counts" },
+]} />
+```
+
+## Props
+
+### RasterBandMixer
+
+Selects source bands and display ranges. No pixels, statistics or missing-data rules are inferred.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `bands` (required) | `readonly RasterSourceBand[]` |  |  |
+| `value` | `RasterBandConfiguration` |  |  |
+| `defaultValue` | `RasterBandConfiguration` | `initial` |  |
+| `onValueChange` | `(value: RasterBandConfiguration) => void` |  | Emits configuration only. The host owns rendering and any statistics or range calculation. |
+| `description` | `ReactNode` |  |  |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through mode, range treatment and active channel controls. |
+| Arrow keys, Home, End | Navigates the focused Vlak selector. Enter or Space commits a choice; Escape closes the menu. |
+| Typing | Edits each active channel's numeric range bounds. |
+
+## Accessibility
+
+- A fieldset legend names the editor. Vlak Select and Input provide shared control paint, with channel labels and 44px targets.
+- Missing, unavailable and disabled source bands stay distinct. Missing-data values and units are readable text, with zero preserved.
+- Active channels require a band. Enhancement requires finite bounds with minimum less than maximum; invalid configurations fail native form validation.
+- Switching modes preserves inactive mappings without submitting them. No enhancement hides and omits range fields without discarding their values.
+- Native form reset restores uncontrolled defaults, including external forms; controlled updates remain with the application.
+- Read-only valid configuration values submit; disabled fields do not. Native fieldset attributes, ref, className and style pass through.
+
+## Classes
+
+`rs-raster-band-mixer`, `rs-raster-band-mixer-legend`, `rs-raster-band-mixer-fields`, `rs-raster-band-mixer-channel`, `rs-raster-band-mixer-title`, `rs-raster-band-mixer-label`, `rs-raster-band-mixer-control`, `rs-raster-band-mixer-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [input](input.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/raster-band-mixer.tsx`  
+CSS: `packages/core/css/components/raster-band-mixer.css`
+
+
+---
+
+# Stack navigator
+
+Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.
+
+Category: science  
+Name: `stack-navigator`  
+Also known as: Image stack controls, Z-stack navigator, Microscopy axes, Multidimensional image navigator, Stage position selector  
+Page: https://vlak.dev/components/stack-navigator/
+
+## When to use
+
+- Image stacks with explicit axis labels, sampled physical values and known position indexes.
+- Selection values are zero-based indexes; displayed position counts are one-based. Physical values are never calculated from spacing.
+- name submits one selected index per axis. Controlled values remain caller-owned; native form reset restores uncontrolled defaults.
+
+## When not to
+
+- Calling an instrument, calculating stage motion, or inferring positions from an index.
+- More than 8 axes or 8192 total positions; the component reports the bound rather than truncating axes.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { StackNavigator } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add stack-navigator
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/stack-navigator.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-stack-navigator"><legend class="rs-stack-navigator-legend">Image stack</legend><div class="rs-stack-navigator-axis"><p class="rs-stack-navigator-label">Depth</p><p class="rs-stack-navigator-copy">Position 1 of 3; -1 µm</p></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { StackNavigator } from "@noorddev/vlak-react";
+
+<StackNavigator label="Image stack" name="stack" axes={[
+  { id: "depth", label: "Depth", unit: "µm", positions: [{ value: -1 }, { value: 0 }, { value: 1 }] },
+  { id: "time", label: "Time", unit: "s", positions: [{ value: 0 }, { value: 5 }, { value: 10 }] },
+  { id: "channel", label: "Channel", positions: [{ value: "Phase" }, { value: "Channel 2" }] },
+  { id: "stage", label: "Stage position", unit: "µm", positions: [{ value: "x 12.5, y -1.5" }] },
+]} defaultValue={{ depth: 1, time: 0, channel: 0, stage: 0 }} />
+```
+
+## Props
+
+### StackNavigator
+
+Navigates supplied stack coordinates without calculating stage positions or calling an instrument.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `axes` (required) | `readonly StackAxis[]` |  |  |
+| `value` | `Readonly<Record<string, number \| null>>` |  |  |
+| `defaultValue` | `Readonly<Record<string, number \| null>>` | `{}` |  |
+| `onValueChange` | `(value: StackSelection) => void` |  |  |
+| `description` | `ReactNode` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between enabled previous, position-select and next controls. |
+| Arrow keys, Home, End, typing | Opens and navigates the position list; disabled positions are skipped. |
+| Enter, Space | Confirms the active list option or activates the focused previous or next button. |
+| Escape | Closes the position list without changing selection. |
+
+## Accessibility
+
+- Every axis has a visible select label and a text description containing the exact displayed index and physical value.
+- Zero and negative physical positions remain visible. Missing or invalid readings are explicitly unavailable.
+- Each input and button has a 44px target and visible focus; no axis is selected implicitly.
+- Read-only values remain submitted through hidden fields, while disabled fieldsets do not submit.
+- The fieldset ref, form association, native attributes, className and style pass through.
+- The shared Select and Button primitives supply combobox navigation and control styling; native form values remain available through the Select backing control.
+
+## Classes
+
+`rs-stack-navigator`, `rs-stack-navigator-legend`, `rs-stack-navigator-axis`, `rs-stack-navigator-label`, `rs-stack-navigator-row`, `rs-stack-navigator-step`, `rs-stack-navigator-copy`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [select](select.md).  
+React: `packages/react/src/components/stack-navigator.tsx`  
+CSS: `packages/core/css/components/stack-navigator.css`
+
+
+---
+
+# Acquisition sequencer
+
+Edits supplied capture steps, exact exposure, time, depth and channel values, and distinguishes requested actions from recorded run state.
+
+Category: science  
+Name: `acquisition-sequencer`  
+Also known as: Capture sequence, Microscopy acquisition plan, Time-lapse plan, Capture step editor, Instrument run plan  
+Page: https://vlak.dev/components/acquisition-sequencer/
+
+## When to use
+
+- Editing and reordering an existing capture plan with onStepsChange.
+- Pass exact values and units from the acquisition application; the component performs no conversions or scheduling.
+- Use explicit step actions and onAction to request operations. Supply pending and confirmedLabel from actual host state.
+
+## When not to
+
+- Treating an edit or action callback as proof that capture ran successfully.
+- Deriving instrument settings or executing acquisition. The host owns commands, persistence and confirmations.
+- More than 128 steps or 128 channels.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AcquisitionSequencer } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add acquisition-sequencer
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/acquisition-sequencer.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-acquisition-sequencer"><legend class="rs-acquisition-sequencer-legend">Capture plan</legend><ol class="rs-acquisition-sequencer-list"><li class="rs-acquisition-sequencer-step"><div class="rs-acquisition-sequencer-head"><span class="rs-acquisition-sequencer-title">First plane</span><span class="rs-acquisition-sequencer-copy">Not run</span></div><p class="rs-acquisition-sequencer-value">Exposure 10 ms · Time offset 0 s · Depth -1 µm · Phase</p></li></ol></fieldset>
+```
+
+## Example
+
+```tsx
+import { useState } from "react";
+import { AcquisitionSequencer } from "@noorddev/vlak-react";
+import type { AcquisitionStep } from "@noorddev/vlak-react";
+
+function CapturePlan() {
+  const [steps, setSteps] = useState<readonly AcquisitionStep[]>([
+    { id: "first", label: "First plane", exposure: 10, exposureUnit: "ms", time: 0, timeUnit: "s", depth: -1, depthUnit: "µm", channel: "phase", status: "Not run" },
+    { id: "second", label: "Second plane", exposure: 10, exposureUnit: "ms", time: 5, timeUnit: "s", depth: 0, depthUnit: "µm", channel: "phase", status: "Not run" },
+  ]);
+  return <AcquisitionSequencer label="Capture plan" channels={[{ id: "phase", label: "Phase" }]} steps={steps} onStepsChange={setSteps} />;
+}
+```
+
+## Props
+
+### AcquisitionSequencer
+
+A controlled capture plan editor and recorded-state display, without an acquisition engine.
+
+Extends `FieldsetHTMLAttributes<HTMLFieldSetElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `steps` (required) | `readonly AcquisitionStep[]` |  |  |
+| `channels` (required) | `readonly AcquisitionChannel[]` |  |  |
+| `onStepsChange` | `(steps: readonly AcquisitionStep[]) => void` |  |  |
+| `onAction` | `(stepId: string, actionId: string) => void` |  |  |
+| `description` | `ReactNode` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through enabled numeric inputs, channel selectors and step actions. |
+| Arrow keys, Home, End, typing | Edits native numeric fields or navigates the opened channel list. |
+| Enter, Space | Confirms the active channel option or requests the focused action or reorder. |
+| Escape | Closes the channel list without changing the supplied selection. |
+
+## Accessibility
+
+- Step fields and action names include the step number and label, preventing ambiguity between repeated capture names.
+- Exposure and time offsets use a native non-negative minimum; signed depth values and all supplied units are preserved.
+- Pending steps disable editing and actions while their last recorded state remains visible.
+- Controls have 44px targets. Controlled native inputs retain the supplied plan through form resets.
+- The fieldset ref and native attributes pass through; no callback is interpreted as an actual run confirmation.
+- Generic controls compose the shared Input, Select and Button primitives; the native numeric fields and Select backing control preserve form values.
+
+## Classes
+
+`rs-acquisition-sequencer`, `rs-acquisition-sequencer-legend`, `rs-acquisition-sequencer-list`, `rs-acquisition-sequencer-step`, `rs-acquisition-sequencer-head`, `rs-acquisition-sequencer-title`, `rs-acquisition-sequencer-fields`, `rs-acquisition-sequencer-label`, `rs-acquisition-sequencer-control`, `rs-acquisition-sequencer-value`, `rs-acquisition-sequencer-copy`, `rs-acquisition-sequencer-actions`, `rs-acquisition-sequencer-action`
+
+## Dependencies
+
+Registry dependencies: [button](button.md), [input](input.md), [select](select.md).  
+React: `packages/react/src/components/acquisition-sequencer.tsx`  
+CSS: `packages/core/css/components/acquisition-sequencer.css`
+
+
+---
+
+# Sequence alignment
+
+Displays a bounded window of already aligned reference and read strings, with supplied genomic positions, gaps and keyboard region selection.
+
+Category: science  
+Name: `sequence-alignment`  
+Also known as: Aligned sequence viewer, Read alignment window, Genomic alignment, Base selection, Sequence window  
+Page: https://vlak.dev/components/sequence-alignment/
+
+## When to use
+
+- Inspecting up to 120 pre-aligned columns and 32 reads with explicit reference and read labels.
+- Supply one one-based genomic position per aligned column; null represents a reference gap.
+- Selection uses one-based aligned column indexes, which are distinct from genomic positions. Use value and onValueChange for host-owned selection.
+
+## When not to
+
+- Running an alignment algorithm or inferring mismatches, insertions, variant calls or genomic positions.
+- Passing inconsistent sequence lengths or silently clipping longer alignments. Supply the intended window.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { SequenceAlignment } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add sequence-alignment
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/sequence-alignment.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-sequence-alignment"><p class="rs-sequence-alignment-title">Read alignment</p><p class="rs-sequence-alignment-copy">chr7 · 1-based reference positions; aligned columns include gaps</p><div class="rs-sequence-alignment-scroll"><table class="rs-sequence-alignment-table" aria-label="Reference and reads"><thead><tr><th class="rs-sequence-alignment-heading" scope="col">Reference position</th><th class="rs-sequence-alignment-column" scope="col">101</th><th class="rs-sequence-alignment-column" scope="col">102</th></tr></thead><tbody><tr><th class="rs-sequence-alignment-heading" scope="row">Reference</th><td class="rs-sequence-alignment-base">A</td><td class="rs-sequence-alignment-base">C</td></tr></tbody></table></div></div>
+```
+
+## Example
+
+```tsx
+import { SequenceAlignment } from "@noorddev/vlak-react";
+
+<SequenceAlignment label="Read alignment" contig="chr7" referenceLabel="Example reference" referenceSequence="AC-GT" positions={[101, 102, null, 103, 104]} reads={[
+  { id: "read-1", label: "Read 1", sequence: "ACAGT" },
+  { id: "read-2", label: "Read 2", sequence: "AC-GT" },
+]} defaultValue={{ startColumn: 1, endColumn: 2 }} />
+```
+
+## Props
+
+### SequenceAlignment
+
+A bounded window of already aligned strings; reference positions and gaps are caller-supplied.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `contig` (required) | `string` |  |  |
+| `referenceLabel` (required) | `string` |  |  |
+| `referenceSequence` (required) | `string` |  |  |
+| `positions` (required) | `readonly (number \| null)[]` |  | One supplied one-based reference position per column; null means a reference gap. |
+| `reads` (required) | `readonly AlignedRead[]` |  |  |
+| `value` | `AlignmentSelection \| null` |  |  |
+| `defaultValue` | `AlignmentSelection \| null` | `null` |  |
+| `onValueChange` | `(value: AlignmentSelection \| null) => void` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Enters the column controls at one focus stop and then reaches the selection actions. |
+| Arrow keys, Home, End | Moves focus between columns in sequence order without changing selection. |
+| Shift+Arrow keys | Extends the selected column region from its anchor. |
+| Enter, Space | Selects the focused base column or activates a selection action. |
+
+## Accessibility
+
+- A native table supplies row labels and reference-position column headers; every base and gap remains visible text.
+- Column buttons have 44px targets and full-column selected fills, with aria-pressed and explicit coordinate names.
+- Long windows scroll inside their container. Read-only tables provide a focusable scroll region.
+- The selection summary lists supplied positions, including gaps, without inventing genomic coordinates.
+- The root div forwards its ref and native attributes; inconsistent or oversized windows have explicit unavailable states.
+- Selection actions compose the shared Button primitive; the aligned column controls retain their dedicated table interaction.
+
+## Classes
+
+`rs-sequence-alignment`, `rs-sequence-alignment-title`, `rs-sequence-alignment-copy`, `rs-sequence-alignment-scroll`, `rs-sequence-alignment-table`, `rs-sequence-alignment-heading`, `rs-sequence-alignment-control`, `rs-sequence-alignment-actions`, `rs-sequence-alignment-action`, `rs-sequence-alignment-column`, `rs-sequence-alignment-selected`, `rs-sequence-alignment-base`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/sequence-alignment.tsx`  
+CSS: `packages/core/css/components/sequence-alignment.css`
+
+
+---
+
+# Coverage inspector
+
+Shows supplied per-locus depth, base and strand counts with an exact position selector, bounded plot and complete depth table.
+
+Category: science  
+Name: `coverage-inspector`  
+Also known as: Read depth inspector, Per-base coverage, Strand count inspector, Locus coverage, Genomic depth plot  
+Page: https://vlak.dev/components/coverage-inspector/
+
+## When to use
+
+- A bounded window of up to 512 unique one-based loci with caller-supplied counts.
+- Inspect base and strand counts independently; the component does not sum them or reconcile them with depth.
+- Use null for missing counts. Zero means an explicitly recorded count of zero.
+
+## When not to
+
+- Calling variants, assigning significance, or applying coverage thresholds.
+- Treating absent counts as zero, or supplying fractional and negative counts as valid depth.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CoverageInspector } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add coverage-inspector
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/coverage-inspector.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<figure class="rs-coverage-inspector"><figcaption class="rs-coverage-inspector-title">Coverage window</figcaption><p class="rs-coverage-inspector-copy">chr7 · 1-based positions</p><div class="rs-coverage-inspector-label"><span id="coverage-position-label">Inspect position</span><div class="rs-select rs-select-fluid rs-coverage-inspector-select"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="coverage-position-label" aria-expanded="false" aria-haspopup="listbox"><span>101 · Depth 0</span></button></div></div><dl class="rs-coverage-inspector-counts"><div><dt>Depth</dt><dd class="rs-coverage-inspector-value">0</dd></div></dl></figure>
+```
+
+## Example
+
+```tsx
+import { CoverageInspector } from "@noorddev/vlak-react";
+
+<CoverageInspector label="Coverage window" contig="chr7" reference="Example reference" loci={[
+  { position: 101, depth: 0, bases: { A: 0, C: 0 }, forward: 0, reverse: 0 },
+  { position: 102, depth: null },
+  { position: 103, depth: 24, bases: { A: 20, C: 4 }, forward: 12, reverse: 12 },
+]} defaultValue={103} />
+```
+
+## Props
+
+### CoverageInspector
+
+Supplied coverage and counts, with missing depth distinct from recorded zero and no variant calls.
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `contig` (required) | `string` |  |  |
+| `reference` | `string` |  |  |
+| `loci` (required) | `readonly CoverageLocus[]` |  |  |
+| `value` | `number \| null` |  | A supplied one-based position, not an array index. |
+| `defaultValue` | `number \| null` |  |  |
+| `onValueChange` | `(position: number \| null) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the Vlak position selector and native depth-table disclosure. |
+| Arrow keys, typing | Opens and navigates the Vlak position selector by arrow keys and typeahead. Escape closes its menu. |
+| Enter, Space | Chooses a highlighted locus or opens and closes the focused native depth disclosure. |
+
+## Accessibility
+
+- The decorative plot has a complete visible depth table; open markers distinguish unavailable depth from recorded zero.
+- Vlak Select provides a 44px trigger and listbox for exact supplied genomic positions. Selected depth, base and strand counts use description lists.
+- Non-finite, negative and non-integer counts are unavailable; missing counts are explicitly not supplied.
+- At most 16 base symbols are displayed per selected locus. Invalid or oversized locus windows are reported without truncation.
+- The figure ref and native attributes pass through; selection supports controlled values and native form reset.
+
+## Classes
+
+`rs-coverage-inspector`, `rs-coverage-inspector-title`, `rs-coverage-inspector-copy`, `rs-coverage-inspector-plot`, `rs-coverage-inspector-stem`, `rs-coverage-inspector-point`, `rs-coverage-inspector-missing`, `rs-coverage-inspector-axis`, `rs-coverage-inspector-label`, `rs-coverage-inspector-select`, `rs-coverage-inspector-counts`, `rs-coverage-inspector-value`, `rs-coverage-inspector-summary`, `rs-coverage-inspector-table`, `rs-coverage-inspector-cell`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/coverage-inspector.tsx`  
+CSS: `packages/core/css/components/coverage-inspector.css`
+
+
+---
+
+# Genomic region field
+
+Collects a reference, contig and validated integer interval with an explicit one-based inclusive coordinate convention and native form submission.
+
+Category: science  
+Name: `genomic-region-field`  
+Also known as: Genome interval input, Genomic coordinates, Contig region input, One-based interval, Genomic location field  
+Page: https://vlak.dev/components/genomic-region-field/
+
+## When to use
+
+- Integer genomic intervals against a fixed caller-supplied reference and explicit contig lengths.
+- The field always uses one-based inclusive positions, including both endpoints. A one-position region has equal start and end.
+- name prefixes submitted reference, coordinates, contig, start and end fields. Native form reset restores uncontrolled defaults.
+- Changing contig keeps the entered integers and revalidates its bounds; no coordinate conversion occurs.
+
+## When not to
+
+- Silently converting zero-based half-open intervals or moving coordinates between genome assemblies.
+- Using guessed contig lengths or clamping invalid coordinates into a different region.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { GenomicRegionField } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add genomic-region-field
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/genomic-region-field.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-genomic-region-field"><legend class="rs-genomic-region-field-legend">Region</legend><p class="rs-genomic-region-field-copy">Reference: Example reference</p><p class="rs-genomic-region-field-copy">1-based, inclusive. Both start and end are included.</p><div class="rs-genomic-region-field-fields"><div class="rs-genomic-region-field-label"><span id="genomic-contig-label">Contig</span><div class="rs-select rs-select-fluid"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="genomic-contig-label" aria-expanded="false" aria-haspopup="listbox"><span>chr7</span></button></div></div><label class="rs-genomic-region-field-label">Start<input class="rs-input rs-input-full rs-genomic-region-field-control" type="number" min="1" step="1" name="region.start" value="101" /></label><label class="rs-genomic-region-field-label">End<input class="rs-input rs-input-full rs-genomic-region-field-control" type="number" min="1" step="1" name="region.end" value="105" /></label></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { GenomicRegionField } from "@noorddev/vlak-react";
+
+<GenomicRegionField label="Region" reference="Example reference" name="region" contigs={[{ id: "chr7", length: 100000 }, { id: "chr8", length: 80000 }]} defaultValue={{ contig: "chr7", start: 101, end: 105 }} required />
+```
+
+## Props
+
+### GenomicRegionField
+
+A region in one-based inclusive coordinates. No assembly or half-open conversion is performed.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `reference` (required) | `string` |  | Fixed reference name or accession, submitted with the region. |
+| `contigs` (required) | `readonly GenomicContig[]` |  |  |
+| `value` | `GenomicRegion` |  |  |
+| `defaultValue` | `GenomicRegion` | `emptyRegion` |  |
+| `onValueChange` | `(value: GenomicRegion) => void` |  |  |
+| `required` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
+| `description` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through the contig, start and end controls. |
+| Arrow keys, typing | Opens and navigates the Vlak contig selector or edits numeric inputs. Enter or Space confirms a contig; Escape closes its menu. |
+
+## Accessibility
+
+- A legend and visible labels name the group. Vlak Select and Input provide 44px controls; the coordinate convention is always visible.
+- Validation rejects partial regions, non-integers, unsafe integers, positions below 1, reversed endpoints and coordinates beyond the supplied contig.
+- Errors are linked to the controls and participate in native form validity. Invalid values remain editable without clamping.
+- Missing reference metadata and invalid contig catalogs are explicit; zero never becomes position 1 automatically.
+- Read-only fields preserve submitted values, disabled fieldsets do not submit, and controlled values remain application-owned.
+
+## Classes
+
+`rs-genomic-region-field`, `rs-genomic-region-field-legend`, `rs-genomic-region-field-fields`, `rs-genomic-region-field-label`, `rs-genomic-region-field-control`, `rs-genomic-region-field-copy`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [select](select.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/genomic-region-field.tsx`  
+CSS: `packages/core/css/components/genomic-region-field.css`
+
+
+---
+
+# Patchbay
+
+Connects supplied source and destination ports through a keyboard-navigable matrix, with signal types, channel groups, and blocked-route reasons.
+
+Category: creative  
+Name: `patchbay`  
+Also known as: Patchbay, Routing matrix, Audio routing, Crosspoint matrix, Connection matrix, Signal patching  
+Page: https://vlak.dev/components/patchbay/
+
+## When to use
+
+- An audio or signal-routing matrix whose ports and confirmed connections come from the host.
+- value/defaultValue/onValueChange for controlled routing requests or a local prototype; the host applies real routing changes.
+- Signal type strings must match; getBlockReason can add a host-specific restriction with a visible explanation.
+- Existing incompatible connections can be disconnected; routes involving unavailable ports remain explicitly listed and preserved.
+
+## When not to
+
+- Assuming the component creates audio streams, manages clocking, or configures a routing engine.
+- Silently deleting host connections when a port temporarily disappears.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { Patchbay } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add patchbay
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/patchbay.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-patchbay"><legend class="rs-patchbay-legend">Studio routing</legend><div class="rs-patchbay-viewport"><table class="rs-patchbay-table"><thead><tr><th class="rs-patchbay-header" scope="col">Source / destination</th><th class="rs-patchbay-header" scope="col">Monitor left<span class="rs-patchbay-detail">Outputs · audio</span></th></tr></thead><tbody><tr><th class="rs-patchbay-header" scope="row">Mix left<span class="rs-patchbay-detail">Mix bus · audio</span></th><td class="rs-patchbay-cell"><label class="rs-patchbay-control rs-patchbay-connected"><span aria-hidden="true">✓</span><input class="rs-patchbay-input" type="checkbox" checked aria-label="Mix left to Monitor left" /></label></td></tr></tbody></table></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { Patchbay } from "@noorddev/vlak-react";
+
+<Patchbay label="Studio routing" name="routes"
+  sources={[{ id: "mix-l", label: "Mix left", group: "Mix bus", signalType: "audio" }]}
+  destinations={[{ id: "out-l", label: "Monitor left", group: "Outputs", signalType: "audio" }, { id: "clock", label: "Clock", signalType: "control" }]}
+  defaultValue={[{ sourceId: "mix-l", destinationId: "out-l" }]} />
+```
+
+## Props
+
+### Patchbay
+
+A connection matrix for supplied ports; the caller owns the routing engine.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue" | "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `sources` (required) | `PatchPort[]` |  |  |
+| `destinations` (required) | `PatchPort[]` |  |  |
+| `value` | `PatchConnection[]` |  |  |
+| `defaultValue` | `PatchConnection[]` | `[]` |  |
+| `onValueChange` | `(connections: PatchConnection[]) => void` |  |  |
+| `getBlockReason` | `(source: PatchPort, destination: PatchPort) => string \| null` |  | Additional host constraints. Matching signal types are required by default. |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Enters the connection matrix at one enabled checkbox, then leaves the matrix. |
+| Arrow keys | Moves focus through enabled crosspoints in the same row or column. |
+| Home, End | Moves to the first or last enabled crosspoint in the row; Control includes the whole matrix. |
+| Space | Toggles the focused connection through the native checkbox. |
+
+## Accessibility
+
+- Native table headers identify sources and destinations; every checkbox also names both ports.
+- Connection targets are at least 44px, with a full-surface checked state and forced-colors support.
+- Blocked crosspoints expose reasons in text and descriptions. Roving focus skips disabled cells.
+- Named checkboxes submit connection pairs; read-only hidden values preserve existing routes. Form reset restores uncontrolled defaults.
+- The ref and native fieldset attributes reach the root fieldset.
+
+## Classes
+
+`rs-patchbay`, `rs-patchbay-legend`, `rs-patchbay-viewport`, `rs-patchbay-table`, `rs-patchbay-header`, `rs-patchbay-detail`, `rs-patchbay-cell`, `rs-patchbay-control`, `rs-patchbay-connected`, `rs-patchbay-blocked`, `rs-patchbay-input`, `rs-patchbay-note`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/patchbay.tsx`  
+CSS: `packages/core/css/components/patchbay.css`
+
+
+---
+
+# Kerning pair editor
+
+Edits supplied glyph-pair offsets in font units, with baseline and edited previews, bounded keyboard nudging, and one-step undo.
+
+Category: creative  
+Name: `kerning-pair-editor`  
+Also known as: KerningPairEditor, Kerning editor, Glyph pair spacing, Font pair editor, Pair adjustment  
+Page: https://vlak.dev/components/kerning-pair-editor/
+
+## When to use
+
+- Supplied glyph strings, a caller-selected font family, and explicit units per em.
+- value/defaultValue/onValueChange as a map from pair id to offset; null or an absent entry means not supplied.
+- baselineOffsets to compare and reset a pair; missing baselines never imply zero.
+- Optional min/max bounds default to negative and positive units per em; typed values retain native validation.
+- activePairId/defaultActivePairId/onActivePairChange for caller-owned pair navigation.
+
+## When not to
+
+- Treating the preview as a font shaping engine, font-file editor, or source of baseline kerning.
+- Assuming a requested font is installed; the browser uses its normal font fallback.
+- Undoing external host changes; undo is available only while the latest requested edit remains current.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { KerningPairEditor } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add kerning-pair-editor
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/kerning-pair-editor.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-kerning-pair-editor"><legend class="rs-kerning-pair-editor-legend">Pair spacing</legend><div class="rs-kerning-pair-editor-previews"><figure class="rs-kerning-pair-editor-preview"><figcaption class="rs-kerning-pair-editor-note">Edited: -80 units</figcaption><div class="rs-kerning-pair-editor-glyphs" style="font-family:Georgia,serif" role="img" aria-label="A followed by V, edited offset -80 units"><span class="rs-kerning-pair-editor-glyph" aria-hidden="true">A</span><span class="rs-kerning-pair-editor-glyph" aria-hidden="true" style="margin-inline-start:-0.08em">V</span></div></figure></div><label class="rs-kerning-pair-editor-field">Offset (font units)<input class="rs-input rs-input-full rs-kerning-pair-editor-input" type="number" value="-80" min="-1000" max="1000" step="any" /></label></fieldset>
+```
+
+## Example
+
+```tsx
+import { KerningPairEditor } from "@noorddev/vlak-react";
+
+<KerningPairEditor label="Pair spacing" name="kerning" fontFamily="Georgia, serif" unitsPerEm={1000}
+  pairs={[{ id: "av", left: "A", right: "V" }, { id: "to", left: "T", right: "o" }]}
+  baselineOffsets={{ av: -60, to: -40 }} defaultValue={{ av: -80, to: -50 }} />
+```
+
+## Props
+
+### KerningPairEditor
+
+Explicit pair offsets with browser font previews, without font-file editing or shaping.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue" | "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `pairs` (required) | `KerningPair[]` |  |  |
+| `fontFamily` (required) | `string` |  |  |
+| `unitsPerEm` (required) | `number` |  |  |
+| `baselineOffsets` | `KerningOffsets` | `{}` |  |
+| `value` | `KerningOffsets` |  |  |
+| `defaultValue` | `KerningOffsets` | `{}` |  |
+| `onValueChange` | `(offsets: KerningOffsets) => void` |  |  |
+| `activePairId` | `string \| null` |  |  |
+| `defaultActivePairId` | `string \| null` |  |  |
+| `onActivePairChange` | `(id: string \| null) => void` |  |  |
+| `min` | `number` | `-unitsPerEm` |  |
+| `max` | `number` | `unitsPerEm` |  |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through the pair selector, navigation, offset editor, reset, and undo actions. |
+| Arrow left, Arrow right | Nudges the focused offset by one font unit within the supplied bounds. |
+| Shift + Arrow left, Shift + Arrow right | Nudges the focused offset by ten font units. |
+| Enter, Space | Activates the focused previous, next, reset, or undo button. |
+
+## Accessibility
+
+- A fieldset and legend name the editor; Vlak Select and Input controls have 44px targets.
+- Baseline and edited offsets remain text, and each pair preview has an accessible description.
+- Preview spacing is offset divided by units per em; intrinsic browser kerning and ligatures are disabled for the comparison.
+- Missing or invalid font units suppress geometry; typed out-of-bounds values expose native validity and a visible explanation.
+- The ref and native attributes reach the fieldset. Named offsets submit per pair; reset restores uncontrolled offsets and clears undo.
+
+## Classes
+
+`rs-kerning-pair-editor`, `rs-kerning-pair-editor-legend`, `rs-kerning-pair-editor-toolbar`, `rs-kerning-pair-editor-field`, `rs-kerning-pair-editor-input`, `rs-kerning-pair-editor-button`, `rs-kerning-pair-editor-previews`, `rs-kerning-pair-editor-preview`, `rs-kerning-pair-editor-glyphs`, `rs-kerning-pair-editor-glyph`, `rs-kerning-pair-editor-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [input](input.md), [button](button.md).  
+React: `packages/react/src/components/kerning-pair-editor.tsx`  
+CSS: `packages/core/css/components/kerning-pair-editor.css`
+
+
+---
+
+# Assembly variant matrix
+
+Edits independent population, bill-of-materials, and placement flags per reference and assembly variant, preserving unspecified choices.
+
+Category: electronics  
+Name: `assembly-variant-matrix`  
+Also known as: AssemblyVariantMatrix, Assembly options, Population matrix, Bill of materials variants, Placement options, Reference variant table  
+Page: https://vlak.dev/components/assembly-variant-matrix/
+
+## When to use
+
+- Caller-owned assembly references, part labels, and named build variants.
+- Three independent boolean-or-null flags: population, bill-of-materials inclusion, and placement-file inclusion.
+- value/defaultValue/onValueChange to receive the proposed cell array; editing one flag leaves the other flags unchanged.
+- Missing cells begin unspecified. Conflicting duplicate cells and unavailable references remain visible rather than being silently merged.
+
+## When not to
+
+- Inferring bill-of-materials or placement policy from the populated flag.
+- Assuming the component generates manufacturing files or changes a board design.
+- Treating unspecified flags as excluded or not populated.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AssemblyVariantMatrix } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add assembly-variant-matrix
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/assembly-variant-matrix.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-assembly-variant-matrix"><legend class="rs-assembly-variant-matrix-legend">Assembly options</legend><div class="rs-assembly-variant-matrix-viewport"><table class="rs-assembly-variant-matrix-table"><thead><tr><th class="rs-assembly-variant-matrix-header" scope="col">Reference / variant</th><th class="rs-assembly-variant-matrix-header" scope="col">Pilot</th></tr></thead><tbody><tr><th class="rs-assembly-variant-matrix-header" scope="row">R1<span class="rs-assembly-variant-matrix-part">10 kΩ resistor</span></th><td class="rs-assembly-variant-matrix-cell"><details class="rs-assembly-variant-matrix-details"><summary class="rs-assembly-variant-matrix-summary">Edit R1 in Pilot<span class="rs-assembly-variant-matrix-part">Not specified</span></summary><div class="rs-assembly-variant-matrix-editor"><div class="rs-assembly-variant-matrix-field"><span>Populated</span><div class="rs-select rs-select-fluid rs-assembly-variant-matrix-select"><button class="rs-dropdown" role="combobox" aria-label="Populated, R1 in Pilot" aria-haspopup="listbox" aria-expanded="false" type="button">Unspecified</button></div></div></div></details></td></tr></tbody></table></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { AssemblyVariantMatrix } from "@noorddev/vlak-react";
+
+<AssemblyVariantMatrix label="Assembly options" name="assembly"
+  references={[{ id: "r1", label: "R1", partLabel: "10 kΩ resistor" }]}
+  variants={[{ id: "pilot", label: "Pilot" }, { id: "production", label: "Production" }]}
+  defaultValue={[{ referenceId: "r1", variantId: "pilot", populated: true, includeInBom: true, includeInPlacement: true }, { referenceId: "r1", variantId: "production", populated: false, includeInBom: true, includeInPlacement: false }]} />
+```
+
+## Props
+
+### AssemblyVariantMatrix
+
+Independent fitted, bill-of-materials and placement choices per reference and variant.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue" | "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `references` (required) | `AssemblyReference[]` |  |  |
+| `variants` (required) | `AssemblyVariant[]` |  |  |
+| `value` | `AssemblyVariantState[]` |  |  |
+| `defaultValue` | `AssemblyVariantState[]` | `[]` |  |
+| `onValueChange` | `(cells: AssemblyVariantState[]) => void` |  |  |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through native cell summaries and controls in expanded editors. |
+| Enter, Space | Opens or closes the focused cell's native details editor. |
+| Arrow keys | Opens and navigates the Vlak selector between Unspecified, Yes, and No; Enter confirms the highlighted choice. |
+
+## Accessibility
+
+- Native row and column headers identify each reference and variant; cell editor summaries repeat that context.
+- Each independent Vlak Select has a flag-specific name including its reference and variant, and a 44px target.
+- Compact summaries expose all three flags in text; no color or population shortcut carries policy.
+- Native details reveal the editor without focus traps; Vlak Select supplies the choice menu, and overflow remains inside the matrix.
+- Named controls submit each flag separately. Read-only values and native form reset are supported; the ref reaches the fieldset.
+
+## Classes
+
+`rs-assembly-variant-matrix`, `rs-assembly-variant-matrix-legend`, `rs-assembly-variant-matrix-viewport`, `rs-assembly-variant-matrix-table`, `rs-assembly-variant-matrix-header`, `rs-assembly-variant-matrix-part`, `rs-assembly-variant-matrix-cell`, `rs-assembly-variant-matrix-details`, `rs-assembly-variant-matrix-summary`, `rs-assembly-variant-matrix-editor`, `rs-assembly-variant-matrix-field`, `rs-assembly-variant-matrix-select`, `rs-assembly-variant-matrix-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/assembly-variant-matrix.tsx`  
+CSS: `packages/core/css/components/assembly-variant-matrix.css`
+
+
+---
+
+# Alarm panel
+
+Industrial alarm records with independent condition, acknowledgement and shelving states, explicit filters and host-confirmed actions.
+
+Category: engineering  
+Name: `alarm-panel`  
+Also known as: Industrial alarms, Alarm acknowledgement, Alarm shelving, Operator alarm list, Process alarm panel  
+Page: https://vlak.dev/components/alarm-panel/
+
+## When to use
+
+- Operator alarm lists with supplied lifecycle fields and explicit unknown values.
+- Supply allowed actions and onAction to request acknowledgement, shelving or unshelving. Return pending and then confirmed records from the host.
+- Use filter and onFilterChange for an application-owned filter; uncontrolled filtering starts from defaultFilter.
+- Provide unique alarm ids, a bounded set of visible records, event time labels and the site's explicit time-zone context.
+
+## When not to
+
+- Treating acknowledgement as clearing a condition, or shelving as acknowledgement.
+- Using a displayed action as proof that equipment changed state. The host owns permissions, audit records, filtering of large streams and shelving timers.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AlarmPanel } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add alarm-panel
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/alarm-panel.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-alarm-panel"><p class="rs-alarm-panel-heading">Plant alarms</p><ul class="rs-alarm-panel-list"><li class="rs-alarm-panel-item"><div class="rs-alarm-panel-head">Cooling flow</div><dl class="rs-alarm-panel-states"><div><dt class="rs-alarm-panel-term">Condition</dt><dd class="rs-alarm-panel-value">Cleared</dd></div><div><dt class="rs-alarm-panel-term">Acknowledgement</dt><dd class="rs-alarm-panel-value">Unacknowledged</dd></div><div><dt class="rs-alarm-panel-term">Shelving</dt><dd class="rs-alarm-panel-value">Not shelved</dd></div></dl></li></ul></div>
+```
+
+## Example
+
+```tsx
+import { AlarmPanel } from "@noorddev/vlak-react";
+
+<AlarmPanel label="Plant alarms" alarms={[
+  { id: "flow", label: "Cooling flow", source: "Example circulation loop", priority: "Medium", condition: "cleared", acknowledgement: "unacknowledged", shelving: "unshelved", timeLabel: "14:32, supplied event time" },
+  { id: "sensor", label: "Sensor connection", condition: "active", acknowledgement: "acknowledged", shelving: "shelved", shelvedUntilLabel: "15:00, local plant time" },
+]} />
+```
+
+## Props
+
+### AlarmPanel
+
+An industrial alarm's condition, acknowledgement and shelving are independent records.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `alarms` (required) | `readonly AlarmRecord[]` |  |  |
+| `filter` | `AlarmFilter` |  |  |
+| `defaultFilter` | `AlarmFilter` | `"all"` |  |
+| `onFilterChange` | `(filter: AlarmFilter) => void` |  |  |
+| `onAction` | `(id: string, action: AlarmAction) => void` |  | Requests an operation. Update the supplied record only after the host confirms it. |
+| `disabled` | `boolean` |  |  |
+| `description` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through filter buttons and supplied enabled alarm actions. |
+| Enter, Space | Applies a filter or requests the focused action. |
+
+## Accessibility
+
+- Each alarm exposes separate condition, acknowledgement and shelving fields as visible text in a description list.
+- Pressed filter buttons use a full fill; all controls have 44px targets, visible keyboard focus and forced-colour support.
+- A polite record count reflects the current filter. Pending records keep their confirmed state and disable actions.
+- The div ref, native attributes, className and style pass through.
+
+## Classes
+
+`rs-alarm-panel`, `rs-alarm-panel-heading`, `rs-alarm-panel-copy`, `rs-alarm-panel-filters`, `rs-alarm-panel-button`, `rs-alarm-panel-selected`, `rs-alarm-panel-list`, `rs-alarm-panel-item`, `rs-alarm-panel-head`, `rs-alarm-panel-states`, `rs-alarm-panel-term`, `rs-alarm-panel-value`, `rs-alarm-panel-actions`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/alarm-panel.tsx`  
+CSS: `packages/core/css/components/alarm-panel.css`
+
+
+---
+
+# Work offset panel
+
+Reported machine and work coordinates alongside editable draft offsets, explicit axis units and a host-owned apply request.
+
+Category: engineering  
+Name: `work-offset-panel`  
+Also known as: Machine coordinates, Work coordinate system, Fixture offsets, Machining offsets, Coordinate readout  
+Page: https://vlak.dev/components/work-offset-panel/
+
+## When to use
+
+- Editing a supplied offset record while keeping actual machine and work readings visible.
+- Supply both reported coordinate sets independently; rotations and additional offsets belong to the controller, so no machine-to-work subtraction is inferred.
+- value and onValueChange let the host load offsets for a chosen draft system. Uncontrolled system changes retain the entered offsets; they do not fetch another system's record.
+- onApply requests a complete finite draft containing only the listed axes and a known enabled system. activeSystemId, offsetState and actual readings change only when supplied by the host.
+- name submits name.system and name.axisId values. External form association and native reset are supported.
+
+## When not to
+
+- Interpreting an apply request as controller acceptance, machine movement or persistence.
+- Treating missing coordinates as zero, or suspended offsets as zeroed offsets. The host owns controller access, validation and interlocks.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { WorkOffsetPanel } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add work-offset-panel
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/work-offset-panel.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-work-offset-panel"><legend class="rs-work-offset-panel-legend">Work coordinates</legend><p class="rs-work-offset-panel-copy">Active system: G54 · Offsets active</p><div class="rs-work-offset-panel-field"><span id="work-offset-system-label">Draft coordinate system</span><div class="rs-select rs-select-fluid"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="work-offset-system-label" aria-expanded="false" aria-haspopup="listbox"><span>G54</span></button></div></div><label class="rs-work-offset-panel-field">X offset (mm)<input class="rs-input rs-input-full rs-work-offset-panel-control" type="number" step="any" value="125" /></label></fieldset>
+```
+
+## Example
+
+```tsx
+import { WorkOffsetPanel } from "@noorddev/vlak-react";
+
+<WorkOffsetPanel label="Work coordinates" name="fixture" activeSystemId="g54" offsetState="active" systems={[{ id: "g54", label: "G54" }, { id: "g55", label: "G55" }]} axes={[
+  { id: "x", label: "X", unit: "mm", machine: 145, work: 20 },
+  { id: "y", label: "Y", unit: "mm", machine: 60, work: 10 },
+]} defaultValue={{ systemId: "g54", offsets: { x: 125, y: 50 } }} />
+```
+
+## Props
+
+### WorkOffsetPanel
+
+Edit a proposed offset while retaining independently supplied machine and work positions.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `axes` (required) | `readonly WorkOffsetAxis[]` |  |  |
+| `systems` (required) | `readonly WorkOffsetSystem[]` |  |  |
+| `activeSystemId` (required) | `string \| null` |  | Actual active system reported by the controller, independent of the draft selection. |
+| `value` | `WorkOffsetValue` |  |  |
+| `defaultValue` | `WorkOffsetValue` | `{ systemId: null, offsets: {} }` |  |
+| `onValueChange` | `(value: WorkOffsetValue) => void` |  |  |
+| `onApply` | `(value: WorkOffsetValue) => void` |  | Request a complete offset update; machine control and coordinate calculations belong to the host. |
+| `offsetState` | `"active" \| "suspended" \| "unknown"` | `"unknown"` |  |
+| `pending` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
+| `description` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through the system selector, scroll region, axis offset inputs and apply action. |
+| Arrow keys | Opens and navigates the Vlak system selector, steps number inputs or scrolls the focused table region. Escape closes the selector. |
+| Enter, Space | Confirms a highlighted system or requests the focused Apply offsets action when a complete draft is available. |
+
+## Accessibility
+
+- A fieldset and legend name the editor. A captioned table separates actual readings from draft values, with axis units in each accessible input name.
+- Unknown, unavailable and zero readings remain distinct. Invalid supplied offsets are marked and prevent apply.
+- Vlak Select, Input and Button retain 44px targets; narrow layouts scroll the table inside a focusable, uniquely named region.
+- Read-only values remain submittable; disabled or pending controls do not submit. Native reset restores uncontrolled defaults without overwriting controlled values.
+- The fieldset ref, native attributes, className and style pass through.
+
+## Classes
+
+`rs-work-offset-panel`, `rs-work-offset-panel-legend`, `rs-work-offset-panel-copy`, `rs-work-offset-panel-field`, `rs-work-offset-panel-control`, `rs-work-offset-panel-viewport`, `rs-work-offset-panel-table`, `rs-work-offset-panel-caption`, `rs-work-offset-panel-cell`, `rs-work-offset-panel-axis`, `rs-work-offset-panel-offset`, `rs-work-offset-panel-button`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [select](select.md), [button](button.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/work-offset-panel.tsx`  
+CSS: `packages/core/css/components/work-offset-panel.css`
+
+
+---
+
+# Joint panel
+
+Pairs host-reported joint positions with independent draft targets, supplied units and limits, and an explicit request action.
+
+Category: robotics  
+Name: `joint-panel`  
+Also known as: JointPanel, Robot joint targets, Joint monitor, Joint position editor, Robot axis targets  
+Page: https://vlak.dev/components/joint-panel/
+
+## When to use
+
+- Reported joint positions and a separate draft target map keyed by joint identifier.
+- value/defaultValue/onValueChange for controlled editing or an isolated prototype; drafts never inherit missing values from reported positions.
+- Finite minimum and maximum values in each joint's supplied unit. A complete valid draft is required before requesting targets.
+- onRequestTargets to ask the host to apply a draft; pending and confirmedLabel describe independently supplied request state.
+- Missing, non-finite, duplicate, and unlisted records receive explicit feedback. No motion or limit policy is inferred.
+
+## When not to
+
+- Treating a successful click as confirmed robot movement.
+- Using the component as a motion planner, interlock, unit converter, or source of joint limits.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { JointPanel } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add joint-panel
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/joint-panel.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-joint-panel"><legend class="rs-joint-panel-legend">Arm joints</legend><p class="rs-joint-panel-copy">Reported at: 12:00:00.125</p><ul class="rs-joint-panel-list"><li class="rs-joint-panel-joint"><div><p class="rs-joint-panel-title">Shoulder</p><p class="rs-joint-panel-reading">Reported: 12.5 deg</p><p class="rs-joint-panel-copy">Limits: -90 to 90 deg</p></div><label class="rs-joint-panel-field">Draft target (deg)<input class="rs-input rs-input-full rs-joint-panel-input" type="number" step="any" min="-90" max="90" value="0" aria-label="Shoulder draft target (deg)" /></label></li></ul><button class="rs-btn-primary rs-joint-panel-button" type="button">Request targets</button></fieldset>
+```
+
+## Example
+
+```tsx
+import { JointPanel } from "@noorddev/vlak-react";
+
+<JointPanel label="Arm joints" name="targets" timeLabel="12:00:00.125"
+  joints={[{ id: "shoulder", label: "Shoulder", unit: "deg", reported: 12.5, minimum: -90, maximum: 90 }, { id: "slide", label: "Slide", unit: "m", reported: 0, minimum: 0, maximum: 0.5 }]}
+  defaultValue={{ shoulder: 0, slide: 0 }}
+  onRequestTargets={targets => console.log("Requested targets", targets)} />
+```
+
+## Props
+
+### JointPanel
+
+Draft joint targets remain separate from host-reported positions and request confirmation.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `joints` (required) | `readonly JointRecord[]` |  |  |
+| `value` | `JointTargets` |  |  |
+| `defaultValue` | `JointTargets` | `{}` |  |
+| `onValueChange` | `(targets: JointTargets) => void` |  |  |
+| `onRequestTargets` | `(targets: JointTargets) => void` |  | Requests the complete draft. Motion and confirmation belong to the host. |
+| `pending` | `boolean` | `false` |  |
+| `confirmedLabel` | `ReactNode` |  |  |
+| `timeLabel` | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through target inputs and the request button. |
+| Arrow up, Arrow down | Uses native number-input stepping within the supplied limits. |
+| Enter, Space | Activates the focused request button when the complete draft is valid. |
+
+## Accessibility
+
+- The fieldset and legend name the joint group; each target names its joint and unit.
+- Vlak Input and Button provide consistent control sizing, focus treatment, and native keyboard behavior.
+- Native validity and visible messages identify missing or out-of-bounds targets; reported zero remains distinct from missing data.
+- Named inputs submit per-joint drafts. Form reset restores uncontrolled defaults, read-only drafts still submit, and pending controls are disabled.
+- The ref, native fieldset attributes, className, and style reach the root fieldset.
+
+## Classes
+
+`rs-joint-panel`, `rs-joint-panel-legend`, `rs-joint-panel-copy`, `rs-joint-panel-list`, `rs-joint-panel-joint`, `rs-joint-panel-title`, `rs-joint-panel-reading`, `rs-joint-panel-field`, `rs-joint-panel-input`, `rs-joint-panel-button`
+
+## Dependencies
+
+Registry dependencies: [input](input.md), [button](button.md).  
+React: `packages/react/src/components/joint-panel.tsx`  
+CSS: `packages/core/css/components/joint-panel.css`
+
+
+---
+
+# Robot pose
+
+Displays exact Cartesian translation and explicitly named orientation components for a selected supplied pose, with frame, time, and recorded status.
+
+Category: robotics  
+Name: `robot-pose`  
+Also known as: RobotPose, Pose inspector, Cartesian pose, Robot pose record, Quaternion inspector, End effector pose  
+Page: https://vlak.dev/components/robot-pose/
+
+## When to use
+
+- Caller-supplied pose records with a frame, time label, recorded status, translation unit, and explicit orientation representation.
+- value/defaultValue/onValueChange to select a supplied record by identifier; changing records does not transform coordinates.
+- orientation.components for exact named values, with optional per-component units. Include axis order and intrinsic or extrinsic conventions in the representation label when relevant.
+- Missing values remain Not supplied, non-finite values remain Unavailable, and zero is never treated as missing.
+- The first supplied record is selected by default; an explicit null leaves the selection empty.
+
+## When not to
+
+- Treating the view as a frame tree, transform calculator, quaternion normalizer, or inverse-kinematics solver.
+- Omitting orientation conventions or presenting an unconfirmed pose as the robot's active target.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { RobotPose } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add robot-pose
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/robot-pose.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-robot-pose"><legend class="rs-robot-pose-legend">Tool pose</legend><dl class="rs-robot-pose-metadata"><div class="rs-robot-pose-detail"><dt>Frame</dt><dd class="rs-robot-pose-text">base</dd></div><div class="rs-robot-pose-detail"><dt>Recorded at</dt><dd class="rs-robot-pose-text">12:00:00.125</dd></div></dl><div><p class="rs-robot-pose-heading">Translation</p><p class="rs-robot-pose-copy">Unit: m</p><dl class="rs-robot-pose-values"><div><dt>X</dt><dd class="rs-robot-pose-value">0.125</dd></div><div><dt>Y</dt><dd class="rs-robot-pose-value">0</dd></div><div><dt>Z</dt><dd class="rs-robot-pose-value">0.25</dd></div></dl></div><p class="rs-robot-pose-copy">Representation: Quaternion, x y z w</p></fieldset>
+```
+
+## Example
+
+```tsx
+import { RobotPose } from "@noorddev/vlak-react";
+
+<RobotPose label="Tool pose" name="pose" poses={[{
+  id: "tool-base", label: "Tool in base", frame: "base", timeLabel: "12:00:00.125", status: "Recorded",
+  translation: { x: 0.125, y: 0, z: 0.25, unit: "m" },
+  orientation: { representation: "Quaternion, x y z w", components: [
+    { id: "qx", label: "qx", value: 0 }, { id: "qy", label: "qy", value: 0 },
+    { id: "qz", label: "qz", value: 0 }, { id: "qw", label: "qw", value: 1 }
+  ] }
+}]} />
+```
+
+## Props
+
+### RobotPose
+
+Exact supplied Cartesian and orientation records, with no frame transform or pose computation.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `poses` (required) | `readonly RobotPoseRecord[]` |  |  |
+| `value` | `string \| null` |  |  |
+| `defaultValue` | `string \| null` |  |  |
+| `onValueChange` | `(poseId: string \| null) => void` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+| `description` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the Vlak pose-record selector. |
+| Enter, Space, Arrow keys | Opens and navigates the selector; Enter confirms the highlighted record. |
+| Home, End, Escape | Moves to an end of the menu or closes it without changing the record. |
+
+## Accessibility
+
+- A fieldset and legend name the pose view; the Vlak Select names the recorded-pose choice and its menu.
+- Definition lists retain every translation and orientation component as exact text, including zero, missing values, and explicit units.
+- A named selection submits its supplied pose identifier through a hidden input. Parent form reset restores uncontrolled selection.
+- Read-only selection retains its submitted value; native disabled fieldsets omit it.
+- The ref and native attributes reach the root fieldset. No live announcement is attached to streamed pose data.
+
+## Classes
+
+`rs-robot-pose`, `rs-robot-pose-legend`, `rs-robot-pose-field`, `rs-robot-pose-select`, `rs-robot-pose-metadata`, `rs-robot-pose-detail`, `rs-robot-pose-heading`, `rs-robot-pose-values`, `rs-robot-pose-value`, `rs-robot-pose-text`, `rs-robot-pose-copy`
+
+## Dependencies
+
+Registry dependencies: [select](select.md).  
+React: `packages/react/src/components/robot-pose.tsx`  
+CSS: `packages/core/css/components/robot-pose.css`
+
+
+---
+
+# Robot mission queue
+
+Shows supplied mission order and recorded step states, with keyboard reorder requests and explicit host actions separate from pending and confirmed records.
+
+Category: robotics  
+Name: `robot-mission-queue`  
+Also known as: RobotMissionQueue, Robot task queue, Mission plan, Robot job sequence, Mission steps  
+Page: https://vlak.dev/components/robot-mission-queue/
+
+## When to use
+
+- A caller-owned ordered step list, explicit recorded statuses, and only those actions the host makes available.
+- onOrderChange receives step identifiers in the proposed order. The host supplies the resulting records; the queue never rewrites status on a reorder request.
+- onAction receives a step identifier and supplied action identifier. pending and confirmedLabel remain separate host records.
+- Pending steps lock their own actions and adjacent reorder controls. readOnly keeps all request controls disabled.
+- Named hidden inputs submit the supplied step identifiers in order; invalid duplicate step or action identifiers suppress ambiguous controls.
+
+## When not to
+
+- Assuming a request starts, cancels, schedules, or confirms physical execution.
+- Using display order as an execution dependency graph or deriving allowed actions from a status string.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { RobotMissionQueue } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add robot-mission-queue
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/robot-mission-queue.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-robot-mission-queue"><legend class="rs-robot-mission-queue-legend">Inspection mission</legend><ol class="rs-robot-mission-queue-list"><li class="rs-robot-mission-queue-step"><div class="rs-robot-mission-queue-head"><p class="rs-robot-mission-queue-title">Inspect station</p><p class="rs-robot-mission-queue-status">Recorded: Not started</p></div><div class="rs-robot-mission-queue-actions"><button class="rs-btn-ghost rs-robot-mission-queue-button" type="button" aria-label="Review plan: step 1, Inspect station">Review plan</button></div></li></ol><p class="rs-robot-mission-queue-copy">Reordering and actions request host changes. Reported mission state remains supplied by the host.</p></fieldset>
+```
+
+## Example
+
+```tsx
+import { RobotMissionQueue } from "@noorddev/vlak-react";
+
+<RobotMissionQueue label="Inspection mission" name="mission"
+  steps={[{ id: "inspect", label: "Inspect station", status: "Not started", actions: [{ id: "review", label: "Review plan" }] }, { id: "return", label: "Return to dock", status: "Not started" }]}
+  onOrderChange={ids => console.log("Requested order", ids)}
+  onAction={(stepId, actionId) => console.log("Requested action", stepId, actionId)} />
+```
+
+## Props
+
+### RobotMissionQueue
+
+A supplied mission order, recorded step states, and explicit host request actions.
+
+Extends `FieldsetHTMLAttributes<HTMLFieldSetElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `steps` (required) | `readonly RobotMissionStep[]` |  |  |
+| `onOrderChange` | `(stepIds: readonly string[]) => void` |  | Proposed step identifiers in order; the host confirms and supplies the resulting records. |
+| `onAction` | `(stepId: string, actionId: string) => void` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+| `description` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through enabled reorder and host-action buttons. |
+| Enter, Space | Requests the focused reorder or supplied host action. |
+
+## Accessibility
+
+- The fieldset and legend name the mission, and a native ordered list conveys its supplied order.
+- Vlak Button actions name both the step number and label. Reorder buttons state their direction and disable at list boundaries.
+- Recorded status, host confirmation, and request-pending text remain distinct; pending feedback uses a status role.
+- Action descriptions are connected to the corresponding button, including its recorded status.
+- The ref and native fieldset attributes reach the root, and read-only ordered records remain available to forms.
+
+## Classes
+
+`rs-robot-mission-queue`, `rs-robot-mission-queue-legend`, `rs-robot-mission-queue-list`, `rs-robot-mission-queue-step`, `rs-robot-mission-queue-head`, `rs-robot-mission-queue-title`, `rs-robot-mission-queue-copy`, `rs-robot-mission-queue-status`, `rs-robot-mission-queue-actions`, `rs-robot-mission-queue-button`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/robot-mission-queue.tsx`  
+CSS: `packages/core/css/components/robot-mission-queue.css`
+
+
+---
+
+# Pad inspector
+
+Circuit-board pad selection with supplied footprint references, net and layer records, pad types and a dimension table with explicit units.
+
+Category: electronics  
+Name: `pad-inspector`  
+Also known as: Footprint pad, Circuit board pad properties, Pad geometry, Copper pad inspector, Board pad selector  
+Page: https://vlak.dev/components/pad-inspector/
+
+## When to use
+
+- Inspecting a bounded collection of pad records supplied by a board editor or manufacturing export.
+- Supply unique, non-empty pad ids and unique measurement ids within each pad. Pad numbers may repeat; ids identify the actual records.
+- Use value and onValueChange for host-owned selection and board or schematic cross-highlighting. No connectivity or geometry calculation runs in the component.
+- Supply geometry values as strings to preserve significant figures. Null fields remain explicitly missing; an empty layers array means none recorded.
+
+## When not to
+
+- Inferring that a missing net means unconnected, a missing drill means no hole, or an unknown layer list means every copper layer.
+- Treating selection as a board edit or inferring dimensions from the shape name.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { PadInspector } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add pad-inspector
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/pad-inspector.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-pad-inspector"><legend class="rs-pad-inspector-legend">Connector pads</legend><div class="rs-pad-inspector-label"><span id="pad-choice-label">Pad</span><div class="rs-select rs-select-fluid rs-pad-inspector-control"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="pad-choice-label" aria-expanded="false" aria-haspopup="listbox">J1 / Pad 1 · pad-a</button></div></div><dl class="rs-pad-inspector-properties"><div><dt class="rs-pad-inspector-term">Net</dt><dd class="rs-pad-inspector-detail">Supply</dd></div><div><dt class="rs-pad-inspector-term">Layers</dt><dd class="rs-pad-inspector-detail">Front copper, Back copper</dd></div></dl><table class="rs-pad-inspector-table"><caption class="rs-pad-inspector-caption">Supplied geometry</caption><thead><tr><th class="rs-pad-inspector-cell" scope="col">Dimension</th><th class="rs-pad-inspector-cell" scope="col">Value</th><th class="rs-pad-inspector-cell" scope="col">Unit</th></tr></thead><tbody><tr><th class="rs-pad-inspector-cell" scope="row">Pad diameter</th><td class="rs-pad-inspector-cell">1.80</td><td class="rs-pad-inspector-cell">mm</td></tr></tbody></table></fieldset>
+```
+
+## Example
+
+```tsx
+import { PadInspector } from "@noorddev/vlak-react";
+
+<PadInspector label="Connector pads" name="pad" boardLabel="Example board, revision C" defaultValue="pad-a" pads={[
+  { id: "pad-a", reference: "J1", number: "1", net: "Supply", layers: ["Front copper", "Back copper"], type: "Through hole", shape: "Circle", geometry: [
+    { id: "diameter", label: "Pad diameter", value: "1.80", unit: "mm" },
+    { id: "drill", label: "Drill diameter", value: "0.90", unit: "mm" },
+  ] },
+  { id: "pad-b", reference: "J1", number: "2", net: "Return", layers: ["Front copper"], type: "Surface mount", shape: "Rectangle" },
+]} />
+```
+
+## Props
+
+### PadInspector
+
+Inspects supplied pad records without inferring connectivity, shape or dimensions.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `pads` (required) | `readonly PadInspectorPad[]` |  |  |
+| `value` | `string \| null` |  |  |
+| `defaultValue` | `string \| null` | `null` |  |
+| `onValueChange` | `(id: string \| null) => void` |  | Requests pad selection only. The host owns board and schematic cross-highlighting. |
+| `boardLabel` | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `selectionLabel` | `string` | `"Pad"` |  |
+| `required` | `boolean` |  |  |
+| `readOnly` | `boolean` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the Vlak pad selector. |
+| Arrow keys, Home, End | Opens or moves through available pad choices. |
+| Enter, Space | Chooses the focused pad. Controlled selection waits for a host update. |
+| Escape | Closes the selector and keeps the current choice. |
+
+## Accessibility
+
+- A fieldset legend names the inspector. Pad choices include their record id, so repeated pad numbers remain distinguishable.
+- Vlak Select supplies the 44px trigger, keyboard listbox and disabled choices. Pad properties use a description list and dimensions use a captioned table with row and column headers.
+- Missing records, unavailable selections, non-finite measurements and missing units have explicit text. Numeric zero and string precision are retained.
+- Native form association and reset are supported. Read-only valid selection remains submittable, while disabled selection is omitted.
+- The fieldset ref, native attributes, className and style pass through.
+
+## Classes
+
+`rs-pad-inspector`, `rs-pad-inspector-legend`, `rs-pad-inspector-label`, `rs-pad-inspector-control`, `rs-pad-inspector-properties`, `rs-pad-inspector-term`, `rs-pad-inspector-detail`, `rs-pad-inspector-table`, `rs-pad-inspector-caption`, `rs-pad-inspector-cell`, `rs-pad-inspector-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [dropdown-menu](dropdown-menu.md).  
+React: `packages/react/src/components/pad-inspector.tsx`  
+CSS: `packages/core/css/components/pad-inspector.css`
+
+
+---
+
+# Design rule results
+
+Supplied board-check violations with severity and status filters, object and location details, and host-confirmed selection and resolution actions.
+
+Category: electronics  
+Name: `design-rule-results`  
+Also known as: Board rule check, Circuit board violations, Clearance results, Design-rule review, Board verification results  
+Page: https://vlak.dev/components/design-rule-results/
+
+## When to use
+
+- Reviewing a bounded set of results supplied by a board design-rule checker.
+- Supply unique result ids, the confirmed severity and status, and any available layer, net, object and location records. Null severity or status means unknown.
+- onSelect requests host selection; selectedId confirms it. onResolve requests resolution of an open result unless canResolve is false. Pending and disabled records cannot invoke actions.
+- Use filter and onFilterChange for host-owned filters; uncontrolled filters start from defaultFilter. Named filters submit as name.severity and name.status.
+
+## When not to
+
+- Treating an action click as a resolved board defect or treating an excluded result as resolved.
+- Inferring that an empty result array means a check ran or passed. The component does not run rules, edit the board or invent clearance limits.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { DesignRuleResults } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add design-rule-results
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/design-rule-results.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-design-rule-results"><legend class="rs-design-rule-results-legend">Reported design rules</legend><p class="rs-design-rule-results-note">Synthetic check run 042</p><ul class="rs-design-rule-results-list"><li class="rs-design-rule-results-item"><p class="rs-design-rule-results-title">Copper clearance</p><dl class="rs-design-rule-results-properties"><div><dt class="rs-design-rule-results-term">Severity</dt><dd class="rs-design-rule-results-detail">Error</dd></div><div><dt class="rs-design-rule-results-term">Confirmed status</dt><dd class="rs-design-rule-results-detail">Open</dd></div><div><dt class="rs-design-rule-results-term">Layer</dt><dd class="rs-design-rule-results-detail">Front copper</dd></div><div><dt class="rs-design-rule-results-term">Location</dt><dd class="rs-design-rule-results-detail">X: 24.5, Y: 18; unit: mm</dd></div></dl></li></ul></fieldset>
+```
+
+## Example
+
+```tsx
+import { DesignRuleResults } from "@noorddev/vlak-react";
+
+<DesignRuleResults label="Reported design rules" runLabel="Synthetic check run 042" violations={[
+  { id: "clearance-1", title: "Copper clearance", severity: "error", status: "open", rule: "Supplied clearance rule", layer: "Front copper", net: "Supply", location: { x: 24.5, y: 18, unit: "mm" }, objects: ["J1 pad 1", "Track 17"] },
+  { id: "label-2", title: "Silkscreen overlap", severity: "warning", status: "excluded", layer: "Front silkscreen", objects: ["J1 reference", "J1 outline"] },
+]} />
+```
+
+## Props
+
+### DesignRuleResults
+
+Supplied rule-check outcomes with local or controlled filters and host-confirmed actions.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onSelect">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `violations` (required) | `readonly DesignRuleViolation[]` |  |  |
+| `filter` | `DesignRuleFilter` |  |  |
+| `defaultFilter` | `DesignRuleFilter` | `initial` |  |
+| `onFilterChange` | `(filter: DesignRuleFilter) => void` |  |  |
+| `selectedId` | `string \| null` |  |  |
+| `onSelect` | `(id: string) => void` |  | Requests selection in the host board viewer; selectedId remains host-owned. |
+| `onResolve` | `(id: string) => void` |  | Requests resolution of an open result. Confirmed status never changes locally. |
+| `runLabel` | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through the Vlak filter selectors and available action buttons. |
+| Arrow keys, Home, End | Navigates a focused filter's choices. |
+| Enter, Space | Chooses a filter or requests the focused selection or resolution action. |
+| Escape | Closes an open filter selector. |
+
+## Accessibility
+
+- A fieldset legend names the results. Vlak Select and Button provide shared control paint, focus states and 44px targets.
+- Visible description lists distinguish reported severity, confirmed status, layer, net and coordinate units. Action names include the unique result id and title.
+- The polite count distinguishes filtered results from the complete supplied set. Empty results and unmatched filters use different messages.
+- Selected records use a full-surface fill and Selected text. Pending actions keep confirmed data readable and disable the action controls.
+- Native form reset restores uncontrolled filters; controlled filters remain with the application. Disabled fieldsets omit filter values and block actions.
+- The fieldset ref, native attributes, className and style pass through.
+
+## Classes
+
+`rs-design-rule-results`, `rs-design-rule-results-legend`, `rs-design-rule-results-filters`, `rs-design-rule-results-label`, `rs-design-rule-results-control`, `rs-design-rule-results-list`, `rs-design-rule-results-item`, `rs-design-rule-results-selected`, `rs-design-rule-results-title`, `rs-design-rule-results-properties`, `rs-design-rule-results-term`, `rs-design-rule-results-detail`, `rs-design-rule-results-actions`, `rs-design-rule-results-action`, `rs-design-rule-results-note`
+
+## Dependencies
+
+Registry dependencies: [select](select.md), [button](button.md).  
+React: `packages/react/src/components/design-rule-results.tsx`  
+CSS: `packages/core/css/components/design-rule-results.css`
+
+
+---
+
+# Colony plate
+
+A bounded plate diagram and keyboard-selectable list of supplied colony markers, with the source count kept separate from annotation totals.
+
+Category: microbiology  
+Name: `colony-plate`  
+Also known as: Colony annotations, Petri dish map, Colony record viewer, Agar plate annotations, Plate colony inspector  
+Page: https://vlak.dev/components/colony-plate/
+
+## When to use
+
+- Inspect supplied colony annotations and source counts without running an image analysis algorithm.
+- recordedCount is the original source count. The exact number of supplied marker records and positioned records are labelled separately; neither substitutes for the source count.
+- Supply unique marker identifiers and normalized x/y percentages from the upper left. The circular plate has center 50, 50 and radius 50.
+- Select a record using value and onValueChange, or use defaultValue for local selection. Native form reset restores uncontrolled selection. readOnly keeps the same record list without selection controls.
+
+## When not to
+
+- Inferring a colony count from marker records, missing annotations or a blank diagram.
+- Identifying organisms, segmenting images or suggesting culture procedures from these records.
+- Supplying more than 256 markers; the component reports the bound without showing a partial list.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ColonyPlate } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add colony-plate
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/colony-plate.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<figure class="rs-colony-plate"><figcaption class="rs-colony-plate-title">Colony annotations</figcaption><p class="rs-colony-plate-count">Source count: 12</p><p class="rs-colony-plate-copy">1 marker records supplied; 1 positioned</p><ol class="rs-colony-plate-list" aria-label="Supplied marker records"><li class="rs-colony-plate-record"><div class="rs-colony-plate-static">1. Colony 01</div><p class="rs-colony-plate-copy">x 28%, y 32%</p></li></ol></figure>
+```
+
+## Example
+
+```tsx
+import { ColonyPlate } from "@noorddev/vlak-react";
+
+<ColonyPlate label="Colony annotations" plateId="P-042" recordedCount={12} source="Imported source count and four annotated records" markers={[
+  { id: "c1", label: "Colony 01", x: 28, y: 32, description: "Source annotation: circular outline" },
+  { id: "c2", label: "Colony 02", x: 62, y: 26, description: "Source annotation: raised center" },
+  { id: "c3", label: "Colony 03", x: 55, y: 68 },
+  { id: "c4", label: "Colony 04", x: null, y: null },
+]} defaultValue="c2" />
+```
+
+## Props
+
+### ColonyPlate
+
+A supplied plate record. Marker positions and source count are never detected or inferred.
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `markers` (required) | `readonly ColonyMarker[]` |  |  |
+| `plateId` | `string` |  |  |
+| `source` | `ReactNode` |  |  |
+| `recordedCount` | `number \| null` |  | The source's recorded count, independent of the number of supplied marker records. |
+| `value` | `string \| null` |  |  |
+| `defaultValue` | `string \| null` | `null` |  |
+| `onValueChange` | `(id: string \| null) => void` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through enabled record-selection buttons and the clear-selection button. |
+| Enter, Space | Selects the focused supplied record or clears the selection; controlled selection waits for the host. |
+
+## Accessibility
+
+- The figure caption names the plate. The decorative diagram is paired with a complete ordered list of record labels, exact coordinates and supplied descriptions.
+- Missing, non-finite and out-of-dish positions retain their list records and have explicit availability text. Only positioned markers are drawn; their exact number is shown.
+- Every control is at least 44px with a visible focus ring. Selected record buttons use a full fill and aria-pressed, including in forced colors.
+- Source count zero remains zero. Missing source counts and invalid negative or unsafe counts receive separate text; no count is inferred from the diagram.
+- Duplicate or empty identifiers and oversized inputs produce an explanation. Native attributes, figure ref, className and style pass through. Selection buttons do not submit forms.
+
+## Classes
+
+`rs-colony-plate`, `rs-colony-plate-title`, `rs-colony-plate-copy`, `rs-colony-plate-count`, `rs-colony-plate-body`, `rs-colony-plate-graphic`, `rs-colony-plate-dish`, `rs-colony-plate-list`, `rs-colony-plate-record`, `rs-colony-plate-static`, `rs-colony-plate-details`, `rs-colony-plate-clear`, `rs-colony-plate-marker`, `rs-colony-plate-chosen`, `rs-colony-plate-control`, `rs-colony-plate-selected`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/colony-plate.tsx`  
+CSS: `packages/core/css/components/colony-plate.css`
+
+
+---
+
+# Culture log
+
+A culture and sample record with supplied medium, conditions, chronological observations and host-owned recording actions.
+
+Category: microbiology  
+Name: `culture-log`  
+Also known as: Culture notebook, Culture observations, Microbiology log, Culture record, Sample culture history  
+Page: https://vlak.dev/components/culture-log/
+
+## When to use
+
+- Review culture identity, sample identity, medium and conditions as supplied by the host.
+- Provide offset-bearing timestamps for chronological ordering. Equal timestamps retain their supplied order; missing and invalid timestamps sort after dated observations.
+- Supply actions and onAction to request recording changes. Update status or observations only when the host has accepted the change; pending disables actions without changing recorded state.
+- Use oldest or newest ordering for at most 256 observations, 32 conditions and 16 actions with unique non-empty identifiers.
+
+## When not to
+
+- Inferring organism identity, contamination, growth interpretation or culture success from a status or observation.
+- Generating a culture recipe, an incubation recommendation or a procedure from the displayed conditions.
+- Treating a requested recording action as confirmation that a laboratory procedure occurred.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CultureLog } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add culture-log
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/culture-log.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-culture-log" role="group" aria-label="Culture observations"><div class="rs-culture-log-head"><p class="rs-culture-log-title">Culture observations</p><span class="rs-culture-log-copy">Awaiting record review</span></div><dl class="rs-culture-log-metadata"><div><dt class="rs-culture-log-copy">Culture</dt><dd class="rs-culture-log-value">C-042</dd></div><div><dt class="rs-culture-log-copy">Sample</dt><dd class="rs-culture-log-value">S-042</dd></div><div><dt class="rs-culture-log-copy">Medium</dt><dd class="rs-culture-log-value">Agar medium A</dd></div></dl><ol class="rs-culture-log-list"><li class="rs-culture-log-observation"><time class="rs-culture-log-time" datetime="2026-09-07T09:00:00+02:00">7 September, 09:00</time><div class="rs-culture-log-content"><p class="rs-culture-log-observation-label">Sample record received</p></div></li></ol></div>
+```
+
+## Example
+
+```tsx
+import { useState } from "react";
+import { CultureLog } from "@noorddev/vlak-react";
+
+function CultureRecord() {
+  const [reviewed, setReviewed] = useState(false);
+  return <CultureLog label="Culture observations" cultureId="C-042" sampleId="S-042" medium="Agar medium A" status={reviewed ? "Record review noted" : "Awaiting record review"} conditions={[{ id: "batch", label: "Medium batch", value: "M-17" }]} observations={[
+    { id: "received", label: "Sample record received", dateTime: "2026-09-07T09:00:00+02:00", timeLabel: "7 September, 09:00", status: "Recorded" },
+    { id: "image", label: "Plate image attached", dateTime: "2026-09-07T10:30:00+02:00", timeLabel: "7 September, 10:30", status: "Recorded", notes: "Image and source annotations attached" },
+  ]} actions={reviewed ? [] : [{ id: "review", label: "Record review" }]} onAction={() => setReviewed(true)} />;
+}
+```
+
+## Props
+
+### CultureLog
+
+A chronological notebook of supplied culture observations, without protocol recommendations.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `cultureId` (required) | `string` |  |  |
+| `sampleId` (required) | `string` |  |  |
+| `observations` (required) | `readonly CultureObservation[]` |  |  |
+| `medium` | `ReactNode` |  |  |
+| `status` | `string \| null` |  |  |
+| `conditions` | `readonly CultureCondition[]` | `[]` |  |
+| `actions` | `readonly CultureAction[]` | `[]` |  |
+| `onAction` | `(actionId: string) => void` |  | Requests a host recording action without changing any supplied observation or status. |
+| `pending` | `boolean` | `false` |  |
+| `order` | `"newest" \| "oldest"` | `"oldest"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between supplied links and enabled recording actions. |
+| Enter, Space | Requests the focused action through onAction without submitting a surrounding form. |
+
+## Accessibility
+
+- A named group contains a description list for metadata and an ordered list of observations. Every valid dated observation has a native time element.
+- Missing times and malformed dates remain explicitly undated. Dates without an offset and impossible calendar dates are not silently reinterpreted.
+- Zero-valued conditions remain visible; empty values and non-finite numeric conditions have explicit availability labels. Supplied statuses remain unchanged during pending requests.
+- Recording actions have 44px targets and visible focus rings. Their names include the culture identity and their descriptions reference the supplied status.
+- Oversized or ambiguous record collections have a visible explanation instead of a partial timeline. The div ref, native attributes, className and style pass through.
+
+## Classes
+
+`rs-culture-log`, `rs-culture-log-head`, `rs-culture-log-title`, `rs-culture-log-copy`, `rs-culture-log-metadata`, `rs-culture-log-value`, `rs-culture-log-list`, `rs-culture-log-observation`, `rs-culture-log-time`, `rs-culture-log-content`, `rs-culture-log-observation-label`, `rs-culture-log-notes`, `rs-culture-log-actions`, `rs-culture-log-action`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/culture-log.tsx`  
+CSS: `packages/core/css/components/culture-log.css`
 
 
 ---
@@ -10056,11 +12634,13 @@ Page: https://vlak.dev/components/select/
 
 - One choice from a list of five or more when the labels are short.
 - Lists that benefit from type-ahead and a consistent overlay across platforms.
+- Use fullWidth in compound field layouts. name and form support native submission; required uses native validation and reset restores uncontrolled defaults. readOnly preserves the submitted selection.
+- Mark unavailable options disabled; they stay visible and are skipped by keyboard navigation.
 
 ## When not to
 
 - Free text or filtering; use Combobox.
-- Native form posts and phones where the platform picker is better; use NativeSelect.
+- A platform picker when it is specifically preferred; use NativeSelect.
 
 ## Install
 
@@ -10132,6 +12712,11 @@ Forwards `ref` to the `HTMLDivElement`.
 | `placeholder` | `ReactNode` | `"Select…"` |  |
 | `onValueChange` | `(value: string) => void` |  |  |
 | `disabled` | `boolean` |  |  |
+| `fullWidth` | `boolean` | `false` | Fill a compound field without imposing a minimum column width. |
+| `name` | `string` |  |  |
+| `form` | `string` |  |  |
+| `required` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
 
 ## Keyboard
 
@@ -10155,7 +12740,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-select`, `rs-select-list`
+`rs-select`, `rs-select-list`, `rs-select-fluid`, `rs-select-native`, `rs-select-feedback`
 
 ## Dependencies
 

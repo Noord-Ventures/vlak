@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "alarm-panel",
+  "type": "registry:component",
+  "title": "Alarm panel",
+  "description": "Industrial alarm records with independent condition, acknowledgement and shelving states, explicit filters and host-confirmed actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/alarm-panel.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\n\nexport type AlarmAction = \"acknowledge\" | \"shelve\" | \"unshelve\";\nexport type AlarmFilter = \"all\" | \"active\" | \"unacknowledged\" | \"shelved\";\nexport interface AlarmRecord {\n  id: string;\n  label: string;\n  source?: string;\n  priority?: string;\n  condition: \"active\" | \"cleared\" | \"unknown\";\n  acknowledgement: \"acknowledged\" | \"unacknowledged\" | \"unknown\";\n  shelving: \"shelved\" | \"unshelved\" | \"unknown\";\n  /** Supplied expiry text; the component never schedules a shelving timer. */\n  shelvedUntilLabel?: string;\n  dateTime?: string;\n  timeLabel?: string;\n  note?: React.ReactNode;\n  /** Actions allowed by the host, independently of the displayed lifecycle fields. */\n  actions?: readonly AlarmAction[];\n  pending?: boolean;\n}\nexport interface AlarmPanelProps extends React.HTMLAttributes<HTMLDivElement> {\n  label: string;\n  alarms: readonly AlarmRecord[];\n  filter?: AlarmFilter;\n  defaultFilter?: AlarmFilter;\n  onFilterChange?: (filter: AlarmFilter) => void;\n  /** Requests an operation. Update the supplied record only after the host confirms it. */\n  onAction?: (id: string, action: AlarmAction) => void;\n  disabled?: boolean;\n  description?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  heading: { margin: 0, fontSize: \"1rem\", fontWeight: 600 },\n  copy: { margin: \"0.5rem 0 0\", fontSize: \"0.75rem\", color: vlak.gray },\n  filters: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", marginBlock: \"1rem\" },\n  button: { flexShrink: 0 },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  list: { listStyleType: \"none\", margin: 0, padding: 0, borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  item: { display: \"grid\", gap: \"0.75rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  head: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.5rem\", fontSize: \"0.875rem\", fontWeight: 600 },\n  states: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem 1.5rem\", margin: 0, fontSize: \"0.875rem\" },\n  term: { fontSize: \"0.75rem\", color: vlak.gray },\n  value: { margin: 0 },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\nconst filters: Record<AlarmFilter, string> = { all: \"All\", active: \"Active\", unacknowledged: \"Unacknowledged\", shelved: \"Shelved\" };\nconst actionLabels: Record<AlarmAction, string> = { acknowledge: \"Acknowledge\", shelve: \"Shelve\", unshelve: \"Unshelve\" };\n\n/** An industrial alarm's condition, acknowledgement and shelving are independent records. */\nexport const AlarmPanel = React.forwardRef<HTMLDivElement, AlarmPanelProps>(function AlarmPanel({ label, alarms, filter, defaultFilter = \"all\", onFilterChange, onAction, disabled, description, children, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultFilter);\n  const current = filter ?? inner;\n  const id = React.useId();\n  const visible = alarms.filter(alarm => current === \"all\" || (current === \"active\" ? alarm.condition === \"active\" : current === \"unacknowledged\" ? alarm.acknowledgement === \"unacknowledged\" : alarm.shelving === \"shelved\"));\n  const root = rs([\"rs-alarm-panel\", className], styles.root);\n  const heading = rs([\"rs-alarm-panel-heading\"], styles.heading);\n  const copy = rs([\"rs-alarm-panel-copy\"], styles.copy);\n  const filterStyle = rs([\"rs-alarm-panel-filters\"], styles.filters);\n  const list = rs([\"rs-alarm-panel-list\"], styles.list);\n  const item = rs([\"rs-alarm-panel-item\"], styles.item);\n  const head = rs([\"rs-alarm-panel-head\"], styles.head);\n  const states = rs([\"rs-alarm-panel-states\"], styles.states);\n  const term = rs([\"rs-alarm-panel-term\"], styles.term);\n  const value = rs([\"rs-alarm-panel-value\"], styles.value);\n  const actions = rs([\"rs-alarm-panel-actions\"], styles.actions);\n  const action = rs([\"rs-alarm-panel-button\"], styles.button);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <p {...heading} id={id}>{label}</p>\n    {description != null && <p {...copy}>{description}</p>}\n    <div {...filterStyle} role=\"group\" aria-label={`${label} filter`}>{(Object.keys(filters) as AlarmFilter[]).map(key => {\n      const selected = current === key;\n      const button = rs([\"rs-alarm-panel-button\", selected && \"rs-alarm-panel-selected\"], styles.button, selected && styles.selected);\n      return <Button variant=\"ghost\" size=\"sm\" key={key} {...button} type=\"button\" disabled={disabled} aria-pressed={selected} onClick={() => { if (filter === undefined) setInner(key); onFilterChange?.(key); }}>{filters[key]}</Button>;\n    })}</div>\n    <p {...copy} role=\"status\">{visible.length} of {alarms.length} alarm records</p>\n    <ul {...list} aria-labelledby={id}>{visible.map(alarm => <li key={alarm.id} {...item}>\n      <div {...head}><span>{alarm.label}</span>{alarm.priority && <span>{alarm.priority}</span>}</div>\n      {alarm.source && <p {...copy}>{alarm.source}</p>}\n      <dl {...states}>\n        <div><dt {...term}>Condition</dt><dd {...value}>{alarm.condition === \"active\" ? \"Active\" : alarm.condition === \"cleared\" ? \"Cleared\" : \"Unknown\"}</dd></div>\n        <div><dt {...term}>Acknowledgement</dt><dd {...value}>{alarm.acknowledgement === \"acknowledged\" ? \"Acknowledged\" : alarm.acknowledgement === \"unacknowledged\" ? \"Unacknowledged\" : \"Unknown\"}</dd></div>\n        <div><dt {...term}>Shelving</dt><dd {...value}>{alarm.shelving === \"shelved\" ? \"Shelved\" : alarm.shelving === \"unshelved\" ? \"Not shelved\" : \"Unknown\"}</dd></div>\n      </dl>\n      {alarm.shelving === \"shelved\" && <p {...copy}>{alarm.shelvedUntilLabel ? `Shelved until ${alarm.shelvedUntilLabel}` : \"Shelving expiry unknown\"}</p>}\n      {alarm.timeLabel && <time {...copy} dateTime={alarm.dateTime}>{alarm.timeLabel}</time>}\n      {alarm.note != null && <div {...copy}>{alarm.note}</div>}\n      {alarm.pending && <p {...copy} role=\"status\">Update pending for {alarm.label}</p>}\n      {onAction && !!alarm.actions?.length && <div {...actions} aria-busy={alarm.pending || undefined}>{alarm.actions.map(choice => <Button variant=\"ghost\" size=\"sm\" key={choice} {...action} type=\"button\" disabled={disabled || alarm.pending} aria-label={`${actionLabels[choice]}: ${alarm.label}`} onClick={() => onAction(alarm.id, choice)}>{actionLabels[choice]}</Button>)}</div>}\n    </li>)}</ul>\n    {!visible.length && <p {...copy}>{alarms.length ? \"No alarm records match this filter\" : \"No alarm records supplied\"}</p>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/alarm-panel.tsx"
+    },
+    {
+      "path": "vlak/styles/alarm-panel.css",
+      "content": "/* ── alarm-panel: generated from packages/react/src/components/alarm-panel.tsx ── */\n.rs-alarm-panel{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-alarm-panel-heading{margin:0;font-size:1rem;font-weight:600}\n.rs-alarm-panel-copy{margin:0.5rem 0 0;font-size:0.75rem;color:var(--text-secondary)}\n.rs-alarm-panel-filters{display:flex;flex-wrap:wrap;gap:0.5rem;margin-block:1rem}\n.rs-alarm-panel-button{flex-shrink:0}\n.rs-alarm-panel-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-alarm-panel-selected{background-color:Highlight;color:HighlightText}}\n.rs-alarm-panel-list{list-style-type:none;margin:0;padding:0;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-alarm-panel-item{display:grid;gap:0.75rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-alarm-panel-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem;font-size:0.875rem;font-weight:600}\n.rs-alarm-panel-states{display:flex;flex-wrap:wrap;gap:0.5rem 1.5rem;margin:0;font-size:0.875rem}\n.rs-alarm-panel-term{font-size:0.75rem;color:var(--text-secondary)}\n.rs-alarm-panel-value{margin:0}\n.rs-alarm-panel-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/alarm-panel.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "engineering",
+      "classes": [
+        "rs-alarm-panel",
+        "rs-alarm-panel-heading",
+        "rs-alarm-panel-copy",
+        "rs-alarm-panel-filters",
+        "rs-alarm-panel-button",
+        "rs-alarm-panel-selected",
+        "rs-alarm-panel-list",
+        "rs-alarm-panel-item",
+        "rs-alarm-panel-head",
+        "rs-alarm-panel-states",
+        "rs-alarm-panel-term",
+        "rs-alarm-panel-value",
+        "rs-alarm-panel-actions"
+      ],
+      "snippet": "<div class=\"rs-alarm-panel\"><p class=\"rs-alarm-panel-heading\">Plant alarms</p><ul class=\"rs-alarm-panel-list\"><li class=\"rs-alarm-panel-item\"><div class=\"rs-alarm-panel-head\">Cooling flow</div><dl class=\"rs-alarm-panel-states\"><div><dt class=\"rs-alarm-panel-term\">Condition</dt><dd class=\"rs-alarm-panel-value\">Cleared</dd></div><div><dt class=\"rs-alarm-panel-term\">Acknowledgement</dt><dd class=\"rs-alarm-panel-value\">Unacknowledged</dd></div><div><dt class=\"rs-alarm-panel-term\">Shelving</dt><dd class=\"rs-alarm-panel-value\">Not shelved</dd></div></dl></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Industrial alarms",
+        "Alarm acknowledgement",
+        "Alarm shelving",
+        "Operator alarm list",
+        "Process alarm panel"
+      ],
+      "example": "import { AlarmPanel } from \"@noorddev/vlak-react\";\n\n<AlarmPanel label=\"Plant alarms\" alarms={[\n  { id: \"flow\", label: \"Cooling flow\", source: \"Example circulation loop\", priority: \"Medium\", condition: \"cleared\", acknowledgement: \"unacknowledged\", shelving: \"unshelved\", timeLabel: \"14:32, supplied event time\" },\n  { id: \"sensor\", label: \"Sensor connection\", condition: \"active\", acknowledgement: \"acknowledged\", shelving: \"shelved\", shelvedUntilLabel: \"15:00, local plant time\" },\n]} />",
+      "usage": {
+        "use": [
+          "Operator alarm lists with supplied lifecycle fields and explicit unknown values.",
+          "Supply allowed actions and onAction to request acknowledgement, shelving or unshelving. Return pending and then confirmed records from the host.",
+          "Use filter and onFilterChange for an application-owned filter; uncontrolled filtering starts from defaultFilter.",
+          "Provide unique alarm ids, a bounded set of visible records, event time labels and the site's explicit time-zone context."
+        ],
+        "avoid": [
+          "Treating acknowledgement as clearing a condition, or shelving as acknowledgement.",
+          "Using a displayed action as proof that equipment changed state. The host owns permissions, audit records, filtering of large streams and shelving timers."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through filter buttons and supplied enabled alarm actions."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Applies a filter or requests the focused action."
+        }
+      ],
+      "a11y": [
+        "Each alarm exposes separate condition, acknowledgement and shelving fields as visible text in a description list.",
+        "Pressed filter buttons use a full fill; all controls have 44px targets, visible keyboard focus and forced-colour support.",
+        "A polite record count reflects the current filter. Pending records keep their confirmed state and disable actions.",
+        "The div ref, native attributes, className and style pass through."
+      ]
+    }
+  }
+}

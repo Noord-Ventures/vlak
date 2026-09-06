@@ -10,6 +10,4 @@
 .rs-experiment-run-step{padding-block:0.75rem;padding-inline-start:0.25rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:0.875rem}
 .rs-experiment-run-details{margin-block:0.5rem;font-size:0.875rem;max-width:66ch}
 .rs-experiment-run-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem}
-.rs-experiment-run-action{min-width:var(--hit);min-height:var(--hit);padding:0.5rem 0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-family:inherit;font-size:0.875rem;cursor:pointer;outline-color:var(--text);outline-offset:2px;opacity:1}
-.rs-experiment-run-action:focus-visible{outline-width:2px;outline-style:solid}
-.rs-experiment-run-action:disabled{opacity:0.55}
+.rs-experiment-run-action{flex-shrink:0}

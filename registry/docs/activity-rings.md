@@ -1,6 +1,6 @@
 # Activity rings
 
-Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
+Shows one to six personal goals as concentric rings with a staggered entrance, gentle rotating encouragement, named progress and explicit missing-data states.
 
 Category: health  
 Name: `activity-rings`  
@@ -12,6 +12,8 @@ Page: https://vlak.dev/components/activity-rings/
 - One activity ring or a compact set of personal movement, routine, or wellness goals.
 - Supply goals in outer-to-inner order, with unique ids, labels, amounts, targets, and units.
 - Pair with ActivityGoal for a linear progress view of the same data.
+- Rings sweep into their supplied values on first view and ease into later updates. Set animate to false for an instant graphic.
+- Encouragement picks a different line every ten seconds while visible. Supply your own encouragement strings, one string for a static line, or false to hide it. The first line stays deterministic during server rendering.
 
 ## When not to
 
@@ -76,17 +78,28 @@ Forwards `ref` to the `HTMLElement`.
 | `label` (required) | `string` |  |  |
 | `goals` (required) | `readonly ActivityRingGoal[]` |  | One to six goals are drawn from the outside inward. Every goal retains a text record. |
 | `description` | `ReactNode` |  |  |
+| `animate` | `boolean` | `true` | Sweep each ring into its supplied value on first view. Reduced motion stays instant. |
+| `encouragement` | `false \| readonly string[]` | `defaultEncouragement` | Gentle lines rotate every ten seconds without immediate repetition. false hides the line. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves to the encouragement pause control when rotation is available. |
+| Enter, Space | Pauses or resumes encouraging text rotation. |
 
 ## Accessibility
 
 - Every valid goal has a named native progress element and an explicit amount, target, and unit.
 - Concentric geometry is decorative. Visible numbering and outer-to-inner order connect the rings with their text records without relying on hue.
 - Zero stays empty, amounts above target retain their actual value, and missing or invalid data has no progress arc.
-- The figure forwards its native attributes and ref. Static rings have no animation or extra tab stops and remain visible in forced colors.
+- The figure forwards its native attributes and ref, and rings remain visible in forced colors. Actual readings and native progress values update immediately throughout the decorative entrance.
+- Reduced motion makes ring fills instant and keeps encouragement static. Rotation also pauses while the figure is offscreen or the document is hidden.
+- A 44px keyboard-accessible control pauses or resumes rotation. Encouragement has no automatic live announcement; text remains available in the reading order.
 
 ## Classes
 
-`rs-activity-rings`, `rs-activity-rings-caption`, `rs-activity-rings-body`, `rs-activity-rings-graphic`, `rs-activity-rings-track`, `rs-activity-rings-arc`, `rs-activity-rings-list`, `rs-activity-rings-item`, `rs-activity-rings-index`, `rs-activity-rings-label`, `rs-activity-rings-value`, `rs-activity-rings-target`, `rs-activity-rings-note`, `rs-activity-rings-description`, `rs-activity-rings-progress`
+`rs-activity-rings`, `rs-activity-rings-caption`, `rs-activity-rings-body`, `rs-activity-rings-graphic`, `rs-activity-rings-track`, `rs-activity-rings-arc`, `rs-activity-rings-list`, `rs-activity-rings-item`, `rs-activity-rings-index`, `rs-activity-rings-label`, `rs-activity-rings-value`, `rs-activity-rings-target`, `rs-activity-rings-note`, `rs-activity-rings-description`, `rs-activity-rings-progress`, `rs-activity-rings-motion`, `rs-activity-rings-waiting`, `rs-activity-rings-encouragement`, `rs-activity-rings-encouragement-text`, `rs-activity-rings-pause`, `rs-activity-rings-pause-icon`
 
 ## Dependencies
 

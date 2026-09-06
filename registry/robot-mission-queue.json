@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "robot-mission-queue",
+  "type": "registry:component",
+  "title": "Robot mission queue",
+  "description": "Shows supplied mission order and recorded step states, with keyboard reorder requests and explicit host actions separate from pending and confirmed records.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/robot-mission-queue.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface RobotMissionAction { id: string; label: string; disabled?: boolean; description?: string }\nexport interface RobotMissionStep { id: string; label: string; detail?: string; status: string; confirmedLabel?: string; pending?: boolean; actions?: readonly RobotMissionAction[] }\nexport interface RobotMissionQueueProps extends React.FieldsetHTMLAttributes<HTMLFieldSetElement> {\n  label: string;\n  steps: readonly RobotMissionStep[];\n  /** Proposed step identifiers in order; the host confirms and supplies the resulting records. */\n  onOrderChange?: (stepIds: readonly string[]) => void;\n  onAction?: (stepId: string, actionId: string) => void;\n  readOnly?: boolean;\n  description?: React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: \"1rem\", fontWeight: 600 },\n  list: { paddingInlineStart: \"1.5rem\", margin: 0 },\n  step: { paddingBlock: \"1rem\", paddingInlineStart: \"0.25rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  head: { display: \"flex\", justifyContent: \"space-between\", alignItems: \"baseline\", flexWrap: \"wrap\", gap: \"0.375rem 1rem\" },\n  title: { margin: 0, fontSize: \"0.875rem\", fontWeight: 500, overflowWrap: \"anywhere\" },\n  copy: { margin: \"0.375rem 0 0\", fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n  status: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", marginTop: \"0.75rem\" },\n  button: { minHeight: vlak.hit },\n});\n\n/** A supplied mission order, recorded step states, and explicit host request actions. */\nexport const RobotMissionQueue = React.forwardRef<HTMLFieldSetElement, RobotMissionQueueProps>(function RobotMissionQueue({ label, steps, onOrderChange, onAction, readOnly = false, description, disabled, name, form, className, style, children, ...props }, ref) {\n  const id = React.useId();\n  const valid = steps.length <= 256 && steps.every(step => step.id.trim() && step.label.trim() && (!step.actions || step.actions.every(action => action.id.trim() && action.label.trim()) && new Set(step.actions.map(action => action.id)).size === step.actions.length)) && new Set(steps.map(step => step.id)).size === steps.length;\n  const move = (index: number, delta: number) => { const ids = steps.map(step => step.id); [ids[index], ids[index + delta]] = [ids[index + delta]!, ids[index]!]; onOrderChange?.(ids); };\n  const root = rs([\"rs-robot-mission-queue\", className], styles.root);\n  const legend = rs([\"rs-robot-mission-queue-legend\"], styles.legend);\n  const list = rs([\"rs-robot-mission-queue-list\"], styles.list);\n  const stepStyle = rs([\"rs-robot-mission-queue-step\"], styles.step);\n  const head = rs([\"rs-robot-mission-queue-head\"], styles.head);\n  const title = rs([\"rs-robot-mission-queue-title\"], styles.title);\n  const copy = rs([\"rs-robot-mission-queue-copy\"], styles.copy);\n  const status = rs([\"rs-robot-mission-queue-status\"], styles.status);\n  const actions = rs([\"rs-robot-mission-queue-actions\"], styles.actions);\n  const button = rs([\"rs-robot-mission-queue-button\"], styles.button);\n  return <fieldset {...props} ref={ref} disabled={disabled} name={name} form={form} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>{description != null && <p {...copy}>{description}</p>}\n    {!valid ? <p {...copy}>Mission records unavailable: supply unique labelled steps and actions, with at most 256 steps.</p> : !steps.length ? <p {...copy}>No mission steps supplied</p> : <ol {...list}>{steps.map((step, index) => {\n      const context = `step ${index + 1}, ${step.label}`;\n      const locked = disabled || readOnly || step.pending;\n      return <li key={step.id} {...stepStyle}>\n        <div {...head}><p {...title}>{step.label}</p><p {...status} id={`${id}-${index}-status`}>Recorded: {step.status.trim() || \"Not supplied\"}</p></div>\n        {step.detail != null && <p {...copy}>{step.detail}</p>}\n        {step.confirmedLabel != null && <p {...copy}>Host confirmation: {step.confirmedLabel}</p>}\n        {step.pending && <p {...copy} role=\"status\">Request pending; recorded status unchanged</p>}\n        {!!(onOrderChange || onAction && step.actions?.length) && <div {...actions}>\n          {onOrderChange && <><Button {...button} variant=\"ghost\" type=\"button\" disabled={locked || index === 0 || steps[index - 1]?.pending} aria-label={`Move ${context} up`} onClick={() => move(index, -1)}>Move up</Button><Button {...button} variant=\"ghost\" type=\"button\" disabled={locked || index === steps.length - 1 || steps[index + 1]?.pending} aria-label={`Move ${context} down`} onClick={() => move(index, 1)}>Move down</Button></>}\n          {onAction && step.actions?.map((action, actionIndex) => <React.Fragment key={action.id}><Button {...button} variant=\"ghost\" type=\"button\" disabled={locked || action.disabled} aria-label={`${action.label}: ${context}`} aria-describedby={[`${id}-${index}-status`, action.description && `${id}-${index}-${actionIndex}-description`].filter(Boolean).join(\" \")} onClick={() => onAction(step.id, action.id)}>{action.label}</Button>{action.description && <span {...copy} id={`${id}-${index}-${actionIndex}-description`}>{action.description}</span>}</React.Fragment>)}\n        </div>}\n        {name && <input type=\"hidden\" name={name} form={form} value={step.id} />}\n      </li>;\n    })}</ol>}\n    <p {...copy}>Reordering and actions request host changes. Reported mission state remains supplied by the host.</p>{children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/robot-mission-queue.tsx"
+    },
+    {
+      "path": "vlak/styles/robot-mission-queue.css",
+      "content": "/* ── robot-mission-queue: generated from packages/react/src/components/robot-mission-queue.tsx ── */\n.rs-robot-mission-queue{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-robot-mission-queue-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}\n.rs-robot-mission-queue-list{padding-inline-start:1.5rem;margin:0}\n.rs-robot-mission-queue-step{padding-block:1rem;padding-inline-start:0.25rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-robot-mission-queue-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:0.375rem 1rem}\n.rs-robot-mission-queue-title{margin:0;font-size:0.875rem;font-weight:500;overflow-wrap:anywhere}\n.rs-robot-mission-queue-copy{margin:0.375rem 0 0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n.rs-robot-mission-queue-status{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere}\n.rs-robot-mission-queue-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}\n.rs-robot-mission-queue-button{min-height:var(--hit)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/robot-mission-queue.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "robotics",
+      "classes": [
+        "rs-robot-mission-queue",
+        "rs-robot-mission-queue-legend",
+        "rs-robot-mission-queue-list",
+        "rs-robot-mission-queue-step",
+        "rs-robot-mission-queue-head",
+        "rs-robot-mission-queue-title",
+        "rs-robot-mission-queue-copy",
+        "rs-robot-mission-queue-status",
+        "rs-robot-mission-queue-actions",
+        "rs-robot-mission-queue-button"
+      ],
+      "snippet": "<fieldset class=\"rs-robot-mission-queue\"><legend class=\"rs-robot-mission-queue-legend\">Inspection mission</legend><ol class=\"rs-robot-mission-queue-list\"><li class=\"rs-robot-mission-queue-step\"><div class=\"rs-robot-mission-queue-head\"><p class=\"rs-robot-mission-queue-title\">Inspect station</p><p class=\"rs-robot-mission-queue-status\">Recorded: Not started</p></div><div class=\"rs-robot-mission-queue-actions\"><button class=\"rs-btn-ghost rs-robot-mission-queue-button\" type=\"button\" aria-label=\"Review plan: step 1, Inspect station\">Review plan</button></div></li></ol><p class=\"rs-robot-mission-queue-copy\">Reordering and actions request host changes. Reported mission state remains supplied by the host.</p></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "RobotMissionQueue",
+        "Robot task queue",
+        "Mission plan",
+        "Robot job sequence",
+        "Mission steps"
+      ],
+      "example": "import { RobotMissionQueue } from \"@noorddev/vlak-react\";\n\n<RobotMissionQueue label=\"Inspection mission\" name=\"mission\"\n  steps={[{ id: \"inspect\", label: \"Inspect station\", status: \"Not started\", actions: [{ id: \"review\", label: \"Review plan\" }] }, { id: \"return\", label: \"Return to dock\", status: \"Not started\" }]}\n  onOrderChange={ids => console.log(\"Requested order\", ids)}\n  onAction={(stepId, actionId) => console.log(\"Requested action\", stepId, actionId)} />",
+      "usage": {
+        "use": [
+          "A caller-owned ordered step list, explicit recorded statuses, and only those actions the host makes available.",
+          "onOrderChange receives step identifiers in the proposed order. The host supplies the resulting records; the queue never rewrites status on a reorder request.",
+          "onAction receives a step identifier and supplied action identifier. pending and confirmedLabel remain separate host records.",
+          "Pending steps lock their own actions and adjacent reorder controls. readOnly keeps all request controls disabled.",
+          "Named hidden inputs submit the supplied step identifiers in order; invalid duplicate step or action identifiers suppress ambiguous controls."
+        ],
+        "avoid": [
+          "Assuming a request starts, cancels, schedules, or confirms physical execution.",
+          "Using display order as an execution dependency graph or deriving allowed actions from a status string."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through enabled reorder and host-action buttons."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests the focused reorder or supplied host action."
+        }
+      ],
+      "a11y": [
+        "The fieldset and legend name the mission, and a native ordered list conveys its supplied order.",
+        "Vlak Button actions name both the step number and label. Reorder buttons state their direction and disable at list boundaries.",
+        "Recorded status, host confirmation, and request-pending text remain distinct; pending feedback uses a status role.",
+        "Action descriptions are connected to the corresponding button, including its recorded status.",
+        "The ref and native fieldset attributes reach the root, and read-only ordered records remain available to forms."
+      ]
+    }
+  }
+}

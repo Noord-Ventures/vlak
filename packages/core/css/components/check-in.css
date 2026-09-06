@@ -10,6 +10,4 @@
 .rs-check-in-unavailable{cursor:default;opacity:0.55}
 @media (forced-colors: active){.rs-check-in-unavailable{opacity:1}}
 .rs-check-in-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);opacity:0;margin:0;cursor:inherit}
-.rs-check-in-clear{justify-self:start;min-width:var(--hit);min-height:var(--hit);padding-inline:0.5rem;background-color:var(--bg);color:var(--text);border-width:0;border-radius:var(--radius-sm);font-size:var(--control-fs);text-decoration:underline;cursor:pointer;outline-color:var(--text);outline-offset:2px;opacity:1}
-.rs-check-in-clear:focus-visible{outline-width:2px;outline-style:solid}
-.rs-check-in-clear:disabled{opacity:0.55}
+.rs-check-in-clear{justify-self:start;min-width:var(--hit);min-height:var(--hit);width:auto;max-width:100%}

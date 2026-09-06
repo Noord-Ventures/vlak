@@ -19,20 +19,20 @@ export const scienceComponents: VlakComponent[] = [
   },
   {
     name: "quantity-field", title: "Quantity field", category: "science",
-    description: "A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.",
+    description: "A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.",
     classes: ["rs-quantity-field", "rs-quantity-field-legend", "rs-quantity-field-row", "rs-quantity-field-label", "rs-quantity-field-control", "rs-quantity-field-description"],
-    css: ["components/quantity-field.css"], react: "components/quantity-field.tsx", registryDependencies: [],
-    snippet: '<fieldset class="rs-quantity-field"><legend class="rs-quantity-field-legend">Sample volume</legend><div class="rs-quantity-field-row"><label class="rs-quantity-field-label">Amount<input class="rs-quantity-field-control" name="volume" type="number" step="any" value="250" /></label><label class="rs-quantity-field-label">Unit<select class="rs-quantity-field-control" name="volume.unit"><option value="ul">µL</option><option value="ml">mL</option></select></label></div></fieldset>',
+    css: ["components/quantity-field.css"], react: "components/quantity-field.tsx", registryDependencies: ["input", "select", "dropdown-menu"],
+    snippet: '<fieldset class="rs-quantity-field"><legend class="rs-quantity-field-legend">Sample volume</legend><div class="rs-quantity-field-row"><label class="rs-quantity-field-label">Amount<input class="rs-input rs-input-full rs-quantity-field-control" name="volume" type="number" step="any" value="250" /></label><div class="rs-quantity-field-label"><span id="quantity-unit-label">Unit</span><div class="rs-select rs-select-fluid"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="quantity-unit-label" aria-expanded="false" aria-haspopup="listbox"><span>µL</span></button></div></div></div></fieldset>',
     example: `import { QuantityField } from "@noorddev/vlak-react";
 
 <QuantityField label="Sample volume" name="volume" units={[{ value: "ul", label: "µL" }, { value: "ml", label: "mL" }]} defaultValue={{ amount: 250, unit: "ul" }} min={0} required description="Enter the amount and its unit" />`,
     usage: { use: ["Dimensioned quantities with explicit unit choices and native numeric constraints.", "name submits the amount and unitName submits the unit, defaulting to name followed by .unit.", "Supply value and onValueChange when the application converts units or persists the result; unit selection alone keeps the supplied amount unchanged.", "null represents a missing amount or unit. Unit option values must be unique and non-empty."], avoid: ["Assuming that choosing a different unit automatically converts the amount.", "Relying on formatting to establish scientific precision or dimensional compatibility."] },
-    keyboard: [{ keys: "Tab", does: "Moves between the amount input and unit selector." }, { keys: "Arrow keys", does: "Uses native number stepping or select navigation on the focused control." }],
-    a11y: ["A fieldset and legend name the quantity; both native controls have visible labels, descriptions and 44px targets.", "Required, min, max and step use native validation. Invalid supplied numbers and unknown units have explicit text states.", "Native form reset restores uncontrolled defaults and leaves controlled values with the application.", "Read-only quantities preserve the submitted amount and unit while preventing edits. Disabled quantities do not submit.", "The fieldset ref and native attributes pass through; no unit is chosen implicitly."],
+    keyboard: [{ keys: "Tab", does: "Moves between the amount input and unit selector." }, { keys: "Arrow keys", does: "Uses native number stepping or opens and navigates the Vlak unit selector. Enter or Space confirms a unit; Escape closes its menu." }],
+    a11y: ["A fieldset and legend name the quantity. Vlak Input and Select have visible labels, descriptions and 44px targets.", "Required, min, max and step use native validation. Invalid supplied numbers and unknown units have explicit text states.", "Native form reset restores uncontrolled defaults and leaves controlled values with the application.", "Read-only quantities preserve the submitted amount and unit while preventing edits. Disabled quantities do not submit.", "The fieldset ref and native attributes pass through; no unit is chosen implicitly."],
     aliases: ["Unit input", "Scientific input", "Dimensioned number", "Amount and unit", "Measurement input"],
   },
   {
-    name: "well-plate", title: "Well plate", category: "science",
+    name: "well-plate", title: "Well plate", category: "microbiology",
     description: "A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.",
     classes: ["rs-well-plate", "rs-well-plate-label", "rs-well-plate-description", "rs-well-plate-scroll", "rs-well-plate-table", "rs-well-plate-heading", "rs-well-plate-cell", "rs-well-plate-well", "rs-well-plate-selected", "rs-well-plate-unavailable", "rs-well-plate-static", "rs-well-plate-coordinate"],
     css: ["components/well-plate.css"], react: "components/well-plate.tsx", registryDependencies: [],
@@ -53,7 +53,7 @@ export const scienceComponents: VlakComponent[] = [
     name: "experiment-run", title: "Experiment run", category: "science",
     description: "Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.",
     classes: ["rs-experiment-run", "rs-experiment-run-head", "rs-experiment-run-title", "rs-experiment-run-context", "rs-experiment-run-conditions", "rs-experiment-run-value", "rs-experiment-run-list", "rs-experiment-run-step", "rs-experiment-run-details", "rs-experiment-run-actions", "rs-experiment-run-action"],
-    css: ["components/experiment-run.css"], react: "components/experiment-run.tsx", registryDependencies: [],
+    css: ["components/experiment-run.css"], react: "components/experiment-run.tsx", registryDependencies: ["button"],
     snippet: '<div class="rs-experiment-run" role="group" aria-label="Optical measurement"><div class="rs-experiment-run-head"><p class="rs-experiment-run-title">Optical measurement</p><span class="rs-experiment-run-context">Awaiting review</span></div><p class="rs-experiment-run-context">Run 042</p><ol class="rs-experiment-run-list"><li class="rs-experiment-run-step"><div class="rs-experiment-run-head"><span>Review acquisition</span><span class="rs-experiment-run-context">Not reviewed</span></div></li></ol></div>',
     example: `import { ExperimentRun } from "@noorddev/vlak-react";
 
@@ -70,7 +70,7 @@ export const scienceComponents: VlakComponent[] = [
     name: "spectrum-plot", title: "Spectrum plot", category: "science",
     description: "A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.",
     classes: ["rs-spectrum-plot", "rs-spectrum-plot-label", "rs-spectrum-plot-description", "rs-spectrum-plot-scroll", "rs-spectrum-plot-svg", "rs-spectrum-plot-axis", "rs-spectrum-plot-grid", "rs-spectrum-plot-trace", "rs-spectrum-plot-point", "rs-spectrum-plot-annotation", "rs-spectrum-plot-ticks", "rs-spectrum-plot-x-label", "rs-spectrum-plot-peaks", "rs-spectrum-plot-summary", "rs-spectrum-plot-table", "rs-spectrum-plot-cell", "rs-spectrum-plot-controls", "rs-spectrum-plot-button"],
-    css: ["components/spectrum-plot.css"], react: "components/spectrum-plot.tsx", registryDependencies: [],
+    css: ["components/spectrum-plot.css"], react: "components/spectrum-plot.tsx", registryDependencies: ["button"],
     snippet: '<figure class="rs-spectrum-plot"><figcaption class="rs-spectrum-plot-label">Supplied spectrum</figcaption><table class="rs-spectrum-plot-table"><caption>Supplied numeric data</caption><thead><tr><th class="rs-spectrum-plot-cell" scope="col">Wavelength (nm)</th><th class="rs-spectrum-plot-cell" scope="col">Signal (counts)</th></tr></thead><tbody><tr><td class="rs-spectrum-plot-cell">400</td><td class="rs-spectrum-plot-cell">1</td></tr><tr><td class="rs-spectrum-plot-cell">500</td><td class="rs-spectrum-plot-cell">15</td></tr></tbody></table></figure>',
     example: `import { SpectrumPlot } from "@noorddev/vlak-react";
 

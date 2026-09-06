@@ -9,6 +9,7 @@ Read channel levels, adjust gain and pan, and control a named parameter with nat
 - [Audio meter](https://vlak.dev/docs/audio-meter.md): Shows supplied channel levels and peaks in decibels, with bounded native meters and explicit missing readings.
 - [Channel strip](https://vlak.dev/docs/channel-strip.md): Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.
 - [Parameter knob](https://vlak.dev/docs/parameter-knob.md): Displays a rotary parameter over a native horizontal range input, with named values, units, and a 64px control.
+- [Patchbay](https://vlak.dev/docs/patchbay.md): Connects supplied source and destination ports through a keyboard-navigable matrix, with signal types, channel groups, and blocked-route reasons.
 
 ## Video
 
@@ -26,7 +27,17 @@ Select, hide, and lock layers; inspect a colour; and edit independent or linked 
 - [Color inspector](https://vlak.dev/docs/color-inspector.md): Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.
 - [Spacing control](https://vlak.dev/docs/spacing-control.md): Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.
 
+## Typography
+
+Compare supplied baseline kerning with per-pair draft offsets in declared font units.
+
+- [Kerning pair editor](https://vlak.dev/docs/kerning-pair-editor.md): Edits supplied glyph-pair offsets in font units, with baseline and edited previews, bounded keyboard nudging, and one-step undo.
+
 ## Data and action contracts
+
+### Respect routing and typography context
+
+Patchbay edits a matrix of compatible supplied source and destination ports; the host supplies additional block reasons and confirmed routing. KerningPairEditor keeps missing baseline values distinct from zero and previews only the supplied glyph pair with an additional offset, without rewriting the font or its shaping tables.
 
 ### Connect controls to an engine
 

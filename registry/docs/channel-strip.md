@@ -46,7 +46,7 @@ npx shadcn add https://vlak.dev/r/channel-strip.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-channel-strip"><legend class="rs-channel-strip-label">Dialogue</legend><label class="rs-channel-strip-field">Gain<input class="rs-channel-strip-range" type="range" min="-60" max="12" step="any" value="0" /></label><label class="rs-channel-strip-field">Pan<input class="rs-channel-strip-range" type="range" min="-100" max="100" step="any" value="0" /></label><div class="rs-channel-strip-actions"><button class="rs-channel-strip-button" type="button" aria-pressed="false">Mute</button><button class="rs-channel-strip-button" type="button" aria-pressed="false">Solo</button></div></fieldset>
+<fieldset class="rs-channel-strip"><legend class="rs-channel-strip-label">Dialogue</legend><label class="rs-channel-strip-field">Gain<input class="rs-channel-strip-range" type="range" min="-60" max="12" step="any" value="0" /></label><label class="rs-channel-strip-field">Pan<input class="rs-channel-strip-range" type="range" min="-100" max="100" step="any" value="0" /></label><div class="rs-channel-strip-actions"><button class="rs-btn-ghost rs-btn-sm rs-channel-strip-button" type="button" aria-pressed="false">Mute</button><button class="rs-btn-ghost rs-btn-sm rs-channel-strip-button" type="button" aria-pressed="false">Solo</button></div></fieldset>
 ```
 
 ## Example
@@ -88,7 +88,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 ## Accessibility
 
 - A fieldset and legend name the channel; native sliders expose gain and pan bounds and descriptive value text. In-range values retain their supplied precision.
-- Mute and solo have stable names and aria-pressed; their entire surface changes on selection.
+- Vlak Button supplies mute and solo actions with stable names and aria-pressed; their entire surface changes on selection.
 - All controls meet the 44px target size. Disabled or read-only controls cannot edit the channel.
 - Uncontrolled form reset restores the supplied default; named read-only channels retain all valid values in form submissions. Disabled channels and out-of-range sliders are omitted. The ref reaches the fieldset.
 
@@ -98,6 +98,6 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/channel-strip.tsx`  
 CSS: `packages/core/css/components/channel-strip.css`

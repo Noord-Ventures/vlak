@@ -6,7 +6,6 @@
 .rs-channel-strip-range{display:block;margin:0;width:100%;min-width:var(--hit);min-height:var(--hit);accent-color:var(--text);outline-color:var(--text);outline-offset:2px}
 .rs-channel-strip-range:focus-visible{outline-width:2px;outline-style:solid}
 .rs-channel-strip-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
-.rs-channel-strip-button{min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-family:inherit;font-size:var(--control-fs);cursor:pointer;outline-color:var(--text);outline-offset:2px}
-.rs-channel-strip-button:focus-visible{outline-width:2px;outline-style:solid}
+.rs-channel-strip-button{min-width:var(--hit);min-height:var(--hit);width:auto;max-width:100%}
 .rs-channel-strip-pressed{background-color:var(--text);color:var(--bg)}
 @media (forced-colors: active){.rs-channel-strip-pressed{background-color:Highlight;color:HighlightText}}

@@ -4,6 +4,7 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
+import { Button } from "./button";
 
 export interface CreativeLayer { id: string; label: string; visible: boolean; locked: boolean }
 export interface LayerStackProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "onSelect"> {
@@ -22,6 +23,7 @@ const styles = stylex.create({
   list: { display: "grid", gap: "0.5rem", listStyleType: "none", margin: 0, padding: 0 },
   row: { display: "grid", gap: "0.5rem", borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.divider, padding: "0.5rem" },
   actions: { display: "flex", flexWrap: "wrap", gap: "0.375rem" },
+  action: { minWidth: vlak.hit, minHeight: vlak.hit, width: "auto", maxWidth: "100%" },
   button: { minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: "0.625rem", borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: "inherit", fontSize: vlak.controlLabel, lineHeight: 1.45, cursor: "pointer", outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2 },
   selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "Highlight" }, color: { default: vlak.paper, [mq.forcedColors]: "HighlightText" } },
   note: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },
@@ -35,7 +37,7 @@ export const LayerStack = React.forwardRef<HTMLDivElement, LayerStackProps>(func
   const row = rs(["rs-layer-stack-row"], styles.row);
   const actions = rs(["rs-layer-stack-actions"], styles.actions);
   const note = rs(["rs-layer-stack-note"], styles.note);
-  const button = rs(["rs-layer-stack-button"], styles.button);
+  const action = rs(["rs-layer-stack-action"], styles.action);
   const update = (id: string, patch: Partial<CreativeLayer>) => onLayersChange?.(layers.map((layer) => layer.id === id ? { ...layer, ...patch } : layer));
   const move = (index: number, delta: number) => {
     const next = [...layers];
@@ -54,10 +56,10 @@ export const LayerStack = React.forwardRef<HTMLDivElement, LayerStackProps>(func
         {onSelect ? <button type="button" disabled={disabled} aria-pressed={selected} className={select.className} style={select.style} onClick={() => onSelect(layer.id)}>{layer.label}</button> : <span>{layer.label}{selected ? " · Selected" : ""}</span>}
         <span className={note.className} style={note.style}>{layer.visible ? "Visible" : "Hidden"} · {layer.locked ? "Locked" : "Unlocked"}</span>
         {onLayersChange && <div className={actions.className} style={actions.style}>
-          <button type="button" disabled={disabled} aria-label={`${layer.label} visibility`} aria-pressed={layer.visible} className={button.className} style={button.style} onClick={() => update(layer.id, { visible: !layer.visible })}>Visibility</button>
-          <button type="button" disabled={disabled} aria-label={`${layer.label} lock`} aria-pressed={layer.locked} className={button.className} style={button.style} onClick={() => update(layer.id, { locked: !layer.locked })}>Lock</button>
-          <button type="button" disabled={disabled || layer.locked || index === 0} aria-label={`Move ${layer.label} up`} className={button.className} style={button.style} onClick={() => move(index, -1)}>↑</button>
-          <button type="button" disabled={disabled || layer.locked || index === layers.length - 1} aria-label={`Move ${layer.label} down`} className={button.className} style={button.style} onClick={() => move(index, 1)}>↓</button>
+          <Button variant="ghost" size="sm" disabled={disabled} aria-label={`${layer.label} visibility`} aria-pressed={layer.visible} {...action} onClick={() => update(layer.id, { visible: !layer.visible })}>Visibility</Button>
+          <Button variant="ghost" size="sm" disabled={disabled} aria-label={`${layer.label} lock`} aria-pressed={layer.locked} {...action} onClick={() => update(layer.id, { locked: !layer.locked })}>Lock</Button>
+          <Button variant="ghost" size="sm" disabled={disabled || layer.locked || index === 0} aria-label={`Move ${layer.label} up`} {...action} onClick={() => move(index, -1)}>↑</Button>
+          <Button variant="ghost" size="sm" disabled={disabled || layer.locked || index === layers.length - 1} aria-label={`Move ${layer.label} down`} {...action} onClick={() => move(index, 1)}>↓</Button>
         </div>}
       </li>;
     })}</ol>

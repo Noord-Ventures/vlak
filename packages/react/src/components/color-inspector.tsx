@@ -4,6 +4,8 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
+import { Input } from "./input";
+
 import { useInputValue } from "../use-input-value";
 import { useMergedRefs } from "../merge-refs";
 
@@ -25,7 +27,7 @@ const styles = stylex.create({
   swatch: { position: "absolute", inset: 0, forcedColorAdjust: "none" },
   fields: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(8rem, 1fr))", gap: "0.75rem" },
   field: { display: "grid", gap: "0.375rem", fontSize: vlak.controlLabel, lineHeight: 1.45 },
-  input: { minWidth: vlak.hit, minHeight: vlak.hit, width: "100%", boxSizing: "border-box", paddingInline: "0.625rem", borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontSize: vlak.controlFs, fontFamily: "ui-monospace, monospace", outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2 },
+  input: { width: "100%", minWidth: 0, fontVariantNumeric: "tabular-nums" },
   note: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },
 });
 
@@ -49,8 +51,8 @@ export const ColorInspector = React.forwardRef<HTMLFieldSetElement, ColorInspect
     <legend className={heading.className} style={heading.style}>{label}</legend>
     <div aria-hidden="true" className={preview.className} style={preview.style}>{validHex && validAlpha && <span className={swatch.className} style={{ ...swatch.style, backgroundColor: current.hex, opacity: current.alpha! }} />}</div>
     <div className={fields.className} style={fields.style}>
-      <label className={field.className} style={field.style}>Hex<input type="text" name={name ? `${name}.hex` : undefined} form={form} value={current.hex} pattern="#[0-9a-fA-F]{6}" required readOnly={readOnly} spellCheck={false} aria-invalid={!validHex || undefined} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => setValue({ ...current, hex: event.currentTarget.value })} /></label>
-      <label className={field.className} style={field.style}>Alpha<input type="number" name={name ? `${name}.alpha` : undefined} form={form} min={0} max={1} step="any" required readOnly={readOnly} value={current.alpha != null && Number.isFinite(current.alpha) ? current.alpha : ""} aria-invalid={!validAlpha || undefined} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => setValue({ ...current, alpha: event.currentTarget.value === "" ? null : Number(event.currentTarget.value) })} /></label>
+      <label className={field.className} style={field.style}>Hex<Input plain type="text" name={name ? `${name}.hex` : undefined} form={form} value={current.hex} pattern="#[0-9a-fA-F]{6}" required readOnly={readOnly} spellCheck={false} aria-invalid={!validHex || undefined} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => setValue({ ...current, hex: event.currentTarget.value })} /></label>
+      <label className={field.className} style={field.style}>Alpha<Input plain type="number" name={name ? `${name}.alpha` : undefined} form={form} min={0} max={1} step="any" required readOnly={readOnly} value={current.alpha != null && Number.isFinite(current.alpha) ? current.alpha : ""} aria-invalid={!validAlpha || undefined} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => setValue({ ...current, alpha: event.currentTarget.value === "" ? null : Number(event.currentTarget.value) })} /></label>
     </div>
     <p id={`${id}-hint`} className={note.className} style={note.style}>{!validHex ? "Enter a six-digit hex color beginning with #." : !validAlpha ? "Enter alpha from 0 to 1." : `${current.hex}, alpha ${current.alpha}`}</p>
   </fieldset>;

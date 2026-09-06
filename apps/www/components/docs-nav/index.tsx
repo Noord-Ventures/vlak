@@ -7,12 +7,9 @@ import { vlakCategories, catalogComponents, type VlakCategory } from "@noorddev/
 import { iconGroups } from "@noorddev/vlak-react";
 import { MobileToc } from "@/components/toc-mobile";
 import { sx } from "@/lib/sx";
+import { categoryTitle as sentence } from "@/lib/category-title";
 import { navStyles } from "./docs-nav.stylex";
 import "./docs-nav.css";
-
-function sentence(value: string) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
 
 function here(pathname: string, href: string) {
   return pathname === href || pathname === `${href}/`;
@@ -62,6 +59,11 @@ export const docsPages = [
   { href: "/docs/civic", title: "Civic" },
   { href: "/docs/science", title: "Science" },
   { href: "/docs/creative", title: "Creative tools" },
+  { href: "/docs/engineering", title: "Industrial" },
+  { href: "/docs/geospatial", title: "Geospatial" },
+  { href: "/docs/robotics", title: "Robotics" },
+  { href: "/docs/electronics", title: "Circuitry" },
+  { href: "/docs/microbiology", title: "Microbiology" },
   { href: "/docs/agents", title: "Agents" },
 ] as const;
 
@@ -79,9 +81,8 @@ function docsLabel(pathname: string) {
  * Components rail: groups in the first 184, that group's items in the
  * second. Hover (and focus) fills the second column. The page's own
  * group stays selected so the column is never empty on load.
- * Detail keeps the live one-module inset (--ml 204) at ≥1024.
- * Catalog index zeros --ml at 1024–1439 so 796 fits; ≥1440
- * restores the airy first 204. Icons toc-sub lists iconGroups.
+ * Every page level uses the shared rail inset: zero on compact
+ * desktop, one module at ≥1440. Icons toc-sub lists iconGroups.
  * Under 900 the rail hides; a stacked 44pt picker takes its place.
  */
 export function DocsNav() {

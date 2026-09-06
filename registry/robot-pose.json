@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "robot-pose",
+  "type": "registry:component",
+  "title": "Robot pose",
+  "description": "Displays exact Cartesian translation and explicitly named orientation components for a selected supplied pose, with frame, time, and recorded status.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/robot-pose.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Select } from \"./select\";\n\nexport interface RobotPoseComponent { id: string; label: string; value: number | null; unit?: string }\nexport interface RobotPoseRecord {\n  id: string;\n  label: string;\n  frame: string | null;\n  timeLabel?: string | null;\n  status: string | null;\n  translation: { x: number | null; y: number | null; z: number | null; unit: string };\n  /** Supply the representation and conventions explicitly; values are never converted or normalized. */\n  orientation: { representation: string; components: readonly RobotPoseComponent[] };\n}\nexport interface RobotPoseProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: string;\n  poses: readonly RobotPoseRecord[];\n  value?: string | null;\n  defaultValue?: string | null;\n  onValueChange?: (poseId: string | null) => void;\n  readOnly?: boolean;\n  description?: React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"1rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: \"1rem\", fontWeight: 600 },\n  field: { display: \"grid\", gap: \"0.375rem\", minWidth: 0, fontSize: \"0.75rem\" },\n  select: { minWidth: 0, width: \"100%\" },\n  metadata: { display: \"grid\", gap: \"0.625rem\", margin: 0, fontSize: \"0.75rem\" },\n  detail: { display: \"grid\", gridTemplateColumns: \"5rem minmax(0, 1fr)\", gap: \"0.5rem\" },\n  heading: { margin: 0, fontSize: \"0.875rem\", fontWeight: 500 },\n  values: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(5rem, 1fr))\", gap: \"0.75rem\", margin: \"0.75rem 0 0\", fontSize: \"0.75rem\" },\n  value: { margin: \"0.25rem 0 0\", fontSize: \"1rem\", fontVariantNumeric: \"tabular-nums\", overflowWrap: \"anywhere\" },\n  text: { margin: 0, overflowWrap: \"anywhere\" },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n});\nconst recorded = (value: number | null) => value == null ? \"Not supplied\" : Number.isFinite(value) ? String(value) : \"Unavailable\";\n\n/** Exact supplied Cartesian and orientation records, with no frame transform or pose computation. */\nexport const RobotPose = React.forwardRef<HTMLFieldSetElement, RobotPoseProps>(function RobotPose({ label, poses, value, defaultValue, onValueChange, readOnly = false, description, disabled, name, form, className, style, children, ...props }, ref) {\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<string | null, HTMLFieldSetElement>(value, defaultValue === undefined ? poses[0]?.id ?? null : defaultValue, onValueChange, refresh);\n  const merged = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const valid = poses.length <= 256 && poses.every(pose => pose.id.trim() && pose.label.trim()) && new Set(poses.map(pose => pose.id)).size === poses.length;\n  const pose = valid ? poses.find(pose => pose.id === current) : undefined;\n  const validOrientation = pose?.orientation.representation.trim() && pose.orientation.components.length > 0 && pose.orientation.components.length <= 16 && pose.orientation.components.every(component => component.id.trim() && component.label.trim()) && new Set(pose.orientation.components.map(component => component.id)).size === pose.orientation.components.length;\n  const root = rs([\"rs-robot-pose\", className], styles.root);\n  const legend = rs([\"rs-robot-pose-legend\"], styles.legend);\n  const field = rs([\"rs-robot-pose-field\"], styles.field);\n  const select = rs([\"rs-robot-pose-select\"], styles.select);\n  const metadata = rs([\"rs-robot-pose-metadata\"], styles.metadata);\n  const detail = rs([\"rs-robot-pose-detail\"], styles.detail);\n  const heading = rs([\"rs-robot-pose-heading\"], styles.heading);\n  const values = rs([\"rs-robot-pose-values\"], styles.values);\n  const valueStyle = rs([\"rs-robot-pose-value\"], styles.value);\n  const text = rs([\"rs-robot-pose-text\"], styles.text);\n  const copy = rs([\"rs-robot-pose-copy\"], styles.copy);\n  return <fieldset {...props} ref={merged} disabled={disabled} name={name} form={form} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>{description != null && <p {...copy}>{description}</p>}\n    {!valid ? <p {...copy}>Pose records unavailable: supply unique identifiers and at most 256 labelled poses.</p> : !poses.length ? <p {...copy}>No pose records supplied</p> : <div {...field}><span id={`${id}-record`}>Pose record</span><Select {...select} fullWidth aria-labelledby={`${id}-record`} options={poses.map(item => ({ value: item.id, label: item.label }))} value={pose?.id ?? \"\"} placeholder=\"Choose a supplied pose\" disabled={disabled} readOnly={readOnly} onValueChange={next => { if (!disabled && !readOnly) setValue(next); }} /></div>}\n    {pose ? <>\n      <dl {...metadata}>{[[\"Frame\", pose.frame?.trim() ? pose.frame : \"Not supplied\"], [\"Recorded at\", pose.timeLabel?.trim() ? pose.timeLabel : \"Not supplied\"], [\"Status\", pose.status?.trim() ? pose.status : \"Not supplied\"]].map(([label, value]) => <div key={label} {...detail}><dt>{label}</dt><dd {...text}>{value}</dd></div>)}</dl>\n      <div><p {...heading}>Translation</p><p {...copy}>Unit: {pose.translation.unit.trim() || \"Not supplied\"}</p><dl {...values}>{([\"x\", \"y\", \"z\"] as const).map(axis => <div key={axis}><dt>{axis.toUpperCase()}</dt><dd {...valueStyle}>{recorded(pose.translation[axis])}</dd></div>)}</dl></div>\n      <div><p {...heading}>Orientation</p><p {...copy}>Representation: {pose.orientation.representation.trim() || \"Not supplied\"}</p>{validOrientation ? <dl {...values}>{pose.orientation.components.map(component => <div key={component.id}><dt>{component.label}{component.unit?.trim() ? ` (${component.unit})` : \"\"}</dt><dd {...valueStyle}>{recorded(component.value)}</dd></div>)}</dl> : <p {...copy}>Orientation components unavailable</p>}</div>\n      {name && <input type=\"hidden\" name={name} form={form} value={pose.id} />}\n    </> : valid && poses.length > 0 && <p {...copy}>{current == null ? \"No pose selected\" : \"Selected pose unavailable\"}</p>}\n    <p {...copy}>Values and frame names are supplied records. Selecting a record does not transform, normalize, or command a pose.</p>{children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/robot-pose.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/robot-pose.css",
+      "content": "/* ── robot-pose: generated from packages/react/src/components/robot-pose.tsx ── */\n.rs-robot-pose{display:grid;gap:1rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-robot-pose-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}\n.rs-robot-pose-field{display:grid;gap:0.375rem;min-width:0;font-size:0.75rem}\n.rs-robot-pose-select{min-width:0;width:100%}\n.rs-robot-pose-metadata{display:grid;gap:0.625rem;margin:0;font-size:0.75rem}\n.rs-robot-pose-detail{display:grid;grid-template-columns:5rem minmax(0, 1fr);gap:0.5rem}\n.rs-robot-pose-heading{margin:0;font-size:0.875rem;font-weight:500}\n.rs-robot-pose-values{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.75rem;margin:0.75rem 0 0;font-size:0.75rem}\n.rs-robot-pose-value{margin:0.25rem 0 0;font-size:1rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}\n.rs-robot-pose-text{margin:0;overflow-wrap:anywhere}\n.rs-robot-pose-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/robot-pose.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "robotics",
+      "classes": [
+        "rs-robot-pose",
+        "rs-robot-pose-legend",
+        "rs-robot-pose-field",
+        "rs-robot-pose-select",
+        "rs-robot-pose-metadata",
+        "rs-robot-pose-detail",
+        "rs-robot-pose-heading",
+        "rs-robot-pose-values",
+        "rs-robot-pose-value",
+        "rs-robot-pose-text",
+        "rs-robot-pose-copy"
+      ],
+      "snippet": "<fieldset class=\"rs-robot-pose\"><legend class=\"rs-robot-pose-legend\">Tool pose</legend><dl class=\"rs-robot-pose-metadata\"><div class=\"rs-robot-pose-detail\"><dt>Frame</dt><dd class=\"rs-robot-pose-text\">base</dd></div><div class=\"rs-robot-pose-detail\"><dt>Recorded at</dt><dd class=\"rs-robot-pose-text\">12:00:00.125</dd></div></dl><div><p class=\"rs-robot-pose-heading\">Translation</p><p class=\"rs-robot-pose-copy\">Unit: m</p><dl class=\"rs-robot-pose-values\"><div><dt>X</dt><dd class=\"rs-robot-pose-value\">0.125</dd></div><div><dt>Y</dt><dd class=\"rs-robot-pose-value\">0</dd></div><div><dt>Z</dt><dd class=\"rs-robot-pose-value\">0.25</dd></div></dl></div><p class=\"rs-robot-pose-copy\">Representation: Quaternion, x y z w</p></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "RobotPose",
+        "Pose inspector",
+        "Cartesian pose",
+        "Robot pose record",
+        "Quaternion inspector",
+        "End effector pose"
+      ],
+      "example": "import { RobotPose } from \"@noorddev/vlak-react\";\n\n<RobotPose label=\"Tool pose\" name=\"pose\" poses={[{\n  id: \"tool-base\", label: \"Tool in base\", frame: \"base\", timeLabel: \"12:00:00.125\", status: \"Recorded\",\n  translation: { x: 0.125, y: 0, z: 0.25, unit: \"m\" },\n  orientation: { representation: \"Quaternion, x y z w\", components: [\n    { id: \"qx\", label: \"qx\", value: 0 }, { id: \"qy\", label: \"qy\", value: 0 },\n    { id: \"qz\", label: \"qz\", value: 0 }, { id: \"qw\", label: \"qw\", value: 1 }\n  ] }\n}]} />",
+      "usage": {
+        "use": [
+          "Caller-supplied pose records with a frame, time label, recorded status, translation unit, and explicit orientation representation.",
+          "value/defaultValue/onValueChange to select a supplied record by identifier; changing records does not transform coordinates.",
+          "orientation.components for exact named values, with optional per-component units. Include axis order and intrinsic or extrinsic conventions in the representation label when relevant.",
+          "Missing values remain Not supplied, non-finite values remain Unavailable, and zero is never treated as missing.",
+          "The first supplied record is selected by default; an explicit null leaves the selection empty."
+        ],
+        "avoid": [
+          "Treating the view as a frame tree, transform calculator, quaternion normalizer, or inverse-kinematics solver.",
+          "Omitting orientation conventions or presenting an unconfirmed pose as the robot's active target."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the Vlak pose-record selector."
+        },
+        {
+          "keys": "Enter, Space, Arrow keys",
+          "does": "Opens and navigates the selector; Enter confirms the highlighted record."
+        },
+        {
+          "keys": "Home, End, Escape",
+          "does": "Moves to an end of the menu or closes it without changing the record."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the pose view; the Vlak Select names the recorded-pose choice and its menu.",
+        "Definition lists retain every translation and orientation component as exact text, including zero, missing values, and explicit units.",
+        "A named selection submits its supplied pose identifier through a hidden input. Parent form reset restores uncontrolled selection.",
+        "Read-only selection retains its submitted value; native disabled fieldsets omit it.",
+        "The ref and native attributes reach the root fieldset. No live announcement is attached to streamed pose data."
+      ]
+    }
+  }
+}

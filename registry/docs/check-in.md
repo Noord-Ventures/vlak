@@ -46,7 +46,7 @@ npx shadcn add https://vlak.dev/r/check-in.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-check-in"><legend class="rs-check-in-legend">How is your energy?</legend><p class="rs-check-in-description">Choose the answer that fits right now.</p><div class="rs-check-in-choices"><label class="rs-check-in-choice"><span>Low</span><input class="rs-check-in-input" type="radio" name="energy" value="low" /></label><label class="rs-check-in-choice rs-check-in-selected"><span>Steady</span><input class="rs-check-in-input" type="radio" name="energy" value="steady" checked /></label><label class="rs-check-in-choice"><span>High</span><input class="rs-check-in-input" type="radio" name="energy" value="high" /></label></div></fieldset>
+<fieldset class="rs-check-in"><legend class="rs-check-in-legend">How is your energy?</legend><p class="rs-check-in-description">Choose the answer that fits right now.</p><div class="rs-check-in-choices"><label class="rs-check-in-choice"><span>Low</span><input class="rs-check-in-input" type="radio" name="energy" value="low" /></label><label class="rs-check-in-choice rs-check-in-selected"><span>Steady</span><input class="rs-check-in-input" type="radio" name="energy" value="steady" checked /></label><label class="rs-check-in-choice"><span>High</span><input class="rs-check-in-input" type="radio" name="energy" value="high" /></label></div><button class="rs-btn-ghost rs-btn-sm rs-check-in-clear" type="button">Clear answer</button></fieldset>
 ```
 
 ## Example
@@ -91,7 +91,7 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 ## Accessibility
 
 - A fieldset and legend name the answer group; native radios use visible text labels and share a name.
-- Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection.
+- Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection. Vlak Button supplies the optional clear action.
 - Descriptions reach the group and each answer. Read-only controls retain the submitted value and announce their unavailable state.
 - Disabled controls do not submit; required uses native radio validation. Form reset restores uncontrolled defaults and preserves controlled values.
 - The forwarded ref reaches the fieldset; native fieldset attributes, className, and style pass through.
@@ -102,6 +102,6 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/check-in.tsx`  
 CSS: `packages/core/css/components/check-in.css`

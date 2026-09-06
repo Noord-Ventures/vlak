@@ -1,0 +1,17 @@
+/* ── culture-log: generated from packages/react/src/components/culture-log.tsx ── */
+.rs-culture-log{display:grid;gap:1rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-culture-log-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem}
+.rs-culture-log-title{margin:0;font-size:0.875rem;font-weight:600}
+.rs-culture-log-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
+.rs-culture-log-metadata{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 8rem), 1fr));gap:0.75rem 1rem;padding-block:1rem;margin:0;border-block-width:1px;border-block-style:solid;border-block-color:var(--divider)}
+@media (max-width: 640px){.rs-culture-log-metadata{grid-template-columns:minmax(0, 1fr)}}
+.rs-culture-log-value{margin:0.25rem 0 0;font-size:0.875rem;font-variant-numeric:tabular-nums}
+.rs-culture-log-list{list-style-type:none;margin:0;padding:0}
+.rs-culture-log-observation{display:grid;grid-template-columns:minmax(6rem, 1fr) minmax(0, 3fr);gap:0.5rem 1rem;padding-block:0.875rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+@media (max-width: 640px){.rs-culture-log-observation{grid-template-columns:minmax(0, 1fr)}}
+.rs-culture-log-time{font-size:0.75rem;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.rs-culture-log-content{display:grid;gap:0.375rem;min-width:0}
+.rs-culture-log-observation-label{margin:0;font-size:0.875rem;font-weight:500}
+.rs-culture-log-notes{font-size:0.875rem;max-width:66ch}
+.rs-culture-log-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-culture-log-action{min-width:var(--hit);min-height:var(--hit);width:auto}

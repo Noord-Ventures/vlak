@@ -1,6 +1,53 @@
+import { chooseWithKeyboard } from "./specialist-e2e.mjs";
+
+/** Chromium's real meter shadow styles; host pseudo queries can hide its native gradients. */
+export async function checkAudioMeterPaint(page, context, fail) {
+  const preview = page.locator(".preview-box");
+  const meters = preview.getByRole("meter");
+  const values = await meters.evaluateAll(elements => elements.map(element => ({ min: element.min, max: element.max, value: element.value, text: element.getAttribute("aria-valuetext") })));
+  if (JSON.stringify(values) !== JSON.stringify([{ min: -60, max: 0, value: -12, text: "-12 dB" }, { min: -60, max: 0, value: -15, text: "-15 dB" }])) fail(`audio meter ${context}: native accessible values changed: ${JSON.stringify(values)}`);
+  for (const name of ["Output Left", "Output Right"]) if (await preview.getByRole("meter", { name, exact: true }).count() !== 1) fail(`audio meter ${context}: the native meter lost its ${name} accessible name`);
+  const colors = await meters.first().evaluate(element => ({ ink: getComputedStyle(element).color, paper: getComputedStyle(element).backgroundColor }));
+  const session = await page.context().newCDPSession(page);
+  try {
+    await session.send("DOM.enable");
+    await session.send("CSS.enable");
+    const { root } = await session.send("DOM.getDocument");
+    const { nodeIds } = await session.send("DOM.querySelectorAll", { nodeId: root.nodeId, selector: ".preview-box meter" });
+    for (const nodeId of nodeIds) {
+      const { node } = await session.send("DOM.describeNode", { nodeId, depth: -1, pierce: true });
+      const parts = [];
+      const visit = child => {
+        const attributes = child.attributes ?? [];
+        const pseudo = attributes[attributes.indexOf("pseudo") + 1];
+        if (["-webkit-meter-bar", "-webkit-meter-optimum-value"].includes(pseudo)) parts.push({ node: child, pseudo });
+        for (const next of [...child.children ?? [], ...child.shadowRoots ?? []]) visit(next);
+      };
+      visit(node);
+      if (parts.length !== 2) fail(`audio meter ${context}: expected the native track and value shadow parts, found ${parts.length}`);
+      for (const part of parts) {
+        // describeNode may expose a backend id without assigning a frontend id.
+        const { nodeIds: ids } = await session.send("DOM.pushNodesByBackendIdsToFrontend", { backendNodeIds: [part.node.backendNodeId] });
+        const { computedStyle } = await session.send("CSS.getComputedStyleForNode", { nodeId: ids[0] });
+        const style = Object.fromEntries(computedStyle.map(property => [property.name, property.value]));
+        if (style["background-image"] !== "none") fail(`audio meter ${context}: ${part.pseudo} retains ${style["background-image"]}`);
+        const expected = part.pseudo === "-webkit-meter-optimum-value" ? colors.ink : colors.paper;
+        if (style["background-color"] !== expected) fail(`audio meter ${context}: ${part.pseudo} uses ${style["background-color"]}, expected ${expected}`);
+        const channels = style["background-color"].match(/[\d.]+/g)?.slice(0, 3).map(Number);
+        if (channels?.length !== 3 || channels[0] !== channels[1] || channels[1] !== channels[2]) {
+          // Paper can be warm; the value must remain the supplied monochrome ink.
+          if (part.pseudo === "-webkit-meter-optimum-value") fail(`audio meter ${context}: native value paint is not monochrome: ${style["background-color"]}`);
+        }
+      }
+    }
+  } finally {
+    await session.detach();
+  }
+}
+
 /** Civic, science and creative specimens: mobile reach, both themes and real keyboard edits. */
 export async function checkDomainCollections({ browser, base, components, axeSource, fail }) {
-  const categories = ["civic", "science", "creative"];
+  const categories = ["civic", "science", "creative", "engineering", "geospatial", "robotics", "electronics", "microbiology"];
   const specimens = components.filter(component => categories.includes(component.category));
   for (const category of categories) if (!specimens.some(component => component.category === category)) fail(`${category}: no components are included in the domain checks`);
   const page = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
@@ -21,6 +68,7 @@ export async function checkDomainCollections({ browser, base, components, axeSou
       await page.emulateMedia({ colorScheme });
       for (const component of specimens) await check(`${component.category} ${component.name} ${colorScheme}`, async () => {
         await go(component.name);
+        if (component.name === "audio-meter") await checkAudioMeterPaint(page, `${colorScheme} mobile`, fail);
         // Open the supplied numeric table as well, so its controls and table
         // semantics are checked in the same mobile themes as the chart.
         if (component.name === "spectrum-plot") {
@@ -31,7 +79,7 @@ export async function checkDomainCollections({ browser, base, components, axeSou
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
         if (overflow > 1) fail(`${component.category} ${component.name} ${colorScheme}: ${overflow}px page overflow at 390px`);
         const small = await page.locator(".preview-box, .rs-scene").evaluateAll(roots => roots.flatMap(root => [...root.querySelectorAll('button, input:not([type="hidden"]), select, textarea, summary, a[href], [role="slider"], [role="switch"]')])
-          .filter((element, index, all) => all.indexOf(element) === index && element.getClientRects().length && getComputedStyle(element).visibility !== "hidden")
+          .filter((element, index, all) => all.indexOf(element) === index && element.getClientRects().length && !element.closest('[aria-hidden="true"]') && getComputedStyle(element).visibility !== "hidden")
           .map(element => {
             // A visually hidden native choice still uses its complete label as
             // the clickable target. Number inputs and selects use their own box.
@@ -49,35 +97,61 @@ export async function checkDomainCollections({ browser, base, components, axeSou
       });
     }
 
+    await page.setViewportSize({ width: 1280, height: 900 });
+    for (const colorScheme of ["light", "dark"]) await check(`creative audio-meter ${colorScheme} desktop paint`, async () => {
+      await page.emulateMedia({ colorScheme });
+      await go("audio-meter");
+      await checkAudioMeterPaint(page, `${colorScheme} desktop`, fail);
+    });
+    await page.setViewportSize({ width: 390, height: 844 });
+
     await check("science quantity-field keyboard conversion", async () => {
       const preview = await go("quantity-field");
       const amount = preview.getByRole("spinbutton", { name: "Amount", exact: true });
       const unit = preview.getByRole("combobox", { name: "Unit", exact: true });
-      if (await amount.inputValue() !== "250" || await unit.inputValue() !== "ul") fail("science quantity-field: the preview must begin with the supplied 250 µL quantity");
-      await unit.focus();
-      // Native select typeahead works across desktop platforms; End does not
-      // change the selected option in the macOS headless native popup.
-      await page.keyboard.press("m");
-      await page.keyboard.press("Tab");
-      if (await unit.inputValue() !== "ml" || Number(await amount.inputValue()) !== 0.25) fail("science quantity-field: choosing mL by keyboard must preserve the volume as 0.25 mL in this preview");
+      if (await amount.inputValue() !== "250" || (await unit.textContent()).trim() !== "µL") fail("science quantity-field: the preview must begin with the supplied 250 µL quantity");
+      await chooseWithKeyboard(page, unit, "mL");
+      if ((await unit.textContent()).trim() !== "mL" || Number(await amount.inputValue()) !== 0.25) fail("science quantity-field: choosing mL by keyboard must preserve the volume as 0.25 mL in this preview");
       await replaceWithKeyboard(amount, "0.5");
-      if (Number(await amount.inputValue()) !== 0.5 || await unit.inputValue() !== "ml") fail("science quantity-field: a keyboard amount edit loses the selected unit");
+      if (Number(await amount.inputValue()) !== 0.5 || (await unit.textContent()).trim() !== "mL") fail("science quantity-field: a keyboard amount edit loses the selected unit");
     });
 
-    await check("science well-plate keyboard selection", async () => {
+    await check("microbiology well-plate keyboard selection", async () => {
       const preview = await go("well-plate");
       const first = preview.getByRole("button", { name: "Well A, 1, Control: Loaded", exact: true });
       await first.focus();
       await page.keyboard.press("ArrowRight");
       const next = preview.getByRole("button", { name: "Well A, 2, Sample 042: Loaded", exact: true });
-      if (!(await next.evaluate(element => element === document.activeElement))) fail("science well-plate: ArrowRight cannot reach the adjacent recorded sample");
-      if (await first.locator("..").getAttribute("aria-selected") !== "true") fail("science well-plate: moving focus unexpectedly changes selection");
+      if (!(await next.evaluate(element => element === document.activeElement))) fail("microbiology well-plate: ArrowRight cannot reach the adjacent recorded sample");
+      if (await first.locator("..").getAttribute("aria-selected") !== "true") fail("microbiology well-plate: moving focus unexpectedly changes selection");
       await page.keyboard.press("Space");
-      if (await next.locator("..").getAttribute("aria-selected") !== "true" || await first.locator("..").getAttribute("aria-selected") !== "false") fail("science well-plate: Space does not select the focused sample");
+      if (await next.locator("..").getAttribute("aria-selected") !== "true" || await first.locator("..").getAttribute("aria-selected") !== "false") fail("microbiology well-plate: Space does not select the focused sample");
       await page.keyboard.press("Home");
       await page.keyboard.press("ArrowDown");
       const unrecorded = preview.getByRole("button", { name: "Well C, 1: Unrecorded", exact: true });
-      if (!(await unrecorded.evaluate(element => element === document.activeElement))) fail("science well-plate: vertical navigation does not skip reserved disabled B1");
+      if (!(await unrecorded.evaluate(element => element === document.activeElement))) fail("microbiology well-plate: vertical navigation does not skip reserved disabled B1");
+    });
+
+    await check("microbiology colony-plate source records", async () => {
+      const preview = await go("colony-plate");
+      const first = preview.getByRole("button", { name: "Select 1. Colony 01", exact: true });
+      await first.focus();
+      await page.keyboard.press("Enter");
+      if (await first.getAttribute("aria-pressed") !== "true" || await preview.getByRole("status").textContent() !== "Selected record: Colony 01") fail("microbiology colony-plate: keyboard selection does not reach the supplied record");
+      if (!(await preview.getByText("Source count: 12", { exact: true }).isVisible()) || !(await preview.getByText("4 marker records supplied; 3 positioned", { exact: true }).isVisible())) fail("microbiology colony-plate: selection changes source counts or confuses records with positioned markers");
+      const missing = preview.getByRole("button", { name: "Select 4. Colony 04", exact: true });
+      await missing.focus();
+      await page.keyboard.press("Space");
+      if (await preview.getByRole("status").textContent() !== "Selected record: Colony 04" || !(await preview.getByText("Position not supplied", { exact: true }).isVisible())) fail("microbiology colony-plate: an unpositioned record cannot be inspected");
+    });
+
+    await check("microbiology culture-log recording action", async () => {
+      const preview = await go("culture-log");
+      const observations = await preview.getByRole("listitem").allTextContents();
+      await preview.getByRole("button", { name: "Record review: C-042", exact: true }).focus();
+      await page.keyboard.press("Enter");
+      if (!(await preview.getByText("Record review noted", { exact: true }).isVisible())) fail("microbiology culture-log: keyboard action does not reach the host record");
+      if (JSON.stringify(await preview.getByRole("listitem").allTextContents()) !== JSON.stringify(observations)) fail("microbiology culture-log: record review changes supplied laboratory observations");
     });
 
     await check("creative parameter-knob keyboard adjustment", async () => {

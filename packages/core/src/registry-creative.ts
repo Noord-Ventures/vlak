@@ -13,21 +13,21 @@ export const creativeComponents: VlakComponent[] = [
 <AudioMeter label="Output" channels={[{ id: "left", label: "Left", level: -12, peak: -3 }, { id: "right", label: "Right", level: -15, peak: -4 }]} />`,
     usage: { use: ["Live or recorded decibel readings supplied by an audio host.", "min and max to set the visible scale; supplied readings remain visible as text.", "Negative infinity for digital silence, and null for an unavailable level."], avoid: ["Expecting microphone access, audio analysis, or automatic peak holding.", "Treating a missing reading as silence or zero decibels."] },
     keyboard: [],
-    a11y: ["Each native meter has a channel name, minimum, maximum, and decibel value text.", "Supplied peaks are visible text; absent and invalid readings suppress the meter.", "Monochrome native meter styles retain boundaries in forced colors.", "The ref and native attributes reach the root div."],
+    a11y: ["Each native meter has a channel name, minimum, maximum, and decibel value text.", "Supplied peaks are visible text; absent and invalid readings suppress the meter.", "Native meter styles remove browser gradients so the track and fill remain monochrome. System colors retain visible fill and boundaries in forced colors.", "The ref and native attributes reach the root div."],
     aliases: ["AudioMeter", "Level meter", "Peak meter", "Decibel meter", "Channel meter"],
   },
   {
     name: "channel-strip", title: "Channel strip", category: "creative",
     description: "Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.",
     classes: ["rs-channel-strip", "rs-channel-strip-label", "rs-channel-strip-field", "rs-channel-strip-text", "rs-channel-strip-range", "rs-channel-strip-actions", "rs-channel-strip-button", "rs-channel-strip-pressed"],
-    css: ["components/channel-strip.css"], react: "components/channel-strip.tsx", registryDependencies: [],
-    snippet: `<fieldset class="rs-channel-strip"><legend class="rs-channel-strip-label">Dialogue</legend><label class="rs-channel-strip-field">Gain<input class="rs-channel-strip-range" type="range" min="-60" max="12" step="any" value="0" /></label><label class="rs-channel-strip-field">Pan<input class="rs-channel-strip-range" type="range" min="-100" max="100" step="any" value="0" /></label><div class="rs-channel-strip-actions"><button class="rs-channel-strip-button" type="button" aria-pressed="false">Mute</button><button class="rs-channel-strip-button" type="button" aria-pressed="false">Solo</button></div></fieldset>`,
+    css: ["components/channel-strip.css"], react: "components/channel-strip.tsx", registryDependencies: ["button"],
+    snippet: `<fieldset class="rs-channel-strip"><legend class="rs-channel-strip-label">Dialogue</legend><label class="rs-channel-strip-field">Gain<input class="rs-channel-strip-range" type="range" min="-60" max="12" step="any" value="0" /></label><label class="rs-channel-strip-field">Pan<input class="rs-channel-strip-range" type="range" min="-100" max="100" step="any" value="0" /></label><div class="rs-channel-strip-actions"><button class="rs-btn-ghost rs-btn-sm rs-channel-strip-button" type="button" aria-pressed="false">Mute</button><button class="rs-btn-ghost rs-btn-sm rs-channel-strip-button" type="button" aria-pressed="false">Solo</button></div></fieldset>`,
     example: `import { ChannelStrip } from "@noorddev/vlak-react";
 
 <ChannelStrip label="Dialogue" name="dialogue" defaultValue={{ gain: -3, pan: 0, muted: false, solo: false }} />`,
     usage: { use: ["A host channel whose gain, pan, mute, and solo states belong together.", "value/defaultValue/onValueChange for controlled or local editing; connect changes to your audio host.", "Pan from -100 percent left through zero center to 100 percent right; gain uses decibels."], avoid: ["Assuming UI changes process audio without a connected host.", "Using solo as a global mixing policy; the application coordinates other channels."] },
     keyboard: [{ keys: "Tab", does: "Moves through enabled gain, pan, mute, and solo controls." }, { keys: "Arrow keys, Home, End", does: "Uses native slider stepping and bounds." }, { keys: "Enter, Space", does: "Toggles the focused mute or solo action." }],
-    a11y: ["A fieldset and legend name the channel; native sliders expose gain and pan bounds and descriptive value text. In-range values retain their supplied precision.", "Mute and solo have stable names and aria-pressed; their entire surface changes on selection.", "All controls meet the 44px target size. Disabled or read-only controls cannot edit the channel.", "Uncontrolled form reset restores the supplied default; named read-only channels retain all valid values in form submissions. Disabled channels and out-of-range sliders are omitted. The ref reaches the fieldset."],
+    a11y: ["A fieldset and legend name the channel; native sliders expose gain and pan bounds and descriptive value text. In-range values retain their supplied precision.", "Vlak Button supplies mute and solo actions with stable names and aria-pressed; their entire surface changes on selection.", "All controls meet the 44px target size. Disabled or read-only controls cannot edit the channel.", "Uncontrolled form reset restores the supplied default; named read-only channels retain all valid values in form submissions. Disabled channels and out-of-range sliders are omitted. The ref reaches the fieldset."],
     aliases: ["ChannelStrip", "Mixer channel", "Audio mixer", "Gain control", "Pan control", "Mute solo"],
   },
   {
@@ -48,8 +48,8 @@ export const creativeComponents: VlakComponent[] = [
     name: "timecode-field", title: "Timecode field", category: "creative",
     description: "Edits hours, minutes, seconds, and frames with native form validation for a supplied integer non-drop frame rate.",
     classes: ["rs-timecode-field", "rs-timecode-field-label", "rs-timecode-field-input", "rs-timecode-field-hint"],
-    css: ["components/timecode-field.css"], react: "components/timecode-field.tsx", registryDependencies: [],
-    snippet: `<div class="rs-timecode-field"><label class="rs-timecode-field-label" for="in-point">In point</label><input class="rs-timecode-field-input" id="in-point" type="text" value="00:01:24:12" pattern="[0-9]{2}:[0-5][0-9]:[0-5][0-9]:[0-9]{2}" aria-describedby="in-point-hint" /><p class="rs-timecode-field-hint" id="in-point-hint">24 fps, non-drop. Hours:minutes:seconds:frames.</p></div>`,
+    css: ["components/timecode-field.css"], react: "components/timecode-field.tsx", registryDependencies: ["input"],
+    snippet: `<div class="rs-timecode-field"><label class="rs-timecode-field-label" for="in-point">In point</label><input class="rs-input rs-input-full rs-timecode-field-input" id="in-point" type="text" value="00:01:24:12" pattern="[0-9]{2}:[0-5][0-9]:[0-5][0-9]:[0-9]{2}" aria-describedby="in-point-hint" /><p class="rs-timecode-field-hint" id="in-point-hint">24 fps, non-drop. Hours:minutes:seconds:frames.</p></div>`,
     example: `import { TimecodeField } from "@noorddev/vlak-react";
 
 <TimecodeField label="In point" name="inPoint" frameRate={24} defaultValue="00:01:24:12" required />`,
@@ -76,7 +76,7 @@ export const creativeComponents: VlakComponent[] = [
     name: "render-queue", title: "Render queue", category: "creative",
     description: "Displays supplied export jobs, progress, and status with explicit cancel and retry callbacks for a connected renderer.",
     classes: ["rs-render-queue", "rs-render-queue-label", "rs-render-queue-list", "rs-render-queue-job", "rs-render-queue-header", "rs-render-queue-note", "rs-render-queue-progress", "rs-render-queue-action"],
-    css: ["components/render-queue.css"], react: "components/render-queue.tsx", registryDependencies: [],
+    css: ["components/render-queue.css"], react: "components/render-queue.tsx", registryDependencies: ["button"],
     snippet: `<div class="rs-render-queue"><p class="rs-render-queue-label">Exports</p><ul class="rs-render-queue-list"><li class="rs-render-queue-job"><div class="rs-render-queue-header"><span>Film master</span><span>Rendering</span></div><progress class="rs-render-queue-progress" value="42" max="100" aria-label="Film master progress">42%</progress><p class="rs-render-queue-note">42%</p></li></ul></div>`,
     example: `import { RenderQueue } from "@noorddev/vlak-react";
 
@@ -89,8 +89,8 @@ export const creativeComponents: VlakComponent[] = [
   {
     name: "layer-stack", title: "Layer stack", category: "creative",
     description: "Manages supplied layer selection, visibility, locking, and order through named 44px controls and caller-owned changes.",
-    classes: ["rs-layer-stack", "rs-layer-stack-label", "rs-layer-stack-list", "rs-layer-stack-row", "rs-layer-stack-actions", "rs-layer-stack-button", "rs-layer-stack-selected", "rs-layer-stack-note"],
-    css: ["components/layer-stack.css"], react: "components/layer-stack.tsx", registryDependencies: [],
+    classes: ["rs-layer-stack", "rs-layer-stack-label", "rs-layer-stack-list", "rs-layer-stack-row", "rs-layer-stack-actions", "rs-layer-stack-action", "rs-layer-stack-button", "rs-layer-stack-selected", "rs-layer-stack-note"],
+    css: ["components/layer-stack.css"], react: "components/layer-stack.tsx", registryDependencies: ["button"],
     snippet: `<div class="rs-layer-stack"><p class="rs-layer-stack-label">Layers</p><ol class="rs-layer-stack-list"><li class="rs-layer-stack-row"><span>Title</span><span class="rs-layer-stack-note">Visible · Unlocked</span></li><li class="rs-layer-stack-row"><span>Background</span><span class="rs-layer-stack-note">Visible · Locked</span></li></ol></div>`,
     example: `import { useState } from "react";
 import { LayerStack } from "@noorddev/vlak-react";
@@ -102,7 +102,7 @@ function Layers() {
   return <LayerStack label="Layers" layers={layers} selectedId={selected} onSelect={setSelected} onLayersChange={setLayers} />;
 }`,
     usage: { use: ["Top-to-bottom layer order for a graphics, audio, or video editor.", "onLayersChange receives the proposed array; the application applies it and owns persistence.", "onSelect independently controls selection; locked layers cannot use their move actions."], avoid: ["Implying drag-and-drop support or modifying document content behind the host's back.", "Rendering state-changing controls without onLayersChange."] },
-    keyboard: [{ keys: "Tab", does: "Moves through available selection, visibility, lock, and move actions." }, { keys: "Enter, Space", does: "Requests the focused action; move buttons reorder one position when allowed." }],
+    keyboard: [{ keys: "Tab", does: "Moves through available layer selection and Vlak visibility, lock, and move buttons." }, { keys: "Enter, Space", does: "Requests the focused action; move buttons reorder one position when allowed." }],
     a11y: ["An ordered list preserves the supplied layer order, with visible status text for visibility and locking.", "Selection, visibility, and lock controls have stable names and pressed states.", "Move actions name their layer, disable at boundaries or when locked, and avoid a drag-only workflow.", "All actions have 44px targets; the ref and native attributes reach the root div."],
     aliases: ["LayerStack", "Layers panel", "Layer list", "Layer inspector", "Object stack"],
   },
@@ -110,8 +110,8 @@ function Layers() {
     name: "color-inspector", title: "Color inspector", category: "creative",
     description: "Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.",
     classes: ["rs-color-inspector", "rs-color-inspector-label", "rs-color-inspector-preview", "rs-color-inspector-swatch", "rs-color-inspector-fields", "rs-color-inspector-field", "rs-color-inspector-input", "rs-color-inspector-note"],
-    css: ["components/color-inspector.css"], react: "components/color-inspector.tsx", registryDependencies: [],
-    snippet: `<fieldset class="rs-color-inspector"><legend class="rs-color-inspector-label">Fill</legend><div class="rs-color-inspector-preview" aria-hidden="true"><span class="rs-color-inspector-swatch" style="background-color:#808080;opacity:0.5"></span></div><div class="rs-color-inspector-fields"><label class="rs-color-inspector-field">Hex<input class="rs-color-inspector-input" type="text" value="#808080" pattern="#[0-9a-fA-F]{6}" required /></label><label class="rs-color-inspector-field">Alpha<input class="rs-color-inspector-input" type="number" value="0.5" min="0" max="1" step="any" required /></label></div></fieldset>`,
+    css: ["components/color-inspector.css"], react: "components/color-inspector.tsx", registryDependencies: ["input"],
+    snippet: `<fieldset class="rs-color-inspector"><legend class="rs-color-inspector-label">Fill</legend><div class="rs-color-inspector-preview" aria-hidden="true"><span class="rs-color-inspector-swatch" style="background-color:#808080;opacity:0.5"></span></div><div class="rs-color-inspector-fields"><label class="rs-color-inspector-field">Hex<input class="rs-input rs-input-full rs-color-inspector-input" type="text" value="#808080" pattern="#[0-9a-fA-F]{6}" required /></label><label class="rs-color-inspector-field">Alpha<input class="rs-input rs-input-full rs-color-inspector-input" type="number" value="0.5" min="0" max="1" step="any" required /></label></div></fieldset>`,
     example: `import { ColorInspector } from "@noorddev/vlak-react";
 
 <ColorInspector label="Fill" name="fill" defaultValue={{ hex: "#808080", alpha: 0.5 }} />`,
@@ -124,8 +124,8 @@ function Layers() {
     name: "spacing-control", title: "Spacing control", category: "creative",
     description: "Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.",
     classes: ["rs-spacing-control", "rs-spacing-control-label", "rs-spacing-control-fields", "rs-spacing-control-field", "rs-spacing-control-input", "rs-spacing-control-link", "rs-spacing-control-linked", "rs-spacing-control-note"],
-    css: ["components/spacing-control.css"], react: "components/spacing-control.tsx", registryDependencies: [],
-    snippet: `<fieldset class="rs-spacing-control"><legend class="rs-spacing-control-label">Padding</legend><div class="rs-spacing-control-fields"><label class="rs-spacing-control-field">Top (px)<input class="rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Right (px)<input class="rs-spacing-control-input" type="number" value="24" /></label><label class="rs-spacing-control-field">Bottom (px)<input class="rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Left (px)<input class="rs-spacing-control-input" type="number" value="24" /></label></div></fieldset>`,
+    css: ["components/spacing-control.css"], react: "components/spacing-control.tsx", registryDependencies: ["input", "button"],
+    snippet: `<fieldset class="rs-spacing-control"><legend class="rs-spacing-control-label">Padding</legend><div class="rs-spacing-control-fields"><label class="rs-spacing-control-field">Top (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Right (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="24" /></label><label class="rs-spacing-control-field">Bottom (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Left (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="24" /></label></div></fieldset>`,
     example: `import { SpacingControl } from "@noorddev/vlak-react";
 
 <SpacingControl label="Padding" name="padding" unit="px" min={0} defaultValue={{ top: 16, right: 24, bottom: 16, left: 24 }} />`,

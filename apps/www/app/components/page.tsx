@@ -6,6 +6,7 @@ import { chrome } from "@/app/site.stylex";
 import { DocsNav } from "@/components/docs-nav";
 import { Preview } from "@/components/preview";
 import { sx } from "@/lib/sx";
+import { categoryTitle } from "@/lib/category-title";
 import { DOOR } from "../specimen";
 
 function iconGroupSlug(title: string) {
@@ -66,7 +67,7 @@ export default function ComponentsPage() {
           return (
             <section key={category} id={category}>
               <h2 className="rs-t-title catalog-group">
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+                {categoryTitle(category)}
               </h2>
               {category === "health" && (
                 <p className="rs-t-body">

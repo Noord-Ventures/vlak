@@ -1,6 +1,6 @@
 # Quantity field
 
-A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
+A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.
 
 Category: science  
 Name: `quantity-field`  
@@ -47,7 +47,7 @@ npx shadcn add https://vlak.dev/r/quantity-field.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-quantity-field"><legend class="rs-quantity-field-legend">Sample volume</legend><div class="rs-quantity-field-row"><label class="rs-quantity-field-label">Amount<input class="rs-quantity-field-control" name="volume" type="number" step="any" value="250" /></label><label class="rs-quantity-field-label">Unit<select class="rs-quantity-field-control" name="volume.unit"><option value="ul">µL</option><option value="ml">mL</option></select></label></div></fieldset>
+<fieldset class="rs-quantity-field"><legend class="rs-quantity-field-legend">Sample volume</legend><div class="rs-quantity-field-row"><label class="rs-quantity-field-label">Amount<input class="rs-input rs-input-full rs-quantity-field-control" name="volume" type="number" step="any" value="250" /></label><div class="rs-quantity-field-label"><span id="quantity-unit-label">Unit</span><div class="rs-select rs-select-fluid"><button type="button" class="rs-dropdown" role="combobox" aria-labelledby="quantity-unit-label" aria-expanded="false" aria-haspopup="listbox"><span>µL</span></button></div></div></div></fieldset>
 ```
 
 ## Example
@@ -91,11 +91,11 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 | Keys | Does |
 | --- | --- |
 | Tab | Moves between the amount input and unit selector. |
-| Arrow keys | Uses native number stepping or select navigation on the focused control. |
+| Arrow keys | Uses native number stepping or opens and navigates the Vlak unit selector. Enter or Space confirms a unit; Escape closes its menu. |
 
 ## Accessibility
 
-- A fieldset and legend name the quantity; both native controls have visible labels, descriptions and 44px targets.
+- A fieldset and legend name the quantity. Vlak Input and Select have visible labels, descriptions and 44px targets.
 - Required, min, max and step use native validation. Invalid supplied numbers and unknown units have explicit text states.
 - Native form reset restores uncontrolled defaults and leaves controlled values with the application.
 - Read-only quantities preserve the submitted amount and unit while preventing edits. Disabled quantities do not submit.
@@ -107,6 +107,6 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md), [select](select.md), [dropdown-menu](dropdown-menu.md).  
 React: `packages/react/src/components/quantity-field.tsx`  
 CSS: `packages/core/css/components/quantity-field.css`

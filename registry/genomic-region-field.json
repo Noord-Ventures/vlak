@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "genomic-region-field",
+  "type": "registry:component",
+  "title": "Genomic region field",
+  "description": "Collects a reference, contig and validated integer interval with an explicit one-based inclusive coordinate convention and native form submission.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/genomic-region-field.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\nimport { Input } from \"./input\";\n\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface GenomicContig { id: string; label?: string; length: number }\nexport interface GenomicRegion { contig: string | null; start: number | null; end: number | null }\nexport interface GenomicRegionFieldProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: React.ReactNode;\n  /** Fixed reference name or accession, submitted with the region. */\n  reference: string;\n  contigs: readonly GenomicContig[];\n  value?: GenomicRegion;\n  defaultValue?: GenomicRegion;\n  onValueChange?: (value: GenomicRegion) => void;\n  required?: boolean;\n  readOnly?: boolean;\n  description?: React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, borderWidth: 0, padding: 0, margin: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: \"0.875rem\", fontWeight: 600 },\n  fields: { display: \"grid\", gridTemplateColumns: { default: \"repeat(3, minmax(0, 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem\" },\n  field: { display: \"grid\", gap: \"0.375rem\", minWidth: 0, fontSize: \"0.75rem\" },\n  control: { width: \"100%\", minWidth: 0, fontVariantNumeric: \"tabular-nums\" },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n});\nconst emptyRegion: GenomicRegion = { contig: null, start: null, end: null };\n/** A region in one-based inclusive coordinates. No assembly or half-open conversion is performed. */\nexport const GenomicRegionField = React.forwardRef<HTMLFieldSetElement, GenomicRegionFieldProps>(function GenomicRegionField({ label, reference, contigs, value, defaultValue = emptyRegion, onValueChange, required = false, readOnly = false, description, name, form, disabled, className, style, children, \"aria-describedby\": ariaDescribedBy, ...props }, ref) {\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<GenomicRegion, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const merged = useMergedRefs(ref, fieldRef);\n  const startRef = React.useRef<HTMLInputElement>(null);\n  const id = React.useId();\n  const validCatalog = reference.trim().length > 0 && contigs.length <= 2048 && contigs.every(contig => contig.id.trim() && Number.isSafeInteger(contig.length) && contig.length >= 1) && new Set(contigs.map(contig => contig.id)).size === contigs.length;\n  const contig = validCatalog ? contigs.find(item => item.id === current.contig) : undefined;\n  const empty = current.contig == null && current.start == null && current.end == null;\n  const error = !validCatalog ? \"Reference or contig bounds unavailable\" : empty && !required ? \"\" : !contig ? \"Choose a supplied contig\" : current.start == null || current.end == null ? \"Enter both start and end positions\" : !Number.isSafeInteger(current.start) || !Number.isSafeInteger(current.end) ? \"Positions must be whole safe integers\" : current.start < 1 || current.end < 1 ? \"Positions begin at 1\" : current.end < current.start ? \"End must be at or after start\" : current.end > contig.length ? `End must be at most ${contig.length}` : \"\";\n  React.useEffect(() => { startRef.current?.setCustomValidity(error); }, [error]);\n  const describedBy = [ariaDescribedBy, `${id}-convention`, `${id}-feedback`, description != null && `${id}-description`].filter(Boolean).join(\" \");\n  const fieldName = (field: string) => name ? `${name}.${field}` : undefined;\n  const root = rs([\"rs-genomic-region-field\", className], styles.root);\n  const legend = rs([\"rs-genomic-region-field-legend\"], styles.legend);\n  const fields = rs([\"rs-genomic-region-field-fields\"], styles.fields);\n  const field = rs([\"rs-genomic-region-field-label\"], styles.field);\n  const control = rs([\"rs-genomic-region-field-control\"], styles.control);\n  const copy = rs([\"rs-genomic-region-field-copy\"], styles.copy);\n  return <fieldset {...props} ref={merged} name={name} form={form} disabled={disabled} aria-describedby={describedBy} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend><p {...copy}>Reference: {reference || \"Not supplied\"}</p><p {...copy} id={`${id}-convention`}>1-based, inclusive. Both start and end are included.</p>\n    {description != null && <div {...copy} id={`${id}-description`}>{description}</div>}\n    <input type=\"hidden\" name={fieldName(\"reference\")} form={form} value={reference} />\n    <input type=\"hidden\" name={fieldName(\"coordinates\")} form={form} value=\"1-based-inclusive\" />\n    <div {...fields}>\n      <div {...field}><span id={`${id}-contig-label`}>Contig</span><Select fullWidth aria-labelledby={`${id}-contig-label`} name={fieldName(\"contig\")} form={form} value={contig?.id ?? \"\"} required={required} disabled={disabled || !validCatalog} readOnly={readOnly} aria-describedby={describedBy} aria-invalid={!!error || undefined} onValueChange={next => setValue({ ...current, contig: next || null })} options={[{ value: \"\", label: \"Choose contig\" }, ...(validCatalog ? contigs.map(item => ({ value: item.id, label: item.label ?? item.id })) : [])]} /></div>\n      <label {...field}>Start<Input plain {...control} ref={startRef} type=\"number\" step={1} min={1} max={contig?.length} required={required} readOnly={readOnly} disabled={disabled} name={fieldName(\"start\")} form={form} value={current.start != null && Number.isFinite(current.start) ? current.start : \"\"} aria-describedby={describedBy} aria-invalid={!!error || undefined} onChange={event => { if (!readOnly) setValue({ ...current, start: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null }); }} /></label>\n      <label {...field}>End<Input plain {...control} type=\"number\" step={1} min={1} max={contig?.length} required={required} readOnly={readOnly} disabled={disabled} name={fieldName(\"end\")} form={form} value={current.end != null && Number.isFinite(current.end) ? current.end : \"\"} aria-describedby={describedBy} aria-invalid={!!error || undefined} onChange={event => { if (!readOnly) setValue({ ...current, end: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null }); }} /></label>\n    </div>\n    <p {...copy} id={`${id}-feedback`}>{error || (empty ? \"No region entered\" : `${current.end! - current.start! + 1} positions, including both endpoints`)}</p>{children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/genomic-region-field.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/genomic-region-field.css",
+      "content": "/* ── genomic-region-field: generated from packages/react/src/components/genomic-region-field.tsx ── */\n.rs-genomic-region-field{display:grid;gap:0.75rem;min-width:0;border-width:0;padding:0;margin:0;color:var(--text);line-height:1.45}\n.rs-genomic-region-field-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}\n.rs-genomic-region-field-fields{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:0.75rem}\n@media (max-width: 640px){.rs-genomic-region-field-fields{grid-template-columns:minmax(0, 1fr)}}\n.rs-genomic-region-field-label{display:grid;gap:0.375rem;min-width:0;font-size:0.75rem}\n.rs-genomic-region-field-control{width:100%;min-width:0;font-variant-numeric:tabular-nums}\n.rs-genomic-region-field-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/genomic-region-field.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "science",
+      "classes": [
+        "rs-genomic-region-field",
+        "rs-genomic-region-field-legend",
+        "rs-genomic-region-field-fields",
+        "rs-genomic-region-field-label",
+        "rs-genomic-region-field-control",
+        "rs-genomic-region-field-copy"
+      ],
+      "snippet": "<fieldset class=\"rs-genomic-region-field\"><legend class=\"rs-genomic-region-field-legend\">Region</legend><p class=\"rs-genomic-region-field-copy\">Reference: Example reference</p><p class=\"rs-genomic-region-field-copy\">1-based, inclusive. Both start and end are included.</p><div class=\"rs-genomic-region-field-fields\"><div class=\"rs-genomic-region-field-label\"><span id=\"genomic-contig-label\">Contig</span><div class=\"rs-select rs-select-fluid\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"genomic-contig-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\"><span>chr7</span></button></div></div><label class=\"rs-genomic-region-field-label\">Start<input class=\"rs-input rs-input-full rs-genomic-region-field-control\" type=\"number\" min=\"1\" step=\"1\" name=\"region.start\" value=\"101\" /></label><label class=\"rs-genomic-region-field-label\">End<input class=\"rs-input rs-input-full rs-genomic-region-field-control\" type=\"number\" min=\"1\" step=\"1\" name=\"region.end\" value=\"105\" /></label></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "select",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Genome interval input",
+        "Genomic coordinates",
+        "Contig region input",
+        "One-based interval",
+        "Genomic location field"
+      ],
+      "example": "import { GenomicRegionField } from \"@noorddev/vlak-react\";\n\n<GenomicRegionField label=\"Region\" reference=\"Example reference\" name=\"region\" contigs={[{ id: \"chr7\", length: 100000 }, { id: \"chr8\", length: 80000 }]} defaultValue={{ contig: \"chr7\", start: 101, end: 105 }} required />",
+      "usage": {
+        "use": [
+          "Integer genomic intervals against a fixed caller-supplied reference and explicit contig lengths.",
+          "The field always uses one-based inclusive positions, including both endpoints. A one-position region has equal start and end.",
+          "name prefixes submitted reference, coordinates, contig, start and end fields. Native form reset restores uncontrolled defaults.",
+          "Changing contig keeps the entered integers and revalidates its bounds; no coordinate conversion occurs."
+        ],
+        "avoid": [
+          "Silently converting zero-based half-open intervals or moving coordinates between genome assemblies.",
+          "Using guessed contig lengths or clamping invalid coordinates into a different region."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the contig, start and end controls."
+        },
+        {
+          "keys": "Arrow keys, typing",
+          "does": "Opens and navigates the Vlak contig selector or edits numeric inputs. Enter or Space confirms a contig; Escape closes its menu."
+        }
+      ],
+      "a11y": [
+        "A legend and visible labels name the group. Vlak Select and Input provide 44px controls; the coordinate convention is always visible.",
+        "Validation rejects partial regions, non-integers, unsafe integers, positions below 1, reversed endpoints and coordinates beyond the supplied contig.",
+        "Errors are linked to the controls and participate in native form validity. Invalid values remain editable without clamping.",
+        "Missing reference metadata and invalid contig catalogs are explicit; zero never becomes position 1 automatically.",
+        "Read-only fields preserve submitted values, disabled fieldsets do not submit, and controlled values remain application-owned."
+      ]
+    }
+  }
+}

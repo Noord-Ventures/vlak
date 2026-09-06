@@ -1,0 +1,104 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sequence-alignment",
+  "type": "registry:component",
+  "title": "Sequence alignment",
+  "description": "Displays a bounded window of already aligned reference and read strings, with supplied genomic positions, gaps and keyboard region selection.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/sequence-alignment.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface AlignedRead { id: string; label: string; sequence: string }\n/** One-based aligned column indexes, independent of supplied genomic positions. */\nexport interface AlignmentSelection { startColumn: number; endColumn: number }\nexport interface SequenceAlignmentProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  label: string;\n  contig: string;\n  referenceLabel: string;\n  referenceSequence: string;\n  /** One supplied one-based reference position per column; null means a reference gap. */\n  positions: readonly (number | null)[];\n  reads: readonly AlignedRead[];\n  value?: AlignmentSelection | null;\n  defaultValue?: AlignmentSelection | null;\n  onValueChange?: (value: AlignmentSelection | null) => void;\n  readOnly?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, maxWidth: \"100%\", color: vlak.ink, lineHeight: 1.45 },\n  title: { margin: 0, fontSize: \"0.875rem\", fontWeight: 600 },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n  scroll: { maxWidth: \"100%\", minWidth: 0, overflowX: \"auto\", overscrollBehaviorX: \"contain\", padding: \"0.25rem\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  table: { width: \"max-content\", borderCollapse: \"collapse\", direction: \"ltr\" },\n  heading: { padding: \"0.5rem\", fontSize: \"0.75rem\", fontWeight: 500, textAlign: \"start\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, whiteSpace: \"nowrap\" },\n  column: { minWidth: vlak.hit, padding: 0, textAlign: \"center\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  base: { minWidth: vlak.hit, padding: \"0.5rem\", boxSizing: \"border-box\", textAlign: \"center\", fontSize: \"1rem\", fontFamily: \"ui-monospace, monospace\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  control: { minWidth: vlak.hit, minHeight: vlak.hit, padding: \"0.5rem\", boxSizing: \"border-box\", borderWidth: 0, borderRadius: 0, backgroundColor: \"transparent\", color: \"inherit\", fontFamily: \"inherit\", fontSize: \"0.75rem\", fontVariantNumeric: \"tabular-nums\", cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: \"currentColor\", outlineOffset: -2 },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  action: { minWidth: vlak.hit, minHeight: vlak.hit, width: \"auto\" },\n});\n/** A bounded window of already aligned strings; reference positions and gaps are caller-supplied. */\nexport const SequenceAlignment = React.forwardRef<HTMLDivElement, SequenceAlignmentProps>(function SequenceAlignment({ label, contig, referenceLabel, referenceSequence, positions, reads, value, defaultValue = null, onValueChange, readOnly = false, className, style, children, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const current = value === undefined ? inner : value;\n  const [focusColumn, setFocusColumn] = React.useState(1);\n  const anchor = React.useRef<number | null>(null);\n  const buttons = React.useRef(new Map<number, HTMLButtonElement>());\n  const id = React.useId();\n  const bounded = positions.length <= 120 && reads.length <= 32;\n  const valid = bounded && positions.length > 0 && referenceSequence.length === positions.length && /^[A-Za-z.*-]+$/.test(referenceSequence) && positions.every((position, index) => position == null ? /[-.]/.test(referenceSequence[index]!) : Number.isSafeInteger(position) && position >= 1 && !/[-.]/.test(referenceSequence[index]!)) && reads.every(read => read.sequence.length === positions.length && /^[A-Za-z.*-]+$/.test(read.sequence)) && new Set(reads.map(read => read.id)).size === reads.length;\n  const validSelection = current != null && Number.isSafeInteger(current.startColumn) && Number.isSafeInteger(current.endColumn) && current.startColumn >= 1 && current.endColumn >= current.startColumn && current.endColumn <= positions.length;\n  const select = (next: AlignmentSelection | null) => { if (value === undefined) setInner(next); onValueChange?.(next); };\n  const choose = (column: number) => { anchor.current = column; select({ startColumn: column, endColumn: column }); };\n  const move = (event: React.KeyboardEvent<HTMLButtonElement>, column: number) => {\n    const next = event.key === \"Home\" ? 1 : event.key === \"End\" ? positions.length : event.key === \"ArrowRight\" ? Math.min(positions.length, column + 1) : event.key === \"ArrowLeft\" ? Math.max(1, column - 1) : null;\n    if (next == null) return;\n    event.preventDefault(); setFocusColumn(next); buttons.current.get(next)?.focus();\n    if (event.shiftKey) { const start = anchor.current ?? (validSelection ? current.startColumn : column); anchor.current = start; select({ startColumn: Math.min(start, next), endColumn: Math.max(start, next) }); }\n  };\n  const root = rs([\"rs-sequence-alignment\", className], styles.root);\n  const title = rs([\"rs-sequence-alignment-title\"], styles.title);\n  const copy = rs([\"rs-sequence-alignment-copy\"], styles.copy);\n  const scroll = rs([\"rs-sequence-alignment-scroll\"], styles.scroll);\n  const table = rs([\"rs-sequence-alignment-table\"], styles.table);\n  const heading = rs([\"rs-sequence-alignment-heading\"], styles.heading);\n  const control = rs([\"rs-sequence-alignment-control\"], styles.control);\n  const actions = rs([\"rs-sequence-alignment-actions\"], styles.actions);\n  const action = rs([\"rs-sequence-alignment-action\"], styles.action);\n  const isSelected = (column: number) => validSelection && column >= current.startColumn && column <= current.endColumn;\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <p {...title} id={`${id}-label`}>{label}</p><p {...copy}>{contig} · 1-based reference positions; aligned columns include gaps</p>\n    {!valid ? <p {...copy}>{!positions.length ? \"No alignment columns supplied\" : !bounded ? \"Alignment unavailable: supply at most 120 columns and 32 reads\" : \"Alignment unavailable: sequences, positions or read identifiers are inconsistent\"}</p> : <>\n      {!readOnly && <p {...copy} id={`${id}-keys`}>Arrow keys move between columns. Enter selects a base; Shift with Arrow keys extends a region.</p>}\n      <div {...scroll} role=\"region\" aria-labelledby={`${id}-label`} tabIndex={readOnly ? 0 : undefined}><table {...table} aria-label={`${label}, reference and reads`} aria-describedby={!readOnly ? `${id}-keys` : undefined}>\n        <thead><tr><th {...heading} scope=\"col\">Reference position</th>{positions.map((position, index) => {\n          const selected = isSelected(index + 1);\n          const cell = rs([\"rs-sequence-alignment-column\", selected && \"rs-sequence-alignment-selected\"], styles.column, selected && styles.selected);\n          return <th key={index} {...cell} scope=\"col\">{readOnly ? <span>{position ?? \"Gap\"}</span> : <button {...control} type=\"button\" ref={node => { if (node) buttons.current.set(index + 1, node); else buttons.current.delete(index + 1); }} tabIndex={index + 1 === Math.min(focusColumn, positions.length) ? 0 : -1} aria-pressed={selected} aria-label={`Column ${index + 1}, ${position == null ? \"reference gap\" : `${contig} position ${position}`}, reference ${referenceSequence[index]}`} onFocus={() => setFocusColumn(index + 1)} onKeyDown={event => move(event, index + 1)} onClick={() => choose(index + 1)}>{position ?? \"Gap\"}</button>}</th>;\n        })}</tr></thead>\n        <tbody>{[{ id: \"reference\", label: referenceLabel, sequence: referenceSequence }, ...reads].map((read, rowIndex) => <tr key={`${rowIndex}-${read.id}`}><th {...heading} scope=\"row\">{read.label}</th>{[...read.sequence].map((base, index) => {\n          const selected = isSelected(index + 1);\n          const cell = rs([\"rs-sequence-alignment-base\", selected && \"rs-sequence-alignment-selected\"], styles.base, selected && styles.selected);\n          return <td key={index} {...cell}>{base}</td>;\n        })}</tr>)}</tbody>\n      </table></div>\n      {!readOnly && <div {...actions}><Button {...action} variant=\"ghost\" onClick={() => { anchor.current = 1; select({ startColumn: 1, endColumn: positions.length }); }}>Select all columns</Button><Button {...action} variant=\"ghost\" disabled={current == null} onClick={() => { anchor.current = null; select(null); }}>Clear selection</Button></div>}\n      <p {...copy} role=\"status\">{validSelection ? `Selected columns ${current.startColumn}–${current.endColumn}; reference positions ${positions.slice(current.startColumn - 1, current.endColumn).map(position => position ?? \"gap\").join(\", \")}` : current == null ? \"No columns selected\" : \"Selected columns unavailable\"}</p>\n    </>}{children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/sequence-alignment.tsx"
+    },
+    {
+      "path": "vlak/styles/sequence-alignment.css",
+      "content": "/* ── sequence-alignment: generated from packages/react/src/components/sequence-alignment.tsx ── */\n.rs-sequence-alignment{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text);line-height:1.45}\n.rs-sequence-alignment-title{margin:0;font-size:0.875rem;font-weight:600}\n.rs-sequence-alignment-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n.rs-sequence-alignment-scroll{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;padding:0.25rem;outline-color:var(--text);outline-offset:2px}\n.rs-sequence-alignment-scroll:focus-visible{outline-width:2px;outline-style:solid}\n.rs-sequence-alignment-table{width:max-content;border-collapse:collapse;direction:ltr}\n.rs-sequence-alignment-heading{padding:0.5rem;font-size:0.75rem;font-weight:500;text-align:start;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);white-space:nowrap}\n.rs-sequence-alignment-column{min-width:var(--hit);padding:0;text-align:center;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-sequence-alignment-base{min-width:var(--hit);padding:0.5rem;box-sizing:border-box;text-align:center;font-size:1rem;font-family:ui-monospace, monospace;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-sequence-alignment-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-sequence-alignment-selected{background-color:Highlight;color:HighlightText}}\n.rs-sequence-alignment-control{min-width:var(--hit);min-height:var(--hit);padding:0.5rem;box-sizing:border-box;border-width:0;border-radius:0;background-color:transparent;color:inherit;font-family:inherit;font-size:0.75rem;font-variant-numeric:tabular-nums;cursor:pointer;outline-color:currentColor;outline-offset:-2px}\n.rs-sequence-alignment-control:focus-visible{outline-width:2px;outline-style:solid}\n.rs-sequence-alignment-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-sequence-alignment-action{min-width:var(--hit);min-height:var(--hit);width:auto}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/sequence-alignment.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "science",
+      "classes": [
+        "rs-sequence-alignment",
+        "rs-sequence-alignment-title",
+        "rs-sequence-alignment-copy",
+        "rs-sequence-alignment-scroll",
+        "rs-sequence-alignment-table",
+        "rs-sequence-alignment-heading",
+        "rs-sequence-alignment-control",
+        "rs-sequence-alignment-actions",
+        "rs-sequence-alignment-action",
+        "rs-sequence-alignment-column",
+        "rs-sequence-alignment-selected",
+        "rs-sequence-alignment-base"
+      ],
+      "snippet": "<div class=\"rs-sequence-alignment\"><p class=\"rs-sequence-alignment-title\">Read alignment</p><p class=\"rs-sequence-alignment-copy\">chr7 · 1-based reference positions; aligned columns include gaps</p><div class=\"rs-sequence-alignment-scroll\"><table class=\"rs-sequence-alignment-table\" aria-label=\"Reference and reads\"><thead><tr><th class=\"rs-sequence-alignment-heading\" scope=\"col\">Reference position</th><th class=\"rs-sequence-alignment-column\" scope=\"col\">101</th><th class=\"rs-sequence-alignment-column\" scope=\"col\">102</th></tr></thead><tbody><tr><th class=\"rs-sequence-alignment-heading\" scope=\"row\">Reference</th><td class=\"rs-sequence-alignment-base\">A</td><td class=\"rs-sequence-alignment-base\">C</td></tr></tbody></table></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Aligned sequence viewer",
+        "Read alignment window",
+        "Genomic alignment",
+        "Base selection",
+        "Sequence window"
+      ],
+      "example": "import { SequenceAlignment } from \"@noorddev/vlak-react\";\n\n<SequenceAlignment label=\"Read alignment\" contig=\"chr7\" referenceLabel=\"Example reference\" referenceSequence=\"AC-GT\" positions={[101, 102, null, 103, 104]} reads={[\n  { id: \"read-1\", label: \"Read 1\", sequence: \"ACAGT\" },\n  { id: \"read-2\", label: \"Read 2\", sequence: \"AC-GT\" },\n]} defaultValue={{ startColumn: 1, endColumn: 2 }} />",
+      "usage": {
+        "use": [
+          "Inspecting up to 120 pre-aligned columns and 32 reads with explicit reference and read labels.",
+          "Supply one one-based genomic position per aligned column; null represents a reference gap.",
+          "Selection uses one-based aligned column indexes, which are distinct from genomic positions. Use value and onValueChange for host-owned selection."
+        ],
+        "avoid": [
+          "Running an alignment algorithm or inferring mismatches, insertions, variant calls or genomic positions.",
+          "Passing inconsistent sequence lengths or silently clipping longer alignments. Supply the intended window."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Enters the column controls at one focus stop and then reaches the selection actions."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Moves focus between columns in sequence order without changing selection."
+        },
+        {
+          "keys": "Shift+Arrow keys",
+          "does": "Extends the selected column region from its anchor."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Selects the focused base column or activates a selection action."
+        }
+      ],
+      "a11y": [
+        "A native table supplies row labels and reference-position column headers; every base and gap remains visible text.",
+        "Column buttons have 44px targets and full-column selected fills, with aria-pressed and explicit coordinate names.",
+        "Long windows scroll inside their container. Read-only tables provide a focusable scroll region.",
+        "The selection summary lists supplied positions, including gaps, without inventing genomic coordinates.",
+        "The root div forwards its ref and native attributes; inconsistent or oversized windows have explicit unavailable states.",
+        "Selection actions compose the shared Button primitive; the aligned column controls retain their dedicated table interaction."
+      ]
+    }
+  }
+}

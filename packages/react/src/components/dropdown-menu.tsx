@@ -36,7 +36,7 @@ export const menuStyles = stylex.create({
       [mq.phone]: "block",
     },
     minWidth: {
-      default: "11.25rem",
+      default: "var(--rs-select-min-width, 11.25rem)",
       [mq.phone]: 0,
     },
     width: {

@@ -1,5 +1,5 @@
 /* ── dropdown-menu: generated from packages/react/src/components/dropdown-menu.tsx ── */
-.rs-select{position:relative;display:inline-block;min-width:11.25rem}
+.rs-select{position:relative;display:inline-block;min-width:var(--rs-select-min-width, 11.25rem)}
 @media (max-width: 640px){.rs-select{display:block;min-width:0;width:100%}}
 .rs-dropdown{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding-block:0.5625rem;padding-inline:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;cursor:pointer;font-family:inherit;background-color:transparent;width:100%;min-height:var(--hit)}
 .rs-dropdown:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}

@@ -1,7 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
 const at900 = "@media (min-width: 900px)";
-const rail = "@media (min-width: 1024px)";
 const phone = "@media (max-width: 640px)";
 const at899 = "@media (max-width: 899px)";
 const reduce = "@media (prefers-reduced-motion: reduce)";
@@ -17,10 +16,7 @@ export const interfaces = stylex.create({
     display: "flex",
     gap: "var(--gutter)",
     paddingInline: "var(--pad)",
-    marginLeft: {
-      default: null,
-      [rail]: 204,
-    },
+    marginLeft: "var(--rail-inset)",
     flexDirection: {
       default: "row",
       [at899]: "column",

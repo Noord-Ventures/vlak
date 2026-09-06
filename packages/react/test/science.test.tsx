@@ -49,7 +49,8 @@ describe("QuantityField", () => {
     expect(new FormData(container.querySelector("form")!).get("volume")).toBe("0");
     await user.clear(screen.getByRole("spinbutton", { name: "Amount" }));
     await user.type(screen.getByRole("spinbutton"), "250");
-    await user.selectOptions(screen.getByRole("combobox", { name: "Unit" }), "ml");
+    await user.click(screen.getByRole("combobox", { name: "Unit" }));
+    await user.keyboard("{End}{Enter}");
     expect(change).toHaveBeenLastCalledWith({ amount: 250, unit: "ml" });
     const data = new FormData(container.querySelector("form")!);
     expect(data.get("volume")).toBe("250");
@@ -59,14 +60,15 @@ describe("QuantityField", () => {
     const change = vi.fn();
     const user = userEvent.setup();
     const { container } = render(<form><QuantityField label="Volume" units={units} value={{ amount: 250, unit: "ul" }} onValueChange={change} /></form>);
-    await user.selectOptions(screen.getByRole("combobox"), "ml");
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("option", { name: "mL" }));
     expect(change).toHaveBeenLastCalledWith({ amount: 250, unit: "ml" });
-    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("ul");
+    expect(screen.getByRole("combobox").textContent).toBe("µL");
     await user.clear(screen.getByRole("spinbutton"));
     expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe("250");
     await act(async () => { container.querySelector("form")!.reset(); });
     expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe("250");
-    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("ul");
+    expect(screen.getByRole("combobox").textContent).toBe("µL");
   });
   it("restores uncontrolled defaults in an external form and follows native validation", async () => {
     const user = userEvent.setup();
@@ -74,23 +76,24 @@ describe("QuantityField", () => {
     await user.clear(screen.getByRole("spinbutton"));
     expect(container.querySelector("form")!.checkValidity()).toBe(false);
     await user.type(screen.getByRole("spinbutton"), "20");
-    await user.selectOptions(screen.getByRole("combobox"), "ml");
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("option", { name: "mL" }));
     expect(container.querySelector("form")!.checkValidity()).toBe(true);
     await act(async () => { container.querySelector("form")!.reset(); });
     expect((screen.getByRole("spinbutton") as HTMLInputElement).value).toBe("0");
-    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("ul");
+    expect(screen.getByRole("combobox").textContent).toBe("µL");
   });
   it("submits read-only quantities but excludes disabled ones, without choosing unknown units", () => {
     const { container, rerender } = render(<form><QuantityField label="Volume" name="amount" units={units} value={{ amount: 0, unit: "ul" }} readOnly /></form>);
     expect((screen.getByRole("spinbutton") as HTMLInputElement).readOnly).toBe(true);
-    expect((screen.getByRole("combobox") as HTMLSelectElement).disabled).toBe(true);
+    expect((screen.getByRole("combobox") as HTMLButtonElement).disabled).toBe(true);
     expect(new FormData(container.querySelector("form")!).get("amount.unit")).toBe("ul");
     rerender(<form><QuantityField label="Volume" name="amount" units={units} value={{ amount: 0, unit: "ul" }} disabled /></form>);
     expect(Array.from(new FormData(container.querySelector("form")!).entries())).toEqual([]);
     rerender(<QuantityField label="Volume" units={units} value={{ amount: Number.NaN, unit: "unknown" }} />);
     expect(screen.getByText("Amount unavailable")).toBeTruthy();
     expect(screen.getByText("Unit unavailable")).toBeTruthy();
-    expect((screen.getByRole("combobox") as HTMLSelectElement).value).toBe("");
+    expect(screen.getByRole("combobox").textContent).toBe("Choose unit");
   });
 });
 

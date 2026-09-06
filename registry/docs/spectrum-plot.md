@@ -104,6 +104,6 @@ Forwards `ref` to the `HTMLElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/spectrum-plot.tsx`  
 CSS: `packages/core/css/components/spectrum-plot.css`

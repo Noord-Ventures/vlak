@@ -1,6 +1,28 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { JointPanelUse as JointPanel } from "./joint-panel/use";
+import { RobotPoseUse as RobotPose } from "./robot-pose/use";
+import { RobotMissionQueueUse as RobotMissionQueue } from "./robot-mission-queue/use";
+import { Use as PadInspector } from "./pad-inspector/use";
+import { Use as DesignRuleResults } from "./design-rule-results/use";
+import { Use as ColonyPlate } from "./colony-plate/use";
+import { Use as CultureLog } from "./culture-log/use";
+
+import { Use as AssemblyVariantMatrix } from "./assembly-variant-matrix/use";
+import { Use as CoordinateReferenceField } from "./coordinate-reference-field/use";
+import { Use as DatumTransformPicker } from "./datum-transform-picker/use";
+import { Use as RasterBandMixer } from "./raster-band-mixer/use";
+import { Use as Patchbay } from "./patchbay/use";
+import { Use as KerningPairEditor } from "./kerning-pair-editor/use";
+import { Use as StackNavigator } from "./stack-navigator/use";
+import { Use as AcquisitionSequencer } from "./acquisition-sequencer/use";
+import { Use as SequenceAlignment } from "./sequence-alignment/use";
+import { Use as CoverageInspector } from "./coverage-inspector/use";
+import { Use as GenomicRegionField } from "./genomic-region-field/use";
+import { Use as AlarmPanel } from "./alarm-panel/use";
+import { Use as WorkOffsetPanel } from "./work-offset-panel/use";
+
 import { Use as IdentityDocument } from "./identity-document/use";
 import { Use as TaxSummary } from "./tax-summary/use";
 import { Use as BenefitProgram } from "./benefit-program/use";
@@ -76,6 +98,28 @@ import { Use as PropertyGrid } from "./property-grid/use";
 
 /** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
+  "joint-panel": JointPanel,
+  "robot-pose": RobotPose,
+  "robot-mission-queue": RobotMissionQueue,
+  "pad-inspector": PadInspector,
+  "design-rule-results": DesignRuleResults,
+  "colony-plate": ColonyPlate,
+  "culture-log": CultureLog,
+
+  "assembly-variant-matrix": AssemblyVariantMatrix,
+  "coordinate-reference-field": CoordinateReferenceField,
+  "datum-transform-picker": DatumTransformPicker,
+  "raster-band-mixer": RasterBandMixer,
+  "patchbay": Patchbay,
+  "kerning-pair-editor": KerningPairEditor,
+  "stack-navigator": StackNavigator,
+  "acquisition-sequencer": AcquisitionSequencer,
+  "sequence-alignment": SequenceAlignment,
+  "coverage-inspector": CoverageInspector,
+  "genomic-region-field": GenomicRegionField,
+  "alarm-panel": AlarmPanel,
+  "work-offset-panel": WorkOffsetPanel,
+
   "identity-document": IdentityDocument,
   "tax-summary": TaxSummary,
   "benefit-program": BenefitProgram,

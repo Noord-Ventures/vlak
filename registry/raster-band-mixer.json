@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "raster-band-mixer",
+  "type": "registry:component",
+  "title": "Raster band mixer",
+  "description": "A raster configuration editor with source-band mapping, single or three-channel modes, supplied stretch bounds and explicit missing-data metadata.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/raster-band-mixer.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\nimport { Input } from \"./input\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface RasterSourceBand {\n  id: string;\n  label: string;\n  description?: React.ReactNode;\n  unit?: string | null;\n  /** undefined means unknown, null means no missing-data sentinel, and zero is a valid sentinel. */\n  noDataValue?: number | null;\n  disabled?: boolean;\n}\nexport interface RasterChannelMapping { bandId: string | null; minimum: number | null; maximum: number | null }\nexport type RasterStretch = \"none\" | \"min-max\" | \"clip\" | \"stretch-clip\";\nexport interface RasterBandConfiguration {\n  mode: \"rgb\" | \"single\";\n  stretch: RasterStretch;\n  red: RasterChannelMapping;\n  green: RasterChannelMapping;\n  blue: RasterChannelMapping;\n  single: RasterChannelMapping;\n}\nexport interface RasterBandMixerProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: React.ReactNode;\n  bands: readonly RasterSourceBand[];\n  value?: RasterBandConfiguration;\n  defaultValue?: RasterBandConfiguration;\n  /** Emits configuration only. The host owns rendering and any statistics or range calculation. */\n  onValueChange?: (value: RasterBandConfiguration) => void;\n  description?: React.ReactNode;\n  readOnly?: boolean;\n}\n\nconst emptyChannel: RasterChannelMapping = { bandId: null, minimum: null, maximum: null };\nconst initial: RasterBandConfiguration = { mode: \"rgb\", stretch: \"none\", red: emptyChannel, green: emptyChannel, blue: emptyChannel, single: emptyChannel };\nconst stretches: { value: RasterStretch; label: string }[] = [{ value: \"none\", label: \"No enhancement\" }, { value: \"min-max\", label: \"Stretch to range\" }, { value: \"clip\", label: \"Clip to range\" }, { value: \"stretch-clip\", label: \"Stretch and clip\" }];\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.875rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: vlak.controlFs, fontWeight: 600 },\n  fields: { display: \"grid\", gridTemplateColumns: { default: \"repeat(auto-fit, minmax(min(100%, 9rem), 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem\", minWidth: 0 },\n  channel: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, padding: \"0.875rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider },\n  title: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600 },\n  field: { display: \"grid\", alignContent: \"start\", gap: \"0.375rem\", minWidth: 0, fontSize: vlak.controlLabel },\n  control: { minWidth: 0, width: \"100%\", minHeight: vlak.hit },\n  note: { margin: 0, color: vlak.gray, fontSize: vlak.controlLabel, maxWidth: \"66ch\", overflowWrap: \"anywhere\" },\n});\n\n/** Selects source bands and display ranges. No pixels, statistics or missing-data rules are inferred. */\nexport const RasterBandMixer = React.forwardRef<HTMLFieldSetElement, RasterBandMixerProps>(function RasterBandMixer({ label, bands, value, defaultValue = initial, onValueChange, description, readOnly, disabled, name, form, className, style, children, \"aria-describedby\": ariaDescribedBy, ...props }, ref) {\n  const id = React.useId();\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<RasterBandConfiguration, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const validBands = bands.every(band => band.id.length > 0) && new Set(bands.map(band => band.id)).size === bands.length;\n  const channels: { key: \"red\" | \"green\" | \"blue\" | \"single\"; label: string }[] = current.mode === \"single\" ? [{ key: \"single\", label: \"Single band\" }] : [{ key: \"red\", label: \"Red channel\" }, { key: \"green\", label: \"Green channel\" }, { key: \"blue\", label: \"Blue channel\" }];\n  const describedBy = [ariaDescribedBy, `${id}-hint`, description != null && `${id}-description`, readOnly && `${id}-readonly`].filter(Boolean).join(\" \");\n  const root = rs([\"rs-raster-band-mixer\", className], styles.root);\n  const legend = rs([\"rs-raster-band-mixer-legend\"], styles.legend);\n  const fields = rs([\"rs-raster-band-mixer-fields\"], styles.fields);\n  const channelStyle = rs([\"rs-raster-band-mixer-channel\"], styles.channel);\n  const title = rs([\"rs-raster-band-mixer-title\"], styles.title);\n  const field = rs([\"rs-raster-band-mixer-label\"], styles.field);\n  const control = rs([\"rs-raster-band-mixer-control\"], styles.control);\n  const note = rs([\"rs-raster-band-mixer-note\"], styles.note);\n  const inputName = (part: string) => name ? `${name}.${part}` : undefined;\n  const change = (next: RasterBandConfiguration) => { if (!readOnly && !disabled) setValue(next); };\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} aria-describedby={describedBy} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>\n    {description != null && <p {...note} id={`${id}-description`}>{description}</p>}\n    <p {...note} id={`${id}-hint`}>Choose display bands and ranges. The application renders the image from this configuration.</p>\n    {readOnly && <p {...note} id={`${id}-readonly`}>Read only</p>}\n    {!validBands ? <p {...note}>Band identifiers must be unique and non-empty.</p> : <>\n      <div {...fields}>\n        <div {...field}><span id={`${id}-mode-label`}>Rendering mode</span><Select {...control} fullWidth name={inputName(\"mode\")} form={form} value={current.mode} disabled={disabled} readOnly={readOnly} aria-labelledby={`${id}-mode-label`} aria-describedby={describedBy} options={[{ value: \"rgb\", label: \"Three channels\" }, { value: \"single\", label: \"Single band\" }]} onValueChange={next => change({ ...current, mode: next as RasterBandConfiguration[\"mode\"] })} /></div>\n        <div {...field}><span id={`${id}-stretch-label`}>Range treatment</span><Select {...control} fullWidth name={inputName(\"stretch\")} form={form} value={current.stretch} disabled={disabled} readOnly={readOnly} aria-labelledby={`${id}-stretch-label`} aria-describedby={describedBy} options={stretches} onValueChange={next => change({ ...current, stretch: next as RasterStretch })} /></div>\n      </div>\n      {channels.map(channel => {\n        const mapping = current[channel.key];\n        const band = bands.find(item => item.id === mapping.bandId);\n        const unavailable = mapping.bandId != null && (!band || band.disabled);\n        const finiteMin = mapping.minimum != null && Number.isFinite(mapping.minimum);\n        const finiteMax = mapping.maximum != null && Number.isFinite(mapping.maximum);\n        const reversed = finiteMin && finiteMax && mapping.minimum! >= mapping.maximum!;\n        const channelId = `${id}-${channel.key}`;\n        const update = (patch: Partial<RasterChannelMapping>) => change({ ...current, [channel.key]: { ...mapping, ...patch } });\n        return <div {...channelStyle} key={channel.key}>\n          <p {...title}>{channel.label}</p>\n          <div {...field}><span id={`${channelId}-label`}>{channel.label} source</span><Select {...control} fullWidth name={inputName(`${channel.key}.band`)} form={form} value={unavailable ? \"\" : mapping.bandId ?? \"\"} disabled={disabled} readOnly={readOnly} required aria-invalid={unavailable || undefined} aria-labelledby={`${channelId}-label`} aria-describedby={`${describedBy} ${channelId}-source`} options={[{ value: \"\", label: unavailable ? `Unavailable band: ${mapping.bandId}` : \"No band selected\" }, ...bands.map(item => ({ value: item.id, label: `${item.label}${item.disabled ? \" (unavailable)\" : \"\"}`, disabled: item.disabled }))]} onValueChange={next => update({ bandId: next || null })} /></div>\n          <p {...note} id={`${channelId}-source`}>{unavailable ? `Source band unavailable: ${mapping.bandId}` : !band ? \"Source band not supplied\" : <>Missing-data value: {band.noDataValue === undefined ? \"Unknown\" : band.noDataValue === null ? \"None defined\" : String(band.noDataValue)}. Unit: {band.unit || \"Not supplied\"}{band.description != null ? <>. {band.description}</> : null}</>}</p>\n          {current.stretch !== \"none\" && <><div {...fields}>{([\"minimum\", \"maximum\"] as const).map(bound => {\n            const amount = mapping[bound];\n            const finite = amount != null && Number.isFinite(amount);\n            const invalid = amount != null && !finite;\n            return <label {...field} key={bound}><span>{channel.label} {bound}</span><Input plain {...control} type=\"number\" name={inputName(`${channel.key}.${bound}`)} form={form} value={finite ? amount : \"\"} step=\"any\" required readOnly={readOnly} aria-invalid={invalid || reversed || undefined} aria-describedby={`${describedBy} ${channelId}-range`} ref={node => { node?.setCustomValidity(reversed ? \"Minimum must be less than maximum.\" : invalid ? \"Range value unavailable. Enter a finite number.\" : \"\"); }} onChange={event => update({ [bound]: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null })} /></label>;\n          })}</div><p {...note} id={`${channelId}-range`}>{reversed ? \"Minimum must be less than maximum\" : !finiteMin || !finiteMax ? \"Supply both range bounds as finite numbers\" : `Supplied range: ${mapping.minimum} to ${mapping.maximum}`}</p></>}\n        </div>;\n      })}\n      {bands.length === 0 && <p {...note}>No source bands supplied</p>}\n    </>}\n    {children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/raster-band-mixer.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/raster-band-mixer.css",
+      "content": "/* ── raster-band-mixer: generated from packages/react/src/components/raster-band-mixer.tsx ── */\n.rs-raster-band-mixer{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-raster-band-mixer-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}\n.rs-raster-band-mixer-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.75rem;min-width:0}\n@media (max-width: 640px){.rs-raster-band-mixer-fields{grid-template-columns:minmax(0, 1fr)}}\n.rs-raster-band-mixer-channel{display:grid;gap:0.75rem;min-width:0;padding:0.875rem;border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-raster-band-mixer-title{margin:0;font-size:var(--control-fs);font-weight:600}\n.rs-raster-band-mixer-label{display:grid;align-content:start;gap:0.375rem;min-width:0;font-size:var(--control-label)}\n.rs-raster-band-mixer-control{min-width:0;width:100%;min-height:var(--hit)}\n.rs-raster-band-mixer-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/raster-band-mixer.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "geospatial",
+      "classes": [
+        "rs-raster-band-mixer",
+        "rs-raster-band-mixer-legend",
+        "rs-raster-band-mixer-fields",
+        "rs-raster-band-mixer-channel",
+        "rs-raster-band-mixer-title",
+        "rs-raster-band-mixer-label",
+        "rs-raster-band-mixer-control",
+        "rs-raster-band-mixer-note"
+      ],
+      "snippet": "<fieldset class=\"rs-raster-band-mixer\"><legend class=\"rs-raster-band-mixer-legend\">Band mapping</legend><p class=\"rs-raster-band-mixer-note\">The application renders the image from this configuration.</p><div class=\"rs-raster-band-mixer-fields\"><div class=\"rs-raster-band-mixer-label\"><span id=\"geo-rendering-mode-label\">Rendering mode</span><div class=\"rs-select rs-select-fluid rs-raster-band-mixer-control\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"geo-rendering-mode-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\">Single band</button></div></div><div class=\"rs-raster-band-mixer-label\"><span id=\"geo-range-treatment-label\">Range treatment</span><div class=\"rs-select rs-select-fluid rs-raster-band-mixer-control\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"geo-range-treatment-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\">No enhancement</button></div></div></div><div class=\"rs-raster-band-mixer-channel\"><p class=\"rs-raster-band-mixer-title\">Single band</p><div class=\"rs-raster-band-mixer-label\"><span id=\"geo-single-band-source-label\">Single band source</span><div class=\"rs-select rs-select-fluid rs-raster-band-mixer-control\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"geo-single-band-source-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\">Band 1</button></div></div><p class=\"rs-raster-band-mixer-note\">Missing-data value: 0. Unit: counts</p></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "input",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Band composition",
+        "Multiband raster",
+        "Satellite band selector",
+        "Raster stretch",
+        "Single-band renderer settings"
+      ],
+      "example": "import { RasterBandMixer } from \"@noorddev/vlak-react\";\nimport type { RasterBandConfiguration } from \"@noorddev/vlak-react\";\n\nconst configuration: RasterBandConfiguration = {\n  mode: \"rgb\", stretch: \"none\",\n  red: { bandId: \"b3\", minimum: 0, maximum: 255 },\n  green: { bandId: \"b2\", minimum: 0, maximum: 255 },\n  blue: { bandId: \"b1\", minimum: 0, maximum: 255 },\n  single: { bandId: \"b1\", minimum: 0, maximum: 255 },\n};\n\n<RasterBandMixer label=\"Band mapping\" name=\"raster\" defaultValue={configuration} bands={[\n  { id: \"b1\", label: \"Band 1\", unit: \"counts\", noDataValue: 0 },\n  { id: \"b2\", label: \"Band 2\", unit: \"counts\", noDataValue: null },\n  { id: \"b3\", label: \"Band 3\", unit: \"counts\" },\n]} />",
+      "usage": {
+        "use": [
+          "Mapping supplied raster bands to red, green and blue display channels or a single band.",
+          "Choose no enhancement, stretch, clipping or both. Each active channel keeps its own supplied minimum and maximum; band changes do not calculate new ranges.",
+          "Use unique, non-empty band identifiers. noDataValue undefined means unknown, null means no sentinel, and zero remains a supplied missing-data value.",
+          "The name prefix submits mode, stretch and active channel fields such as name.red.band and name.red.minimum. Inactive mappings remain in state but do not submit; ranges only submit when enhancement uses them."
+        ],
+        "avoid": [
+          "Treating the component as a raster renderer, deriving a histogram or assuming a missing-data value from the image appearance.",
+          "Reusing display ranges across different bands without application review. No automatic statistics or unit conversion runs here."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through mode, range treatment and active channel controls."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Navigates the focused Vlak selector. Enter or Space commits a choice; Escape closes the menu."
+        },
+        {
+          "keys": "Typing",
+          "does": "Edits each active channel's numeric range bounds."
+        }
+      ],
+      "a11y": [
+        "A fieldset legend names the editor. Vlak Select and Input provide shared control paint, with channel labels and 44px targets.",
+        "Missing, unavailable and disabled source bands stay distinct. Missing-data values and units are readable text, with zero preserved.",
+        "Active channels require a band. Enhancement requires finite bounds with minimum less than maximum; invalid configurations fail native form validation.",
+        "Switching modes preserves inactive mappings without submitting them. No enhancement hides and omits range fields without discarding their values.",
+        "Native form reset restores uncontrolled defaults, including external forms; controlled updates remain with the application.",
+        "Read-only valid configuration values submit; disabled fields do not. Native fieldset attributes, ref, className and style pass through."
+      ]
+    }
+  }
+}

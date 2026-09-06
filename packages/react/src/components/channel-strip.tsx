@@ -6,6 +6,7 @@ import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useInputValue } from "../use-input-value";
 import { useMergedRefs } from "../merge-refs";
+import { Button } from "./button";
 
 export interface ChannelStripValue { gain: number; pan: number; muted: boolean; solo: boolean }
 export interface ChannelStripProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue"> {
@@ -26,7 +27,7 @@ const styles = stylex.create({
   text: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "0.5rem", fontVariantNumeric: "tabular-nums" },
   range: { display: "block", margin: 0, width: "100%", minWidth: vlak.hit, minHeight: vlak.hit, accentColor: vlak.ink, outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2 },
   actions: { display: "flex", flexWrap: "wrap", gap: "0.5rem" },
-  button: { minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: "0.75rem", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, fontFamily: "inherit", fontSize: vlak.controlFs, cursor: "pointer", outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2 },
+  button: { minWidth: vlak.hit, minHeight: vlak.hit, width: "auto", maxWidth: "100%" },
   pressed: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "Highlight" }, color: { default: vlak.paper, [mq.forcedColors]: "HighlightText" } },
 });
 
@@ -52,7 +53,7 @@ export const ChannelStrip = React.forwardRef<HTMLFieldSetElement, ChannelStripPr
     <label className={field.className} style={field.style}><span className={text.className} style={text.style}><span>Pan</span><span>{panText}</span></span><input type="range" aria-label="Pan" form={form} name={name ? `${name}.pan` : undefined} min={-100} max={100} step="any" value={panValid ? current.pan : 0} disabled={disabled || readOnly || !panValid} aria-invalid={!panValid || undefined} aria-valuetext={panText} className={range.className} style={range.style} onChange={(event) => setValue({ ...current, pan: Number(event.currentTarget.value) })} /></label>
     <div className={actions.className} style={actions.style}>{([['muted', 'Mute'], ['solo', 'Solo']] as const).map(([key, title]) => {
       const button = rs(["rs-channel-strip-button", current[key] && "rs-channel-strip-pressed"], styles.button, current[key] && styles.pressed);
-      return <button key={key} type="button" disabled={disabled || readOnly} aria-pressed={current[key]} className={button.className} style={button.style} onClick={() => setValue({ ...current, [key]: !current[key] })}>{title}</button>;
+      return <Button key={key} variant={current[key] ? "primary" : "ghost"} size="sm" disabled={disabled || readOnly} aria-pressed={current[key]} {...button} onClick={() => setValue({ ...current, [key]: !current[key] })}>{title}</Button>;
     })}</div>
     {name && <><input type="hidden" name={`${name}.muted`} form={form} value={String(current.muted)} /><input type="hidden" name={`${name}.solo`} form={form} value={String(current.solo)} /></>}
     {readOnly && name && <>{gainValid && <input type="hidden" name={`${name}.gain`} form={form} value={current.gain} />}{panValid && <input type="hidden" name={`${name}.pan`} form={form} value={current.pan} />}</>}

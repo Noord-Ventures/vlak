@@ -16,7 +16,7 @@ const styles = stylex.create({
   label: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },
   channel: { display: "grid", gap: "0.375rem" },
   text: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "0.25rem 1rem", fontSize: vlak.controlLabel, lineHeight: 1.45, fontVariantNumeric: "tabular-nums" },
-  meter: { display: "block", width: "100%", height: "0.75rem", appearance: "none", backgroundColor: vlak.paper, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, boxSizing: "border-box", "::-webkit-meter-bar": { backgroundColor: vlak.paper, borderWidth: 0, borderRadius: 0, boxShadow: "none" }, "::-webkit-meter-optimum-value": { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "CanvasText" } }, "::-moz-meter-bar": { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "CanvasText" } } },
+  meter: { display: "block", width: "100%", height: "0.75rem", appearance: "none", backgroundColor: vlak.paper, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, boxSizing: "border-box", "::-webkit-meter-bar": { backgroundColor: vlak.paper, backgroundImage: "none", borderWidth: 0, borderRadius: 0, boxShadow: "none" }, "::-webkit-meter-optimum-value": { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "CanvasText" }, backgroundImage: "none" }, "::-moz-meter-bar": { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "CanvasText" }, backgroundImage: "none" } },
   note: { color: vlak.gray, margin: 0, fontSize: vlak.controlLabel, lineHeight: 1.45 },
 });
 

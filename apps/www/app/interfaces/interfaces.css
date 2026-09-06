@@ -10,7 +10,8 @@ body:has(.if-index) {
 }
 
 .if-index {
-  --ml: 0px;
+  --ml: var(--rail-inset);
+  margin-left: var(--rail-inset);
   display: flex;
   gap: var(--gutter);
   padding: 0 var(--pad);
@@ -18,12 +19,6 @@ body:has(.if-index) {
 @media (min-width: 481px) {
   .if-index {
     width: calc(max(round(down, 100vw - var(--ml) - 2 * var(--pad) + var(--gutter), 204px), 204px) + var(--gutter));
-  }
-}
-@media (min-width: 1024px) {
-  .if-index {
-    --ml: 204px;
-    margin-left: 204px;
   }
 }
 @media (min-width: 1700px) {

@@ -6,6 +6,7 @@ import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
 import { useInputValue } from "../use-input-value";
+import { Button } from "./button";
 
 export interface CheckInOption {
   value: string;
@@ -37,7 +38,7 @@ const styles = stylex.create({
   selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: "Highlight" }, color: { default: vlak.paper, [mq.forcedColors]: "HighlightText" } },
   unavailable: { cursor: "default", opacity: { default: 0.55, [mq.forcedColors]: 1 } },
   input: { position: "absolute", inset: "-1px", width: "calc(100% + 2px)", height: "calc(100% + 2px)", opacity: 0, margin: 0, cursor: "inherit" },
-  clear: { justifySelf: "start", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: "0.5rem", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: 0, borderRadius: vlak.radiusSm, fontSize: vlak.controlFs, textDecoration: "underline", cursor: "pointer", outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2, opacity: { default: 1, ":disabled": 0.55 } },
+  clear: { justifySelf: "start", minWidth: vlak.hit, minHeight: vlak.hit, width: "auto", maxWidth: "100%" },
 });
 
 /** A named text choice without an inferred clinical score. */
@@ -74,6 +75,6 @@ export const CheckIn = React.forwardRef<HTMLFieldSetElement, CheckInProps>(funct
           onChange={() => { if (!readOnly) setValue(option.value); }} />
       </label>;
     })}</div>
-    {clearable && <button type="button" disabled={disabled || readOnly || current == null} className={clear.className} style={clear.style} onClick={() => setValue(null)}>{clearLabel}</button>}
+    {clearable && <Button variant="ghost" size="sm" disabled={disabled || readOnly || current == null} {...clear} onClick={() => setValue(null)}>{clearLabel}</Button>}
   </fieldset>;
 });

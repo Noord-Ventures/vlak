@@ -5,6 +5,5 @@
 .rs-color-inspector-swatch{position:absolute;inset:0;forced-color-adjust:none}
 .rs-color-inspector-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(8rem, 1fr));gap:0.75rem}
 .rs-color-inspector-field{display:grid;gap:0.375rem;font-size:var(--control-label);line-height:1.45}
-.rs-color-inspector-input{min-width:var(--hit);min-height:var(--hit);width:100%;box-sizing:border-box;padding-inline:0.625rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-size:var(--control-fs);font-family:ui-monospace, monospace;outline-color:var(--text);outline-offset:2px}
-.rs-color-inspector-input:focus-visible{outline-width:2px;outline-style:solid}
+.rs-color-inspector-input{width:100%;min-width:0;font-variant-numeric:tabular-nums}
 .rs-color-inspector-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}

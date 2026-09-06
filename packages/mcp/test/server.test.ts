@@ -102,6 +102,11 @@ describe("vlak-mcp", () => {
       ["civic", "benefit-program", "Supply policy decisions"],
       ["science", "spectrum-plot", "Show the evidence behind a plot"],
       ["creative", "channel-strip", "Connect controls to an engine"],
+      ["engineering", "alarm-panel", "Preserve independent states"],
+      ["geospatial", "raster-band-mixer", "Assignment is distinct from reprojection"],
+      ["robotics", "joint-panel", "Keep coordinate frames explicit"],
+      ["electronics", "pad-inspector", "Preserve independent assembly flags"],
+      ["microbiology", "colony-plate", "Distinguish annotations from source counts"],
     ] as const) {
       expect(resources.map(resource => resource.uri)).toContain(`vlak://docs/${category}`);
       expect(resourceText(await client.readResource({ uri: `vlak://docs/${category}` }))).toContain(contract);

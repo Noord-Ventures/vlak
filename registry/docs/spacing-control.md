@@ -46,7 +46,7 @@ npx shadcn add https://vlak.dev/r/spacing-control.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-spacing-control"><legend class="rs-spacing-control-label">Padding</legend><div class="rs-spacing-control-fields"><label class="rs-spacing-control-field">Top (px)<input class="rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Right (px)<input class="rs-spacing-control-input" type="number" value="24" /></label><label class="rs-spacing-control-field">Bottom (px)<input class="rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Left (px)<input class="rs-spacing-control-input" type="number" value="24" /></label></div></fieldset>
+<fieldset class="rs-spacing-control"><legend class="rs-spacing-control-label">Padding</legend><div class="rs-spacing-control-fields"><label class="rs-spacing-control-field">Top (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Right (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="24" /></label><label class="rs-spacing-control-field">Bottom (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="16" /></label><label class="rs-spacing-control-field">Left (px)<input class="rs-input rs-input-full rs-spacing-control-input" type="number" value="24" /></label></div></fieldset>
 ```
 
 ## Example
@@ -103,6 +103,6 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md), [button](button.md).  
 React: `packages/react/src/components/spacing-control.tsx`  
 CSS: `packages/core/css/components/spacing-control.css`

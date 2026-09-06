@@ -1,0 +1,22 @@
+/* ── colony-plate: generated from packages/react/src/components/colony-plate.tsx ── */
+.rs-colony-plate{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-colony-plate-title{font-size:0.875rem;font-weight:600}
+.rs-colony-plate-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
+.rs-colony-plate-count{margin:0;font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.rs-colony-plate-body{display:flex;flex-wrap:wrap;align-items:start;gap:1rem 1.5rem;min-width:0}
+.rs-colony-plate-graphic{display:block;flex:0 1 15rem;width:15rem;max-width:100%;height:auto;color:var(--text)}
+@media (forced-colors: active){.rs-colony-plate-graphic{color:CanvasText}}
+.rs-colony-plate-dish{fill:var(--bg);stroke:currentColor;stroke-width:1}
+@media (forced-colors: active){.rs-colony-plate-dish{fill:Canvas}}
+.rs-colony-plate-marker{fill:currentColor;stroke:currentColor;stroke-width:1}
+.rs-colony-plate-chosen{fill:var(--bg);stroke:var(--text);stroke-width:3}
+@media (forced-colors: active){.rs-colony-plate-chosen{fill:HighlightText;stroke:Highlight}}
+.rs-colony-plate-list{list-style-type:none;margin:0;padding:0;display:grid;gap:0.5rem;flex:1 1 10rem;min-width:0}
+.rs-colony-plate-record{display:grid;gap:0.25rem;min-width:0;font-size:0.75rem}
+.rs-colony-plate-control{display:block;width:100%;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;text-align:start;padding:0.625rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere;cursor:pointer;outline-color:var(--text);outline-offset:2px}
+.rs-colony-plate-control:focus-visible{outline-width:2px;outline-style:solid}
+.rs-colony-plate-selected{background-color:var(--text);color:var(--bg)}
+@media (forced-colors: active){.rs-colony-plate-selected{background-color:Highlight;color:HighlightText}}
+.rs-colony-plate-static{padding-block:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-colony-plate-details{margin:0;font-size:0.75rem;max-width:66ch}
+.rs-colony-plate-clear{min-width:var(--hit);min-height:var(--hit);width:auto;justify-self:start}

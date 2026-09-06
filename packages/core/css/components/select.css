@@ -1,3 +1,6 @@
 /* ── select: generated from packages/react/src/components/select.tsx ── */
-.rs-select{position:relative;display:inline-block;min-width:11.25rem;background-color:var(--bg)}
+.rs-select{position:relative;display:inline-block;min-width:var(--rs-select-min-width, 11.25rem);background-color:var(--bg)}
+.rs-select-fluid{display:block;width:100%;min-width:0;--rs-select-min-width:0px}
+.rs-select-native{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border-width:0}
+.rs-select-feedback{margin:0.5rem 0 0;font-size:0.75rem;color:var(--text-secondary);line-height:1.45}
 .rs-menu.rs-select-list{max-height:17.5rem;overflow-y:auto}

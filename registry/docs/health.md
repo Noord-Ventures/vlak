@@ -19,7 +19,7 @@ Collect a check-in, record a routine, review a sleep period, and follow personal
 - [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
-- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
+- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with a staggered entrance, gentle rotating encouragement, named progress and explicit missing-data states.
 
 ## Care workflows
 

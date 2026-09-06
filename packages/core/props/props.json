@@ -2624,6 +2624,20 @@
               "name": "description",
               "type": "ReactNode",
               "required": false
+            },
+            {
+              "name": "animate",
+              "type": "boolean",
+              "required": false,
+              "default": "true",
+              "description": "Sweep each ring into its supplied value on first view. Reduced motion stays instant."
+            },
+            {
+              "name": "encouragement",
+              "type": "false | readonly string[]",
+              "required": false,
+              "default": "defaultEncouragement",
+              "description": "Gentle lines rotate every ten seconds without immediate repetition. false hides the line."
             }
           ]
         }
@@ -3889,6 +3903,1239 @@
         }
       ]
     },
+    "coordinate-reference-field": {
+      "exports": [
+        {
+          "name": "CoordinateReferenceField",
+          "kind": "component",
+          "description": "Numeric coordinates and an explicitly assigned reference, without implicit conversion.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "axes",
+              "type": "readonly CoordinateReferenceAxis[]",
+              "required": true,
+              "description": "Two or three axes in the supplied coordinate order. Units are never inferred."
+            },
+            {
+              "name": "references",
+              "type": "readonly CoordinateReferenceOption[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "CoordinateReferenceValue",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "CoordinateReferenceValue",
+              "required": false,
+              "default": "initial"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: CoordinateReferenceValue) => void",
+              "required": false,
+              "description": "Assigning a reference preserves every numeric value. The host owns reprojection."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "referenceLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Coordinate reference\""
+            },
+            {
+              "name": "unknownReferenceLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Unknown reference\""
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "datum-transform-picker": {
+      "exports": [
+        {
+          "name": "DatumTransformPicker",
+          "kind": "component",
+          "description": "Compares host-supplied operations and keeps unavailable alternatives visible.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "sourceReference",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "destinationReference",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "transformations",
+              "type": "readonly DatumTransformation[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false,
+              "description": "null means no operation selected; an unknown identifier stays explicitly unavailable."
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "selectionLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Transformation\""
+            },
+            {
+              "name": "noneLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"No transformation selected\""
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "raster-band-mixer": {
+      "exports": [
+        {
+          "name": "RasterBandMixer",
+          "kind": "component",
+          "description": "Selects source bands and display ranges. No pixels, statistics or missing-data rules are inferred.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "bands",
+              "type": "readonly RasterSourceBand[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "RasterBandConfiguration",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "RasterBandConfiguration",
+              "required": false,
+              "default": "initial"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: RasterBandConfiguration) => void",
+              "required": false,
+              "description": "Emits configuration only. The host owns rendering and any statistics or range calculation."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "stack-navigator": {
+      "exports": [
+        {
+          "name": "StackNavigator",
+          "kind": "component",
+          "description": "Navigates supplied stack coordinates without calculating stage positions or calling an instrument.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "axes",
+              "type": "readonly StackAxis[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "Readonly<Record<string, number | null>>",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "Readonly<Record<string, number | null>>",
+              "required": false,
+              "default": "{}"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: StackSelection) => void",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "acquisition-sequencer": {
+      "exports": [
+        {
+          "name": "AcquisitionSequencer",
+          "kind": "component",
+          "description": "A controlled capture plan editor and recorded-state display, without an acquisition engine.",
+          "extends": "FieldsetHTMLAttributes<HTMLFieldSetElement>",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "steps",
+              "type": "readonly AcquisitionStep[]",
+              "required": true
+            },
+            {
+              "name": "channels",
+              "type": "readonly AcquisitionChannel[]",
+              "required": true
+            },
+            {
+              "name": "onStepsChange",
+              "type": "(steps: readonly AcquisitionStep[]) => void",
+              "required": false
+            },
+            {
+              "name": "onAction",
+              "type": "(stepId: string, actionId: string) => void",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "sequence-alignment": {
+      "exports": [
+        {
+          "name": "SequenceAlignment",
+          "kind": "component",
+          "description": "A bounded window of already aligned strings; reference positions and gaps are caller-supplied.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "contig",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "referenceLabel",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "referenceSequence",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "positions",
+              "type": "readonly (number | null)[]",
+              "required": true,
+              "description": "One supplied one-based reference position per column; null means a reference gap."
+            },
+            {
+              "name": "reads",
+              "type": "readonly AlignedRead[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "AlignmentSelection | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "AlignmentSelection | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: AlignmentSelection | null) => void",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "coverage-inspector": {
+      "exports": [
+        {
+          "name": "CoverageInspector",
+          "kind": "component",
+          "description": "Supplied coverage and counts, with missing depth distinct from recorded zero and no variant calls.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"defaultValue\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "contig",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "reference",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "loci",
+              "type": "readonly CoverageLocus[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "number | null",
+              "required": false,
+              "description": "A supplied one-based position, not an array index."
+            },
+            {
+              "name": "defaultValue",
+              "type": "number | null",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(position: number | null) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "genomic-region-field": {
+      "exports": [
+        {
+          "name": "GenomicRegionField",
+          "kind": "component",
+          "description": "A region in one-based inclusive coordinates. No assembly or half-open conversion is performed.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "reference",
+              "type": "string",
+              "required": true,
+              "description": "Fixed reference name or accession, submitted with the region."
+            },
+            {
+              "name": "contigs",
+              "type": "readonly GenomicContig[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "GenomicRegion",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "GenomicRegion",
+              "required": false,
+              "default": "emptyRegion"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: GenomicRegion) => void",
+              "required": false
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "patchbay": {
+      "exports": [
+        {
+          "name": "Patchbay",
+          "kind": "component",
+          "description": "A connection matrix for supplied ports; the caller owns the routing engine.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "sources",
+              "type": "PatchPort[]",
+              "required": true
+            },
+            {
+              "name": "destinations",
+              "type": "PatchPort[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "PatchConnection[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "PatchConnection[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(connections: PatchConnection[]) => void",
+              "required": false
+            },
+            {
+              "name": "getBlockReason",
+              "type": "(source: PatchPort, destination: PatchPort) => string | null",
+              "required": false,
+              "description": "Additional host constraints. Matching signal types are required by default."
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "kerning-pair-editor": {
+      "exports": [
+        {
+          "name": "KerningPairEditor",
+          "kind": "component",
+          "description": "Explicit pair offsets with browser font previews, without font-file editing or shaping.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "pairs",
+              "type": "KerningPair[]",
+              "required": true
+            },
+            {
+              "name": "fontFamily",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "unitsPerEm",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "baselineOffsets",
+              "type": "KerningOffsets",
+              "required": false,
+              "default": "{}"
+            },
+            {
+              "name": "value",
+              "type": "KerningOffsets",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "KerningOffsets",
+              "required": false,
+              "default": "{}"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(offsets: KerningOffsets) => void",
+              "required": false
+            },
+            {
+              "name": "activePairId",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "defaultActivePairId",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "onActivePairChange",
+              "type": "(id: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false,
+              "default": "-unitsPerEm"
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false,
+              "default": "unitsPerEm"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "assembly-variant-matrix": {
+      "exports": [
+        {
+          "name": "AssemblyVariantMatrix",
+          "kind": "component",
+          "description": "Independent fitted, bill-of-materials and placement choices per reference and variant.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "references",
+              "type": "AssemblyReference[]",
+              "required": true
+            },
+            {
+              "name": "variants",
+              "type": "AssemblyVariant[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "AssemblyVariantState[]",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "AssemblyVariantState[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(cells: AssemblyVariantState[]) => void",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "alarm-panel": {
+      "exports": [
+        {
+          "name": "AlarmPanel",
+          "kind": "component",
+          "description": "An industrial alarm's condition, acknowledgement and shelving are independent records.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "alarms",
+              "type": "readonly AlarmRecord[]",
+              "required": true
+            },
+            {
+              "name": "filter",
+              "type": "AlarmFilter",
+              "required": false
+            },
+            {
+              "name": "defaultFilter",
+              "type": "AlarmFilter",
+              "required": false,
+              "default": "\"all\""
+            },
+            {
+              "name": "onFilterChange",
+              "type": "(filter: AlarmFilter) => void",
+              "required": false
+            },
+            {
+              "name": "onAction",
+              "type": "(id: string, action: AlarmAction) => void",
+              "required": false,
+              "description": "Requests an operation. Update the supplied record only after the host confirms it."
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "work-offset-panel": {
+      "exports": [
+        {
+          "name": "WorkOffsetPanel",
+          "kind": "component",
+          "description": "Edit a proposed offset while retaining independently supplied machine and work positions.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "axes",
+              "type": "readonly WorkOffsetAxis[]",
+              "required": true
+            },
+            {
+              "name": "systems",
+              "type": "readonly WorkOffsetSystem[]",
+              "required": true
+            },
+            {
+              "name": "activeSystemId",
+              "type": "string | null",
+              "required": true,
+              "description": "Actual active system reported by the controller, independent of the draft selection."
+            },
+            {
+              "name": "value",
+              "type": "WorkOffsetValue",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "WorkOffsetValue",
+              "required": false,
+              "default": "{ systemId: null, offsets: {} }"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: WorkOffsetValue) => void",
+              "required": false
+            },
+            {
+              "name": "onApply",
+              "type": "(value: WorkOffsetValue) => void",
+              "required": false,
+              "description": "Request a complete offset update; machine control and coordinate calculations belong to the host."
+            },
+            {
+              "name": "offsetState",
+              "type": "\"active\" | \"suspended\" | \"unknown\"",
+              "required": false,
+              "default": "\"unknown\""
+            },
+            {
+              "name": "pending",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "joint-panel": {
+      "exports": [
+        {
+          "name": "JointPanel",
+          "kind": "component",
+          "description": "Draft joint targets remain separate from host-reported positions and request confirmation.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "joints",
+              "type": "readonly JointRecord[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "JointTargets",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "JointTargets",
+              "required": false,
+              "default": "{}"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(targets: JointTargets) => void",
+              "required": false
+            },
+            {
+              "name": "onRequestTargets",
+              "type": "(targets: JointTargets) => void",
+              "required": false,
+              "description": "Requests the complete draft. Motion and confirmation belong to the host."
+            },
+            {
+              "name": "pending",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "confirmedLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "timeLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "robot-pose": {
+      "exports": [
+        {
+          "name": "RobotPose",
+          "kind": "component",
+          "description": "Exact supplied Cartesian and orientation records, with no frame transform or pose computation.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "poses",
+              "type": "readonly RobotPoseRecord[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(poseId: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "robot-mission-queue": {
+      "exports": [
+        {
+          "name": "RobotMissionQueue",
+          "kind": "component",
+          "description": "A supplied mission order, recorded step states, and explicit host request actions.",
+          "extends": "FieldsetHTMLAttributes<HTMLFieldSetElement>",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "steps",
+              "type": "readonly RobotMissionStep[]",
+              "required": true
+            },
+            {
+              "name": "onOrderChange",
+              "type": "(stepIds: readonly string[]) => void",
+              "required": false,
+              "description": "Proposed step identifiers in order; the host confirms and supplies the resulting records."
+            },
+            {
+              "name": "onAction",
+              "type": "(stepId: string, actionId: string) => void",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "pad-inspector": {
+      "exports": [
+        {
+          "name": "PadInspector",
+          "kind": "component",
+          "description": "Inspects supplied pad records without inferring connectivity, shape or dimensions.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "pads",
+              "type": "readonly PadInspectorPad[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(id: string | null) => void",
+              "required": false,
+              "description": "Requests pad selection only. The host owns board and schematic cross-highlighting."
+            },
+            {
+              "name": "boardLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "selectionLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Pad\""
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "design-rule-results": {
+      "exports": [
+        {
+          "name": "DesignRuleResults",
+          "kind": "component",
+          "description": "Supplied rule-check outcomes with local or controlled filters and host-confirmed actions.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onSelect\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "violations",
+              "type": "readonly DesignRuleViolation[]",
+              "required": true
+            },
+            {
+              "name": "filter",
+              "type": "DesignRuleFilter",
+              "required": false
+            },
+            {
+              "name": "defaultFilter",
+              "type": "DesignRuleFilter",
+              "required": false,
+              "default": "initial"
+            },
+            {
+              "name": "onFilterChange",
+              "type": "(filter: DesignRuleFilter) => void",
+              "required": false
+            },
+            {
+              "name": "selectedId",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "onSelect",
+              "type": "(id: string) => void",
+              "required": false,
+              "description": "Requests selection in the host board viewer; selectedId remains host-owned."
+            },
+            {
+              "name": "onResolve",
+              "type": "(id: string) => void",
+              "required": false,
+              "description": "Requests resolution of an open result. Confirmed status never changes locally."
+            },
+            {
+              "name": "runLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "colony-plate": {
+      "exports": [
+        {
+          "name": "ColonyPlate",
+          "kind": "component",
+          "description": "A supplied plate record. Marker positions and source count are never detected or inferred.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"defaultValue\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "markers",
+              "type": "readonly ColonyMarker[]",
+              "required": true
+            },
+            {
+              "name": "plateId",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "source",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "recordedCount",
+              "type": "number | null",
+              "required": false,
+              "description": "The source's recorded count, independent of the number of supplied marker records."
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(id: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "culture-log": {
+      "exports": [
+        {
+          "name": "CultureLog",
+          "kind": "component",
+          "description": "A chronological notebook of supplied culture observations, without protocol recommendations.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "cultureId",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "sampleId",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "observations",
+              "type": "readonly CultureObservation[]",
+              "required": true
+            },
+            {
+              "name": "medium",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "conditions",
+              "type": "readonly CultureCondition[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "actions",
+              "type": "readonly CultureAction[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onAction",
+              "type": "(actionId: string) => void",
+              "required": false,
+              "description": "Requests a host recording action without changing any supplied observation or status."
+            },
+            {
+              "name": "pending",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "order",
+              "type": "\"newest\" | \"oldest\"",
+              "required": false,
+              "default": "\"oldest\""
+            }
+          ]
+        }
+      ]
+    },
     "button": {
       "exports": [
         {
@@ -4554,6 +5801,35 @@
               "name": "disabled",
               "type": "boolean",
               "required": false
+            },
+            {
+              "name": "fullWidth",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Fill a compound field without imposing a minimum column width."
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "form",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
             }
           ]
         }

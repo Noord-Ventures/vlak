@@ -92,6 +92,28 @@ const healthCases: Record<string, Case> = {
 };
 
 const domainCases: Record<string, Case> = {
+  JointPanel: { tag: "fieldset", props: {"label": "Robot joints", "joints": []} },
+  RobotPose: { tag: "fieldset", props: {"label": "Recorded pose", "poses": []} },
+  RobotMissionQueue: { tag: "fieldset", props: {"label": "Inspection mission", "steps": []} },
+  PadInspector: { tag: "fieldset", props: {"label": "Board pads", "pads": []} },
+  DesignRuleResults: { tag: "fieldset", props: {"label": "Board rule results", "violations": []} },
+  ColonyPlate: { tag: "figure", props: {"label": "Plate annotations", "markers": []} },
+  CultureLog: { tag: "div", props: {"label": "Culture observations", "cultureId": "Example culture", "sampleId": "Example sample", "observations": []} },
+
+  AssemblyVariantMatrix: { tag: "fieldset", props: {"label": "Assembly variants", "references": [], "variants": []} },
+  CoordinateReferenceField: { tag: "fieldset", props: {"label": "Map coordinates", "axes": [], "references": []} },
+  DatumTransformPicker: { tag: "fieldset", props: {"label": "Datum transformation", "sourceReference": "Source", "destinationReference": "Destination", "transformations": []} },
+  RasterBandMixer: { tag: "fieldset", props: {"label": "Raster bands", "bands": []} },
+  Patchbay: { tag: "fieldset", props: {"label": "Audio routes", "sources": [], "destinations": []} },
+  KerningPairEditor: { tag: "fieldset", props: {"label": "Pair spacing", "pairs": [], "fontFamily": "serif", "unitsPerEm": 1000} },
+  StackNavigator: { tag: "fieldset", props: {"label": "Image stack", "axes": []} },
+  AcquisitionSequencer: { tag: "fieldset", props: {"label": "Acquisition steps", "steps": [], "channels": []} },
+  SequenceAlignment: { tag: "div", props: {"label": "Aligned reads", "contig": "chr1", "referenceLabel": "Example reference", "referenceSequence": "AC", "positions": [1, 2], "reads": []} },
+  CoverageInspector: { tag: "figure", props: {"label": "Coverage", "contig": "chr1", "loci": [{"position": 1, "depth": 0}]} },
+  GenomicRegionField: { tag: "fieldset", props: {"label": "Region", "reference": "Example reference", "contigs": [{"id": "chr1", "length": 100}]} },
+  AlarmPanel: { tag: "div", props: {"label": "Plant alarms", "alarms": []} },
+  WorkOffsetPanel: { tag: "fieldset", props: {"label": "Work coordinates", "axes": [], "systems": [], "activeSystemId": null} },
+
   ActivityRings: { props: { label: "Personal goals", goals: [{ id: "walk", label: "Walking", current: 18, target: 30, unit: "minutes" }] }, tag: "figure" },
   IdentityDocument: { props: { documentTitle: "Residence document", holderName: "Robin Ellis", maskedIdentifier: "•••• 2048", status: "Verification pending" }, tag: "div" },
   TaxSummary: { props: { label: "Annual assessment", periodLabel: "2025", status: "Provisional", items: [{ id: "assessment", label: "Assessed amount", amount: "€ 240.00" }], totals: [{ id: "payable", label: "Amount payable", amount: "€ 240.00" }] }, tag: "div" },

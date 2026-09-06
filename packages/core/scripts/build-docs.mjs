@@ -54,7 +54,7 @@ const table = (head, rows) =>
   [`| ${head.join(" | ")} |`, `| ${head.map(() => "---").join(" | ")} |`, ...rows.map((r) => `| ${r.map(cell).join(" | ")} |`)].join("\n");
 const fence = (lang, body) => `\`\`\`${lang}\n${body}\n\`\`\``;
 const list = (items) => items.map((i) => `- ${i}`).join("\n");
-const title = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const title = (s) => domainCollections.find((collection) => collection.name === s)?.title ?? s.charAt(0).toUpperCase() + s.slice(1);
 
 const docUrl = (name) => `${HOST}/docs/${name}.md`;
 const pageUrl = (name) => `${HOST}/components/${name}/`;

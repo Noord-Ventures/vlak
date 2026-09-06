@@ -86,7 +86,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 | Keys | Does |
 | --- | --- |
-| Tab | Moves through available selection, visibility, lock, and move actions. |
+| Tab | Moves through available layer selection and Vlak visibility, lock, and move buttons. |
 | Enter, Space | Requests the focused action; move buttons reorder one position when allowed. |
 
 ## Accessibility
@@ -98,10 +98,10 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-layer-stack`, `rs-layer-stack-label`, `rs-layer-stack-list`, `rs-layer-stack-row`, `rs-layer-stack-actions`, `rs-layer-stack-button`, `rs-layer-stack-selected`, `rs-layer-stack-note`
+`rs-layer-stack`, `rs-layer-stack-label`, `rs-layer-stack-list`, `rs-layer-stack-row`, `rs-layer-stack-actions`, `rs-layer-stack-action`, `rs-layer-stack-button`, `rs-layer-stack-selected`, `rs-layer-stack-note`
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/layer-stack.tsx`  
 CSS: `packages/core/css/components/layer-stack.css`

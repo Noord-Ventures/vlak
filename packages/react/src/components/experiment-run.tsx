@@ -4,6 +4,8 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
+import { Button } from "./button";
+
 
 export interface ExperimentCondition { id: string; label: React.ReactNode; value: React.ReactNode }
 export interface ExperimentAction { id: string; label: string; disabled?: boolean }
@@ -30,7 +32,7 @@ const styles = stylex.create({
   step: { paddingBlock: "0.75rem", paddingInlineStart: "0.25rem", borderBottomWidth: vlak.hairline, borderBottomStyle: "solid", borderBottomColor: vlak.divider, fontSize: "0.875rem" },
   details: { marginBlock: "0.5rem", fontSize: "0.875rem", maxWidth: "66ch" },
   actions: { display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.5rem" },
-  action: { minWidth: vlak.hit, minHeight: vlak.hit, padding: "0.5rem 0.75rem", borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontFamily: "inherit", fontSize: "0.875rem", cursor: "pointer", outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2, opacity: { default: 1, ":disabled": 0.55 } },
+  action: { flexShrink: 0 },
 });
 
 /** Supplied run metadata and protocol steps, with application-owned transitions. */
@@ -56,7 +58,7 @@ export const ExperimentRun = React.forwardRef<HTMLDivElement, ExperimentRunProps
       <div {...head}><span>{step.label}</span><span {...context} id={`${id}-${index}-status`}>{step.status.trim() || "Step status not supplied"}</span></div>
       {step.details != null && <div {...details}>{step.details}</div>}
       <span {...context} role="status">{step.pending ? "Update pending" : null}</span>
-      {onAction && !!step.actions?.length && <div {...actions}>{step.actions.map(action => <button key={action.id} {...actionStyle} type="button" disabled={step.pending || action.disabled} aria-label={`${action.label}: step ${index + 1}, ${step.label}`} aria-describedby={`${id}-${index}-status`} onClick={() => onAction(step.id, action.id)}>{action.label}</button>)}</div>}
+      {onAction && !!step.actions?.length && <div {...actions}>{step.actions.map(action => <Button variant="ghost" size="sm" key={action.id} {...actionStyle} type="button" disabled={step.pending || action.disabled} aria-label={`${action.label}: step ${index + 1}, ${step.label}`} aria-describedby={`${id}-${index}-status`} onClick={() => onAction(step.id, action.id)}>{action.label}</Button>)}</div>}
     </li>)}</ol>}
     {children}
   </div>;

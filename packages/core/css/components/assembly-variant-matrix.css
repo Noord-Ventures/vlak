@@ -1,0 +1,16 @@
+/* ── assembly-variant-matrix: generated from packages/react/src/components/assembly-variant-matrix.tsx ── */
+.rs-assembly-variant-matrix{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
+.rs-assembly-variant-matrix-legend{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
+.rs-assembly-variant-matrix-viewport{min-width:0;max-width:100%;overflow:auto;border-width:1px;border-style:solid;border-color:var(--divider)}
+.rs-assembly-variant-matrix-table{width:100%;border-collapse:collapse;font-size:var(--control-label);line-height:1.45}
+.rs-assembly-variant-matrix-header{padding:0.75rem;min-width:7rem;text-align:start;vertical-align:top;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:600}
+.rs-assembly-variant-matrix-part{display:block;font-size:var(--control-label);color:var(--text-secondary);font-weight:400;line-height:1.45}
+.rs-assembly-variant-matrix-cell{padding:0.5rem;min-width:12rem;vertical-align:top;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-assembly-variant-matrix-summary{box-sizing:border-box;min-width:var(--hit);min-height:var(--hit);padding:0.625rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);cursor:pointer;background-color:var(--bg);color:var(--text);outline-color:var(--text);outline-offset:2px}
+.rs-assembly-variant-matrix-summary:focus-visible{outline-width:2px;outline-style:solid}
+.rs-assembly-variant-matrix-details::details-content{color:var(--text)}
+@media (forced-colors: active){.rs-assembly-variant-matrix-details::details-content{color:CanvasText}}
+.rs-assembly-variant-matrix-editor{display:grid;gap:0.625rem;padding-top:0.75rem}
+.rs-assembly-variant-matrix-field{display:grid;gap:0.25rem;font-size:var(--control-label);line-height:1.45}
+.rs-assembly-variant-matrix-select{min-width:0;width:100%}
+.rs-assembly-variant-matrix-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}

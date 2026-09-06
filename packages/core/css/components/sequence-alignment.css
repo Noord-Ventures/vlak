@@ -1,0 +1,16 @@
+/* ── sequence-alignment: generated from packages/react/src/components/sequence-alignment.tsx ── */
+.rs-sequence-alignment{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text);line-height:1.45}
+.rs-sequence-alignment-title{margin:0;font-size:0.875rem;font-weight:600}
+.rs-sequence-alignment-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
+.rs-sequence-alignment-scroll{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;padding:0.25rem;outline-color:var(--text);outline-offset:2px}
+.rs-sequence-alignment-scroll:focus-visible{outline-width:2px;outline-style:solid}
+.rs-sequence-alignment-table{width:max-content;border-collapse:collapse;direction:ltr}
+.rs-sequence-alignment-heading{padding:0.5rem;font-size:0.75rem;font-weight:500;text-align:start;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);white-space:nowrap}
+.rs-sequence-alignment-column{min-width:var(--hit);padding:0;text-align:center;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-sequence-alignment-base{min-width:var(--hit);padding:0.5rem;box-sizing:border-box;text-align:center;font-size:1rem;font-family:ui-monospace, monospace;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-sequence-alignment-selected{background-color:var(--text);color:var(--bg)}
+@media (forced-colors: active){.rs-sequence-alignment-selected{background-color:Highlight;color:HighlightText}}
+.rs-sequence-alignment-control{min-width:var(--hit);min-height:var(--hit);padding:0.5rem;box-sizing:border-box;border-width:0;border-radius:0;background-color:transparent;color:inherit;font-family:inherit;font-size:0.75rem;font-variant-numeric:tabular-nums;cursor:pointer;outline-color:currentColor;outline-offset:-2px}
+.rs-sequence-alignment-control:focus-visible{outline-width:2px;outline-style:solid}
+.rs-sequence-alignment-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-sequence-alignment-action{min-width:var(--hit);min-height:var(--hit);width:auto}

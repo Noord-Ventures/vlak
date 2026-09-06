@@ -1,0 +1,7 @@
+/* ── coordinate-reference-field: generated from packages/react/src/components/coordinate-reference-field.tsx ── */
+.rs-coordinate-reference-field{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-coordinate-reference-field-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
+.rs-coordinate-reference-field-axes{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.75rem}
+.rs-coordinate-reference-field-label{display:grid;align-content:start;gap:0.375rem;min-width:0;font-size:var(--control-label)}
+.rs-coordinate-reference-field-control{min-width:0;width:100%;min-height:var(--hit)}
+.rs-coordinate-reference-field-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}

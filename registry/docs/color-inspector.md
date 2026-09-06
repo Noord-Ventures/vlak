@@ -46,7 +46,7 @@ npx shadcn add https://vlak.dev/r/color-inspector.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<fieldset class="rs-color-inspector"><legend class="rs-color-inspector-label">Fill</legend><div class="rs-color-inspector-preview" aria-hidden="true"><span class="rs-color-inspector-swatch" style="background-color:#808080;opacity:0.5"></span></div><div class="rs-color-inspector-fields"><label class="rs-color-inspector-field">Hex<input class="rs-color-inspector-input" type="text" value="#808080" pattern="#[0-9a-fA-F]{6}" required /></label><label class="rs-color-inspector-field">Alpha<input class="rs-color-inspector-input" type="number" value="0.5" min="0" max="1" step="any" required /></label></div></fieldset>
+<fieldset class="rs-color-inspector"><legend class="rs-color-inspector-label">Fill</legend><div class="rs-color-inspector-preview" aria-hidden="true"><span class="rs-color-inspector-swatch" style="background-color:#808080;opacity:0.5"></span></div><div class="rs-color-inspector-fields"><label class="rs-color-inspector-field">Hex<input class="rs-input rs-input-full rs-color-inspector-input" type="text" value="#808080" pattern="#[0-9a-fA-F]{6}" required /></label><label class="rs-color-inspector-field">Alpha<input class="rs-input rs-input-full rs-color-inspector-input" type="number" value="0.5" min="0" max="1" step="any" required /></label></div></fieldset>
 ```
 
 ## Example
@@ -95,6 +95,6 @@ Forwards `ref` to the `HTMLFieldSetElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md).  
 React: `packages/react/src/components/color-inspector.tsx`  
 CSS: `packages/core/css/components/color-inspector.css`

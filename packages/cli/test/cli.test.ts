@@ -265,8 +265,8 @@ describe("docs", () => {
     expect(search("medication").map(hit => hit.name)).toContain("medication-schedule");
   });
 
-  it("serves civic, science, and creative guides with their components", () => {
-    for (const [collection, component] of [["civic", "benefit-program"], ["science", "well-plate"], ["creative", "channel-strip"]] as const) {
+  it("serves specialist collection guides with their components", () => {
+    for (const [collection, component] of [["civic", "benefit-program"], ["science", "sequence-alignment"], ["creative", "channel-strip"], ["engineering", "alarm-panel"], ["geospatial", "raster-band-mixer"], ["robotics", "joint-panel"], ["electronics", "pad-inspector"], ["microbiology", "colony-plate"]] as const) {
       expect(docsFor(collection)).toContain("## Data and action contracts");
       expect(docsFor(collection)).toContain(`/docs/${component}.md`);
       expect(search(component)[0]?.name).toBe(component);

@@ -100,7 +100,7 @@ export function createServer(): McpServer {
     "list_components",
     {
       title: "List Vlak components",
-      description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, health, civic, science, creative.",
+      description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, health, civic, science, creative, engineering, geospatial, robotics, electronics, microbiology.",
       inputSchema: { category: z.string().optional().describe("Only this category") },
     },
     ({ category }) => {
@@ -199,7 +199,7 @@ export function createServer(): McpServer {
     (uri) => ({ contents: [{ uri: uri.href, mimeType: "text/markdown", text: docsFor("health") ?? "" }] }),
   );
 
-  for (const [name, title] of [["civic", "Civic"], ["science", "Science"], ["creative", "Creative tools"]] as const) {
+  for (const [name, title] of [["civic", "Civic"], ["science", "Science"], ["creative", "Creative tools"], ["engineering", "Industrial"], ["geospatial", "Geospatial"], ["robotics", "Robotics"], ["electronics", "Circuitry"], ["microbiology", "Microbiology"]] as const) {
     server.registerResource(
       `${name}-guide`,
       `vlak://docs/${name}`,

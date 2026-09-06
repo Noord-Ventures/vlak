@@ -2,8 +2,11 @@
 
 import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
-import { vlak, mq } from "../tokens.stylex";
+import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
+import { Select } from "./select";
+import { Input } from "./input";
+
 import { useInputValue } from "../use-input-value";
 import { useMergedRefs } from "../merge-refs";
 
@@ -34,7 +37,7 @@ const styles = stylex.create({
   legend: { padding: 0, marginBottom: "0.5rem", fontWeight: 500, fontSize: "0.875rem" },
   row: { display: "grid", gridTemplateColumns: "minmax(0, 2fr) minmax(0, 1fr)", gap: "0.75rem" },
   field: { display: "grid", gap: "0.375rem", minWidth: 0, fontSize: "0.75rem", color: vlak.gray },
-  control: { boxSizing: "border-box", width: "100%", minWidth: 0, minHeight: vlak.hit, padding: "0.625rem", fontFamily: "inherit", fontSize: { default: "0.875rem", [mq.phone]: "1rem" }, fontVariantNumeric: "tabular-nums", color: vlak.ink, backgroundColor: vlak.paper, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2 },
+  control: { width: "100%", minWidth: 0, fontVariantNumeric: "tabular-nums" },
   description: { margin: 0, fontSize: "0.75rem", color: vlak.gray, maxWidth: "66ch" },
 });
 
@@ -58,10 +61,9 @@ export const QuantityField = React.forwardRef<HTMLFieldSetElement, QuantityField
     {description != null && <p {...copy} id={`${id}-description`}>{description}</p>}
     {readOnly && <p {...copy} id={`${id}-readonly`}>Read only</p>}
     <div {...row}>
-      <label {...field}><span>{amountLabel}</span><input {...control} type="number" name={name} form={form} value={validAmount ? current.amount! : ""} min={min} max={max} step={step} required={required} readOnly={readOnly} disabled={disabled} aria-describedby={describedBy} onChange={event => { if (!readOnly) setValue({ amount: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null, unit: current.unit }); }} /></label>
-      <label {...field}><span>{unitLabel}</span><select {...control} name={unitName} form={form} value={validUnit ? current.unit! : ""} required={required} disabled={disabled || readOnly} aria-describedby={describedBy} onChange={event => setValue({ amount: current.amount, unit: event.currentTarget.value || null })}><option value="">{unitPlaceholder}</option>{units.map(unit => <option key={unit.value} value={unit.value} disabled={unit.disabled}>{unit.label}</option>)}</select></label>
+      <label {...field}><span>{amountLabel}</span><Input plain {...control} type="number" name={name} form={form} value={validAmount ? current.amount! : ""} min={min} max={max} step={step} required={required} readOnly={readOnly} disabled={disabled} aria-describedby={describedBy} onChange={event => { if (!readOnly) setValue({ amount: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null, unit: current.unit }); }} /></label>
+      <div {...field}><span id={`${id}-unit-label`}>{unitLabel}</span><Select fullWidth aria-labelledby={`${id}-unit-label`} name={unitName} form={form} value={validUnit ? current.unit! : ""} required={required} disabled={disabled} readOnly={readOnly} aria-describedby={describedBy} onValueChange={next => setValue({ amount: current.amount, unit: next || null })} options={[{ value: "", label: unitPlaceholder }, ...units]} /></div>
     </div>
-    {readOnly && !disabled && validUnit && <input type="hidden" name={unitName} form={form} value={current.unit!} />}
     {current.amount != null && !validAmount && <p {...copy}>Amount unavailable</p>}
     {current.unit != null && !validUnit && <p {...copy}>Unit unavailable</p>}
     {children}

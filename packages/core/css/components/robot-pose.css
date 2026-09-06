@@ -1,0 +1,12 @@
+/* ── robot-pose: generated from packages/react/src/components/robot-pose.tsx ── */
+.rs-robot-pose{display:grid;gap:1rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-robot-pose-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}
+.rs-robot-pose-field{display:grid;gap:0.375rem;min-width:0;font-size:0.75rem}
+.rs-robot-pose-select{min-width:0;width:100%}
+.rs-robot-pose-metadata{display:grid;gap:0.625rem;margin:0;font-size:0.75rem}
+.rs-robot-pose-detail{display:grid;grid-template-columns:5rem minmax(0, 1fr);gap:0.5rem}
+.rs-robot-pose-heading{margin:0;font-size:0.875rem;font-weight:500}
+.rs-robot-pose-values{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.75rem;margin:0.75rem 0 0;font-size:0.75rem}
+.rs-robot-pose-value{margin:0.25rem 0 0;font-size:1rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rs-robot-pose-text{margin:0;overflow-wrap:anywhere}
+.rs-robot-pose-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}

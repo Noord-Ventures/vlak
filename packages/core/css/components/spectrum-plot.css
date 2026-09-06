@@ -19,6 +19,4 @@
 .rs-spectrum-plot-table{width:100%;border-collapse:collapse;font-size:0.75rem;font-variant-numeric:tabular-nums}
 .rs-spectrum-plot-cell{padding:0.5rem;text-align:start;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:400}
 .rs-spectrum-plot-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding-block:0.5rem;font-size:0.75rem}
-.rs-spectrum-plot-button{min-width:var(--hit);min-height:var(--hit);padding:0.5rem 0.75rem;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-family:inherit;font-size:0.75rem;cursor:pointer;outline-color:var(--text);outline-offset:2px;opacity:1}
-.rs-spectrum-plot-button:focus-visible{outline-width:2px;outline-style:solid}
-.rs-spectrum-plot-button:disabled{opacity:0.55}
+.rs-spectrum-plot-button{flex-shrink:0}

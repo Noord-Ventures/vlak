@@ -18,8 +18,30 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 146;
+const expectedCatalogueSize = 166;
 const additions = [
+  ["joint-panel", "JointPanel"],
+  ["robot-pose", "RobotPose"],
+  ["robot-mission-queue", "RobotMissionQueue"],
+  ["pad-inspector", "PadInspector"],
+  ["design-rule-results", "DesignRuleResults"],
+  ["colony-plate", "ColonyPlate"],
+  ["culture-log", "CultureLog"],
+
+  ["assembly-variant-matrix", "AssemblyVariantMatrix"],
+  ["coordinate-reference-field", "CoordinateReferenceField"],
+  ["datum-transform-picker", "DatumTransformPicker"],
+  ["raster-band-mixer", "RasterBandMixer"],
+  ["patchbay", "Patchbay"],
+  ["kerning-pair-editor", "KerningPairEditor"],
+  ["stack-navigator", "StackNavigator"],
+  ["acquisition-sequencer", "AcquisitionSequencer"],
+  ["sequence-alignment", "SequenceAlignment"],
+  ["coverage-inspector", "CoverageInspector"],
+  ["genomic-region-field", "GenomicRegionField"],
+  ["alarm-panel", "AlarmPanel"],
+  ["work-offset-panel", "WorkOffsetPanel"],
+
   ["number-field", "NumberField"], ["range-slider", "RangeSlider"], ["multi-select", "MultiSelect"], ["tag-input", "TagInput"], ["date-range-picker", "DateRangePicker"],
   ["time-field", "TimeField"], ["file-upload", "FileUpload"], ["transfer-list", "TransferList"], ["inline-edit", "InlineEdit"], ["rating", "Rating"],
   ["description-list", "DescriptionList"], ["metric", "Metric"], ["activity-timeline", "ActivityTimeline"], ["code-block", "CodeBlock"], ["json-viewer", "JSONViewer"],
@@ -40,6 +62,28 @@ const additions = [
 const renderAdditions = `
 const additions = ${JSON.stringify(additions)};
 const fixtureProps = {
+  JointPanel: {"label": "Robot joints", "joints": []},
+  RobotPose: {"label": "Recorded pose", "poses": []},
+  RobotMissionQueue: {"label": "Inspection mission", "steps": []},
+  PadInspector: {"label": "Board pads", "pads": []},
+  DesignRuleResults: {"label": "Board rule results", "violations": []},
+  ColonyPlate: {"label": "Plate annotations", "markers": []},
+  CultureLog: {"label": "Culture observations", "cultureId": "Example culture", "sampleId": "Example sample", "observations": []},
+
+  AssemblyVariantMatrix: {"label": "Assembly variants", "references": [], "variants": []},
+  CoordinateReferenceField: {"label": "Map coordinates", "axes": [], "references": []},
+  DatumTransformPicker: {"label": "Datum transformation", "sourceReference": "Source", "destinationReference": "Destination", "transformations": []},
+  RasterBandMixer: {"label": "Raster bands", "bands": []},
+  Patchbay: {"label": "Audio routes", "sources": [], "destinations": []},
+  KerningPairEditor: {"label": "Pair spacing", "pairs": [], "fontFamily": "serif", "unitsPerEm": 1000},
+  StackNavigator: {"label": "Image stack", "axes": []},
+  AcquisitionSequencer: {"label": "Acquisition steps", "steps": [], "channels": []},
+  SequenceAlignment: {"label": "Aligned reads", "contig": "chr1", "referenceLabel": "Example reference", "referenceSequence": "AC", "positions": [1, 2], "reads": []},
+  CoverageInspector: {"label": "Coverage", "contig": "chr1", "loci": [{"position": 1, "depth": 0}]},
+  GenomicRegionField: {"label": "Region", "reference": "Example reference", "contigs": [{"id": "chr1", "length": 100}]},
+  AlarmPanel: {"label": "Plant alarms", "alarms": []},
+  WorkOffsetPanel: {"label": "Work coordinates", "axes": [], "systems": [], "activeSystemId": null},
+
   NumberField: { label: "Count", defaultValue: 3 }, RangeSlider: { label: "Range" }, MultiSelect: { label: "Cities", options: [{ value: "a", label: "Alkmaar" }] }, TagInput: { label: "Tags" },
   TimeField: { label: "Time" }, TransferList: { options: [{ value: "a", label: "Alkmaar" }] },
   DescriptionList: { items: [{ id: "range", label: "Range", value: "386 km" }] }, Metric: { label: "Range", value: 386 },

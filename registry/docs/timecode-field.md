@@ -46,7 +46,7 @@ npx shadcn add https://vlak.dev/r/timecode-field.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-timecode-field"><label class="rs-timecode-field-label" for="in-point">In point</label><input class="rs-timecode-field-input" id="in-point" type="text" value="00:01:24:12" pattern="[0-9]{2}:[0-5][0-9]:[0-5][0-9]:[0-9]{2}" aria-describedby="in-point-hint" /><p class="rs-timecode-field-hint" id="in-point-hint">24 fps, non-drop. Hours:minutes:seconds:frames.</p></div>
+<div class="rs-timecode-field"><label class="rs-timecode-field-label" for="in-point">In point</label><input class="rs-input rs-input-full rs-timecode-field-input" id="in-point" type="text" value="00:01:24:12" pattern="[0-9]{2}:[0-5][0-9]:[0-5][0-9]:[0-9]{2}" aria-describedby="in-point-hint" /><p class="rs-timecode-field-hint" id="in-point-hint">24 fps, non-drop. Hours:minutes:seconds:frames.</p></div>
 ```
 
 ## Example
@@ -95,6 +95,6 @@ Forwards `ref` to the `HTMLInputElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [input](input.md).  
 React: `packages/react/src/components/timecode-field.tsx`  
 CSS: `packages/core/css/components/timecode-field.css`

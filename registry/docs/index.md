@@ -1,6 +1,6 @@
 # Vlak components
 
-146 components in 13 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+166 components in 18 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -153,7 +153,7 @@
 - [Habit tracker](habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
-- [Activity rings](activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
+- [Activity rings](activity-rings.md): Shows one to six personal goals as concentric rings with a staggered entrance, gentle rotating encouragement, named progress and explicit missing-data states.
 - [Patient banner](patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
 - [Medication schedule](medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
 - [Appointment card](appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
@@ -170,12 +170,16 @@
 ## Science
 
 - [Measurement value](measurement-value.md): A supplied scientific reading with units, symmetric uncertainty, optional scientific notation and explicit availability.
-- [Quantity field](quantity-field.md): A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
-- [Well plate](well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Quantity field](quantity-field.md): A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.
 - [Experiment run](experiment-run.md): Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.
 - [Spectrum plot](spectrum-plot.md): A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.
+- [Stack navigator](stack-navigator.md): Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.
+- [Acquisition sequencer](acquisition-sequencer.md): Edits supplied capture steps, exact exposure, time, depth and channel values, and distinguishes requested actions from recorded run state.
+- [Sequence alignment](sequence-alignment.md): Displays a bounded window of already aligned reference and read strings, with supplied genomic positions, gaps and keyboard region selection.
+- [Coverage inspector](coverage-inspector.md): Shows supplied per-locus depth, base and strand counts with an exact position selector, bounded plot and complete depth table.
+- [Genomic region field](genomic-region-field.md): Collects a reference, contig and validated integer interval with an explicit one-based inclusive coordinate convention and native form submission.
 
-## Creative
+## Creative tools
 
 - [Audio meter](audio-meter.md): Shows supplied channel levels and peaks in decibels, with bounded native meters and explicit missing readings.
 - [Channel strip](channel-strip.md): Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.
@@ -186,6 +190,37 @@
 - [Layer stack](layer-stack.md): Manages supplied layer selection, visibility, locking, and order through named 44px controls and caller-owned changes.
 - [Color inspector](color-inspector.md): Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.
 - [Spacing control](spacing-control.md): Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.
+- [Patchbay](patchbay.md): Connects supplied source and destination ports through a keyboard-navigable matrix, with signal types, channel groups, and blocked-route reasons.
+- [Kerning pair editor](kerning-pair-editor.md): Edits supplied glyph-pair offsets in font units, with baseline and edited previews, bounded keyboard nudging, and one-step undo.
+
+## Industrial
+
+- [Alarm panel](alarm-panel.md): Industrial alarm records with independent condition, acknowledgement and shelving states, explicit filters and host-confirmed actions.
+- [Work offset panel](work-offset-panel.md): Reported machine and work coordinates alongside editable draft offsets, explicit axis units and a host-owned apply request.
+
+## Geospatial
+
+- [Coordinate reference field](coordinate-reference-field.md): Two or three numeric coordinate axes with supplied units and a reference selector that preserves entered values when assigning a reference.
+- [Datum transform picker](datum-transform-picker.md): A Vlak transformation selector with source and destination references, supplied accuracy and area, and visible support-grid availability.
+- [Raster band mixer](raster-band-mixer.md): A raster configuration editor with source-band mapping, single or three-channel modes, supplied stretch bounds and explicit missing-data metadata.
+
+## Robotics
+
+- [Joint panel](joint-panel.md): Pairs host-reported joint positions with independent draft targets, supplied units and limits, and an explicit request action.
+- [Robot pose](robot-pose.md): Displays exact Cartesian translation and explicitly named orientation components for a selected supplied pose, with frame, time, and recorded status.
+- [Robot mission queue](robot-mission-queue.md): Shows supplied mission order and recorded step states, with keyboard reorder requests and explicit host actions separate from pending and confirmed records.
+
+## Circuitry
+
+- [Assembly variant matrix](assembly-variant-matrix.md): Edits independent population, bill-of-materials, and placement flags per reference and assembly variant, preserving unspecified choices.
+- [Pad inspector](pad-inspector.md): Circuit-board pad selection with supplied footprint references, net and layer records, pad types and a dimension table with explicit units.
+- [Design rule results](design-rule-results.md): Supplied board-check violations with severity and status filters, object and location details, and host-confirmed selection and resolution actions.
+
+## Microbiology
+
+- [Well plate](well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Colony plate](colony-plate.md): A bounded plate diagram and keyboard-selectable list of supplied colony markers, with the source count kept separate from annotation totals.
+- [Culture log](culture-log.md): A culture and sample record with supplied medium, conditions, chronological observations and host-owned recording actions.
 
 ## Also
 

@@ -78,7 +78,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - Each native meter has a channel name, minimum, maximum, and decibel value text.
 - Supplied peaks are visible text; absent and invalid readings suppress the meter.
-- Monochrome native meter styles retain boundaries in forced colors.
+- Native meter styles remove browser gradients so the track and fill remain monochrome. System colors retain visible fill and boundaries in forced colors.
 - The ref and native attributes reach the root div.
 
 ## Classes

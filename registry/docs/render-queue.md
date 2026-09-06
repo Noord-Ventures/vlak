@@ -95,6 +95,6 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/render-queue.tsx`  
 CSS: `packages/core/css/components/render-queue.css`

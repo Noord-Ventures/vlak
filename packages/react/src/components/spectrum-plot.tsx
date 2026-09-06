@@ -4,6 +4,8 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
+import { Button } from "./button";
+
 
 export interface SpectrumPoint { x: number; y: number }
 export interface SpectrumPeak extends SpectrumPoint { id: string; label: string }
@@ -40,7 +42,7 @@ const styles = stylex.create({
   table: { width: "100%", borderCollapse: "collapse", fontSize: "0.75rem", fontVariantNumeric: "tabular-nums" },
   cell: { padding: "0.5rem", textAlign: "start", borderBottomWidth: vlak.hairline, borderBottomStyle: "solid", borderBottomColor: vlak.divider, fontWeight: 400 },
   controls: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem", paddingBlock: "0.5rem", fontSize: "0.75rem" },
-  button: { minWidth: vlak.hit, minHeight: vlak.hit, padding: "0.5rem 0.75rem", color: vlak.ink, backgroundColor: vlak.paper, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, fontFamily: "inherit", fontSize: "0.75rem", cursor: "pointer", outlineWidth: { default: null, ":focus-visible": 2 }, outlineStyle: { default: null, ":focus-visible": "solid" }, outlineColor: vlak.ink, outlineOffset: 2, opacity: { default: 1, ":disabled": 0.55 } },
+  button: { flexShrink: 0 },
 });
 
 function domainFor(values: readonly number[], supplied?: readonly [number, number]): readonly [number, number] {
@@ -115,7 +117,7 @@ export const SpectrumPlot = React.forwardRef<HTMLElement, SpectrumPlotProps>(fun
     </>}
     {bounded && peaks.length > 0 && <ol {...peakList} aria-label="Supplied peak annotations">{peaks.map(peak => <li key={peak.id}>{peak.label}: {xTitle} {Number.isFinite(peak.x) ? peak.x : "Unavailable"}; {yTitle} {Number.isFinite(peak.y) ? peak.y : "Unavailable"}</li>)}</ol>}
     {bounded && points.length > 0 && <details><summary {...summary}>Data table, {points.length} points</summary>
-      <div {...controls}><button {...button} type="button" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Previous rows</button><span role="status">Rows {currentPage * 50 + 1}–{Math.min(points.length, (currentPage + 1) * 50)} of {points.length}</span><button {...button} type="button" disabled={currentPage + 1 >= pageCount} onClick={() => setPage(currentPage + 1)}>Next rows</button></div>
+      <div {...controls}><Button variant="ghost" size="sm" {...button} type="button" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}>Previous rows</Button><span role="status">Rows {currentPage * 50 + 1}–{Math.min(points.length, (currentPage + 1) * 50)} of {points.length}</span><Button variant="ghost" size="sm" {...button} type="button" disabled={currentPage + 1 >= pageCount} onClick={() => setPage(currentPage + 1)}>Next rows</Button></div>
       <div {...scroll}><table {...table}><caption>{label}, supplied data</caption><thead><tr><th {...cell} scope="col">Point</th><th {...cell} scope="col">{xTitle}</th><th {...cell} scope="col">{yTitle}</th></tr></thead><tbody>{visible.map((point, index) => <tr key={currentPage * 50 + index}><th {...cell} scope="row">{currentPage * 50 + index + 1}</th><td {...cell}>{Number.isFinite(point.x) ? point.x : "Unavailable"}</td><td {...cell}>{Number.isFinite(point.y) ? point.y : "Unavailable"}</td></tr>)}</tbody></table></div>
     </details>}
     {children}

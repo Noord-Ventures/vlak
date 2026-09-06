@@ -1,0 +1,14 @@
+/* ── datum-transform-picker: generated from packages/react/src/components/datum-transform-picker.tsx ── */
+.rs-datum-transform-picker{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-datum-transform-picker-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
+.rs-datum-transform-picker-context{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 10rem), 1fr));gap:0.75rem;margin:0}
+.rs-datum-transform-picker-term{font-size:var(--control-label);color:var(--text-secondary)}
+.rs-datum-transform-picker-detail{margin:0;font-size:var(--control-fs);overflow-wrap:anywhere}
+.rs-datum-transform-picker-label{display:grid;gap:0.375rem;font-size:var(--control-label)}
+.rs-datum-transform-picker-control{min-width:0;width:100%;min-height:var(--hit)}
+.rs-datum-transform-picker-list{list-style:none;margin:0;padding:0;display:grid;gap:0.5rem}
+.rs-datum-transform-picker-item{display:grid;gap:0.625rem;padding:0.875rem;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0}
+.rs-datum-transform-picker-selected{background-color:var(--table-alt);border-color:var(--control-border)}
+@media (forced-colors: active){.rs-datum-transform-picker-selected{border-color:Highlight}}
+.rs-datum-transform-picker-title{margin:0;font-weight:600;font-size:var(--control-fs);overflow-wrap:anywhere}
+.rs-datum-transform-picker-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}

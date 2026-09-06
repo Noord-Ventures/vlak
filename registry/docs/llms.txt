@@ -1,6 +1,6 @@
 # Vlak
 
-> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 146 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
+> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 166 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
 
 Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-react/css"`, vendor the source with `npx @noorddev/vlak-cli add <name>`, or use `npx shadcn add https://vlak.dev/r/<name>.json`. Every component page below has install paths, a React example, a props table generated from the types, keyboard interactions, and accessibility notes.
 
@@ -10,8 +10,13 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Component index](https://vlak.dev/docs/index.md): the catalogue by category
 - [Health guide](https://vlak.dev/docs/health.md): health, wellness, and care components with data and action contracts
 - [Civic guide](https://vlak.dev/docs/civic.md): Components for public services, identity records, tax summaries, benefits, and applications.
-- [Science guide](https://vlak.dev/docs/science.md): Components for measurements, physical quantities, laboratory plates, experimental procedures, and spectra.
+- [Science guide](https://vlak.dev/docs/science.md): Components for measurements, physical quantities, microscopy acquisition, sequence inspection, experimental procedures, and spectra.
 - [Creative tools guide](https://vlak.dev/docs/creative.md): Controls for professional audio, video, and design workspaces.
+- [Industrial guide](https://vlak.dev/docs/engineering.md): Controls for operator alarms and machining coordinate records.
+- [Geospatial guide](https://vlak.dev/docs/geospatial.md): Controls for coordinate reference assignment, datum transformation selection and raster band configuration.
+- [Robotics guide](https://vlak.dev/docs/robotics.md): Controls for robot joint targets, recorded poses and mission plans.
+- [Circuitry guide](https://vlak.dev/docs/electronics.md): Controls for board pad inspection, design-rule results and assembly variants.
+- [Microbiology guide](https://vlak.dev/docs/microbiology.md): Components for well plates, supplied colony annotations and culture observation records.
 - [Tokens](https://vlak.dev/docs/tokens.md): every custom property with light and dark values
 - [Props JSON](https://vlak.dev/docs/props.json): every export and its props as data
 - [Registry index](https://vlak.dev/r/index.json): the shadcn-compatible registry; items at https://vlak.dev/r/<name>.json
@@ -167,7 +172,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
-- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
+- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with a staggered entrance, gentle rotating encouragement, named progress and explicit missing-data states.
 - [Patient banner](https://vlak.dev/docs/patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
 - [Medication schedule](https://vlak.dev/docs/medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
 - [Appointment card](https://vlak.dev/docs/appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
@@ -184,12 +189,16 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 ## Science
 
 - [Measurement value](https://vlak.dev/docs/measurement-value.md): A supplied scientific reading with units, symmetric uncertainty, optional scientific notation and explicit availability.
-- [Quantity field](https://vlak.dev/docs/quantity-field.md): A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
-- [Well plate](https://vlak.dev/docs/well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Quantity field](https://vlak.dev/docs/quantity-field.md): A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.
 - [Experiment run](https://vlak.dev/docs/experiment-run.md): Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.
 - [Spectrum plot](https://vlak.dev/docs/spectrum-plot.md): A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.
+- [Stack navigator](https://vlak.dev/docs/stack-navigator.md): Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.
+- [Acquisition sequencer](https://vlak.dev/docs/acquisition-sequencer.md): Edits supplied capture steps, exact exposure, time, depth and channel values, and distinguishes requested actions from recorded run state.
+- [Sequence alignment](https://vlak.dev/docs/sequence-alignment.md): Displays a bounded window of already aligned reference and read strings, with supplied genomic positions, gaps and keyboard region selection.
+- [Coverage inspector](https://vlak.dev/docs/coverage-inspector.md): Shows supplied per-locus depth, base and strand counts with an exact position selector, bounded plot and complete depth table.
+- [Genomic region field](https://vlak.dev/docs/genomic-region-field.md): Collects a reference, contig and validated integer interval with an explicit one-based inclusive coordinate convention and native form submission.
 
-## Creative
+## Creative tools
 
 - [Audio meter](https://vlak.dev/docs/audio-meter.md): Shows supplied channel levels and peaks in decibels, with bounded native meters and explicit missing readings.
 - [Channel strip](https://vlak.dev/docs/channel-strip.md): Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.
@@ -200,6 +209,37 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Layer stack](https://vlak.dev/docs/layer-stack.md): Manages supplied layer selection, visibility, locking, and order through named 44px controls and caller-owned changes.
 - [Color inspector](https://vlak.dev/docs/color-inspector.md): Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.
 - [Spacing control](https://vlak.dev/docs/spacing-control.md): Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.
+- [Patchbay](https://vlak.dev/docs/patchbay.md): Connects supplied source and destination ports through a keyboard-navigable matrix, with signal types, channel groups, and blocked-route reasons.
+- [Kerning pair editor](https://vlak.dev/docs/kerning-pair-editor.md): Edits supplied glyph-pair offsets in font units, with baseline and edited previews, bounded keyboard nudging, and one-step undo.
+
+## Industrial
+
+- [Alarm panel](https://vlak.dev/docs/alarm-panel.md): Industrial alarm records with independent condition, acknowledgement and shelving states, explicit filters and host-confirmed actions.
+- [Work offset panel](https://vlak.dev/docs/work-offset-panel.md): Reported machine and work coordinates alongside editable draft offsets, explicit axis units and a host-owned apply request.
+
+## Geospatial
+
+- [Coordinate reference field](https://vlak.dev/docs/coordinate-reference-field.md): Two or three numeric coordinate axes with supplied units and a reference selector that preserves entered values when assigning a reference.
+- [Datum transform picker](https://vlak.dev/docs/datum-transform-picker.md): A Vlak transformation selector with source and destination references, supplied accuracy and area, and visible support-grid availability.
+- [Raster band mixer](https://vlak.dev/docs/raster-band-mixer.md): A raster configuration editor with source-band mapping, single or three-channel modes, supplied stretch bounds and explicit missing-data metadata.
+
+## Robotics
+
+- [Joint panel](https://vlak.dev/docs/joint-panel.md): Pairs host-reported joint positions with independent draft targets, supplied units and limits, and an explicit request action.
+- [Robot pose](https://vlak.dev/docs/robot-pose.md): Displays exact Cartesian translation and explicitly named orientation components for a selected supplied pose, with frame, time, and recorded status.
+- [Robot mission queue](https://vlak.dev/docs/robot-mission-queue.md): Shows supplied mission order and recorded step states, with keyboard reorder requests and explicit host actions separate from pending and confirmed records.
+
+## Circuitry
+
+- [Assembly variant matrix](https://vlak.dev/docs/assembly-variant-matrix.md): Edits independent population, bill-of-materials, and placement flags per reference and assembly variant, preserving unspecified choices.
+- [Pad inspector](https://vlak.dev/docs/pad-inspector.md): Circuit-board pad selection with supplied footprint references, net and layer records, pad types and a dimension table with explicit units.
+- [Design rule results](https://vlak.dev/docs/design-rule-results.md): Supplied board-check violations with severity and status filters, object and location details, and host-confirmed selection and resolution actions.
+
+## Microbiology
+
+- [Well plate](https://vlak.dev/docs/well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Colony plate](https://vlak.dev/docs/colony-plate.md): A bounded plate diagram and keyboard-selectable list of supplied colony markers, with the source count kept separate from annotation totals.
+- [Culture log](https://vlak.dev/docs/culture-log.md): A culture and sample record with supplied medium, conditions, chronological observations and host-owned recording actions.
 
 ## Optional
 

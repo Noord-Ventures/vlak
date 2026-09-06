@@ -101,6 +101,6 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Dependencies
 
-Registry dependencies: none.  
+Registry dependencies: [button](button.md).  
 React: `packages/react/src/components/experiment-run.tsx`  
 CSS: `packages/core/css/components/experiment-run.css`

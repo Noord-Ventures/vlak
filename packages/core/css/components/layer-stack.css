@@ -4,6 +4,7 @@
 .rs-layer-stack-list{display:grid;gap:0.5rem;list-style-type:none;margin:0;padding:0}
 .rs-layer-stack-row{display:grid;gap:0.5rem;border-width:1px;border-style:solid;border-color:var(--divider);padding:0.5rem}
 .rs-layer-stack-actions{display:flex;flex-wrap:wrap;gap:0.375rem}
+.rs-layer-stack-action{min-width:var(--hit);min-height:var(--hit);width:auto;max-width:100%}
 .rs-layer-stack-button{min-width:var(--hit);min-height:var(--hit);padding-inline:0.625rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:var(--control-label);line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}
 .rs-layer-stack-button:focus-visible{outline-width:2px;outline-style:solid}
 .rs-layer-stack-selected{background-color:var(--text);color:var(--bg)}
