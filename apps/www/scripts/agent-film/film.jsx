@@ -1,16 +1,20 @@
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { AgentsBoard } from "../../app/interfaces/agents/board";
-import { createAgentController, agentFilmEvents } from "./controller.mjs";
+import { createAgentController, agentFilmEventsFor } from "./controller.mjs";
 import { collectAgentParts, independentAgentParts } from "./parts.mjs";
 import { actionTimes as at, motionCues, filmDuration } from "./timeline.mjs";
+import { mobileDetailOpenTime, mobileMotionCues } from "./mobile-timeline.mjs";
 import { createBrowserFrame } from "../interface-films/browser-frame.jsx";
 
 // The actual AgentsBoard DOM supplies every surface, icon, label and control.
 // Film-only visibility, framing and reversible transforms provide the motion.
-const width = 1180,
-	height = 772,
+const mobile = window.agentFilmFormat === "reel";
+const width = mobile ? 390 : 1180,
+	height = mobile ? 740 : 772,
 	density = 3;
+const activeMotionCues = mobile ? mobileMotionCues : motionCues;
+const agentFilmEvents = agentFilmEventsFor({ mobile });
 const clamp = (v) => Math.max(0, Math.min(1, v));
 const mix = (a, b, p) => a + (b - a) * p;
 const ease = (v) => {
@@ -35,6 +39,7 @@ const browserFrame = createBrowserFrame({
 	width,
 	height,
 	density,
+	mobile,
 });
 let generation = 0,
 	lastTime = 0,
@@ -86,7 +91,8 @@ function applyCue(cue, time) {
 	}
 }
 function phase(name, time) {
-	for (const cue of motionCues) if (cue.phase === name) applyCue(cue, time);
+	for (const cue of activeMotionCues)
+		if (cue.phase === name) applyCue(cue, time);
 }
 function interpolate(a, b, time, start, end) {
 	const p = ease((time - start) / (end - start));
@@ -95,6 +101,23 @@ function interpolate(a, b, time, start, end) {
 	);
 }
 function cameraPose(time) {
+	if (mobile) {
+		const wide = {
+				x: width / 2,
+				y: height / 2,
+				scale: 1.95,
+				screenX: 540,
+				screenY: 1000,
+			},
+			detail = { ...wide, scale: 2.02 },
+			ending = { ...wide, scale: 1.85, screenY: 1080 };
+		if (time < 14.65) return interpolate(wide, detail, time, 8.7, 9.5);
+		if (time < 16) return interpolate(detail, wide, time, 14.65, 15.1);
+		if (time < 22.15) return interpolate(wide, detail, time, 16, 16.8);
+		if (time < 23) return interpolate(detail, wide, time, 22.15, 22.7);
+		if (time < 33) return interpolate(wide, detail, time, 23, 24);
+		return interpolate(detail, ending, time, 33, 35.5);
+	}
 	const full = { cropLeft: 0, cropTop: 0, cropRight: 0, cropBottom: 0 },
 		panel = { cropLeft: 280, cropTop: 148, cropRight: 0, cropBottom: 30 };
 	const browser = window.agentFilmCamera === "browser",
@@ -163,7 +186,9 @@ function intro(time, inventory) {
 		birth = spring(time - 0.15);
 	// Build one task at reading size, then dock it into its original queue slot.
 	modify(hero, {
-		transform: `translate(${450.5 * (1 - dock)}px,${-25 * (1 - dock)}px) rotate(${(1 - birth) * -3}deg) scale(${mix(2.55, 1, dock) * mix(0.72, 1, birth)})`,
+		transform: mobile
+			? `translateY(${90 * (1 - dock)}px) rotate(${(1 - birth) * -3}deg) scale(${Math.min(1, mix(0.96, 1, dock) * mix(0.85, 1, birth))})`
+			: `translate(${450.5 * (1 - dock)}px,${-25 * (1 - dock)}px) rotate(${(1 - birth) * -3}deg) scale(${mix(2.55, 1, dock) * mix(0.72, 1, birth)})`,
 		transformOrigin: "50% 50%",
 	});
 }
@@ -219,6 +244,8 @@ function reactions(time, start, mode) {
 		});
 }
 function stateMotion(time, inventory) {
+	if (mobile && time >= mobileDetailOpenTime && time < 11.5)
+		phase("mobile-detail", time);
 	if (time >= at.output && time < 11.7) phase("output", time);
 	if (time >= at.approve && time < 15) {
 		phase("approved", time);
@@ -320,7 +347,7 @@ async function step(frame) {
 }
 async function initialise() {
 	await remount();
-	controller = createAgentController(host, { remount });
+	controller = createAgentController(host, { remount, mobile });
 	await document.fonts.ready;
 	await step(0);
 	window[window.agentFilmTarget ?? "film"] = {
@@ -343,7 +370,9 @@ async function initialise() {
 				"Textarea",
 				"ToggleGroup",
 			],
-			individualMotionLayers: motionCues.length,
+			individualMotionLayers: activeMotionCues.length,
+			responsiveLayout: mobile ? "mobile" : "desktop",
+			layoutViewport: { width, height },
 			cameraSubject:
 				window.agentFilmCamera === "browser" ? "browser" : "content",
 			format: window.agentFilmFormat === "reel" ? "reel" : "landscape",

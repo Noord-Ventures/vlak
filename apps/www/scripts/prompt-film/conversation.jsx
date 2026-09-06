@@ -5,6 +5,7 @@ import {
 	CardBody,
 	Icon,
 	Input,
+	InputGroup,
 	Spinner,
 } from "@noorddev/vlak-react";
 
@@ -71,57 +72,67 @@ export function Conversation({ onReady, onSubmit }) {
 					onSubmit?.(draft);
 				}}
 			>
-				<Input
-					ref={promptField}
-					plain
-					aria-label="Message"
-					value={draft}
-					readOnly={submitted}
-					onChange={(event) => {
-						if (!submitted) setDraft(event.target.value);
-					}}
-					onKeyDown={(event) => {
-						if (
-							!submitted &&
-							event.key === "Enter" &&
-							!event.shiftKey &&
-							!event.nativeEvent.isComposing
-						) {
-							event.preventDefault();
-							event.currentTarget.form.requestSubmit();
-						}
-					}}
-					placeholder=""
+				<InputGroup
 					style={
 						submitted
 							? {
 									backgroundColor: "var(--text)",
-									color: "var(--bg)",
 									borderColor: "var(--text)",
-									caretColor: "transparent",
 								}
 							: undefined
 					}
-				/>
-				<div style={{ position: "relative", height: 44 }}>
+				>
+					<Input
+						ref={promptField}
+						plain
+						aria-label="Message"
+						value={draft}
+						readOnly={submitted}
+						onChange={(event) => {
+							if (!submitted) setDraft(event.target.value);
+						}}
+						onKeyDown={(event) => {
+							if (
+								!submitted &&
+								event.key === "Enter" &&
+								!event.shiftKey &&
+								!event.nativeEvent.isComposing
+							) {
+								event.preventDefault();
+								event.currentTarget.form.requestSubmit();
+							}
+						}}
+						placeholder=""
+						style={
+							submitted
+								? {
+										backgroundColor: "var(--text)",
+										color: "var(--bg)",
+										borderColor: "var(--text)",
+										caretColor: "transparent",
+									}
+								: undefined
+						}
+					/>
 					<Button
 						type="submit"
+						grouped
+						aria-label="Send"
 						disabled={submitted || !draft.trim()}
 						tabIndex={submitted ? -1 : undefined}
 						aria-hidden={submitted || undefined}
 						style={{
-							position: "absolute",
-							right: 0,
-							top: 0,
-							width: "auto",
-							paddingInline: 14,
-							opacity: submitted ? 0 : 1,
+							alignSelf: "center",
+							flex: "0 0 44px",
+							width: 44,
+							paddingInline: 0,
 							visibility: submitted ? "hidden" : "visible",
 						}}
 					>
-						<Icon name="send" />
-						Send
+						<Icon name="arrow-up" />
 					</Button>
+				</InputGroup>
+				<div style={{ position: "relative", height: 44 }}>
 					<div
 						aria-live="polite"
 						aria-atomic="true"

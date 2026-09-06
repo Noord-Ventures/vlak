@@ -99,13 +99,78 @@ export const agentFilmEvents = Object.freeze(
 		.map(Object.freeze),
 );
 
+/** Narrow layouts navigate through the board's own queue and detail screens. */
+export const agentMobileFilmEvents = Object.freeze(
+	[
+		...agentFilmEvents,
+		{
+			id: "mobile-filter-review",
+			mobile: true,
+			kind: "click",
+			time: 8.35,
+			label: "Review",
+			selector: ".am-mobile-nav button",
+		},
+		{
+			id: "mobile-select-task-013",
+			mobile: true,
+			kind: "click",
+			time: 9.05,
+			label: "Audit keyboard navigation",
+			selector: ".am-task",
+			taskId: "013",
+		},
+		{
+			id: "mobile-back-after-review",
+			mobile: true,
+			kind: "click",
+			time: 14.65,
+			label: "Tasks",
+			selector: ".am-back",
+		},
+		{
+			id: "mobile-filter-active",
+			mobile: true,
+			kind: "click",
+			time: 15.15,
+			label: "Active",
+			selector: ".am-mobile-nav button",
+		},
+		{
+			id: "mobile-back-before-compose",
+			mobile: true,
+			kind: "click",
+			time: 22.15,
+			label: "Tasks",
+			selector: ".am-back",
+		},
+		{
+			id: "mobile-filter-all",
+			mobile: true,
+			kind: "click",
+			time: 22.55,
+			label: "All tasks",
+			selector: ".am-mobile-nav button",
+		},
+	]
+		.sort((a, b) => a.time - b.time)
+		.map(Object.freeze),
+);
+
+export function agentFilmEventsFor({ mobile = false } = {}) {
+	return mobile ? agentMobileFilmEvents : agentFilmEvents;
+}
+
 /**
  * Drive an original AgentsBoard through its real controls. `rootElement` is a
  * stable host containing .am; `remount` must restore the original React fixture
  * in that same host and resolve after its DOM commit. It is called on rewinds.
  * Calls are serialized. No animation state, component paint or text is replaced.
  */
-export function createAgentController(rootElement, { remount } = {}) {
+export function createAgentController(
+	rootElement,
+	{ remount, mobile = false } = {},
+) {
 	if (!rootElement?.querySelector || typeof remount !== "function") {
 		throw new TypeError(
 			"An AgentsBoard host and async remount callback are required",
@@ -113,6 +178,7 @@ export function createAgentController(rootElement, { remount } = {}) {
 	}
 	const document = rootElement.ownerDocument;
 	const window = document.defaultView;
+	const events = agentFilmEventsFor({ mobile });
 	let time = -1;
 	let eventIndex = 0;
 	let previousBoard = null;
@@ -131,6 +197,7 @@ export function createAgentController(rootElement, { remount } = {}) {
 	function matchingButton(current, event) {
 		return [...current.querySelectorAll(event.selector)].find((button) => {
 			if (button.tagName !== "BUTTON") return false;
+			if (mobile && button.getClientRects().length === 0) return false;
 			if (event.taskId)
 				return (
 					normalText(button.querySelector(".am-task-number")?.textContent) ===
@@ -146,10 +213,12 @@ export function createAgentController(rootElement, { remount } = {}) {
 	}
 
 	function matchingField(current, event) {
-		return [...current.querySelectorAll(event.selector)].find((input) =>
-			[...(input.labels ?? [])].some(
-				(label) => normalText(label.textContent) === event.label,
-			),
+		return [...current.querySelectorAll(event.selector)].find(
+			(input) =>
+				(!mobile || input.getClientRects().length > 0) &&
+				[...(input.labels ?? [])].some(
+					(label) => normalText(label.textContent) === event.label,
+				),
 		);
 	}
 
@@ -214,8 +283,26 @@ export function createAgentController(rootElement, { remount } = {}) {
 		return {
 			time,
 			completedEvents: eventIndex,
+			mobile,
+			mobileScreen: mobile ? current.dataset.mobileScreen : null,
+			queueFilter: mobile
+				? normalText(
+						current
+							.querySelector('.am-mobile-nav button[aria-pressed="true"]')
+							?.getAttribute("aria-label") ||
+							current.querySelector(
+								'.am-mobile-nav button[aria-pressed="true"]',
+							)?.textContent,
+					)
+				: null,
 			mode: composing ? "compose" : "detail",
-			selectedId: tasks.find((task) => task.selected)?.id ?? null,
+			selectedId:
+				tasks.find((task) => task.selected)?.id ??
+				(mobile && !composing && current.dataset.mobileScreen === "detail"
+					? normalText(
+							current.querySelector(".am-detail-id")?.textContent,
+						).replace(/^Task\s+/, "") || null
+					: null),
 			detailTitle: normalText(
 				current.querySelector(".am-detail-head h2, .am-compose-heading h2")
 					?.textContent,
@@ -280,10 +367,10 @@ export function createAgentController(rootElement, { remount } = {}) {
 			}
 			previousBoard = board();
 			while (
-				eventIndex < agentFilmEvents.length &&
-				agentFilmEvents[eventIndex].time <= target + 1e-9
+				eventIndex < events.length &&
+				events[eventIndex].time <= target + 1e-9
 			) {
-				execute(agentFilmEvents[eventIndex]);
+				execute(events[eventIndex]);
 				eventIndex++;
 				changed = true;
 			}
@@ -302,7 +389,7 @@ export function createAgentController(rootElement, { remount } = {}) {
 	}
 
 	return {
-		events: agentFilmEvents,
+		events,
 		inspect,
 		step(nextTime) {
 			const operation = pending.then(

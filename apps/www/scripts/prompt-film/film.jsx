@@ -3,7 +3,7 @@ import { flushSync } from "react-dom";
 import { CardTitle, Icon } from "@noorddev/vlak-react";
 import "../agent-film/film.jsx";
 import { Conversation } from "./conversation.jsx";
-import { agentFilmEvents } from "../agent-film/controller.mjs";
+import { agentFilmEventsFor } from "../agent-film/controller.mjs";
 import {
 	beats,
 	duration,
@@ -28,6 +28,7 @@ const spring = (value) => {
 const raf = () => new Promise((resolve) => requestAnimationFrame(resolve));
 const world = document.getElementById("world");
 const reel = window.agentFilmFormat === "reel";
+const agentFilmEvents = agentFilmEventsFor({ mobile: reel });
 const frameWidth = reel ? 1080 : 1920;
 function layer(name) {
 	const element = document.createElement("div");
@@ -106,6 +107,7 @@ function point(element) {
 }
 function pointer(t) {
 	let action, target, start, end;
+	const approach = reel ? 0.25 : 0.62;
 	if (t >= beats.send - 0.75 && t < beats.send) {
 		target = chat.querySelector('button[type="submit"]');
 		start = beats.send - 0.75;
@@ -115,11 +117,11 @@ function pointer(t) {
 			.filter((item) => item.kind === "click")
 			.find((item) => {
 				const at = sourceToStory(item.time);
-				return t >= at - 0.62 && t < at + 0.12;
+				return t >= at - approach && t < at + (reel ? 0 : 0.12);
 			});
 		if (action) {
 			target = matchAction(action);
-			start = sourceToStory(action.time) - 0.62;
+			start = sourceToStory(action.time) - approach;
 			end = sourceToStory(action.time);
 		}
 	}
@@ -305,9 +307,12 @@ window.film = { ready: false, error: null };
 					"Prompt → thinking → reply → browser assembly → AI walkthrough → payoff",
 				browserFrame: true,
 				format: reel ? "reel" : "landscape",
+				responsiveLayout: reel ? "mobile" : "desktop",
 				wholeBrowserCamera: true,
 				visiblePromptLabels: false,
 				openingPromptLines: 1,
+				promptSubmitPlacement: "inside",
+				promptSubmitIcon: "arrow-up",
 				walkthroughCaptions: false,
 				uniformPayoffTypography: true,
 				themeChanges,

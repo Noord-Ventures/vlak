@@ -9,13 +9,14 @@ import {
 	InputGroup,
 } from "@noorddev/vlak-react";
 
-const toolbarHeight = 64;
+const desktopToolbarHeight = 64;
+const mobileToolbarHeight = 56;
 const clamp = (value) => Math.max(0, Math.min(1, value));
 const ease = (value) => {
 	const p = clamp(value);
 	return p * p * p * (p * (p * 6 - 15) + 10);
 };
-function BrowserChrome({ slug, title }) {
+function BrowserChrome({ slug, title, mobile = false }) {
 	const control = (icon, label) => (
 		<Button
 			variant="ghost"
@@ -26,10 +27,37 @@ function BrowserChrome({ slug, title }) {
 			<Icon name={icon} size={16} />
 		</Button>
 	);
+	if (mobile)
+		return (
+			<div
+				style={{
+					height: mobileToolbarHeight,
+					display: "grid",
+					gridTemplateColumns: "minmax(0, 1fr) 44px",
+					alignItems: "center",
+					gap: 8,
+					padding: "6px 8px",
+					boxSizing: "border-box",
+				}}
+			>
+				<InputGroup style={{ width: "100%", minWidth: 0 }}>
+					<InputAddon>
+						<Icon name="lock" size={14} />
+					</InputAddon>
+					<Input
+						aria-label={`${title} address`}
+						readOnly
+						tabIndex={-1}
+						value={`vlak.dev/interfaces/${slug}`}
+					/>
+				</InputGroup>
+				{control("refresh", "Reload")}
+			</div>
+		);
 	return (
 		<div
 			style={{
-				height: toolbarHeight,
+				height: desktopToolbarHeight,
 				display: "grid",
 				gridTemplateColumns: "132px minmax(0, 1fr) 132px",
 				alignItems: "center",
@@ -76,11 +104,14 @@ export function createBrowserFrame({
 	width,
 	height,
 	density = 3,
+	mobile = false,
 }) {
+	const toolbarHeight = mobile ? mobileToolbarHeight : desktopToolbarHeight;
 	const shell = document.createElement("div"),
 		chrome = document.createElement("div"),
 		viewport = document.createElement("div");
 	shell.dataset.filmBrowser = slug;
+	shell.dataset.browserFormat = mobile ? "mobile" : "desktop";
 	shell.style.cssText =
 		"position:absolute;transform-origin:0 0;border:1px solid var(--divider);background:var(--bg);box-sizing:content-box;";
 	chrome.dataset.browserChrome = "";
@@ -93,7 +124,9 @@ export function createBrowserFrame({
 	shell.append(chrome, viewport);
 	viewport.append(camera);
 	const root = createRoot(chrome);
-	flushSync(() => root.render(<BrowserChrome slug={slug} title={title} />));
+	flushSync(() =>
+		root.render(<BrowserChrome slug={slug} title={title} mobile={mobile} />),
+	);
 	let last = null;
 	return {
 		layout({
@@ -129,17 +162,20 @@ export function createBrowserFrame({
 		inspect() {
 			return {
 				style: "Vlak browser",
+				format: mobile ? "mobile" : "desktop",
 				address: `vlak.dev/interfaces/${slug}`,
 				title,
 				toolbarHeight,
-				components: [
-					"ButtonGroup",
-					"Button",
-					"Icon",
-					"InputGroup",
-					"InputAddon",
-					"Input",
-				],
+				components: mobile
+					? ["Button", "Icon", "InputGroup", "InputAddon", "Input"]
+					: [
+							"ButtonGroup",
+							"Button",
+							"Icon",
+							"InputGroup",
+							"InputAddon",
+							"Input",
+						],
 				bounds: last,
 				board: { width: host.offsetWidth, height: host.offsetHeight },
 			};

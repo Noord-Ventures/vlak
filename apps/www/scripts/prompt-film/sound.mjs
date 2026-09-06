@@ -7,6 +7,9 @@ import {
 	soundSource as agentSoundSource,
 } from "../agent-film/sound.mjs";
 import { writeCuelumeScore } from "../agent-film/cuelume-offline.mjs";
+import { agentMobileFilmEvents } from "../agent-film/controller.mjs";
+import { mobileMotionCues } from "../agent-film/mobile-timeline.mjs";
+import { firstContact } from "../agent-film/timeline.mjs";
 import {
 	beats,
 	duration as filmDuration,
@@ -46,14 +49,43 @@ export const soundSource = Object.freeze({
 	),
 });
 
-const interfaceCues = agentCues.map((event) => ({
+const retime = (event) => ({
 	...event,
 	time: round(sourceToStory(event.time)),
 	sourceTime: event.time,
 	...(event.start === undefined
 		? {}
 		: { start: round(sourceToStory(event.start)), sourceStart: event.start }),
-}));
+});
+const interfaceCues = agentCues.map(retime);
+const mobileInterfaceCues = [
+	...agentCues.filter((event) => event.kind !== "landing"),
+	...mobileMotionCues
+		.filter((motion) => motion.cue && motion.gain > 0)
+		.map((motion) =>
+			cue(motion.start + firstContact, motion.id, motion.cue, motion.gain, {
+				kind: "landing",
+				phase: motion.phase,
+				selector: motion.selector,
+				index: motion.index,
+				start: motion.start,
+			}),
+		),
+	...agentMobileFilmEvents
+		.filter((event) => event.mobile)
+		.map((event) =>
+			cue(
+				event.time,
+				event.label,
+				event.id.includes("filter") ? "toggle" : "page",
+				0.3,
+				{
+					kind: "action",
+					id: event.id,
+				},
+			),
+		),
+].map(retime);
 
 // Match film.jsx's actual rounded character count at each 30fps frame, then
 // sparsely choose from those insertions. Every audible tick is a visible edit.
@@ -127,6 +159,15 @@ export const cuelumeCues = [
 	...interfaceCues,
 	...themeCues,
 ].sort((a, b) => a.time - b.time);
+export const mobileCuelumeCues = [
+	...typingCues,
+	...narrativeCues,
+	...mobileInterfaceCues,
+	...themeCues,
+].sort((a, b) => a.time - b.time);
+export const mobileLandingCues = mobileInterfaceCues.filter(
+	(event) => event.kind === "landing",
+);
 
 // Editorial metadata only; transitions do not introduce independent effects.
 export const scoreCuts = [
@@ -146,8 +187,17 @@ export const scoreCuts = [
 ].sort((a, b) => a - b);
 
 /** Unmodified official Cuelume recipes, 48kHz stereo PCM, without music. */
-export async function writeScore(file, duration = filmDuration) {
-	await writeCuelumeScore(file, cuelumeCues, duration, { bedGain: 0 });
+export async function writeScore(
+	file,
+	duration = filmDuration,
+	{ mobile = false } = {},
+) {
+	await writeCuelumeScore(
+		file,
+		mobile ? mobileCuelumeCues : cuelumeCues,
+		duration,
+		{ bedGain: 0 },
+	);
 	return file;
 }
 

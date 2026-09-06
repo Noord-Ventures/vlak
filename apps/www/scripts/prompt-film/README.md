@@ -2,9 +2,10 @@
 
 A 40-second, 1080p film using Vlak's native Input, Button, Spinner, Card,
 Callout, icons, and the original AgentsBoard. The opening is an unbranded native
-form containing only the prompt field and send button. On submission, that same
+form containing only a single-line prompt field and an up-arrow Send button
+inside its trailing edge. On submission, that same
 input becomes a solid, read-only message bubble, retaining its value, position,
-size and typography. Thinking and the reply share the former Send row.
+size and typography. Thinking and the reply appear below the submitted bubble.
 The browser frame uses
 the shared Vlak Button, Input, and InputGroup composition. Film motion changes geometry and
 timing; the components retain their original paint and native state transitions.
@@ -38,9 +39,13 @@ changes the destination, `VLAK_FFMPEG` selects the encoder, and `VLAK_MUSIC`
 selects the existing music WAV. The renderer retains a silent master, the
 effects stem, review frames, a cover, and a JSON report beside the final MP4.
 
-The Reel master is composed at 1080×1920 in 9:16. The prompt, attached browser
-camera and closing type have independent portrait positions and
-sizes. It is not a cropped or letterboxed copy of the landscape export.
+The Reel master is composed at 1080×1920 in 9:16. Its original AgentsBoard renders
+at a 390×740 layout viewport, activating the existing compact styles and native
+task navigation. The queue, review output, running task, and composer occupy
+separate mobile screens. Real taps on Review, Tasks, and Active move between
+them. A compact browser bar holds the address and Reload button, and the whole
+mobile browser moves through camera changes. The prompt and closing type have
+independent portrait positions and sizes.
 
 ## Sound
 
@@ -57,8 +62,9 @@ sets music to 0.4× (−8 dB) and effects to 3× (+9.5 dB), making interface con
 clear above the drone. These fixed gains and a peak limiter preserve the music's
 crescendo. A native
 Cuelume release marks the prompt-to-bubble change. Four toggle/page cues follow
-the light/dark changes, with measured levels audible under the drone. All 195
-effects use the verified, unmodified Cuelume recipes.
+the light/dark changes, with measured levels audible under the drone. The mobile
+score follows its own visible assembly parts and six additional navigation taps.
+All effects use the verified, unmodified Cuelume recipes.
 See `../agent-film/vendor/cuelume/provenance.json` for the MIT source provenance.
 
 Full renders exercise the original interface assertions and submit the native

@@ -17,6 +17,7 @@ import {
 	writeScore,
 	scoreCuts,
 	landingCues,
+	mobileLandingCues,
 	soundSource,
 } from "./prompt-film/sound.mjs";
 
@@ -114,7 +115,7 @@ html::before{display:none}html,body{margin:0;padding:0;width:100%;height:100%;ov
 #world,#world *{transition:none}
 #world{position:absolute;left:0;top:0;width:${reel ? 1080 : 1920}px;height:${reel ? 1920 : 1080}px;transform-origin:0 0}
 #agent-camera{position:absolute;left:0;top:0;transform-origin:0 0}
-#agent-interface{width:1180px;height:772px;zoom:3;container-type:inline-size;transform-origin:0 0}
+#agent-interface{width:${reel ? 390 : 1180}px;height:${reel ? 740 : 772}px;zoom:3;container-type:inline-size;transform-origin:0 0}
 #film-type{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;color:var(--text)}
 #film-name{position:absolute;left:72px;top:64px;font-size:22px;letter-spacing:-.025em;line-height:1.2}
 #film-wordmark{position:absolute;left:72px;top:55px;font-size:116px;line-height:1;letter-spacing:-.055em}
@@ -316,7 +317,7 @@ try {
 	if (errors.length) throw new Error(errors.join("\n"));
 	if (sound) {
 		try {
-			await writeScore(scoreFile, duration);
+			await writeScore(scoreFile, duration, { mobile: reel });
 			await new Promise((resolve, reject) => {
 				const muxer = spawn(
 					ffmpeg,
@@ -415,7 +416,7 @@ try {
 					effectsGain: 3,
 					limiterPeak: 0.84,
 					cuts: scoreCuts,
-					landingCues,
+					landingCues: reel ? mobileLandingCues : landingCues,
 				}
 			: null,
 		source: "apps/www/scripts/render-prompt-film.mjs",
