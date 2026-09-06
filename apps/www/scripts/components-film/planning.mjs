@@ -21,34 +21,34 @@ export function createPlanning(THREE, kit) {
     const card=new THREE.Group();
     const paper=box(3.65,2.1,.12,m.paper,.055);
     const rim=frame(3.65,2.1,.025,m.gray,.055,.018);
-    const titleMesh=label(card,title,.30,-1.48,.62,.15,m.ink,'left');
-    const timeMesh=label(card,time,.245,-1.48,.04,.15,m.gray,'left');
-    const rescheduledTime=i===2?label(card,'11:30–12:30',.245,-1.48,.04,.15,m.gray,'left'):null;
-    const action=tile(3.12,.48,'Reschedule',{fontSize:.22,depth:.08,radius:.04});action.position.set(0,-.65,.15);
-    const status=tile(2.02,.48,['Planned','In progress','Complete'][i%3],{fontSize:.22,depth:.08,radius:.04});status.position.set(-.55,-.65,.15);card.add(status);
+    const titleMesh=label(card,title,.30,-1.48,.62,.023,m.ink,'left');
+    const timeMesh=label(card,time,.245,-1.48,.04,.023,m.gray,'left');
+    const rescheduledTime=i===2?label(card,'11:30–12:30',.245,-1.48,.04,.023,m.gray,'left'):null;
+    const action=tile(3.12,.48,'Reschedule',{fontSize:.22,depth:.08,radius:.04});action.position.set(0,-.65,.023);
+    const status=tile(2.02,.48,['Planned','In progress','Complete'][i%3],{fontSize:.22,depth:.08,radius:.04});status.position.set(-.55,-.65,.023);card.add(status);
     const originalStatus=status.children[2];
-    const movedStatus=i<2?label(status,i===0?'In progress':'Planned',.22,0,0,.064,m.ink):null;
-    const up=tile(.46,.48,'',{depth:.08,radius:.04});up.position.set(.98,-.65,.15);
-    const down=tile(.46,.48,'',{depth:.08,radius:.04});down.position.set(1.55,-.65,.15);
+    const movedStatus=i<2?label(status,i===0?'In progress':'Planned',.22,0,0,.023,m.ink):null;
+    const up=tile(.46,.48,'',{depth:.08,radius:.04});up.position.set(.98,-.65,.023);
+    const down=tile(.46,.48,'',{depth:.08,radius:.04});down.position.set(1.55,-.65,.023);
     [up,down].forEach((button,which)=>{
       const arrow=new THREE.Group();
       const stem=box(.02,.23,.02,m.ink,0);
       const left=box(.02,.13,.02,m.ink,0);left.position.set(-.045,.07,0);left.rotation.z=-.7;
       const right=box(.02,.13,.02,m.ink,0);right.position.set(.045,.07,0);right.rotation.z=.7;
-      arrow.add(stem,left,right);arrow.position.z=.07;arrow.rotation.z=which*Math.PI;button.add(arrow);
+      arrow.add(stem,left,right);arrow.position.z=.023;arrow.rotation.z=which*Math.PI;button.add(arrow);
     });
     const grip=new THREE.Group();
     for(let dot=0;dot<6;dot++){
       const bit=box(.031,.031,.022,m.ink,.015);bit.position.set((dot%2)*.09,Math.floor(dot/2)*.09,0);grip.add(bit);
-    }grip.position.set(1.35,.47,.19);
-    const strip=box(3.3,.027,.023,m.gray,.005);strip.position.set(0,-.27,.16);
+    }grip.position.set(1.35,.47,.023);
+    const strip=box(3.3,.027,.023,m.gray,.005);strip.position.set(0,-.27,.023);
     card.add(paper,rim,action,status,up,down,grip,strip);
     group.add(card);
     return {card,paper,rim,titleMesh,timeMesh,rescheduledTime,action,status,originalStatus,movedStatus,up,down,grip,strip,day,row,index:i};
   });
   const kanban=['Planned','In progress','Complete'].map((name,i)=>{
     const column=new THREE.Group();
-    const border=frame(4.78,7.8,.025,m.gray,.04,.016);
+    const border=frame(4.78,8.1,.025,m.gray,.04,.016);border.position.y=-.15;
     const heading=label(column,name,.37,-2.1,3.45,.05,m.ink,'left');
     label(column,'3',.31,2.05,3.45,.05,m.gray);
     column.add(border);column.position.set((i-1)*5.2,.0,0);group.add(column);return {column,border,heading};
@@ -85,18 +85,18 @@ export function createPlanning(THREE, kit) {
         .35+(1-p)*4+Math.sin(morph*Math.PI)*(1.1+(i%3)*.3)+(i===0?Math.sin(transfer*Math.PI)*2.8:i===1?Math.sin(returnMove*Math.PI)*1.0:0));
       card.rotation.set((1-p)*.26+Math.sin(morph*Math.PI)*.12,Math.sin(morph*Math.PI)*(i%2?.23:-.23),pulse(t,4.58+i*.03)*.015+(i===0?Math.sin(transfer*Math.PI)*-.07:0));
       card.scale.setScalar(mix(.60,1,morph));
-      paper.position.z=0;rim.position.z=.08+layer*.35;
-      titleMesh.position.z=.15+layer*.7;
-      timeMesh.position.z=.15+layer*.95;
+      paper.position.z=0;rim.position.z=.016+layer*.35;
+      titleMesh.position.z=.023+layer*.7;
+      timeMesh.position.z=.023+layer*.95;
       timeMesh.visible=morph<.95&&!(i===2&&t>2.65);
       if(rescheduledTime){rescheduledTime.visible=morph<.95&&t>2.65;rescheduledTime.position.z=timeMesh.position.z;}
       action.visible=morph<.6;
-      action.position.z=.15+layer*1.1-Math.max(0,pulse(t,1.9))*(i===2?.12:0);
-      status.visible=up.visible=down.visible=grip.visible=morph>.55;
+      action.position.z=.023+layer*1.1+Math.max(0,pulse(t,1.9))*(i===2?.12:0);
+      status.visible=up.visible=down.visible=grip.visible=morph>=.6;
       if(movedStatus){const changed=t>5.55+i*.1;originalStatus.visible=!changed;movedStatus.visible=changed;}
       strip.visible=morph>.8;
-      [status,up,down].forEach((control,j)=>{control.position.z=.15+Math.max(0,1-spring(Math.max(0,t-4.12-i*.025-j*.035)))*.75;});
-      grip.position.z=.19+(i===0?Math.sin(transfer*Math.PI)*.12:0);
+      [status,up,down].forEach((control,j)=>{control.position.z=.023+Math.max(0,1-spring(Math.max(0,t-4.12-i*.025-j*.035)))*.75;});
+      grip.position.z=.023+(i===0?Math.sin(transfer*Math.PI)*.12:0);
     });
     kanban.forEach(({column,heading},i)=>{
       column.visible=morph>0;

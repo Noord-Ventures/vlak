@@ -1,10 +1,10 @@
 /**
- * A six-second mechanical reading of Waveform, MediaScrubber and PlaybackControls.
- * Every bar, rail, tick, keycap and symbol is geometry. update() is a pure timeline
+ * Six seconds of paper-thin Waveform, MediaScrubber and PlaybackControls surfaces.
+ * Every bar, rail, tick, control and symbol is geometry. update() is a pure timeline
  * evaluation: arbitrary frames can be revisited without accumulating simulation state.
  * Bounds are approximately 16.2 × 8.3 in XY, with the camera-facing surface at +Z.
  */
-export function createMechanisms(THREE, { box, text, materials }) {
+export function createMechanisms(THREE, { box, frame, text, materials }) {
   const group = new THREE.Group();
   group.name = "Waveform, scrubber and playback mechanisms";
   const clamp = (value) => Math.max(0, Math.min(1, value));
@@ -20,16 +20,15 @@ export function createMechanisms(THREE, { box, text, materials }) {
   const ink = materials.ink;
   const paper = materials.paper;
   const gray = materials.gray;
-  const metal = materials.metal;
   const part = (parent, width, height, depth, material, x = 0, y = 0, z = 0, radius = 0.015) => {
-    const mesh = box(width, height, depth, material, radius);
+    const mesh = box(width, height, Math.min(depth, 0.01), material, radius);
     mesh.position.set(x, y, z);
     mesh.castShadow = mesh.receiveShadow = true;
     parent.add(mesh);
     return mesh;
   };
   const type = (value, size, x, y, z) => {
-    const mesh = text(value, size, ink, 0.018);
+    const mesh = text(value, size, ink, 0.001);
     mesh.position.set(x + (mesh.userData.width ?? 0) / 2, y, z);
     group.add(mesh);
     return mesh;
@@ -37,49 +36,46 @@ export function createMechanisms(THREE, { box, text, materials }) {
 
   // Each of the 128 rounded bars has its own geometry and unfolding phase.
   const bars = Array.from({ length: 128 }, (_, index) => {
-    const mesh = part(group, 0.062, 1, 0.145, index < 18 ? ink : gray, 0, 0, 0, 0.027);
+    const mesh = part(group, 0.062, 1, 0.008, index < 18 ? ink : gray, 0, 0, 0, 0.027);
     mesh.geometry = mesh.geometry.clone();
     mesh.name = `Amplitude ${String(index + 1).padStart(3, "0")}`;
     return mesh;
   });
-  const baseline = part(group, 15.55, 0.021, 0.035, gray, 0, 1.59, 0.085, 0.006);
-  const upperLabel = type("Waveform", 0.3, -7.72, 3.45, 0.12);
+  const baseline = part(group, 15.55, 0.021, 0.003, gray, 0, 1.59, 0.025, 0.006);
+  const upperLabel = type("Waveform", 0.3, -7.72, 3.45, 0.035);
 
-  // A genuine three-layer scrubber beam: lower chassis, inset track and moving fill.
+  // Only the UI track and active fill remain; no chassis or machined support.
   const railGroup = new THREE.Group();
   railGroup.position.y = -1.06;
   group.add(railGroup);
-  const railBack = part(railGroup, 15.66, 0.2, 0.105, metal, 0, 0, 0.095, 0.075);
-  const railTrack = part(railGroup, 15.42, 0.112, 0.085, gray, 0, 0, 0.183, 0.048);
-  const railFill = part(railGroup, 1, 0.065, 0.055, ink, -7.64, 0, 0.255, 0.025);
+  const railTrack = part(railGroup, 15.42, 0.075, 0.006, gray, 0, 0, 0.025, 0.032);
+  const railFill = part(railGroup, 1, 0.05, 0.004, ink, -7.64, 0, 0.033, 0.024);
   const ticks = Array.from({ length: 41 }, (_, index) => {
     const major = index % 5 === 0;
-    return part(group, major ? 0.021 : 0.014, major ? 0.19 : 0.09, 0.045, major ? ink : gray, -7.7 + index / 40 * 15.4, -1.46, 0.085, 0.005);
+    return part(group, major ? 0.021 : 0.014, major ? 0.19 : 0.09, 0.003, major ? ink : gray, -7.7 + index / 40 * 15.4, -1.46, 0.022, 0.005);
   });
-  type("0:00", 0.25, -7.74, -1.98, 0.11);
-  type("0:18", 0.25, 6.94, -1.98, 0.11);
+  type("0:00", 0.25, -7.74, -1.98, 0.035);
+  type("0:18", 0.25, 6.94, -1.98, 0.035);
 
   const knob = new THREE.Group();
   knob.position.y = -1.06;
   group.add(knob);
-  const collar = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.042, 10, 48), metal);
-  collar.position.z = 0.275;
-  knob.add(collar);
-  const knobFace = new THREE.Mesh(new THREE.CylinderGeometry(0.225, 0.225, 0.105, 48), paper);
-  knobFace.rotation.x = Math.PI / 2;
-  knobFace.position.z = 0.31;
+  const knobFace = new THREE.Mesh(new THREE.CircleGeometry(0.2, 48), paper);
+  knobFace.position.z = 0.043;
   knobFace.castShadow = knobFace.receiveShadow = true;
   knob.add(knobFace);
-  const knobStem = part(knob, 0.083, 0.46, 0.1, ink, 0, 0, 0.392, 0.033);
-  const gripLines = [-1, 0, 1].map((side) => part(knob, 0.021, 0.135, 0.016, gray, side * 0.104, 0, 0.373, 0.008));
+  const knobBorder = new THREE.Mesh(new THREE.RingGeometry(0.195, 0.212, 48), ink);
+  knobBorder.position.z = 0.044;
+  knob.add(knobBorder);
+  const knobStem = part(knob, 0.035, 0.24, 0.002, ink, 0, 0, 0.046, 0.014);
   const rippleTimes = [1.9, 3.16, 4.67, 5.21];
   const ripples = rippleTimes.map(() => {
     const material = ink.clone();
     material.transparent = true;
     material.opacity = 0;
     material.depthWrite = false;
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(0.295, 0.013, 8, 64), material);
-    ring.position.set(0, -1.06, 0.3);
+    const ring = new THREE.Mesh(new THREE.RingGeometry(0.273, 0.283, 64), material);
+    ring.position.set(0, -1.06, 0.047);
     group.add(ring);
     return ring;
   });
@@ -90,7 +86,7 @@ export function createMechanisms(THREE, { box, text, materials }) {
     shape.lineTo(0.225 * direction, 0);
     shape.lineTo(-0.155 * direction, 0.23);
     shape.closePath();
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.065, bevelEnabled: true, bevelSegments: 2, steps: 1, bevelSize: 0.007, bevelThickness: 0.007 });
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.002, bevelEnabled: false, steps: 1 });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(x, y, z);
     mesh.scale.setScalar(scale);
@@ -126,7 +122,7 @@ export function createMechanisms(THREE, { box, text, materials }) {
     const hole = new THREE.Path(inside.reverse());
     hole.closePath();
     shape.holes.push(hole);
-    const mesh = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 0.055, bevelEnabled: false, steps: 1 }), material);
+    const mesh = new THREE.Mesh(new THREE.ExtrudeGeometry(shape, { depth: 0.002, bevelEnabled: false, steps: 1 }), material);
     mesh.name = "Vlak outlined transport mark";
     parent.add(mesh);
     return mesh;
@@ -134,16 +130,16 @@ export function createMechanisms(THREE, { box, text, materials }) {
 
   function transportStem(parent, x, material) {
     // Open SVG strokes end at y=3.5 and y=12.5, without round caps.
-    const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.048, 9 * 0.048, 0.055), material);
-    mesh.position.set((x - 8) * 0.048, 0, 0.0275);
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.048, 9 * 0.048, 0.002), material);
+    mesh.position.set((x - 8) * 0.048, 0, 0.001);
     parent.add(mesh);
   }
 
   function repeat(parent, material) {
-    const arc = new THREE.Mesh(new THREE.TorusGeometry(0.245, 0.024, 8, 40, Math.PI * 1.67), material);
+    const arc = new THREE.Mesh(new THREE.RingGeometry(0.221, 0.269, 48, 1, 0, Math.PI * 1.67), material);
     arc.rotation.z = 0.3;
     parent.add(arc);
-    const arrow = triangle(parent, 1, material, 0.225, 0.071, -0.015, 0.32);
+    const arrow = triangle(parent, 1, material, 0.225, 0.071, 0.001, 0.32);
     arrow.rotation.z = -Math.PI / 2;
   }
 
@@ -155,24 +151,40 @@ export function createMechanisms(THREE, { box, text, materials }) {
         new THREE.Vector3(0.09, -direction * 0.135, 0),
         new THREE.Vector3(0.26, -direction * 0.16, 0),
       ]);
-      parent.add(new THREE.Mesh(new THREE.TubeGeometry(curve, 20, 0.02, 8, false), material));
-      triangle(parent, 1, material, 0.25, -direction * 0.16, -0.019, 0.28);
+      const vertices = [];
+      const indices = [];
+      for (let step = 0; step <= 24; step++) {
+        const point = curve.getPoint(step / 24);
+        const tangent = curve.getTangent(step / 24);
+        for (const side of [-1, 1]) vertices.push(point.x - tangent.y * 0.02 * side, point.y + tangent.x * 0.02 * side, 0);
+        if (step < 24) {
+          const index = step * 2;
+          indices.push(index, index + 2, index + 1, index + 1, index + 2, index + 3);
+        }
+      }
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+      geometry.setIndex(indices);
+      geometry.computeVertexNormals();
+      parent.add(new THREE.Mesh(geometry, material));
+      triangle(parent, 1, material, 0.25, -direction * 0.16, 0.001, 0.28);
     }
   }
 
-  // Keycaps are separately suspended over exposed metallic feet and ink gaskets.
+  // One thin UI surface per control. Its ink glyph floats in, then settles flush.
   const buttons = ["shuffle", "previous", "play", "next", "repeat"].map((name, index) => {
     const button = new THREE.Group();
-    button.name = `${name} key`;
+    button.name = `${name} control`;
     button.position.set((index - 2) * 1.8, -3.24, 0);
     group.add(button);
-    const shoe = part(button, 1.25, 1.25, 0.105, metal, 0, 0, 0.105, 0.115);
-    const gasket = part(button, 1.19, 1.19, 0.075, ink, 0, 0, 0.22, 0.09);
     const capGroup = new THREE.Group();
     button.add(capGroup);
-    const cap = part(capGroup, 1.155, 1.155, 0.18, index === 2 ? ink : paper, 0, 0, 0, 0.085);
+    const cap = part(capGroup, 1.155, 1.155, 0.01, index === 2 ? ink : paper, 0, 0, 0, 0.085);
+    const outline = frame(1.155, 1.155, 0.001, index === 2 ? ink : gray, 0.085, 0.018);
+    outline.position.z = 0.0065;
+    capGroup.add(outline);
     const symbol = new THREE.Group();
-    symbol.position.z = 0.135;
+    symbol.position.z = 0.009;
     capGroup.add(symbol);
     let play;
     let pause;
@@ -190,11 +202,11 @@ export function createMechanisms(THREE, { box, text, materials }) {
       transportStem(symbol, previous ? 3.5 : 12.5, ink);
     } else if (name === "repeat") repeat(symbol, ink);
     else shuffle(symbol, ink);
-    return { button, shoe, gasket, cap, capGroup, symbol, play, pause };
+    return { button, cap, capGroup, symbol, play, pause };
   });
 
   const clocks = Array.from({ length: 19 }, (_, index) => {
-    const label = type(`0:${String(index).padStart(2, "0")}`, 0.32, -0.42, -0.29, 0.19);
+    const label = type(`0:${String(index).padStart(2, "0")}`, 0.32, -0.42, -0.29, 0.035);
     label.visible = false;
     return label;
   });
@@ -233,32 +245,31 @@ export function createMechanisms(THREE, { box, text, materials }) {
       const peak = 0.34 + 1.33 * Math.abs(Math.sin(index * 0.194) * Math.cos(index * 0.063));
       const traveling = Math.exp(-(((f - progress) * 12) ** 2));
       const amplitude = peak * (1 + playing * (0.13 * Math.sin(t * 8.1 - index * 0.32) + traveling * 0.35));
-      bar.position.set(mix(coilX, -7.62 + f * 15.24, unravel), mix(coilY, 1.6, unravel), mix(0.55 + f * 1.34, 0.225 + traveling * playing * 0.3, unravel));
+      bar.position.set(mix(coilX, -7.62 + f * 15.24, unravel), mix(coilY, 1.6, unravel), Math.max(0.042, mix(0.55 + f * 1.34, 0.05 + traveling * playing * 0.09, unravel)));
       bar.rotation.set((1 - unravel) * Math.sin(angle) * 0.52, (1 - unravel) * Math.cos(angle) * 0.32, (1 - unravel) * (angle + Math.PI / 2));
       bar.scale.set(1, mix(0.2 + f * 0.17, amplitude, unravel), 1);
       bar.material = f <= progress ? ink : gray;
     }
     const railAssembly = Math.min(1.018, spring(Math.max(0, t - 0.72)));
-    railGroup.position.z = 1.55 * (1 - railAssembly);
+    railGroup.position.z = Math.max(0, 1.2 * (1 - railAssembly));
+    railGroup.position.y = -1.06 + (1 - railAssembly) * 0.12;
     railGroup.rotation.x = 0.16 * (1 - railAssembly);
-    railBack.position.z = 0.095 + 0.25 * (1 - railAssembly);
-    railTrack.position.z = 0.183 + 0.54 * (1 - railAssembly);
+    railTrack.position.z = 0.025 + Math.max(0, 1 - railAssembly) * 0.36;
     railFill.scale.x = Math.max(0.01, progress * 15.28);
     railFill.position.x = -7.64 + progress * 15.28 / 2;
-    railFill.position.z = 0.255 + 0.81 * (1 - railAssembly);
+    railFill.position.z = 0.033 + Math.max(0, 1 - railAssembly) * 0.62;
     baseline.scale.x = smooth(0.92, 1.87, t);
     for (let index = 0; index < ticks.length; index++) {
       const assembled = Math.min(1.025, spring(Math.max(0, t - 0.72 - index * 0.014)));
-      ticks[index].position.z = 0.085 + (1 - assembled) * 1.28;
+      ticks[index].position.z = 0.022 + Math.max(0, 1 - assembled) * 1.05;
       ticks[index].rotation.y = (1 - assembled) * 0.55;
     }
     const knobAssembly = spring(Math.max(0, t - 0.91));
     knob.position.x = -7.64 + progress * 15.28;
-    knob.position.z = Math.max(-0.04, (1 - knobAssembly) * 1.82);
+    knob.position.z = Math.max(0, (1 - knobAssembly) * 1.62);
+    knob.position.y = -1.06 + (1 - knobAssembly) * 0.09;
     knob.rotation.z = (1 - knobAssembly) * 0.8;
-    collar.rotation.z = t * 0.18;
-    knobStem.position.z = 0.392 + (1 - knobAssembly) * 0.27;
-    for (let index = 0; index < gripLines.length; index++) gripLines[index].position.z = 0.373 + (1 - knobAssembly) * (0.15 + index * 0.055);
+    knobStem.position.z = 0.046 + Math.max(0, 1 - knobAssembly) * 0.14;
     for (let index = 0; index < ripples.length; index++) {
       const ring = ripples[index];
       const age = t - rippleTimes[index];
@@ -272,11 +283,11 @@ export function createMechanisms(THREE, { box, text, materials }) {
       const assembled = spring(Math.max(0, t - 0.38 - index * 0.11));
       const pressed = pressAt(index, t);
       key.button.rotation.z = (1 - assembled) * (index % 2 ? -0.15 : 0.15);
-      key.shoe.position.z = 0.105 + (1 - assembled) * 0.21;
-      key.gasket.position.z = 0.22 + (1 - assembled) * 0.76;
-      key.capGroup.position.z = 0.43 + (1 - assembled) * 1.73 - pressed * 0.125;
-      key.capGroup.rotation.x = pressed * 0.042;
-      key.symbol.position.z = 0.135 + (1 - assembled) * 0.34;
+      key.capGroup.position.z = 0.04 + Math.max(0, 1 - assembled) * 1.45 - pressed * 0.025;
+      key.capGroup.position.y = (1 - assembled) * 0.055;
+      key.capGroup.rotation.x = pressed * 0.015 + (1 - assembled) * 0.12;
+      key.capGroup.scale.set(1 - pressed * 0.012, 1 - pressed * 0.018, 1);
+      key.symbol.position.z = 0.009 + Math.max(0, 1 - assembled) * 0.25;
       if (key.play) {
         const paused = t < 1.88 || t >= 4.79;
         key.play.visible = paused;

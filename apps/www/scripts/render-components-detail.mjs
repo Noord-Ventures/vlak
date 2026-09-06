@@ -28,7 +28,7 @@ const limit = limitIndex < 0 ? fps * filmDuration : Number(process.argv[limitInd
 if (!Number.isInteger(limit) || limit < 1 || limit > fps * filmDuration) throw new Error('--limit-frames must be an integer from 1 to 960');
 const frames = limit, duration = frames / fps;
 const partial = frames < fps * filmDuration;
-const name = (proof ? 'vlak-components-detail-proof' : 'vlak-components-detail') + (partial ? '-partial' : '');
+const name = 'vlak-components-flat-physics' + (proof ? '-proof' : '') + (partial ? '-partial' : '');
 const file = path.join(output, name + '.mp4');
 const silentFile = sound ? path.join(output, name + '-silent.mp4') : null;
 const scoreFile = sound ? path.join(output, name + '-score.wav') : null;

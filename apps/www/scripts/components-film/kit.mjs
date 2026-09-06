@@ -26,15 +26,18 @@ export async function createKit(materials) {
   const sourceFont = opentype.parse(data);
   const cache = new Map();
   const glyphs = new Map();
-  function extrude(shape, depth, bevel = .016) {
-    bevel = Math.min(bevel, depth * .23);
-    const geometry = new THREE.ExtrudeGeometry(shape, { depth: depth - bevel * 2, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 2, curveSegments: 12, steps: 1 });
-    geometry.translate(0, 0, -depth / 2 + bevel);
+  // Surfaces have paper thickness. Motion lives in object positions, so
+  // flattening a surface never compresses its flight or layer separation.
+  const surfaceDepth = depth => Math.min(depth, .012);
+  function extrude(shape, depth) {
+    depth = surfaceDepth(depth);
+    const geometry = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false, curveSegments: 12, steps: 1 });
+    geometry.translate(0, 0, -depth / 2);
     return geometry;
   }
   function box(w, h, depth, material = materials.paper, radius = .045) {
     const key = [w,h,depth,radius].join(':');
-    if (!cache.has(key)) cache.set(key, extrude(path(w,h,radius), depth, Math.min(.014,radius*.3)));
+    if (!cache.has(key)) cache.set(key, extrude(path(w,h,radius), depth));
     const mesh = new THREE.Mesh(cache.get(key), material);
     mesh.castShadow = true; mesh.receiveShadow = true;
     return mesh;
@@ -42,22 +45,23 @@ export async function createKit(materials) {
   function frame(w, h, depth, material = materials.gray, radius = .045, thickness = .026) {
     const shape = path(w,h,radius);
     shape.holes.push(path(w-thickness*2,h-thickness*2,Math.max(.001,radius-thickness)));
-    const mesh = new THREE.Mesh(extrude(shape,depth,Math.min(.005,thickness*.13)), material);
+    const mesh = new THREE.Mesh(extrude(shape,depth), material);
     mesh.castShadow = true;mesh.receiveShadow = true;
     return mesh;
   }
   function text(value, em = .32, material = materials.ink, depth = .014, tracking = -.015) {
-    if (typeof material === 'number' || typeof material === 'string') material = new THREE.MeshStandardMaterial({color:material,roughness:.6});
+    depth = Math.min(depth, .001);
+    if (typeof material === 'number' || typeof material === 'string') material = new THREE.MeshStandardMaterial({color:material,roughness:1,envMapIntensity:0});
     const group = new THREE.Group();
     let advance = 0;
     for (let i=0;i<value.length;i++) {
       const character = value[i];
       const size = em * .72;
       const key = character+':'+size+':'+depth;
-      if (!glyphs.has(key)) glyphs.set(key, new TextGeometry(character, {font,size,depth,curveSegments:8,bevelEnabled:depth>.025,bevelThickness:Math.min(.006,depth*.12),bevelSize:Math.min(.004,depth*.1),bevelSegments:2}));
+      if (!glyphs.has(key)) glyphs.set(key, new TextGeometry(character, {font,size,depth,curveSegments:8,bevelEnabled:false}));
       const mesh = new THREE.Mesh(glyphs.get(key), material);
       mesh.position.x = advance;
-      mesh.castShadow = true;
+      mesh.castShadow = false;
       group.add(mesh);
       const glyph = sourceFont.charToGlyph(character);
       const next = sourceFont.charToGlyph(value[i+1] ?? ' ');
@@ -79,9 +83,9 @@ export async function createKit(materials) {
     const group = new THREE.Group();
     const body = box(w,h,options.depth??.12,options.ink?materials.ink:materials.paper,options.radius??.055);
     const border = frame(w-.014,h-.014,.02,options.ink?materials.ink:materials.gray,options.radius??.055,.018);
-    border.position.z = (options.depth??.12)/2+.006;
+    border.position.z = surfaceDepth(options.depth??.12)/2+.008;
     group.add(body,border);
-    if(labelValue) label(group,labelValue,options.fontSize??.32,0,0,(options.depth??.12)/2+.024,options.ink?materials.paper:materials.ink);
+    if(labelValue) label(group,labelValue,options.fontSize??.32,0,0,surfaceDepth(options.depth??.12)/2+.017,options.ink?materials.paper:materials.ink);
     group.userData.body=body;return group;
   }
   function line(points, radius=.018, material=materials.ink) {

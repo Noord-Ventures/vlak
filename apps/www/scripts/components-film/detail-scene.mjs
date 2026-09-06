@@ -9,8 +9,7 @@ import { createPlanning } from './planning.mjs';
 export async function createFilm() {
   const studio=createStudio(innerWidth,innerHeight);
   const {scene,camera,renderer,materials:m}=studio;
-  m.gray=new THREE.MeshStandardMaterial({color:0x3e3e3e,roughness:.85,envMapIntensity:.12});
-  m.ink.roughness=.86;m.ink.metalness=0;m.ink.clearcoat=0;m.ink.envMapIntensity=.12;
+  m.gray=m.paper.clone();m.gray.color.setHex(0x3e3e3e);
   m.metal=m.silver;
   document.querySelector('#stage').append(renderer.domElement);
   const kit=await createKit(m);
@@ -22,7 +21,7 @@ export async function createFilm() {
   for(const chapter of chapters) scene.add(chapter.group);
 
   const finale=new THREE.Group();scene.add(finale);
-  const logo=kit.text('Vlak.dev',5.25,[m.ink,m.graphite],.42,-.055);
+  const logo=kit.text('Vlak.dev',5.25,m.ink,.001,-.055);
   finale.add(logo);
   const letterBase=logo.children.map(letter=>letter.position.clone());
   const atoms=[];
@@ -54,7 +53,6 @@ export async function createFilm() {
     const dark=time>=6&&time<12.5;
     scene.background.setHex(dark?0x10100f:0xf0efeb);
     m.backdrop.color.setHex(dark?0x080807:0xfaf8f2);
-    m.backdrop.envMapIntensity=dark?.05:1;
     m.paper.color.setHex(dark?0x191918:0xfaf8f2);
     m.ink.color.setHex(dark?0xecebe7:0x080808);
     m.gray.color.setHex(dark?0x666664:0x3e3e3e);
@@ -62,32 +60,32 @@ export async function createFilm() {
     finale.visible=false;
     endTitle.style.opacity='0';veil.style.opacity='0';endnote.style.opacity='0';
     grain.style.opacity='.026';document.body.classList.remove('inverse');
-    studio.setDOF(true);
+    studio.setDOF(false);
     if(time<6) {
       const t=time;
       controls.group.visible=true;controls.update(t);
       controls.group.rotation.set(0,0,0);
-      if(t<2.3) view([-8,8,11.5],[-2,6,15],t/2.3,[0,.3,1.1],[0,0,1.25]);
-      else view([-2,6,15],[.8,3.4,23.7],(t-2.3)/1.55,[0,.1,.4],[0,.8,.4]);
+      if(t<2.3) view([-4.2,4.8,14],[-1.2,3.0,15.5],t/2.3,[0,.3,1.1],[0,0,1.25]);
+      else view([-1.2,3.0,15.5],[.4,1.1,23.7],(t-2.3)/1.55,[0,.1,.4],[0,.8,.4]);
     } else if(time<12.5) {
       const t=time-6;
       mechanisms.group.visible=true;mechanisms.update(Math.min(6,t));
-      mechanisms.group.rotation.set(-.07,.04,-.025);
+      mechanisms.group.rotation.set(-.02,.015,-.012);
       mechanisms.group.position.set(0,.5,0);
-      if(t<1.7) view([-4.5,5.1,19],[2.5,4.7,20.5],t/1.7,[0,.3,1.1],[0,.3,1.3]);
-      else view([2.5,4.7,20.5],[-1.0,2.1,21.8],(t-1.7)/3.5,[0,.25,.6],[0,0,.5]);
+      if(t<1.7) view([-2.3,2.8,19],[1.2,2.2,20.5],t/1.7,[0,.3,1.1],[0,.3,1.3]);
+      else view([1.2,2.2,20.5],[-.4,.8,21.8],(t-1.7)/3.5,[0,.25,.6],[0,0,.5]);
     } else if(time<19) {
       const t=time-12.5;
       selection.group.visible=true;selection.update(t);
-      selection.group.rotation.set(-.065,.035,-.02);
-      view([-4,5,22],[2.5,3,23.5],t/6.5,[0,.2,.8],[0,.4,1.2]);
+      selection.group.rotation.set(-.018,.012,-.01);
+      view([-2,2.6,22],[1.0,1.2,23.5],t/6.5,[0,.2,.8],[0,.4,1.2]);
     } else if(time<26.5) {
       const t=time-19;
       planning.group.visible=true;planning.update(t);
-      planning.group.rotation.set(-.04,.025,-.018);
-      if(t<1.65) view([-6,5.8,12],[-1,4.8,20],t/1.65,[-2.5,1.2,1.2],[-2.5,1.8,1]);
-      else if(t<3.35) view([-1,4.8,20],[1.6,3,26.5],(t-1.65)/1.7,[0,.2,.6],t<3.28?[-1,0,3.2]:[0,1,.8]);
-      else view([1.6,3,26.5],[-1.2,1.2,25],(t-3.35)/4.15,[0,.1,.5],[0,0,1]);
+      planning.group.rotation.set(-.012,.008,-.006);
+      if(t<1.65) view([-4.3,3.7,12],[-.5,2.4,20],t/1.65,[-2.5,1.2,1.2],[-2.5,1.8,1]);
+      else if(t<3.35) view([-.5,2.4,20],[.8,1.5,26.5],(t-1.65)/1.7,[0,.2,.6],t<3.28?[-1,0,3.2]:[0,1,.8]);
+      else view([.8,1.5,26.5],[-.4,.5,25],(t-3.35)/4.15,[0,.1,.5],[0,0,1]);
     } else {
       const t=time-26.5;
       finale.visible=true;
@@ -110,7 +108,7 @@ export async function createFilm() {
         atom.rotation.set(Math.sin(angle)*.24*(1-build),Math.cos(angle)*.4*(1-build),angle*.2*(1-build));
         atom.scale.setScalar(mix(.75,.55,build));
       });
-      view([-3,4.5,24],[0,.1,23.8],t/3,[0,.2,.5],[0,.2,.65]);
+      view([-1.5,2.2,24],[0,.1,23.8],t/3,[0,.2,.5],[0,.2,.65]);
       if(t>1.6)studio.setDOF(false);
       if(time>29.55) {
         const p=ease((time-29.55)/.38);

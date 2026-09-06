@@ -12,6 +12,8 @@ export function createSelection(THREE, kit) {
   const H = 44 * S;
   const R = 4 * S;
   const W = 3.518;
+  // Flat resting surfaces; airborne separation remains in the timeline terms.
+  const Z = { plane: 0.018, rim: 0.007, label: 0.009, frame: 0.007 };
   const ink = materials.ink;
   const paper = materials.paper;
   const gray = materials.gray ?? materials.edge;
@@ -43,7 +45,7 @@ export function createSelection(THREE, kit) {
     return part;
   }
   function type(parent, value, size, x, y, z, material = ink, align = "left") {
-    const part = text(value, size, material, 0.024, -0.01);
+    const part = text(value, size, material, 0.001, -0.01);
     add(parent, part, x + (align === "left" ? part.userData.width / 2 : 0), y, z);
     return part;
   }
@@ -67,7 +69,7 @@ export function createSelection(THREE, kit) {
     }
     const shape = new THREE.Shape([...left, ...right.reverse()]);
     shape.closePath();
-    const mesh = new THREE.Mesh(extrude(shape, 0.035, 0.002), material);
+    const mesh = new THREE.Mesh(extrude(shape, 0.001, 0), material);
     mesh.castShadow = true;
     parent.add(mesh);
     return mesh;
@@ -87,10 +89,10 @@ export function createSelection(THREE, kit) {
   function control(parent, width, value, options = {}) {
     const part = new THREE.Group();
     part.name = options.name ?? value;
-    const body = add(part, box(width, H, 0.14, paper, R));
-    const rim = add(part, frame(width - 0.007, H - 0.007, 0.038, options.ghost ? divider : border, R, S), 0, 0, 0.091);
-    const caption = value ? type(part, value, 14 * S, options.center ? 0 : -width / 2 + 12 * S, 0, 0.116, options.muted ? muted : ink, options.center ? "center" : "left") : null;
-    const arrow = options.select ? chevron(part, width / 2 - 20 * S, 0, 0.132) : null;
+    const body = add(part, box(width, H, 0.012, paper, R));
+    const rim = add(part, frame(width - 0.007, H - 0.007, 0.001, options.ghost ? divider : border, R, S), 0, 0, Z.rim);
+    const caption = value ? type(part, value, 14 * S, options.center ? 0 : -width / 2 + 12 * S, 0, Z.label, options.muted ? muted : ink, options.center ? "center" : "left") : null;
+    const arrow = options.select ? chevron(part, width / 2 - 20 * S, 0, Z.label) : null;
     parent.add(part);
     return { group: part, body, rim, caption, arrow, width };
   }
@@ -99,28 +101,28 @@ export function createSelection(THREE, kit) {
   menu.name = "MultiSelect individual controls";
   group.add(menu);
   const summary = control(menu, 6.06, "Select topics", { select: true });
-  summary.group.position.set(-5.38, 4.26, 0.23);
-  const summaryStates = ["Motion", "Motion, Accessibility"].map((value) => type(summary.group, value, 14 * S, -3.03 + 12 * S, 0, 0.118));
-  const panel = add(menu, frame(6.06, 8.04, 0.07, border, R, S), -5.38, -0.37, 0.13);
+  summary.group.position.set(-5.38, 4.26, Z.plane);
+  const summaryStates = ["Motion", "Motion, Accessibility"].map((value) => type(summary.group, value, 14 * S, -3.03 + 12 * S, 0, Z.label));
+  const panel = add(menu, frame(6.06, 8.04, 0.001, border, R, S), -5.38, -0.37, Z.frame);
   const search = control(menu, 5.53, "Search options", { muted: true });
-  search.group.position.set(-5.38, 2.85, 0.25);
+  search.group.position.set(-5.38, 2.85, Z.plane);
   const optionNames = ["Motion", "Typography", "Components", "Accessibility", "Documentation", "Tokens"];
   const rows = optionNames.map((value, i) => {
     const row = new THREE.Group();
     row.name = `${value} option`;
     const width = 5.53;
-    const slab = add(row, box(width, H, 0.085, paper, R));
-    const wash = add(row, box(width - 0.022, H - 0.022, 0.04, selected, R), 0, 0, 0.065);
+    const slab = add(row, box(width, H, 0.012, paper, R));
+    const wash = add(row, box(width - 0.022, H - 0.022, 0.001, selected, R), 0, 0, Z.rim);
     const checkbox = new THREE.Group();
     checkbox.name = `${value} checkbox`;
-    const checkFace = add(checkbox, box(16 * S, 16 * S, 0.07, paper, 3 * S));
-    add(checkbox, frame(16 * S, 16 * S, 0.03, ink, 3 * S, 1.5 * S), 0, 0, 0.05);
+    const checkFace = add(checkbox, box(16 * S, 16 * S, 0.012, paper, 3 * S));
+    add(checkbox, frame(16 * S, 16 * S, 0.001, ink, 3 * S, 1.5 * S), 0, 0, Z.rim);
     const check = new THREE.Group();
     stroke(check, [[3.5, 8.5], [6.5, 11.5], [12.5, 4.5]], 12 * S, paper);
-    add(checkbox, check, 0, 0, 0.08);
-    add(row, checkbox, -width / 2 + 16 * S, 0, 0.12);
-    const caption = type(row, value, 14 * S, -width / 2 + 33 * S, 0, 0.123);
-    add(menu, row, -5.38, 1.69 - i * 48 * S, 0.22);
+    add(checkbox, check, 0, 0, Z.label);
+    add(row, checkbox, -width / 2 + 16 * S, 0, 0.014);
+    const caption = type(row, value, 14 * S, -width / 2 + 33 * S, 0, Z.label);
+    add(menu, row, -5.38, 1.69 - i * 48 * S, Z.plane);
     return { group: row, slab, wash, checkbox, checkFace, check, caption, y: row.position.y };
   });
 
@@ -131,46 +133,46 @@ export function createSelection(THREE, kit) {
     const value = optionNames[rowIndex];
     const part = new THREE.Group();
     part.name = `${value}: selected option → tag → query value`;
-    const caption = text(value, 14 * S, ink, 0.03, -0.01);
+    const caption = text(value, 14 * S, ink, 0.001, -0.01);
     const width = caption.userData.width + 66 * S;
-    const body = add(part, box(width, 54 * S, 0.16, paper, R));
-    const rim = add(part, frame(width - 0.007, 54 * S - 0.007, 0.04, border, R, S), 0, 0, 0.103);
-    const valueBody = add(part, box(W, H, 0.16, paper, R));
-    const valueRim = add(part, frame(W - 0.007, H - 0.007, 0.04, border, R, S), 0, 0, 0.103);
+    const body = add(part, box(width, 54 * S, 0.012, paper, R));
+    const rim = add(part, frame(width - 0.007, 54 * S - 0.007, 0.001, border, R, S), 0, 0, Z.rim);
+    const valueBody = add(part, box(W, H, 0.012, paper, R));
+    const valueRim = add(part, frame(W - 0.007, H - 0.007, 0.001, border, R, S), 0, 0, Z.rim);
     const labelX = -width / 2 + 12 * S + caption.userData.width / 2;
-    add(part, caption, labelX, 0, 0.137);
+    add(part, caption, labelX, 0, Z.label);
     const remove = new THREE.Group();
-    const removeBody = add(remove, box(H, H, 0.045, selected, R));
-    const icon = cross(remove, 0, 0, 0.047);
-    const removeRim = add(remove, frame(H, H, 0.035, divider, R, S), 0, 0, 0.035);
-    const finalRemoveBody = add(remove, box(W, H, 0.045, paper, R));
-    const finalRemoveRim = add(remove, frame(W, H, 0.035, divider, R, S), 0, 0, 0.035);
-    const removeLabel = type(remove, "Remove", 14 * S, 0, 0, 0.063, ink, "center");
-    add(part, remove, width / 2 - 26 * S, 0, 0.111);
+    const removeBody = add(remove, box(H, H, 0.012, selected, R));
+    const icon = cross(remove, 0, 0, Z.label);
+    const removeRim = add(remove, frame(H, H, 0.001, divider, R, S), 0, 0, Z.rim);
+    const finalRemoveBody = add(remove, box(W, H, 0.012, paper, R));
+    const finalRemoveRim = add(remove, frame(W, H, 0.001, divider, R, S), 0, 0, Z.rim);
+    const removeLabel = type(remove, "Remove", 14 * S, 0, 0, Z.label, ink, "center");
+    add(part, remove, width / 2 - 26 * S, 0, 0.014);
     group.add(part);
     return {
       group: part, body, rim, valueBody, valueRim, caption, width, labelX, remove, removeBody,
       removeRim, finalRemoveBody, finalRemoveRim, removeLabel, icon, start: 1.25 + i * 0.48,
-      source: new THREE.Vector3(-5.16, rows[rowIndex].y, 0.44),
+      source: new THREE.Vector3(-5.16, rows[rowIndex].y, 0.044),
       hover: new THREE.Vector3(i === 0 ? 2.24 : 4.49, i === 0 ? 1.19 : -1.21, 1.15 + i * 0.28),
-      target: new THREE.Vector3(1.847, i === 0 ? 0.31 : -1.12, 0.31),
+      target: new THREE.Vector3(1.847, i === 0 ? 0.31 : -1.12, Z.plane),
     };
   });
 
   const query = new THREE.Group();
   query.name = "QueryBuilder nested groups and controls";
   group.add(query);
-  const outerFrame = add(query, frame(16.64, 9.14, 0.063, divider, 0.001, S), 0, 0, 0.10);
-  const innerFrame = add(query, frame(15.23, 5.93, 0.054, divider, 0.001, S), 0, -0.20, 0.16);
+  const outerFrame = add(query, frame(16.64, 9.14, 0.001, divider, 0.001, S), 0, 0, Z.frame);
+  const innerFrame = add(query, frame(15.23, 5.93, 0.001, divider, 0.001, S), 0, -0.20, Z.frame);
   // A small paper legend backing is part of the fieldset itself, not a panel.
-  const legendMask = add(query, box(1.95, 0.40, 0.08, paper, 0.001), -6.72, 4.57, 0.16);
-  const legend = type(query, "Conditions", 14 * S, -7.54, 4.57, 0.217);
-  const nestedMask = add(query, box(2.45, 0.42, 0.06, paper, 0.001), -5.98, 2.765, 0.18);
-  const nestedLegend = type(query, "Nested group", 14 * S, -7.09, 2.765, 0.22);
+  const legendMask = add(query, box(1.95, 0.40, 0.001, paper, 0.001), -6.72, 4.57, 0.0085);
+  const legend = type(query, "Conditions", 14 * S, -7.54, 4.57, 0.010);
+  const nestedMask = add(query, box(2.45, 0.42, 0.001, paper, 0.001), -5.98, 2.765, 0.0085);
+  const nestedLegend = type(query, "Nested group", 14 * S, -7.09, 2.765, 0.010);
   const all = control(query, 4.65, "All conditions", { select: true });
-  all.group.position.set(-5.41, 3.69, 0.29);
+  all.group.position.set(-5.41, 3.69, Z.plane);
   const any = control(query, 4.35, "Any condition", { select: true });
-  any.group.position.set(-5.09, 1.88, 0.29);
+  any.group.position.set(-5.09, 1.88, Z.plane);
   const fields = [];
   const rowLabels = [];
   const controlX = [-5.541, -1.847, 1.847, 5.541];
@@ -178,11 +180,11 @@ export function createSelection(THREE, kit) {
     const y = rowIndex === 0 ? 0.31 : -1.12;
     for (let column = 0; column < 2; column++) {
       const part = control(query, W, column === 0 ? "Topic" : "is", { select: true });
-      part.group.position.set(controlX[column], y, 0.31);
+      part.group.position.set(controlX[column], y, Z.plane);
       fields.push({ ...part, rowIndex, column, target: part.group.position.clone(), start: 3.57 + rowIndex * 0.17 + column * 0.13 });
     }
     for (let column = 0; column < 3; column++) {
-      const label = type(query, ["Field", "Operator", "Value"][column], 12 * S, controlX[column] - W / 2, y + 0.70, 0.22, muted);
+      const label = type(query, ["Field", "Operator", "Value"][column], 12 * S, controlX[column] - W / 2, y + 0.70, Z.plane + Z.label, muted);
       rowLabels.push({ label, rowIndex, column });
     }
   }
@@ -195,7 +197,7 @@ export function createSelection(THREE, kit) {
   ];
   const actions = actionSpecs.map(([value, x, y, width, start]) => {
     const part = control(query, width, value, { ghost: true, center: true });
-    part.group.position.set(x, y, 0.23);
+    part.group.position.set(x, y, Z.plane);
     return { ...part, target: part.group.position.clone(), start };
   });
 
@@ -211,45 +213,47 @@ export function createSelection(THREE, kit) {
       .addScaledVector(b, p ** 3);
   }
   function splitLayers(part, settled, amount = 1) {
-    part.body.position.z = (1 - settled) * 0.22 * amount;
-    part.rim.position.z = 0.091 + (1 - settled) * 0.61 * amount;
-    if (part.caption) part.caption.position.z = 0.116 + (1 - settled) * 1.02 * amount;
-    if (part.arrow) part.arrow.position.z = 0.132 + (1 - settled) * 1.22 * amount;
+    // Reflect the spring at contact so a thin label cannot pass through its face.
+    const flight = Math.abs(1 - settled);
+    part.body.position.z = flight * 0.22 * amount;
+    part.rim.position.z = Z.rim + flight * 0.61 * amount;
+    if (part.caption) part.caption.position.z = Z.label + flight * 1.02 * amount;
+    if (part.arrow) part.arrow.position.z = Z.label + flight * 1.22 * amount;
   }
 
   function update(time) {
     const t = Math.max(0, Math.min(6.5, Number.isFinite(time) ? time : 0));
     const menuAway = smooth(3.04, 3.90, t);
     menu.visible = menuAway < 1;
-    menu.position.set(-5.38 * menuAway * 0.94, 0, 0.03 + menuAway * 0.6);
+    menu.position.set(-5.38 * menuAway * 0.94, 0, menuAway * 0.6);
     menu.scale.setScalar(1 - menuAway * 0.94);
     const summaryAssembled = spring(t - 0.03);
-    summary.group.position.z = 0.23 + (1 - summaryAssembled) * 0.7 + menuAway * 0.2;
+    summary.group.position.z = Z.plane + Math.abs(1 - summaryAssembled) * 0.7 + menuAway * 0.2;
     splitLayers(summary, summaryAssembled);
     summary.group.rotation.x = (1 - summaryAssembled) * 0.10;
     summary.caption.visible = t < chips[0].start + 0.12;
     for (let i = 0; i < summaryStates.length; i++) {
       summaryStates[i].visible = i === 0 ? t >= chips[0].start + 0.12 && t < chips[1].start + 0.12 : t >= chips[1].start + 0.12;
-      summaryStates[i].position.z = 0.118 + (1 - summaryAssembled) * 1.02;
+      summaryStates[i].position.z = Z.label + Math.abs(1 - summaryAssembled) * 1.02;
     }
     const panelOpening = smooth(0.22, 1.14, t);
     panel.scale.y = Math.max(0.001, panelOpening);
     panel.position.y = 3.65 - 4.02 * panelOpening;
-    panel.position.z = 0.13 + (1 - panelOpening) * 0.75;
+    panel.position.z = Z.frame + (1 - panelOpening) * 0.75;
     const searchAssembled = spring(t - 0.31);
     search.group.visible = t > 0.20;
     splitLayers(search, searchAssembled, 0.7);
-    search.group.position.z = 0.25 + (1 - searchAssembled) * 0.5;
+    search.group.position.z = Z.plane + Math.abs(1 - searchAssembled) * 0.5;
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       const settled = spring(t - 0.40 - i * 0.064, 1.08);
       const inView = smooth(0.27 + i * 0.05, 0.62 + i * 0.06, t);
       row.group.visible = inView > 0;
-      row.group.position.set(-5.38 + (1 - settled) * (i % 2 ? 0.50 : -0.5), row.y + (1 - settled) * 0.65, 0.22 + (1 - settled) * (1.1 + i * 0.15));
+      row.group.position.set(-5.38 + (1 - settled) * (i % 2 ? 0.50 : -0.5), row.y + (1 - settled) * 0.65, Z.plane + Math.abs(1 - settled) * (1.1 + i * 0.15));
       row.group.rotation.set((1 - settled) * 0.11, (1 - settled) * (i % 2 ? -0.11 : 0.11), (1 - settled) * 0.035);
       row.group.scale.setScalar(Math.max(0.001, inView));
-      row.caption.position.z = 0.123 + (1 - settled) * 0.35;
-      row.checkbox.position.z = 0.12 + (1 - settled) * 0.53;
+      row.caption.position.z = Z.label + Math.abs(1 - settled) * 0.35;
+      row.checkbox.position.z = 0.014 + Math.abs(1 - settled) * 0.53;
       const selectedIndex = selectedRows.indexOf(i);
       const at = selectedIndex < 0 ? 99 : chips[selectedIndex].start;
       const fill = smooth(at, at + 0.22, t);
@@ -259,24 +263,24 @@ export function createSelection(THREE, kit) {
       row.checkFace.material = t >= at + 0.09 ? ink : paper;
       row.check.visible = t >= at + 0.09;
       row.check.scale.setScalar(Math.max(0.001, spring((t - at - 0.09) * 1.8)));
-      row.check.position.z = 0.08 + Math.max(0, 1 - spring(t - at - 0.09)) * 0.28;
-      row.slab.position.z = -0.048 * press(t, at);
+      row.check.position.z = Z.label + Math.max(0, 1 - spring(t - at - 0.09)) * 0.28;
+      row.slab.position.z = -0.004 * press(t, at);
     }
 
     const queryAppears = smooth(3.15, 3.90, t);
     query.visible = queryAppears > 0;
     const frameSettle = spring(t - 3.29);
     outerFrame.scale.set(Math.max(0.001, queryAppears), 0.58 + 0.42 * queryAppears, 1);
-    outerFrame.position.z = Math.max(0.055, 0.1 + (1 - frameSettle) * 1.30);
+    outerFrame.position.z = Z.frame + Math.abs(1 - frameSettle) * 1.30;
     innerFrame.scale.set(Math.max(0.001, smooth(3.40, 4.24, t)), 0.48 + 0.52 * smooth(3.40, 4.24, t), 1);
-    innerFrame.position.z = 0.16 + (1 - spring(t - 3.55)) * 1.40;
+    innerFrame.position.z = Z.frame + Math.abs(1 - spring(t - 3.55)) * 1.40;
     for (const part of [legendMask, legend, nestedMask, nestedLegend]) {
       part.scale.setScalar(smooth(3.72, 4.35, t));
     }
     for (const [index, part] of [all, any].entries()) {
       const assembled = spring(t - 3.31 - index * 0.18);
       splitLayers(part, assembled, 0.67);
-      part.group.position.z = 0.29 + (1 - assembled) * 1.25;
+      part.group.position.z = Z.plane + Math.abs(1 - assembled) * 1.25;
       part.group.rotation.x = (1 - assembled) * -0.17;
       part.group.scale.setScalar(Math.max(0.001, smooth(3.20 + index * 0.15, 3.80 + index * 0.15, t)));
     }
@@ -304,11 +308,11 @@ export function createSelection(THREE, kit) {
       chip.valueBody.visible = chip.valueRim.visible = assembled >= 0.999;
       // Keep the exact glyphs; only their left padding changes with the shell.
       chip.caption.position.x = lerp(chip.labelX, -W / 2 + 12 * S + chip.caption.userData.width / 2, assembled);
-      chip.caption.position.z = 0.137 + Math.sin(assembled * Math.PI) * 0.34;
+      chip.caption.position.z = Z.label + Math.sin(assembled * Math.PI) * 0.34;
       const removeFlight = smooth(assemblyStart + 0.17, assemblyStart + 1.30, t);
       chip.remove.position.x = lerp(chip.width / 2 - 26 * S, controlX[3] - controlX[2], removeFlight);
       chip.remove.position.y = Math.sin(removeFlight * Math.PI) * (i === 0 ? 0.52 : -0.47);
-      chip.remove.position.z = 0.111 + Math.sin(removeFlight * Math.PI) * 1.32;
+      chip.remove.position.z = lerp(0.014, 0, removeFlight) + Math.sin(removeFlight * Math.PI) * 1.32;
       chip.remove.rotation.z = Math.sin(removeFlight * Math.PI) * (i === 0 ? 0.10 : -0.10);
       chip.removeBody.scale.x = lerp(1, W / H, removeFlight);
       chip.removeBody.material = t < assemblyStart + 0.35 ? selected : paper;
@@ -334,7 +338,7 @@ export function createSelection(THREE, kit) {
       const start = 4.11 + rowIndex * 0.19 + column * 0.10;
       const settled = spring(t - start);
       label.visible = t > start;
-      label.position.z = 0.22 + (1 - settled) * 0.58;
+      label.position.z = Z.plane + Z.label + Math.abs(1 - settled) * 0.58;
       label.scale.setScalar(Math.max(0.001, smooth(start, start + 0.29, t)));
     }
     for (let i = 0; i < actions.length; i++) {
@@ -343,7 +347,7 @@ export function createSelection(THREE, kit) {
       part.group.visible = t >= part.start;
       part.group.position.copy(part.target);
       part.group.position.y -= (1 - settled) * 0.32;
-      part.group.position.z += (1 - settled) * (1.05 + i * 0.07);
+      part.group.position.z += Math.abs(1 - settled) * (1.05 + i * 0.07);
       part.group.rotation.x = (1 - settled) * -0.14;
       part.group.scale.setScalar(Math.max(0.001, smooth(part.start, part.start + 0.30, t)));
       splitLayers(part, settled, 0.45);
