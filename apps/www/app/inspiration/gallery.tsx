@@ -151,13 +151,9 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
 
           <div className="inspiration-stage-arrow inspiration-stage-arrow-prev inspiration-stage-paper"><Button variant="ghost" style={iconButtonLayout} aria-label="Previous work" onClick={() => select(active - 1)}><Icon name="arrow-left" /></Button></div>
           <div className="inspiration-stage-arrow inspiration-stage-arrow-next inspiration-stage-paper"><Button variant="ghost" style={iconButtonLayout} aria-label="Next work" onClick={() => select(active + 1)}><Icon name="arrow-right" /></Button></div>
-        </div>
-
           <div className="inspiration-stage-bottom">
             <div className="inspiration-stage-paper">
-              <ButtonGroup aria-label="Drag behavior">
-                {(["browse", "turn"] as const).map((mode) => <Button key={mode} variant={interaction === mode ? "primary" : "ghost"} aria-pressed={interaction === mode} disabled={!ready} onClick={() => { setInteraction(mode); engine.current?.setInteraction(mode); }}>{mode === "browse" ? "Browse" : "Turn object"}</Button>)}
-              </ButtonGroup>
+              <Toggle pressed={interaction === "turn"} disabled={!ready} onPressedChange={(pressed) => { const mode = pressed ? "turn" : "browse"; setInteraction(mode); engine.current?.setInteraction(mode); }}>Turn object</Toggle>
             </div>
             <div className="inspiration-gesture inspiration-stage-paper" aria-hidden="true"><CardBody>{interaction === "browse" ? "Drag to explore" : "Drag to rotate"}</CardBody></div>
             <div className="inspiration-stage-paper inspiration-rotation">
@@ -166,6 +162,7 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
               </Toggle>
             </div>
           </div>
+        </div>
 
         <div className="inspiration-caption" aria-live="polite" aria-atomic="true" data-work-id={study.id}>
           <Card style={{ maxWidth: "none", display: "grid", gap: "20px" }}>

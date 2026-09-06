@@ -31,7 +31,10 @@ html:has(.inspiration-page)::after { display: none; }
 .inspiration-stage-arrow-next { right: 20px; }
 .inspiration-fallback { position: absolute; inset: 80px; z-index: 1; display: flex; flex-direction: column; gap: 12px; justify-content: center; align-items: center; text-align: center; }
 .inspiration-fallback img { max-height: 80%; max-width: 75%; object-fit: contain; }
-.inspiration-stage-bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; padding-block: 20px; border-bottom: 1px solid var(--divider); }
+.inspiration-stage-bottom { position: absolute; z-index: 3; bottom: 20px; left: 20px; right: 20px; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px 20px; pointer-events: none; }
+.inspiration-stage-bottom .inspiration-stage-paper { min-width: 0; border-radius: var(--radius-sm); }
+.inspiration-stage-bottom button { width: 100%; min-height: var(--hit); height: auto; padding-block: 8px; }
+.inspiration-gesture { justify-self: center; padding: 8px 12px; text-align: center; }
 .inspiration-caption { display: grid; grid-template-columns: repeat(3, 1fr); align-items: start; gap: 20px; padding-block: 24px; min-height: 136px; }
 .inspiration-caption-description { max-width: 45ch; }
 .inspiration-caption-kind { justify-self: end; }
@@ -59,7 +62,6 @@ html:has(.inspiration-page)::after { display: none; }
   .inspiration-caption, .inspiration-notes { grid-template-columns: repeat(2, 1fr); }
   .inspiration-caption-kind { justify-self: start; }
   .inspiration-notes a { grid-column: 2; justify-self: start; }
-  .inspiration-gesture { display: none; }
 }
 @media (max-width: 640px) {
   .inspiration-header { min-height: 72px; }
@@ -69,10 +71,10 @@ html:has(.inspiration-page)::after { display: none; }
   .inspiration-stage-top { top: 12px; left: 12px; right: 12px; }
   .inspiration-stage-arrow-prev { left: 8px; }
   .inspiration-stage-arrow-next { right: 8px; }
-  .inspiration-fallback { inset: 80px 50px; }
+  .inspiration-fallback { inset: 80px 50px 128px; }
   .inspiration-fallback img { max-width: 100%; }
-  .inspiration-stage-bottom > :first-child { flex: 1 1 100%; }
-  .inspiration-stage-bottom .inspiration-rotation { margin-left: auto; }
+  .inspiration-stage-bottom { bottom: 12px; left: 12px; right: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+  .inspiration-gesture { grid-row: 2; grid-column: 1 / -1; }
   .inspiration-caption, .inspiration-notes { grid-template-columns: 1fr; gap: 16px; }
   .inspiration-controls > :first-child { flex: 1 1 100%; }
   .inspiration-zoom { width: 100%; }

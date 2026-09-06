@@ -160,7 +160,7 @@ function isClosed(el: MarkEl): boolean {
 }
 
 function inkFor(el: MarkEl, variant: IconVariant) {
-  return variant === "filled" && isClosed(el) ? iconFill : iconInk;
+  return (el.t === "circle" && el.solid) || (variant === "filled" && isClosed(el)) ? iconFill : iconInk;
 }
 
 function renderEl(el: MarkEl, key: number, variant: IconVariant): React.ReactNode {

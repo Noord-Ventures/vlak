@@ -10,12 +10,14 @@
  * Arrow endpoints: balanced 90° heads with an uninterrupted wing–tip–wing
  * subpath. The shaft meets that apex in the same painted path; it never
  * turns into a head wing, which would create an acute miter spur.
+ * Wi-Fi uses two concentric 90° waves at a 4-unit pitch, centered on a
+ * solid source point. The line and filled families keep the same silhouette.
  */
 
 export type MarkEl =
   | { t: "path"; d: string }
   | { t: "rect"; x: number; y: number; w: number; h: number }
-  | { t: "circle"; cx: number; cy: number; r: number }
+  | { t: "circle"; cx: number; cy: number; r: number; solid?: true }
   | { t: "line"; x1: number; y1: number; x2: number; y2: number };
 
 /** Element indexes that become transparent detail cuts in the filled mark. */
@@ -27,6 +29,13 @@ const p = (d: string): MarkEl => ({ t: "path", d });
 const r = (x: number, y: number, w: number, h: number): MarkEl => ({ t: "rect", x, y, w, h });
 const o = (cx: number, cy: number, rad: number): MarkEl => ({ t: "circle", cx, cy, r: rad });
 const l = (x1: number, y1: number, x2: number, y2: number): MarkEl => ({ t: "line", x1, y1, x2, y2 });
+
+// Both arcs share the source point (8, 12.5), not independently fitted centers.
+const wifiSignal: MarkEl[] = [
+  p("M1.636039 6.136039 A9 9 0 0 1 14.363961 6.136039"),
+  p("M4.464466 8.964466 A5 5 0 0 1 11.535534 8.964466"),
+  { t: "circle", cx: 8, cy: 12.5, r: 1, solid: true },
+];
 
 /** Unique drawn marks. Aliases resolve elsewhere. */
 export const iconNames = [
@@ -404,7 +413,7 @@ export const marks: Record<DrawnName, MarkEl[]> = {
     p("M2.5 11.5 A5.5 1.8 0 0 0 13.5 11.5"),
     p("M2.5 8 A5.5 1.8 0 0 0 13.5 8"),
   ],
-  wifi: [p("M3.5 7.5 A6 6 0 0 1 12.5 7.5"), p("M5 9.5 A4 4 0 0 1 11 9.5"), p("M6.5 11.5 A2 2 0 0 1 9.5 11.5"), o(8, 13, 0.6)],
+  wifi: wifiSignal,
   "panel-right": [r(2.5, 3.5, 11, 9), p("M9.5 3.5 V12.5")],
   minimize: [p("M3.5 11.5 H12.5")],
   cut: [o(5, 11.5, 1.5), o(11, 11.5, 1.5), p("M5.5 10.2 L11 3.5"), p("M10.5 10.2 L5 3.5")],
@@ -454,9 +463,7 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   monitor: [r(2.5, 3.5, 11, 7.5), p("M8 11 V13"), p("M5.5 13 H10.5")],
   smartphone: [r(5, 1.5, 6, 13), p("M7 12.5 H9")],
   "wifi-off": [
-    p("M3.5 7.5 A6 6 0 0 1 12.5 7.5"),
-    p("M5 9.5 A4 4 0 0 1 11 9.5"),
-    o(8, 13, 0.6),
+    ...wifiSignal,
     p("M3.5 12.5 L12.5 3.5"),
   ],
   layers: [
@@ -669,10 +676,11 @@ export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
     p("M3.5 12.5 L12.5 3.5"),
   ],
   "wifi-off": [
-    ...marks.wifi.slice(0, 2),
-    marks.wifi[3]!,
-    p("M2 11 L11 2 L14 5 L5 14 Z"),
-    p("M3.5 12.5 L12.5 3.5"),
+    ...wifiSignal,
+    // A 2.5-unit clearance and a hand-cut 1.5-unit slash keep the signal
+    // recognizable. The family-wide off-state cut erases this small wave.
+    p("M2.616117 11.616117 L11.616117 2.616117 L13.383883 4.383883 L4.383883 13.383883 Z"),
+    p("M2.96967 11.96967 L11.96967 2.96967 L13.03033 4.03033 L4.03033 13.03033 Z"),
   ],
 };
 

@@ -72,7 +72,8 @@ describe("Icon optical fidelity", () => {
       const mask = container.querySelector("mask")!;
       const separator = mask.querySelector('path[fill="black"]');
       expect(separator).toBeTruthy();
-      expect(mask.querySelector('g')?.lastElementChild?.getAttribute("stroke")).toBe("white");
+      const slash = mask.querySelector('g')!.lastElementChild!;
+      expect(slash.getAttribute("stroke") === "white" || slash.getAttribute("fill") === "white").toBe(true);
       expect(separator?.compareDocumentPosition(mask.querySelector('g')!.lastElementChild!))
         .toBe(Node.DOCUMENT_POSITION_FOLLOWING);
       unmount();

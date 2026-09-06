@@ -39,6 +39,25 @@ try {
   const cell = page.locator("#reference-collection");
   await cell.scrollIntoViewIfNeeded();
   await page.locator(".inspiration-stage[data-ready='true']").waitFor();
+  const stage = page.locator(".inspiration-stage");
+  const turn = stage.getByRole("button", { name: "Turn object", exact: true });
+  assert.equal(await turn.count(), 1);
+  assert.equal(await page.getByRole("button", { name: "Browse", exact: true }).count(), 0);
+  assert.equal(await stage.getAttribute("data-interaction"), "browse");
+  assert.equal(await turn.getAttribute("aria-pressed"), "false");
+  assert.equal(await stage.locator(".inspiration-gesture").innerText(), "Drag to explore");
+  await turn.focus();
+  await page.keyboard.press("Space");
+  assert.equal(await turn.getAttribute("aria-pressed"), "true");
+  assert.equal(await stage.getAttribute("data-interaction"), "turn");
+  assert.equal(await stage.locator(".inspiration-gesture").innerText(), "Drag to rotate");
+  await page.keyboard.press("Space");
+  assert.equal(await turn.getAttribute("aria-pressed"), "false");
+  assert.equal(await stage.getAttribute("data-interaction"), "browse");
+  await stage.getByRole("button", { name: "Auto rotate", exact: true }).click();
+  assert.equal(await stage.getByRole("button", { name: "Stop rotation", exact: true }).getAttribute("aria-pressed"), "true");
+  await stage.getByRole("button", { name: "Stop rotation", exact: true }).click();
+  assert.equal(await stage.getByRole("button", { name: "Auto rotate", exact: true }).getAttribute("aria-pressed"), "false");
   await page.waitForTimeout(900);
   assert.ok(loadedModels.size >= 1);
   const bounds = await cell.boundingBox();
@@ -84,6 +103,12 @@ try {
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), true, `overflow at ${width}px`);
     const small = await page.locator(".inspiration-embed button, .inspiration-embed input").evaluateAll((elements) => elements.filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 43.9 || r.height < 43.9); }).map((el) => ({ label: el.getAttribute("aria-label") ?? el.textContent, rect: el.getBoundingClientRect().toJSON() })));
     assert.deepEqual(small, [], `targets at ${width}px`);
+    const outsideStage = await stage.locator(".inspiration-stage-bottom button, .inspiration-gesture").evaluateAll((elements) => elements.filter((element) => {
+      const box = element.getBoundingClientRect();
+      const parent = element.closest(".inspiration-stage").getBoundingClientRect();
+      return box.width === 0 || box.height === 0 || box.left < parent.left || box.top < parent.top || box.right > parent.right || box.bottom > parent.bottom;
+    }).map((element) => element.textContent));
+    assert.deepEqual(outsideStage, [], `carousel controls and drag hint stay visible on the scene at ${width}px`);
     if (width === 390) {
       await page.evaluate(() => { document.documentElement.dataset.theme = "light"; });
       await page.waitForTimeout(700);

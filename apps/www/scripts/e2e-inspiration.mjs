@@ -100,7 +100,10 @@ try {
     await ready(desktop);
   });
   await check("drag browsing changes the selected work", async () => {
-    await desktop.getByRole("button", { name: "Browse", exact: true }).click();
+    const turn = desktop.getByRole("button", { name: "Turn object", exact: true });
+    if (await turn.getAttribute("aria-pressed") === "true") await turn.click();
+    assert.equal(await desktop.getByRole("button", { name: "Browse", exact: true }).count(), 0);
+    assert.equal(await desktop.locator(".inspiration-stage").getAttribute("data-interaction"), "browse");
     await ready(desktop);
     await desktop.locator(".inspiration-stage").scrollIntoViewIfNeeded();
     const box = await desktop.locator(".inspiration-canvas").boundingBox();
