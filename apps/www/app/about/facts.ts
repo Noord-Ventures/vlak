@@ -362,7 +362,7 @@ export const notes = [
   },
   {
     q: "What is Noord?",
-    a: "Noord is a frontier design lab in Alkmaar, the Netherlands. Vlak was designed and built there.",
+    a: "Noord is an applied design lab in Alkmaar, the Netherlands. Vlak was designed and built there.",
   },
   {
     q: "What are the ten principles?",
@@ -385,7 +385,7 @@ export const typeface = {
 };
 
 export const noord = {
-  heading: "Noord Frontier Design Lab",
+  heading: "Noord Applied Design Lab",
   url: "https://noord.dev/",
   span: "Alkmaar",
   built: "Design and development:",

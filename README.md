@@ -4,7 +4,7 @@ Vlak is a minimal design system for product exploration. Its name is Dutch for p
 
 [vlak.dev](https://vlak.dev) · [github.com/Noord-Ventures/vlak](https://github.com/Noord-Ventures/vlak)
 
-Designed and built at Noord Frontier Design Lab in Alkmaar.
+Designed and built at Noord Applied Design Lab in Alkmaar.
 
 ## Install
 
