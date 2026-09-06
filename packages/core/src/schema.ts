@@ -14,6 +14,7 @@ export const vlakCategories = [
   "icons",
   "charts",
   "patterns",
+  "health",
 ] as const;
 
 export type VlakCategory = (typeof vlakCategories)[number];

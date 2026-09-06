@@ -257,6 +257,13 @@ describe("docs", () => {
     for (const entry of list()) expect(docsFor(entry.name), entry.name).toBeTruthy();
     expect(docsFor("nope")).toBeUndefined();
   });
+
+  it("serves the health composition guide alongside individual health components", () => {
+    expect(docsFor("health")).toContain("# Health, wellness, and care");
+    expect(docsFor("health")).toContain("Confirm recorded actions");
+    expect(docsFor("check-in")).toContain("## Keyboard");
+    expect(search("medication").map(hit => hit.name)).toContain("medication-schedule");
+  });
 });
 
 describe("search", () => {

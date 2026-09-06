@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "habit-tracker",
+  "type": "registry:component",
+  "title": "Habit tracker",
+  "description": "Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/habit-tracker.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport type HabitStatus = \"complete\" | \"missed\" | \"skipped\" | \"unrecorded\";\n\nexport interface HabitDay {\n  /** Application-owned calendar date, used as a key and passed back unchanged. */\n  date: string;\n  /** Explicit accessible date label; no date or timezone is inferred. */\n  label: string;\n  status: HabitStatus;\n  disabled?: boolean;\n}\n\nexport interface HabitTrackerProps extends React.HTMLAttributes<HTMLDivElement> {\n  label: React.ReactNode;\n  description?: React.ReactNode;\n  /** A supplied week or another dated range, rendered in the given order. */\n  days: HabitDay[];\n  /** A completion action requests complete, or unrecorded when clearing completion. */\n  onDayChange?: (date: string, status: HabitStatus) => void;\n  disabled?: boolean;\n  readOnly?: boolean;\n}\n\nconst statusLabels: Record<HabitStatus, string> = { complete: \"Complete\", missed: \"Missed\", skipped: \"Skipped\", unrecorded: \"Unrecorded\" };\nconst statusMarks: Record<HabitStatus, string> = { complete: \"✓\", missed: \"×\", skipped: \"–\", unrecorded: \"·\" };\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, color: vlak.ink },\n  label: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  description: { margin: 0, color: vlak.gray, fontSize: vlak.controlFs, lineHeight: 1.45, maxWidth: \"66ch\" },\n  days: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(5rem, 1fr))\", gap: \"0.5rem\", listStyleType: \"none\", padding: 0, margin: 0 },\n  day: { minWidth: 0, display: \"grid\", gap: \"0.5rem\", alignContent: \"start\", textAlign: \"center\" },\n  date: { fontSize: vlak.controlLabel, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  control: { display: \"grid\", justifyItems: \"center\", alignContent: \"center\", gap: \"0.25rem\", minHeight: \"4.5rem\", minWidth: vlak.hit, boxSizing: \"border-box\", width: \"100%\", padding: \"0.5rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: \"inherit\", fontSize: vlak.controlLabel, lineHeight: 1.45, cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  complete: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  unavailable: { cursor: \"default\", opacity: { default: 0.55, [mq.forcedColors]: 1 } },\n  static: { cursor: \"default\" },\n  mark: { fontSize: \"1.25rem\", lineHeight: 1.2 },\n});\n\n/** Dated completion records with caller-owned state and no inferred streak. */\nexport const HabitTracker = React.forwardRef<HTMLDivElement, HabitTrackerProps>(function HabitTracker({\n  label, description, days, onDayChange, disabled = false, readOnly = false, className, style, \"aria-label\": ariaLabel, \"aria-labelledby\": ariaLabelledBy, \"aria-describedby\": ariaDescribedBy, ...props\n}, ref) {\n  const id = React.useId();\n  const interactive = onDayChange != null && !readOnly;\n  const root = rs([\"rs-habit-tracker\", className], styles.root);\n  const heading = rs([\"rs-habit-tracker-label\"], styles.label);\n  const copy = rs([\"rs-habit-tracker-description\"], styles.description);\n  const list = rs([\"rs-habit-tracker-days\"], styles.days);\n  const dayStyle = rs([\"rs-habit-tracker-day\"], styles.day);\n  const dateStyle = rs([\"rs-habit-tracker-date\"], styles.date);\n  const mark = rs([\"rs-habit-tracker-mark\"], styles.mark);\n  return <div {...props} ref={ref} role=\"group\" aria-label={ariaLabel} aria-labelledby={ariaLabelledBy ?? (ariaLabel == null ? `${id}-label` : undefined)} aria-describedby={[ariaDescribedBy, description != null && `${id}-description`].filter(Boolean).join(\" \") || undefined} className={root.className} style={{ ...root.style, ...style }}>\n    <p id={`${id}-label`} className={heading.className} style={heading.style}>{label}</p>\n    {description != null && <p id={`${id}-description`} className={copy.className} style={copy.style}>{description}</p>}\n    {days.length === 0 && <p className={copy.className} style={copy.style}>No days recorded</p>}\n    <ul className={list.className} style={list.style}>{days.map((day, index) => {\n      const complete = day.status === \"complete\";\n      const unavailable = interactive && (disabled || day.disabled);\n      const control = rs([\"rs-habit-tracker-control\", complete && \"rs-habit-tracker-complete\", unavailable && \"rs-habit-tracker-unavailable\", !interactive && \"rs-habit-tracker-static\"], styles.control, complete && styles.complete, unavailable && styles.unavailable, !interactive && styles.static);\n      const contents = <><span aria-hidden=\"true\" className={mark.className} style={mark.style}>{statusMarks[day.status]}</span><span id={`${id}-status-${index}`}>{statusLabels[day.status]}</span></>;\n      return <li key={day.date} className={dayStyle.className} style={dayStyle.style}>\n        <span className={dateStyle.className} style={dateStyle.style}>{day.label}</span>\n        {interactive ? <button type=\"button\" disabled={disabled || day.disabled} aria-pressed={complete} aria-label={`${day.label}: completion`} aria-describedby={`${id}-status-${index}`} className={control.className} style={control.style} onClick={() => onDayChange?.(day.date, complete ? \"unrecorded\" : \"complete\")}>{contents}</button> : <div className={control.className} style={control.style}>{contents}</div>}\n      </li>;\n    })}</ul>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/habit-tracker.tsx"
+    },
+    {
+      "path": "vlak/styles/habit-tracker.css",
+      "content": "/* ── habit-tracker: generated from packages/react/src/components/habit-tracker.tsx ── */\n.rs-habit-tracker{display:grid;gap:0.75rem;min-width:0;color:var(--text)}\n.rs-habit-tracker-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-habit-tracker-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}\n.rs-habit-tracker-days{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.5rem;list-style-type:none;padding:0;margin:0}\n.rs-habit-tracker-day{min-width:0;display:grid;gap:0.5rem;align-content:start;text-align:center}\n.rs-habit-tracker-date{font-size:var(--control-label);line-height:1.45;overflow-wrap:anywhere}\n.rs-habit-tracker-control{display:grid;justify-items:center;align-content:center;gap:0.25rem;min-height:4.5rem;min-width:var(--hit);box-sizing:border-box;width:100%;padding:0.5rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:var(--control-label);line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-habit-tracker-control:focus-visible{outline-width:2px;outline-style:solid}\n.rs-habit-tracker-complete{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-habit-tracker-complete{background-color:Highlight;color:HighlightText}}\n.rs-habit-tracker-unavailable{cursor:default;opacity:0.55}\n@media (forced-colors: active){.rs-habit-tracker-unavailable{opacity:1}}\n.rs-habit-tracker-static{cursor:default}\n.rs-habit-tracker-mark{font-size:1.25rem;line-height:1.2}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/habit-tracker.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-habit-tracker",
+        "rs-habit-tracker-label",
+        "rs-habit-tracker-description",
+        "rs-habit-tracker-days",
+        "rs-habit-tracker-day",
+        "rs-habit-tracker-date",
+        "rs-habit-tracker-control",
+        "rs-habit-tracker-complete",
+        "rs-habit-tracker-unavailable",
+        "rs-habit-tracker-static",
+        "rs-habit-tracker-mark"
+      ],
+      "snippet": "<div class=\"rs-habit-tracker\" role=\"group\" aria-labelledby=\"habit-label\"><p class=\"rs-habit-tracker-label\" id=\"habit-label\">Evening walk</p><ul class=\"rs-habit-tracker-days\"><li class=\"rs-habit-tracker-day\"><span class=\"rs-habit-tracker-date\">Mon 7 Sep</span><div class=\"rs-habit-tracker-control rs-habit-tracker-complete rs-habit-tracker-static\"><span class=\"rs-habit-tracker-mark\" aria-hidden=\"true\">✓</span><span>Complete</span></div></li><li class=\"rs-habit-tracker-day\"><span class=\"rs-habit-tracker-date\">Tue 8 Sep</span><div class=\"rs-habit-tracker-control rs-habit-tracker-static\"><span class=\"rs-habit-tracker-mark\" aria-hidden=\"true\">·</span><span>Unrecorded</span></div></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "HabitTracker",
+        "Habit calendar",
+        "Wellness log",
+        "Daily completion",
+        "Habit grid"
+      ],
+      "example": "import { useState } from \"react\";\nimport { HabitTracker } from \"@noorddev/vlak-react\";\nimport type { HabitDay } from \"@noorddev/vlak-react\";\n\nfunction WalkingRecord() {\n  const [days, setDays] = useState<HabitDay[]>([\n    { date: \"2026-09-07\", label: \"Mon 7 Sep\", status: \"complete\" },\n    { date: \"2026-09-08\", label: \"Tue 8 Sep\", status: \"unrecorded\" },\n  ]);\n  return <HabitTracker label=\"Evening walk\" days={days} onDayChange={(date, status) => setDays((records) => records.map((day) => day.date === date ? { ...day, status } : day))} />;\n}",
+      "usage": {
+        "use": [
+          "A week of application-owned habit records, supplied in the intended order.",
+          "Explicit date labels and stable date keys, with no inferred current day or timezone.",
+          "onDayChange to request complete or clear completion to unrecorded; the application updates days and owns persistence."
+        ],
+        "avoid": [
+          "Inferring missed days from absent records or calculating a punitive streak.",
+          "Assuming a click has been saved without updating and persisting the supplied data."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through enabled completion controls when onDayChange is supplied."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests completion, or clears an existing completion to unrecorded."
+        }
+      ],
+      "a11y": [
+        "A named group contains an ordered display of supplied day records; every status remains visible as text.",
+        "Completion controls have stable accessible names, aria-pressed, and descriptions that announce complete, missed, skipped, or unrecorded.",
+        "Controls are at least 44px in each dimension; the responsive grid wraps on narrow screens.",
+        "Without onDayChange or with readOnly, records render as static text. Disabled controls do not call onDayChange.",
+        "The forwarded ref and native attributes reach the root div."
+      ]
+    }
+  }
+}

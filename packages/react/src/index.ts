@@ -31,6 +31,19 @@ export type { ViewerImage } from "./components/image-viewer";
 export type { ComposedMessage } from "./components/message-composer";
 export { rs } from "./rs";
 export { vlak, phone, mobileGrid, rail, wide, vlakFont, vlakMono } from "./tokens.stylex";
+export { HealthMetric, type HealthMetricProps } from "./components/health-metric";
+export { ReferenceRange, type ReferenceRangeProps } from "./components/reference-range";
+export { LabResults, type LabResultsProps, type LabResult } from "./components/lab-results";
+export { SymptomDiary, type SymptomDiaryProps, type SymptomEntry } from "./components/symptom-diary";
+export { CheckIn, type CheckInProps, type CheckInOption } from "./components/check-in";
+export { HabitTracker, type HabitTrackerProps, type HabitDay, type HabitStatus } from "./components/habit-tracker";
+export { SleepTimeline, type SleepTimelineProps, type SleepInterval, type SleepState } from "./components/sleep-timeline";
+export { ActivityGoal, type ActivityGoalProps } from "./components/activity-goal";
+export { PatientBanner, type PatientBannerProps, type PatientBannerIdentifier, type PatientBannerContextItem } from "./components/patient-banner";
+export { MedicationSchedule, type MedicationScheduleProps, type MedicationScheduleItem, type MedicationScheduleAction } from "./components/medication-schedule";
+export { AppointmentCard, type AppointmentCardProps } from "./components/appointment-card";
+export { CarePlan, type CarePlanProps, type CarePlanTask } from "./components/care-plan";
+
 export {
   Icon,
   Icons,

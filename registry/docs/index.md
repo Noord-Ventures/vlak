@@ -1,6 +1,6 @@
 # Vlak components
 
-114 components in 9 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+126 components in 10 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -142,6 +142,21 @@
 - [Inline form](inline-form.md): Pairs one field with an embedded submit action. The button appears after validation.
 - [Workflow card](workflow.md): Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 - [Assistant panel](assistant.md): Frames an assistant exchange with a user message, reply, suggestion, and input row.
+
+## Health
+
+- [Health metric](health-metric.md): A supplied health reading, unit, time and source with explicit pending, unavailable and stale states.
+- [Reference range](reference-range.md): Positions a supplied numeric reading against caller-supplied reference bounds, with a complete text equivalent.
+- [Lab results](lab-results.md): A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.
+- [Symptom diary](symptom-diary.md): A chronological record of supplied symptoms and intensity descriptions, with notes and 44px native detail disclosures.
+- [Check-in](check-in.md): Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.
+- [Habit tracker](habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
+- [Sleep timeline](sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
+- [Activity goal](activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+- [Patient banner](patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
+- [Medication schedule](medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
+- [Appointment card](appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
+- [Care plan](care-plan.md): Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.
 
 ## Also
 

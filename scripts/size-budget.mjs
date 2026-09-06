@@ -28,7 +28,9 @@ const budgets = [
   // so growth in the catalog cannot hide a regression in a common control.
   ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 24 * 1024],
   ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024],
-  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 136 * 1024],
+  // Twelve health leaves bring the catalog to 126 components. The combined
+  // bundle and registry grow; existing control/CSS caps stay unchanged.
+  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 144 * 1024],
   ["@noorddev/vlak-react components/button.js", "packages/react/dist/components/button.js", 4 * 1024],
   ["@noorddev/vlak-react components/number-field.js", "packages/react/dist/components/number-field.js", 3 * 1024],
   ["@noorddev/vlak-react components/playback-controls.js", "packages/react/dist/components/playback-controls.js", 2 * 1024],
@@ -37,7 +39,9 @@ const budgets = [
   ["@noorddev/vlak-react components/media-player.js", "packages/react/dist/components/media-player.js", 5 * 1024],
   ["@noorddev/vlak-react components/scheduler.js", "packages/react/dist/components/scheduler.js", 6 * 1024],
   ["@noorddev/vlak-react components/file-upload.js", "packages/react/dist/components/file-upload.js", 5 * 1024],
-  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 64 * 1024],
+  ...["health-metric", "reference-range", "lab-results", "symptom-diary", "check-in", "habit-tracker", "sleep-timeline", "activity-goal", "patient-banner", "medication-schedule", "appointment-card", "care-plan"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 68 * 1024],
 ];
 
 let failed = false;

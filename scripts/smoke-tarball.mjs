@@ -18,7 +18,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 114;
+const expectedCatalogueSize = 126;
 const additions = [
   ["number-field", "NumberField"], ["range-slider", "RangeSlider"], ["multi-select", "MultiSelect"], ["tag-input", "TagInput"], ["date-range-picker", "DateRangePicker"],
   ["time-field", "TimeField"], ["file-upload", "FileUpload"], ["transfer-list", "TransferList"], ["inline-edit", "InlineEdit"], ["rating", "Rating"],
@@ -28,6 +28,9 @@ const additions = [
   ["query-builder", "QueryBuilder"], ["sortable-list", "SortableList"], ["virtual-list", "VirtualList"], ["master-detail", "MasterDetail"], ["property-grid", "PropertyGrid"],
   ["playback-controls", "PlaybackControls"], ["media-scrubber", "MediaScrubber"], ["media-player", "MediaPlayer"], ["waveform", "Waveform"], ["image-viewer", "ImageViewer"],
   ["canvas-controls", "CanvasControls"], ["message-composer", "MessageComposer"], ["file-browser", "FileBrowser"], ["kanban-board", "KanbanBoard"], ["scheduler", "Scheduler"],
+  ["health-metric", "HealthMetric"], ["reference-range", "ReferenceRange"], ["lab-results", "LabResults"], ["symptom-diary", "SymptomDiary"],
+  ["activity-goal", "ActivityGoal"], ["habit-tracker", "HabitTracker"], ["check-in", "CheckIn"], ["sleep-timeline", "SleepTimeline"],
+  ["patient-banner", "PatientBanner"], ["medication-schedule", "MedicationSchedule"], ["appointment-card", "AppointmentCard"], ["care-plan", "CarePlan"],
 ];
 // The same fixtures exercise the packed modules under both supported React majors.
 const renderAdditions = `
@@ -42,6 +45,18 @@ const fixtureProps = {
   VirtualList: { label: "Records", items: [] }, MasterDetail: { items: [] }, PropertyGrid: { fields: [] },
   MediaScrubber: { duration: 60 }, MediaPlayer: { src: "/recording.mp3", label: "Recording" }, Waveform: { samples: [0.2, 0.6], duration: 60 }, ImageViewer: { images: [] },
   MessageComposer: { onSend() {} }, FileBrowser: { entries: [] }, KanbanBoard: { columns: [] }, Scheduler: { events: [], defaultView: "agenda", defaultValue: new Date("2026-09-06T00:00:00Z"), timeZone: "UTC" },
+  HealthMetric: { label: "Recorded amount", value: 2, unit: "units", status: "available", source: "Fictional fixture" },
+  ReferenceRange: { label: "Example assay", value: 2, minimum: 1, maximum: 3, unit: "units", rangeLabel: "Supplied example interval" },
+  LabResults: { label: "Example results", results: [{ id: "assay", name: "Example assay", value: 2, unit: "units", status: "final", minimum: 1, maximum: 3, note: "Fictional fixture" }] },
+  SymptomDiary: { entries: [{ id: "entry", symptom: "Reported discomfort", dateTime: "2026-09-14T08:00:00+02:00", timeLabel: "14 September, 08:00 UTC+02:00", intensity: "As reported", notes: "Fictional fixture" }] },
+  ActivityGoal: { label: "Personal activity goal", current: 2, target: 3, unit: "sessions" },
+  HabitTracker: { label: "Example habit", days: [{ date: "2026-09-14", label: "14 September", status: "unrecorded" }], onDayChange() {} },
+  CheckIn: { label: "How was your day?", options: [{ value: "steady", label: "Steady" }, { value: "difficult", label: "Difficult" }], value: null, onValueChange() {} },
+  SleepTimeline: { label: "Recorded sleep", start: 0, end: 120, startLabel: "22:00", endLabel: "00:00", intervals: [{ id: "asleep", start: 0, end: 90, startLabel: "22:00", endLabel: "23:30", state: "asleep" }, { id: "unknown", start: 90, end: 120, startLabel: "23:30", endLabel: "00:00", state: "unknown" }] },
+  PatientBanner: { patientName: "Robin Ellis", identifiers: [{ id: "record", label: "Patient ID", value: "Demo 042" }], contextItems: [{ id: "allergies", label: "Allergies", value: "Not reviewed" }] },
+  MedicationSchedule: { timeZone: "Europe/Amsterdam, UTC+02:00", dateLabel: "14 September 2026", items: [{ id: "morning", name: "Example medication", dose: "Supplied dose", timeLabel: "08:00", status: "Not recorded", instructions: "Supplied instructions", actions: [{ id: "taken", label: "Record as taken" }] }], onAction() {} },
+  AppointmentCard: { appointmentTitle: "Care team check-in", dateLabel: "18 September 2026", timeLabel: "10:30–11:00", timeZone: "Europe/Amsterdam, UTC+02:00", dateTime: "2026-09-18T10:30:00+02:00", clinician: "Alex Morgan", location: "Demo clinic", status: "Awaiting confirmation" },
+  CarePlan: { tasks: [{ id: "questions", title: "Prepare questions", owner: "Robin Ellis", dueLabel: "17 September", status: "Open", completed: false }], onCompletedChange() {} },
 };
 let additionHtml = "";
 for (const [name, exported] of additions) {
@@ -180,7 +195,7 @@ if (bad.length) process.exit(1);
     }
     if (/from\s*["']@noorddev\/vlak-react/.test(source)) throw new Error(`cli: vendored source leaked a package dependency in ${file}`);
   }
-  log(`cli: all 40 additions present, ${vendored.length} source files have complete relative import closure`);
+  log(`cli: all ${additions.length} additions present, ${vendored.length} source files have complete relative import closure`);
   log(`cli: init + add wrote the tree, list --json has ${listed.length} entries`);
 
   log("ok");

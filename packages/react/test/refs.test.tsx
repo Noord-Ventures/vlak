@@ -76,7 +76,23 @@ const inRow = (el: React.ReactElement) => (
   </Vlak.Table>
 );
 
+const healthCases: Record<string, Case> = {
+  HealthMetric: { props: { label: "Recorded events", value: 0, unit: "events", source: "Diary" }, tag: "div" },
+  ReferenceRange: { props: { label: "Reported measurement", value: 24, minimum: 20, maximum: 30, unit: "units" }, tag: "div" },
+  LabResults: { props: { label: "Latest report", results: [{ id: "reported", name: "Reported measurement", value: 24, unit: "units", status: "final" }] }, tag: "ul" },
+  SymptomDiary: { props: { entries: [{ id: "morning", symptom: "Headache", dateTime: "2026-09-06T09:00:00+02:00", intensity: "Mild", details: "Recorded after breakfast" }] }, tag: "ol" },
+  CheckIn: { props: { label: "How is your energy?", options: [{ value: "steady", label: "Steady" }], defaultValue: null }, tag: "fieldset" },
+  HabitTracker: { props: { label: "Evening walk", days: [{ date: "2026-09-06", label: "Sun 6 Sep", status: "unrecorded" }], onDayChange: noop }, tag: "div" },
+  SleepTimeline: { props: { label: "Last night", start: 0, end: 480, startLabel: "22:30", endLabel: "06:30", intervals: [{ id: "sleep", start: 0, end: 480, startLabel: "22:30", endLabel: "06:30", state: "asleep" }] }, tag: "figure" },
+  ActivityGoal: { props: { label: "Walking", current: 24, target: 30, unit: "min" }, tag: "div" },
+  PatientBanner: { props: { patientName: "Robin Ellis", identifiers: [{ id: "record", label: "Patient ID", value: "Demo 042" }], contextItems: [{ id: "allergies", label: "Allergies", value: "Not reviewed" }] }, tag: "div" },
+  MedicationSchedule: { props: { timeZone: "Europe/Amsterdam, UTC+02:00", items: [{ id: "morning", name: "Example medication", dose: "Supplied dose", timeLabel: "08:00", status: "Not recorded", actions: [{ id: "taken", label: "Record as taken" }] }], onAction: noop }, tag: "div" },
+  AppointmentCard: { props: { appointmentTitle: "Care team check-in", dateLabel: "18 September 2026", timeLabel: "10:30", timeZone: "Europe/Amsterdam, UTC+02:00", status: "Awaiting confirmation" }, tag: "div" },
+  CarePlan: { props: { tasks: [{ id: "visit", title: "Confirm the next visit", owner: "Robin Ellis", dueLabel: "17 September", status: "Open", completed: false }], onCompletedChange: noop }, tag: "div" },
+};
+
 const cases: Record<string, Case> = {
+  ...healthCases,
   NumberField: { props: { label: "Count" }, tag: "input" },
   RangeSlider: { props: { label: "Range" }, tag: "fieldset" },
   MultiSelect: { props: { options: option, label: "Cities" }, tag: "fieldset" },
@@ -306,6 +322,21 @@ describe("ref forwarding", () => {
       render(wrap(<Component ref={ref} {...props} />));
       expect(ref.current).toBeInstanceOf(Element);
       expect(ref.current?.tagName.toLowerCase()).toBe(tag);
+    });
+  }
+
+  for (const [name, { props = {} }] of Object.entries(healthCases)) {
+    it(`${name} preserves native root attributes and merges consumer styles`, () => {
+      const Component = exportsByName[name] as React.ComponentType<AnyProps & React.RefAttributes<Element>>;
+      const ref = React.createRef<HTMLElement>();
+      render(<Component ref={ref} {...props} id="health-record" title="Supplied record title" data-record="demo" dir="rtl" className="consumer-record" style={{ marginTop: 17 }} />);
+      expect(ref.current?.id).toBe("health-record");
+      expect(ref.current?.getAttribute("title")).toBe("Supplied record title");
+      expect(ref.current?.dataset.record).toBe("demo");
+      expect(ref.current?.dir).toBe("rtl");
+      expect(ref.current?.classList.contains("consumer-record")).toBe(true);
+      expect(ref.current?.className).toMatch(/rs-/);
+      expect(ref.current?.style.marginTop).toBe("17px");
     });
   }
 });

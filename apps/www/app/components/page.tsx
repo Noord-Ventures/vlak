@@ -67,6 +67,11 @@ export default function ComponentsPage() {
               <h2 className="rs-t-title catalog-group">
                 {category.charAt(0).toUpperCase() + category.slice(1)}
               </h2>
+              {category === "health" && (
+                <p className="rs-t-body">
+                  Readings, daily routines, and care workflows. <Link href="/docs/health" className="rs-link">Building health software</Link>
+                </p>
+              )}
               <div {...sx("gallery", chrome.gallery)}>
                 {items.map((c) => (
                   <div key={c.name} {...sx("gallery-item", chrome.galleryItem)}>

@@ -10,6 +10,7 @@ import { join, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
+import { checkHealthCollection } from "./health-e2e.mjs";
 
 const require = createRequire(import.meta.url);
 const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
@@ -52,7 +53,7 @@ const browser = await chromium.launch(
 );
 
 /* axe on every page, desktop. */
-const docs = ["", "frameworks/", "theming/", "tokens/", "layers/", "stylex/", "accessibility/", "agents/"].map((d) => `/docs/${d}`);
+const docs = ["", "frameworks/", "theming/", "tokens/", "layers/", "stylex/", "accessibility/", "health/", "agents/"].map((d) => `/docs/${d}`);
 const pages = ["/", ...docs, "/components/", "/about/", "/interfaces/", "/interfaces/evening/", ...catalogComponents.map((c) => `/components/${c.name}/`)];
 const desk = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 for (const path of pages) {
@@ -273,6 +274,8 @@ await phone.waitForTimeout(250);
 if (await phone.evaluate(() => document.querySelector("#navPanel")?.getAttribute("data-open") === "true")) fail("phone menu: Escape did not close it");
 if (!(await phone.evaluate(() => document.activeElement?.classList.contains("nav-toggle")))) fail("phone menu: focus did not return to the toggle");
 await phone.close();
+
+await checkHealthCollection({ browser, base, components: catalogComponents, axeSource, fail });
 
 await browser.close();
 server.close();

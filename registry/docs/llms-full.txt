@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 114 components in 9 categories: actions (14), forms (27), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 126 components in 10 categories: actions (14), forms (27), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), health (12). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 
@@ -89,7 +89,7 @@ Conventions that hold across the catalogue:
 - Reading: body copy stays between 45 and 90 characters per line, with 66 characters as the default measure. Body line-height stays between 1.2 and 1.45 times its font size; Vlak defaults to 1.45.
 - Controlled and uncontrolled: `value` / `defaultValue` / `onValueChange` (Select, Combobox, Tabs, RadioGroup, ToggleGroup, Slider, Calendar, DatePicker); `checked` / `defaultChecked` / `onCheckedChange` (Switch); `pressed` / `defaultPressed` / `onPressedChange` (Toggle); `open` / `onClose` (Dialog, AlertDialog, Sheet, Drawer, CommandDialog). Checkbox and Radio are native inputs and use `checked` / `onChange`.
 - `className` and `style` merge with the component's own; native attributes and event handlers pass through to the root element (the props tables say which attribute set each component extends).
-- Refs: 187 of 188 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
+- Refs: 199 of 200 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
 - Names: components that render no visible label take `aria-label` or `aria-labelledby` (Select, Combobox, Switch, Slider, ButtonGroup, ToggleGroup, RadioGroup, ScrollArea, Carousel, Split). Dialogs are named by their Title part.
 - Platform first: `<dialog>`, `<details>`, the Popover API, scroll snap, and native inputs do the work. Where the platform has nothing, the APG pattern applies (listbox, menu, grid, tabs) with full keyboard support, listed on each page.
 - Sentence case everywhere. No all caps. Copy is short and matter-of-fact.
@@ -369,6 +369,80 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 | `phone.font` | `16` |
 | `phone.label` | `15` |
 | `breakpoint` | `640` |
+
+
+---
+
+# Health, wellness, and care
+
+Compose readings, daily routines, and care workflows from the health collection. Each component is available as React, CSS, and a registry item.
+
+## Readings and observations
+
+Keep a reading with its unit, source, collection time, and result status. Compare only against the reference interval supplied with that result.
+
+- [Health metric](https://vlak.dev/docs/health-metric.md): A supplied health reading, unit, time and source with explicit pending, unavailable and stale states.
+- [Reference range](https://vlak.dev/docs/reference-range.md): Positions a supplied numeric reading against caller-supplied reference bounds, with a complete text equivalent.
+- [Lab results](https://vlak.dev/docs/lab-results.md): A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.
+- [Symptom diary](https://vlak.dev/docs/symptom-diary.md): A chronological record of supplied symptoms and intensity descriptions, with notes and 44px native detail disclosures.
+
+## Daily wellbeing
+
+Collect a check-in, record a routine, review a sleep period, and follow a personal activity goal. Keep unrecorded days and gaps visible.
+
+- [Check-in](https://vlak.dev/docs/check-in.md): Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.
+- [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
+- [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
+- [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+
+## Care workflows
+
+Keep patient identity and recorded context together. Show the supplied medication schedule, appointment details, and care tasks with explicit action states.
+
+- [Patient banner](https://vlak.dev/docs/patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
+- [Medication schedule](https://vlak.dev/docs/medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
+- [Appointment card](https://vlak.dev/docs/appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
+- [Care plan](https://vlak.dev/docs/care-plan.md): Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.
+
+## Data and action contracts
+
+### Preserve missing information
+
+Zero is a reading. Missing, pending, unavailable, skipped, and not recorded describe different states. Pass the state explicitly and retain the original value.
+
+### Keep context with a value
+
+Supply units, source, collection time, display labels, and the relevant time zone. Format dates in the application so the server and browser show the same appointment or measurement time.
+
+### Supply clinical meaning
+
+The application supplies result flags, reference intervals, medication instructions, and care priorities. These components present that information; they do not calculate diagnoses, recommend doses, or classify a person from a reading.
+
+### Confirm recorded actions
+
+Medication and care-plan callbacks express a requested action. Keep the item pending while saving, show the confirmed state after success, and preserve the prior record when saving fails.
+
+### Use text as well as geometry
+
+Status is written in words. Ranges and timelines include text equivalents. Check-ins use named native choices, and controls retain keyboard access and 44px targets.
+
+### Connect the product boundary
+
+The host application owns identity, access control, persistence, audit history, and any health-record integration. Examples use fictional records and local demonstration state.
+
+## Compose with the wider system
+
+Use NumberField and Field for measurement entry, DateRangePicker for reporting periods, Scheduler for booking, MessageComposer for care conversations, and ErrorSummary for a submission that needs attention.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+# Or vendor an individual component
+npx @noorddev/vlak-cli add check-in
+# Or use the registry
+npx shadcn add https://vlak.dev/r/check-in.json
+```
 
 
 ---
@@ -4468,6 +4542,1297 @@ Forwards `ref` to the `HTMLDivElement`.
 Registry dependencies: [button](button.md), [icons](icons.md), [input](input.md), [native-select](native-select.md), [dialog](dialog.md).  
 React: `packages/react/src/components/scheduler.tsx`  
 CSS: `packages/core/css/components/scheduler.css`
+
+
+---
+
+# Health metric
+
+A supplied health reading, unit, time and source with explicit pending, unavailable and stale states.
+
+Category: health  
+Name: `health-metric`  
+Also known as: Vital sign, Vital metric, Health reading, Patient observation, Biometric card, Wellness metric  
+Page: https://vlak.dev/components/health-metric/
+
+## When to use
+
+- Patient summaries and wellness dashboards with a known source for each reading.
+- Pass status from the application's data policy; the component does not infer freshness.
+- Pass timeLabel with the relevant timezone when a human-readable time is needed.
+
+## When not to
+
+- Deriving a diagnosis, clinical flag or urgency from the number.
+- Using zero as a placeholder for missing data; omit value instead.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { HealthMetric } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add health-metric
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/health-metric.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-health-metric" data-status="stale">
+  <p class="rs-health-metric-label">Resting heart rate</p>
+  <p class="rs-health-metric-reading"><span class="rs-health-metric-value">64</span> <span class="rs-health-metric-unit">bpm</span></p>
+  <p class="rs-health-metric-status">Last recorded, stale</p>
+  <p class="rs-health-metric-meta"><time datetime="2026-09-05T07:20:00+02:00">5 Sep, 07:20 CEST</time><span>Wrist sensor</span></p>
+</div>
+```
+
+## Example
+
+```tsx
+import { HealthMetric } from "@noorddev/vlak-react";
+
+<HealthMetric
+  label="Resting heart rate"
+  value={64}
+  unit="bpm"
+  status="stale"
+  dateTime="2026-09-05T07:20:00+02:00"
+  timeLabel="5 Sep, 07:20 CEST"
+  source="Wrist sensor"
+  description="Waiting for the next device sync"
+/>
+<HealthMetric label="Sleep duration" status="pending" />
+```
+
+## Props
+
+### HealthMetric
+
+A sourced reading with explicit data availability, without clinical interpretation.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `value` | `string \| number \| null` |  | A supplied reading. Zero is a reading; empty strings and non-finite numbers are missing. |
+| `unit` | `string` |  |  |
+| `status` | `HealthMetricStatus` | `"available"` | Supplied by the application. Freshness is never inferred from the timestamp. |
+| `statusLabel` | `ReactNode` |  |  |
+| `dateTime` | `string` |  |  |
+| `timeLabel` | `string` |  | Human-readable time, including the relevant timezone. Falls back to dateTime. |
+| `source` | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+
+## Accessibility
+
+- Visible labels, units, status, source and time accompany the reading.
+- Zero is preserved; empty strings and non-finite values become unavailable. Pending and unavailable states suppress any supplied reading.
+- Stale values remain visible with a textual stale label. No clinical status is calculated.
+- A native time element preserves the supplied machine-readable timestamp. Native attributes and the div ref pass through.
+- The component adds no live region or tab stop. The application can announce updates in context.
+
+## Classes
+
+`rs-health-metric`, `rs-health-metric-label`, `rs-health-metric-reading`, `rs-health-metric-value`, `rs-health-metric-unit`, `rs-health-metric-status`, `rs-health-metric-meta`, `rs-health-metric-description`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/health-metric.tsx`  
+CSS: `packages/core/css/components/health-metric.css`
+
+
+---
+
+# Reference range
+
+Positions a supplied numeric reading against caller-supplied reference bounds, with a complete text equivalent.
+
+Category: health  
+Name: `reference-range`  
+Also known as: Reference interval, Lab range, Result range, Observation range, Biomarker interval  
+Page: https://vlak.dev/components/reference-range/
+
+## When to use
+
+- Display numeric bounds supplied by the responsible laboratory or data source.
+- Pass valueLabel to format the reading and rangeLabel to identify the source of the interval.
+- One-sided intervals are textual; a marker requires two finite, ordered bounds.
+
+## When not to
+
+- Hard-coding a universal normal interval across patients, methods or units.
+- Using the marker to indicate a diagnosis, treatment decision or calculated clinical status.
+- Comparing a value and bounds expressed in different units.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ReferenceRange } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add reference-range
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/reference-range.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-reference-range">
+  <p class="rs-reference-range-head"><span class="rs-reference-range-label">Reported measurement</span><span class="rs-reference-range-value">24 units</span></p>
+  <div class="rs-reference-range-track" aria-hidden="true"><span class="rs-reference-range-interval"></span><span class="rs-reference-range-marker" style="inset-inline-start:44%"></span></div>
+  <p class="rs-reference-range-bounds"><span>Supplied reference interval</span><span>20–30 units</span></p>
+</div>
+```
+
+## Example
+
+```tsx
+import { ReferenceRange } from "@noorddev/vlak-react";
+
+<ReferenceRange
+  label="Reported measurement"
+  value={24}
+  minimum={20}
+  maximum={30}
+  unit="units"
+  rangeLabel="Supplied reference interval"
+/>
+<ReferenceRange label="One-sided interval" value={8} maximum={10} unit="units" />
+```
+
+## Props
+
+### ReferenceRange
+
+A supplied numeric reference interval. Position describes arithmetic, never clinical status.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  |  |
+| `value` | `number \| null` |  |  |
+| `minimum` | `number \| null` |  | Caller-supplied lower bound. Omit for an upper bound only. |
+| `maximum` | `number \| null` |  | Caller-supplied upper bound. Omit for a lower bound only. |
+| `unit` | `string` |  |  |
+| `valueLabel` | `string` |  | Display formatting for the supplied numeric value. |
+| `rangeLabel` | `string` | `"Reference interval"` | Optional contextual label, such as the laboratory's reference interval. |
+
+## Accessibility
+
+- The reading, unit and reference interval are visible as text; decorative geometry is aria-hidden.
+- The reference band spans 20% to 80% of the track from the reading direction's start. Outlying markers clamp to the track and have a textual above or below description.
+- Missing, non-finite, equal and reversed bounds never produce an invalid marker position. Missing results are named explicitly.
+- A one-sided interval is rendered as at least or up to without inventing a second bound.
+- The marker remains visible in forced colors. There is no animation, interactive control or clinical classification.
+
+## Classes
+
+`rs-reference-range`, `rs-reference-range-head`, `rs-reference-range-label`, `rs-reference-range-value`, `rs-reference-range-track`, `rs-reference-range-interval`, `rs-reference-range-marker`, `rs-reference-range-bounds`, `rs-reference-range-description`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/reference-range.tsx`  
+CSS: `packages/core/css/components/reference-range.css`
+
+
+---
+
+# Lab results
+
+A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.
+
+Category: health  
+Name: `lab-results`  
+Also known as: Laboratory report, Lab panel, Test results, Patient results, Pathology results, Diagnostic report  
+Page: https://vlak.dev/components/lab-results/
+
+## When to use
+
+- Review numeric and qualitative results from an existing report.
+- Supply report states and flags from the source; the component never derives them from a reading.
+- Attach note to explain an amendment or unavailable result; provide stable result ids.
+
+## When not to
+
+- Calculating diagnoses, critical-result alerts or treatment recommendations.
+- Implying that final means clinically normal or that an amended value is the original report.
+- Using the synthetic example values as clinical reference intervals.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { LabResults } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add lab-results
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/lab-results.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<ul class="rs-lab-results" aria-label="Latest report">
+  <li class="rs-lab-results-item" data-status="amended"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Reported measurement</p><p class="rs-lab-results-status">Amended</p></div><p class="rs-lab-results-reading">24 <span class="rs-lab-results-unit">units</span></p><p class="rs-lab-results-note">Replaces the earlier report</p></li>
+  <li class="rs-lab-results-item" data-status="pending"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Additional analysis</p><p class="rs-lab-results-status">Pending</p></div></li>
+</ul>
+```
+
+## Example
+
+```tsx
+import { LabResults } from "@noorddev/vlak-react";
+
+<LabResults label="Latest report" results={[
+  { id: "reported", name: "Reported measurement", value: 24, unit: "units", minimum: 20, maximum: 30, status: "amended", note: "Replaces the earlier report" },
+  { id: "analysis", name: "Additional analysis", status: "pending" },
+  { id: "sample", name: "Sample analysis", status: "unavailable", note: "The laboratory did not release a result" },
+]} />
+```
+
+## Props
+
+### LabResults
+
+Supplied laboratory results with explicit report states and optional reference intervals.
+
+Extends `Omit<HTMLAttributes<HTMLUListElement>, "results">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLUListElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `string` |  | Accessible collection name. |
+| `results` (required) | `readonly LabResult[]` |  |  |
+| `emptyLabel` | `string` | `"No results available"` |  |
+
+## Accessibility
+
+- The root is a native list named by label, with one item per result and a forwarded list ref.
+- Final, pending, unavailable and amended states are explicit text; caller-supplied flags supplement the report state.
+- Pending and unavailable results hide any supplied value. Zero and qualitative result strings remain valid readings.
+- Numeric reference intervals reuse ReferenceRange, including its visible text equivalent and invalid-bound handling.
+- An amended report without a reading explicitly says result unavailable. No live announcements are added automatically.
+
+## Classes
+
+`rs-lab-results`, `rs-lab-results-item`, `rs-lab-results-head`, `rs-lab-results-name`, `rs-lab-results-status`, `rs-lab-results-reading`, `rs-lab-results-unit`, `rs-lab-results-note`, `rs-lab-results-time`
+
+## Dependencies
+
+Registry dependencies: [reference-range](reference-range.md).  
+React: `packages/react/src/components/lab-results.tsx`  
+CSS: `packages/core/css/components/lab-results.css`
+
+
+---
+
+# Symptom diary
+
+A chronological record of supplied symptoms and intensity descriptions, with notes and 44px native detail disclosures.
+
+Category: health  
+Name: `symptom-diary`  
+Also known as: Symptom journal, Patient diary, Symptom history, Pain diary, Health journal, Patient-reported outcomes  
+Page: https://vlak.dev/components/symptom-diary/
+
+## When to use
+
+- Read patient-entered symptom history without converting their descriptions into a diagnosis.
+- Supply intensity in words or with a named scale; the component does not create severity categories.
+- Use actions for application-owned edit or review controls with accessible names and 44px targets.
+
+## When not to
+
+- Triage, diagnosis or urgency inferred from diary text.
+- Assuming a missing diary entry means that no symptom occurred.
+- Passing ambiguous timestamps; use ISO timestamps with an explicit offset and timeLabel for display.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { SymptomDiary } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add symptom-diary
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/symptom-diary.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<ol class="rs-symptom-diary" aria-label="Recent symptom entries"><li class="rs-symptom-diary-item">
+  <time class="rs-symptom-diary-time" datetime="2026-09-06T09:00:00+02:00">6 Sep, 09:00 CEST</time>
+  <div class="rs-symptom-diary-content"><div class="rs-symptom-diary-head"><p class="rs-symptom-diary-symptom">Headache</p><p class="rs-symptom-diary-intensity">Mild, self-reported</p></div><p class="rs-symptom-diary-body">Recorded after breakfast</p><details><summary class="rs-symptom-diary-summary" aria-label="Details for Headache, 6 Sep at 09:00 CEST">Details</summary><p class="rs-symptom-diary-body">No additional context recorded</p></details></div>
+</li></ol>
+```
+
+## Example
+
+```tsx
+import { SymptomDiary } from "@noorddev/vlak-react";
+
+<SymptomDiary aria-label="Recent symptom entries" order="newest" entries={[
+  { id: "morning", symptom: "Headache", dateTime: "2026-09-06T09:00:00+02:00", timeLabel: "6 Sep, 09:00 CEST", intensity: "Mild, self-reported", notes: "Recorded after breakfast", details: "No additional context recorded" },
+  { id: "evening", symptom: "Fatigue", dateTime: "2026-09-05T18:30:00+02:00", timeLabel: "5 Sep, 18:30 CEST", intensity: "Noticeable, self-reported", notes: "Recorded at the end of the workday" },
+]} />
+```
+
+## Props
+
+### SymptomDiary
+
+A time-ordered record of supplied symptoms, descriptions and native detail disclosures.
+
+Extends `HTMLAttributes<HTMLOListElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLOListElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `entries` (required) | `readonly SymptomEntry[]` |  |  |
+| `emptyLabel` | `string` | `"No symptoms recorded"` |  |
+| `order` | `"newest" \| "oldest"` | `"newest"` | Sorts a copy of entries. Equal timestamps retain their supplied order. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses each detail summary and any supplied actions |
+| Enter, Space | Opens or closes a focused native detail disclosure |
+
+## Accessibility
+
+- A native ordered list preserves chronological structure. Order defaults to newest first and never mutates the supplied entries.
+- Equal timestamps retain input order; invalid timestamps sort last and have no invalid datetime attribute.
+- Each disclosure has a unique default name combining symptom and display time; detailsLabel can supply a more precise name.
+- Native details and summary provide keyboard toggling. Summaries have 44px targets and a 2px focus ring.
+- Intensity and context remain readable text. There are no inferred clinical flags or automatic announcements.
+
+## Classes
+
+`rs-symptom-diary`, `rs-symptom-diary-item`, `rs-symptom-diary-time`, `rs-symptom-diary-content`, `rs-symptom-diary-head`, `rs-symptom-diary-symptom`, `rs-symptom-diary-intensity`, `rs-symptom-diary-body`, `rs-symptom-diary-summary`, `rs-symptom-diary-actions`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/symptom-diary.tsx`  
+CSS: `packages/core/css/components/symptom-diary.css`
+
+
+---
+
+# Check-in
+
+Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.
+
+Category: health  
+Name: `check-in`  
+Also known as: CheckIn, Mood check-in, Energy check-in, Wellness check-in, Text rating, Self report  
+Page: https://vlak.dev/components/check-in/
+
+## When to use
+
+- A daily mood, comfort, or energy check-in with application-owned wording.
+- Unique option values and explicit labels for every answer.
+- value, defaultValue, and onValueChange with null for an unanswered check-in; name and form submit the selected string.
+
+## When not to
+
+- Inventing a clinical questionnaire, diagnostic interpretation, or score from the selected position.
+- Treating an unanswered check-in as a negative answer.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CheckIn } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add check-in
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/check-in.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<fieldset class="rs-check-in"><legend class="rs-check-in-legend">How is your energy?</legend><p class="rs-check-in-description">Choose the answer that fits right now.</p><div class="rs-check-in-choices"><label class="rs-check-in-choice"><span>Low</span><input class="rs-check-in-input" type="radio" name="energy" value="low" /></label><label class="rs-check-in-choice rs-check-in-selected"><span>Steady</span><input class="rs-check-in-input" type="radio" name="energy" value="steady" checked /></label><label class="rs-check-in-choice"><span>High</span><input class="rs-check-in-input" type="radio" name="energy" value="high" /></label></div></fieldset>
+```
+
+## Example
+
+```tsx
+import { CheckIn } from "@noorddev/vlak-react";
+
+<CheckIn label="How is your energy?" description="Choose the answer that fits right now." name="energy" options={[{ value: "low", label: "Low" }, { value: "steady", label: "Steady" }, { value: "high", label: "High" }]} defaultValue={null} />
+```
+
+## Props
+
+### CheckIn
+
+A named text choice without an inferred clinical score.
+
+Extends `Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, "onChange" | "defaultValue">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLFieldSetElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `options` (required) | `CheckInOption[]` |  | Text answers supplied by the application. Values must be unique. |
+| `value` | `string \| null` |  | null is an unanswered check-in. |
+| `defaultValue` | `string \| null` | `null` |  |
+| `onValueChange` | `(value: string \| null) => void` |  |  |
+| `required` | `boolean` |  |  |
+| `readOnly` | `boolean` | `false` |  |
+| `clearable` | `boolean` | `true` |  |
+| `clearLabel` | `string` | `"Clear answer"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves into the native radio group and then to the available clear action. |
+| Arrow keys, Space | Uses native radio selection; read-only answers prevent changes. |
+| Enter, Space | Activates the focused clear action. |
+
+## Accessibility
+
+- A fieldset and legend name the answer group; native radios use visible text labels and share a name.
+- Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection.
+- Descriptions reach the group and each answer. Read-only controls retain the submitted value and announce their unavailable state.
+- Disabled controls do not submit; required uses native radio validation. Form reset restores uncontrolled defaults and preserves controlled values.
+- The forwarded ref reaches the fieldset; native fieldset attributes, className, and style pass through.
+
+## Classes
+
+`rs-check-in`, `rs-check-in-legend`, `rs-check-in-description`, `rs-check-in-choices`, `rs-check-in-choice`, `rs-check-in-selected`, `rs-check-in-unavailable`, `rs-check-in-input`, `rs-check-in-clear`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/check-in.tsx`  
+CSS: `packages/core/css/components/check-in.css`
+
+
+---
+
+# Habit tracker
+
+Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
+
+Category: health  
+Name: `habit-tracker`  
+Also known as: HabitTracker, Habit calendar, Wellness log, Daily completion, Habit grid  
+Page: https://vlak.dev/components/habit-tracker/
+
+## When to use
+
+- A week of application-owned habit records, supplied in the intended order.
+- Explicit date labels and stable date keys, with no inferred current day or timezone.
+- onDayChange to request complete or clear completion to unrecorded; the application updates days and owns persistence.
+
+## When not to
+
+- Inferring missed days from absent records or calculating a punitive streak.
+- Assuming a click has been saved without updating and persisting the supplied data.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { HabitTracker } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add habit-tracker
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/habit-tracker.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-habit-tracker" role="group" aria-labelledby="habit-label"><p class="rs-habit-tracker-label" id="habit-label">Evening walk</p><ul class="rs-habit-tracker-days"><li class="rs-habit-tracker-day"><span class="rs-habit-tracker-date">Mon 7 Sep</span><div class="rs-habit-tracker-control rs-habit-tracker-complete rs-habit-tracker-static"><span class="rs-habit-tracker-mark" aria-hidden="true">✓</span><span>Complete</span></div></li><li class="rs-habit-tracker-day"><span class="rs-habit-tracker-date">Tue 8 Sep</span><div class="rs-habit-tracker-control rs-habit-tracker-static"><span class="rs-habit-tracker-mark" aria-hidden="true">·</span><span>Unrecorded</span></div></li></ul></div>
+```
+
+## Example
+
+```tsx
+import { useState } from "react";
+import { HabitTracker } from "@noorddev/vlak-react";
+import type { HabitDay } from "@noorddev/vlak-react";
+
+function WalkingRecord() {
+  const [days, setDays] = useState<HabitDay[]>([
+    { date: "2026-09-07", label: "Mon 7 Sep", status: "complete" },
+    { date: "2026-09-08", label: "Tue 8 Sep", status: "unrecorded" },
+  ]);
+  return <HabitTracker label="Evening walk" days={days} onDayChange={(date, status) => setDays((records) => records.map((day) => day.date === date ? { ...day, status } : day))} />;
+}
+```
+
+## Props
+
+### HabitTracker
+
+Dated completion records with caller-owned state and no inferred streak.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `days` (required) | `HabitDay[]` |  | A supplied week or another dated range, rendered in the given order. |
+| `onDayChange` | `(date: string, status: HabitStatus) => void` |  | A completion action requests complete, or unrecorded when clearing completion. |
+| `disabled` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves through enabled completion controls when onDayChange is supplied. |
+| Enter, Space | Requests completion, or clears an existing completion to unrecorded. |
+
+## Accessibility
+
+- A named group contains an ordered display of supplied day records; every status remains visible as text.
+- Completion controls have stable accessible names, aria-pressed, and descriptions that announce complete, missed, skipped, or unrecorded.
+- Controls are at least 44px in each dimension; the responsive grid wraps on narrow screens.
+- Without onDayChange or with readOnly, records render as static text. Disabled controls do not call onDayChange.
+- The forwarded ref and native attributes reach the root div.
+
+## Classes
+
+`rs-habit-tracker`, `rs-habit-tracker-label`, `rs-habit-tracker-description`, `rs-habit-tracker-days`, `rs-habit-tracker-day`, `rs-habit-tracker-date`, `rs-habit-tracker-control`, `rs-habit-tracker-complete`, `rs-habit-tracker-unavailable`, `rs-habit-tracker-static`, `rs-habit-tracker-mark`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/habit-tracker.tsx`  
+CSS: `packages/core/css/components/habit-tracker.css`
+
+
+---
+
+# Sleep timeline
+
+Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
+
+Category: health  
+Name: `sleep-timeline`  
+Also known as: SleepTimeline, Sleep log, Sleep chart, Sleep interval, Sleep record, Wellness timeline  
+Page: https://vlak.dev/components/sleep-timeline/
+
+## When to use
+
+- Display-only sleep records from a caller-owned source, using minute offsets on a single timeline.
+- Explicit boundary labels that include the date and timezone when needed.
+- Gaps remain unrecorded; supplied unknown intervals retain their unknown state.
+
+## When not to
+
+- Inferring sleep stages, diagnosis, or sleep quality from the supplied intervals.
+- Silently clipping out-of-window records, merging overlaps, or filling missing time with sleep.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { SleepTimeline } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add sleep-timeline
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/sleep-timeline.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<figure class="rs-sleep-timeline"><figcaption class="rs-sleep-timeline-caption"><span class="rs-sleep-timeline-label">Last night</span></figcaption><div class="rs-sleep-timeline-chart" aria-hidden="true"><span class="rs-sleep-timeline-segment rs-sleep-timeline-asleep" style="width:75%"></span><span class="rs-sleep-timeline-segment rs-sleep-timeline-awake" style="width:25%"></span></div><div class="rs-sleep-timeline-axis"><span>22:30</span><span>06:30</span></div><ul class="rs-sleep-timeline-list"><li class="rs-sleep-timeline-interval"><span>Asleep</span><span class="rs-sleep-timeline-period">22:30 to 04:30</span></li><li class="rs-sleep-timeline-interval"><span>Awake</span><span class="rs-sleep-timeline-period">04:30 to 06:30</span></li></ul></figure>
+```
+
+## Example
+
+```tsx
+import { SleepTimeline } from "@noorddev/vlak-react";
+
+<SleepTimeline label="Last night" description="Recorded intervals, local time" start={0} end={480} startLabel="22:30" endLabel="06:30" intervals={[
+  { id: "sleep-1", start: 0, end: 240, startLabel: "22:30", endLabel: "02:30", state: "asleep" },
+  { id: "wake-1", start: 240, end: 255, startLabel: "02:30", endLabel: "02:45", state: "awake" },
+  { id: "sleep-2", start: 270, end: 480, startLabel: "03:00", endLabel: "06:30", state: "asleep" },
+]} />
+```
+
+## Props
+
+### SleepTimeline
+
+Supplied sleep and wake intervals, with gaps exposed as unrecorded time.
+
+Extends `HTMLAttributes<HTMLElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `intervals` (required) | `SleepInterval[]` |  |  |
+| `start` (required) | `number` |  | Visible window in minutes. All intervals must fit within it. |
+| `end` (required) | `number` |  |  |
+| `startLabel` (required) | `string` |  |  |
+| `endLabel` (required) | `string` |  |  |
+
+## Accessibility
+
+- A native figure and caption introduce the record. The decorative chart is hidden from assistive technology.
+- Every supplied interval and unrecorded gap has a visible text equivalent with start and end labels.
+- Overlapping, invalid, or out-of-window intervals produce a visible explanation and suppress the chart while preserving supplied text.
+- Sleep, wake, and unknown segments use distinct monochrome fills and boundaries; forced-colors retains a dotted unknown marker.
+- The forwarded ref and native attributes reach the figure.
+
+## Classes
+
+`rs-sleep-timeline`, `rs-sleep-timeline-caption`, `rs-sleep-timeline-label`, `rs-sleep-timeline-description`, `rs-sleep-timeline-chart`, `rs-sleep-timeline-segment`, `rs-sleep-timeline-asleep`, `rs-sleep-timeline-awake`, `rs-sleep-timeline-unknown`, `rs-sleep-timeline-axis`, `rs-sleep-timeline-list`, `rs-sleep-timeline-interval`, `rs-sleep-timeline-period`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/sleep-timeline.tsx`  
+CSS: `packages/core/css/components/sleep-timeline.css`
+
+
+---
+
+# Activity goal
+
+Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+
+Category: health  
+Name: `activity-goal`  
+Also known as: ActivityGoal, Activity progress, Movement goal, Hydration goal, Step goal, Wellness goal  
+Page: https://vlak.dev/components/activity-goal/
+
+## When to use
+
+- Movement, hydration, or another activity with a caller-supplied amount, unit, and positive target.
+- null for missing current data or an unset target; zero remains a valid recorded amount.
+- Actual values above the target remain visible while the native bar stops at its maximum.
+
+## When not to
+
+- Adding default health recommendations or interpreting goal completion as a clinical outcome.
+- An indeterminate loading state; missing data is explicitly labelled and has no progress bar.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { ActivityGoal } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add activity-goal
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/activity-goal.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-activity-goal"><p class="rs-activity-goal-label" id="walking-goal">Walking</p><p class="rs-activity-goal-description">Your personal goal for today</p><p class="rs-activity-goal-value">24 <span class="rs-activity-goal-target">of 30 min</span></p><progress class="rs-activity-goal-progress" value="24" max="30" aria-labelledby="walking-goal" aria-valuetext="24 of 30 min">24 of 30 min</progress></div>
+```
+
+## Example
+
+```tsx
+import { ActivityGoal } from "@noorddev/vlak-react";
+
+<ActivityGoal label="Walking" description="Your personal goal for today" current={24} target={30} unit="min" />
+<ActivityGoal label="Water recorded" current={null} target={null} unit="ml" />
+```
+
+## Props
+
+### ActivityGoal
+
+Progress toward a supplied activity goal, without recommended targets or scores.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `current` (required) | `number \| null` |  | A supplied amount. null means no recorded amount; zero is a valid record. |
+| `target` (required) | `number \| null` |  | A positive caller-owned goal. null means no goal has been set. |
+| `unit` (required) | `string` |  |  |
+
+## Accessibility
+
+- The native progress element is named by the visible label, aria-label, or aria-labelledby; aria-valuetext includes the actual amount, target, and unit.
+- Missing, non-finite, negative amounts and non-positive targets have explicit text states and never produce a misleading bar or NaN attributes.
+- Goal reached and goal exceeded remain text, with no color-only completion signal.
+- The forwarded ref and native attributes reach the root div; descriptions are linked to progress.
+
+## Classes
+
+`rs-activity-goal`, `rs-activity-goal-label`, `rs-activity-goal-description`, `rs-activity-goal-value`, `rs-activity-goal-target`, `rs-activity-goal-progress`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/activity-goal.tsx`  
+CSS: `packages/core/css/components/activity-goal.css`
+
+
+---
+
+# Patient banner
+
+Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
+
+Category: health  
+Name: `patient-banner`  
+Also known as: PatientBanner, Patient header, Patient summary, Clinical context, EHR header  
+Page: https://vlak.dev/components/patient-banner/
+
+## When to use
+
+- Patient record headers and care workspaces where identity and recorded context must stay together.
+- Supply explicit values such as Unknown, Not reviewed, or None recorded according to the actual source record.
+
+## When not to
+
+- Inferring age from a birth date or treating missing context as no allergies.
+- Urgent notifications that need a live announcement; the banner is static context.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { PatientBanner } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add patient-banner
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/patient-banner.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-patient-banner" role="group" aria-label="Robin Ellis"><p class="rs-patient-banner-name">Robin Ellis</p><dl class="rs-patient-banner-identifiers"><div class="rs-patient-banner-field"><dt class="rs-patient-banner-label">Patient ID</dt><dd class="rs-patient-banner-value">Demo 042</dd></div></dl><dl class="rs-patient-banner-context"><div class="rs-patient-banner-field"><dt class="rs-patient-banner-label">Allergies</dt><dd class="rs-patient-banner-value">Not reviewed</dd></div></dl></div>
+```
+
+## Example
+
+```tsx
+import { PatientBanner } from "@noorddev/vlak-react";
+
+<PatientBanner patientName="Robin Ellis" identifiers={[{ id: "record", label: "Patient ID", value: "Demo 042" }]} contextItems={[{ id: "allergies", label: "Allergies", value: "Not reviewed" }, { id: "language", label: "Preferred language", value: "English, as recorded" }]} />
+```
+
+## Props
+
+### PatientBanner
+
+A supplied patient identity and explicitly recorded context, without clinical inference.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `patientName` (required) | `string` |  | Caller-supplied identity. No age or other demographic values are inferred. |
+| `identifiers` | `readonly PatientBannerIdentifier[]` | `[]` |  |
+| `contextItems` | `readonly PatientBannerContextItem[]` | `[]` |  |
+| `identifiersEmptyLabel` | `ReactNode` | `"Identifiers not supplied"` |  |
+| `contextEmptyLabel` | `ReactNode` | `"Patient context not supplied"` | Missing context never means that no allergies or alerts exist. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| None | Static identity and description lists add no keyboard stop. Any supplied child controls keep their native behavior. |
+
+## Accessibility
+
+- The patient name labels a group; identifiers and context use dl, dt, and dd in reading order.
+- Unknown and none-recorded distinctions are supplied as visible text. Empty defaults describe missing data without making clinical claims.
+- The root forwards its div ref, native attributes, className, and style.
+
+## Classes
+
+`rs-patient-banner`, `rs-patient-banner-name`, `rs-patient-banner-identifiers`, `rs-patient-banner-field`, `rs-patient-banner-label`, `rs-patient-banner-value`, `rs-patient-banner-context`, `rs-patient-banner-missing`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/patient-banner.tsx`  
+CSS: `packages/core/css/components/patient-banner.css`
+
+
+---
+
+# Medication schedule
+
+Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
+
+Category: health  
+Name: `medication-schedule`  
+Also known as: MedicationSchedule, Medication list, Medication record, Dose log, Medication administration record  
+Page: https://vlak.dev/components/medication-schedule/
+
+## When to use
+
+- Displaying an existing medication schedule and requesting explicit record updates.
+- Supply timezone, dosing text, instructions, action labels, and recorded statuses from the application.
+
+## When not to
+
+- Calculating doses, suggesting medication, guessing overdue entries, or declaring a record saved from a click alone.
+- Treating an empty list as evidence that a patient takes no medication.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { MedicationSchedule } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add medication-schedule
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/medication-schedule.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-medication-schedule" role="group" aria-label="Medication schedule"><div class="rs-medication-schedule-header"><span>14 September</span><span class="rs-medication-schedule-zone">Europe/Amsterdam, UTC+02:00</span></div><ol class="rs-medication-schedule-list"><li class="rs-medication-schedule-row"><span class="rs-medication-schedule-time">08:00</span><div class="rs-medication-schedule-body"><p class="rs-medication-schedule-name">Example medication</p><p class="rs-medication-schedule-detail">Dose supplied by the care team</p><p class="rs-medication-schedule-status">Not recorded</p></div></li></ol></div>
+```
+
+## Example
+
+```tsx
+import { MedicationSchedule } from "@noorddev/vlak-react";
+
+<MedicationSchedule dateLabel="14 September" timeZone="Europe/Amsterdam, UTC+02:00" items={[{ id: "morning", name: "Example medication", dose: "Dose supplied by the care team", timeLabel: "08:00", status: "Not recorded", instructions: "Instructions supplied by the care team" }]} />
+
+// For editing, pass explicit item.actions and onAction(itemId, actionId).
+// The caller persists the choice, sets item.pending, and supplies the new status.
+```
+
+## Props
+
+### MedicationSchedule
+
+A controlled record of supplied medication rows, not a dosing or reminder engine.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "onAction">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `readonly MedicationScheduleItem[]` |  |  |
+| `timeZone` (required) | `ReactNode` |  | Display label supplied by the application, including any relevant UTC offset. |
+| `dateLabel` | `ReactNode` |  |  |
+| `emptyLabel` | `ReactNode` | `"No medication entries supplied"` |  |
+| `onAction` | `(itemId: string, actionId: string) => void` |  | Requests a record change. The caller persists it and supplies updated items. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between enabled recording buttons when onAction and item actions are supplied. |
+| Enter, Space | Requests the selected recording action. Pending or disabled rows cannot request changes. |
+
+## Accessibility
+
+- Rows remain in supplied order in an ordered list. Optional dateTime values are passed through unchanged.
+- Action names include the visible action label and medication name. Each action is described by its scheduled time, dose, and recorded status to distinguish repeated doses. Buttons have at least 44px targets.
+- Pending state remains visible alongside the existing status, uses aria-busy and a polite status region, and disables recording actions.
+- No internal persistence or automatic success state. Without onAction the schedule is read-only.
+
+## Classes
+
+`rs-medication-schedule`, `rs-medication-schedule-header`, `rs-medication-schedule-zone`, `rs-medication-schedule-list`, `rs-medication-schedule-row`, `rs-medication-schedule-time`, `rs-medication-schedule-body`, `rs-medication-schedule-name`, `rs-medication-schedule-detail`, `rs-medication-schedule-status`, `rs-medication-schedule-actions`, `rs-medication-schedule-action`, `rs-medication-schedule-empty`
+
+## Dependencies
+
+Registry dependencies: [button](button.md).  
+React: `packages/react/src/components/medication-schedule.tsx`  
+CSS: `packages/core/css/components/medication-schedule.css`
+
+
+---
+
+# Appointment card
+
+Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
+
+Category: health  
+Name: `appointment-card`  
+Also known as: AppointmentCard, Visit card, Booking card, Care appointment, Consultation details  
+Page: https://vlak.dev/components/appointment-card/
+
+## When to use
+
+- Confirmed, proposed, cancelled, or otherwise explicitly supplied appointments.
+- Add real links or buttons as children when navigation or an action is available.
+
+## When not to
+
+- Inferring confirmation, converting timezones, or deriving a relative date from the system clock.
+- Rendering placeholder Join, Cancel, or Reschedule buttons without working actions.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AppointmentCard } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add appointment-card
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/appointment-card.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-appointment-card" role="group" aria-label="Care team check-in"><div class="rs-appointment-card-header"><p class="rs-appointment-card-title">Care team check-in</p><span class="rs-appointment-card-status">Confirmed</span></div><div class="rs-appointment-card-when"><span class="rs-appointment-card-date">18 September 2026</span><span class="rs-appointment-card-time">10:30–11:00 · Europe/Amsterdam, UTC+02:00</span></div><dl class="rs-appointment-card-details"><div class="rs-appointment-card-field"><dt class="rs-appointment-card-label">Clinician</dt><dd class="rs-appointment-card-value">Alex Morgan</dd></div><div class="rs-appointment-card-field"><dt class="rs-appointment-card-label">Location</dt><dd class="rs-appointment-card-value">Room 04, demo clinic</dd></div></dl></div>
+```
+
+## Example
+
+```tsx
+import { AppointmentCard } from "@noorddev/vlak-react";
+
+<AppointmentCard appointmentTitle="Care team check-in" dateLabel="18 September 2026" timeLabel="10:30–11:00" timeZone="Europe/Amsterdam, UTC+02:00" dateTime="2026-09-18T10:30:00+02:00" clinician="Alex Morgan" location="Room 04, demo clinic" status="Confirmed" />
+
+// Supply children for real navigation links or application-owned actions.
+```
+
+## Props
+
+### AppointmentCard
+
+Appointment details exactly as supplied, with an application-owned action slot.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `appointmentTitle` (required) | `string` |  |  |
+| `dateLabel` (required) | `ReactNode` |  |  |
+| `timeLabel` (required) | `ReactNode` |  |  |
+| `timeZone` (required) | `ReactNode` |  | Supplied display timezone; the component performs no date conversion. |
+| `dateTime` | `string` |  |  |
+| `clinician` | `ReactNode` |  |  |
+| `location` | `ReactNode` |  |  |
+| `status` (required) | `ReactNode` |  |  |
+| `children` | `ReactNode` |  | Actual links or buttons whose actions are owned by the application. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Enter, Space | Supplied links and buttons retain their native keyboard interactions. The card adds no tab stop. |
+
+## Accessibility
+
+- Appointment title names a group. Date, time, timezone, and status are text; clinician and location use a description list.
+- Missing clinician and location are explicitly labelled as not supplied.
+- Use native action controls with accessible names and at least 44px targets in the children slot.
+- Native root attributes and the div ref pass through. The caller owns status updates and announcements.
+
+## Classes
+
+`rs-appointment-card`, `rs-appointment-card-header`, `rs-appointment-card-title`, `rs-appointment-card-status`, `rs-appointment-card-when`, `rs-appointment-card-date`, `rs-appointment-card-time`, `rs-appointment-card-details`, `rs-appointment-card-field`, `rs-appointment-card-label`, `rs-appointment-card-value`, `rs-appointment-card-actions`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/appointment-card.tsx`  
+CSS: `packages/core/css/components/appointment-card.css`
+
+
+---
+
+# Care plan
+
+Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.
+
+Category: health  
+Name: `care-plan`  
+Also known as: CarePlan, Care tasks, Patient checklist, Care coordination, Treatment task list  
+Page: https://vlak.dev/components/care-plan/
+
+## When to use
+
+- Existing care plans with named owners and application-supplied deadlines and task status.
+- Supply an explicit completed boolean and onCompletedChange to enable a completion control.
+
+## When not to
+
+- Generating treatment plans or deriving task urgency from dates.
+- Treating an unknown completion state as unchecked or showing success before the caller updates the record.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { CarePlan } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add care-plan
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/care-plan.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-care-plan" role="group" aria-label="Care plan"><ul class="rs-care-plan-list"><li class="rs-care-plan-row"><p class="rs-care-plan-title">Confirm the next visit</p><dl class="rs-care-plan-metadata"><div class="rs-care-plan-field"><dt class="rs-care-plan-label">Owner</dt><dd class="rs-care-plan-value">Robin Ellis</dd></div><div class="rs-care-plan-field"><dt class="rs-care-plan-label">Due</dt><dd class="rs-care-plan-value">17 September</dd></div><div class="rs-care-plan-field"><dt class="rs-care-plan-label">Status</dt><dd class="rs-care-plan-value">Open</dd></div></dl></li></ul></div>
+```
+
+## Example
+
+```tsx
+import { CarePlan } from "@noorddev/vlak-react";
+
+<CarePlan tasks={[{ id: "visit", title: "Confirm the next visit", owner: "Robin Ellis", dueLabel: "17 September", status: "Open", completed: false }]} />
+
+// Pass onCompletedChange(taskId, completed) to request changes.
+// The caller persists completion and supplies updated tasks and pending states.
+```
+
+## Props
+
+### CarePlan
+
+A supplied care task list with controlled completion requests and explicit pending states.
+
+Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `tasks` (required) | `readonly CarePlanTask[]` |  |  |
+| `description` | `ReactNode` |  |  |
+| `emptyLabel` | `ReactNode` | `"No care tasks supplied"` |  |
+| `onCompletedChange` | `(taskId: string, completed: boolean) => void` |  | Requests a change only. Persist it and return updated tasks from the caller. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between enabled completion checkboxes when editing is available. |
+| Space | Requests a completion change through onCompletedChange. The checkbox stays at the supplied value until the caller updates it. |
+
+## Accessibility
+
+- Task labels name native checkboxes with at least 44px label targets; the recorded status describes each checkbox.
+- Pending or disabled tasks cannot be changed. Pending text is visible in a polite status region with aria-busy on the task.
+- Tasks with unknown completion or no change callback render as static text, without an invented checkbox state.
+- Owner and due-date omissions are explicitly marked as not supplied. Dates are never parsed or inferred.
+
+## Classes
+
+`rs-care-plan`, `rs-care-plan-description`, `rs-care-plan-list`, `rs-care-plan-row`, `rs-care-plan-title`, `rs-care-plan-check`, `rs-care-plan-detail`, `rs-care-plan-metadata`, `rs-care-plan-field`, `rs-care-plan-label`, `rs-care-plan-value`, `rs-care-plan-pending`, `rs-care-plan-empty`
+
+## Dependencies
+
+Registry dependencies: [checkbox](checkbox.md).  
+React: `packages/react/src/components/care-plan.tsx`  
+CSS: `packages/core/css/components/care-plan.css`
 
 
 ---

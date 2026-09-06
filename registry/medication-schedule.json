@@ -1,0 +1,94 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "medication-schedule",
+  "type": "registry:component",
+  "title": "Medication schedule",
+  "description": "Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/medication-schedule.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface MedicationScheduleAction {\n  id: string;\n  /** An explicit recording choice, for example \"Record as taken\". */\n  label: string;\n  disabled?: boolean;\n}\n\nexport interface MedicationScheduleItem {\n  id: string;\n  name: string;\n  dose: React.ReactNode;\n  timeLabel: React.ReactNode;\n  /** Optional machine-readable value; never parsed or reformatted. */\n  dateTime?: string;\n  /** Recorded status supplied by the application, never inferred from the time. */\n  status: React.ReactNode;\n  instructions?: React.ReactNode;\n  actions?: readonly MedicationScheduleAction[];\n  pending?: boolean;\n  pendingLabel?: React.ReactNode;\n  disabled?: boolean;\n}\n\nexport interface MedicationScheduleProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"onAction\"> {\n  items: readonly MedicationScheduleItem[];\n  /** Display label supplied by the application, including any relevant UTC offset. */\n  timeZone: React.ReactNode;\n  dateLabel?: React.ReactNode;\n  emptyLabel?: React.ReactNode;\n  /** Requests a record change. The caller persists it and supplies updated items. */\n  onAction?: (itemId: string, actionId: string) => void;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  header: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.5rem 1rem\", paddingBottom: \"1rem\", fontSize: \"0.875rem\" },\n  zone: { color: vlak.gray, fontVariantNumeric: \"tabular-nums\" },\n  list: { margin: 0, padding: 0, listStyle: \"none\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  row: { display: \"grid\", gridTemplateColumns: { default: \"minmax(4.5rem, 0.5fr) minmax(0, 3fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem 1.25rem\", paddingBlock: \"1.25rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  time: { fontSize: \"0.875rem\", fontVariantNumeric: \"tabular-nums\", fontWeight: 600 },\n  body: { display: \"flex\", flexDirection: \"column\", minWidth: 0, gap: \"0.5rem\" },\n  name: { margin: 0, fontSize: \"1rem\", fontWeight: 600, lineHeight: 1.3 },\n  detail: { margin: 0, fontSize: \"0.875rem\", maxWidth: \"66ch\" },\n  status: { margin: 0, color: vlak.gray, fontSize: \"0.875rem\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", marginTop: \"0.25rem\" },\n  action: { minWidth: vlak.hit, minHeight: vlak.hit, height: \"auto\", paddingBlock: \"0.625rem\", whiteSpace: \"normal\", lineHeight: 1.3 },\n  empty: { margin: 0, paddingBlock: \"1.25rem\", color: vlak.gray, fontSize: \"0.875rem\" },\n});\n\n/** A controlled record of supplied medication rows, not a dosing or reminder engine. */\nexport const MedicationSchedule = React.forwardRef<HTMLDivElement, MedicationScheduleProps>(function MedicationSchedule(\n  { items, timeZone, dateLabel, emptyLabel = \"No medication entries supplied\", onAction, children, className, style, ...props }, ref,\n) {\n  const baseId = React.useId();\n  const root = rs([\"rs-medication-schedule\", className], styles.root);\n  const header = rs([\"rs-medication-schedule-header\"], styles.header);\n  const zone = rs([\"rs-medication-schedule-zone\"], styles.zone);\n  const list = rs([\"rs-medication-schedule-list\"], styles.list);\n  const row = rs([\"rs-medication-schedule-row\"], styles.row);\n  const time = rs([\"rs-medication-schedule-time\"], styles.time);\n  const body = rs([\"rs-medication-schedule-body\"], styles.body);\n  const name = rs([\"rs-medication-schedule-name\"], styles.name);\n  const detail = rs([\"rs-medication-schedule-detail\"], styles.detail);\n  const status = rs([\"rs-medication-schedule-status\"], styles.status);\n  const actions = rs([\"rs-medication-schedule-actions\"], styles.actions);\n  const action = rs([\"rs-medication-schedule-action\"], styles.action);\n  const empty = rs([\"rs-medication-schedule-empty\"], styles.empty);\n  return <div ref={ref} role=\"group\" aria-label=\"Medication schedule\" {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...header}>{dateLabel != null && <span>{dateLabel}</span>}<span {...zone}>{timeZone}</span></div>\n    {items.length === 0 ? <p {...empty}>{emptyLabel}</p> : <ol {...list}>{items.map((item, index) => {\n      const nameId = `${baseId}-${index}-name`;\n      const timeId = `${baseId}-${index}-time`;\n      const doseId = `${baseId}-${index}-dose`;\n      const statusId = `${baseId}-${index}-status`;\n      return <li key={item.id} {...row} aria-labelledby={nameId} aria-busy={item.pending || undefined}>\n        {item.dateTime ? <time {...time} id={timeId} dateTime={item.dateTime}>{item.timeLabel}</time> : <span {...time} id={timeId}>{item.timeLabel}</span>}\n        <div {...body}>\n          <p {...name} id={nameId}>{item.name}</p>\n          <p {...detail} id={doseId}>{item.dose}</p>\n          {item.instructions != null && <p {...detail}>{item.instructions}</p>}\n          <p {...status} id={statusId}>{item.status}</p>\n          <span role=\"status\" aria-live=\"polite\" {...status}>{item.pending ? (item.pendingLabel ?? \"Record update pending\") : null}</span>\n          {onAction && (item.actions?.length ?? 0) > 0 && <div {...actions}>{item.actions?.map(choice => <Button key={choice.id} {...action} variant=\"ghost\" type=\"button\" disabled={item.pending || item.disabled || choice.disabled} aria-label={`${choice.label}: ${item.name}`} aria-describedby={`${timeId} ${doseId} ${statusId}`} onClick={() => onAction(item.id, choice.id)}>{choice.label}</Button>)}</div>}\n        </div>\n      </li>;\n    })}</ol>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/medication-schedule.tsx"
+    },
+    {
+      "path": "vlak/styles/medication-schedule.css",
+      "content": "/* ── medication-schedule: generated from packages/react/src/components/medication-schedule.tsx ── */\n.rs-medication-schedule{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-medication-schedule-header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;padding-bottom:1rem;font-size:0.875rem}\n.rs-medication-schedule-zone{color:var(--text-secondary);font-variant-numeric:tabular-nums}\n.rs-medication-schedule-list{margin:0;padding:0;list-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-medication-schedule-row{display:grid;grid-template-columns:minmax(4.5rem, 0.5fr) minmax(0, 3fr);gap:0.75rem 1.25rem;padding-block:1.25rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n@media (max-width: 640px){.rs-medication-schedule-row{grid-template-columns:minmax(0, 1fr)}}\n.rs-medication-schedule-time{font-size:0.875rem;font-variant-numeric:tabular-nums;font-weight:600}\n.rs-medication-schedule-body{display:flex;flex-direction:column;min-width:0;gap:0.5rem}\n.rs-medication-schedule-name{margin:0;font-size:1rem;font-weight:600;line-height:1.3}\n.rs-medication-schedule-detail{margin:0;font-size:0.875rem;max-width:66ch}\n.rs-medication-schedule-status{margin:0;color:var(--text-secondary);font-size:0.875rem}\n.rs-medication-schedule-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem}\n.rs-medication-schedule-action{min-width:var(--hit);min-height:var(--hit);height:auto;padding-block:0.625rem;white-space:normal;line-height:1.3}\n.rs-medication-schedule-empty{margin:0;padding-block:1.25rem;color:var(--text-secondary);font-size:0.875rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/medication-schedule.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-medication-schedule",
+        "rs-medication-schedule-header",
+        "rs-medication-schedule-zone",
+        "rs-medication-schedule-list",
+        "rs-medication-schedule-row",
+        "rs-medication-schedule-time",
+        "rs-medication-schedule-body",
+        "rs-medication-schedule-name",
+        "rs-medication-schedule-detail",
+        "rs-medication-schedule-status",
+        "rs-medication-schedule-actions",
+        "rs-medication-schedule-action",
+        "rs-medication-schedule-empty"
+      ],
+      "snippet": "<div class=\"rs-medication-schedule\" role=\"group\" aria-label=\"Medication schedule\"><div class=\"rs-medication-schedule-header\"><span>14 September</span><span class=\"rs-medication-schedule-zone\">Europe/Amsterdam, UTC+02:00</span></div><ol class=\"rs-medication-schedule-list\"><li class=\"rs-medication-schedule-row\"><span class=\"rs-medication-schedule-time\">08:00</span><div class=\"rs-medication-schedule-body\"><p class=\"rs-medication-schedule-name\">Example medication</p><p class=\"rs-medication-schedule-detail\">Dose supplied by the care team</p><p class=\"rs-medication-schedule-status\">Not recorded</p></div></li></ol></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "MedicationSchedule",
+        "Medication list",
+        "Medication record",
+        "Dose log",
+        "Medication administration record"
+      ],
+      "example": "import { MedicationSchedule } from \"@noorddev/vlak-react\";\n\n<MedicationSchedule dateLabel=\"14 September\" timeZone=\"Europe/Amsterdam, UTC+02:00\" items={[{ id: \"morning\", name: \"Example medication\", dose: \"Dose supplied by the care team\", timeLabel: \"08:00\", status: \"Not recorded\", instructions: \"Instructions supplied by the care team\" }]} />\n\n// For editing, pass explicit item.actions and onAction(itemId, actionId).\n// The caller persists the choice, sets item.pending, and supplies the new status.",
+      "usage": {
+        "use": [
+          "Displaying an existing medication schedule and requesting explicit record updates.",
+          "Supply timezone, dosing text, instructions, action labels, and recorded statuses from the application."
+        ],
+        "avoid": [
+          "Calculating doses, suggesting medication, guessing overdue entries, or declaring a record saved from a click alone.",
+          "Treating an empty list as evidence that a patient takes no medication."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between enabled recording buttons when onAction and item actions are supplied."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests the selected recording action. Pending or disabled rows cannot request changes."
+        }
+      ],
+      "a11y": [
+        "Rows remain in supplied order in an ordered list. Optional dateTime values are passed through unchanged.",
+        "Action names include the visible action label and medication name. Each action is described by its scheduled time, dose, and recorded status to distinguish repeated doses. Buttons have at least 44px targets.",
+        "Pending state remains visible alongside the existing status, uses aria-busy and a polite status region, and disables recording actions.",
+        "No internal persistence or automatic success state. Without onAction the schedule is read-only."
+      ]
+    }
+  }
+}

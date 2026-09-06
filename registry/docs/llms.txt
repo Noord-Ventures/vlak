@@ -1,6 +1,6 @@
 # Vlak
 
-> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 114 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
+> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 126 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
 
 Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-react/css"`, vendor the source with `npx @noorddev/vlak-cli add <name>`, or use `npx shadcn add https://vlak.dev/r/<name>.json`. Every component page below has install paths, a React example, a props table generated from the types, keyboard interactions, and accessibility notes.
 
@@ -8,6 +8,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 - [Guide](https://vlak.dev/docs/guide.md): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents
 - [Component index](https://vlak.dev/docs/index.md): the catalogue by category
+- [Health guide](https://vlak.dev/docs/health.md): health, wellness, and care components with data and action contracts
 - [Tokens](https://vlak.dev/docs/tokens.md): every custom property with light and dark values
 - [Props JSON](https://vlak.dev/docs/props.json): every export and its props as data
 - [Registry index](https://vlak.dev/r/index.json): the shadcn-compatible registry; items at https://vlak.dev/r/<name>.json
@@ -152,6 +153,21 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Inline form](https://vlak.dev/docs/inline-form.md): Pairs one field with an embedded submit action. The button appears after validation.
 - [Workflow card](https://vlak.dev/docs/workflow.md): Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 - [Assistant panel](https://vlak.dev/docs/assistant.md): Frames an assistant exchange with a user message, reply, suggestion, and input row.
+
+## Health
+
+- [Health metric](https://vlak.dev/docs/health-metric.md): A supplied health reading, unit, time and source with explicit pending, unavailable and stale states.
+- [Reference range](https://vlak.dev/docs/reference-range.md): Positions a supplied numeric reading against caller-supplied reference bounds, with a complete text equivalent.
+- [Lab results](https://vlak.dev/docs/lab-results.md): A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.
+- [Symptom diary](https://vlak.dev/docs/symptom-diary.md): A chronological record of supplied symptoms and intensity descriptions, with notes and 44px native detail disclosures.
+- [Check-in](https://vlak.dev/docs/check-in.md): Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.
+- [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
+- [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
+- [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+- [Patient banner](https://vlak.dev/docs/patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
+- [Medication schedule](https://vlak.dev/docs/medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
+- [Appointment card](https://vlak.dev/docs/appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
+- [Care plan](https://vlak.dev/docs/care-plan.md): Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.
 
 ## Optional
 

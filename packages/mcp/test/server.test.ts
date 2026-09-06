@@ -84,4 +84,15 @@ describe("vlak-mcp", () => {
     const { resources } = await client.listResources();
     expect(resources.map((r) => r.uri)).toContain("vlak://docs/button");
   });
+
+  it("discovers health components and supplies their shared data contracts", async () => {
+    const health = await client.readResource({ uri: "vlak://docs/health" });
+    expect(resourceText(health)).toContain("Confirm recorded actions");
+    const { resources } = await client.listResources();
+    expect(resources.map(resource => resource.uri)).toContain("vlak://docs/health");
+    const listed = textOf(await client.callTool({ name: "list_components", arguments: { category: "health" } }));
+    expect(listed).toContain('"medication-schedule"');
+    expect(listed).toContain('"check-in"');
+    expect(listed).not.toContain('"button"');
+  });
 });

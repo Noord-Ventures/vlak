@@ -58,6 +58,7 @@ export const docsPages = [
   { href: "/docs/layers", title: "Layers" },
   { href: "/docs/stylex", title: "StyleX" },
   { href: "/docs/accessibility", title: "Accessibility" },
+  { href: "/docs/health", title: "Health" },
   { href: "/docs/agents", title: "Agents" },
 ] as const;
 

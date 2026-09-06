@@ -2219,6 +2219,567 @@
         }
       ]
     },
+    "health-metric": {
+      "exports": [
+        {
+          "name": "HealthMetric",
+          "kind": "component",
+          "description": "A sourced reading with explicit data availability, without clinical interpretation.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | number | null",
+              "required": false,
+              "description": "A supplied reading. Zero is a reading; empty strings and non-finite numbers are missing."
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "HealthMetricStatus",
+              "required": false,
+              "default": "\"available\"",
+              "description": "Supplied by the application. Freshness is never inferred from the timestamp."
+            },
+            {
+              "name": "statusLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "dateTime",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "timeLabel",
+              "type": "string",
+              "required": false,
+              "description": "Human-readable time, including the relevant timezone. Falls back to dateTime."
+            },
+            {
+              "name": "source",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "reference-range": {
+      "exports": [
+        {
+          "name": "ReferenceRange",
+          "kind": "component",
+          "description": "A supplied numeric reference interval. Position describes arithmetic, never clinical status.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "number | null",
+              "required": false
+            },
+            {
+              "name": "minimum",
+              "type": "number | null",
+              "required": false,
+              "description": "Caller-supplied lower bound. Omit for an upper bound only."
+            },
+            {
+              "name": "maximum",
+              "type": "number | null",
+              "required": false,
+              "description": "Caller-supplied upper bound. Omit for a lower bound only."
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "valueLabel",
+              "type": "string",
+              "required": false,
+              "description": "Display formatting for the supplied numeric value."
+            },
+            {
+              "name": "rangeLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Reference interval\"",
+              "description": "Optional contextual label, such as the laboratory's reference interval."
+            }
+          ]
+        }
+      ]
+    },
+    "lab-results": {
+      "exports": [
+        {
+          "name": "LabResults",
+          "kind": "component",
+          "description": "Supplied laboratory results with explicit report states and optional reference intervals.",
+          "extends": "Omit<HTMLAttributes<HTMLUListElement>, \"results\">",
+          "ref": "HTMLUListElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "description": "Accessible collection name."
+            },
+            {
+              "name": "results",
+              "type": "readonly LabResult[]",
+              "required": true
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"No results available\""
+            }
+          ]
+        }
+      ]
+    },
+    "symptom-diary": {
+      "exports": [
+        {
+          "name": "SymptomDiary",
+          "kind": "component",
+          "description": "A time-ordered record of supplied symptoms, descriptions and native detail disclosures.",
+          "extends": "HTMLAttributes<HTMLOListElement>",
+          "ref": "HTMLOListElement",
+          "props": [
+            {
+              "name": "entries",
+              "type": "readonly SymptomEntry[]",
+              "required": true
+            },
+            {
+              "name": "emptyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"No symptoms recorded\""
+            },
+            {
+              "name": "order",
+              "type": "\"newest\" | \"oldest\"",
+              "required": false,
+              "default": "\"newest\"",
+              "description": "Sorts a copy of entries. Equal timestamps retain their supplied order."
+            }
+          ]
+        }
+      ]
+    },
+    "check-in": {
+      "exports": [
+        {
+          "name": "CheckIn",
+          "kind": "component",
+          "description": "A named text choice without an inferred clinical score.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "options",
+              "type": "CheckInOption[]",
+              "required": true,
+              "description": "Text answers supplied by the application. Values must be unique."
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false,
+              "description": "null is an unanswered check-in."
+            },
+            {
+              "name": "defaultValue",
+              "type": "string | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string | null) => void",
+              "required": false
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "clearable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "clearLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Clear answer\""
+            }
+          ]
+        }
+      ]
+    },
+    "habit-tracker": {
+      "exports": [
+        {
+          "name": "HabitTracker",
+          "kind": "component",
+          "description": "Dated completion records with caller-owned state and no inferred streak.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "days",
+              "type": "HabitDay[]",
+              "required": true,
+              "description": "A supplied week or another dated range, rendered in the given order."
+            },
+            {
+              "name": "onDayChange",
+              "type": "(date: string, status: HabitStatus) => void",
+              "required": false,
+              "description": "A completion action requests complete, or unrecorded when clearing completion."
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "sleep-timeline": {
+      "exports": [
+        {
+          "name": "SleepTimeline",
+          "kind": "component",
+          "description": "Supplied sleep and wake intervals, with gaps exposed as unrecorded time.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "intervals",
+              "type": "SleepInterval[]",
+              "required": true
+            },
+            {
+              "name": "start",
+              "type": "number",
+              "required": true,
+              "description": "Visible window in minutes. All intervals must fit within it."
+            },
+            {
+              "name": "end",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "startLabel",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "endLabel",
+              "type": "string",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "activity-goal": {
+      "exports": [
+        {
+          "name": "ActivityGoal",
+          "kind": "component",
+          "description": "Progress toward a supplied activity goal, without recommended targets or scores.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "current",
+              "type": "number | null",
+              "required": true,
+              "description": "A supplied amount. null means no recorded amount; zero is a valid record."
+            },
+            {
+              "name": "target",
+              "type": "number | null",
+              "required": true,
+              "description": "A positive caller-owned goal. null means no goal has been set."
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "patient-banner": {
+      "exports": [
+        {
+          "name": "PatientBanner",
+          "kind": "component",
+          "description": "A supplied patient identity and explicitly recorded context, without clinical inference.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "patientName",
+              "type": "string",
+              "required": true,
+              "description": "Caller-supplied identity. No age or other demographic values are inferred."
+            },
+            {
+              "name": "identifiers",
+              "type": "readonly PatientBannerIdentifier[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "contextItems",
+              "type": "readonly PatientBannerContextItem[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "identifiersEmptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Identifiers not supplied\""
+            },
+            {
+              "name": "contextEmptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Patient context not supplied\"",
+              "description": "Missing context never means that no allergies or alerts exist."
+            }
+          ]
+        }
+      ]
+    },
+    "medication-schedule": {
+      "exports": [
+        {
+          "name": "MedicationSchedule",
+          "kind": "component",
+          "description": "A controlled record of supplied medication rows, not a dosing or reminder engine.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onAction\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "readonly MedicationScheduleItem[]",
+              "required": true
+            },
+            {
+              "name": "timeZone",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Display label supplied by the application, including any relevant UTC offset."
+            },
+            {
+              "name": "dateLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "emptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"No medication entries supplied\""
+            },
+            {
+              "name": "onAction",
+              "type": "(itemId: string, actionId: string) => void",
+              "required": false,
+              "description": "Requests a record change. The caller persists it and supplies updated items."
+            }
+          ]
+        }
+      ]
+    },
+    "appointment-card": {
+      "exports": [
+        {
+          "name": "AppointmentCard",
+          "kind": "component",
+          "description": "Appointment details exactly as supplied, with an application-owned action slot.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "appointmentTitle",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "dateLabel",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "timeLabel",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "timeZone",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Supplied display timezone; the component performs no date conversion."
+            },
+            {
+              "name": "dateTime",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "clinician",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "location",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Actual links or buttons whose actions are owned by the application."
+            }
+          ]
+        }
+      ]
+    },
+    "care-plan": {
+      "exports": [
+        {
+          "name": "CarePlan",
+          "kind": "component",
+          "description": "A supplied care task list with controlled completion requests and explicit pending states.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "tasks",
+              "type": "readonly CarePlanTask[]",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "emptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"No care tasks supplied\""
+            },
+            {
+              "name": "onCompletedChange",
+              "type": "(taskId: string, completed: boolean) => void",
+              "required": false,
+              "description": "Requests a change only. Persist it and return updated tasks from the caller."
+            }
+          ]
+        }
+      ]
+    },
     "button": {
       "exports": [
         {

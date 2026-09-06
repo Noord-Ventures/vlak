@@ -1,0 +1,10 @@
+/* ── lab-results: generated from packages/react/src/components/lab-results.tsx ── */
+.rs-lab-results{list-style-type:none;margin:0;padding:0;min-width:0;color:var(--text);line-height:1.45}
+.rs-lab-results-item{display:grid;gap:0.75rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);overflow-wrap:anywhere}
+.rs-lab-results-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.25rem 1rem}
+.rs-lab-results-name{margin:0;font-size:0.875rem;font-weight:600}
+.rs-lab-results-status{margin:0;font-size:0.75rem;color:var(--text-secondary)}
+.rs-lab-results-reading{margin:0;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.rs-lab-results-unit{font-size:0.875rem;color:var(--text-secondary)}
+.rs-lab-results-note{margin:0;font-size:0.875rem;max-width:66ch}
+.rs-lab-results-time{font-size:0.75rem;color:var(--text-secondary)}

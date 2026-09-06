@@ -1,0 +1,15 @@
+/* ── habit-tracker: generated from packages/react/src/components/habit-tracker.tsx ── */
+.rs-habit-tracker{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
+.rs-habit-tracker-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
+.rs-habit-tracker-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}
+.rs-habit-tracker-days{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.5rem;list-style-type:none;padding:0;margin:0}
+.rs-habit-tracker-day{min-width:0;display:grid;gap:0.5rem;align-content:start;text-align:center}
+.rs-habit-tracker-date{font-size:var(--control-label);line-height:1.45;overflow-wrap:anywhere}
+.rs-habit-tracker-control{display:grid;justify-items:center;align-content:center;gap:0.25rem;min-height:4.5rem;min-width:var(--hit);box-sizing:border-box;width:100%;padding:0.5rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:var(--control-label);line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}
+.rs-habit-tracker-control:focus-visible{outline-width:2px;outline-style:solid}
+.rs-habit-tracker-complete{background-color:var(--text);color:var(--bg)}
+@media (forced-colors: active){.rs-habit-tracker-complete{background-color:Highlight;color:HighlightText}}
+.rs-habit-tracker-unavailable{cursor:default;opacity:0.55}
+@media (forced-colors: active){.rs-habit-tracker-unavailable{opacity:1}}
+.rs-habit-tracker-static{cursor:default}
+.rs-habit-tracker-mark{font-size:1.25rem;line-height:1.2}

@@ -1,6 +1,18 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { Use as HealthMetric } from "./health-metric/use";
+import { Use as ReferenceRange } from "./reference-range/use";
+import { Use as LabResults } from "./lab-results/use";
+import { Use as SymptomDiary } from "./symptom-diary/use";
+import { Use as CheckIn } from "./check-in/use";
+import { Use as HabitTracker } from "./habit-tracker/use";
+import { Use as SleepTimeline } from "./sleep-timeline/use";
+import { Use as ActivityGoal } from "./activity-goal/use";
+import { Use as PatientBanner } from "./patient-banner/use";
+import { Use as MedicationSchedule } from "./medication-schedule/use";
+import { Use as AppointmentCard } from "./appointment-card/use";
+import { Use as CarePlan } from "./care-plan/use";
 import { Use as PlaybackControls } from "./playback-controls/use";
 import { Use as MediaScrubber } from "./media-scrubber/use";
 import { Use as MediaPlayer } from "./media-player/use";
@@ -44,6 +56,18 @@ import { Use as PropertyGrid } from "./property-grid/use";
 
 /** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
+  "health-metric": HealthMetric,
+  "reference-range": ReferenceRange,
+  "lab-results": LabResults,
+  "symptom-diary": SymptomDiary,
+  "check-in": CheckIn,
+  "habit-tracker": HabitTracker,
+  "sleep-timeline": SleepTimeline,
+  "activity-goal": ActivityGoal,
+  "patient-banner": PatientBanner,
+  "medication-schedule": MedicationSchedule,
+  "appointment-card": AppointmentCard,
+  "care-plan": CarePlan,
   "playback-controls": PlaybackControls,
   "media-scrubber": MediaScrubber,
   "media-player": MediaPlayer,

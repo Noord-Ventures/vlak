@@ -3406,6 +3406,1036 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "health-metric",
+      "type": "registry:component",
+      "title": "Health metric",
+      "description": "A supplied health reading, unit, time and source with explicit pending, unavailable and stale states.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-health-metric",
+            "rs-health-metric-label",
+            "rs-health-metric-reading",
+            "rs-health-metric-value",
+            "rs-health-metric-unit",
+            "rs-health-metric-status",
+            "rs-health-metric-meta",
+            "rs-health-metric-description"
+          ],
+          "snippet": "<div class=\"rs-health-metric\" data-status=\"stale\">\n  <p class=\"rs-health-metric-label\">Resting heart rate</p>\n  <p class=\"rs-health-metric-reading\"><span class=\"rs-health-metric-value\">64</span> <span class=\"rs-health-metric-unit\">bpm</span></p>\n  <p class=\"rs-health-metric-status\">Last recorded, stale</p>\n  <p class=\"rs-health-metric-meta\"><time datetime=\"2026-09-05T07:20:00+02:00\">5 Sep, 07:20 CEST</time><span>Wrist sensor</span></p>\n</div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Vital sign",
+            "Vital metric",
+            "Health reading",
+            "Patient observation",
+            "Biometric card",
+            "Wellness metric"
+          ],
+          "example": "import { HealthMetric } from \"@noorddev/vlak-react\";\n\n<HealthMetric\n  label=\"Resting heart rate\"\n  value={64}\n  unit=\"bpm\"\n  status=\"stale\"\n  dateTime=\"2026-09-05T07:20:00+02:00\"\n  timeLabel=\"5 Sep, 07:20 CEST\"\n  source=\"Wrist sensor\"\n  description=\"Waiting for the next device sync\"\n/>\n<HealthMetric label=\"Sleep duration\" status=\"pending\" />",
+          "usage": {
+            "use": [
+              "Patient summaries and wellness dashboards with a known source for each reading.",
+              "Pass status from the application's data policy; the component does not infer freshness.",
+              "Pass timeLabel with the relevant timezone when a human-readable time is needed."
+            ],
+            "avoid": [
+              "Deriving a diagnosis, clinical flag or urgency from the number.",
+              "Using zero as a placeholder for missing data; omit value instead."
+            ]
+          },
+          "keyboard": [],
+          "a11y": [
+            "Visible labels, units, status, source and time accompany the reading.",
+            "Zero is preserved; empty strings and non-finite values become unavailable. Pending and unavailable states suppress any supplied reading.",
+            "Stale values remain visible with a textual stale label. No clinical status is calculated.",
+            "A native time element preserves the supplied machine-readable timestamp. Native attributes and the div ref pass through.",
+            "The component adds no live region or tab stop. The application can announce updates in context."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/health-metric.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/health-metric.tsx"
+        },
+        {
+          "path": "vlak/styles/health-metric.css",
+          "type": "registry:file",
+          "target": "styles/vlak/health-metric.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "reference-range",
+      "type": "registry:component",
+      "title": "Reference range",
+      "description": "Positions a supplied numeric reading against caller-supplied reference bounds, with a complete text equivalent.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-reference-range",
+            "rs-reference-range-head",
+            "rs-reference-range-label",
+            "rs-reference-range-value",
+            "rs-reference-range-track",
+            "rs-reference-range-interval",
+            "rs-reference-range-marker",
+            "rs-reference-range-bounds",
+            "rs-reference-range-description"
+          ],
+          "snippet": "<div class=\"rs-reference-range\">\n  <p class=\"rs-reference-range-head\"><span class=\"rs-reference-range-label\">Reported measurement</span><span class=\"rs-reference-range-value\">24 units</span></p>\n  <div class=\"rs-reference-range-track\" aria-hidden=\"true\"><span class=\"rs-reference-range-interval\"></span><span class=\"rs-reference-range-marker\" style=\"inset-inline-start:44%\"></span></div>\n  <p class=\"rs-reference-range-bounds\"><span>Supplied reference interval</span><span>20–30 units</span></p>\n</div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Reference interval",
+            "Lab range",
+            "Result range",
+            "Observation range",
+            "Biomarker interval"
+          ],
+          "example": "import { ReferenceRange } from \"@noorddev/vlak-react\";\n\n<ReferenceRange\n  label=\"Reported measurement\"\n  value={24}\n  minimum={20}\n  maximum={30}\n  unit=\"units\"\n  rangeLabel=\"Supplied reference interval\"\n/>\n<ReferenceRange label=\"One-sided interval\" value={8} maximum={10} unit=\"units\" />",
+          "usage": {
+            "use": [
+              "Display numeric bounds supplied by the responsible laboratory or data source.",
+              "Pass valueLabel to format the reading and rangeLabel to identify the source of the interval.",
+              "One-sided intervals are textual; a marker requires two finite, ordered bounds."
+            ],
+            "avoid": [
+              "Hard-coding a universal normal interval across patients, methods or units.",
+              "Using the marker to indicate a diagnosis, treatment decision or calculated clinical status.",
+              "Comparing a value and bounds expressed in different units."
+            ]
+          },
+          "keyboard": [],
+          "a11y": [
+            "The reading, unit and reference interval are visible as text; decorative geometry is aria-hidden.",
+            "The reference band spans 20% to 80% of the track from the reading direction's start. Outlying markers clamp to the track and have a textual above or below description.",
+            "Missing, non-finite, equal and reversed bounds never produce an invalid marker position. Missing results are named explicitly.",
+            "A one-sided interval is rendered as at least or up to without inventing a second bound.",
+            "The marker remains visible in forced colors. There is no animation, interactive control or clinical classification."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/reference-range.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/reference-range.tsx"
+        },
+        {
+          "path": "vlak/styles/reference-range.css",
+          "type": "registry:file",
+          "target": "styles/vlak/reference-range.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "lab-results",
+      "type": "registry:component",
+      "title": "Lab results",
+      "description": "A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/reference-range.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-lab-results",
+            "rs-lab-results-item",
+            "rs-lab-results-head",
+            "rs-lab-results-name",
+            "rs-lab-results-status",
+            "rs-lab-results-reading",
+            "rs-lab-results-unit",
+            "rs-lab-results-note",
+            "rs-lab-results-time"
+          ],
+          "snippet": "<ul class=\"rs-lab-results\" aria-label=\"Latest report\">\n  <li class=\"rs-lab-results-item\" data-status=\"amended\"><div class=\"rs-lab-results-head\"><p class=\"rs-lab-results-name\">Reported measurement</p><p class=\"rs-lab-results-status\">Amended</p></div><p class=\"rs-lab-results-reading\">24 <span class=\"rs-lab-results-unit\">units</span></p><p class=\"rs-lab-results-note\">Replaces the earlier report</p></li>\n  <li class=\"rs-lab-results-item\" data-status=\"pending\"><div class=\"rs-lab-results-head\"><p class=\"rs-lab-results-name\">Additional analysis</p><p class=\"rs-lab-results-status\">Pending</p></div></li>\n</ul>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "reference-range",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Laboratory report",
+            "Lab panel",
+            "Test results",
+            "Patient results",
+            "Pathology results",
+            "Diagnostic report"
+          ],
+          "example": "import { LabResults } from \"@noorddev/vlak-react\";\n\n<LabResults label=\"Latest report\" results={[\n  { id: \"reported\", name: \"Reported measurement\", value: 24, unit: \"units\", minimum: 20, maximum: 30, status: \"amended\", note: \"Replaces the earlier report\" },\n  { id: \"analysis\", name: \"Additional analysis\", status: \"pending\" },\n  { id: \"sample\", name: \"Sample analysis\", status: \"unavailable\", note: \"The laboratory did not release a result\" },\n]} />",
+          "usage": {
+            "use": [
+              "Review numeric and qualitative results from an existing report.",
+              "Supply report states and flags from the source; the component never derives them from a reading.",
+              "Attach note to explain an amendment or unavailable result; provide stable result ids."
+            ],
+            "avoid": [
+              "Calculating diagnoses, critical-result alerts or treatment recommendations.",
+              "Implying that final means clinically normal or that an amended value is the original report.",
+              "Using the synthetic example values as clinical reference intervals."
+            ]
+          },
+          "keyboard": [],
+          "a11y": [
+            "The root is a native list named by label, with one item per result and a forwarded list ref.",
+            "Final, pending, unavailable and amended states are explicit text; caller-supplied flags supplement the report state.",
+            "Pending and unavailable results hide any supplied value. Zero and qualitative result strings remain valid readings.",
+            "Numeric reference intervals reuse ReferenceRange, including its visible text equivalent and invalid-bound handling.",
+            "An amended report without a reading explicitly says result unavailable. No live announcements are added automatically."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/lab-results.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/lab-results.tsx"
+        },
+        {
+          "path": "vlak/styles/lab-results.css",
+          "type": "registry:file",
+          "target": "styles/vlak/lab-results.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "symptom-diary",
+      "type": "registry:component",
+      "title": "Symptom diary",
+      "description": "A chronological record of supplied symptoms and intensity descriptions, with notes and 44px native detail disclosures.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-symptom-diary",
+            "rs-symptom-diary-item",
+            "rs-symptom-diary-time",
+            "rs-symptom-diary-content",
+            "rs-symptom-diary-head",
+            "rs-symptom-diary-symptom",
+            "rs-symptom-diary-intensity",
+            "rs-symptom-diary-body",
+            "rs-symptom-diary-summary",
+            "rs-symptom-diary-actions"
+          ],
+          "snippet": "<ol class=\"rs-symptom-diary\" aria-label=\"Recent symptom entries\"><li class=\"rs-symptom-diary-item\">\n  <time class=\"rs-symptom-diary-time\" datetime=\"2026-09-06T09:00:00+02:00\">6 Sep, 09:00 CEST</time>\n  <div class=\"rs-symptom-diary-content\"><div class=\"rs-symptom-diary-head\"><p class=\"rs-symptom-diary-symptom\">Headache</p><p class=\"rs-symptom-diary-intensity\">Mild, self-reported</p></div><p class=\"rs-symptom-diary-body\">Recorded after breakfast</p><details><summary class=\"rs-symptom-diary-summary\" aria-label=\"Details for Headache, 6 Sep at 09:00 CEST\">Details</summary><p class=\"rs-symptom-diary-body\">No additional context recorded</p></details></div>\n</li></ol>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Symptom journal",
+            "Patient diary",
+            "Symptom history",
+            "Pain diary",
+            "Health journal",
+            "Patient-reported outcomes"
+          ],
+          "example": "import { SymptomDiary } from \"@noorddev/vlak-react\";\n\n<SymptomDiary aria-label=\"Recent symptom entries\" order=\"newest\" entries={[\n  { id: \"morning\", symptom: \"Headache\", dateTime: \"2026-09-06T09:00:00+02:00\", timeLabel: \"6 Sep, 09:00 CEST\", intensity: \"Mild, self-reported\", notes: \"Recorded after breakfast\", details: \"No additional context recorded\" },\n  { id: \"evening\", symptom: \"Fatigue\", dateTime: \"2026-09-05T18:30:00+02:00\", timeLabel: \"5 Sep, 18:30 CEST\", intensity: \"Noticeable, self-reported\", notes: \"Recorded at the end of the workday\" },\n]} />",
+          "usage": {
+            "use": [
+              "Read patient-entered symptom history without converting their descriptions into a diagnosis.",
+              "Supply intensity in words or with a named scale; the component does not create severity categories.",
+              "Use actions for application-owned edit or review controls with accessible names and 44px targets."
+            ],
+            "avoid": [
+              "Triage, diagnosis or urgency inferred from diary text.",
+              "Assuming a missing diary entry means that no symptom occurred.",
+              "Passing ambiguous timestamps; use ISO timestamps with an explicit offset and timeLabel for display."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Focuses each detail summary and any supplied actions"
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Opens or closes a focused native detail disclosure"
+            }
+          ],
+          "a11y": [
+            "A native ordered list preserves chronological structure. Order defaults to newest first and never mutates the supplied entries.",
+            "Equal timestamps retain input order; invalid timestamps sort last and have no invalid datetime attribute.",
+            "Each disclosure has a unique default name combining symptom and display time; detailsLabel can supply a more precise name.",
+            "Native details and summary provide keyboard toggling. Summaries have 44px targets and a 2px focus ring.",
+            "Intensity and context remain readable text. There are no inferred clinical flags or automatic announcements."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/symptom-diary.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/symptom-diary.tsx"
+        },
+        {
+          "path": "vlak/styles/symptom-diary.css",
+          "type": "registry:file",
+          "target": "styles/vlak/symptom-diary.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "check-in",
+      "type": "registry:component",
+      "title": "Check-in",
+      "description": "Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-check-in",
+            "rs-check-in-legend",
+            "rs-check-in-description",
+            "rs-check-in-choices",
+            "rs-check-in-choice",
+            "rs-check-in-selected",
+            "rs-check-in-unavailable",
+            "rs-check-in-input",
+            "rs-check-in-clear"
+          ],
+          "snippet": "<fieldset class=\"rs-check-in\"><legend class=\"rs-check-in-legend\">How is your energy?</legend><p class=\"rs-check-in-description\">Choose the answer that fits right now.</p><div class=\"rs-check-in-choices\"><label class=\"rs-check-in-choice\"><span>Low</span><input class=\"rs-check-in-input\" type=\"radio\" name=\"energy\" value=\"low\" /></label><label class=\"rs-check-in-choice rs-check-in-selected\"><span>Steady</span><input class=\"rs-check-in-input\" type=\"radio\" name=\"energy\" value=\"steady\" checked /></label><label class=\"rs-check-in-choice\"><span>High</span><input class=\"rs-check-in-input\" type=\"radio\" name=\"energy\" value=\"high\" /></label></div></fieldset>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "CheckIn",
+            "Mood check-in",
+            "Energy check-in",
+            "Wellness check-in",
+            "Text rating",
+            "Self report"
+          ],
+          "example": "import { CheckIn } from \"@noorddev/vlak-react\";\n\n<CheckIn label=\"How is your energy?\" description=\"Choose the answer that fits right now.\" name=\"energy\" options={[{ value: \"low\", label: \"Low\" }, { value: \"steady\", label: \"Steady\" }, { value: \"high\", label: \"High\" }]} defaultValue={null} />",
+          "usage": {
+            "use": [
+              "A daily mood, comfort, or energy check-in with application-owned wording.",
+              "Unique option values and explicit labels for every answer.",
+              "value, defaultValue, and onValueChange with null for an unanswered check-in; name and form submit the selected string."
+            ],
+            "avoid": [
+              "Inventing a clinical questionnaire, diagnostic interpretation, or score from the selected position.",
+              "Treating an unanswered check-in as a negative answer."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves into the native radio group and then to the available clear action."
+            },
+            {
+              "keys": "Arrow keys, Space",
+              "does": "Uses native radio selection; read-only answers prevent changes."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Activates the focused clear action."
+            }
+          ],
+          "a11y": [
+            "A fieldset and legend name the answer group; native radios use visible text labels and share a name.",
+            "Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection.",
+            "Descriptions reach the group and each answer. Read-only controls retain the submitted value and announce their unavailable state.",
+            "Disabled controls do not submit; required uses native radio validation. Form reset restores uncontrolled defaults and preserves controlled values.",
+            "The forwarded ref reaches the fieldset; native fieldset attributes, className, and style pass through."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/check-in.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/check-in.tsx"
+        },
+        {
+          "path": "vlak/use-input-value.ts",
+          "type": "registry:file",
+          "target": "components/vlak/use-input-value.ts"
+        },
+        {
+          "path": "vlak/styles/check-in.css",
+          "type": "registry:file",
+          "target": "styles/vlak/check-in.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "habit-tracker",
+      "type": "registry:component",
+      "title": "Habit tracker",
+      "description": "Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-habit-tracker",
+            "rs-habit-tracker-label",
+            "rs-habit-tracker-description",
+            "rs-habit-tracker-days",
+            "rs-habit-tracker-day",
+            "rs-habit-tracker-date",
+            "rs-habit-tracker-control",
+            "rs-habit-tracker-complete",
+            "rs-habit-tracker-unavailable",
+            "rs-habit-tracker-static",
+            "rs-habit-tracker-mark"
+          ],
+          "snippet": "<div class=\"rs-habit-tracker\" role=\"group\" aria-labelledby=\"habit-label\"><p class=\"rs-habit-tracker-label\" id=\"habit-label\">Evening walk</p><ul class=\"rs-habit-tracker-days\"><li class=\"rs-habit-tracker-day\"><span class=\"rs-habit-tracker-date\">Mon 7 Sep</span><div class=\"rs-habit-tracker-control rs-habit-tracker-complete rs-habit-tracker-static\"><span class=\"rs-habit-tracker-mark\" aria-hidden=\"true\">✓</span><span>Complete</span></div></li><li class=\"rs-habit-tracker-day\"><span class=\"rs-habit-tracker-date\">Tue 8 Sep</span><div class=\"rs-habit-tracker-control rs-habit-tracker-static\"><span class=\"rs-habit-tracker-mark\" aria-hidden=\"true\">·</span><span>Unrecorded</span></div></li></ul></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "HabitTracker",
+            "Habit calendar",
+            "Wellness log",
+            "Daily completion",
+            "Habit grid"
+          ],
+          "example": "import { useState } from \"react\";\nimport { HabitTracker } from \"@noorddev/vlak-react\";\nimport type { HabitDay } from \"@noorddev/vlak-react\";\n\nfunction WalkingRecord() {\n  const [days, setDays] = useState<HabitDay[]>([\n    { date: \"2026-09-07\", label: \"Mon 7 Sep\", status: \"complete\" },\n    { date: \"2026-09-08\", label: \"Tue 8 Sep\", status: \"unrecorded\" },\n  ]);\n  return <HabitTracker label=\"Evening walk\" days={days} onDayChange={(date, status) => setDays((records) => records.map((day) => day.date === date ? { ...day, status } : day))} />;\n}",
+          "usage": {
+            "use": [
+              "A week of application-owned habit records, supplied in the intended order.",
+              "Explicit date labels and stable date keys, with no inferred current day or timezone.",
+              "onDayChange to request complete or clear completion to unrecorded; the application updates days and owns persistence."
+            ],
+            "avoid": [
+              "Inferring missed days from absent records or calculating a punitive streak.",
+              "Assuming a click has been saved without updating and persisting the supplied data."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves through enabled completion controls when onDayChange is supplied."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Requests completion, or clears an existing completion to unrecorded."
+            }
+          ],
+          "a11y": [
+            "A named group contains an ordered display of supplied day records; every status remains visible as text.",
+            "Completion controls have stable accessible names, aria-pressed, and descriptions that announce complete, missed, skipped, or unrecorded.",
+            "Controls are at least 44px in each dimension; the responsive grid wraps on narrow screens.",
+            "Without onDayChange or with readOnly, records render as static text. Disabled controls do not call onDayChange.",
+            "The forwarded ref and native attributes reach the root div."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/habit-tracker.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/habit-tracker.tsx"
+        },
+        {
+          "path": "vlak/styles/habit-tracker.css",
+          "type": "registry:file",
+          "target": "styles/vlak/habit-tracker.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "sleep-timeline",
+      "type": "registry:component",
+      "title": "Sleep timeline",
+      "description": "Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-sleep-timeline",
+            "rs-sleep-timeline-caption",
+            "rs-sleep-timeline-label",
+            "rs-sleep-timeline-description",
+            "rs-sleep-timeline-chart",
+            "rs-sleep-timeline-segment",
+            "rs-sleep-timeline-asleep",
+            "rs-sleep-timeline-awake",
+            "rs-sleep-timeline-unknown",
+            "rs-sleep-timeline-axis",
+            "rs-sleep-timeline-list",
+            "rs-sleep-timeline-interval",
+            "rs-sleep-timeline-period"
+          ],
+          "snippet": "<figure class=\"rs-sleep-timeline\"><figcaption class=\"rs-sleep-timeline-caption\"><span class=\"rs-sleep-timeline-label\">Last night</span></figcaption><div class=\"rs-sleep-timeline-chart\" aria-hidden=\"true\"><span class=\"rs-sleep-timeline-segment rs-sleep-timeline-asleep\" style=\"width:75%\"></span><span class=\"rs-sleep-timeline-segment rs-sleep-timeline-awake\" style=\"width:25%\"></span></div><div class=\"rs-sleep-timeline-axis\"><span>22:30</span><span>06:30</span></div><ul class=\"rs-sleep-timeline-list\"><li class=\"rs-sleep-timeline-interval\"><span>Asleep</span><span class=\"rs-sleep-timeline-period\">22:30 to 04:30</span></li><li class=\"rs-sleep-timeline-interval\"><span>Awake</span><span class=\"rs-sleep-timeline-period\">04:30 to 06:30</span></li></ul></figure>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "SleepTimeline",
+            "Sleep log",
+            "Sleep chart",
+            "Sleep interval",
+            "Sleep record",
+            "Wellness timeline"
+          ],
+          "example": "import { SleepTimeline } from \"@noorddev/vlak-react\";\n\n<SleepTimeline label=\"Last night\" description=\"Recorded intervals, local time\" start={0} end={480} startLabel=\"22:30\" endLabel=\"06:30\" intervals={[\n  { id: \"sleep-1\", start: 0, end: 240, startLabel: \"22:30\", endLabel: \"02:30\", state: \"asleep\" },\n  { id: \"wake-1\", start: 240, end: 255, startLabel: \"02:30\", endLabel: \"02:45\", state: \"awake\" },\n  { id: \"sleep-2\", start: 270, end: 480, startLabel: \"03:00\", endLabel: \"06:30\", state: \"asleep\" },\n]} />",
+          "usage": {
+            "use": [
+              "Display-only sleep records from a caller-owned source, using minute offsets on a single timeline.",
+              "Explicit boundary labels that include the date and timezone when needed.",
+              "Gaps remain unrecorded; supplied unknown intervals retain their unknown state."
+            ],
+            "avoid": [
+              "Inferring sleep stages, diagnosis, or sleep quality from the supplied intervals.",
+              "Silently clipping out-of-window records, merging overlaps, or filling missing time with sleep."
+            ]
+          },
+          "keyboard": [],
+          "a11y": [
+            "A native figure and caption introduce the record. The decorative chart is hidden from assistive technology.",
+            "Every supplied interval and unrecorded gap has a visible text equivalent with start and end labels.",
+            "Overlapping, invalid, or out-of-window intervals produce a visible explanation and suppress the chart while preserving supplied text.",
+            "Sleep, wake, and unknown segments use distinct monochrome fills and boundaries; forced-colors retains a dotted unknown marker.",
+            "The forwarded ref and native attributes reach the figure."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/sleep-timeline.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/sleep-timeline.tsx"
+        },
+        {
+          "path": "vlak/styles/sleep-timeline.css",
+          "type": "registry:file",
+          "target": "styles/vlak/sleep-timeline.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "activity-goal",
+      "type": "registry:component",
+      "title": "Activity goal",
+      "description": "Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-activity-goal",
+            "rs-activity-goal-label",
+            "rs-activity-goal-description",
+            "rs-activity-goal-value",
+            "rs-activity-goal-target",
+            "rs-activity-goal-progress"
+          ],
+          "snippet": "<div class=\"rs-activity-goal\"><p class=\"rs-activity-goal-label\" id=\"walking-goal\">Walking</p><p class=\"rs-activity-goal-description\">Your personal goal for today</p><p class=\"rs-activity-goal-value\">24 <span class=\"rs-activity-goal-target\">of 30 min</span></p><progress class=\"rs-activity-goal-progress\" value=\"24\" max=\"30\" aria-labelledby=\"walking-goal\" aria-valuetext=\"24 of 30 min\">24 of 30 min</progress></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "ActivityGoal",
+            "Activity progress",
+            "Movement goal",
+            "Hydration goal",
+            "Step goal",
+            "Wellness goal"
+          ],
+          "example": "import { ActivityGoal } from \"@noorddev/vlak-react\";\n\n<ActivityGoal label=\"Walking\" description=\"Your personal goal for today\" current={24} target={30} unit=\"min\" />\n<ActivityGoal label=\"Water recorded\" current={null} target={null} unit=\"ml\" />",
+          "usage": {
+            "use": [
+              "Movement, hydration, or another activity with a caller-supplied amount, unit, and positive target.",
+              "null for missing current data or an unset target; zero remains a valid recorded amount.",
+              "Actual values above the target remain visible while the native bar stops at its maximum."
+            ],
+            "avoid": [
+              "Adding default health recommendations or interpreting goal completion as a clinical outcome.",
+              "An indeterminate loading state; missing data is explicitly labelled and has no progress bar."
+            ]
+          },
+          "keyboard": [],
+          "a11y": [
+            "The native progress element is named by the visible label, aria-label, or aria-labelledby; aria-valuetext includes the actual amount, target, and unit.",
+            "Missing, non-finite, negative amounts and non-positive targets have explicit text states and never produce a misleading bar or NaN attributes.",
+            "Goal reached and goal exceeded remain text, with no color-only completion signal.",
+            "The forwarded ref and native attributes reach the root div; descriptions are linked to progress."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/activity-goal.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/activity-goal.tsx"
+        },
+        {
+          "path": "vlak/styles/activity-goal.css",
+          "type": "registry:file",
+          "target": "styles/vlak/activity-goal.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "patient-banner",
+      "type": "registry:component",
+      "title": "Patient banner",
+      "description": "Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-patient-banner",
+            "rs-patient-banner-name",
+            "rs-patient-banner-identifiers",
+            "rs-patient-banner-field",
+            "rs-patient-banner-label",
+            "rs-patient-banner-value",
+            "rs-patient-banner-context",
+            "rs-patient-banner-missing"
+          ],
+          "snippet": "<div class=\"rs-patient-banner\" role=\"group\" aria-label=\"Robin Ellis\"><p class=\"rs-patient-banner-name\">Robin Ellis</p><dl class=\"rs-patient-banner-identifiers\"><div class=\"rs-patient-banner-field\"><dt class=\"rs-patient-banner-label\">Patient ID</dt><dd class=\"rs-patient-banner-value\">Demo 042</dd></div></dl><dl class=\"rs-patient-banner-context\"><div class=\"rs-patient-banner-field\"><dt class=\"rs-patient-banner-label\">Allergies</dt><dd class=\"rs-patient-banner-value\">Not reviewed</dd></div></dl></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "PatientBanner",
+            "Patient header",
+            "Patient summary",
+            "Clinical context",
+            "EHR header"
+          ],
+          "example": "import { PatientBanner } from \"@noorddev/vlak-react\";\n\n<PatientBanner patientName=\"Robin Ellis\" identifiers={[{ id: \"record\", label: \"Patient ID\", value: \"Demo 042\" }]} contextItems={[{ id: \"allergies\", label: \"Allergies\", value: \"Not reviewed\" }, { id: \"language\", label: \"Preferred language\", value: \"English, as recorded\" }]} />",
+          "usage": {
+            "use": [
+              "Patient record headers and care workspaces where identity and recorded context must stay together.",
+              "Supply explicit values such as Unknown, Not reviewed, or None recorded according to the actual source record."
+            ],
+            "avoid": [
+              "Inferring age from a birth date or treating missing context as no allergies.",
+              "Urgent notifications that need a live announcement; the banner is static context."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "None",
+              "does": "Static identity and description lists add no keyboard stop. Any supplied child controls keep their native behavior."
+            }
+          ],
+          "a11y": [
+            "The patient name labels a group; identifiers and context use dl, dt, and dd in reading order.",
+            "Unknown and none-recorded distinctions are supplied as visible text. Empty defaults describe missing data without making clinical claims.",
+            "The root forwards its div ref, native attributes, className, and style."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/patient-banner.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/patient-banner.tsx"
+        },
+        {
+          "path": "vlak/styles/patient-banner.css",
+          "type": "registry:file",
+          "target": "styles/vlak/patient-banner.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "medication-schedule",
+      "type": "registry:component",
+      "title": "Medication schedule",
+      "description": "Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/button.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-medication-schedule",
+            "rs-medication-schedule-header",
+            "rs-medication-schedule-zone",
+            "rs-medication-schedule-list",
+            "rs-medication-schedule-row",
+            "rs-medication-schedule-time",
+            "rs-medication-schedule-body",
+            "rs-medication-schedule-name",
+            "rs-medication-schedule-detail",
+            "rs-medication-schedule-status",
+            "rs-medication-schedule-actions",
+            "rs-medication-schedule-action",
+            "rs-medication-schedule-empty"
+          ],
+          "snippet": "<div class=\"rs-medication-schedule\" role=\"group\" aria-label=\"Medication schedule\"><div class=\"rs-medication-schedule-header\"><span>14 September</span><span class=\"rs-medication-schedule-zone\">Europe/Amsterdam, UTC+02:00</span></div><ol class=\"rs-medication-schedule-list\"><li class=\"rs-medication-schedule-row\"><span class=\"rs-medication-schedule-time\">08:00</span><div class=\"rs-medication-schedule-body\"><p class=\"rs-medication-schedule-name\">Example medication</p><p class=\"rs-medication-schedule-detail\">Dose supplied by the care team</p><p class=\"rs-medication-schedule-status\">Not recorded</p></div></li></ol></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "button",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "MedicationSchedule",
+            "Medication list",
+            "Medication record",
+            "Dose log",
+            "Medication administration record"
+          ],
+          "example": "import { MedicationSchedule } from \"@noorddev/vlak-react\";\n\n<MedicationSchedule dateLabel=\"14 September\" timeZone=\"Europe/Amsterdam, UTC+02:00\" items={[{ id: \"morning\", name: \"Example medication\", dose: \"Dose supplied by the care team\", timeLabel: \"08:00\", status: \"Not recorded\", instructions: \"Instructions supplied by the care team\" }]} />\n\n// For editing, pass explicit item.actions and onAction(itemId, actionId).\n// The caller persists the choice, sets item.pending, and supplies the new status.",
+          "usage": {
+            "use": [
+              "Displaying an existing medication schedule and requesting explicit record updates.",
+              "Supply timezone, dosing text, instructions, action labels, and recorded statuses from the application."
+            ],
+            "avoid": [
+              "Calculating doses, suggesting medication, guessing overdue entries, or declaring a record saved from a click alone.",
+              "Treating an empty list as evidence that a patient takes no medication."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves between enabled recording buttons when onAction and item actions are supplied."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Requests the selected recording action. Pending or disabled rows cannot request changes."
+            }
+          ],
+          "a11y": [
+            "Rows remain in supplied order in an ordered list. Optional dateTime values are passed through unchanged.",
+            "Action names include the visible action label and medication name. Each action is described by its scheduled time, dose, and recorded status to distinguish repeated doses. Buttons have at least 44px targets.",
+            "Pending state remains visible alongside the existing status, uses aria-busy and a polite status region, and disables recording actions.",
+            "No internal persistence or automatic success state. Without onAction the schedule is read-only."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/medication-schedule.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/medication-schedule.tsx"
+        },
+        {
+          "path": "vlak/styles/medication-schedule.css",
+          "type": "registry:file",
+          "target": "styles/vlak/medication-schedule.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "appointment-card",
+      "type": "registry:component",
+      "title": "Appointment card",
+      "description": "Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-appointment-card",
+            "rs-appointment-card-header",
+            "rs-appointment-card-title",
+            "rs-appointment-card-status",
+            "rs-appointment-card-when",
+            "rs-appointment-card-date",
+            "rs-appointment-card-time",
+            "rs-appointment-card-details",
+            "rs-appointment-card-field",
+            "rs-appointment-card-label",
+            "rs-appointment-card-value",
+            "rs-appointment-card-actions"
+          ],
+          "snippet": "<div class=\"rs-appointment-card\" role=\"group\" aria-label=\"Care team check-in\"><div class=\"rs-appointment-card-header\"><p class=\"rs-appointment-card-title\">Care team check-in</p><span class=\"rs-appointment-card-status\">Confirmed</span></div><div class=\"rs-appointment-card-when\"><span class=\"rs-appointment-card-date\">18 September 2026</span><span class=\"rs-appointment-card-time\">10:30–11:00 · Europe/Amsterdam, UTC+02:00</span></div><dl class=\"rs-appointment-card-details\"><div class=\"rs-appointment-card-field\"><dt class=\"rs-appointment-card-label\">Clinician</dt><dd class=\"rs-appointment-card-value\">Alex Morgan</dd></div><div class=\"rs-appointment-card-field\"><dt class=\"rs-appointment-card-label\">Location</dt><dd class=\"rs-appointment-card-value\">Room 04, demo clinic</dd></div></dl></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "AppointmentCard",
+            "Visit card",
+            "Booking card",
+            "Care appointment",
+            "Consultation details"
+          ],
+          "example": "import { AppointmentCard } from \"@noorddev/vlak-react\";\n\n<AppointmentCard appointmentTitle=\"Care team check-in\" dateLabel=\"18 September 2026\" timeLabel=\"10:30–11:00\" timeZone=\"Europe/Amsterdam, UTC+02:00\" dateTime=\"2026-09-18T10:30:00+02:00\" clinician=\"Alex Morgan\" location=\"Room 04, demo clinic\" status=\"Confirmed\" />\n\n// Supply children for real navigation links or application-owned actions.",
+          "usage": {
+            "use": [
+              "Confirmed, proposed, cancelled, or otherwise explicitly supplied appointments.",
+              "Add real links or buttons as children when navigation or an action is available."
+            ],
+            "avoid": [
+              "Inferring confirmation, converting timezones, or deriving a relative date from the system clock.",
+              "Rendering placeholder Join, Cancel, or Reschedule buttons without working actions."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Enter, Space",
+              "does": "Supplied links and buttons retain their native keyboard interactions. The card adds no tab stop."
+            }
+          ],
+          "a11y": [
+            "Appointment title names a group. Date, time, timezone, and status are text; clinician and location use a description list.",
+            "Missing clinician and location are explicitly labelled as not supplied.",
+            "Use native action controls with accessible names and at least 44px targets in the children slot.",
+            "Native root attributes and the div ref pass through. The caller owns status updates and announcements."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/appointment-card.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/appointment-card.tsx"
+        },
+        {
+          "path": "vlak/styles/appointment-card.css",
+          "type": "registry:file",
+          "target": "styles/vlak/appointment-card.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "care-plan",
+      "type": "registry:component",
+      "title": "Care plan",
+      "description": "Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/checkbox.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "health",
+          "classes": [
+            "rs-care-plan",
+            "rs-care-plan-description",
+            "rs-care-plan-list",
+            "rs-care-plan-row",
+            "rs-care-plan-title",
+            "rs-care-plan-check",
+            "rs-care-plan-detail",
+            "rs-care-plan-metadata",
+            "rs-care-plan-field",
+            "rs-care-plan-label",
+            "rs-care-plan-value",
+            "rs-care-plan-pending",
+            "rs-care-plan-empty"
+          ],
+          "snippet": "<div class=\"rs-care-plan\" role=\"group\" aria-label=\"Care plan\"><ul class=\"rs-care-plan-list\"><li class=\"rs-care-plan-row\"><p class=\"rs-care-plan-title\">Confirm the next visit</p><dl class=\"rs-care-plan-metadata\"><div class=\"rs-care-plan-field\"><dt class=\"rs-care-plan-label\">Owner</dt><dd class=\"rs-care-plan-value\">Robin Ellis</dd></div><div class=\"rs-care-plan-field\"><dt class=\"rs-care-plan-label\">Due</dt><dd class=\"rs-care-plan-value\">17 September</dd></div><div class=\"rs-care-plan-field\"><dt class=\"rs-care-plan-label\">Status</dt><dd class=\"rs-care-plan-value\">Open</dd></div></dl></li></ul></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "checkbox",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "CarePlan",
+            "Care tasks",
+            "Patient checklist",
+            "Care coordination",
+            "Treatment task list"
+          ],
+          "example": "import { CarePlan } from \"@noorddev/vlak-react\";\n\n<CarePlan tasks={[{ id: \"visit\", title: \"Confirm the next visit\", owner: \"Robin Ellis\", dueLabel: \"17 September\", status: \"Open\", completed: false }]} />\n\n// Pass onCompletedChange(taskId, completed) to request changes.\n// The caller persists completion and supplies updated tasks and pending states.",
+          "usage": {
+            "use": [
+              "Existing care plans with named owners and application-supplied deadlines and task status.",
+              "Supply an explicit completed boolean and onCompletedChange to enable a completion control."
+            ],
+            "avoid": [
+              "Generating treatment plans or deriving task urgency from dates.",
+              "Treating an unknown completion state as unchecked or showing success before the caller updates the record."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves between enabled completion checkboxes when editing is available."
+            },
+            {
+              "keys": "Space",
+              "does": "Requests a completion change through onCompletedChange. The checkbox stays at the supplied value until the caller updates it."
+            }
+          ],
+          "a11y": [
+            "Task labels name native checkboxes with at least 44px label targets; the recorded status describes each checkbox.",
+            "Pending or disabled tasks cannot be changed. Pending text is visible in a polite status region with aria-busy on the task.",
+            "Tasks with unknown completion or no change callback render as static text, without an invented checkbox state.",
+            "Owner and due-date omissions are explicitly marked as not supplied. Dates are never parsed or inferred."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/care-plan.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/care-plan.tsx"
+        },
+        {
+          "path": "vlak/styles/care-plan.css",
+          "type": "registry:file",
+          "target": "styles/vlak/care-plan.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "button",
       "type": "registry:component",
       "title": "Button",
