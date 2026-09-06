@@ -1,6 +1,7 @@
 import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import config from "film:config";
+import { createBrowserFrame } from "./browser-frame.jsx";
 
 // Paint and state belong to the original board. This transport only supplies
 // reversible motion, a camera, and deterministic native input events.
@@ -11,6 +12,16 @@ const root = createRoot(host);
 const width = config.width ?? 1180,
 	height = config.height ?? 772,
 	density = 3;
+const browserFrame = createBrowserFrame({
+	world,
+	camera,
+	host,
+	slug: config.slug,
+	title: config.title,
+	width,
+	height,
+	density,
+});
 const clamp = (v) => Math.max(0, Math.min(1, v));
 const mix = (a, b, p) => a + (b - a) * p;
 const ease = (v) => {
@@ -333,8 +344,15 @@ function cueMotion(cue, t) {
 function paint(t) {
 	resetMotion();
 	const ending = ease((t - 33) / 2.5);
-	let scale = mix(1.14, 1.04, ending),
-		screenY = mix(560, 635, ending),
+	const frameScale = mix(1.14, 1, ending),
+		frameScreenY = mix(560, 648, ending);
+	const offset = browserFrame.layout({
+		time: t,
+		scale: frameScale,
+		screenY: frameScreenY,
+	});
+	let scale = frameScale,
+		screenY = frameScreenY,
 		centerX = width / 2,
 		centerY = height / 2;
 	for (const shot of config.shots ?? []) {
@@ -386,7 +404,7 @@ function paint(t) {
 		});
 	}
 	world.style.transform = `scale(${innerWidth / 1920})`;
-	camera.style.transform = `translate(${960 - centerX * scale}px,${screenY - centerY * scale}px) scale(${scale / density})`;
+	camera.style.transform = `translate(${960 - centerX * scale - offset.left}px,${screenY - centerY * scale - offset.top}px) scale(${scale / density})`;
 	if (t < 8.15) {
 		modify(board, {
 			visibility: t < 3.2 ? "hidden" : "visible",
@@ -414,7 +432,7 @@ function paint(t) {
 			y = (height / 2 - heroRect.y - heroRect.height / 2) * (1 - dock);
 		modify(hero, {
 			transformOrigin: "50% 50%",
-			transform: `translate(${x}px,${y}px) scale(${mix(config.hero.scale ?? 2.4, 1, dock) * mix(0.8, 1, birth)})`,
+			transform: `translate(${x}px,${y}px) scale(${mix(Math.min(config.hero.scale ?? 2.4, (width - 96) / heroRect.width, (height - 96) / heroRect.height), 1, dock) * mix(0.8, 1, birth)})`,
 		});
 	}
 	for (const rebuild of config.rebuilds ?? []) {
@@ -444,7 +462,7 @@ function paint(t) {
 	const name = document.getElementById("film-name"),
 		wordmark = document.getElementById("film-wordmark"),
 		path = document.getElementById("film-path");
-	name.style.opacity = String(ease(t / 0.6) * (1 - ease((t - 32.8) / 0.6)));
+	name.style.display = "none";
 	wordmark.style.opacity = path.style.opacity = String(ease((t - 34.1) / 0.75));
 	wordmark.style.transform = `translateY(${24 * (1 - ease((t - 34.1) / 0.75))}px)`;
 	// Pause original CSS keyframes on film time; component paint is untouched.
@@ -489,6 +507,7 @@ window.film = {
 	},
 	inspect: () => ({
 		state: config.inspect?.(board),
+		browserFrame: browserFrame.inspect(),
 		events,
 		sounds: [...sounds.values()].sort((a, b) => a.time - b.time),
 		warnings: [...warnings],

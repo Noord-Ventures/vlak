@@ -302,7 +302,10 @@ export default {
 				root
 					.querySelector('.cx-timeline button[aria-label="Pause turntable"]')
 					?.click();
-				await new Promise((resolve) => setTimeout(resolve, 900));
+				// The API reports ready before Sketchfab finishes dissolving its
+				// built-in loading overlay. Let the original viewer finish before
+				// the deterministic recording clock starts.
+				await new Promise((resolve) => setTimeout(resolve, 4000));
 				if (viewer.dataset.viewerStatus !== "ready")
 					throw new Error("Vehicle viewer became unavailable during warm-up");
 				return;

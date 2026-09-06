@@ -4,6 +4,7 @@ import { AgentsBoard } from "../../app/interfaces/agents/board";
 import { createAgentController, agentFilmEvents } from "./controller.mjs";
 import { collectAgentParts, independentAgentParts } from "./parts.mjs";
 import { actionTimes as at, motionCues, filmDuration } from "./timeline.mjs";
+import { createBrowserFrame } from "../interface-films/browser-frame.jsx";
 
 // The actual AgentsBoard DOM supplies every surface, icon, label and control.
 // Film-only visibility, framing and reversible transforms provide the motion.
@@ -25,6 +26,16 @@ const host = document.getElementById("agent-interface"),
 	world = document.getElementById("world");
 const root = createRoot(host),
 	changed = new Map();
+const browserFrame = createBrowserFrame({
+	world,
+	camera,
+	host,
+	slug: "agents",
+	title: "Agent management",
+	width,
+	height,
+	density,
+});
 let generation = 0,
 	lastTime = 0,
 	lastPose = null,
@@ -98,8 +109,8 @@ function cameraPose(time) {
 	const ending = {
 		x: width / 2,
 		y: height / 2,
-		scale: 1.04,
-		screenY: 635,
+		scale: 1,
+		screenY: 648,
 		...full,
 	};
 	if (time < 14.8) return interpolate(wide, detail, time, 8.2, 9.25);
@@ -243,6 +254,12 @@ async function step(frame) {
 	camera.style.transform = `scale(${1 / density})`;
 	const inventory = collectAgentParts(host),
 		pose = cameraPose(time);
+	const browserEnding = ease((time - 33) / 2.5);
+	const viewport = browserFrame.layout({
+		time,
+		scale: mix(1.14, 1, browserEnding),
+		screenY: mix(560, 648, browserEnding),
+	});
 	intro(time, inventory);
 	stateMotion(time, inventory);
 	surroundings(time);
@@ -250,10 +267,8 @@ async function step(frame) {
 		time < 8.15
 			? "none"
 			: `inset(${pose.cropTop}px ${pose.cropRight}px ${pose.cropBottom}px ${pose.cropLeft}px)`;
-	camera.style.transform = `translate(960px,${pose.screenY}px) scale(${pose.scale / density}) translate(${-pose.x * density}px,${-pose.y * density}px)`;
-	document.getElementById("film-name").style.opacity = String(
-		ease(time / 0.5) * (1 - ease((time - 1.8) / 0.5)),
-	);
+	camera.style.transform = `translate(${960 - viewport.left}px,${pose.screenY - viewport.top}px) scale(${pose.scale / density}) translate(${-pose.x * density}px,${-pose.y * density}px)`;
+	document.getElementById("film-name").style.display = "none";
 	const wordmark = document.getElementById("film-wordmark");
 	wordmark.style.opacity = String(ease((time - 36) / 0.4));
 	wordmark.style.transform = `translateY(${(1 - spring(time - 36)) * 80}px)`;
@@ -270,7 +285,7 @@ async function initialise() {
 	controller = createAgentController(host, { remount });
 	await document.fonts.ready;
 	await step(0);
-	window.film = {
+	window[window.agentFilmTarget ?? "film"] = {
 		ready: true,
 		step,
 		stats: {
@@ -293,16 +308,24 @@ async function initialise() {
 			individualMotionLayers: motionCues.length,
 			filmDuration,
 			events: agentFilmEvents,
+			browserFrame: browserFrame.inspect(),
 		},
 		inspect: () => ({
 			time: lastTime,
 			camera: lastPose,
+			browserFrame: browserFrame.inspect(),
 			nativeParts: lastInventory.parts.length,
 			...controller.inspect(),
 		}),
-		dispose: () => root.unmount(),
+		dispose: () => {
+			root.unmount();
+			browserFrame.dispose();
+		},
 	};
 }
 initialise().catch((error) => {
-	window.film = { ready: false, error: error.stack ?? String(error) };
+	window[window.agentFilmTarget ?? "film"] = {
+		ready: false,
+		error: error.stack ?? String(error),
+	};
 });

@@ -1,6 +1,7 @@
-// Render Vlak's actual agent interface and native interactions with film motion.
-// node apps/www/scripts/render-agents-film.mjs --proof --stills
-// node apps/www/scripts/render-agents-film.mjs --sound
+// Render a native Vlak prompt, browser assembly and agent walkthrough.
+// node apps/www/scripts/render-prompt-film.mjs --proof --stills
+// node apps/www/scripts/render-prompt-film.mjs --sound
+// Compose prompt-film/music.py first. VLAK_MUSIC selects an existing music WAV.
 // VLAK_FFMPEG and VLAK_VIDEO_OUTPUT override the encoder and destination.
 import { createServer } from "node:http";
 import { spawn } from "node:child_process";
@@ -17,12 +18,12 @@ import {
 	scoreCuts,
 	landingCues,
 	soundSource,
-} from "./agent-film/sound.mjs";
+} from "./prompt-film/sound.mjs";
 
-import { filmDuration } from "./agent-film/timeline.mjs";
+import { duration as filmDuration } from "./prompt-film/timeline.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
-const filmRoot = path.join(directory, "agent-film");
+const filmRoot = path.join(directory, "prompt-film");
 const site = path.resolve(directory, "..");
 const repo = path.resolve(site, "../..");
 const require = createRequire(path.join(site, "package.json"));
@@ -54,7 +55,7 @@ const bundled = await build({
 });
 const output = path.resolve(
 	process.env.VLAK_VIDEO_OUTPUT ??
-		path.join(homedir(), "Movies/Vlak/interface-films/agents"),
+		path.join(homedir(), "Movies/Vlak/prompt-to-interface"),
 );
 const proof = process.argv.includes("--proof");
 const stills = process.argv.includes("--stills");
@@ -79,17 +80,19 @@ const frames = limit,
 	duration = frames / fps;
 const partial = frames < fps * filmDuration;
 const name =
-	"vlak-agents-interface" +
+	"vlak-prompt-to-interface" +
 	(proof ? "-proof" : "") +
 	(partial ? "-partial" : "");
 const file = path.join(output, name + ".mp4");
 const silentFile = sound ? path.join(output, name + "-silent.mp4") : null;
 const scoreFile = sound ? path.join(output, name + "-score.wav") : null;
 const ffmpeg = process.env.VLAK_FFMPEG ?? "ffmpeg";
+const musicFile =
+	process.env.VLAK_MUSIC ?? path.join(output, "vlak-prompt-music.wav");
+if (sound) await stat(musicFile);
 const checkpointTimes = [
-	0.4, 0.65, 0.9, 1.3, 2, 2.8, 3.4, 4.15, 4.55, 5.2, 5.8, 6.3, 6.9, 7.6, 8.1,
-	9.4, 9.8, 10.05, 10.5, 11.5, 13.9, 16.3, 17.4, 18.8, 20.5, 23.3, 23.8, 24.3,
-	24.8, 27.5, 29.35, 29.7, 30.05, 30.6, 31.6, 34.5, 36.2, 37.2, 39.7,
+	0.5, 2, 3.9, 4.55, 4.8, 5.5, 6.6, 7.5, 8.7, 9.45, 10, 10.8, 11.7, 12.7, 13.5,
+	15.5, 18.5, 20.5, 23.5, 26, 29, 31, 32.5, 34, 36, 39.7,
 ];
 const checkpoints = [
 	...new Set(
@@ -112,7 +115,7 @@ html::before{display:none}html,body{margin:0;padding:0;width:100%;height:100%;ov
 #film-name{position:absolute;left:72px;top:64px;font-size:22px;letter-spacing:-.025em;line-height:1.2}
 #film-wordmark{position:absolute;left:72px;top:55px;font-size:116px;line-height:1;letter-spacing:-.055em}
 #film-path{position:absolute;right:72px;top:145px;font-size:20px;line-height:1.2;color:var(--text-secondary)}
-</style></head><body><div id="world"><div id="agent-camera"><div id="agent-interface"></div></div><div id="film-type"><div id="film-name">Agent management</div><div id="film-wordmark">Vlak.dev</div><div id="film-path">/interfaces/agents</div></div></div><script src="/bundle.js"></script></body></html>`;
+</style></head><body><div id="world"><div id="agent-camera"><div id="agent-interface"></div></div><div id="film-type"><div id="film-name">Agent management</div><div id="film-wordmark">Vlak.dev</div><div id="film-path">/interfaces/agents</div></div></div><script>window.agentFilmTarget="agentFilm";</script><script src="/bundle.js"></script></body></html>`;
 
 const types = {
 	".css": "text/css",
@@ -322,10 +325,14 @@ try {
 						silentFile,
 						"-i",
 						scoreFile,
+						"-i",
+						musicFile,
+						"-filter_complex",
+						"[1:a]volume=2[sfx];[2:a][sfx]amix=inputs=2:normalize=0,alimiter=limit=0.84:level=false:attack=5:release=80:latency=1[mix]",
 						"-map",
 						"0:v:0",
 						"-map",
-						"1:a:0",
+						"[mix]",
 						"-c:v",
 						"copy",
 						"-c:a",
@@ -336,8 +343,6 @@ try {
 						"48000",
 						"-ac",
 						"2",
-						"-af",
-						"loudnorm=I=-20:TP=-2:LRA=9",
 						"-movflags",
 						"+faststart",
 						"-shortest",
@@ -392,21 +397,23 @@ try {
 		score: sound
 			? {
 					file: scoreFile,
-					source: "apps/www/scripts/agent-film/sound.mjs",
-					original: false,
+					source: "apps/www/scripts/prompt-film/sound.mjs",
+					original: true,
+					musicFile,
+					musicSource: "apps/www/scripts/prompt-film/music.py",
 					soundSource,
 					sampleRate: 48000,
 					channels: 2,
 					codec: "aac",
 					bitrate: 192000,
-					loudnessTargetLUFS: -20,
-					truePeakTargetDBTP: -2,
+					preserveCrescendoDynamics: true,
+					limiterPeak: 0.84,
 					cuts: scoreCuts,
 					landingCues,
 				}
 			: null,
-		source: "apps/www/scripts/render-agents-film.mjs",
-		scene: "apps/www/scripts/agent-film/film.jsx",
+		source: "apps/www/scripts/render-prompt-film.mjs",
+		scene: "apps/www/scripts/prompt-film/film.jsx",
 		interface: "apps/www/app/interfaces/agents/board.tsx",
 		interfaceStyles: "apps/www/app/interfaces/agents/scene.css",
 	};

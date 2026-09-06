@@ -1,6 +1,6 @@
 # Vlak interface films
 
-One 40-second, 1920×1080/30 fps film for every interface in the original catalog. The approved agent film is retained; the other twelve use this shared renderer. All surfaces, typography, icons, controls, images and native interactions come from the original React boards and their compiled Vlak components. Film configuration adds reversible transforms, visibility, camera framing and scripted user input. It does not edit or re-create the product components.
+One 40-second, 1920×1080/30 fps film for every interface in the original catalog, presented inside a shared faux browser window. The agent film retains its approved choreography and sound; the other twelve use this shared renderer. All surfaces, typography, icons, controls, images and native interactions come from the original React boards and their compiled Vlak components. Film configuration adds reversible transforms, visibility, camera framing and scripted user input. It does not edit or re-create the product components.
 
 ## Render
 
@@ -13,7 +13,7 @@ node apps/www/scripts/render-interface-film.mjs press --sound
 
 Replace `press` with `line`, `wall`, `night`, `evening`, `room`, `graphics`, `render`, `drive`, `orbit`, `frontier`, or `platforms`. The existing Agents renderer remains `apps/www/scripts/render-agents-film.mjs --sound`.
 
-`VLAK_FFMPEG` selects the encoder executable; `VLAK_VIDEO_OUTPUT` selects an individual film's destination. By default each new film writes to `~/Movies/Vlak/interface-films/<slug>/`. Each export includes the final H.264/AAC MP4, a silent master, a 48kHz stereo WAV score, checkpoint PNGs, a cover and a JSON render report. `--proof` renders at 960×540, `--stills` renders review checkpoints, and `--limit-frames=N` creates a partial export.
+`VLAK_FFMPEG` selects the encoder executable; `VLAK_VIDEO_OUTPUT` selects an individual film's destination. Every renderer, including Agents, defaults to `~/Movies/Vlak/interface-films/<slug>/`. Each export includes the final H.264/AAC MP4, a silent master, a 48kHz stereo WAV score, checkpoint PNGs, a cover and a JSON render report. `--proof` renders at 960×540, `--stills` renders review checkpoints, and `--limit-frames=N` creates a partial export. Use a separate destination such as `~/Movies/Vlak/browser-films/<slug>/` while reviewing replacement masters.
 
 When all masters are complete:
 
@@ -22,7 +22,21 @@ node apps/www/scripts/interface-films/assemble-collection.mjs
 node apps/www/scripts/interface-films/serve-collection.mjs
 ```
 
-This reads the original interface catalog, decodes all 13 current masters and records their SHA-256 checksums, copies the approved agent film, and creates a portable gallery, manifest and ZIP. It refuses an incomplete, corrupt, or warning-bearing master; FFmpeg must be available for this verification. `VLAK_COLLECTION_OUTPUT` overrides the collection folder; `VLAK_AGENTS_OUTPUT` locates the approved agent export. The local review server supports video byte ranges and defaults to http://127.0.0.1:3115/; `VLAK_VIDEO_PORT` selects another port. The extracted gallery can also be opened directly from its index.html.
+This reads the original interface catalog, decodes all 13 current masters and records their SHA-256 checksums, then creates a portable gallery, manifest and ZIP. Every master, including Agents, must already be present with browser-frame metadata. The assembler never substitutes the old `agent-assembly` export. It refuses an incomplete, corrupt, unframed, or warning-bearing master; FFmpeg must be available for verification.
+
+To publish an entire reviewed staging collection:
+
+```sh
+VLAK_COLLECTION_STAGING="$HOME/Movies/Vlak/browser-films" node apps/www/scripts/interface-films/assemble-collection.mjs
+```
+
+All 13 staged masters are verified before any served film is replaced. Export files are replaced atomically, companion report paths are relocated to the collection, and existing gallery assets and other review artifacts are retained. When replacing the original unframed collection, its ZIP is preserved as `Vlak-interface-films-unframed.zip`; the new portable ZIP is built separately and moved into place. `VLAK_COLLECTION_OUTPUT` overrides the collection folder. The local review server supports video byte ranges and defaults to http://127.0.0.1:3115/; `VLAK_VIDEO_PORT` selects another port. The extracted gallery can also be opened directly from its index.html.
+
+When `~/Movies/Vlak/prompt-to-interface/` contains the final `vlak-prompt-to-interface.mp4`, matching JSON report and `-cover.png`, the assembler also verifies and publishes the optional **Prompt to interface** narrative above the interface grid. `VLAK_FEATURE_OUTPUT` overrides that source folder. Its three assets are copied into the gallery and ZIP, and its metadata appears under `manifest.feature`; the original catalog count remains 13. Partial or unfinished renders are not published. Video and poster URLs include master checksums so a refreshed gallery shows the current export.
+
+## Browser framing
+
+`browser-frame.jsx` wraps each original 1180×772 interface in a square window with a 64px toolbar. Navigation, window controls, and the address field are original Vlak `Button`, `ButtonGroup`, `Icon`, `Input`, `InputGroup`, and `InputAddon` components. The address identifies the current interface. The window stays still while the native component camera moves inside its clipped content viewport; opening hero components are constrained to fit. The final window settles below the large Vlak.dev wordmark. Browser geometry and native board dimensions are recorded under `finalState.browserFrame` in every report.
 
 ## Motion and state
 
