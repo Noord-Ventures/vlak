@@ -12,6 +12,7 @@ import {
 	Waveform,
 } from "@noorddev/vlak-react";
 import { PlanningSpecimen } from "./planning-exact.jsx";
+import { mediaStateAt } from "./media-timeline.mjs";
 
 /**
  * Canonical film specimens. The host loads @noorddev/vlak-react/css and its
@@ -67,16 +68,6 @@ const ruleAccessibility = {
 	value: "Accessibility",
 };
 
-function progressAt(time) {
-	return (
-		0.12 +
-		0.33 * smooth(1.65, 3.03, time) +
-		0.23 * smooth(3.12, 3.49, time) +
-		0.21 * smooth(3.5, 4.65, time) -
-		0.73 * smooth(5.17, 5.74, time)
-	);
-}
-
 function selectionsAt(time, overview) {
 	if (overview || time >= 1.73) return ["motion", "accessibility"];
 	return time >= 1.25 ? ["motion"] : [];
@@ -106,6 +97,7 @@ function ExactMultiSelect({ time, overview }) {
 /** Local chapter time: controls0–6, media0–6.5, selection0–6.5, planning0–7.5. */
 export function ExactSpecimen({ id, time = 0, overview = false }) {
 	const t = Math.max(0, Number.isFinite(time) ? time : 0);
+	const media = mediaStateAt(t, overview);
 	switch (id) {
 		case "switch":
 			return (
@@ -162,7 +154,7 @@ export function ExactSpecimen({ id, time = 0, overview = false }) {
 				<Waveform
 					label="Field recording"
 					samples={samples}
-					value={overview ? 0.5 : progressAt(t)}
+					value={media.progress}
 					onValueChange={noop}
 					data-film-specimen={id}
 				/>
@@ -171,7 +163,7 @@ export function ExactSpecimen({ id, time = 0, overview = false }) {
 			return (
 				<PlaybackControls
 					label="Recording transport"
-					playing={!overview && t >= 1.88 && t < 4.79}
+					playing={media.playing}
 					onPlayingChange={noop}
 					onPrevious={noop}
 					onNext={noop}
@@ -183,8 +175,9 @@ export function ExactSpecimen({ id, time = 0, overview = false }) {
 			return (
 				<MediaScrubber
 					label="Recording position"
-					duration={18}
-					value={overview ? 9 : Math.floor(progressAt(t) * 18)}
+					duration={media.duration}
+					value={media.position}
+					step={0.001}
 					buffered={16}
 					onValueChange={noop}
 					data-film-specimen={id}

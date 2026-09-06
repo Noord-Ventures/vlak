@@ -51,6 +51,10 @@ Omit `--sound` for a silent film. `--limit-frames 90` renders the first three se
 
 The film changes real component props and native state: the switch checks, the number reaches 204, range values move, playback and progress change, selected topics become tags and query rules, and planning fixtures update. The overview retains the canonical components and their completed states through the end of the film.
 
+The opening Switch retreats before NumberField appears. The four opening components finish their exit before the media chapter enters, keeping their painted surfaces and labels separate throughout the transition.
+
+The audio-player sequence keeps the waveform stationary. It plays at normal speed, pauses, makes one smooth forward seek, and resumes. Waveform fill, the native scrubber, displayed time, transport state, and button clicks share one timeline.
+
 The scheduling chapter opens `Scheduler`'s own reschedule dialog and edits its native date and time inputs. The fixture moves **Layout review** from 9 September 2026, 09:00–10:00 UTC, to 10 September, 11:30–12:30 UTC, preserving its duration. The Kanban fixture moves **Type study** to **In progress** and **Motion study** to **Planned**. These are application fixtures around the exported components, not replacement forms or cards.
 
 ## Source files
@@ -60,6 +64,7 @@ The scheduling chapter opens `Scheduler`'s own reschedule dialog and edits its n
 - [capture/specimens-exact.jsx](capture/specimens-exact.jsx): the twelve exported components, their props, and the component catalog.
 - [capture/planning-exact.jsx](capture/planning-exact.jsx): controlled scheduling and Kanban fixtures.
 - [capture/planning-motion.mjs](capture/planning-motion.mjs): measured movement of the actual Kanban cards between their native column positions.
+- [capture/media-timeline.mjs](capture/media-timeline.mjs): shared playback, pause, seek, resume, and transport-click times.
 - [exact-sound.mjs](exact-sound.mjs): deterministic original synthesis and documented contact times.
 
 Frame time is `frame / 30`. Motion is evaluated from that time instead of accumulating a physics simulation. Modified inline motion styles are restored before the next frame. The renderer fixes locale to `en-GB`, timezone to UTC, and disables incidental package motion with reduced-motion preferences; the film's explicit transforms remain under the frame clock.
@@ -75,7 +80,7 @@ The component wrappers use CSS zoom and an equal inverse camera scale, with extr
 - `landingCues`: named contact events with `time`, `component`, `gain`, and `pan`.
 - `landingCueTimes`: the sorted numeric contact times for review or metadata.
 
-The short, dry landing clicks are separate from presses and controlled state changes. Cue times follow the DOM animation's first spring contact, including the slower whole-host and overview arrivals. Minor waveform groups and labels have quieter cues; each overview tile has an individual landing click. Synthesis uses no external recordings or music samples. The ending bed resolves gently while the grid remains visible.
+The short, dry landing clicks are separate from presses and controlled state changes. Cue times follow the DOM animation's first spring contact, including the slower whole-host and overview arrivals. Minor labels have quieter cues; each overview tile has an individual landing click. Synthesis uses no external recordings or music samples. The ending bed resolves gently while the grid remains visible.
 
 The standard spring reaches its first contact after:
 

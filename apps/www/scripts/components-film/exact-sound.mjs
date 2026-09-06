@@ -3,6 +3,7 @@
 import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { planningMotionTiming } from "./capture/planning-motion.mjs";
+import { mediaTiming, mediaTransportEvents } from "./capture/media-timeline.mjs";
 
 // capture/exact-film.jsx: incoming clocks begin at these chapter boundaries.
 export const scoreCuts = [0, 6, 12.5, 19, 26];
@@ -31,7 +32,7 @@ const components = [
 /**
  * Cue times follow actual canonical DOM nodes in capture/exact-film.jsx.
  * flight() uses spring(time-start), so its first contact is start+contact.
- * Whole hosts run at .85 speed; waveform fans and overview tiles run at .8.
+ * Whole hosts run at .85 speed; overview tiles run at .8.
  * Minor labels travel with their controls and do not need separate loud hits.
  */
 export const landingCues = [
@@ -72,15 +73,6 @@ export const landingCues = [
 	cue(4.34, "From value settles", 0.36, -0.14),
 	cue(4.65, "To value settles", 0.36, 0.14),
 
-	// Four quiet fans represent the 128 real waveform bars; no invented rulers.
-	...[0.125, 0.375, 0.625, 0.875].map((f, i) =>
-		cue(
-			6 + 0.24 + f * 0.55 + contact / 0.8,
-			"Waveform fan " + (i + 1),
-			0.2,
-			(f - 0.5) * 0.45,
-		),
-	),
 	...["Previous", "Play", "Next", "Stop"].map((name, i) =>
 		cue(
 			6.38 + i * 0.11 + contact,
@@ -91,6 +83,7 @@ export const landingCues = [
 	),
 	cue(6.72 + contact, "MediaScrubber track", 0.42),
 	cue(6.83 + contact, "MediaScrubber times", 0.25),
+	cue(mediaTiming.seekEnd, "MediaScrubber seek reaches 9 seconds", 0.38, 0.08),
 
 	// The details panel opens at12.72; all six real option rows already exist.
 	cue(12.68 + contact, "MultiSelect trigger", 0.42, -0.2),
@@ -229,13 +222,8 @@ const pressCues = [
 	...[3.3, 3.72, 4.14].map((time) =>
 		cue(time, "NumberField increment", 0.66, 0.25),
 	),
-	...[
-		[7.72, 1],
-		[9.12, 2],
-		[10.62, 3],
-		[11.17, 0],
-	].map(([start, index]) =>
-		cue(start + 0.175, "PlaybackControls press", 0.62, (index - 1.5) * 0.12),
+	...mediaTransportEvents.map(({ action, time }) =>
+		cue(time, "PlaybackControls " + action + " press", 0.58, -0.06),
 	),
 	cue(13.75, "Select Motion", 0.48, -0.2),
 	cue(14.23, "Select Accessibility", 0.48, -0.2),

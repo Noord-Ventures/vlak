@@ -2,6 +2,7 @@ import { createRoot } from "react-dom/client";
 import { flushSync } from "react-dom";
 import { ExactSpecimen, specimenCatalog } from "./specimens-exact.jsx";
 import { applyPlanningMotion } from "./planning-motion.mjs";
+import { mediaTransportEvents } from "./media-timeline.mjs";
 
 // Only the film hosts and motion transforms are authored here. Every visible
 // control, label, icon, native input and component border belongs to Vlak.
@@ -45,10 +46,10 @@ const entry = {
 	kanban: 22.35,
 };
 const exit = {
-	switch: 6,
-	number: 6,
-	range: 6,
-	rating: 6,
+	switch: 5.55,
+	number: 5.55,
+	range: 5.55,
+	rating: 5.55,
 	waveform: 12.5,
 	playback: 12.5,
 	scrubber: 12.5,
@@ -159,7 +160,8 @@ function parts(host, selector, time, start, stagger = 0.045, amount = 1) {
 
 function place(id, time, height) {
 	if (id === "switch") {
-		const p = ease((time - 2.2) / 1.4);
+		// Clear the NumberField's landing area before its first visible frame.
+		const p = ease((time - 1.1) / 1.05);
 		return { x: mix(960, 480, p), y: mix(475, 340, p), scale: mix(18, 7, p) };
 	}
 	if (id === "number") return { x: 1195, y: 350, scale: 1.85 };
@@ -265,7 +267,6 @@ function animateHost(host, spec, index, time) {
 		? "inline-block"
 		: "none";
 	if (final || alpha <= 0.0001) return;
-	const local = time - chapter[spec.id];
 	switch (spec.id) {
 		case "switch": {
 			const thumb = host.querySelector(".rs-switch-thumb");
@@ -312,35 +313,20 @@ function animateHost(host, spec, index, time) {
 				0.085,
 			);
 			break;
-		case "waveform": {
-			const bars = host.querySelectorAll(".rs-waveform-bar");
-			bars.forEach((bar, i) => {
-				const f = i / Math.max(1, bars.length - 1),
-					p = spring((local - 0.24 - f * 0.55) * 0.8),
-					r = 10 + f * 62,
-					a = f * Math.PI * 5;
-				const x = Number(bar.getAttribute("x")) + 1,
-					y = 24;
-				modify(bar, {
-					transformBox: "fill-box",
-					transformOrigin: "center",
-					transform: `translate(${(1 - p) * (256 + Math.cos(a) * r - x)}px,${(1 - p) * (24 + Math.sin(a) * r * 0.55 - y)}px) rotate(${(1 - p) * ((a * 180) / Math.PI + 90)}deg)`,
-				});
-			});
+		case "waveform":
+			// Playback and seeking update only Vlak's played fill and native
+			// scrubber. The waveform bars keep their canonical positions.
 			break;
-		}
 		case "playback": {
 			parts(host, "button", time, 6.38, 0.11);
-			const times = [0, 7.72, 9.12, 10.62, 11.17];
 			const buttons = host.querySelectorAll("button");
-			buttons.forEach((button, i) => {
-				const at = times[[4, 1, 2, 3][i]],
-					d = time - at;
+			for (const event of mediaTransportEvents) {
+				const d = time - (event.time - 0.175);
 				if (d >= 0 && d < 0.35)
-					modify(button, {
+					modify(buttons[event.buttonIndex], {
 						transform: `translateZ(${-Math.sin((Math.PI * d) / 0.35) * 3}px) scale(${1 - Math.sin((Math.PI * d) / 0.35) * 0.02})`,
 					});
-			});
+			}
 			break;
 		}
 		case "scrubber":
