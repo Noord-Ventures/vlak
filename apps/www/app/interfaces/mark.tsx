@@ -9,6 +9,7 @@ const marks = {
   night: "truck",
   evening: "bag",
   room: "hash",
+  agents: "terminal",
   graphics: "image",
   render: "box",
   drive: "compass",

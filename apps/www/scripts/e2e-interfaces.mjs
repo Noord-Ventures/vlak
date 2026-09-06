@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const slugs = ["graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
+const slugs = ["agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
@@ -62,7 +62,7 @@ try {
         if (layout.clippedFormats.length) failures.push(`${width}px ${route}: clipped format labels: ${layout.clippedFormats.join(", ")}`);
         layout.links.forEach(href => { componentLinks.add(href); });
       }
-      console.log(`${scheme} ${width}px: checked gallery and twelve studies`);
+      console.log(`${scheme} ${width}px: checked gallery and ${slugs.length} studies`);
     }
     await page.close();
   }
@@ -71,8 +71,8 @@ try {
   const context = await browser.newContext({ permissions: ["clipboard-read", "clipboard-write"], viewport: { width: 390, height: 844 } });
   const page = await context.newPage();
   await page.goto(base + "/interfaces/", { waitUntil: "networkidle" });
-  assert.equal(await page.locator(".if-tile").count(), 12);
-  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /graphics/);
+  assert.equal(await page.locator(".if-tile").count(), slugs.length);
+  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /agents/);
   await page.goto(base + "/interfaces/graphics/", { waitUntil: "networkidle" });
   await page.locator(".if-build-link").click();
   await page.waitForFunction(() => location.hash === "#build-with-vlak");

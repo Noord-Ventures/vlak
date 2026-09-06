@@ -4,6 +4,7 @@ import { sx } from "@/lib/sx";
 import { type InterfaceSlug, interfaceBySlug } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { Mark } from "./mark";
+import "./agents/crop.css";
 
 function Lockup({ slug }: { slug: InterfaceSlug }) {
   const proto = interfaceBySlug(slug)!;
@@ -110,6 +111,27 @@ function GraphicsCrop() {
   );
 }
 
+function AgentsCrop() {
+  return (
+    <div className="if-crop-scene if-crop-agents">
+      <header><span><Icon name="layers" size={16} /> Website release</span><span>5 agents</span></header>
+      <div className="if-crop-agents-summary"><span><i />2 running</span><span>1 needs review</span></div>
+      <div className="if-crop-agents-work">
+        <div className="if-crop-agents-queue">
+          <div><Icon name="activity" size={16} /><span><b>Account settings</b><small>Frontend · working</small></span></div>
+          <div data-selected="true"><Icon name="user-check" size={16} /><span><b>Keyboard audit</b><small>Needs review</small></span></div>
+          <div><Icon name="activity" size={16} /><span><b>Mobile layouts</b><small>Responsive · working</small></span></div>
+        </div>
+        <div className="if-crop-agents-detail">
+          <span>Accessibility agent</span><b>Ready for<br />your review.</b>
+          <div className="if-crop-agents-trace"><span><Icon name="check" size={12} />18 checks passed</span><span><Icon name="check" size={12} />2 files prepared</span><span><Icon name="user-check" size={12} />Awaiting approval</span></div>
+          <div className="if-crop-agents-approval"><Icon name="check" size={12} />Approve review</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RenderCrop() {
   return (
     <div className="if-crop-scene if-crop-render">
@@ -167,6 +189,7 @@ const CROPS: Record<InterfaceSlug, () => ReactNode> = {
   night: NightCrop,
   evening: EveningCrop,
   room: RoomCrop,
+  agents: AgentsCrop,
   graphics: GraphicsCrop,
   render: RenderCrop,
   drive: DriveCrop,

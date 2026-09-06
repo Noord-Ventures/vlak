@@ -11,7 +11,7 @@ import "./interfaces.css";
 
 export const metadata: Metadata = {
   title: "Interfaces",
-  description: "Explore twelve working interface studies, inspect their components, and build your own with Vlak. React, CSS, and source included.",
+  description: "Explore working interface studies, inspect their components, and build your own with Vlak. React, CSS, and source included.",
   alternates: { canonical: `${DOOR}/interfaces/` },
 };
 
@@ -24,7 +24,7 @@ export default function InterfacesPage() {
         <header className={`${cover.className} if-index-cover`} style={cover.style}>
           <h1 className="rs-t-display">Interfaces</h1>
           <p className="rs-t-sub">See what you can build with Vlak.</p>
-          <p className="if-index-intro">Twelve working studies, from a conversation to a complete workspace. Try the interactions, inspect the components, and take the source into your own project.</p>
+          <p className="if-index-intro">Working studies, from a conversation to a complete workspace. Try the interactions, inspect the components, and take the source into your own project.</p>
           <div className="if-index-links"><Link href="/docs/">Start building <span aria-hidden="true">→</span></Link><a href="/design.md">Get the design brief <span aria-hidden="true">↗</span></a></div>
         </header>
         <div {...sx("if-list", ifx.list)}>

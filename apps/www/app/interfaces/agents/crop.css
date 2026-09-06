@@ -1,0 +1,22 @@
+.if-crop-agents { height: 100%; display: flex; flex-direction: column; background: var(--bg); font-size: 12px; line-height: 1.35; }
+.if-crop-agents > header { min-height: 48px; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--divider); }
+.if-crop-agents > header > span:first-child { display: flex; gap: 8px; align-items: center; }
+.if-crop-agents > header > span:last-child { color: var(--text-secondary); white-space: nowrap; }
+.if-crop-agents-summary { display: flex; gap: 20px; padding: 12px 16px; border-bottom: 1px solid var(--divider); color: var(--text-secondary); }
+.if-crop-agents-summary > span:first-child { display: flex; gap: 6px; align-items: center; color: var(--text); }
+.if-crop-agents-summary i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.if-crop-agents-work { display: grid; grid-template-columns: 1fr 1fr; min-height: 0; flex: 1; }
+.if-crop-agents-queue { border-right: 1px solid var(--divider); min-width: 0; }
+.if-crop-agents-queue > div { display: flex; align-items: flex-start; gap: 8px; padding: 13px 12px; border-bottom: 1px solid var(--divider); }
+.if-crop-agents-queue > div[data-selected] { background: var(--text); color: var(--bg); }
+.if-crop-agents-queue > div[data-selected] small { color: inherit; }
+.if-crop-agents-queue svg { margin-top: 1px; }
+.if-crop-agents-queue b { display: block; font-size: 12px; font-weight: 500; }
+.if-crop-agents-queue small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 10px; }
+.if-crop-agents-detail { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; padding: 14px; min-width: 0; }
+.if-crop-agents-detail > span { font-size: 10px; color: var(--text-secondary); }
+.if-crop-agents-detail > b { font-size: clamp(16px, 1.6vw, 23px); font-weight: 500; letter-spacing: -.03em; line-height: 1.2; }
+.if-crop-agents-trace { margin-top: auto; display: grid; gap: 7px; font-size: 10px; color: var(--text-secondary); }
+.if-crop-agents-trace > span { display: flex; gap: 6px; align-items: center; }
+.if-crop-agents-trace > span:last-child { color: var(--text); }
+.if-crop-agents-approval { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; border-radius: var(--radius-sm); background: var(--text); color: var(--bg); font-size: 10px; }

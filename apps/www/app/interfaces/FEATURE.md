@@ -2,9 +2,9 @@
 
 What it is, how to get there, what done looks like.
 
-Writers: the twelve studies live in `app/interfaces/catalog.ts`. Each proto is its own folder and route. The section is a first-class nav sibling of Components, Docs, and About — not a page inside a component.
+Writers: the studies live in `app/interfaces/catalog.ts`. Each proto is its own folder and route. The section is a first-class nav sibling of Components, Docs, and About, not a page inside a component.
 
-Each interface is a fictional app with a descriptive English name. The gallery, side rail, and detail headings use those names. Stable route slugs are implementation details, not product brands. The six newer concepts appear first.
+Each interface is a fictional app with a descriptive English name. The gallery, side rail, and detail headings use those names. Stable route slugs are implementation details, not product brands. Newer concepts appear first, starting with agent management.
 
 Landing cards are poster crops — a clipped fragment of that UI, not a tiny full-page shrink, not a title-only frame. Type in a crop wraps on a word. A composer or photograph may run off the card; a letter may not. Captions follow the English names.
 
@@ -20,13 +20,14 @@ Each app has two to three levels of use: list → detail → one level deeper. I
 
 | Surface | Route | Click path | Done |
 | --- | --- | --- | --- |
-| Interfaces index | `/interfaces` | Corner → Interfaces | Lists the twelve. Title occupies a 204 cell. At scroll 0 the H1 top shares the rail first-row line. Each card is a poster crop on the 204, then the English name. Index tiles are chrome-square (radius 0), same lock as Components `.rs-card`. Vertical gap is two gutters so the stack is looser than a flush cage. The field under the title and around the crops reads as the module. |
+| Interfaces index | `/interfaces` | Corner → Interfaces | Lists the studies. Title occupies a 204 cell. At scroll 0 the H1 top shares the rail first-row line. Each card is a poster crop on the 204, then the English name. Index tiles are chrome-square (radius 0), same lock as Components `.rs-card`. Vertical gap is two gutters so the stack is looser than a flush cage. The field under the title and around the crops reads as the module. |
 | Line | `/interfaces/line` | Interfaces → Line | AI chat. List → chat → a line. Centered measure. Composer in the pane, aligned. Site 204s run around the box. On the phone: five-chat inbox plus composer (V1 still), not a squeezed three-pane. |
 | Press | `/interfaces/press` | Interfaces → Press | Dashboard. Floor → job → sheet. Hue in the rail. One Crouwel spot. On the phone: 38 / 12 / 4 metrics and four jobs, not a 204 rail stacked on the floor. |
 | Wall | `/interfaces/wall` | Interfaces → Wall | Social feed. Feed → post → profile. Masonry on desktop, a text stream on the phone. All people and portraits are fictional mock users created for the interface studies. |
 | Fleet management | `/interfaces/night` | Interfaces → Fleet management | List → unit → trip. A neighborhood at city scale with readable streets and a selected route. On phones, switch between the van list and map; trip details open in a dismissible sheet. |
 | Food ordering | `/interfaces/evening` | Interfaces → Food ordering | Search and filter restaurants → store → bag. Image-led cards adapt to phones. The bag is a sheet; no order is submitted. |
 | Room | `/interfaces/room` | Interfaces → Room | Team chat. Channel → message → thread. People in the rail. Not Wall. On the phone: channels and people list plus composer, not a 204 rail stacked on the thread. |
+| Agent management | `/interfaces/agents` | Interfaces → Agent management | Queue → task → activity or output. Create local tasks, pause or resume a run, and approve a review. Narrow panels use list-to-detail navigation. No model or external agent service is connected. |
 | Wallpaper generator | `/interfaces/graphics` | Interfaces → Wallpaper generator | Direction → generate → select → export. Geometric compositions run locally in-browser. Export produces a PNG with a 6,144px long edge; no image API is required. |
 | 3D workspace | `/interfaces/render` | Interfaces → 3D workspace | Live WebGL car model, modeling tools, selected panel, render timeline. Drag rotates the model. |
 | EV controls | `/interfaces/drive` | Interfaces → EV controls | Driving status, navigation, media, cabin and connectivity in a restrained automotive field. |
@@ -37,4 +38,4 @@ Each app has two to three levels of use: list → detail → one level deeper. I
 
 Routes are derived from `catalog.ts`; CI fails if a catalog route disappears.
 
-Before shipping, check all twelve routes at phone and desktop widths, including 320px. Verify one main landmark and page heading, no horizontal page overflow, primary local interactions, clipboard feedback, design-guide URL, component links, and the build anchor. Scope container queries to the owning study. Run the site typecheck and production build.
+Before shipping, check all study routes at phone and desktop widths, including 320px. Verify one main landmark and page heading, no horizontal page overflow, primary local interactions, clipboard feedback, design-guide URL, component links, and the build anchor. Scope container queries to the owning study. Run the site typecheck and production build.
