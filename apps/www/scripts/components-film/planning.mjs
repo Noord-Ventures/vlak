@@ -23,8 +23,11 @@ export function createPlanning(THREE, kit) {
     const rim=frame(3.65,2.1,.025,m.gray,.055,.018);
     const titleMesh=label(card,title,.30,-1.48,.62,.15,m.ink,'left');
     const timeMesh=label(card,time,.245,-1.48,.04,.15,m.gray,'left');
+    const rescheduledTime=i===2?label(card,'11:30–12:30',.245,-1.48,.04,.15,m.gray,'left'):null;
     const action=tile(3.12,.48,'Reschedule',{fontSize:.22,depth:.08,radius:.04});action.position.set(0,-.65,.15);
     const status=tile(2.02,.48,['Planned','In progress','Complete'][i%3],{fontSize:.22,depth:.08,radius:.04});status.position.set(-.55,-.65,.15);card.add(status);
+    const originalStatus=status.children[2];
+    const movedStatus=i<2?label(status,i===0?'In progress':'Planned',.22,0,0,.064,m.ink):null;
     const up=tile(.46,.48,'',{depth:.08,radius:.04});up.position.set(.98,-.65,.15);
     const down=tile(.46,.48,'',{depth:.08,radius:.04});down.position.set(1.55,-.65,.15);
     [up,down].forEach((button,which)=>{
@@ -41,7 +44,7 @@ export function createPlanning(THREE, kit) {
     const strip=box(3.3,.027,.023,m.gray,.005);strip.position.set(0,-.27,.16);
     card.add(paper,rim,action,status,up,down,grip,strip);
     group.add(card);
-    return {card,paper,rim,titleMesh,timeMesh,action,status,up,down,grip,strip,day,row,index:i};
+    return {card,paper,rim,titleMesh,timeMesh,rescheduledTime,action,status,originalStatus,movedStatus,up,down,grip,strip,day,row,index:i};
   });
   const kanban=['Planned','In progress','Complete'].map((name,i)=>{
     const column=new THREE.Group();
@@ -51,7 +54,7 @@ export function createPlanning(THREE, kit) {
     column.add(border);column.position.set((i-1)*5.2,.0,0);group.add(column);return {column,border,heading};
   });
   const editor=new THREE.Group();
-  const date=tile(3.7,.78,'09 / 09 / 2026',{fontSize:.28,depth:.15});
+  const date=tile(3.7,.78,'10 / 09 / 2026',{fontSize:.28,depth:.15});
   const time=tile(2.2,.78,'11:30',{fontSize:.29,depth:.15});time.position.x=3.15;
   const save=tile(1.75,.78,'Save',{fontSize:.29,depth:.15,ink:true});save.position.x=5.35;
   editor.add(date,time,save);group.add(editor);
@@ -67,7 +70,7 @@ export function createPlanning(THREE, kit) {
       column.scale.x=Math.max(.001,1-morph*.9);
     });
     cards.forEach((item,i)=>{
-      const {card,paper,rim,titleMesh,timeMesh,action,status,up,down,grip,strip,day,row}=item;
+      const {card,paper,rim,titleMesh,timeMesh,rescheduledTime,action,status,originalStatus,movedStatus,up,down,grip,strip,day,row}=item;
       const p=spring(Math.max(0,t-.16-i*.05));
       const layer=ease((t-.2-i*.035)/.55)*(1-ease((t-1.0-i*.03)/.55));
       const x0=(day-3)*2.5, y0=2.1-row*2.25;
@@ -85,10 +88,12 @@ export function createPlanning(THREE, kit) {
       paper.position.z=0;rim.position.z=.08+layer*.35;
       titleMesh.position.z=.15+layer*.7;
       timeMesh.position.z=.15+layer*.95;
-      timeMesh.visible=morph<.95;
+      timeMesh.visible=morph<.95&&!(i===2&&t>2.65);
+      if(rescheduledTime){rescheduledTime.visible=morph<.95&&t>2.65;rescheduledTime.position.z=timeMesh.position.z;}
       action.visible=morph<.6;
       action.position.z=.15+layer*1.1-Math.max(0,pulse(t,1.9))*(i===2?.12:0);
       status.visible=up.visible=down.visible=grip.visible=morph>.55;
+      if(movedStatus){const changed=t>5.55+i*.1;originalStatus.visible=!changed;movedStatus.visible=changed;}
       strip.visible=morph>.8;
       [status,up,down].forEach((control,j)=>{control.position.z=.15+Math.max(0,1-spring(Math.max(0,t-4.12-i*.025-j*.035)))*.75;});
       grip.position.z=.19+(i===0?Math.sin(transfer*Math.PI)*.12:0);
