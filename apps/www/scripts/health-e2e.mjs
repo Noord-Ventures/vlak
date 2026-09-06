@@ -59,6 +59,41 @@ export async function checkHealthCollection({ browser, base, components, axeSour
     await page.locator(".preview-box summary").focus();
     await page.keyboard.press("Enter");
     if (!(await page.locator(".preview-box details").evaluate(element => element.open))) fail("health symptom diary: Enter does not open the details");
+
+    // A range's value, bounds, interval and marker must share a coherent axis.
+    for (const width of [390, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const name of ["reference-range", "lab-results"]) {
+        await page.goto(`${base}/components/${name}/`, { waitUntil: "networkidle" });
+        const layout = await page.locator(".preview-box").evaluate(box => {
+          const style = getComputedStyle(box);
+          const available = box.clientWidth - Number.parseFloat(style.paddingLeft) - Number.parseFloat(style.paddingRight);
+          const root = box.querySelector(".rs-lab-results, .rs-reference-range");
+          return {
+            available,
+            width: root.getBoundingClientRect().width,
+            ranges: [...box.querySelectorAll(".rs-reference-range")].map(range => {
+              const track = range.querySelector(".rs-reference-range-track").getBoundingClientRect();
+              const marker = range.querySelector(".rs-reference-range-marker")?.getBoundingClientRect();
+              const interval = range.querySelector(".rs-reference-range-interval")?.getBoundingClientRect();
+              const value = range.querySelector(".rs-reference-range-value").getBoundingClientRect();
+              const bound = range.querySelector(".rs-reference-range-bound-value").getBoundingClientRect();
+              return { center: track.y + track.height / 2, marker: marker && marker.y + marker.height / 2, interval: interval && interval.y + interval.height / 2, valueEnd: value.right, boundEnd: bound.right };
+            }),
+          };
+        });
+        if (Math.abs(layout.width - layout.available) > 2) fail(`health ${name} ${width}: specimen does not fill its available width`);
+        for (const range of layout.ranges) {
+          if (range.marker != null && Math.abs(range.marker - range.center) > 1) fail(`health ${name} ${width}: marker is off the range axis`);
+          if (range.interval != null && Math.abs(range.interval - range.center) > 1) fail(`health ${name} ${width}: interval is off the range axis`);
+          if (Math.abs(range.valueEnd - range.boundEnd) > 1) fail(`health ${name} ${width}: reading and reference bounds are misaligned`);
+        }
+      }
+    }
+    await page.goto(`${base}/components/activity-rings/`, { waitUntil: "networkidle" });
+    const rings = page.locator(".preview-box");
+    if (await rings.getByRole("progressbar").count() !== 3) fail("health activity rings: each personal goal needs named progress");
+    if (await rings.locator("svg circle.rs-activity-rings-arc").count() !== 3) fail("health activity rings: the three recorded goals are not drawn");
   } finally {
     await page.close();
   }

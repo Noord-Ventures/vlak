@@ -39,6 +39,7 @@ export { CheckIn, type CheckInProps, type CheckInOption } from "./components/che
 export { HabitTracker, type HabitTrackerProps, type HabitDay, type HabitStatus } from "./components/habit-tracker";
 export { SleepTimeline, type SleepTimelineProps, type SleepInterval, type SleepState } from "./components/sleep-timeline";
 export { ActivityGoal, type ActivityGoalProps } from "./components/activity-goal";
+export { ActivityRings, type ActivityRingsProps, type ActivityRingGoal } from "./components/activity-rings";
 export { PatientBanner, type PatientBannerProps, type PatientBannerIdentifier, type PatientBannerContextItem } from "./components/patient-banner";
 export { MedicationSchedule, type MedicationScheduleProps, type MedicationScheduleItem, type MedicationScheduleAction } from "./components/medication-schedule";
 export { AppointmentCard, type AppointmentCardProps } from "./components/appointment-card";
@@ -246,3 +247,23 @@ export {
   type RefItemProps,
   type CiteBoxProps,
 } from "./components/refs";
+
+export { IdentityDocument, type IdentityDocumentProps } from "./components/identity-document";
+export { TaxSummary, type TaxSummaryProps, type TaxSummaryItem, type TaxSummaryTotal } from "./components/tax-summary";
+export { BenefitProgram, type BenefitProgramProps, type BenefitProgramCriterion } from "./components/benefit-program";
+export { ApplicationStatus, type ApplicationStatusProps, type ApplicationMilestone } from "./components/application-status";
+export { EvidenceChecklist, type EvidenceChecklistProps, type EvidenceChecklistItem, type EvidenceChecklistAction } from "./components/evidence-checklist";
+export { MeasurementValue, type MeasurementValueProps } from "./components/measurement-value";
+export { QuantityField, type QuantityFieldProps, type QuantityValue, type QuantityUnit } from "./components/quantity-field";
+export { WellPlate, type WellPlateProps, type WellPosition, type WellRecord } from "./components/well-plate";
+export { ExperimentRun, type ExperimentRunProps, type ExperimentCondition, type ExperimentAction, type ExperimentStep } from "./components/experiment-run";
+export { SpectrumPlot, type SpectrumPlotProps, type SpectrumPoint, type SpectrumPeak } from "./components/spectrum-plot";
+export { AudioMeter, type AudioMeterProps, type AudioMeterChannel } from "./components/audio-meter";
+export { ChannelStrip, type ChannelStripProps, type ChannelStripValue } from "./components/channel-strip";
+export { ParameterKnob, type ParameterKnobProps } from "./components/parameter-knob";
+export { TimecodeField, type TimecodeFieldProps } from "./components/timecode-field";
+export { ClipTimeline, type ClipTimelineProps, type ClipTrack, type TimelineClip } from "./components/clip-timeline";
+export { RenderQueue, type RenderQueueProps, type RenderJob, type RenderJobStatus } from "./components/render-queue";
+export { LayerStack, type LayerStackProps, type CreativeLayer } from "./components/layer-stack";
+export { ColorInspector, type ColorInspectorProps, type InspectorColor } from "./components/color-inspector";
+export { SpacingControl, type SpacingControlProps, type SpacingValue } from "./components/spacing-control";

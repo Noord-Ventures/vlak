@@ -1,0 +1,13 @@
+/* ── identity-document: generated from packages/react/src/components/identity-document.tsx ── */
+.rs-identity-document{width:100%;min-width:0;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--divider);padding:1.25rem;display:grid;gap:1.25rem;color:var(--text);background-color:var(--bg);overflow-wrap:anywhere;line-height:1.45}
+.rs-identity-document-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.75rem}
+.rs-identity-document-title{margin:0;font-weight:600;font-size:0.875rem}
+.rs-identity-document-status{border-width:1px;border-style:solid;border-color:var(--divider);padding:0.25rem 0.5rem;font-size:0.75rem}
+.rs-identity-document-holder{margin:0;font-size:1.375rem;font-weight:500;letter-spacing:-0.03em;line-height:1.25}
+.rs-identity-document-fields{margin:0;display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem}
+@media (max-width: 640px){.rs-identity-document-fields{grid-template-columns:minmax(0, 1fr)}}
+.rs-identity-document-field{min-width:0}
+.rs-identity-document-label{margin:0;color:var(--text-secondary);font-size:0.75rem}
+.rs-identity-document-value{margin:0;margin-top:0.25rem;font-size:0.875rem;font-variant-numeric:tabular-nums}
+.rs-identity-document-detail{margin:0;color:var(--text-secondary);max-width:66ch;font-size:0.875rem}
+.rs-identity-document-actions{border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem;display:flex;flex-wrap:wrap;gap:0.5rem}

@@ -1,0 +1,16 @@
+/* ── tax-summary: generated from packages/react/src/components/tax-summary.tsx ── */
+.rs-tax-summary{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-tax-summary-header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;margin-bottom:1rem;font-size:0.875rem}
+.rs-tax-summary-status{font-weight:600}
+.rs-tax-summary-reference{color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.rs-tax-summary-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:0.875rem}
+.rs-tax-summary-caption{text-align:start;padding-bottom:1rem;font-size:1.125rem;font-weight:600}
+.rs-tax-summary-period{display:block;font-size:0.875rem;font-weight:400;color:var(--text-secondary);margin-top:0.25rem}
+.rs-tax-summary-column{text-align:start;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:0.75rem;font-weight:500;color:var(--text-secondary)}
+.rs-tax-summary-row-label{text-align:start;font-weight:400;vertical-align:top;padding-block:1rem;padding-inline-end:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-tax-summary-amount{text-align:end;vertical-align:top;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-variant-numeric:tabular-nums;width:38%}
+.rs-tax-summary-detail{display:block;color:var(--text-secondary);font-size:0.75rem;margin-top:0.25rem}
+.rs-tax-summary-total{background-color:var(--table-alt);font-weight:600}
+.rs-tax-summary-footer{display:grid;gap:0.5rem;margin-top:1rem;font-size:0.875rem}
+.rs-tax-summary-note{margin:0;color:var(--text-secondary);max-width:66ch}
+.rs-tax-summary-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}

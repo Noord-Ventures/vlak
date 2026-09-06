@@ -1,6 +1,25 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { Use as IdentityDocument } from "./identity-document/use";
+import { Use as TaxSummary } from "./tax-summary/use";
+import { Use as BenefitProgram } from "./benefit-program/use";
+import { Use as ApplicationStatus } from "./application-status/use";
+import { Use as EvidenceChecklist } from "./evidence-checklist/use";
+import { Use as MeasurementValue } from "./measurement-value/use";
+import { Use as QuantityField } from "./quantity-field/use";
+import { Use as WellPlate } from "./well-plate/use";
+import { Use as ExperimentRun } from "./experiment-run/use";
+import { Use as SpectrumPlot } from "./spectrum-plot/use";
+import { Use as AudioMeter } from "./audio-meter/use";
+import { Use as ChannelStrip } from "./channel-strip/use";
+import { Use as ParameterKnob } from "./parameter-knob/use";
+import { Use as TimecodeField } from "./timecode-field/use";
+import { Use as ClipTimeline } from "./clip-timeline/use";
+import { Use as RenderQueue } from "./render-queue/use";
+import { Use as LayerStack } from "./layer-stack/use";
+import { Use as ColorInspector } from "./color-inspector/use";
+import { Use as SpacingControl } from "./spacing-control/use";
 import { Use as HealthMetric } from "./health-metric/use";
 import { Use as ReferenceRange } from "./reference-range/use";
 import { Use as LabResults } from "./lab-results/use";
@@ -9,6 +28,7 @@ import { Use as CheckIn } from "./check-in/use";
 import { Use as HabitTracker } from "./habit-tracker/use";
 import { Use as SleepTimeline } from "./sleep-timeline/use";
 import { Use as ActivityGoal } from "./activity-goal/use";
+import { Use as ActivityRings } from "./activity-rings/use";
 import { Use as PatientBanner } from "./patient-banner/use";
 import { Use as MedicationSchedule } from "./medication-schedule/use";
 import { Use as AppointmentCard } from "./appointment-card/use";
@@ -56,6 +76,25 @@ import { Use as PropertyGrid } from "./property-grid/use";
 
 /** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
+  "identity-document": IdentityDocument,
+  "tax-summary": TaxSummary,
+  "benefit-program": BenefitProgram,
+  "application-status": ApplicationStatus,
+  "evidence-checklist": EvidenceChecklist,
+  "measurement-value": MeasurementValue,
+  "quantity-field": QuantityField,
+  "well-plate": WellPlate,
+  "experiment-run": ExperimentRun,
+  "spectrum-plot": SpectrumPlot,
+  "audio-meter": AudioMeter,
+  "channel-strip": ChannelStrip,
+  "parameter-knob": ParameterKnob,
+  "timecode-field": TimecodeField,
+  "clip-timeline": ClipTimeline,
+  "render-queue": RenderQueue,
+  "layer-stack": LayerStack,
+  "color-inspector": ColorInspector,
+  "spacing-control": SpacingControl,
   "health-metric": HealthMetric,
   "reference-range": ReferenceRange,
   "lab-results": LabResults,
@@ -64,6 +103,7 @@ export const additions: Record<string, ComponentType> = {
   "habit-tracker": HabitTracker,
   "sleep-timeline": SleepTimeline,
   "activity-goal": ActivityGoal,
+  "activity-rings": ActivityRings,
   "patient-banner": PatientBanner,
   "medication-schedule": MedicationSchedule,
   "appointment-card": AppointmentCard,

@@ -24,6 +24,7 @@ import { catalogComponents, vlakComponents } from "../src/registry.ts";
 import { vlakCategories } from "../src/schema.ts";
 import { vlakTokens } from "../src/tokens.ts";
 import { healthWorkflows, healthDataContract } from "../src/health.ts";
+import { domainCollections } from "../src/domains.ts";
 
 const corePath = (p) => fileURLToPath(new URL(`../${p}`, import.meta.url));
 const repoPath = (p) => fileURLToPath(new URL(`../../../${p}`, import.meta.url));
@@ -340,6 +341,22 @@ function healthPage() {
   return `${parts.join("\n\n")}\n`;
 }
 
+function domainPage(collection) {
+  const parts = [`# ${collection.title}`, collection.description];
+  for (const group of collection.groups) {
+    parts.push(`## ${group.title}`, group.description);
+    parts.push(group.components.map(name => {
+      const component = catalogComponents.find(item => item.name === name);
+      if (!component) throw new Error(`Collection guide references missing component: ${name}`);
+      return `- [${component.title}](${docUrl(name)}): ${component.description}`;
+    }).join("\n"));
+  }
+  parts.push("## Data and action contracts");
+  for (const rule of collection.contracts) parts.push(`### ${rule.title}`, rule.description);
+  parts.push("## Install", fence("sh", `npm install ${REACT}\n# Or vendor an individual component\nnpx ${CLI} add ${collection.groups[0].components[0]}`));
+  return `${parts.join("\n\n")}\n`;
+}
+
 /* ── llms.txt ── */
 function llmsIndex() {
   const lines = [
@@ -354,6 +371,7 @@ function llmsIndex() {
     `- [Guide](${docUrl("guide")}): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents`,
     `- [Component index](${docUrl("index")}): the catalogue by category`,
     `- [Health guide](${docUrl("health")}): health, wellness, and care components with data and action contracts`,
+    ...domainCollections.map(collection => `- [${collection.title} guide](${docUrl(collection.name)}): ${collection.description}`),
     `- [Tokens](${docUrl("tokens")}): every custom property with light and dark values`,
     `- [Props JSON](${HOST}/docs/props.json): every export and its props as data`,
     `- [Registry index](${HOST}/r/index.json): the shadcn-compatible registry; items at ${HOST}/r/<name>.json`,
@@ -375,6 +393,11 @@ for (const [name, text] of pages) write(`${name}.md`, text);
 const guide = guidePage();
 const tokens = tokensPage();
 const health = healthPage();
+const domains = domainCollections.map(collection => {
+  const page = domainPage(collection);
+  write(`${collection.name}.md`, page);
+  return page;
+});
 write("index.md", indexPage());
 write("tokens.md", tokens);
 write("guide.md", guide);
@@ -382,7 +405,7 @@ write("health.md", health);
 write("llms.txt", llmsIndex());
 write(
   "llms-full.txt",
-  [guide, tokens, health, ...[...pages.values()]].join("\n\n---\n\n"),
+  [guide, tokens, health, ...domains, ...[...pages.values()]].join("\n\n---\n\n"),
 );
 
 /* Hidden entries are documented too, for the CLI and MCP only. */

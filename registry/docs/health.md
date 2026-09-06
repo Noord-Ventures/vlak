@@ -13,12 +13,13 @@ Keep a reading with its unit, source, collection time, and result status. Compar
 
 ## Daily wellbeing
 
-Collect a check-in, record a routine, review a sleep period, and follow a personal activity goal. Keep unrecorded days and gaps visible.
+Collect a check-in, record a routine, review a sleep period, and follow personal goals as a bar or concentric rings. Keep unrecorded days and gaps visible.
 
 - [Check-in](https://vlak.dev/docs/check-in.md): Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.
 - [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
 
 ## Care workflows
 

@@ -1,6 +1,6 @@
 # Vlak components
 
-126 components in 10 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+146 components in 13 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -153,10 +153,39 @@
 - [Habit tracker](habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+- [Activity rings](activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
 - [Patient banner](patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
 - [Medication schedule](medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
 - [Appointment card](appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
 - [Care plan](care-plan.md): Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.
+
+## Civic
+
+- [Identity document](identity-document.md): Displays a supplied credential, masked identifier, issuer, dates, and verification status without exposing a raw identifier.
+- [Tax summary](tax-summary.md): Separates supplied assessment line items from authoritative totals in a semantic two-column table.
+- [Benefit program](benefit-program.md): Keeps programme availability, supplied eligibility, award terms, and criterion assessments separate.
+- [Application status](application-status.md): Shows a supplied case reference, status, update time, milestones, and next step without estimating progress.
+- [Evidence checklist](evidence-checklist.md): Lists evidence requirements, file records, and supplied verification status with controlled 44px action buttons.
+
+## Science
+
+- [Measurement value](measurement-value.md): A supplied scientific reading with units, symmetric uncertainty, optional scientific notation and explicit availability.
+- [Quantity field](quantity-field.md): A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
+- [Well plate](well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Experiment run](experiment-run.md): Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.
+- [Spectrum plot](spectrum-plot.md): A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.
+
+## Creative
+
+- [Audio meter](audio-meter.md): Shows supplied channel levels and peaks in decibels, with bounded native meters and explicit missing readings.
+- [Channel strip](channel-strip.md): Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.
+- [Parameter knob](parameter-knob.md): Displays a rotary parameter over a native horizontal range input, with named values, units, and a 64px control.
+- [Timecode field](timecode-field.md): Edits hours, minutes, seconds, and frames with native form validation for a supplied integer non-drop frame rate.
+- [Clip timeline](clip-timeline.md): Positions supplied clips within a declared duration, with contained horizontal scrolling, accessible selection, and optional seeking.
+- [Render queue](render-queue.md): Displays supplied export jobs, progress, and status with explicit cancel and retry callbacks for a connected renderer.
+- [Layer stack](layer-stack.md): Manages supplied layer selection, visibility, locking, and order through named 44px controls and caller-owned changes.
+- [Color inspector](color-inspector.md): Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.
+- [Spacing control](spacing-control.md): Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.
 
 ## Also
 

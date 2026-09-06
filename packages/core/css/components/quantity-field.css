@@ -1,0 +1,9 @@
+/* ── quantity-field: generated from packages/react/src/components/quantity-field.tsx ── */
+.rs-quantity-field{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-quantity-field-legend{padding:0;margin-bottom:0.5rem;font-weight:500;font-size:0.875rem}
+.rs-quantity-field-row{display:grid;grid-template-columns:minmax(0, 2fr) minmax(0, 1fr);gap:0.75rem}
+.rs-quantity-field-label{display:grid;gap:0.375rem;min-width:0;font-size:0.75rem;color:var(--text-secondary)}
+.rs-quantity-field-control{box-sizing:border-box;width:100%;min-width:0;min-height:var(--hit);padding:0.625rem;font-family:inherit;font-size:0.875rem;font-variant-numeric:tabular-nums;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}
+.rs-quantity-field-control:focus-visible{outline-width:2px;outline-style:solid}
+@media (max-width: 640px){.rs-quantity-field-control{font-size:1rem}}
+.rs-quantity-field-description{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}

@@ -42,14 +42,14 @@ export const healthObservations: VlakComponent[] = [
     title: "Reference range",
     description: "Positions a supplied numeric reading against caller-supplied reference bounds, with a complete text equivalent.",
     category: "health",
-    classes: ["rs-reference-range", "rs-reference-range-head", "rs-reference-range-label", "rs-reference-range-value", "rs-reference-range-track", "rs-reference-range-interval", "rs-reference-range-marker", "rs-reference-range-bounds", "rs-reference-range-description"],
+    classes: ["rs-reference-range", "rs-reference-range-head", "rs-reference-range-label", "rs-reference-range-value", "rs-reference-range-track", "rs-reference-range-interval", "rs-reference-range-marker", "rs-reference-range-bounds", "rs-reference-range-bound-value", "rs-reference-range-description"],
     css: ["components/reference-range.css"],
     react: "components/reference-range.tsx",
     registryDependencies: [],
     snippet: `<div class="rs-reference-range">
   <p class="rs-reference-range-head"><span class="rs-reference-range-label">Reported measurement</span><span class="rs-reference-range-value">24 units</span></p>
   <div class="rs-reference-range-track" aria-hidden="true"><span class="rs-reference-range-interval"></span><span class="rs-reference-range-marker" style="inset-inline-start:44%"></span></div>
-  <p class="rs-reference-range-bounds"><span>Supplied reference interval</span><span>20–30 units</span></p>
+  <p class="rs-reference-range-bounds"><span>Supplied reference interval</span><span class="rs-reference-range-bound-value">20–30 units</span></p>
 </div>`,
     example: `import { ReferenceRange } from "@noorddev/vlak-react";
 
@@ -75,12 +75,12 @@ export const healthObservations: VlakComponent[] = [
     title: "Lab results",
     description: "A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.",
     category: "health",
-    classes: ["rs-lab-results", "rs-lab-results-item", "rs-lab-results-head", "rs-lab-results-name", "rs-lab-results-status", "rs-lab-results-reading", "rs-lab-results-unit", "rs-lab-results-note", "rs-lab-results-time"],
+    classes: ["rs-lab-results", "rs-lab-results-item", "rs-lab-results-head", "rs-lab-results-name", "rs-lab-results-status", "rs-lab-results-reading", "rs-lab-results-reading-label", "rs-lab-results-reading-value", "rs-lab-results-unit", "rs-lab-results-note", "rs-lab-results-time"],
     css: ["components/lab-results.css"],
     react: "components/lab-results.tsx",
     registryDependencies: ["reference-range"],
     snippet: `<ul class="rs-lab-results" aria-label="Latest report">
-  <li class="rs-lab-results-item" data-status="amended"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Reported measurement</p><p class="rs-lab-results-status">Amended</p></div><p class="rs-lab-results-reading">24 <span class="rs-lab-results-unit">units</span></p><p class="rs-lab-results-note">Replaces the earlier report</p></li>
+  <li class="rs-lab-results-item" data-status="amended"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Reported measurement</p><p class="rs-lab-results-status">Amended</p></div><p class="rs-lab-results-reading"><span class="rs-lab-results-reading-label">Result</span><span class="rs-lab-results-reading-value">24 <span class="rs-lab-results-unit">units</span></span></p><p class="rs-lab-results-note">Replaces the earlier report</p></li>
   <li class="rs-lab-results-item" data-status="pending"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Additional analysis</p><p class="rs-lab-results-status">Pending</p></div></li>
 </ul>`,
     example: `import { LabResults } from "@noorddev/vlak-react";

@@ -2600,6 +2600,35 @@
         }
       ]
     },
+    "activity-rings": {
+      "exports": [
+        {
+          "name": "ActivityRings",
+          "kind": "component",
+          "description": "Concentric personal-goal progress, with a complete named record for each ring.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "goals",
+              "type": "readonly ActivityRingGoal[]",
+              "required": true,
+              "description": "One to six goals are drawn from the outside inward. Every goal retains a text record."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
     "patient-banner": {
       "exports": [
         {
@@ -2775,6 +2804,1086 @@
               "type": "(taskId: string, completed: boolean) => void",
               "required": false,
               "description": "Requests a change only. Persist it and return updated tasks from the caller."
+            }
+          ]
+        }
+      ]
+    },
+    "identity-document": {
+      "exports": [
+        {
+          "name": "IdentityDocument",
+          "kind": "component",
+          "description": "A credential record using only the supplied, display-safe identity information.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "documentTitle",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "holderName",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "maskedIdentifier",
+              "type": "string | null",
+              "required": false,
+              "description": "A display-safe, already-masked identifier. This component does not mask raw data."
+            },
+            {
+              "name": "identifierLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Document number\""
+            },
+            {
+              "name": "issuer",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "issuedLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "expiresLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Supplied record or verification status. Expiry is never calculated."
+            },
+            {
+              "name": "statusDetail",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Working links or application-owned actions. No reveal or copy action is generated."
+            }
+          ]
+        }
+      ]
+    },
+    "tax-summary": {
+      "exports": [
+        {
+          "name": "TaxSummary",
+          "kind": "component",
+          "description": "A supplied assessment with distinct line items and authoritative totals.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "periodLabel",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "reference",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "items",
+              "type": "readonly TaxSummaryItem[]",
+              "required": true
+            },
+            {
+              "name": "totals",
+              "type": "readonly TaxSummaryTotal[]",
+              "required": true
+            },
+            {
+              "name": "dueLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "note",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "itemsEmptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Assessment lines not supplied\""
+            },
+            {
+              "name": "totalsEmptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Totals not supplied\""
+            }
+          ]
+        }
+      ]
+    },
+    "benefit-program": {
+      "exports": [
+        {
+          "name": "BenefitProgram",
+          "kind": "component",
+          "description": "Programme availability, supplied eligibility, and award terms kept as distinct facts.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "programName",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "provider",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Supplied programme availability, separate from a person's eligibility."
+            },
+            {
+              "name": "eligibility",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "awardLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "awardDetails",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "deadlineLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "criteria",
+              "type": "readonly BenefitProgramCriterion[]",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "criteriaEmptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Eligibility criteria not supplied\""
+            }
+          ]
+        }
+      ]
+    },
+    "application-status": {
+      "exports": [
+        {
+          "name": "ApplicationStatus",
+          "kind": "component",
+          "description": "A case reference, explicit decision status, and supplied milestones with no inferred progress.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "applicationTitle",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "reference",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "statusDetail",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "updatedLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "milestones",
+              "type": "readonly ApplicationMilestone[]",
+              "required": true
+            },
+            {
+              "name": "nextStep",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "milestonesEmptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Application milestones not supplied\""
+            }
+          ]
+        }
+      ]
+    },
+    "evidence-checklist": {
+      "exports": [
+        {
+          "name": "EvidenceChecklist",
+          "kind": "component",
+          "description": "Evidence requirements, file records, and verification status with controlled action requests.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onAction\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "items",
+              "type": "readonly EvidenceChecklistItem[]",
+              "required": true
+            },
+            {
+              "name": "summary",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Application-supplied coverage summary; the component does not count approvals."
+            },
+            {
+              "name": "emptyLabel",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Evidence requirements not supplied\""
+            },
+            {
+              "name": "onAction",
+              "type": "(itemId: string, actionId: string) => void",
+              "required": false,
+              "description": "Requests an action only; uploads, removals, and resulting statuses belong to the caller."
+            }
+          ]
+        }
+      ]
+    },
+    "measurement-value": {
+      "exports": [
+        {
+          "name": "MeasurementValue",
+          "kind": "component",
+          "description": "A supplied scientific reading without inferred precision, confidence or unit conversion.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | number | null",
+              "required": false,
+              "description": "Strings preserve supplied significant figures. Non-finite numbers are unavailable."
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "uncertainty",
+              "type": "number | null",
+              "required": false,
+              "description": "A supplied symmetric, non-negative uncertainty in the same unit as value."
+            },
+            {
+              "name": "uncertaintyLabel",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "notation",
+              "type": "\"plain\" | \"scientific\"",
+              "required": false,
+              "default": "\"plain\"",
+              "description": "Scientific notation changes numeric formatting only; supplied strings are unchanged."
+            },
+            {
+              "name": "status",
+              "type": "\"pending\" | \"unavailable\" | \"recorded\"",
+              "required": false,
+              "default": "\"recorded\""
+            },
+            {
+              "name": "source",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "quantity-field": {
+      "exports": [
+        {
+          "name": "QuantityField",
+          "kind": "component",
+          "description": "A native numeric input and unit selector. Selection never converts the amount.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "units",
+              "type": "readonly QuantityUnit[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "QuantityValue",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "QuantityValue",
+              "required": false,
+              "default": "{ amount: null, unit: null }"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: QuantityValue) => void",
+              "required": false,
+              "description": "Requests a quantity change. A unit change preserves the amount; the host owns conversion."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "unitName",
+              "type": "string",
+              "required": false,
+              "default": "name ? `${name}.unit` : undefined",
+              "description": "Input names: name submits the amount; unitName defaults to name + '.unit'."
+            },
+            {
+              "name": "amountLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Amount\""
+            },
+            {
+              "name": "unitLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Unit\""
+            },
+            {
+              "name": "unitPlaceholder",
+              "type": "string",
+              "required": false,
+              "default": "\"Choose unit\""
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "step",
+              "type": "number | \"any\"",
+              "required": false,
+              "default": "\"any\""
+            },
+            {
+              "name": "required",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "well-plate": {
+      "exports": [
+        {
+          "name": "WellPlate",
+          "kind": "component",
+          "description": "A plate of up to 1536 wells, with roving keyboard focus and explicit unrecorded cells.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "rows",
+              "type": "readonly string[]",
+              "required": true
+            },
+            {
+              "name": "columns",
+              "type": "readonly string[]",
+              "required": true
+            },
+            {
+              "name": "wells",
+              "type": "readonly WellRecord[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "WellPosition | null",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "WellPosition | null",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: WellPosition) => void",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Static well cells add no tab stops; their scroll container remains focusable."
+            }
+          ]
+        }
+      ]
+    },
+    "experiment-run": {
+      "exports": [
+        {
+          "name": "ExperimentRun",
+          "kind": "component",
+          "description": "Supplied run metadata and protocol steps, with application-owned transitions.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "runId",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "protocol",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "conditions",
+              "type": "readonly ExperimentCondition[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "steps",
+              "type": "readonly ExperimentStep[]",
+              "required": true
+            },
+            {
+              "name": "onAction",
+              "type": "(stepId: string, actionId: string) => void",
+              "required": false,
+              "description": "Requests an explicit action. State remains supplied by the application."
+            }
+          ]
+        }
+      ]
+    },
+    "spectrum-plot": {
+      "exports": [
+        {
+          "name": "SpectrumPlot",
+          "kind": "component",
+          "description": "A supplied spectrum and peak annotations, with a paginated complete data table.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "points",
+              "type": "readonly SpectrumPoint[]",
+              "required": true,
+              "description": "Up to 4096 supplied points, connected in the supplied order without resampling."
+            },
+            {
+              "name": "xLabel",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "yLabel",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "xUnit",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "yUnit",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "xDomain",
+              "type": "readonly [number, number]",
+              "required": false
+            },
+            {
+              "name": "yDomain",
+              "type": "readonly [number, number]",
+              "required": false
+            },
+            {
+              "name": "peaks",
+              "type": "readonly SpectrumPeak[]",
+              "required": false,
+              "default": "[]",
+              "description": "Up to 128 supplied annotations. The component never detects peaks."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "audio-meter": {
+      "exports": [
+        {
+          "name": "AudioMeter",
+          "kind": "component",
+          "description": "Supplied channel levels and peaks; no audio analysis or peak holding.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "channels",
+              "type": "AudioMeterChannel[]",
+              "required": true
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false,
+              "default": "-60"
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            }
+          ]
+        }
+      ]
+    },
+    "channel-strip": {
+      "exports": [
+        {
+          "name": "ChannelStrip",
+          "kind": "component",
+          "description": "Gain, pan, mute and solo state for an application-owned audio channel.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "ChannelStripValue",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "ChannelStripValue",
+              "required": false,
+              "default": "initial"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: ChannelStripValue) => void",
+              "required": false
+            },
+            {
+              "name": "gainMin",
+              "type": "number",
+              "required": false,
+              "default": "-60"
+            },
+            {
+              "name": "gainMax",
+              "type": "number",
+              "required": false,
+              "default": "12"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "parameter-knob": {
+      "exports": [
+        {
+          "name": "ParameterKnob",
+          "kind": "component",
+          "description": "A rotary display driven by a native horizontal range input.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\" | \"min\" | \"max\" | \"step\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: number) => void",
+              "required": false
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false,
+              "default": "100"
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "timecode-field": {
+      "exports": [
+        {
+          "name": "TimecodeField",
+          "kind": "component",
+          "description": "Editable hours, minutes, seconds and frames for integer non-drop timecode.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\" | \"pattern\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "frameRate",
+              "type": "number",
+              "required": true,
+              "description": "Integer non-drop frame rate from 1 to 99."
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false,
+              "description": "Receives editable text, including incomplete or invalid input."
+            }
+          ]
+        }
+      ]
+    },
+    "clip-timeline": {
+      "exports": [
+        {
+          "name": "ClipTimeline",
+          "kind": "component",
+          "description": "Supplied clip positions, with separate reachable selection and seek controls.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "tracks",
+              "type": "ClipTrack[]",
+              "required": true
+            },
+            {
+              "name": "clips",
+              "type": "TimelineClip[]",
+              "required": true
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "unit",
+              "type": "\"seconds\" | \"frames\"",
+              "required": true
+            },
+            {
+              "name": "position",
+              "type": "number | null",
+              "required": false
+            },
+            {
+              "name": "selectedClipId",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "onSeek",
+              "type": "(position: number) => void",
+              "required": false
+            },
+            {
+              "name": "onSelectClip",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "render-queue": {
+      "exports": [
+        {
+          "name": "RenderQueue",
+          "kind": "component",
+          "description": "Host-owned render jobs and available cancel or retry actions.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "jobs",
+              "type": "RenderJob[]",
+              "required": true
+            },
+            {
+              "name": "onCancel",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "onRetry",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "layer-stack": {
+      "exports": [
+        {
+          "name": "LayerStack",
+          "kind": "component",
+          "description": "A controlled layer order with explicit selection, visibility, lock and move actions.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onSelect\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "layers",
+              "type": "CreativeLayer[]",
+              "required": true,
+              "description": "Ordered from top to bottom."
+            },
+            {
+              "name": "selectedId",
+              "type": "string | null",
+              "required": false
+            },
+            {
+              "name": "onSelect",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "onLayersChange",
+              "type": "(layers: CreativeLayer[]) => void",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "color-inspector": {
+      "exports": [
+        {
+          "name": "ColorInspector",
+          "kind": "component",
+          "description": "A data swatch and editable six-digit hex and alpha, on a monochrome shell.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "InspectorColor",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "InspectorColor",
+              "required": false,
+              "default": "initial"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: InspectorColor) => void",
+              "required": false,
+              "description": "Receives editable hex text and alpha, including incomplete values."
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "spacing-control": {
+      "exports": [
+        {
+          "name": "SpacingControl",
+          "kind": "component",
+          "description": "Four native numeric fields; linking applies the next edit to every side.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "SpacingValue",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "SpacingValue",
+              "required": false,
+              "default": "initial"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: SpacingValue) => void",
+              "required": false
+            },
+            {
+              "name": "linked",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultLinked",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onLinkedChange",
+              "type": "(linked: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "unit",
+              "type": "string",
+              "required": false,
+              "default": "\"px\""
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false
             }
           ]
         }

@@ -304,7 +304,7 @@ export function Board() {
             </div>
           </div>
           <form className="sc-wall-comment-dock" onSubmit={addComment}>
-            <Input value={draft} aria-label="Add a comment" placeholder="Add a comment" enterKeyHint="send" onChange={(event) => setDraft(event.target.value)} />
+            <Input plain value={draft} aria-label="Add a comment" placeholder="Add a comment" enterKeyHint="send" onChange={(event) => setDraft(event.target.value)} />
             <Button type="submit" style={{ width: 44, padding: 0 }} aria-label="Post comment" disabled={!draft.trim()}><Icon name="send" size={16} /></Button>
           </form>
           </div>

@@ -2,7 +2,7 @@
 
 import { useState, type ComponentType } from "react";
 import {
-  ActivityGoal, AppointmentCard, CarePlan, CheckIn, HabitTracker, HealthMetric,
+  ActivityGoal, ActivityRings, AppointmentCard, CarePlan, CheckIn, HabitTracker, HealthMetric,
   LabResults, MedicationSchedule, PatientBanner, ReferenceRange, SleepTimeline,
   SymptomDiary, type CarePlanTask, type HabitDay, type MedicationScheduleItem,
 } from "@noorddev/vlak-react";
@@ -50,6 +50,11 @@ export const healthPreviews: Record<string, ComponentType> = {
     { id: "rest", start: 225, end: 480, startLabel: "02:15", endLabel: "06:30", state: "asleep" },
   ]} />,
   "activity-goal": () => <ActivityGoal label="Walking" current={18} target={30} unit="minutes" />,
+  "activity-rings": () => <ActivityRings label="Daily activity" goals={[
+    { id: "walk", label: "Walking", current: 18, target: 30, unit: "minutes" },
+    { id: "move", label: "Movement breaks", current: 5, target: 8, unit: "breaks" },
+    { id: "stand", label: "Standing", current: 7, target: 10, unit: "hours" },
+  ]} />,
   "patient-banner": () => <PatientBanner patientName="Alex Morgan" identifiers={[{ id: "record", label: "Record", value: "DEMO-204" }]} contextItems={[{ id: "allergies", label: "Allergies", value: "Not yet reviewed" }]} />,
   "medication-schedule": MedicationPreview,
   "appointment-card": () => <AppointmentCard appointmentTitle="Care check-in" dateLabel="10 September" timeLabel="10:30–11:00" timeZone="Europe/Amsterdam" clinician="Robin Lee" location="Video appointment" status="Confirmed" />,

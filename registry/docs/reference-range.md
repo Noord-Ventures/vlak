@@ -50,7 +50,7 @@ npx shadcn add https://vlak.dev/r/reference-range.json
 <div class="rs-reference-range">
   <p class="rs-reference-range-head"><span class="rs-reference-range-label">Reported measurement</span><span class="rs-reference-range-value">24 units</span></p>
   <div class="rs-reference-range-track" aria-hidden="true"><span class="rs-reference-range-interval"></span><span class="rs-reference-range-marker" style="inset-inline-start:44%"></span></div>
-  <p class="rs-reference-range-bounds"><span>Supplied reference interval</span><span>20–30 units</span></p>
+  <p class="rs-reference-range-bounds"><span>Supplied reference interval</span><span class="rs-reference-range-bound-value">20–30 units</span></p>
 </div>
 ```
 
@@ -100,7 +100,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-reference-range`, `rs-reference-range-head`, `rs-reference-range-label`, `rs-reference-range-value`, `rs-reference-range-track`, `rs-reference-range-interval`, `rs-reference-range-marker`, `rs-reference-range-bounds`, `rs-reference-range-description`
+`rs-reference-range`, `rs-reference-range-head`, `rs-reference-range-label`, `rs-reference-range-value`, `rs-reference-range-track`, `rs-reference-range-interval`, `rs-reference-range-marker`, `rs-reference-range-bounds`, `rs-reference-range-bound-value`, `rs-reference-range-description`
 
 ## Dependencies
 

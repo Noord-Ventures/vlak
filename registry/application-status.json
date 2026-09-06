@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "application-status",
+  "type": "registry:component",
+  "title": "Application status",
+  "description": "Shows a supplied case reference, status, update time, milestones, and next step without estimating progress.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/application-status.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface ApplicationMilestone {\n  id: string;\n  label: React.ReactNode;\n  status: React.ReactNode;\n  description?: React.ReactNode;\n  dateLabel?: React.ReactNode;\n  dateTime?: string;\n  /** Explicitly marks the current step. No step is selected from its date or status. */\n  current?: boolean;\n}\n\nexport interface ApplicationStatusProps extends React.HTMLAttributes<HTMLDivElement> {\n  applicationTitle: string;\n  reference?: React.ReactNode;\n  status: React.ReactNode;\n  statusDetail?: React.ReactNode;\n  updatedLabel?: React.ReactNode;\n  milestones: readonly ApplicationMilestone[];\n  nextStep?: React.ReactNode;\n  milestonesEmptyLabel?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, display: \"grid\", gap: \"1.25rem\", color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  header: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", alignItems: \"baseline\", gap: \"0.5rem 1rem\" },\n  title: { margin: 0, fontSize: \"1.125rem\", fontWeight: 600, lineHeight: 1.3 },\n  reference: { color: vlak.gray, fontSize: \"0.875rem\", fontVariantNumeric: \"tabular-nums\" },\n  overview: { display: \"grid\", gap: \"0.5rem\" },\n  status: { margin: 0, fontSize: \"1.5rem\", fontWeight: 500, lineHeight: 1.25, letterSpacing: \"-0.03em\" },\n  detail: { margin: 0, fontSize: \"0.875rem\", color: vlak.gray, maxWidth: \"66ch\" },\n  milestones: { margin: 0, padding: 0, listStyle: \"none\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  milestone: { display: \"grid\", gridTemplateColumns: { default: \"minmax(0, 2fr) minmax(6rem, 1fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.5rem 1rem\", padding: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  current: { backgroundColor: { default: vlak.tableAlt, [mq.forcedColors]: \"Canvas\" }, fontWeight: 600 },\n  milestoneLabel: { fontSize: \"0.875rem\" },\n  milestoneMeta: { display: \"flex\", flexDirection: \"column\", alignItems: { default: \"flex-end\", [mq.phone]: \"flex-start\" }, gap: \"0.25rem\", fontSize: \"0.75rem\", fontVariantNumeric: \"tabular-nums\" },\n  next: { display: \"grid\", gap: \"0.5rem\", fontSize: \"0.875rem\" },\n  nextLabel: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\n\n/** A case reference, explicit decision status, and supplied milestones with no inferred progress. */\nexport const ApplicationStatus = React.forwardRef<HTMLDivElement, ApplicationStatusProps>(function ApplicationStatus(\n  { applicationTitle, reference, status, statusDetail, updatedLabel, milestones, nextStep, milestonesEmptyLabel = \"Application milestones not supplied\", children, className, style, ...props }, ref,\n) {\n  const root = rs([\"rs-application-status\", className], styles.root);\n  const header = rs([\"rs-application-status-header\"], styles.header);\n  const title = rs([\"rs-application-status-title\"], styles.title);\n  const referenceStyle = rs([\"rs-application-status-reference\"], styles.reference);\n  const overview = rs([\"rs-application-status-overview\"], styles.overview);\n  const statusStyle = rs([\"rs-application-status-status\"], styles.status);\n  const detail = rs([\"rs-application-status-detail\"], styles.detail);\n  const milestonesStyle = rs([\"rs-application-status-milestones\"], styles.milestones);\n  const milestoneLabel = rs([\"rs-application-status-milestone-label\"], styles.milestoneLabel);\n  const milestoneMeta = rs([\"rs-application-status-milestone-meta\"], styles.milestoneMeta);\n  const next = rs([\"rs-application-status-next\"], styles.next);\n  const nextLabel = rs([\"rs-application-status-next-label\"], styles.nextLabel);\n  const actions = rs([\"rs-application-status-actions\"], styles.actions);\n  return <div ref={ref} role=\"group\" aria-label={applicationTitle} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...header}><p {...title}>{applicationTitle}</p><span {...referenceStyle}>{reference ?? \"Case reference not supplied\"}</span></div>\n    <div {...overview}><p {...statusStyle}>{status ?? \"Status not supplied\"}</p>{statusDetail != null && <p {...detail}>{statusDetail}</p>}<p {...detail}>{updatedLabel ?? \"Update time not supplied\"}</p></div>\n    {milestones.length > 0 ? <ol {...milestonesStyle} aria-label=\"Application milestones\">{milestones.map(item => {\n      const milestone = rs([\"rs-application-status-milestone\", item.current && \"rs-application-status-current\"], styles.milestone, item.current && styles.current);\n      return <li key={item.id} {...milestone} aria-current={item.current ? \"step\" : undefined}>\n        <div><span {...milestoneLabel}>{item.label}</span>{item.description != null && <p {...detail}>{item.description}</p>}</div>\n        <div {...milestoneMeta}><span>{item.status ?? \"Status not supplied\"}</span>{item.dateTime && item.dateLabel != null ? <time dateTime={item.dateTime}>{item.dateLabel}</time> : <span>{item.dateLabel ?? \"Date not supplied\"}</span>}</div>\n      </li>;\n    })}</ol> : <p {...detail}>{milestonesEmptyLabel}</p>}\n    <div {...next}><p {...nextLabel}>Next step</p><div>{nextStep ?? \"Next step not supplied\"}</div></div>\n    {children != null && <div {...actions}>{children}</div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/application-status.tsx"
+    },
+    {
+      "path": "vlak/styles/application-status.css",
+      "content": "/* ── application-status: generated from packages/react/src/components/application-status.tsx ── */\n.rs-application-status{width:100%;min-width:0;display:grid;gap:1.25rem;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-application-status-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem}\n.rs-application-status-title{margin:0;font-size:1.125rem;font-weight:600;line-height:1.3}\n.rs-application-status-reference{color:var(--text-secondary);font-size:0.875rem;font-variant-numeric:tabular-nums}\n.rs-application-status-overview{display:grid;gap:0.5rem}\n.rs-application-status-status{margin:0;font-size:1.5rem;font-weight:500;line-height:1.25;letter-spacing:-0.03em}\n.rs-application-status-detail{margin:0;font-size:0.875rem;color:var(--text-secondary);max-width:66ch}\n.rs-application-status-milestones{margin:0;padding:0;list-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-application-status-milestone{display:grid;grid-template-columns:minmax(0, 2fr) minmax(6rem, 1fr);gap:0.5rem 1rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n@media (max-width: 640px){.rs-application-status-milestone{grid-template-columns:minmax(0, 1fr)}}\n.rs-application-status-current{background-color:var(--table-alt);font-weight:600}\n@media (forced-colors: active){.rs-application-status-current{background-color:Canvas}}\n.rs-application-status-milestone-label{font-size:0.875rem}\n.rs-application-status-milestone-meta{display:flex;flex-direction:column;align-items:flex-end;gap:0.25rem;font-size:0.75rem;font-variant-numeric:tabular-nums}\n@media (max-width: 640px){.rs-application-status-milestone-meta{align-items:flex-start}}\n.rs-application-status-next{display:grid;gap:0.5rem;font-size:0.875rem}\n.rs-application-status-next-label{margin:0;font-size:0.75rem;color:var(--text-secondary)}\n.rs-application-status-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/application-status.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "civic",
+      "classes": [
+        "rs-application-status",
+        "rs-application-status-header",
+        "rs-application-status-title",
+        "rs-application-status-reference",
+        "rs-application-status-overview",
+        "rs-application-status-status",
+        "rs-application-status-detail",
+        "rs-application-status-milestones",
+        "rs-application-status-milestone",
+        "rs-application-status-current",
+        "rs-application-status-milestone-label",
+        "rs-application-status-milestone-meta",
+        "rs-application-status-next",
+        "rs-application-status-next-label",
+        "rs-application-status-actions"
+      ],
+      "snippet": "<div class=\"rs-application-status\" role=\"group\" aria-label=\"Community grant application\"><div class=\"rs-application-status-header\"><p class=\"rs-application-status-title\">Community grant application</p><span class=\"rs-application-status-reference\">Example 204</span></div><div class=\"rs-application-status-overview\"><p class=\"rs-application-status-status\">Under review</p><p class=\"rs-application-status-detail\">Updated 14 September, as supplied</p></div><ol class=\"rs-application-status-milestones\" aria-label=\"Application milestones\"><li class=\"rs-application-status-milestone rs-application-status-current\" aria-current=\"step\"><span class=\"rs-application-status-milestone-label\">Evidence review</span><span class=\"rs-application-status-milestone-meta\">In progress</span></li></ol><div class=\"rs-application-status-next\"><p class=\"rs-application-status-next-label\">Next step</p><div>Wait for the review update</div></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ApplicationStatus",
+        "Case status",
+        "Application tracker",
+        "Permit status",
+        "Claim progress",
+        "Case timeline"
+      ],
+      "example": "import { ApplicationStatus } from \"@noorddev/vlak-react\";\n\n<ApplicationStatus applicationTitle=\"Community grant application\" reference=\"Example 204\" status=\"Under review\" updatedLabel=\"Updated 14 September, as supplied\" milestones={[{ id: \"received\", label: \"Application received\", status: \"Recorded\", dateLabel: \"12 September\" }, { id: \"review\", label: \"Evidence review\", status: \"In progress\", current: true }]} nextStep=\"Wait for the review update\" />",
+      "usage": {
+        "use": [
+          "Permit, benefits, tax, and grant cases with supplied status and milestones.",
+          "Supply the current milestone explicitly, preserve source milestone order, and use nextStep for the authority’s actual instruction."
+        ],
+        "avoid": [
+          "Predicting approval, calculating completion percentages, or choosing the current step from dates.",
+          "Presenting estimated service times as confirmed decision dates."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Any supplied child links or buttons keep their native keyboard behavior. Milestones are not interactive."
+        }
+      ],
+      "a11y": [
+        "An ordered, named list preserves milestone order. Explicit current milestones use aria-current=step and a full-surface fill.",
+        "Status and dates are readable text. Optional machine-readable milestone dates are passed through without conversion.",
+        "Missing reference, update time, milestone dates, milestones, and next step have explicit descriptions.",
+        "The root forwards native div attributes and its ref. Use at least 44px targets for supplied actions."
+      ]
+    }
+  }
+}

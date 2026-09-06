@@ -1,6 +1,6 @@
 # Vlak
 
-> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 126 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
+> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 146 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
 
 Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-react/css"`, vendor the source with `npx @noorddev/vlak-cli add <name>`, or use `npx shadcn add https://vlak.dev/r/<name>.json`. Every component page below has install paths, a React example, a props table generated from the types, keyboard interactions, and accessibility notes.
 
@@ -9,6 +9,9 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Guide](https://vlak.dev/docs/guide.md): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents
 - [Component index](https://vlak.dev/docs/index.md): the catalogue by category
 - [Health guide](https://vlak.dev/docs/health.md): health, wellness, and care components with data and action contracts
+- [Civic guide](https://vlak.dev/docs/civic.md): Components for public services, identity records, tax summaries, benefits, and applications.
+- [Science guide](https://vlak.dev/docs/science.md): Components for measurements, physical quantities, laboratory plates, experimental procedures, and spectra.
+- [Creative tools guide](https://vlak.dev/docs/creative.md): Controls for professional audio, video, and design workspaces.
 - [Tokens](https://vlak.dev/docs/tokens.md): every custom property with light and dark values
 - [Props JSON](https://vlak.dev/docs/props.json): every export and its props as data
 - [Registry index](https://vlak.dev/r/index.json): the shadcn-compatible registry; items at https://vlak.dev/r/<name>.json
@@ -164,10 +167,39 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Habit tracker](https://vlak.dev/docs/habit-tracker.md): Shows dated complete, missed, skipped, and unrecorded states, with controlled completion actions and a responsive week view.
 - [Sleep timeline](https://vlak.dev/docs/sleep-timeline.md): Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.
 - [Activity goal](https://vlak.dev/docs/activity-goal.md): Shows a supplied activity amount and target with native progress, visible units, and distinct missing-data states.
+- [Activity rings](https://vlak.dev/docs/activity-rings.md): Shows one to six personal goals as concentric rings with named progress, units, and explicit missing-data states.
 - [Patient banner](https://vlak.dev/docs/patient-banner.md): Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.
 - [Medication schedule](https://vlak.dev/docs/medication-schedule.md): Lists supplied medication, dose, time, and recorded status with controlled 44px recording actions.
 - [Appointment card](https://vlak.dev/docs/appointment-card.md): Groups supplied appointment time, timezone, clinician, location, and status with an optional action slot.
 - [Care plan](https://vlak.dev/docs/care-plan.md): Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.
+
+## Civic
+
+- [Identity document](https://vlak.dev/docs/identity-document.md): Displays a supplied credential, masked identifier, issuer, dates, and verification status without exposing a raw identifier.
+- [Tax summary](https://vlak.dev/docs/tax-summary.md): Separates supplied assessment line items from authoritative totals in a semantic two-column table.
+- [Benefit program](https://vlak.dev/docs/benefit-program.md): Keeps programme availability, supplied eligibility, award terms, and criterion assessments separate.
+- [Application status](https://vlak.dev/docs/application-status.md): Shows a supplied case reference, status, update time, milestones, and next step without estimating progress.
+- [Evidence checklist](https://vlak.dev/docs/evidence-checklist.md): Lists evidence requirements, file records, and supplied verification status with controlled 44px action buttons.
+
+## Science
+
+- [Measurement value](https://vlak.dev/docs/measurement-value.md): A supplied scientific reading with units, symmetric uncertainty, optional scientific notation and explicit availability.
+- [Quantity field](https://vlak.dev/docs/quantity-field.md): A 44px native numeric input and unit selector with controlled quantity values, form submission and reset support.
+- [Well plate](https://vlak.dev/docs/well-plate.md): A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.
+- [Experiment run](https://vlak.dev/docs/experiment-run.md): Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.
+- [Spectrum plot](https://vlak.dev/docs/spectrum-plot.md): A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.
+
+## Creative
+
+- [Audio meter](https://vlak.dev/docs/audio-meter.md): Shows supplied channel levels and peaks in decibels, with bounded native meters and explicit missing readings.
+- [Channel strip](https://vlak.dev/docs/channel-strip.md): Edits channel gain, pan, mute, and solo with native sliders and 44px toggle actions wired to caller-owned state.
+- [Parameter knob](https://vlak.dev/docs/parameter-knob.md): Displays a rotary parameter over a native horizontal range input, with named values, units, and a 64px control.
+- [Timecode field](https://vlak.dev/docs/timecode-field.md): Edits hours, minutes, seconds, and frames with native form validation for a supplied integer non-drop frame rate.
+- [Clip timeline](https://vlak.dev/docs/clip-timeline.md): Positions supplied clips within a declared duration, with contained horizontal scrolling, accessible selection, and optional seeking.
+- [Render queue](https://vlak.dev/docs/render-queue.md): Displays supplied export jobs, progress, and status with explicit cancel and retry callbacks for a connected renderer.
+- [Layer stack](https://vlak.dev/docs/layer-stack.md): Manages supplied layer selection, visibility, locking, and order through named 44px controls and caller-owned changes.
+- [Color inspector](https://vlak.dev/docs/color-inspector.md): Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.
+- [Spacing control](https://vlak.dev/docs/spacing-control.md): Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.
 
 ## Optional
 

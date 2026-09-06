@@ -264,6 +264,16 @@ describe("docs", () => {
     expect(docsFor("check-in")).toContain("## Keyboard");
     expect(search("medication").map(hit => hit.name)).toContain("medication-schedule");
   });
+
+  it("serves civic, science, and creative guides with their components", () => {
+    for (const [collection, component] of [["civic", "benefit-program"], ["science", "well-plate"], ["creative", "channel-strip"]] as const) {
+      expect(docsFor(collection)).toContain("## Data and action contracts");
+      expect(docsFor(collection)).toContain(`/docs/${component}.md`);
+      expect(search(component)[0]?.name).toBe(component);
+      expect(docsFor(component)).toContain("## Keyboard");
+    }
+    expect(search("activity ring").map(hit => hit.name)).toContain("activity-rings");
+  });
 });
 
 describe("search", () => {

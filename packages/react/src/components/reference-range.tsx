@@ -18,14 +18,15 @@ export interface ReferenceRangeProps extends React.HTMLAttributes<HTMLDivElement
 }
 
 const styles = stylex.create({
-  root: { display: "grid", gap: "0.5rem", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: "anywhere" },
-  head: { margin: 0, display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "0.25rem 1rem", fontSize: "0.875rem" },
+  root: { display: "grid", gap: "0.5rem", width: "100%", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: "anywhere" },
+  head: { margin: 0, display: "flex", alignItems: "baseline", flexWrap: "wrap", justifyContent: "space-between", gap: "0.25rem 1rem", fontSize: "0.875rem" },
   label: { fontWeight: 500 },
-  value: { fontVariantNumeric: "tabular-nums" },
-  track: { position: "relative", height: "1rem", marginInline: "0.3125rem", borderBottomWidth: vlak.hairline, borderBottomStyle: "solid", borderBottomColor: vlak.controlBorder },
-  interval: { position: "absolute", insetInlineStart: "20%", width: "60%", height: "0.5rem", bottom: "-0.25rem", backgroundColor: { default: vlak.divider, [mq.forcedColors]: "Canvas" }, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, boxSizing: "border-box" },
-  marker: { position: "absolute", bottom: "-0.3125rem", height: "0.625rem", width: "0.625rem", marginInlineStart: "-0.3125rem", backgroundColor: { default: vlak.ink, [mq.forcedColors]: "CanvasText" }, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.ink, boxSizing: "border-box" },
-  bounds: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: "0.25rem 1rem", margin: 0, fontSize: "0.75rem", color: vlak.gray, fontVariantNumeric: "tabular-nums" },
+  value: { fontVariantNumeric: "tabular-nums", fontSize: "1.25rem", fontWeight: 500, lineHeight: 1.2, textAlign: "end", marginInlineStart: "auto" },
+  track: { position: "relative", height: "1.5rem", marginInline: "0.3125rem", "::before": { content: "''", position: "absolute", insetInline: 0, top: "50%", height: vlak.hairline, transform: "translateY(-50%)", backgroundColor: { default: vlak.controlBorder, [mq.forcedColors]: "CanvasText" } } },
+  interval: { position: "absolute", insetInlineStart: "20%", width: "60%", height: "0.5rem", top: "50%", transform: "translateY(-50%)", backgroundColor: { default: vlak.divider, [mq.forcedColors]: "Canvas" }, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, boxSizing: "border-box" },
+  marker: { position: "absolute", top: "50%", transform: "translateY(-50%)", height: "0.625rem", width: "0.625rem", marginInlineStart: "-0.3125rem", backgroundColor: { default: vlak.ink, [mq.forcedColors]: "CanvasText" }, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.ink, boxSizing: "border-box" },
+  bounds: { display: "flex", alignItems: "baseline", flexWrap: "wrap", justifyContent: "space-between", gap: "0.25rem 1rem", margin: 0, fontSize: "0.75rem", color: vlak.gray, fontVariantNumeric: "tabular-nums" },
+  boundValue: { textAlign: "end", marginInlineStart: "auto" },
   description: { margin: 0, fontSize: "0.75rem", color: vlak.gray },
 });
 
@@ -51,11 +52,12 @@ export const ReferenceRange = React.forwardRef<HTMLDivElement, ReferenceRangePro
   const interval = rs(["rs-reference-range-interval"], styles.interval);
   const marker = rs(["rs-reference-range-marker"], styles.marker);
   const bounds = rs(["rs-reference-range-bounds"], styles.bounds);
+  const boundValue = rs(["rs-reference-range-bound-value"], styles.boundValue);
   const description = rs(["rs-reference-range-description"], styles.description);
   return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>
     <p {...head}><span {...labelStyle}>{label}</span><span {...valueStyle}>{hasValue ? (valueLabel ?? `${value}${suffix}`) : "No result"}</span></p>
     {bounded && <div {...track} aria-hidden="true"><span {...interval} />{position != null && <span className={marker.className} style={{ ...marker.style, insetInlineStart: `${position}%` }} />}</div>}
-    <p {...bounds}><span>{rangeLabel}</span><span>{intervalText}</span></p>
+    <p {...bounds}><span>{rangeLabel}</span><span {...boundValue}>{intervalText}</span></p>
     {placement && <p {...description}>{placement}</p>}
     {children}
   </div>;

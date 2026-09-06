@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { vlakCategories, catalogComponents } from "@noorddev/vlak";
+import { vlakCategories, catalogComponents, domainCollections } from "@noorddev/vlak";
 import { Icon, iconGroups } from "@noorddev/vlak-react";
 import { chrome } from "@/app/site.stylex";
 import { DocsNav } from "@/components/docs-nav";
@@ -60,6 +60,7 @@ export default function ComponentsPage() {
               </section>
             );
           }
+          const collection = domainCollections.find(item => item.name === category);
           const items = catalogComponents.filter((c) => c.category === category);
           if (items.length === 0) return null;
           return (
@@ -72,6 +73,7 @@ export default function ComponentsPage() {
                   Readings, daily routines, and care workflows. <Link href="/docs/health" className="rs-link">Building health software</Link>
                 </p>
               )}
+              {collection && <p className="rs-t-body">{collection.description} <Link href={`/docs/${category}`} className="rs-link">Read the collection guide</Link></p>}
               <div {...sx("gallery", chrome.gallery)}>
                 {items.map((c) => (
                   <div key={c.name} {...sx("gallery-item", chrome.galleryItem)}>

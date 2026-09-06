@@ -1,0 +1,8 @@
+/* ── measurement-value: generated from packages/react/src/components/measurement-value.tsx ── */
+.rs-measurement-value{display:grid;gap:0.5rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-measurement-value-label{margin:0;font-size:0.875rem;font-weight:500}
+.rs-measurement-value-reading{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.375rem;font-variant-numeric:tabular-nums}
+.rs-measurement-value-number{font-size:1.75rem;font-weight:500;letter-spacing:-0.035em;line-height:1.2}
+.rs-measurement-value-uncertainty{font-size:1rem}
+.rs-measurement-value-unit{font-size:0.875rem;color:var(--text-secondary)}
+.rs-measurement-value-context{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}

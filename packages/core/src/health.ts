@@ -7,8 +7,8 @@ export const healthWorkflows = [
   },
   {
     title: "Daily wellbeing",
-    description: "Collect a check-in, record a routine, review a sleep period, and follow a personal activity goal. Keep unrecorded days and gaps visible.",
-    components: ["check-in", "habit-tracker", "sleep-timeline", "activity-goal"],
+    description: "Collect a check-in, record a routine, review a sleep period, and follow personal goals as a bar or concentric rings. Keep unrecorded days and gaps visible.",
+    components: ["check-in", "habit-tracker", "sleep-timeline", "activity-goal", "activity-rings"],
   },
   {
     title: "Care workflows",

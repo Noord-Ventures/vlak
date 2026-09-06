@@ -18,7 +18,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 126;
+const expectedCatalogueSize = 146;
 const additions = [
   ["number-field", "NumberField"], ["range-slider", "RangeSlider"], ["multi-select", "MultiSelect"], ["tag-input", "TagInput"], ["date-range-picker", "DateRangePicker"],
   ["time-field", "TimeField"], ["file-upload", "FileUpload"], ["transfer-list", "TransferList"], ["inline-edit", "InlineEdit"], ["rating", "Rating"],
@@ -31,6 +31,10 @@ const additions = [
   ["health-metric", "HealthMetric"], ["reference-range", "ReferenceRange"], ["lab-results", "LabResults"], ["symptom-diary", "SymptomDiary"],
   ["activity-goal", "ActivityGoal"], ["habit-tracker", "HabitTracker"], ["check-in", "CheckIn"], ["sleep-timeline", "SleepTimeline"],
   ["patient-banner", "PatientBanner"], ["medication-schedule", "MedicationSchedule"], ["appointment-card", "AppointmentCard"], ["care-plan", "CarePlan"],
+  ["activity-rings", "ActivityRings"], ["identity-document", "IdentityDocument"], ["tax-summary", "TaxSummary"], ["benefit-program", "BenefitProgram"], ["application-status", "ApplicationStatus"], ["evidence-checklist", "EvidenceChecklist"],
+  ["measurement-value", "MeasurementValue"], ["quantity-field", "QuantityField"], ["well-plate", "WellPlate"], ["experiment-run", "ExperimentRun"], ["spectrum-plot", "SpectrumPlot"],
+  ["audio-meter", "AudioMeter"], ["channel-strip", "ChannelStrip"], ["parameter-knob", "ParameterKnob"], ["timecode-field", "TimecodeField"], ["clip-timeline", "ClipTimeline"],
+  ["render-queue", "RenderQueue"], ["layer-stack", "LayerStack"], ["color-inspector", "ColorInspector"], ["spacing-control", "SpacingControl"],
 ];
 // The same fixtures exercise the packed modules under both supported React majors.
 const renderAdditions = `
@@ -57,6 +61,26 @@ const fixtureProps = {
   MedicationSchedule: { timeZone: "Europe/Amsterdam, UTC+02:00", dateLabel: "14 September 2026", items: [{ id: "morning", name: "Example medication", dose: "Supplied dose", timeLabel: "08:00", status: "Not recorded", instructions: "Supplied instructions", actions: [{ id: "taken", label: "Record as taken" }] }], onAction() {} },
   AppointmentCard: { appointmentTitle: "Care team check-in", dateLabel: "18 September 2026", timeLabel: "10:30–11:00", timeZone: "Europe/Amsterdam, UTC+02:00", dateTime: "2026-09-18T10:30:00+02:00", clinician: "Alex Morgan", location: "Demo clinic", status: "Awaiting confirmation" },
   CarePlan: { tasks: [{ id: "questions", title: "Prepare questions", owner: "Robin Ellis", dueLabel: "17 September", status: "Open", completed: false }], onCompletedChange() {} },
+  ActivityRings: { label: "Personal goals", goals: [{ id: "walk", label: "Walking", current: 18, target: 30, unit: "minutes" }, { id: "read", label: "Reading", current: null, target: 20, unit: "minutes" }] },
+  IdentityDocument: { documentTitle: "Residence document", holderName: "Robin Ellis", maskedIdentifier: "•••• 2048", issuer: "Example civic office", status: "Verification pending" },
+  TaxSummary: { label: "Annual assessment", periodLabel: "2025", reference: "Example 204", status: "Provisional", items: [{ id: "assessment", label: "Assessed amount", amount: "€ 240.00" }], totals: [{ id: "payable", label: "Amount payable", amount: "€ 240.00" }] },
+  BenefitProgram: { programName: "Community project grant", status: "Applications open", eligibility: "Not assessed", criteria: [{ id: "location", label: "Project location", status: "Not reviewed" }] },
+  ApplicationStatus: { applicationTitle: "Grant application", reference: "Example 204", status: "Under review", milestones: [{ id: "review", label: "Evidence review", status: "In progress", current: true }], nextStep: "Wait for the provider update" },
+  EvidenceChecklist: { label: "Application evidence", items: [{ id: "address", label: "Proof of address", status: "Awaiting review", fileName: "Example-address.pdf", actions: [{ id: "view", label: "View record" }] }], onAction() {} },
+  MeasurementValue: { label: "Sample mass", value: "2.400", unit: "g", uncertainty: 0.001, source: "Example balance" },
+  QuantityField: { label: "Sample quantity", units: [{ value: "g", label: "Grams" }], defaultValue: { amount: 2.4, unit: "g" } },
+  WellPlate: { label: "Example plate", rows: ["A", "B"], columns: ["1", "2"], wells: [{ row: "A", column: "1", status: "Recorded", label: "Sample 01" }], onValueChange() {} },
+  ExperimentRun: { label: "Sample preparation", runId: "Example 204", status: "Paused", conditions: [{ id: "batch", label: "Batch", value: "Example 01" }], steps: [{ id: "prepare", label: "Prepare sample", status: "Awaiting operator", actions: [{ id: "resume", label: "Request resume" }] }], onAction() {} },
+  SpectrumPlot: { label: "Recorded spectrum", xLabel: "Wavelength", yLabel: "Intensity", xUnit: "nm", points: [{ x: 400, y: 0.2 }, { x: 500, y: 0.6 }, { x: 600, y: 0.3 }], peaks: [{ id: "annotation", x: 500, y: 0.6, label: "Supplied annotation" }] },
+  AudioMeter: { label: "Output levels", channels: [{ id: "left", label: "Left", level: -18, peak: -6 }, { id: "right", label: "Right", level: -20, peak: -8 }] },
+  ChannelStrip: { label: "Dialogue", defaultValue: { gain: -6, pan: 0, muted: false, solo: false } },
+  ParameterKnob: { label: "Mix", defaultValue: 40, min: 0, max: 100, unit: "%" },
+  TimecodeField: { label: "In point", frameRate: 25, defaultValue: "00:01:12:10" },
+  ClipTimeline: { label: "Edit timeline", tracks: [{ id: "video", label: "Video" }], clips: [{ id: "opening", trackId: "video", label: "Opening", start: 0, duration: 5 }], duration: 30, unit: "seconds", position: 2, onSeek() {}, onSelectClip() {} },
+  RenderQueue: { label: "Export queue", jobs: [{ id: "draft", label: "Draft export", status: "rendering", progress: 25 }, { id: "failed", label: "Previous export", status: "failed", detail: "Example failure" }], onCancel() {}, onRetry() {} },
+  LayerStack: { label: "Document layers", layers: [{ id: "title", label: "Title", visible: true, locked: false }], selectedId: "title", onSelect() {}, onLayersChange() {} },
+  ColorInspector: { label: "Fill", defaultValue: { hex: "#808080", alpha: 1 } },
+  SpacingControl: { label: "Padding", defaultValue: { top: 8, right: 12, bottom: 8, left: 12 }, unit: "px" },
 };
 let additionHtml = "";
 for (const [name, exported] of additions) {

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "render-queue",
+  "type": "registry:component",
+  "title": "Render queue",
+  "description": "Displays supplied export jobs, progress, and status with explicit cancel and retry callbacks for a connected renderer.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/render-queue.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport type RenderJobStatus = \"queued\" | \"rendering\" | \"complete\" | \"failed\" | \"canceled\";\nexport interface RenderJob { id: string; label: string; status: RenderJobStatus; /** Completion percentage from 0 to 100. */ progress?: number | null; detail?: React.ReactNode }\nexport interface RenderQueueProps extends React.HTMLAttributes<HTMLDivElement> { label: React.ReactNode; jobs: RenderJob[]; onCancel?: (id: string) => void; onRetry?: (id: string) => void; disabled?: boolean }\n\nconst labels: Record<RenderJobStatus, string> = { queued: \"Queued\", rendering: \"Rendering\", complete: \"Complete\", failed: \"Failed\", canceled: \"Canceled\" };\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, color: vlak.ink },\n  label: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  list: { listStyleType: \"none\", margin: 0, padding: 0, display: \"grid\" },\n  job: { display: \"grid\", gap: \"0.5rem\", paddingBlock: \"0.875rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"baseline\", justifyContent: \"space-between\", gap: \"0.25rem 1rem\", fontSize: vlak.controlFs, lineHeight: 1.45 },\n  note: { margin: 0, color: vlak.gray, fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  progress: { display: \"block\", width: \"100%\", height: \"0.5rem\", accentColor: vlak.ink },\n  action: { minWidth: vlak.hit, minHeight: vlak.hit, justifySelf: \"start\", paddingInline: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: \"inherit\", fontSize: vlak.controlFs, cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n});\n\n/** Host-owned render jobs and available cancel or retry actions. */\nexport const RenderQueue = React.forwardRef<HTMLDivElement, RenderQueueProps>(function RenderQueue({ label, jobs, onCancel, onRetry, disabled, className, style, ...props }, ref) {\n  const root = rs([\"rs-render-queue\", className], styles.root);\n  const heading = rs([\"rs-render-queue-label\"], styles.label);\n  const list = rs([\"rs-render-queue-list\"], styles.list);\n  const row = rs([\"rs-render-queue-job\"], styles.job);\n  const header = rs([\"rs-render-queue-header\"], styles.header);\n  const note = rs([\"rs-render-queue-note\"], styles.note);\n  const progress = rs([\"rs-render-queue-progress\"], styles.progress);\n  const action = rs([\"rs-render-queue-action\"], styles.action);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <p className={heading.className} style={heading.style}>{label}</p>\n    {jobs.length === 0 && <p className={note.className} style={note.style}>No render jobs</p>}\n    <ul className={list.className} style={list.style}>{jobs.map((job) => {\n      const validProgress = job.progress != null && Number.isFinite(job.progress) && job.progress >= 0 && job.progress <= 100;\n      const active = job.status === \"queued\" || job.status === \"rendering\";\n      const retry = job.status === \"failed\" || job.status === \"canceled\";\n      return <li key={job.id} className={row.className} style={row.style}>\n        <div className={header.className} style={header.style}><span>{job.label}</span><span>{Object.hasOwn(labels, job.status) ? labels[job.status] : \"Unknown status\"}</span></div>\n        {job.detail != null && <div className={note.className} style={note.style}>{job.detail}</div>}\n        {active && (validProgress ? <><progress value={job.progress!} max={100} aria-label={`${job.label} progress`} className={progress.className} style={progress.style}>{job.progress}%</progress><p className={note.className} style={note.style}>{job.progress}%</p></> : <p className={note.className} style={note.style}>{job.progress == null ? \"Progress not reported\" : \"Progress unavailable\"}</p>)}\n        {active && onCancel && <button type=\"button\" disabled={disabled} aria-label={`Cancel ${job.label}`} className={action.className} style={action.style} onClick={() => onCancel(job.id)}>Cancel</button>}\n        {retry && onRetry && <button type=\"button\" disabled={disabled} aria-label={`Retry ${job.label}`} className={action.className} style={action.style} onClick={() => onRetry(job.id)}>Retry</button>}\n      </li>;\n    })}</ul>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/render-queue.tsx"
+    },
+    {
+      "path": "vlak/styles/render-queue.css",
+      "content": "/* ── render-queue: generated from packages/react/src/components/render-queue.tsx ── */\n.rs-render-queue{display:grid;gap:0.75rem;min-width:0;color:var(--text)}\n.rs-render-queue-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-render-queue-list{list-style-type:none;margin:0;padding:0;display:grid}\n.rs-render-queue-job{display:grid;gap:0.5rem;padding-block:0.875rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-render-queue-header{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.25rem 1rem;font-size:var(--control-fs);line-height:1.45}\n.rs-render-queue-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}\n.rs-render-queue-progress{display:block;width:100%;height:0.5rem;accent-color:var(--text)}\n.rs-render-queue-action{min-width:var(--hit);min-height:var(--hit);justify-self:start;padding-inline:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:var(--control-fs);cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-render-queue-action:focus-visible{outline-width:2px;outline-style:solid}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/render-queue.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-render-queue",
+        "rs-render-queue-label",
+        "rs-render-queue-list",
+        "rs-render-queue-job",
+        "rs-render-queue-header",
+        "rs-render-queue-note",
+        "rs-render-queue-progress",
+        "rs-render-queue-action"
+      ],
+      "snippet": "<div class=\"rs-render-queue\"><p class=\"rs-render-queue-label\">Exports</p><ul class=\"rs-render-queue-list\"><li class=\"rs-render-queue-job\"><div class=\"rs-render-queue-header\"><span>Film master</span><span>Rendering</span></div><progress class=\"rs-render-queue-progress\" value=\"42\" max=\"100\" aria-label=\"Film master progress\">42%</progress><p class=\"rs-render-queue-note\">42%</p></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "RenderQueue",
+        "Export queue",
+        "Encoding queue",
+        "Render jobs",
+        "Export progress"
+      ],
+      "example": "import { RenderQueue } from \"@noorddev/vlak-react\";\n\n<RenderQueue label=\"Exports\" jobs={[{ id: \"master\", label: \"Film master\", status: \"rendering\", progress: 42, detail: \"ProRes master\" }, { id: \"preview\", label: \"Review copy\", status: \"queued\" }]} />",
+      "usage": {
+        "use": [
+          "Renderer-owned jobs with queued, rendering, complete, failed, or canceled status.",
+          "onCancel for active jobs and onRetry for failed or canceled jobs; the host owns the resulting status.",
+          "Known percentages from zero through 100; missing progress remains explicitly unreported."
+        ],
+        "avoid": [
+          "Simulating render progress or success without a backend result.",
+          "Displaying cancel or retry controls when there is no callback to handle them."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through available cancel and retry buttons."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests the focused job action without changing the supplied job state."
+        }
+      ],
+      "a11y": [
+        "Job labels and statuses remain text; determinate native progress is named per job.",
+        "Missing or invalid progress has an explicit text state and never emits NaN or an invented percentage.",
+        "Actions have job-specific names, 44px targets, and disabled support.",
+        "The ref and native attributes reach the root div."
+      ]
+    }
+  }
+}

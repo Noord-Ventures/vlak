@@ -14,6 +14,11 @@ import { mediaAdditions } from "./registry-media-additions.ts";
 import { healthObservations } from "./registry-health-observations.ts";
 import { healthWellness } from "./registry-health-wellness.ts";
 import { healthCare } from "./registry-health-care.ts";
+import { healthRings } from "./registry-health-rings.ts";
+
+import { civicComponents } from "./registry-civic.ts";
+import { scienceComponents } from "./registry-science.ts";
+import { creativeComponents } from "./registry-creative.ts";
 
 export type { VlakComponent } from "./schema";
 
@@ -24,7 +29,11 @@ export const vlakComponents: VlakComponent[] = [
   ...mediaAdditions,
   ...healthObservations,
   ...healthWellness,
+  ...healthRings,
   ...healthCare,
+  ...civicComponents,
+  ...scienceComponents,
+  ...creativeComponents,
   {
     name: "button",
     title: "Button",

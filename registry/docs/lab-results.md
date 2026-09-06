@@ -48,7 +48,7 @@ npx shadcn add https://vlak.dev/r/lab-results.json
 
 ```html
 <ul class="rs-lab-results" aria-label="Latest report">
-  <li class="rs-lab-results-item" data-status="amended"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Reported measurement</p><p class="rs-lab-results-status">Amended</p></div><p class="rs-lab-results-reading">24 <span class="rs-lab-results-unit">units</span></p><p class="rs-lab-results-note">Replaces the earlier report</p></li>
+  <li class="rs-lab-results-item" data-status="amended"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Reported measurement</p><p class="rs-lab-results-status">Amended</p></div><p class="rs-lab-results-reading"><span class="rs-lab-results-reading-label">Result</span><span class="rs-lab-results-reading-value">24 <span class="rs-lab-results-unit">units</span></span></p><p class="rs-lab-results-note">Replaces the earlier report</p></li>
   <li class="rs-lab-results-item" data-status="pending"><div class="rs-lab-results-head"><p class="rs-lab-results-name">Additional analysis</p><p class="rs-lab-results-status">Pending</p></div></li>
 </ul>
 ```
@@ -91,7 +91,7 @@ Forwards `ref` to the `HTMLUListElement`.
 
 ## Classes
 
-`rs-lab-results`, `rs-lab-results-item`, `rs-lab-results-head`, `rs-lab-results-name`, `rs-lab-results-status`, `rs-lab-results-reading`, `rs-lab-results-unit`, `rs-lab-results-note`, `rs-lab-results-time`
+`rs-lab-results`, `rs-lab-results-item`, `rs-lab-results-head`, `rs-lab-results-name`, `rs-lab-results-status`, `rs-lab-results-reading`, `rs-lab-results-reading-label`, `rs-lab-results-reading-value`, `rs-lab-results-unit`, `rs-lab-results-note`, `rs-lab-results-time`
 
 ## Dependencies
 

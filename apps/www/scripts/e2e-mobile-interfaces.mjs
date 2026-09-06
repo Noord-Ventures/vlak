@@ -4,7 +4,9 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const slugs = ["agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
+const allSlugs = ["agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
+const slugs = process.env.INTERFACES ? process.env.INTERFACES.split(",").map(slug => slug.trim()).filter(Boolean) : allSlugs;
+assert(slugs.length > 0 && slugs.every(slug => allSlugs.includes(slug)), "INTERFACES must contain known interface slugs");
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
@@ -35,6 +37,17 @@ async function fit(page, label) {
   assert.equal(layout.legacyChrome, 0, `${label}: duplicated status/header chrome`);
   assert.deepEqual(layout.shortTargets, [], `${label}: touch targets below 44px`);
   assert.deepEqual(layout.offscreenDocks, [], `${label}: primary navigation outside the screen`);
+}
+
+async function commentDock(page, label) {
+  const geometry = await page.locator(".sc-wall-comment-dock").evaluate(form => {
+    const input = form.querySelector("input").getBoundingClientRect();
+    const button = form.querySelector("button").getBoundingClientRect();
+    return { inputHeight: input.height, buttonHeight: button.height, topDifference: Math.abs(input.top - button.top) };
+  });
+  assert(geometry.inputHeight >= 43.5, `${label}: comment input is below 44px (${geometry.inputHeight}px)`);
+  assert(Math.abs(geometry.inputHeight - geometry.buttonHeight) <= 1, `${label}: comment input and send button heights differ`);
+  assert(geometry.topDifference <= 1, `${label}: comment input and send button are vertically misaligned`);
 }
 
 async function flow(page, slug) {
@@ -147,6 +160,7 @@ async function flow(page, slug) {
     assert.equal(await frame.getByRole("button", { name: "Like Mara’s post", exact: true }).first().getAttribute("aria-pressed"), "true");
     await frame.getByRole("button", { name: "Comments on Mara’s post", exact: true }).first().click();
     assert(!(await frame.locator(".sc-wall-feed").isVisible()));
+    await commentDock(page, "wall mobile");
     await frame.getByLabel("Add a comment", { exact: true }).fill("The composition reads well on a phone.");
     await frame.getByRole("button", { name: "Post comment", exact: true }).click();
     assert(await frame.getByText("The composition reads well on a phone.", { exact: false }).isVisible());
@@ -215,6 +229,17 @@ try {
       console.log(`${width}×${height} ${colorScheme}: ${slug} mobile flow passed`);
     }
     await page.close();
+  }
+  if (slugs.includes("wall")) {
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
+    await page.goto(`${base}/interfaces/wall/`, { waitUntil: "networkidle" });
+    await page.getByRole("button", { name: "Comments on Mara’s post", exact: true }).first().click();
+    await commentDock(page, "wall desktop");
+    await page.getByLabel("Add a comment", { exact: true }).fill("The desktop proof is ready.");
+    await page.getByRole("button", { name: "Post comment", exact: true }).click();
+    assert(await page.getByText("The desktop proof is ready.", { exact: false }).isVisible());
+    await page.close();
+    console.log("1440×1000: wall desktop comment sizing and submission passed");
   }
   assert.deepEqual(errors, [], "No runtime errors during mobile flows");
   console.log("All mobile interface flows passed");

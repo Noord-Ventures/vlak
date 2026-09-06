@@ -1,0 +1,99 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "spacing-control",
+  "type": "registry:component",
+  "title": "Spacing control",
+  "description": "Edits top, right, bottom, and left spacing with linked or independent native number fields and explicit units.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/spacing-control.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface SpacingValue { top: number | null; right: number | null; bottom: number | null; left: number | null }\nexport interface SpacingControlProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\"> {\n  label: React.ReactNode;\n  value?: SpacingValue;\n  defaultValue?: SpacingValue;\n  onValueChange?: (value: SpacingValue) => void;\n  linked?: boolean;\n  defaultLinked?: boolean;\n  onLinkedChange?: (linked: boolean) => void;\n  unit?: string;\n  min?: number;\n  max?: number;\n  step?: number;\n  readOnly?: boolean;\n}\n\nconst initial: SpacingValue = { top: 0, right: 0, bottom: 0, left: 0 };\nconst sides = [\"top\", \"right\", \"bottom\", \"left\"] as const;\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink },\n  label: { marginBottom: \"0.75rem\", padding: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  fields: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(5rem, 1fr))\", gap: \"0.5rem\" },\n  field: { display: \"grid\", gap: \"0.375rem\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  input: { minWidth: vlak.hit, minHeight: vlak.hit, width: \"100%\", boxSizing: \"border-box\", paddingInline: \"0.5rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontSize: vlak.controlFs, fontFamily: \"inherit\", fontVariantNumeric: \"tabular-nums\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  link: { minWidth: vlak.hit, minHeight: vlak.hit, justifySelf: \"start\", paddingInline: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: \"inherit\", fontSize: vlak.controlFs, cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  linked: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  note: { margin: 0, color: vlak.gray, fontSize: vlak.controlLabel, lineHeight: 1.45 },\n});\n\n/** Four native numeric fields; linking applies the next edit to every side. */\nexport const SpacingControl = React.forwardRef<HTMLFieldSetElement, SpacingControlProps>(function SpacingControl({ label, value, defaultValue = initial, onValueChange, linked, defaultLinked = false, onLinkedChange, unit = \"px\", min, max, step = 1, readOnly, name, form, disabled, className, style, ...props }, ref) {\n  const id = React.useId();\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<SpacingValue, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const [isLinked, setLinked, linkRef] = useInputValue<boolean, HTMLButtonElement>(linked, defaultLinked, onLinkedChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const validBounds = (min == null || Number.isFinite(min)) && (max == null || Number.isFinite(max)) && (min == null || max == null || min <= max) && Number.isFinite(step) && step > 0;\n  const root = rs([\"rs-spacing-control\", className], styles.root);\n  const heading = rs([\"rs-spacing-control-label\"], styles.label);\n  const fields = rs([\"rs-spacing-control-fields\"], styles.fields);\n  const field = rs([\"rs-spacing-control-field\"], styles.field);\n  const input = rs([\"rs-spacing-control-input\"], styles.input);\n  const link = rs([\"rs-spacing-control-link\", isLinked && \"rs-spacing-control-linked\"], styles.link, isLinked && styles.linked);\n  const note = rs([\"rs-spacing-control-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={heading.className} style={heading.style}>{label}</legend>\n    <div className={fields.className} style={fields.style}>{sides.map((side) => <label key={side} className={field.className} style={field.style}>{side.charAt(0).toUpperCase() + side.slice(1)} ({unit})<input type=\"number\" form={form} name={name ? `${name}.${side}` : undefined} min={validBounds ? min : undefined} max={validBounds ? max : undefined} step={validBounds ? step : undefined} disabled={disabled || !validBounds} readOnly={readOnly} value={current[side] != null && Number.isFinite(current[side]) ? current[side] : \"\"} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => {\n      const next = event.currentTarget.value === \"\" ? null : Number(event.currentTarget.value);\n      setValue(isLinked ? { top: next, right: next, bottom: next, left: next } : { ...current, [side]: next });\n    }} /></label>)}</div>\n    <button type=\"button\" ref={linkRef} form={form} disabled={disabled || readOnly || !validBounds} aria-pressed={isLinked} aria-describedby={`${id}-hint`} className={link.className} style={link.style} onClick={() => setLinked(!isLinked)}>Link sides</button>\n    <p id={`${id}-hint`} className={note.className} style={note.style}>{!validBounds ? \"Spacing bounds unavailable\" : isLinked ? \"The next edit applies to all four sides.\" : \"Each side is edited separately.\"}</p>\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/spacing-control.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/spacing-control.css",
+      "content": "/* ── spacing-control: generated from packages/react/src/components/spacing-control.tsx ── */\n.rs-spacing-control{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}\n.rs-spacing-control-label{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-spacing-control-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.5rem}\n.rs-spacing-control-field{display:grid;gap:0.375rem;font-size:var(--control-label);line-height:1.45}\n.rs-spacing-control-input{min-width:var(--hit);min-height:var(--hit);width:100%;box-sizing:border-box;padding-inline:0.5rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-size:var(--control-fs);font-family:inherit;font-variant-numeric:tabular-nums;outline-color:var(--text);outline-offset:2px}\n.rs-spacing-control-input:focus-visible{outline-width:2px;outline-style:solid}\n.rs-spacing-control-link{min-width:var(--hit);min-height:var(--hit);justify-self:start;padding-inline:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:var(--control-fs);cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-spacing-control-link:focus-visible{outline-width:2px;outline-style:solid}\n.rs-spacing-control-linked{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-spacing-control-linked{background-color:Highlight;color:HighlightText}}\n.rs-spacing-control-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/spacing-control.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-spacing-control",
+        "rs-spacing-control-label",
+        "rs-spacing-control-fields",
+        "rs-spacing-control-field",
+        "rs-spacing-control-input",
+        "rs-spacing-control-link",
+        "rs-spacing-control-linked",
+        "rs-spacing-control-note"
+      ],
+      "snippet": "<fieldset class=\"rs-spacing-control\"><legend class=\"rs-spacing-control-label\">Padding</legend><div class=\"rs-spacing-control-fields\"><label class=\"rs-spacing-control-field\">Top (px)<input class=\"rs-spacing-control-input\" type=\"number\" value=\"16\" /></label><label class=\"rs-spacing-control-field\">Right (px)<input class=\"rs-spacing-control-input\" type=\"number\" value=\"24\" /></label><label class=\"rs-spacing-control-field\">Bottom (px)<input class=\"rs-spacing-control-input\" type=\"number\" value=\"16\" /></label><label class=\"rs-spacing-control-field\">Left (px)<input class=\"rs-spacing-control-input\" type=\"number\" value=\"24\" /></label></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "SpacingControl",
+        "Spacing inspector",
+        "Padding editor",
+        "Margin editor",
+        "Inset controls",
+        "Box model"
+      ],
+      "example": "import { SpacingControl } from \"@noorddev/vlak-react\";\n\n<SpacingControl label=\"Padding\" name=\"padding\" unit=\"px\" min={0} defaultValue={{ top: 16, right: 24, bottom: 16, left: 24 }} />",
+      "usage": {
+        "use": [
+          "Padding, margin, inset, or other four-sided numeric values in a caller-specified unit.",
+          "Link sides to apply the next edit to every side; linking alone preserves existing values.",
+          "value/defaultValue/onValueChange and linked/defaultLinked/onLinkedChange control the values and link state independently."
+        ],
+        "avoid": [
+          "Converting between units or assuming CSS semantics beyond the supplied numeric fields.",
+          "Treating cleared values as zero; a cleared side is null."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through four number inputs and the link action."
+        },
+        {
+          "keys": "Arrow up, Arrow down",
+          "does": "Uses native number stepping with supplied min, max, and step."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Toggles Link sides on the focused action."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the spacing group; each native number field includes its side and unit.",
+        "Link sides has a stable name and aria-pressed, plus text explaining the next-edit behavior.",
+        "Inputs and the link action have 44px targets; native bounds and step support form validation.",
+        "Named fields submit separately; reset restores uncontrolled values and link state. The ref reaches the fieldset."
+      ]
+    }
+  }
+}

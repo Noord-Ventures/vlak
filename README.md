@@ -1,6 +1,6 @@
 # Vlak
 
-Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 126 components ship as React, CSS, vendored StyleX source, and machine-readable data.
+Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 146 components ship as React, CSS, vendored StyleX source, and machine-readable data.
 
 [vlak.dev](https://vlak.dev) · [github.com/Noord-Ventures/vlak](https://github.com/Noord-Ventures/vlak)
 
@@ -60,7 +60,7 @@ Everything a coding agent needs is machine-readable and served from the same reg
 | Surface | Where |
 |---|---|
 | Index for language models | [vlak.dev/llms.txt](https://vlak.dev/llms.txt), [llms-full.txt](https://vlak.dev/llms-full.txt) |
-| One markdown page per component, tokens, and the guides | `vlak.dev/docs/<name>.md`, `/docs/tokens.md`, `/docs/guide.md`, `/docs/health.md` |
+| One markdown page per component, tokens, and the guides | `vlak.dev/docs/<name>.md`, `/docs/tokens.md`, `/docs/guide.md`, `/docs/health.md`, `/docs/civic.md`, `/docs/science.md`, `/docs/creative.md` |
 | shadcn registry items | `vlak.dev/r/<name>.json`, index at `/r/index.json` |
 | Props extracted from the types | `@noorddev/vlak/props` (JSON) |
 | CLI | `npx @noorddev/vlak-cli list --json`, `search <term> --json`, `docs <name>`, `tokens --json` |

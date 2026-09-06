@@ -30,12 +30,14 @@ export interface LabResultsProps extends Omit<React.HTMLAttributes<HTMLUListElem
 }
 
 const styles = stylex.create({
-  root: { listStyleType: "none", margin: 0, padding: 0, minWidth: 0, color: vlak.ink, lineHeight: 1.45 },
+  root: { listStyleType: "none", margin: 0, padding: 0, width: "100%", minWidth: 0, color: vlak.ink, lineHeight: 1.45 },
   item: { display: "grid", gap: "0.75rem", paddingBlock: "1rem", borderBottomWidth: vlak.hairline, borderBottomStyle: "solid", borderBottomColor: vlak.divider, overflowWrap: "anywhere" },
   head: { display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: "0.25rem 1rem" },
   name: { margin: 0, fontSize: "0.875rem", fontWeight: 600 },
   status: { margin: 0, fontSize: "0.75rem", color: vlak.gray },
-  reading: { margin: 0, fontSize: "1.25rem", fontVariantNumeric: "tabular-nums" },
+  reading: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "baseline", gap: "0.25rem 1rem", margin: 0, fontSize: "1.25rem", fontWeight: 500, lineHeight: 1.2, fontVariantNumeric: "tabular-nums" },
+  readingLabel: { fontSize: "0.875rem", lineHeight: 1.45 },
+  readingValue: { textAlign: "end", marginInlineStart: "auto" },
   unit: { fontSize: "0.875rem", color: vlak.gray },
   note: { margin: 0, fontSize: "0.875rem", maxWidth: "66ch" },
   time: { fontSize: "0.75rem", color: vlak.gray },
@@ -49,6 +51,8 @@ export const LabResults = React.forwardRef<HTMLUListElement, LabResultsProps>(fu
   const name = rs(["rs-lab-results-name"], styles.name);
   const statusStyle = rs(["rs-lab-results-status"], styles.status);
   const reading = rs(["rs-lab-results-reading"], styles.reading);
+  const readingLabel = rs(["rs-lab-results-reading-label"], styles.readingLabel);
+  const readingValue = rs(["rs-lab-results-reading-value"], styles.readingValue);
   const unit = rs(["rs-lab-results-unit"], styles.unit);
   const note = rs(["rs-lab-results-note"], styles.note);
   const time = rs(["rs-lab-results-time"], styles.time);
@@ -65,7 +69,7 @@ export const LabResults = React.forwardRef<HTMLUListElement, LabResultsProps>(fu
         <div {...head}><p {...name}>{result.name}</p><p {...statusStyle}>{labels[status]}{result.statusLabel != null && <> · {result.statusLabel}</>}</p></div>
         {showValue && hasRange && typeof result.value === "number"
           ? <ReferenceRange label="Result" value={result.value} minimum={result.minimum} maximum={result.maximum} unit={result.unit} rangeLabel={result.rangeLabel} />
-          : showValue && <p {...reading}>{result.value}{result.unit && <> <span {...unit}>{result.unit}</span></>}</p>}
+          : showValue && <p {...reading}><span {...readingLabel}>Result</span><span {...readingValue}>{result.value}{result.unit && <> <span {...unit}>{result.unit}</span></>}</span></p>}
         {status === "amended" && !hasValue && <p {...note}>Result unavailable</p>}
         {(result.dateTime || result.timeLabel) && <time {...time} dateTime={result.dateTime}>{result.timeLabel ?? result.dateTime}</time>}
         {result.note != null && <div {...note}>{result.note}</div>}

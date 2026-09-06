@@ -91,8 +91,32 @@ const healthCases: Record<string, Case> = {
   CarePlan: { props: { tasks: [{ id: "visit", title: "Confirm the next visit", owner: "Robin Ellis", dueLabel: "17 September", status: "Open", completed: false }], onCompletedChange: noop }, tag: "div" },
 };
 
+const domainCases: Record<string, Case> = {
+  ActivityRings: { props: { label: "Personal goals", goals: [{ id: "walk", label: "Walking", current: 18, target: 30, unit: "minutes" }] }, tag: "figure" },
+  IdentityDocument: { props: { documentTitle: "Residence document", holderName: "Robin Ellis", maskedIdentifier: "•••• 2048", status: "Verification pending" }, tag: "div" },
+  TaxSummary: { props: { label: "Annual assessment", periodLabel: "2025", status: "Provisional", items: [{ id: "assessment", label: "Assessed amount", amount: "€ 240.00" }], totals: [{ id: "payable", label: "Amount payable", amount: "€ 240.00" }] }, tag: "div" },
+  BenefitProgram: { props: { programName: "Community project grant", status: "Applications open", eligibility: "Not assessed", criteria: [{ id: "location", label: "Project location", status: "Not reviewed" }] }, tag: "div" },
+  ApplicationStatus: { props: { applicationTitle: "Grant application", reference: "Example 204", status: "Under review", milestones: [{ id: "review", label: "Evidence review", status: "In progress", current: true }] }, tag: "div" },
+  EvidenceChecklist: { props: { label: "Application evidence", items: [{ id: "address", label: "Proof of address", status: "Awaiting review", fileName: "Example-address.pdf", actions: [{ id: "view", label: "View record" }] }], onAction: noop }, tag: "div" },
+  MeasurementValue: { props: { label: "Sample mass", value: "2.400", unit: "g", uncertainty: 0.001, source: "Example balance" }, tag: "div" },
+  QuantityField: { props: { label: "Sample quantity", units: [{ value: "g", label: "Grams" }], defaultValue: { amount: 2.4, unit: "g" } }, tag: "fieldset" },
+  WellPlate: { props: { label: "Example plate", rows: ["A", "B"], columns: ["1", "2"], wells: [{ row: "A", column: "1", status: "Recorded", label: "Sample 01" }], onValueChange: noop }, tag: "div" },
+  ExperimentRun: { props: { label: "Sample preparation", runId: "Example 204", status: "Paused", steps: [{ id: "prepare", label: "Prepare sample", status: "Awaiting operator", actions: [{ id: "resume", label: "Request resume" }] }], onAction: noop }, tag: "div" },
+  SpectrumPlot: { props: { label: "Recorded spectrum", xLabel: "Wavelength", yLabel: "Intensity", xUnit: "nm", points: [{ x: 400, y: 0.2 }, { x: 500, y: 0.6 }, { x: 600, y: 0.3 }] }, tag: "figure" },
+  AudioMeter: { props: { label: "Output levels", channels: [{ id: "left", label: "Left", level: -18, peak: -6 }, { id: "right", label: "Right", level: -20, peak: -8 }] }, tag: "div" },
+  ChannelStrip: { props: { label: "Dialogue", defaultValue: { gain: -6, pan: 0, muted: false, solo: false } }, tag: "fieldset" },
+  ParameterKnob: { props: { label: "Mix", defaultValue: 40, min: 0, max: 100, unit: "%" }, tag: "input" },
+  TimecodeField: { props: { label: "In point", frameRate: 25, defaultValue: "00:01:12:10" }, tag: "input" },
+  ClipTimeline: { props: { label: "Edit timeline", tracks: [{ id: "video", label: "Video" }], clips: [{ id: "opening", trackId: "video", label: "Opening", start: 0, duration: 5 }], duration: 30, unit: "seconds", position: 2, onSeek: noop, onSelectClip: noop }, tag: "div" },
+  RenderQueue: { props: { label: "Export queue", jobs: [{ id: "draft", label: "Draft export", status: "rendering", progress: 25 }], onCancel: noop }, tag: "div" },
+  LayerStack: { props: { label: "Document layers", layers: [{ id: "title", label: "Title", visible: true, locked: false }], selectedId: "title", onSelect: noop, onLayersChange: noop }, tag: "div" },
+  ColorInspector: { props: { label: "Fill", defaultValue: { hex: "#808080", alpha: 1 } }, tag: "fieldset" },
+  SpacingControl: { props: { label: "Padding", defaultValue: { top: 8, right: 12, bottom: 8, left: 12 }, unit: "px" }, tag: "fieldset" },
+};
+
 const cases: Record<string, Case> = {
   ...healthCases,
+  ...domainCases,
   NumberField: { props: { label: "Count" }, tag: "input" },
   RangeSlider: { props: { label: "Range" }, tag: "fieldset" },
   MultiSelect: { props: { options: option, label: "Cities" }, tag: "fieldset" },
@@ -325,7 +349,7 @@ describe("ref forwarding", () => {
     });
   }
 
-  for (const [name, { props = {} }] of Object.entries(healthCases)) {
+  for (const [name, { props = {} }] of Object.entries({ ...healthCases, ...domainCases })) {
     it(`${name} preserves native root attributes and merges consumer styles`, () => {
       const Component = exportsByName[name] as React.ComponentType<AnyProps & React.RefAttributes<Element>>;
       const ref = React.createRef<HTMLElement>();

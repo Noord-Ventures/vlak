@@ -231,7 +231,7 @@
 .sc-wall-note > .if-face { margin-top: 8px; }
 .sc-wall-note > span > b { display: flex; align-items: center; min-height: 44px; }
 .sc-wall-comment-dock { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--divider); padding: 12px; }
-.sc-wall-comment-dock input { min-width: 0; flex: 1; font-size: 16px; }
+.sc-wall-comment-dock > input { min-width: 0; flex: 1; min-height: var(--hit); height: var(--control-h); padding-block: 8px; font-size: 16px; line-height: 1.45; }
 .sc-wall-comment-dock button { flex-shrink: 0; }
 
 @container (max-width: 900px) {
