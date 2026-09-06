@@ -55,7 +55,10 @@ const escapeHtml = (s) =>
 				c
 			],
 	);
-async function verifyMaster(file) {
+async function verifyMaster(
+	file,
+	{ width = 1920, height = 1080, fps = 30, frames: expectedFrames = 1200 } = {},
+) {
 	const ffmpeg = process.env.VLAK_FFMPEG ?? "ffmpeg";
 	const decoded = await new Promise((resolve, reject) => {
 		const process = spawn(
@@ -95,8 +98,10 @@ async function verifyMaster(file) {
 			);
 			if (
 				code !== 0 ||
-				frames !== 1200 ||
-				!diagnostic.match(/Video: h264[^\n]*1920x1080[^\n]*30 fps/) ||
+				frames !== expectedFrames ||
+				!diagnostic.match(
+					new RegExp(`Video: h264[^\\n]*${width}x${height}[^\\n]*${fps} fps`),
+				) ||
 				!diagnostic.match(/Audio: aac[^\n]*48000 Hz, stereo/)
 			)
 				return reject(
@@ -163,49 +168,68 @@ for (const item of interfaces) {
 		browserFrame,
 	});
 }
-let feature = null;
-const featureName = "vlak-prompt-to-interface";
-try {
-	await Promise.all(
-		[".mp4", "-cover.png", ".json"].map((suffix) =>
-			stat(path.join(featureSource, featureName + suffix)),
-		),
-	);
-	const report = JSON.parse(
-		await readFile(path.join(featureSource, featureName + ".json"), "utf8"),
-	);
-	if (
-		report.width !== 1920 ||
-		report.height !== 1080 ||
-		report.fps !== 30 ||
-		report.duration !== 40 ||
-		report.frames !== 1200 ||
-		!report.audio ||
-		report.partial ||
-		report.finalState?.warnings?.length
-	)
-		throw new Error("Incomplete featured master: prompt-to-interface");
-	const original = path.join(featureSource, featureName + ".mp4");
-	feature = {
-		slug: "prompt-to-interface",
-		title: "Prompt to interface",
-		description:
-			"A prompt becomes an agent workspace, with an original electronic crescendo.",
-		file: `prompt-to-interface/${featureName}.mp4`,
-		cover: `prompt-to-interface/${featureName}-cover.png`,
-		report: `prompt-to-interface/${featureName}.json`,
-		bytes: (await stat(original)).size,
-		...(await verifyMaster(original)),
-		duration: 40,
-		width: 1920,
-		height: 1080,
-		fps: 30,
-		audio: "AAC stereo, 48 kHz",
-		sound: "Original electronic score and Cuelume 0.2.2",
-	};
-} catch (error) {
-	if (error.code !== "ENOENT") throw error;
+async function readFeature({ name, slug, title, format, width, height }) {
+	try {
+		await Promise.all(
+			[".mp4", "-cover.png", ".json"].map((suffix) =>
+				stat(path.join(featureSource, name + suffix)),
+			),
+		);
+		const report = JSON.parse(
+			await readFile(path.join(featureSource, name + ".json"), "utf8"),
+		);
+		if (
+			report.width !== width ||
+			report.height !== height ||
+			report.fps !== 30 ||
+			report.duration !== 40 ||
+			report.frames !== 1200 ||
+			!report.audio ||
+			report.partial ||
+			report.finalState?.warnings?.length
+		)
+			throw new Error(`Incomplete featured master: ${slug}`);
+		const original = path.join(featureSource, name + ".mp4");
+		return {
+			slug,
+			title,
+			format,
+			description:
+				"A prompt becomes a working agent interface, with an original drone score.",
+			file: `prompt-to-interface/${name}.mp4`,
+			cover: `prompt-to-interface/${name}-cover.png`,
+			report: `prompt-to-interface/${name}.json`,
+			bytes: (await stat(original)).size,
+			...(await verifyMaster(original, { width, height })),
+			duration: 40,
+			width,
+			height,
+			fps: 30,
+			audio: "AAC stereo, 48 kHz",
+			sound: "Original drone score and Cuelume 0.2.2",
+		};
+	} catch (error) {
+		if (error.code !== "ENOENT") throw error;
+		return null;
+	}
 }
+const feature = await readFeature({
+	name: "vlak-prompt-to-interface",
+	slug: "prompt-to-interface",
+	title: "Prompt to interface",
+	format: "landscape",
+	width: 1920,
+	height: 1080,
+});
+const featureReel = await readFeature({
+	name: "vlak-prompt-to-interface-reel",
+	slug: "prompt-to-interface-reel",
+	title: "Prompt to interface · Reel",
+	format: "reel",
+	width: 1080,
+	height: 1920,
+});
+const featuredFilms = [feature, featureReel].filter(Boolean);
 // Validate every source before replacing any served file. Never fall back to
 // the old, unframed agent export or discard other review-gallery artifacts.
 await mkdir(output, { recursive: true });
@@ -246,8 +270,9 @@ if (source !== output) {
 		}
 	}
 }
-if (feature) {
+for (const item of featuredFilms) {
 	await mkdir(path.join(output, "prompt-to-interface"), { recursive: true });
+	const featureName = path.basename(item.file, ".mp4");
 	for (const suffix of [".mp4", "-cover.png", ".json"]) {
 		const filename = featureName + suffix,
 			origin = path.join(featureSource, filename),
@@ -255,7 +280,7 @@ if (feature) {
 		if (origin === destination) continue;
 		if (suffix === ".json") {
 			const report = JSON.parse(await readFile(origin, "utf8"));
-			report.file = path.join(output, feature.file);
+			report.file = path.join(output, item.file);
 			await atomicWrite(destination, JSON.stringify(report, null, 2) + "\n");
 		} else {
 			const temporary = `${destination}.incoming-${process.pid}`;
@@ -282,6 +307,7 @@ const manifest = {
 	created: new Date().toISOString(),
 	interfaces: entries,
 	...(feature ? { feature } : {}),
+	...(featureReel ? { featureReel } : {}),
 	soundSource: {
 		url: "https://cuelume.dev/",
 		version: "0.2.2",
@@ -292,12 +318,12 @@ await atomicWrite(
 	path.join(output, "manifest.json"),
 	JSON.stringify(manifest, null, 2) + "\n",
 );
-const featuredHtml = feature
-	? `<section class="featured" id="prompt-to-interface" aria-labelledby="featured-title"><div class="caption"><h2 id="featured-title">${escapeHtml(feature.title)}</h2><span class="number">Featured film</span></div><p class="workflow">${escapeHtml(feature.description)}</p><video controls playsinline preload="none" poster="${feature.cover}?v=${feature.sha256.slice(0, 12)}" aria-label="Prompt to interface film"><source src="${feature.file}?v=${feature.sha256.slice(0, 12)}" type="video/mp4"></video><div class="file"><span>40 seconds · 1080p · Sound on</span><a href="${feature.file}" download>Download MP4 ↗</a></div></section>`
+const featuredHtml = featuredFilms.length
+	? `<section class="featured" id="prompt-to-interface" aria-labelledby="featured-title"><div class="caption"><h2 id="featured-title">Prompt to interface</h2><span class="number">Featured film</span></div><p class="workflow">${escapeHtml(featuredFilms[0].description)}</p><div class="featured-previews${featuredFilms.length === 1 ? " is-single" : ""}">${featuredFilms.map((item) => `<div class="feature-preview" data-format="${item.format}" style="--film-aspect:${item.width}/${item.height}"><h3>${item.format === "reel" ? "Instagram Reel · 9:16" : "Landscape · 16:9"}</h3><video controls playsinline preload="none" poster="${item.cover}?v=${item.sha256.slice(0, 12)}" aria-label="${escapeHtml(item.title)} film"><source src="${item.file}?v=${item.sha256.slice(0, 12)}" type="video/mp4"></video><div class="file"><span>40 seconds · ${item.width}×${item.height}</span><a href="${item.file}" download>${item.format === "reel" ? "Download Reel" : "Download MP4"} ↗</a></div></div>`).join("")}</div></section>`
 	: "";
 const html = `<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vlak · Interface films</title><link rel="stylesheet" href="assets/vlak-react.css"><link rel="stylesheet" href="assets/components.css"><style>
-*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text)}html::before{display:none}body{padding:48px clamp(20px,4vw,80px) 64px}header{display:flex;align-items:end;justify-content:space-between;gap:32px;padding-bottom:40px}h1{font-size:clamp(64px,9vw,144px);font-weight:500;line-height:.9;letter-spacing:-.065em;margin:0}header p{margin:20px 0 0;color:var(--text-secondary);font-size:18px}a{color:inherit;text-decoration-thickness:1px;text-underline-offset:5px}header>a{font-size:16px;white-space:nowrap}nav{display:flex;flex-wrap:wrap;gap:12px 24px;border-top:1px solid var(--divider);padding:20px 0 28px}nav a{font-size:14px}.featured{border:1px solid var(--divider);padding:24px;margin-bottom:40px;scroll-margin-top:24px}.featured video{max-width:1120px;margin-inline:auto}.films{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--divider);border-left:1px solid var(--divider)}article{min-width:0;border-right:1px solid var(--divider);border-bottom:1px solid var(--divider);padding:24px;scroll-margin-top:24px}.caption{display:flex;justify-content:space-between;gap:20px;align-items:baseline}h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.025em}.number{color:var(--text-secondary);font-size:14px;font-variant-numeric:tabular-nums}.workflow{min-height:36px;margin:12px 0 18px;color:var(--text-secondary);font-size:14px;line-height:1.5}video{display:block;width:100%;aspect-ratio:16/9;background:var(--bg)}.file{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:16px;font-size:13px}.file span{color:var(--text-secondary)}footer{display:flex;gap:20px;justify-content:space-between;padding-top:28px;color:var(--text-secondary);font-size:13px}@media(max-width:760px){body{padding-top:28px}header{align-items:start;flex-direction:column;gap:24px}.films{grid-template-columns:1fr}article{padding:20px}.workflow{min-height:0}footer{flex-direction:column}}
-</style></head><body><header><div><h1>Vlak.dev</h1><p>${entries.length} interfaces. Built in motion.</p></div><a id="download-all" href="Vlak-interface-films.zip" download>Download all ${entries.length + (feature ? 1 : 0)} films ↗</a></header>${featuredHtml}<nav aria-label="Choose an interface">${entries.map((item) => `<a href="#${item.slug}">${escapeHtml(item.title)}</a>`).join("")}</nav><main class="films">${entries.map((item, index) => `<article id="${item.slug}"><div class="caption"><h2>${escapeHtml(item.title)}</h2><span class="number">${String(index + 1).padStart(2, "0")}</span></div><p class="workflow">${escapeHtml(item.workflow)}</p><video controls playsinline preload="none" poster="${item.cover}?v=${item.sha256.slice(0, 12)}" aria-label="${escapeHtml(item.title)} film"><source src="${item.file}?v=${item.sha256.slice(0, 12)}" type="video/mp4"></video><div class="file"><span>40 seconds · 1080p · Sound on</span><a href="${item.file}" download>Download MP4 ↗</a></div></article>`).join("")}</main><footer><span>Original Vlak components and native interface interactions.</span><span>Sound effects by <a href="https://cuelume.dev/">Cuelume</a></span></footer><script>const archive=document.getElementById('download-all');if(location.protocol==='file:')archive.hidden=true;else fetch(archive.href,{method:'HEAD'}).then(response=>{if(!response.ok)archive.hidden=true;}).catch(()=>{archive.hidden=true;});document.addEventListener('play',event=>{if(event.target.tagName==='VIDEO')for(const video of document.querySelectorAll('video'))if(video!==event.target)video.pause();},true);</script></body></html>`;
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text)}html::before{display:none}body{padding:48px clamp(20px,4vw,80px) 64px}header{display:flex;align-items:end;justify-content:space-between;gap:32px;padding-bottom:40px}h1{font-size:clamp(64px,9vw,144px);font-weight:500;line-height:.9;letter-spacing:-.065em;margin:0}header p{margin:20px 0 0;color:var(--text-secondary);font-size:18px}a{color:inherit;text-decoration-thickness:1px;text-underline-offset:5px}header>a{font-size:16px;white-space:nowrap}nav{display:flex;flex-wrap:wrap;gap:12px 24px;border-top:1px solid var(--divider);padding:20px 0 28px}nav a{font-size:14px}.featured{border:1px solid var(--divider);padding:24px;margin-bottom:40px;scroll-margin-top:24px}.featured-previews{display:grid;grid-template-columns:minmax(0,16fr) minmax(180px,5.0625fr);gap:24px;max-width:1440px;margin-inline:auto;align-items:start}.feature-preview{min-width:0}.feature-preview h3{margin:0 0 12px;font-size:15px;font-weight:500}.feature-preview video{aspect-ratio:var(--film-aspect)}.feature-preview .file{flex-wrap:wrap;row-gap:8px}.featured-previews.is-single{display:block;max-width:1120px}.is-single .feature-preview[data-format="reel"]{max-width:360px;margin-inline:auto}.films{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--divider);border-left:1px solid var(--divider)}article{min-width:0;border-right:1px solid var(--divider);border-bottom:1px solid var(--divider);padding:24px;scroll-margin-top:24px}.caption{display:flex;justify-content:space-between;gap:20px;align-items:baseline}h2{margin:0;font-size:22px;font-weight:500;letter-spacing:-.025em}.number{color:var(--text-secondary);font-size:14px;font-variant-numeric:tabular-nums}.workflow{min-height:36px;margin:12px 0 18px;color:var(--text-secondary);font-size:14px;line-height:1.5}video{display:block;width:100%;aspect-ratio:16/9;background:var(--bg)}.file{display:flex;justify-content:space-between;gap:12px;align-items:baseline;margin-top:16px;font-size:13px}.file span{color:var(--text-secondary)}footer{display:flex;gap:20px;justify-content:space-between;padding-top:28px;color:var(--text-secondary);font-size:13px}@media(max-width:760px){body{padding-top:28px}header{align-items:start;flex-direction:column;gap:24px}.films{grid-template-columns:1fr}.featured{padding:20px}.featured-previews{grid-template-columns:1fr;gap:28px}.feature-preview[data-format="reel"]{width:min(100%,320px);justify-self:center}article{padding:20px}.workflow{min-height:0}footer{flex-direction:column}}
+</style></head><body><header><div><h1>Vlak.dev</h1><p>${entries.length} interfaces. Built in motion.</p></div><a id="download-all" href="Vlak-interface-films.zip" download>Download all ${entries.length + featuredFilms.length} films ↗</a></header>${featuredHtml}<nav aria-label="Choose an interface">${entries.map((item) => `<a href="#${item.slug}">${escapeHtml(item.title)}</a>`).join("")}</nav><main class="films">${entries.map((item, index) => `<article id="${item.slug}"><div class="caption"><h2>${escapeHtml(item.title)}</h2><span class="number">${String(index + 1).padStart(2, "0")}</span></div><p class="workflow">${escapeHtml(item.workflow)}</p><video controls playsinline preload="none" poster="${item.cover}?v=${item.sha256.slice(0, 12)}" aria-label="${escapeHtml(item.title)} film"><source src="${item.file}?v=${item.sha256.slice(0, 12)}" type="video/mp4"></video><div class="file"><span>40 seconds · 1080p · Sound on</span><a href="${item.file}" download>Download MP4 ↗</a></div></article>`).join("")}</main><footer><span>Original Vlak components and native interface interactions.</span><span>Sound effects by <a href="https://cuelume.dev/">Cuelume</a></span></footer><script>const archive=document.getElementById('download-all');if(location.protocol==='file:')archive.hidden=true;else fetch(archive.href,{method:'HEAD'}).then(response=>{if(!response.ok)archive.hidden=true;}).catch(()=>{archive.hidden=true;});document.addEventListener('play',event=>{if(event.target.tagName==='VIDEO')for(const video of document.querySelectorAll('video'))if(video!==event.target)video.pause();},true);</script></body></html>`;
 await atomicWrite(path.join(output, "index.html"), html);
 const temporaryArchive = path.join(
 	output,
@@ -314,7 +340,7 @@ await new Promise((resolve, reject) => {
 			"manifest.json",
 			"assets",
 			...entries.flatMap((item) => [item.file, item.cover, item.report]),
-			...(feature ? [feature.file, feature.cover, feature.report] : []),
+			...featuredFilms.flatMap((item) => [item.file, item.cover, item.report]),
 		],
 		{ cwd: output, stdio: ["ignore", "ignore", "pipe"] },
 	);
@@ -335,6 +361,7 @@ console.log(
 			archive,
 			count: entries.length,
 			feature: feature?.file ?? null,
+			featureReel: featureReel?.file ?? null,
 			bytes: (await stat(archive)).size,
 		},
 		null,

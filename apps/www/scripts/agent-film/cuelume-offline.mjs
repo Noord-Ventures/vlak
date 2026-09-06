@@ -132,6 +132,7 @@ export async function writeCuelumeScore(file, cues, duration, { bedGain = 0.0028
 		return { file, version: cuelumeVersion, peak: result.peak, rms: result.rms, cues: result.cues, rate: result.rate, length: result.length };
 	} finally {
 		await browser?.close();
+		server.closeAllConnections();
 		await new Promise((resolve) => server.close(resolve));
 	}
 }

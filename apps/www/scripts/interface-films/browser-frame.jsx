@@ -96,9 +96,18 @@ export function createBrowserFrame({
 	flushSync(() => root.render(<BrowserChrome slug={slug} title={title} />));
 	let last = null;
 	return {
-		layout({ time, scale, screenY }) {
-			const left = 960 - (width * scale) / 2,
-				top = screenY - (height * scale) / 2;
+		layout({
+			time,
+			scale,
+			screenY,
+			screenX = 960,
+			x = width / 2,
+			y = height / 2,
+		}) {
+			// Move the browser and its original content as one camera subject.
+			// Centered defaults retain the established fixed-viewport framing.
+			const left = screenX - x * scale,
+				top = screenY - y * scale;
 			shell.style.left = `${left - 1}px`;
 			shell.style.top = `${top - toolbarHeight * scale - 1}px`;
 			shell.style.width = `${width * scale}px`;

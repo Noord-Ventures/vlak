@@ -8,7 +8,8 @@ import {
 	CardTitle,
 	Callout,
 	Icon,
-	MessageComposer,
+	Textarea,
+	Button,
 	Spinner,
 } from "@noorddev/vlak-react";
 import "../agent-film/film.jsx";
@@ -35,6 +36,8 @@ const spring = (value) => {
 };
 const raf = () => new Promise((resolve) => requestAnimationFrame(resolve));
 const world = document.getElementById("world");
+const reel = window.agentFilmFormat === "reel";
+const frameWidth = reel ? 1080 : 1920;
 function layer(name) {
 	const element = document.createElement("div");
 	element.id = name;
@@ -72,26 +75,39 @@ function Conversation() {
 	}, []);
 	return (
 		<Card style={{ width: 560, maxWidth: "none" }}>
-			<CardLabel>Vlak assistant</CardLabel>
 			{!submitted ? (
-				<>
-					<CardTitle>What would you like to build?</CardTitle>
-					<MessageComposer
-						label="Prompt"
+				<form
+					aria-label="Message"
+					style={{ display: "flex", flexDirection: "column", gap: 12 }}
+					onSubmit={(event) => {
+						event.preventDefault();
+						if (!draft.trim()) return;
+						setSubmitted(draft.trim());
+						events.push({
+							id: "send-prompt",
+							time: beats.send,
+							text: draft.trim(),
+						});
+					}}
+				>
+					<Textarea
+						aria-label="Message"
 						value={draft}
-						onValueChange={setDraft}
-						onSend={({ text }) => {
-							setSubmitted(text);
-							events.push({ id: "send-prompt", time: beats.send, text });
-						}}
-						sendOnEnter
-						placeholder="Describe an interface…"
+						onChange={(event) => setDraft(event.target.value)}
+						placeholder=""
 					/>
-				</>
+					<Button
+						type="submit"
+						disabled={!draft.trim()}
+						style={{ alignSelf: "flex-end", width: "auto", paddingInline: 14 }}
+					>
+						<Icon name="send" />
+						Send
+					</Button>
+				</form>
 			) : (
 				<>
 					<Callout>
-						<CardLabel>You</CardLabel>
 						<CardBody>{submitted}</CardBody>
 					</Callout>
 					<div style={{ marginTop: 24 }}>
@@ -101,10 +117,7 @@ function Conversation() {
 								<CardBody>Thinking through the interface…</CardBody>
 							</div>
 						) : (
-							<>
-								<CardLabel>Vlak assistant</CardLabel>
-								<CardBody>{reply}</CardBody>
-							</>
+							<CardBody>{reply}</CardBody>
 						)}
 					</div>
 				</>
@@ -112,6 +125,7 @@ function Conversation() {
 		</Card>
 	);
 }
+
 function nativeType(value) {
 	const textarea = chat.querySelector("textarea");
 	if (!textarea) throw Error("Native Vlak prompt missing");
@@ -157,7 +171,7 @@ function matchAction(action) {
 }
 function point(element) {
 	const bounds = element.getBoundingClientRect(),
-		scale = innerWidth / 1920;
+		scale = innerWidth / frameWidth;
 	return {
 		x: (bounds.x + bounds.width * 0.62) / scale,
 		y: (bounds.y + bounds.height * 0.6) / scale,
@@ -205,24 +219,17 @@ async function step(frame) {
 	time = frame / 30;
 	if (time < last) await mountChat();
 	await agentFilm.step(storyToSource(time) * 30);
+	world.style.transform = `scale(${innerWidth / frameWidth})`;
 	const shell = document.querySelector('[data-film-browser="agents"]');
-	const constructing = time >= beats.construct,
-		entrance = spring((time - beats.construct) * 1.1),
-		finish = ease((time - beats.payoff) / 0.8);
+	const constructing = time >= beats.construct;
+	const entrance = spring((time - beats.construct) * 1.1);
+	const finish = ease((time - beats.payoff) / 0.9);
 	shell.style.visibility = constructing ? "visible" : "hidden";
 	shell.style.transformOrigin = "50% 50%";
-	shell.style.transform = "";
-	const base = shell.getBoundingClientRect(),
-		worldScale = innerWidth / 1920,
-		shellScale = mix(0.94, 1, entrance) * mix(1, 0.82, finish);
-	const naturalTop =
-		(base.top + (base.height * (1 - shellScale)) / 2) / worldScale;
-	const clearTop = Math.max(
-		naturalTop,
-		mix(base.top / worldScale, 280, finish),
-	);
-	shell.style.transform = `translateY(${85 * (1 - entrance) + clearTop - naturalTop}px) scale(${shellScale})`;
-	if (!constructing) shell.style.opacity = "0";
+	shell.style.transform = `translateY(${85 * (1 - entrance)}px) scale(${mix(0.94, 1, entrance) * mix(1, 0.97, finish)})`;
+	shell.style.opacity = constructing
+		? String(ease((time - beats.construct) / 0.16) * mix(1, 0.22, finish))
+		: "0";
 	document.getElementById("film-type").style.display = "none";
 	const count = Math.round(
 		prompt.length *
@@ -259,9 +266,9 @@ async function step(frame) {
 		chatEnter = spring(time - 0.12);
 	center(
 		chat,
-		1.9 * mix(0.9, 1, chatEnter) * mix(1, 0.91, chatExit),
-		960 - 170 * chatExit,
-		515 - 24 * chatExit,
+		(reel ? 1.65 : 1.9) * mix(0.9, 1, chatEnter) * mix(1, 0.91, chatExit),
+		frameWidth / 2 - (reel ? 90 : 170) * chatExit,
+		(reel ? 870 : 515) - 24 * chatExit,
 	);
 	sceneOpacity(chat, ease(time / 0.28) * (1 - chatExit));
 	const sendButton = chat.querySelector('button[type="submit"]');
@@ -285,9 +292,23 @@ async function step(frame) {
 		flushSync(() =>
 			tourRoot.render(
 				index < 0 ? null : (
-					<Card style={{ width: 760, maxWidth: "none" }}>
+					<Card
+						style={{
+							width: reel ? 360 : 1280,
+							maxWidth: "none",
+							display: reel ? "block" : "flex",
+							alignItems: "center",
+							gap: 16,
+						}}
+					>
 						<CardLabel
-							style={{ display: "flex", gap: 8, alignItems: "center" }}
+							style={{
+								display: "flex",
+								gap: 8,
+								alignItems: "center",
+								marginBottom: reel ? 6 : 0,
+								flexShrink: 0,
+							}}
 						>
 							<Icon name="message" size={12} /> Vlak assistant
 						</CardLabel>
@@ -303,15 +324,39 @@ async function step(frame) {
 			fade =
 				ease((time - item.start) / 0.25) *
 				(1 - ease((time - (item.end - 0.22)) / 0.22));
-		center(tour, 1.3, 960, 1040 + 8 * (1 - fade));
+		center(
+			tour,
+			reel ? 2 : 1.2,
+			frameWidth / 2,
+			(reel ? 1570 : 1058) + 8 * (1 - fade),
+		);
 		sceneOpacity(tour, fade);
 	} else sceneOpacity(tour, 0);
-	const endEnter = ease((time - (beats.payoff + 0.8)) / 0.6);
-	center(payoffLabel, 2.3, 960, 66 - 15 * (1 - endEnter));
-	sceneOpacity(payoffLabel, endEnter);
-	const wordEnter = spring(time - (beats.payoff + 1));
-	center(payoff, 7.6, 960, 200 + 30 * (1 - wordEnter));
-	sceneOpacity(payoff, ease((time - (beats.payoff + 1)) / 0.5));
+	// The closing words intentionally overprint the whole interface. Short,
+	// irregular cut-ins give the payoff a graphic flash, then a readable hold.
+	const titleTime = time - beats.payoff;
+	const flashes = [
+		[0, 0.1],
+		[0.16, 0.38],
+		[0.44, 0.58],
+		[0.68, 2.5],
+		[2.62, 4.1],
+		[4.2, 8.2],
+	];
+	const flash = flashes.some(
+		([start, end]) => titleTime >= start && titleTime < end,
+	)
+		? 1
+		: 0;
+	const jitter =
+		titleTime < 0.68
+			? [0, -8, 6, 0][Math.floor(Math.max(0, titleTime) * 30) % 4]
+			: 0;
+	const textScale = reel ? 7.8 : 10.2;
+	payoffLabel.style.transform = `translate(${(reel ? 60 : 64) + jitter}px,${reel ? 320 : 165}px) scale(${textScale})`;
+	payoff.style.transform = `translate(${(reel ? 53 : 55) - jitter}px,${reel ? 1220 : 595}px) scale(${reel ? 13.1 : 23})`;
+	sceneOpacity(payoffLabel, flash);
+	sceneOpacity(payoff, flash);
 	pointer(time);
 	document.activeElement?.blur?.();
 	document.scrollingElement.scrollTop = 0;
@@ -328,7 +373,18 @@ window.film = { ready: false, error: null };
 		}
 		agentFilm = window.agentFilm;
 		flushSync(() => {
-			labelRoot.render(<CardBody>Generate instant interface with</CardBody>);
+			labelRoot.render(
+				<div>
+					{(reel
+						? ["Generate", "instant", "interface", "with"]
+						: ["Generate instant", "interface with"]
+					).map((line) => (
+						<CardTitle key={line} style={{ whiteSpace: "nowrap" }}>
+							{line}
+						</CardTitle>
+					))}
+				</div>,
+			);
 			payoffRoot.render(<CardTitle>Vlak.dev</CardTitle>);
 			cursorRoot.render(
 				<Icon
@@ -352,6 +408,9 @@ window.film = { ready: false, error: null };
 				narrative:
 					"Prompt → thinking → reply → browser assembly → AI walkthrough → payoff",
 				browserFrame: true,
+				format: reel ? "reel" : "landscape",
+				wholeBrowserCamera: true,
+				visiblePromptLabels: false,
 				constructionSeconds: beats.assembled - beats.construct,
 			},
 			inspect: () => ({
@@ -362,6 +421,7 @@ window.film = { ready: false, error: null };
 				events,
 				agentInterface: agentFilm.inspect(),
 				payoff: "Generate instant interface with Vlak.dev",
+				payoffStyle: "Oversized left-aligned flashing overprint",
 			}),
 			dispose: () => {
 				agentFilm.dispose?.();

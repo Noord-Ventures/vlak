@@ -58,10 +58,11 @@ const output = path.resolve(
 		path.join(homedir(), "Movies/Vlak/prompt-to-interface"),
 );
 const proof = process.argv.includes("--proof");
+const reel = process.argv.includes("--reel");
 const stills = process.argv.includes("--stills");
 const sound = process.argv.includes("--sound") && !stills;
-const width = proof ? 960 : 1920,
-	height = proof ? 540 : 1080;
+const width = reel ? (proof ? 540 : 1080) : proof ? 960 : 1920,
+	height = reel ? (proof ? 960 : 1920) : proof ? 540 : 1080;
 const fps = 30;
 const limitIndex = process.argv.findIndex(
 	(arg) => arg === "--limit-frames" || arg.startsWith("--limit-frames="),
@@ -81,6 +82,7 @@ const frames = limit,
 const partial = frames < fps * filmDuration;
 const name =
 	"vlak-prompt-to-interface" +
+	(reel ? "-reel" : "") +
 	(proof ? "-proof" : "") +
 	(partial ? "-partial" : "");
 const file = path.join(output, name + ".mp4");
@@ -108,14 +110,14 @@ await stat(path.join(filmRoot, "film.jsx"));
 const html = `<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><title>Vlak · Agent management</title>
 <link rel="stylesheet" href="/css/vlak-react.css"><link rel="stylesheet" href="/core-components.css"><link rel="stylesheet" href="/agent-scene.css"><style>
 html::before{display:none}html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:var(--bg)}
-#world{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0}
+#world{position:absolute;left:0;top:0;width:${reel ? 1080 : 1920}px;height:${reel ? 1920 : 1080}px;transform-origin:0 0}
 #agent-camera{position:absolute;left:0;top:0;transform-origin:0 0}
 #agent-interface{width:1180px;height:772px;zoom:3;container-type:inline-size;transform-origin:0 0}
 #film-type{position:absolute;left:0;top:0;width:1920px;height:1080px;pointer-events:none;color:var(--text)}
 #film-name{position:absolute;left:72px;top:64px;font-size:22px;letter-spacing:-.025em;line-height:1.2}
 #film-wordmark{position:absolute;left:72px;top:55px;font-size:116px;line-height:1;letter-spacing:-.055em}
 #film-path{position:absolute;right:72px;top:145px;font-size:20px;line-height:1.2;color:var(--text-secondary)}
-</style></head><body><div id="world"><div id="agent-camera"><div id="agent-interface"></div></div><div id="film-type"><div id="film-name">Agent management</div><div id="film-wordmark">Vlak.dev</div><div id="film-path">/interfaces/agents</div></div></div><script>window.agentFilmTarget="agentFilm";</script><script src="/bundle.js"></script></body></html>`;
+</style></head><body><div id="world"><div id="agent-camera"><div id="agent-interface"></div></div><div id="film-type"><div id="film-name">Agent management</div><div id="film-wordmark">Vlak.dev</div><div id="film-path">/interfaces/agents</div></div></div><script>window.agentFilmTarget="agentFilm";window.agentFilmCamera="browser";window.agentFilmFormat=${JSON.stringify(reel ? "reel" : "landscape")};</script><script src="/bundle.js"></script></body></html>`;
 
 const types = {
 	".css": "text/css",

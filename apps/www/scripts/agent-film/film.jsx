@@ -97,22 +97,53 @@ function interpolate(a, b, time, start, end) {
 function cameraPose(time) {
 	const full = { cropLeft: 0, cropTop: 0, cropRight: 0, cropBottom: 0 },
 		panel = { cropLeft: 280, cropTop: 148, cropRight: 0, cropBottom: 30 };
-	const wide = {
-		x: width / 2,
-		y: height / 2,
-		scale: 1.14,
-		screenY: 560,
-		...full,
-	};
-	const detail = { x: 730, y: 446, scale: 1.48, screenY: 555, ...panel },
-		form = { x: 730, y: 395, scale: 1.62, screenY: 570, ...panel };
-	const ending = {
-		x: width / 2,
-		y: height / 2,
-		scale: 1,
-		screenY: 648,
-		...full,
-	};
+	const browser = window.agentFilmCamera === "browser",
+		reel = browser && window.agentFilmFormat === "reel";
+	const wide = browser
+		? {
+				x: width / 2,
+				y: height / 2,
+				scale: reel ? 0.82 : 1.06,
+				screenX: reel ? 540 : 960,
+				screenY: reel ? 1000 : 560,
+				...full,
+			}
+		: {
+				x: width / 2,
+				y: height / 2,
+				scale: 1.14,
+				screenY: 560,
+				...full,
+			};
+	const detail = browser
+			? {
+					x: 730,
+					y: height / 2,
+					scale: reel ? 1.05 : 1.22,
+					screenX: reel ? 540 : 960,
+					screenY: reel ? 1000 : 565,
+					...full,
+				}
+			: { x: 730, y: 446, scale: 1.48, screenY: 555, ...panel },
+		form = browser
+			? { ...detail }
+			: { x: 730, y: 395, scale: 1.62, screenY: 570, ...panel };
+	const ending = browser
+		? {
+				x: width / 2,
+				y: height / 2,
+				scale: reel ? 0.82 : 1,
+				screenX: reel ? 540 : 960,
+				screenY: reel ? 1130 : 648,
+				...full,
+			}
+		: {
+				x: width / 2,
+				y: height / 2,
+				scale: 1,
+				screenY: 648,
+				...full,
+			};
 	if (time < 14.8) return interpolate(wide, detail, time, 8.2, 9.25);
 	if (time < 16.5) return interpolate(detail, wide, time, 14.8, 15.6);
 	if (time < 21.5) return interpolate(wide, detail, time, 16.5, 17.6);
@@ -254,20 +285,27 @@ async function step(frame) {
 	camera.style.transform = `scale(${1 / density})`;
 	const inventory = collectAgentParts(host),
 		pose = cameraPose(time);
+	const browserCamera = window.agentFilmCamera === "browser";
 	const browserEnding = ease((time - 33) / 2.5);
-	const viewport = browserFrame.layout({
-		time,
-		scale: mix(1.14, 1, browserEnding),
-		screenY: mix(560, 648, browserEnding),
-	});
+	const viewport = browserFrame.layout(
+		browserCamera
+			? { time, ...pose }
+			: {
+					time,
+					scale: mix(1.14, 1, browserEnding),
+					screenY: mix(560, 648, browserEnding),
+				},
+	);
 	intro(time, inventory);
 	stateMotion(time, inventory);
-	surroundings(time);
+	if (!browserCamera) surroundings(time);
 	host.style.clipPath =
-		time < 8.15
+		browserCamera || time < 8.15
 			? "none"
 			: `inset(${pose.cropTop}px ${pose.cropRight}px ${pose.cropBottom}px ${pose.cropLeft}px)`;
-	camera.style.transform = `translate(${960 - viewport.left}px,${pose.screenY - viewport.top}px) scale(${pose.scale / density}) translate(${-pose.x * density}px,${-pose.y * density}px)`;
+	camera.style.transform = browserCamera
+		? `scale(${pose.scale / density})`
+		: `translate(${960 - viewport.left}px,${pose.screenY - viewport.top}px) scale(${pose.scale / density}) translate(${-pose.x * density}px,${-pose.y * density}px)`;
 	document.getElementById("film-name").style.display = "none";
 	const wordmark = document.getElementById("film-wordmark");
 	wordmark.style.opacity = String(ease((time - 36) / 0.4));
@@ -306,6 +344,9 @@ async function initialise() {
 				"ToggleGroup",
 			],
 			individualMotionLayers: motionCues.length,
+			cameraSubject:
+				window.agentFilmCamera === "browser" ? "browser" : "content",
+			format: window.agentFilmFormat === "reel" ? "reel" : "landscape",
 			filmDuration,
 			events: agentFilmEvents,
 			browserFrame: browserFrame.inspect(),
@@ -313,6 +354,9 @@ async function initialise() {
 		inspect: () => ({
 			time: lastTime,
 			camera: lastPose,
+			cameraSubject:
+				window.agentFilmCamera === "browser" ? "browser" : "content",
+			format: window.agentFilmFormat === "reel" ? "reel" : "landscape",
 			browserFrame: browserFrame.inspect(),
 			nativeParts: lastInventory.parts.length,
 			...controller.inspect(),
