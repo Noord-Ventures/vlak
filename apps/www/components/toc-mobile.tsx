@@ -23,12 +23,26 @@ export function MobileToc({
   const [open, setOpen] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const panelRef = React.useRef<HTMLElement>(null);
+  const restoreFocusFrame = React.useRef<number | null>(null);
   const sheetId = React.useId();
 
-  const close = React.useCallback((restoreFocus = false) => {
-    setOpen(false);
-    if (restoreFocus) requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
+  const cancelRestoreFocus = React.useCallback(() => {
+    if (restoreFocusFrame.current !== null) {
+      cancelAnimationFrame(restoreFocusFrame.current);
+      restoreFocusFrame.current = null;
+    }
   }, []);
+
+  const close = React.useCallback((restoreFocus = false) => {
+    cancelRestoreFocus();
+    setOpen(false);
+    if (restoreFocus) restoreFocusFrame.current = requestAnimationFrame(() => {
+      restoreFocusFrame.current = null;
+      triggerRef.current?.focus({ preventScroll: true });
+    });
+  }, [cancelRestoreFocus]);
+
+  React.useEffect(() => cancelRestoreFocus, [cancelRestoreFocus]);
 
   React.useEffect(() => close(), [pathname, close]);
 
@@ -36,6 +50,7 @@ export function MobileToc({
     const media = window.matchMedia("(min-width: 900px)");
     const onResize = () => { if (media.matches) close(); };
     const onNavigation = (event: Event) => {
+      cancelRestoreFocus();
       if ((event as CustomEvent<string>).detail !== "section") close();
     };
     media.addEventListener("change", onResize);
@@ -44,7 +59,7 @@ export function MobileToc({
       media.removeEventListener("change", onResize);
       window.removeEventListener("vlak:navigation-open", onNavigation);
     };
-  }, [close]);
+  }, [close, cancelRestoreFocus]);
 
   useIsoLayoutEffect(() => {
     if (!open || !panelRef.current) return;
@@ -107,6 +122,7 @@ export function MobileToc({
       onClick={() => {
         if (expanded) close(true);
         else {
+          cancelRestoreFocus();
           window.dispatchEvent(new CustomEvent("vlak:navigation-open", { detail: "section" }));
           setOpen(true);
         }

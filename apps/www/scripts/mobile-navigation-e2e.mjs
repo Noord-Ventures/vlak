@@ -153,6 +153,18 @@ try {
       await page.locator("#appearanceMenu").waitFor({ state: "visible" });
       await page.keyboard.press("Escape");
     }
+    if (width === 390) {
+      await open();
+      await page.evaluate(() => {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+        document.querySelector(".nav-toggle").click();
+      });
+      await closed();
+      await settle(page);
+      assert.equal(await page.locator("#navPanel").getAttribute("data-open"), "true");
+      assert(await page.locator("#navPanel").evaluate(element => element.contains(document.activeElement)), "Opening the site menu cancels queued section focus restoration");
+      await page.getByRole("button", { name: "Close menu", exact: true }).tap();
+    }
     await open();
     await page.setViewportSize({ width: 1024, height: 844 });
     await closed();
