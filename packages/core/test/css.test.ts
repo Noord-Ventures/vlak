@@ -87,6 +87,32 @@ describe("generated vlak.css", () => {
     expect(css).toContain("padding-inline:1.25rem");
   });
 
+  it("centers playback and media controls without extra transport block spacing", () => {
+    const playbackCss = readFileSync(join(pkgDir, "css/components/playback-controls.css"), "utf8");
+    const playerCss = readFileSync(join(pkgDir, "css/components/media-player.css"), "utf8");
+    const playback = playbackCss.match(/\.rs-playback-controls\{([^}]+)\}/)?.[1];
+    const controls = playerCss.match(/\.rs-media-player-controls\{([^}]+)\}/)?.[1];
+    for (const row of [playback, controls]) {
+      expect(row).toContain("display:flex");
+      expect(row).toContain("align-items:center");
+    }
+    // One-sided padding enlarges the flex item and shifts Play above Mute and Volume.
+    expect(playback).not.toMatch(/(?:^|;)(?:padding|margin)(?:-(?:top|bottom|block(?:-start|-end)?))?:/);
+
+    const play = playbackCss.match(/\.rs-playback-action\{([^}]+)\}/)?.[1];
+    const mute = playerCss.match(/\.rs-media-player-action\{([^}]+)\}/)?.[1];
+    expect(play).toContain("height:var(--hit)");
+    expect(mute).toContain("min-height:var(--hit)");
+    for (const action of [play, mute]) expect(action).toContain("min-width:var(--hit)");
+  });
+
+  it("keeps media actions compact when phone buttons otherwise fill their row", () => {
+    const playerCss = readFileSync(join(pkgDir, "css/components/media-player.css"), "utf8");
+    const mute = playerCss.match(/@media \(max-width: 640px\)\{\.rs-media-player-action\{([^}]+)\}\}/)?.[1];
+    // CSS-first consumers need an override at the same breakpoint as Button's full width.
+    expect(mute).toContain("width:auto");
+  });
+
   it("defines every custom property it uses", () => {
     const used = new Set([...vlakCss.matchAll(/var\((--[a-z-]+)[,)]/g)].map((m) => m[1]!));
     const defined = new Set([...vlakCss.matchAll(/(--[a-z-]+)\s*:/g)].map((m) => m[1]!));

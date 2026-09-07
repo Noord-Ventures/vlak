@@ -22,7 +22,7 @@ export interface PlaybackControlsProps extends React.HTMLAttributes<HTMLDivEleme
   label?: string;
 }
 const styles = stylex.create({
-  root: { display: "flex", alignItems: "center", flexWrap: "wrap", gap: "0.5rem", paddingBottom: "0.75rem", color: vlak.ink },
+  root: { display: "flex", alignItems: "center", flexWrap: "wrap", gap: "0.5rem", color: vlak.ink },
   action: { width: vlak.hit, minWidth: vlak.hit, height: vlak.hit, padding: 0, flexShrink: 0 },
 });
 

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
-import { vlak } from "../tokens.stylex";
+import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
 import { Button } from "./button";
@@ -29,7 +29,12 @@ const styles = stylex.create({
   media: { display: "block", width: "100%", maxHeight: "32rem", backgroundColor: vlak.controlFill },
   heading: { margin: 0, fontSize: "1rem", fontWeight: 600, lineHeight: 1.45, overflowWrap: "anywhere" },
   controls: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem" },
-  action: { width: "auto", paddingInline: "0.75rem", minWidth: vlak.hit, minHeight: vlak.hit },
+  action: {
+    width: { default: "auto", [mq.phone]: "auto" },
+    paddingInline: "0.75rem",
+    minWidth: vlak.hit,
+    minHeight: vlak.hit,
+  },
   volume: { flex: "0 1 8rem", minWidth: "5rem" },
   status: { margin: 0, fontSize: "0.875rem", color: vlak.gray, lineHeight: 1.45 },
   transcript: { lineHeight: 1.45, maxWidth: "66ch" },
@@ -78,7 +83,9 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
   const media = rs(["rs-media-player-media"], styles.media);
   const heading = rs(["rs-media-player-title"], styles.heading);
   const controls = rs(["rs-media-player-controls"], styles.controls);
-  const action = rs(["rs-media-player-action"], styles.action);
+  const actionSx = rs(["rs-media-player-action"], styles.action);
+  // Composed Button atomics keep their phone width, so preserve this row's intrinsic sizing.
+  const action = { ...actionSx, style: { ...actionSx.style, width: "auto" } };
   const volumeStyle = rs(["rs-media-player-volume"], styles.volume);
   const message = rs(["rs-media-player-status"], styles.status);
   const transcriptStyle = rs(["rs-media-player-transcript"], styles.transcript);
