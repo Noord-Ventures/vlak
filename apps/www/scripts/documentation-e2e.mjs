@@ -31,11 +31,28 @@ export async function checkDocumentation({ page, base, fail }) {
     if (!narrow) {
       const contents = root.locator(".dc-rail .dc-contents");
       const marks = contents.locator(".dc-outline-marks");
-      assert.equal(await contents.locator(".dc-document-map").count(), 0, "The outline uses headings rather than miniature body text");
-      assert.equal(await marks.locator("span").count(), 5);
+      await page.waitForFunction(() => document.querySelector('.dc-rail .dc-contents')?.dataset.lineSource === 'layout');
+      assert.equal(await contents.locator(".dc-document-map").count(), 0, "The outline uses line marks without miniature body text");
+      const readingLines = await marks.locator('[data-kind="line"]').count();
+      assert(readingLines > 10, "The outline includes body text between its section marks");
+      const renderedLines = await root.locator('.dc-lead, .dc-article-section p, .dc-article-section li').evaluateAll(elements => elements.reduce((count, element) => count + Math.round(element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight)), 0));
+      assert.equal(readingLines, renderedLines, "The collapsed outline represents each rendered line of article text");
       assert.equal(await marks.locator('[data-depth="0"]').count(), 1);
       assert.equal(await marks.locator('[data-depth="1"]').count(), 4);
-      assert((await marks.boundingBox()).height < 80, "The resting outline stays compact");
+      assert((await marks.boundingBox()).height <= (page.viewportSize()?.height ?? 1000) / 2, "The dense outline fits within half the viewing height");
+      const ticks = await marks.locator(":scope > span").evaluateAll(elements => elements.map(element => ({
+        width: element.getBoundingClientRect().width,
+        height: element.getBoundingClientRect().height,
+        left: element.getBoundingClientRect().left,
+        kind: element.dataset.kind,
+        current: element.dataset.current === "true",
+      })));
+      assert(ticks.some(tick => tick.width === 12 && tick.height === 1), "Reading lines remain short hairlines");
+      assert(ticks.every(tick => tick.left === ticks[0].left), "Text and heading marks share one left edge");
+      assert(ticks.filter(tick => tick.kind === "heading").every(tick => tick.height >= 3), "Section marks stay heavier than reading lines");
+      assert.equal(ticks.find(tick => tick.current)?.width, 52, "The current heading is the longest mark");
+      assert.equal(await contents.locator(".dc-outline-title").evaluate(element => getComputedStyle(element).opacity), "0", "Only marks remain visible at rest");
+      assert.equal(await contents.getByRole("button", { name: "All guides", exact: true }).isVisible(), false);
       assert.equal(await marks.locator('[data-current="true"]').getAttribute("data-depth"), "0", "The document title is current before the first section");
       assert.equal(await contents.getAttribute("data-expanded"), "false");
       const rail = await root.locator(".dc-rail").boundingBox();
@@ -48,14 +65,17 @@ export async function checkDocumentation({ page, base, fail }) {
       await root.getByRole("heading", { name: "Write the state you know", exact: true }).focus(); await settle();
       assert.equal(await contents.getAttribute("data-expanded"), "false");
       await page.emulateMedia({ reducedMotion: "reduce" });
-      assert.equal(await contents.locator(".dc-outline-reveal").evaluate(element => getComputedStyle(element).transitionDuration), "0s");
+      for (const selector of [".dc-outline-reveal", ".dc-outline-marks", ".dc-outline-marks > span", ".dc-outline-toggle"])
+        assert.equal(await contents.locator(selector).first().evaluate(element => getComputedStyle(element).transitionDuration), "0s", "Reduced motion applies to every part of the outline");
       await page.emulateMedia({ reducedMotion: "no-preference" });
       const paragraphSize = await root.locator(".dc-article-section p").first().evaluate(element => parseFloat(getComputedStyle(element).fontSize));
       await activate(root.getByRole("button", { name: "Reader settings", exact: true }));
       await activate(root.locator(".dc-settings").getByRole("button", { name: "Increase text size", exact: true }));
       assert(await root.locator(".dc-article-section p").first().evaluate(element => parseFloat(getComputedStyle(element).fontSize)) > paragraphSize);
-      assert.equal(await marks.locator("span").count(), 5, "Changing body text size preserves the heading outline");
+      assert.equal(await marks.locator('[data-kind="heading"]').count(), 5, "Changing body text size preserves every section heading");
+      await page.waitForFunction(previous => document.querySelectorAll('.dc-rail .dc-outline-marks > span[data-kind="line"]').length > previous, readingLines);
       await activate(root.locator(".dc-settings").getByRole("button", { name: "Decrease text size", exact: true }));
+      await page.waitForFunction(previous => document.querySelectorAll('.dc-rail .dc-outline-marks > span[data-kind="line"]').length === previous, readingLines);
       await page.keyboard.press("Escape"); await settle();
     }
     if (narrow) await activate(root.getByRole("button", { name: "Open reading menu", exact: true }));
@@ -79,6 +99,10 @@ export async function checkDocumentation({ page, base, fail }) {
       assert(outlineAlignment.every(offset => offset < 1), "Outline labels and collapsed marks align with Contents");
       assert.equal(await contents.locator('.dc-outline-toggle svg').count(), 0, "Contents has no pin icon");
       assert.equal(await contents.getByRole("button", { name: "Avoid an invented conclusion", exact: true }).getAttribute("aria-current"), "location");
+      assert.equal(await contents.locator('.dc-outline-marks > span[data-current="true"]').getAttribute("data-depth"), "1");
+      await page.waitForFunction(() => document.querySelector('.dc-rail .dc-outline-marks > span[data-current="true"]')?.getBoundingClientRect().width === 52);
+      const hoverColor = await contents.getByRole("button", { name: "Avoid an invented conclusion", exact: true }).evaluate(element => getComputedStyle(element).backgroundColor);
+      assert.equal(hoverColor, "rgba(0, 0, 0, 0)", "The current heading remains free of a background fill");
       await scroll.evaluate(element => { element.scrollTop = 0; });
       await page.waitForFunction(() => document.querySelector('.dc-rail .dc-outline-links [aria-current="location"]')?.textContent === "Write the state you know");
       await contents.getByRole("button", { name: "Hide guide contents", exact: true }).focus();

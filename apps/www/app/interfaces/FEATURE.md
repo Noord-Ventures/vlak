@@ -51,6 +51,7 @@ State transitions are restrained. Focus and a user-triggered change can move del
 | Transit app | `/interfaces/platforms` | Plan → route → saved day | Search sample stations, choose departure time, inspect stops, save a trip and edit traveler preferences. No timetable or booking service is connected. |
 | Mobile OS | `/interfaces/mobile-os` | Home → app → system controls | Two independent phones each provide 16 apps, local editing, settings, notifications, recents, timers and synthesized audio. |
 | Music player | `/interfaces/music-player` | Library or Queue → recording → Sound | Play individual official previews or attached local files. Sound adds a measured spectrum and five-band equalizer when processing is available. |
+| Video player | `/interfaces/video-player` | Music video playlist → official embed → playback | Loathe, Foals and Woodkid official YouTube and Vimeo music videos with actual player controls, native captions, and mobile Watching / Playlist screens. |
 | Documentation | `/interfaces/documentation` | Index → article → heading outline | A bounded Inter reader with metadata, reading preferences, section navigation, pinning and index-position restoration. |
 
 Routes are derived from `catalog.ts`; catalogue entries must resolve to actual pages.

@@ -47,7 +47,7 @@ export function StartBuilding({ title, slug, source }: { title: string; slug: st
       <div className="if-install-top"><span>Install the package</span><CopyAction text={install} label="Copy install" primary /></div>
       <pre tabIndex={0} style={{ paddingInline: 0 }}><code>{install}</code></pre>
       <pre tabIndex={0} style={{ paddingInline: 0 }}><code>{'import "@noorddev/vlak-react/css";'}</code></pre>
-      <div className="if-build-links"><a href="/docs/">Installation guide <span aria-hidden="true">→</span></a><a href={source}>View study source <span aria-hidden="true">↗</span></a></div>
+      <div className="if-build-links"><a className="rs-link-underline" href="/docs/">Installation guide <span aria-hidden="true">→</span></a><a className="rs-link-underline" href={source}>View study source <span aria-hidden="true">↗</span></a></div>
     </div>
     <div className="if-agent-start">
       <div><h3>Start with your coding agent</h3><p>A ready-to-use brief with this study, Vlak’s components, and the <a href="/design.md">design guide</a>.</p></div>

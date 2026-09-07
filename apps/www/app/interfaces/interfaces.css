@@ -80,8 +80,16 @@ body:has(.if-index) {
 .if-index-cover { max-width: 592px; padding-bottom: 32px; }
 .if-index-intro { margin: 16px 0 0; max-width: 54ch; font-size: .9375rem; font-weight: 400; line-height: 1.6; color: var(--text-secondary); }
 .if-index-links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 20px; }
-.if-index-links a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: .875rem; color: var(--text); text-decoration: underline; text-decoration-color: var(--divider); text-underline-offset: 5px; }
-.if-index-links a:hover { text-decoration-color: currentColor; }
+.if-index-links a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: .875rem; color: var(--text); }
+/* Use Vlak's single underline across the entire link, including the flex gap. */
+.if-index-links .rs-link-underline,
+.if-build-links .rs-link-underline { background-position: 1px calc(50% + .65em); }
+@media (forced-colors: active) {
+  .if-index-links .rs-link-underline,
+  .if-build-links .rs-link-underline { position: relative; }
+  .if-index-links .rs-link-underline::after,
+  .if-build-links .rs-link-underline::after { content: ""; position: absolute; inset-inline: 1px 0; top: calc(50% + .65em); border-bottom: 1px solid currentColor; pointer-events: none; }
+}
 .if-tile-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 16px; font-size: .6875rem; font-weight: 400; line-height: 1.4; color: var(--text-secondary); }
 .if-tile-foot > span:last-child { color: var(--text); }
 .if-tile-matter .if-tile-head + p { min-height: 2.8em; }

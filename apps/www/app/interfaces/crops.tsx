@@ -4,6 +4,7 @@ import { sx } from "@/lib/sx";
 import { type InterfaceSlug, interfaceBySlug } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { DocumentationCrop } from "./documentation/crop";
+import { VideoPlayerCrop } from "./video-player/crop";
 import { MusicPlayerCrop } from "./music-player/crop";
 import { MicroscopyCrop } from "./microscopy/crop";
 import { ChatCrop, DashboardCrop, SocialCrop, FleetCrop, FoodCrop, TeamCrop, WallpaperCrop, MobileOSCrop, TransitCrop } from "./workflow-crops";
@@ -43,7 +44,7 @@ function RenderCrop() {
 function DriveCrop() {
   return <div className="if-crop-scene if-crop-drive">
     <header className="if-crop-console-head"><Icon name="sliders" size={16} /><div><strong>Vehicle 01</strong><span>Parked / connected</span></div><Icon name="lock" size={16} /></header>
-    <div className="if-crop-vehicle-art rw-crop-model"><img className="rw-crop-light" src="/interfaces/concepts/vehicle-line-preview-light-v1.png" alt="" /><img className="rw-crop-dark" src="/interfaces/concepts/vehicle-line-preview-dark-v1.png" alt="" /></div>
+    <div className="if-crop-vehicle-art rw-crop-model"><img className="rw-crop-light" src="/interfaces/concepts/evoque-line-side-light-v2.png" alt="" /><img className="rw-crop-dark" src="/interfaces/concepts/evoque-line-side-dark-v2.png" alt="" /></div>
     <div className="if-crop-ev-status"><div><span>Range · 84%</span><strong>386 <small>km</small></strong></div><div><span>Cabin</span><strong>20<small>°</small></strong></div><div><span>Media</span><strong>Loathe</strong></div></div>
   </div>;
 }
@@ -107,6 +108,7 @@ const CROPS: Record<InterfaceSlug, () => ReactNode> = {
   music: MusicCrop,
   documentation: DocumentationCrop,
   "music-player": MusicPlayerCrop,
+  "video-player": VideoPlayerCrop,
   microscopy: MicroscopyCrop,
 };
 
