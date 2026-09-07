@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CopyControl } from "@/components/code-block";
 import { sx } from "@/lib/sx";
@@ -7,10 +8,10 @@ import { SpecimenPrinciples } from "./specimen-principles";
 import { specimen } from "./specimen.stylex";
 import "./specimen.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/", {
   title: { absolute: WORD },
   description: LAW,
-};
+});
 
 export default function Home() {
   return (

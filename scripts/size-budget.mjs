@@ -23,9 +23,9 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 
 /* [label, path or directory + filter, gzipped budget in bytes] */
 const budgets = [
-  // The 166-component catalog adds industrial, geospatial, robotics, electronics
-  // and microbiology workbenches. Aggregate costs are about 28.6 KB CSS,
-  // 199.5 KB JS and 100.7 KB CLI; individual leaf budgets still bound each addition.
+  // The 167-component catalog includes the stage-position editor alongside the
+  // industrial, geospatial, robotics, electronics and microbiology workbenches.
+  // Aggregate caps are unchanged; each new leaf also has its own bound.
   // Keep atomic CSS and existing control caps; bound every new leaf separately.
   ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 29 * 1024],
   ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024],
@@ -50,6 +50,8 @@ const budgets = [
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
   ...["raster-band-mixer", "patchbay", "kerning-pair-editor", "sequence-alignment", "design-rule-results"].map(name =>
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 4 * 1024]),
+  // Native selection, inclusion, accepted-order focus recovery and coordinate validation.
+  ["@noorddev/vlak-react components/stage-position-list.js", "packages/react/dist/components/stage-position-list.js", 4 * 1024],
   ...["joint-panel", "robot-pose", "robot-mission-queue", "pad-inspector", "colony-plate", "culture-log"].map(name =>
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
   ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 104 * 1024],

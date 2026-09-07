@@ -1,13 +1,14 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR, HOST } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/agents", {
   title: "Agents",
   description: "Machine-readable Vlak documentation: llms.txt, markdown, JSON registry data, CLI output, MCP resources, and API conventions.",
   alternates: { canonical: `${DOOR}/docs/agents/` },
-};
+});
 
 const surfaces = [
   [`${HOST}/design.md`, "Composition, component choices, responsive behavior, and a page-building brief"],

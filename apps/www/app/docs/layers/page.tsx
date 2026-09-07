@@ -1,13 +1,14 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/layers", {
   title: "Layers",
   description: "Six cascade layers, why your CSS wins without !important, and the rs-* class contract.",
   alternates: { canonical: `${DOOR}/docs/layers/` },
-};
+});
 
 const layers = [
   { name: "vlak.tokens", holds: "Custom properties on :root, the dark block, color-scheme." },

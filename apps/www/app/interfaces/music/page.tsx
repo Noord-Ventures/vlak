@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { interfaceBySlug } from "../catalog";
 import { InterfaceShell } from "../shell";
@@ -6,5 +7,5 @@ import "../interfaces.css";
 import "./scene.css";
 
 const study = interfaceBySlug("music")!;
-export const metadata: Metadata = { title: study.title, description: study.law };
+export const metadata: Metadata = pageMetadata("/interfaces/music", { title: study.title, description: study.law });
 export default function Page() { return <InterfaceShell slug="music"><MusicBoard /></InterfaceShell>; }

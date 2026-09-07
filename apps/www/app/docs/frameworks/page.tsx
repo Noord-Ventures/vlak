@@ -1,13 +1,14 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/frameworks", {
   title: "Frameworks",
   description: "Vlak in Next.js, Vite, Remix and React Router, Astro, and plain HTML.",
   alternates: { canonical: `${DOOR}/docs/frameworks/` },
-};
+});
 
 const next = `// app/layout.tsx
 import "@noorddev/vlak-react/css";

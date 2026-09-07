@@ -144,6 +144,13 @@
       ]
     },
     {
+      "source": "/(design|interfaces).md",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Content-Type", "value": "text/markdown; charset=utf-8" }
+      ]
+    },
+    {
       "source": "/llms(.*).txt",
       "headers": [
         {

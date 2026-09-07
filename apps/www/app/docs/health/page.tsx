@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { catalogComponents, healthDataContract, healthWorkflows } from "@noorddev/vlak";
@@ -5,11 +6,11 @@ import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/health", {
   title: "Health",
   description: "Vlak components for health, wellness, and medical software. Readings, check-ins, routines, and care workflows with explicit data and action states.",
   alternates: { canonical: `${DOOR}/docs/health/` },
-};
+});
 
 const example = `import "@noorddev/vlak-react/css";
 import { CheckIn, HealthMetric } from "@noorddev/vlak-react";

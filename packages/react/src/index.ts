@@ -273,6 +273,7 @@ export { DatumTransformPicker, type DatumTransformGrid, type DatumTransformation
 export { RasterBandMixer, type RasterSourceBand, type RasterChannelMapping, type RasterStretch, type RasterBandConfiguration, type RasterBandMixerProps } from "./components/raster-band-mixer";
 export { Patchbay, type PatchPort, type PatchConnection, type PatchbayProps } from "./components/patchbay";
 export { KerningPairEditor, type KerningPair, type KerningOffsets, type KerningPairEditorProps } from "./components/kerning-pair-editor";
+export { StagePositionList, type StagePosition, type StageCoordinateFrame, type StagePositionUnits, type StagePositionListProps } from "./components/stage-position-list";
 export { StackNavigator, type StackPosition, type StackAxis, type StackSelection, type StackNavigatorProps } from "./components/stack-navigator";
 export { AcquisitionSequencer, type AcquisitionChannel, type AcquisitionStepAction, type AcquisitionStep, type AcquisitionSequencerProps } from "./components/acquisition-sequencer";
 export { SequenceAlignment, type AlignedRead, type AlignmentSelection, type SequenceAlignmentProps } from "./components/sequence-alignment";

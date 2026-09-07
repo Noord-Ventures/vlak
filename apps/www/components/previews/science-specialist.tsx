@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ComponentType } from "react";
-import { StackNavigator, AcquisitionSequencer, SequenceAlignment, CoverageInspector, GenomicRegionField } from "@noorddev/vlak-react";
+import { StackNavigator, StagePositionList, AcquisitionSequencer, SequenceAlignment, CoverageInspector, GenomicRegionField } from "@noorddev/vlak-react";
 import type { AcquisitionStep } from "@noorddev/vlak-react";
 
 function AcquisitionPreview() {
@@ -14,6 +14,7 @@ function AcquisitionPreview() {
 }
 
 export const scienceSpecialistPreviews: Record<string, ComponentType> = {
+  "stage-position-list": () => <StagePositionList label="Stage positions" coordinateFrame={{ id: "stage-01", label: "Recorded stage" }} units={{ x: "µm", y: "µm", z: "µm" }} positions={[{ id: "field-01", name: "Overview", x: 0, y: -12.5, z: null, enabled: true }]} value="field-01" readOnly />,
   "stack-navigator": () => <StackNavigator label="Stack coordinates" axes={[
     { id: "depth", label: "Depth", unit: "µm", positions: [{ value: -1 }, { value: 0 }, { value: 1 }] },
     { id: "time", label: "Time", unit: "s", positions: [{ value: 0 }, { value: 5 }, { value: 10 }] },

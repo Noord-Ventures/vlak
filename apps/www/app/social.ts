@@ -10,25 +10,15 @@ const image = {
   alt: `${WORD}. ${LAW}`,
 };
 
-function siteBase() {
-  if (process.env.VERCEL_ENV === "preview" && process.env.VERCEL_URL) {
-    return new URL(`https://${process.env.VERCEL_URL}`);
-  }
-  return new URL(HOST);
-}
-
 /** Shared card. Title is the word. Description is the law. Image is the poster. */
 export const social: Metadata = {
-  metadataBase: siteBase(),
+  metadataBase: new URL(HOST),
   title: {
     default: title,
     template: `%s · ${WORD}`,
   },
   description,
   applicationName: WORD,
-  alternates: {
-    canonical: DOOR,
-  },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },

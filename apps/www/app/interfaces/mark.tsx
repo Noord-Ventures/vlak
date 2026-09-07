@@ -18,6 +18,7 @@ const marks = {
   platforms: "smartphone",
   "mobile-os": "grid",
   microbiology: "grid",
+  microscopy: "layers",
   genome: "list",
   protein: "layers",
   robotics: "activity",

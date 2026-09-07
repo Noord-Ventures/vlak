@@ -51,8 +51,8 @@ const intro = [
 	part("mesh-count", ".rw-footer > span:first-child", 2.65, { x: 45 }),
 	{
 		...part(
-			"live-vehicle",
-			".rw-vehicle-viewport",
+			"live-object",
+			".rw-object-viewport",
 			3.15,
 			{ y: 25, scale: 0.97 },
 			"press",
@@ -241,7 +241,7 @@ export default {
 			selector: '.rw-tools button[aria-label="Reset camera"]',
 			label: "Reset camera",
 			sound: "release",
-			assert: { selector: '.rw-vehicle-viewport[data-viewer-status="ready"]' },
+			assert: { selector: '.rw-object-viewport[data-viewer-status="ready"]' },
 		},
 	],
 	rebuilds: [
@@ -290,10 +290,10 @@ export default {
 	async ready(root) {
 		const deadline = Date.now() + 50000;
 		while (Date.now() < deadline) {
-			const viewer = root.querySelector(".rw-vehicle-viewport");
+			const viewer = root.querySelector(".rw-object-viewport");
 			if (viewer?.dataset.viewerStatus === "error")
 				throw new Error(
-					"The local vehicle model failed to load. A working WebGL context is required; do not capture an unavailable-model frame.",
+					"The local radio model failed to load. A working WebGL context is required; do not capture an unavailable-model frame.",
 				);
 			if (viewer?.dataset.viewerStatus === "ready") {
 				// Establish a stable view of the loaded licensed geometry.
@@ -303,21 +303,21 @@ export default {
 				// Let the paused camera and control state settle before recording.
 				await new Promise((resolve) => setTimeout(resolve, 150));
 				if (viewer.dataset.viewerStatus !== "ready")
-					throw new Error("Vehicle viewer became unavailable during warm-up");
+					throw new Error("Object viewer became unavailable during warm-up");
 				return;
 			}
 			await new Promise((resolve) => setTimeout(resolve, 100));
 		}
 		throw new Error(
-			"Local vehicle model readiness timed out after 50 seconds",
+			"Local radio model readiness timed out after 50 seconds",
 		);
 	},
 	inspect(root) {
 		return {
-			viewerStatus: root.querySelector(".rw-vehicle-viewport")?.dataset
+			viewerStatus: root.querySelector(".rw-object-viewport")?.dataset
 				.viewerStatus,
-			modelUrl: root.querySelector(".rw-vehicle-canvas")?.dataset.modelUrl,
-			triangles: root.querySelector(".rw-vehicle-canvas")?.dataset.triangles,
+			modelUrl: root.querySelector(".rw-object-canvas")?.dataset.modelUrl,
+			triangles: root.querySelector(".rw-object-canvas")?.dataset.triangles,
 			mesh: root
 				.querySelector('.rw-tools button[aria-label="Show mesh"]')
 				?.getAttribute("aria-pressed"),
@@ -326,7 +326,7 @@ export default {
 				.querySelector('[role="treeitem"][aria-selected="true"]')
 				?.getAttribute("aria-label"),
 			material: root.querySelector('select[aria-label="Line treatment"]')?.value,
-			renderer: root.querySelector(".rw-vehicle-canvas")?.dataset.renderer,
+			renderer: root.querySelector(".rw-object-canvas")?.dataset.renderer,
 		};
 	},
 };

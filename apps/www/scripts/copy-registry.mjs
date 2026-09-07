@@ -67,5 +67,7 @@ if (!existsSync(starterSrc)) {
   process.exit(1);
 }
 mkdirSync(fileURLToPath(new URL("../public/starter", import.meta.url)), { recursive: true });
-writeFileSync(starterDest, readFileSync(starterSrc, "utf8").replaceAll("{{CSS_HREF}}", "/vlak.css"));
+writeFileSync(starterDest, readFileSync(starterSrc, "utf8")
+  .replaceAll("{{CSS_HREF}}", "/vlak.css")
+  .replace("</head>", '<meta name="robots" content="noindex,follow">\n</head>'));
 console.log("wrote starter specimen → public/starter/index.html");

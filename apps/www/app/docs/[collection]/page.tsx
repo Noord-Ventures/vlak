@@ -1,9 +1,9 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { catalogComponents, domainCollections } from "@noorddev/vlak";
 import { DocsShell } from "@/components/docs-shell";
-import { DOOR } from "../../specimen";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { collection: name } = await params;
   const collection = domainCollections.find(item => item.name === name);
   if (!collection) notFound();
-  return { title: collection.title, description: collection.description, alternates: { canonical: `${DOOR}/docs/${name}/` } };
+  return pageMetadata(`/docs/${name}`, { title: collection.title, description: collection.description });
 }
 export default async function CollectionPage({ params }: PageProps) {
   const { collection: name } = await params;

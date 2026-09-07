@@ -8,7 +8,7 @@
 //   - publint and are-the-types-wrong on each tarball
 //
 // Run after `pnpm build`. Needs network for react/react-dom.
-import { execFileSync, execSync } from "node:child_process";
+import { execSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
@@ -18,7 +18,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 166;
+const expectedCatalogueSize = 167;
 const additions = [
   ["joint-panel", "JointPanel"],
   ["robot-pose", "RobotPose"],
@@ -34,6 +34,7 @@ const additions = [
   ["raster-band-mixer", "RasterBandMixer"],
   ["patchbay", "Patchbay"],
   ["kerning-pair-editor", "KerningPairEditor"],
+  ["stage-position-list", "StagePositionList"],
   ["stack-navigator", "StackNavigator"],
   ["acquisition-sequencer", "AcquisitionSequencer"],
   ["sequence-alignment", "SequenceAlignment"],
@@ -76,6 +77,11 @@ const fixtureProps = {
   RasterBandMixer: {"label": "Raster bands", "bands": []},
   Patchbay: {"label": "Audio routes", "sources": [], "destinations": []},
   KerningPairEditor: {"label": "Pair spacing", "pairs": [], "fontFamily": "serif", "unitsPerEm": 1000},
+  StagePositionList: {
+    label: "Recorded stage positions", coordinateFrame: { id: "stage-smoke", label: "Supplied frame" }, units: { x: "µm", y: "µm", z: "µm" },
+    positions: [{ id: "field-01", name: "Overview", x: 0.0001, y: null, z: 0, enabled: true }, { id: "field-02", name: "Detail", x: -12.5, y: 20, z: null, enabled: false }],
+    value: "field-01", name: "stage-position", onValueChange() {}, onEnabledChange() {}, onOrderChange() {}, onRemove() {},
+  },
   StackNavigator: {"label": "Image stack", "axes": []},
   AcquisitionSequencer: {"label": "Acquisition steps", "steps": [], "channels": []},
   SequenceAlignment: {"label": "Aligned reads", "contig": "chr1", "referenceLabel": "Example reference", "referenceSequence": "AC", "positions": [1, 2], "reads": []},
@@ -133,6 +139,7 @@ for (const [name, exported] of additions) {
   if (leaf[exported] !== R[exported]) throw new Error("Mismatched leaf export: " + exported);
   const markup = renderToString(h(R[exported], fixtureProps[exported] ?? {}));
   if (!markup.includes("rs-")) throw new Error("Empty or unstyled SSR: " + exported);
+  if (exported === "StagePositionList" && !(markup.startsWith("<fieldset") && markup.includes("Supplied frame (stage-smoke)") && markup.includes(">0.0001<") && markup.includes(">0<") && markup.includes("Not supplied") && markup.includes("field-01") && markup.includes("Move down"))) throw new Error("Stage position fixture lost its native root, coordinate context or supplied values");
   additionHtml += markup;
 }
 console.log("  ✓ all " + additions.length + " new root/leaf exports render, " + additionHtml.length + " chars");
@@ -181,6 +188,8 @@ checks.push(["props json", typeof props.components === "object"]);
 const R = vlak;
 ${renderAdditions}
 checks.push(["new component props", additions.every(([name, exported]) => props.components[name]?.exports.some(entry => entry.name === exported))]);
+const stageProps = props.components["stage-position-list"]?.exports.find(entry => entry.name === "StagePositionList");
+checks.push(["stage position contract", stageProps?.ref === "HTMLFieldSetElement" && ["label", "coordinateFrame", "units", "positions"].every(name => stageProps.props.some(prop => prop.name === name && prop.required)) && ["value", "onValueChange", "onEnabledChange", "onOrderChange", "onRemove", "readOnly"].every(name => stageProps.props.some(prop => prop.name === name))]);
 const html = renderToString(h("div", null,
   h(Button, null, "Hi"),
   h(vlak.Dialog, { open: false, onClose() {} }, h(vlak.DialogTitle, null, "T")),

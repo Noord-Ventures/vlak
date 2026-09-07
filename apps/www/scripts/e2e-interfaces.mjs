@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const slugs = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "mobile-os", "documentation", "music-player", "line", "press", "wall", "night", "evening", "room"];
+const slugs = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "microscopy", "agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "mobile-os", "documentation", "music-player", "line", "press", "wall", "night", "evening", "room"];
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
@@ -127,6 +127,7 @@ try {
   assert(temperatureControls.every(box => box.width >= 44 && box.height >= 44), "Temperature controls need 44px targets");
   assert(temperatureControls[1].left >= temperatureControls[0].right, "Temperature controls should not overlap");
   await page.locator('.ev-readings').getByRole('button', { name: 'Media', exact: true }).click();
+  await page.getByRole("group", { name: "Playback controls", exact: true }).waitFor({ state: "visible" });
   assert.equal(await page.getByRole("group", { name: "Playback controls" }).count(), 1, "Playback uses the Vlak Button group");
   console.log("EV shared Metrics, detail triggers, padded controls and playback group passed");
   await page.evaluate(() => Object.defineProperty(navigator.clipboard, "writeText", { configurable: true, value: () => Promise.reject(new Error("denied")) }));

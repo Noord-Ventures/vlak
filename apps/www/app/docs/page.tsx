@@ -1,14 +1,15 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { Callout } from "@noorddev/vlak-react";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
-import { COMMAND, DOOR, HOST, INSTALL, LAW } from "../specimen";
+import { COMMAND, DOOR, HOST, INSTALL } from "../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs", {
   title: "Getting started",
-  description: LAW,
+  description: "Install precompiled React components, vendor the StyleX source, or use the CSS classes directly. All three are generated from the same leaves.",
   alternates: { canonical: `${DOOR}/docs/` },
-};
+});
 
 const packageUsage = `// app/layout.tsx, main.tsx, or wherever your app starts
 import "@noorddev/vlak-react/css";
