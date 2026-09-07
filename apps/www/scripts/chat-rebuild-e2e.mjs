@@ -1,0 +1,101 @@
+import { readFile } from "node:fs/promises";
+
+const activate = async (control) => { await control.page().evaluate(() => new Promise(requestAnimationFrame)); await control.press("Enter"); await control.page().evaluate(() => new Promise(requestAnimationFrame)); };
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const focusIs = async (page, locator) => page.waitForFunction(element => document.activeElement === element, await locator.elementHandle());
+
+export async function checkChats({ page, base, fail }) {
+  try {
+    await page.goto(`${base}/interfaces/line/`, { waitUntil: "networkidle" });
+    const root = page.locator(".ac");
+    await root.waitFor();
+    await activate(root.locator('[data-conversation="onboarding"]'));
+    await root.getByRole("heading", { name: "A better first five minutes" }).waitFor();
+    const input = root.getByRole("textbox", { name: "Message", exact: true });
+    await input.fill("Keep this question while I check another note.");
+    const back = root.getByRole("button", { name: "Back to conversations", exact: true });
+    if (await back.isVisible()) await activate(back);
+    await activate(root.locator('[data-conversation="questions"]'));
+    if (await back.isVisible()) await activate(back);
+    await activate(root.locator('[data-conversation="onboarding"]'));
+    assert(await input.inputValue() === "Keep this question while I check another note.", "Conversation switching must preserve each unsent draft");
+    await input.fill("");
+    await activate(root.getByRole("button", { name: "Response details", exact: true }).first());
+    await root.getByRole("heading", { name: "Response details", exact: true }).waitFor();
+    assert((await root.locator(".ac-detail-scroll").innerText()).includes("Authored sample text"), "Authored responses must disclose their source");
+    await activate(root.getByRole("button", { name: "Save response", exact: true }));
+    assert(await root.getByRole("button", { name: "Saved response", exact: true }).getAttribute("aria-pressed") === "true", "Saving a response must update its state");
+    await activate(root.getByRole("button", { name: "Back to conversation", exact: true }));
+    await focusIs(page, root.getByRole("button", { name: "Response details", exact: true }).first());
+    await activate(root.getByRole("button", { name: "New conversation", exact: true }));
+    await input.fill("Prepare a research handoff with open questions.");
+    const format = root.getByRole("combobox", { name: "Response format" });
+    await activate(format);
+    await format.press("End");
+    await activate(format);
+    assert((await format.innerText()).includes("Short response"), "Format choice must change the real combobox value");
+    await input.press("Control+Enter");
+    await root.locator('.ac-message[data-role="assistant"]').waitFor();
+    assert(await root.locator(".ac-message").count() === 2, "Sending in a new conversation must create exactly the question and its response");
+    assert((await root.locator('.ac-message[data-role="assistant"]').innerText()).includes("Prepare a research handoff with open questions."), "Local response must retain the actual supplied prompt");
+    assert((await root.locator('.ac-message[data-role="assistant"]').innerText()).includes("Local template"), "Local replies must not claim a connected model");
+    await activate(root.getByRole("button", { name: "Response details", exact: true }));
+    const downloading = page.waitForEvent("download");
+    await activate(root.getByRole("button", { name: "Export conversation", exact: true }));
+    const download = await downloading;
+    const path = await download.path();
+    assert(path, "Conversation export must produce a file");
+    const exported = await readFile(path, "utf8");
+    assert(exported.includes("Prepare a research handoff with open questions.") && exported.includes("local templates"), "Markdown export must contain the actual conversation and its local provenance");
+    console.log("PASS AI chat: independent drafts, response provenance/save, focus return, local send, format choice, real export");
+  } catch (error) { fail("AI chat principal flow", error.message); }
+
+  try {
+    await page.goto(`${base}/interfaces/room/`, { waitUntil: "networkidle" });
+    const root = page.locator(".tc");
+    await root.waitFor();
+    await activate(root.locator('[data-channel="studio"]'));
+    const firstThread = root.locator('[data-message="s1"] .tc-open-thread');
+    await activate(firstThread);
+    await root.getByRole("heading", { name: "Thread", exact: true }).waitFor();
+    const reply = root.getByRole("textbox", { name: "Reply in thread", exact: true });
+    await reply.fill("The venue address and time match the latest brief.");
+    await reply.press("Control+Enter");
+    await root.locator(".tc-reply").filter({ hasText: "The venue address and time match the latest brief." }).waitFor();
+    assert(await root.locator(".tc-reply").count() === 3, "Reply must append to the selected thread without replacing its existing replies");
+    await activate(root.getByRole("button", { name: "Pin message", exact: true }));
+    await activate(root.getByRole("button", { name: "Back to channel", exact: true }));
+    await focusIs(page, firstThread);
+    assert((await firstThread.innerText()).includes("3 replies"), "Channel reply count must reflect the actual thread");
+    assert(await root.locator('[data-message="s1"] .tc-pinned').isVisible(), "Pinned state must carry back to the channel");
+    const acknowledge = root.locator('[data-message="s1"] .tc-ack');
+    await activate(acknowledge);
+    assert(await acknowledge.getAttribute("aria-pressed") === "true", "Acknowledgement must be a reversible local state");
+    await activate(acknowledge);
+    assert(await acknowledge.getAttribute("aria-pressed") === "false", "Acknowledgement must be removable");
+    await activate(root.getByRole("button", { name: "New channel", exact: true }));
+    await root.getByRole("textbox", { name: "Channel name", exact: true }).fill("studio");
+    await activate(root.getByRole("button", { name: "Create channel", exact: true }));
+    assert((await root.locator(".tc-editor").innerText()).includes("already exists"), "Duplicate channel names must be rejected without creating a channel");
+    await root.getByRole("textbox", { name: "Channel name", exact: true }).fill("review-notes");
+    await root.getByRole("textbox", { name: "Channel purpose", exact: true }).fill("Keep review decisions with their context.");
+    await activate(root.getByRole("button", { name: "Create channel", exact: true }));
+    await root.getByRole("heading", { name: "review-notes", exact: true }).waitFor();
+    assert(await root.locator(".tc-message").count() === 0, "A new channel must begin with no fabricated messages");
+    const message = root.getByRole("textbox", { name: "Message channel", exact: true });
+    await message.fill("The handoff is ready for a second pair of eyes.");
+    await message.press("Control+Enter");
+    await root.locator(".tc-message").filter({ hasText: "The handoff is ready for a second pair of eyes." }).waitFor();
+    await activate(root.getByRole("button", { name: "Channel details", exact: true }));
+    await root.getByRole("textbox", { name: "Channel purpose", exact: true }).fill("Review decisions and follow-up actions.");
+    await activate(root.getByRole("button", { name: "Save changes", exact: true }));
+    assert((await root.locator(".tc-channel-intro").innerText()).includes("Review decisions and follow-up actions."), "Channel edits must change the visible channel purpose");
+    const back = root.getByRole("button", { name: "Back to channels", exact: true });
+    if (await back.isVisible()) await activate(back);
+    await activate(root.locator('[data-channel="production"]'));
+    if (await back.isVisible()) await activate(back);
+    await activate(root.locator(".tc-channel-row").filter({ hasText: "review-notes" }));
+    assert((await root.locator(".tc-message").innerText()).includes("The handoff is ready for a second pair of eyes."), "Channel switching must preserve the new channel and its messages");
+    console.log("PASS Team chat: threaded reply/count, pin/acknowledge, focus return, duplicate validation, new channel/send, purpose edit, retained history");
+  } catch (error) { fail("Team chat principal flow", error.message); }
+}

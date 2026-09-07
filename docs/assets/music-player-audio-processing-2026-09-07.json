@@ -1,0 +1,276 @@
+{
+  "recordedDate": "2026-09-07",
+  "interface": "music-player",
+  "previewProcessing": {
+    "source": "Official iTunes promotional preview URLs from the existing verified playlist metadata",
+    "host": "audio-ssl.itunes.apple.com",
+    "browserProbe": "Chromium fetch HEAD, mode cors, cache no-store; metadata only, no preview audio cached or downloaded",
+    "results": [
+      {
+        "title": "Fortress Down",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Silk In the Strings",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "UNETHICAL",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Arkangel",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "the precipice",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Stockholm (feat. Yamê)",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "SORRY! CRASH!",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Lo Quiero Ya !",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "The Turning",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Sextape",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "BAILE INoLVIDABLE",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "The Apparition",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Lithonia",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Götterdämmerung",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Blackhole",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Always: Your Way",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "If We Want It, It's Right",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Something of an End",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Jigsaw Falling Into Place",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Desafío",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Dawan",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Survivalism",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      },
+      {
+        "title": "Looped",
+        "status": 200,
+        "cors": "cors",
+        "allowed": true
+      }
+    ],
+    "runtime": "Probe on selection; Play calls audio.play and AudioContext.resume within the gesture. A pending or failed probe keeps that media element on direct native playback."
+  },
+  "equalizer": {
+    "frequenciesHz": [
+      80,
+      250,
+      1000,
+      4000,
+      12000
+    ],
+    "types": [
+      "lowshelf",
+      "peaking",
+      "peaking",
+      "peaking",
+      "highshelf"
+    ],
+    "gainRangeDb": [
+      -12,
+      12
+    ],
+    "visualizer": "24 logarithmic bands from real AnalyserNode data; measured RMS in dBFS; no generated waveform"
+  },
+  "verification": {
+    "browser": "Google Chrome, actual Web Audio and native HTMLAudioElement",
+    "widthsPx": [
+      320,
+      390,
+      1024,
+      1440
+    ],
+    "themes": [
+      "light",
+      "dark"
+    ],
+    "tone": "Generated 48 kHz PCM sine at 1 kHz, amplitude 1000/32768; 70% player volume",
+    "measuredBaselineDbfs": -36.42,
+    "gainSettingDb": 6,
+    "measuredFilterResponseDb": 5.99,
+    "measuredBoostedDbfs": -30.45,
+    "checks": [
+      "Preview playback and CORS processing",
+      "Native immediate playback while the HEAD probe remains pending",
+      "Local tone frequency response and measured spectrum",
+      "Bypass retains settings and restores original measured level",
+      "Reset restores zero gain on all five actual filters",
+      "Half volume reduces measured output by approximately 6 dB",
+      "Pause clears the visualizer",
+      "Hidden Sound stops analysis while audio continues",
+      "Reduced motion holds the visualizer without stopping audio",
+      "Suspended context pauses the UI and resumes through Play",
+      "One media source per audio element and one audio context per board",
+      "Replaced media source disconnection and unmount context closure",
+      "React Strict Mode mount replay preserves source playback"
+    ],
+    "helper": "apps/www/scripts/music-player-sound-e2e.mjs",
+    "existingPlaybackHelper": "apps/www/scripts/music-player-e2e.mjs",
+    "limitation": "The gesture path was verified in Chromium; Safari/iOS was not directly available in this environment.",
+    "productionExport": {
+      "origin": "http://localhost:3016",
+      "contentSecurityPolicy": "Exact Vercel CSP applied as the document response header",
+      "cases": [
+        {
+          "widthPx": 320,
+          "theme": "light",
+          "passed": true,
+          "responseDb": 5.994240657778002
+        },
+        {
+          "widthPx": 320,
+          "theme": "dark",
+          "passed": true,
+          "responseDb": 5.991018367079082
+        },
+        {
+          "widthPx": 390,
+          "theme": "light",
+          "passed": true,
+          "responseDb": 5.990307162217835
+        },
+        {
+          "widthPx": 390,
+          "theme": "dark",
+          "passed": true,
+          "responseDb": 5.994843535896637
+        },
+        {
+          "widthPx": 1024,
+          "theme": "light",
+          "passed": true,
+          "responseDb": 5.994275969622532
+        },
+        {
+          "widthPx": 1024,
+          "theme": "dark",
+          "passed": true,
+          "responseDb": 5.994167437172333
+        },
+        {
+          "widthPx": 1440,
+          "theme": "light",
+          "passed": true,
+          "responseDb": 5.994922462578418
+        },
+        {
+          "widthPx": 1440,
+          "theme": "dark",
+          "passed": true,
+          "responseDb": 5.995230373631556
+        }
+      ],
+      "axe": "Full main including color contrast with Sound expanded: zero violations",
+      "overflowPx": 0,
+      "smallTargets": 0,
+      "cspViolations": 0,
+      "network": {
+        "previewHead200": 32,
+        "previewGet206": 25,
+        "artworkGet200": 31
+      },
+      "pendingHeadFirstPlay": "Passed with preview progressing while compatibility remained checking and no AudioContext or MediaElementSource existed"
+    }
+  },
+  "primaryReferences": [
+    "https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/createMediaElementSource",
+    "https://developer.mozilla.org/en-US/docs/Web/API/BiquadFilterNode",
+    "https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getFloatFrequencyData"
+  ]
+}

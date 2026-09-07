@@ -255,17 +255,10 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   color: var(--text-secondary); cursor: pointer; outline: none;
   filter: drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg));
 }
-.nav-toggle-icon { position: relative; display: block; width: 16px; height: 12px; }
-.nav-toggle-icon span {
-  position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor;
-  transition: transform var(--duration) var(--ease), opacity var(--duration) var(--ease);
-}
-.nav-toggle-icon span:nth-child(1) { top: 0; }
-.nav-toggle-icon span:nth-child(2) { top: 5.25px; }
-.nav-toggle-icon span:nth-child(3) { bottom: 0; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(1) { transform: translateY(5.25px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(2) { opacity: 0; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(3) { transform: translateY(-5.25px) rotate(-45deg); }
+.nav-toggle-icon { display: block; width: 20px; height: 20px; overflow: visible; }
+.nav-toggle-icon path { fill: none; stroke: currentColor; stroke-width: 1.5px; transform-origin: 10px 10px; transition: transform var(--duration) var(--ease); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon path:first-child { transform: rotate(45deg) translateY(3px); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon path:last-child { transform: rotate(-45deg) translateY(-3px); }
 
 .nav-panel {
   position: fixed; top: 64px; left: 0; right: 0; z-index: 205;
@@ -812,7 +805,8 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   color: var(--text); cursor: pointer; font: inherit;
   font-size: 1rem; font-weight: 600; letter-spacing: -.01em; text-align: left;
 }
-.toc-mobile-mark { font-weight: 400; color: var(--text-secondary); }
+.toc-mobile-mark { display: flex; align-items: center; color: var(--text-secondary); }
+.toc-mobile-trigger:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
 .toc-mobile-dismiss {
   position: fixed; inset: 0; z-index: 149;
   background: none; border: none; padding: 0;
@@ -852,9 +846,11 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
     position: sticky;
     top: calc(72px + env(safe-area-inset-top, 0px));
     z-index: 150;
-    background: var(--bg);
-    border-bottom: 1px solid var(--divider-subtle);
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color var(--duration-snap) var(--ease), border-color var(--duration-snap) var(--ease);
   }
+  .toc-mobile[data-scrolled="true"] { background: var(--bg); border-bottom-color: var(--divider-subtle); }
   .toc-mobile-inset {
     margin-top: calc(72px + env(safe-area-inset-top, 0px));
     top: calc(72px + env(safe-area-inset-top, 0px));

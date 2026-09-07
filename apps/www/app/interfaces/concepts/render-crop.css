@@ -1,0 +1,9 @@
+.rw-crop-model { background: var(--table-alt); }
+.rw-crop-model .rw-crop-light { display: block; }
+.rw-crop-model .rw-crop-dark { display: none; }
+[data-theme="dark"] .rw-crop-model .rw-crop-light { display: none; }
+[data-theme="dark"] .rw-crop-model .rw-crop-dark { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .rw-crop-model .rw-crop-light { display: none; }
+  :root:not([data-theme="light"]) .rw-crop-model .rw-crop-dark { display: block; }
+}

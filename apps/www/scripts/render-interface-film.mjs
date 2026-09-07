@@ -31,6 +31,7 @@ const slugs = [
 	"orbit",
 	"frontier",
 	"platforms",
+	"robotics",
 ];
 if (!slugs.includes(slug))
 	throw new Error(`Choose an interface: ${slugs.join(", ")}`);
@@ -77,12 +78,13 @@ const bundled = await build({
 	],
 	absWorkingDir: site,
 	bundle: true,
+	loader: { ".css": "empty" },
 	write: false,
 	format: "iife",
 	platform: "browser",
 	target: "chrome120",
 	jsx: "automatic",
-	define: { "process.env.NODE_ENV": '"production"' },
+	define: { "process.env.NODE_ENV": '"production"', "process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN": JSON.stringify(process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "") },
 	minify: true,
 	logLevel: "silent",
 });
@@ -191,9 +193,9 @@ const server = createServer(async (request, response) => {
 		if (pathname === "/scene.css")
 			asset = path.join(
 				site,
-				`app/interfaces/${concept ? "concepts" : slug}/scene.css`,
+				["render", "drive", "orbit"].includes(slug) ? `app/interfaces/concepts/${slug}.css` : slug === "graphics" ? "app/interfaces/concepts/wallpaper.css" : slug === "platforms" ? "app/interfaces/concepts/transit.css" : `app/interfaces/${concept ? "concepts" : slug}/scene.css`,
 			);
-		if (pathname === "/interfaces.css" || pathname === "/scene-motion.css")
+		if (pathname === "/interfaces.css")
 			asset = path.join(site, "app/interfaces", pathname.slice(1));
 		if (pathname.startsWith("/interfaces/"))
 			asset = within(

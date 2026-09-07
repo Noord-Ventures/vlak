@@ -1,71 +1,110 @@
 # Interfaces
 
-What it is, how to get there, what done looks like.
+The catalogue contains 24 working interface studies. Their definitions live in `app/interfaces/catalog.ts`; each study has its own route and source folder. Interfaces is a first-class site destination alongside Components, Docs and About. The component expansion adds 52 specialist controls, taking the public component catalogue from 114 to 166.
 
-Writers: the studies live in `app/interfaces/catalog.ts`. Each proto is its own folder and route. The section is a first-class nav sibling of Components, Docs, and About, not a page inside a component.
+## Catalogue and shared shell
 
-Each interface is a fictional app with a descriptive English name. The gallery, side rail, and detail headings use those names. Stable route slugs are implementation details, not product brands. The eight specialist workspaces appear first, followed by the earlier concepts and communication studies.
+Each study has a descriptive English title. Stable route slugs identify source locations, not product brands. The sidebar uses the shorter labels Website, Genome Mapping and Protein Sequence for `/interfaces/frontier`, `/interfaces/genome` and `/interfaces/protein`. The Interfaces rail and compact contents index sort these display labels alphabetically. The eight specialist workspaces lead the separately curated poster gallery.
 
-Landing cards are poster crops — a clipped fragment of that UI, not a tiny full-page shrink, not a title-only frame. Type in a crop wraps on a word. A composer or photograph may run off the card; a letter may not. Captions follow the English names.
+The gallery presents poster crops: clipped fragments of actual interfaces with readable type. A photograph or model can extend beyond a card; text stays inside word boundaries. Captions use the study titles. The first eight specialist title-bar dividers reach both crop edges while their labels and body content retain the same inset. The H1 aligns with the first rail row at scroll zero. Cards occupy the 204px module, have square chrome and use two gutters of vertical separation.
 
-The site gutter overlay (184 + 20 verticals) shows on `/interfaces` the same as Components — painted on `html::before`, not a second body field. The utmost left gutter paints; do not clip it. Homepage is boxed cells only and does not share this overlay. Type occupies the first cell. Cards sit on the grid. Ink is `--grid-line`, quieter than the Home / About `--divider` cage. Quiet, readable on paper and dark. Do not raise opacity. Detail routes keep the field around the boxed specimen. No page-level horizontal cage.
+The site gutter overlay appears on `/interfaces` as it does on Components. It is painted by `html::before`, including the leftmost gutter. Do not introduce a second body grid or a page-level horizontal cage. Use `--grid-line`, quieter than the Home and About divider. Detail pages retain the surrounding site field; the Documentation reader itself has no construction grid.
 
-Detail keeps Vlak site chrome (logo, corner nav, crumb bar, Interfaces rail). A compact title and Build with Vlak link sit directly above the boxed specimen, aligned with the top of the rail. Below it: interaction summary, source link, plain-language description, and links to components actually used. Component modification notes describe custom implementation honestly.
+Detail pages keep the Vlak logo, corner navigation, breadcrumb and Interfaces rail. A compact title and Build with Vlak link sit directly above the specimen. Below it are the interaction summary, source, plain-language description and links to the components actually used. Custom visual adaptations are documented honestly. The Build section supplies a package install, stylesheet import, installation guide, source link and copyable study brief. Copy reports actual clipboard success or exposes selectable text. `/design.md` is copied from the root guide during site preparation. Gallery and next-study links finish the page, with the next arrow in the gutter.
 
-The Build with Vlak section supplies a copyable package install, stylesheet import, installation guide, source link, and study-specific brief for coding agents. Copy reports actual clipboard success or exposes selectable text on failure. `/design.md` is copied from the root guide during site preparation. Finish with gallery and next-study links. Do not claim account, backend, vehicle, satellite, or commercial generation services exist: these are local examples.
+On narrow pages, a secondary contents picker sits below the main navigation. It is transparent at the top and backed by paper after scroll. Its chevron and the two-line main menu mark share the Vlak icon geometry. Desktop documentation menus allow pointer travel from trigger into the panel; focus, outside-click and Escape paths remain usable.
 
-The boxed UI is a coherent modern product with a Vlak core, not a floaty flat demo. Module, hairlines, grotesque, sentence case. Never all caps. No tape. Chrome stays mostly monochrome. A board may take one spot or a quiet hue for hierarchy. Faces, circular controls, and physical phone frames may be round. Structural cards, panels, rails, rows, and full-bleed dividers stay square and meet their edges. Vlak `Card` supplies the unframed typographic stack inside those regions. Nav, lists, composers, jobs, cart, and fleet units use Vlak `Icon` marks from the family (16 viewBox, 1px currentColor). No second icon set.
+## Visual and interaction contract
 
-Each app has two to three levels of use: list → detail → one level deeper. Inspector panes (`.if-inspect`) open with width and opacity. A state the user caused may snap, ease, or confirm. Quiet, precise, a little pleasure on the change. Entry is not a show. No fade-up on load, no staggered reveal. Color, opacity, and width name the change. Nothing bounces. Reduced motion stills the loops.
+Use Vlak paper, ink and gray tokens, inherited Inter, sentence case, hairlines and the shared control family. Structural cards, panels, rails and rows stay square. Dividers meet the edges of the region they separate; padding belongs to the content inside that region. Vlak Card provides the unframed typographic stack within these regions. Buttons, inputs, selectors and toggles use Vlak primitives where applicable.
 
-| Surface | Route | Click path | Done |
+Specialized artwork can keep meaningful distinctions: album artwork and generated food photographs retain their colors, while Athena, satellite mapping and the vehicle scenes remain monochrome. Phone hardware, app icons, grouped settings, circular controls and physical models retain the forms their tasks require. Shared symbols use Vlak Icon's 16-unit grid and 1px ink. Do not add a competing general-purpose icon set.
+
+Each study supports a useful list, detail and action path. Local actions have visible results and preserve drafts or selections when returning. Do not claim a backend, model provider, account, government submission, clinical action, food order, vehicle command or satellite operation exists. Real integrations are identified separately: Mapbox geographic requests, official music previews, local Web Audio and browser exports.
+
+State transitions are restrained. Focus and a user-triggered change can move deliberately; no bouncing or generic entrance cascade. Reduced motion stops continuous scenes and visualizers while preserving their useful final state. Every interactive target is at least 44 × 44px. Phone body copy is generally 15–16px and editable text fields use at least 16px. Selection changes the whole control surface, its ink or weight. Numeric meters use a fixed value column and stable decimal formatting.
+
+## Studies and primary workflows
+
+| Study | Route | Main path | Result and boundary |
 | --- | --- | --- | --- |
-| Microbiology notebook | `/interfaces/microbiology` | Culture → plate marker → observation | Preserve source counts and missing coordinates, record a note and request a local review. |
+| Microbiology notebook | `/interfaces/microbiology` | Culture → plate marker → observation | Preserve recorded counts and missing coordinates; save a local observation or review request. |
 | Genome mapping workspace | `/interfaces/genome` | Region → alignment or coverage → annotation | Inspect a bounded sample region, select an exact locus, save annotations and export their actual JSON records. |
-| Protein sequence workbench | `/interfaces/protein` | Sequence → residue → variant comparison | Edit a deliberately nonfunctional toy sequence, compare exact substitutions and review explicit local constraints. The ribbon is illustrative; no folding or design model runs. |
-| Robotics workspace | `/interfaces/robotics` | Robot state → joint target → confirmation or event | Pause, resume and step sample telemetry; keep requested joint targets separate from reported and confirmed values. |
-| Circuit board workspace | `/interfaces/circuitry` | Board pad → prompt → editable proposal | Local prompt templates prepare explicit net/assembly proposals. Apply the reviewed changes to the local board draft; imported rule checks retain their supplied status. |
-| Identity application | `/interfaces/identity` | Applicant → evidence → review → receipt | Native validation, sample evidence and a local receipt; no government submission. Browser persistence reports whether storage succeeds. |
-| Patient dashboard | `/interfaces/patient` | Overview → readings or care → visit preparation | Inspect sample readings, update a local care record, and save a visit note or preference. Data and storage are local to the example. |
-| Music session | `/interfaces/music` | Clip → pattern → mix or export | Four synthesized tracks play on the Web Audio clock. Clips, tempo, gain, pan, mute, solo and tone change the sound. Export renders a real stereo wave file. |
-| Interfaces index | `/interfaces` | Corner → Interfaces | Lists the studies. Title occupies a 204 cell. At scroll 0 the H1 top shares the rail first-row line. Each card is a poster crop on the 204, then the English name. Index tiles are chrome-square (radius 0), same lock as Components `.rs-card`. Vertical gap is two gutters so the stack is looser than a flush cage. The field under the title and around the crops reads as the module. |
-| AI chat | `/interfaces/line` | Interfaces → AI chat | Inbox → conversation → response or information. A full-width reading screen and pinned composer replace the desktop panes on mobile. |
-| Dashboard | `/interfaces/press` | Interfaces → Dashboard | Overview → jobs or invoices → brief. Bottom navigation and a focused production overview replace the desktop dashboard on mobile. |
-| Social feed | `/interfaces/wall` | Interfaces → Social feed | Feed → comments → profile. Feed and People have bottom navigation; comments get their own reply screen. All portraits are fictional mock users. |
-| Fleet management | `/interfaces/night` | Interfaces → Fleet management | Vehicles → map → trip. A compact vehicle card anchors the map; the itinerary uses a full reading screen with Back and Show on map actions. |
-| Food ordering | `/interfaces/evening` | Interfaces → Food ordering | Kitchens → menu → dish → bag. Filters and ordering use focused mobile screens with a bottom action. The confirmation is local; no order or payment is submitted. |
-| Team chat | `/interfaces/room` | Interfaces → Team chat | Channels → conversation → thread. Each mobile level gets a contextual header and Back action. Conversations and threads have their own pinned composers. |
-| Agent management | `/interfaces/agents` | Interfaces → Agent management | Queue → task → activity or output. Create local tasks, pause or resume a run, and approve a review. Narrow panels use list-to-detail navigation. No model or external agent service is connected. |
-| Wallpaper generator | `/interfaces/graphics` | Interfaces → Wallpaper generator | Direction → generate → select → export. Geometric compositions run locally in-browser. Export produces a PNG with a 6,144px long edge; no image API is required. |
-| 3D workspace | `/interfaces/render` | Interfaces → 3D workspace | Live WebGL car model, modeling tools, selected panel, render timeline. Drag rotates the model. |
-| EV controls | `/interfaces/drive` | Interfaces → EV controls | Driving status, navigation, media, cabin and connectivity in a restrained automotive field. |
-| Satellite operations | `/interfaces/orbit` | Interfaces → Satellite operations | Animated pass, targets, sweep, spectral layers and telemetry over an illustrative European observation image. |
-| Frontier model company | `/interfaces/frontier` | Interfaces → Frontier model company | Proposition → evidence → model access. Uses Vlak Card stacks for capability regions. |
-| Mobile platforms | `/interfaces/platforms` | Interfaces → Mobile platforms | The same itinerary in iPhone and Android frames with platform-specific navigation and chrome. |
-| Phone | ≤430 | Contents picker | Rail hides under 900. A stacked 44pt picker lists all studies. Scene controls use the 44pt phone scale. Each boxed demo is a mobile composition, not the desktop scene scaled down. |
+| Protein sequence workbench | `/interfaces/protein` | Sequence → residue → variant comparison | Edit a deliberately nonfunctional toy sequence and compare exact substitutions. The ribbon is illustrative; no folding or design model runs. |
+| Robotics workspace | `/interfaces/robotics` | Robot → joint target → confirmation or event | A Three.js arm follows sampled joint state. Draft, requested and confirmed targets remain separate; changing one joint preserves the others. |
+| Circuit board workspace | `/interfaces/circuitry` | Board pad → prompt → proposal | Local templates prepare explicit net and assembly proposals. Apply reviewed draft changes; supplied rule checks retain their actual status. |
+| Identity application | `/interfaces/identity` | Applicant → evidence → review → receipt | Validate fields and sample evidence, then create a local receipt. Storage reports success or failure; no government submission occurs. |
+| Patient dashboard | `/interfaces/patient` | Overview → readings or care → visit preparation | Inspect sample readings, update a local care record, and preserve an unsaved visit note or appointment preference across Back until explicitly saved. |
+| Music session | `/interfaces/music` | Clip → pattern → mix or export | Four synthesized tracks use the Web Audio clock. Clip, tempo, mix and tone controls affect sound; export renders a stereo wave file. |
+| AI chat | `/interfaces/line` | Notebook → conversation → response details | Independent conversations and drafts, local response templates, saved replies and Markdown export. |
+| Dashboard | `/interfaces/press` | Production → job → review | Supplied dates and records drive the metrics and filters. Save review notes without changing invoice payment state. |
+| Social feed | `/interfaces/wall` | Feed → comments → profile | Publish text, filter contributors, like, reply and follow locally. People and post records are fictional. |
+| Fleet management | `/interfaces/night` | Vehicles → map → trip | Filter sample vehicles on Mapbox's monochrome Dogpatch map, inspect provider street routes and save local trip notes. |
+| Food ordering | `/interfaces/evening` | Kitchen → menu → bag → receipt | Browse four restaurants, filter dishes, change quantities and produce a local receipt. No order or payment is sent. |
+| Team chat | `/interfaces/room` | Channel → conversation → thread | Create local channels, send messages and replies, pin and acknowledge updates. Cancel returns to the originating list, conversation or thread. |
+| Agent management | `/interfaces/agents` | Queue → task → activity or output | Create tasks, pause or resume sample runs, and review local work. No agent or model service is connected. |
+| Wallpaper generator | `/interfaces/graphics` | Direction → generate → select → export | Seeded geometric compositions run in the browser. Export creates a PNG with a 6,144px long edge. |
+| 3D workspace | `/interfaces/render` | Vehicle → surface or viewport → camera | The local licensed vehicle responds to Fine lines, Ink lines, mesh, orbit, zoom, reset and turntable controls. |
+| EV controls | `/interfaces/drive` | Vehicle → Journey → Energy | Side-profile exterior, third-person perspective streetscape and isometric exploded battery views respond to the simulation. Reading blocks open focused detail panes. |
+| Satellite operations | `/interfaces/orbit` | Map → asset → pass | Select assets and layers, change zoom, and manage a local capture queue around a monochrome map and scanning reticle. |
+| Website / Athena Labs | `/interfaces/frontier` | Proposition → model → system card | A large cropped hairline Athena bust turns slowly beside local model information. Reduced motion holds it still. |
+| Transit app | `/interfaces/platforms` | Plan → route → saved day | Search sample stations, choose departure time, inspect stops, save a trip and edit traveler preferences. No timetable or booking service is connected. |
+| Mobile OS | `/interfaces/mobile-os` | Home → app → system controls | Two independent phones each provide 16 apps, local editing, settings, notifications, recents, timers and synthesized audio. |
+| Music player | `/interfaces/music-player` | Library or Queue → recording → Sound | Play individual official previews or attached local files. Sound adds a measured spectrum and five-band equalizer when processing is available. |
+| Documentation | `/interfaces/documentation` | Index → article → heading outline | A bounded Inter reader with metadata, reading preferences, section navigation, pinning and index-position restoration. |
 
-Routes are derived from `catalog.ts`; CI fails if a catalog route disappears.
+Routes are derived from `catalog.ts`; catalogue entries must resolve to actual pages.
 
-## Mobile composition contract
+## Mobile composition
 
-The specimen container, not only the browser width, determines the layout. At 640px and below, replace desktop information architecture with focused screens. A narrow specimen next to the documentation rail must receive the same mobile treatment. Desktop remains multi-pane above that threshold.
+Use the specimen's width, not only the browser width. At 640px and below, desktop panes become focused screens. The same mobile composition must work inside a narrow specimen beside the desktop documentation rail.
 
-- Agent management uses Tasks, Active, and Review bottom navigation. Task details and new-task forms replace the queue and header, with a pinned primary action and independently scrolling content.
-- Wallpaper generation separates Preview from Direction. Show one selected result, keep a three-result picker, and return to Preview after generation. All format and export controls remain reachable.
-- The 3D workspace separates Viewport from Inspector and puts modeling tools in a horizontal toolbar.
-- Vehicle controls separate Vehicle, Controls, and Media. Keep the artwork, settings, and playback at a usable scale without competing for the same screen.
-- Satellite operations separate Map, Assets, and Pass details. Do not hide telemetry to make the map fit.
-- The frontier company uses a disclosure menu and a single-column reading flow, with Escape and focus return.
-- Mobile platforms show one full-width handset behind an iOS/Android picker. Both preserve their own navigation and saved-trip state.
+- The music session uses one selected track with four clip launchers and scene actions. Its Clip screen presents 16 steps as four labeled beat rows; Mixer and Clip keep Back, focus restoration and pinned transport.
+- Patient visit preparation preserves unsaved note and preference drafts when returning to the overview; its saved record changes only on explicit Save.
+- Team chat restores the originating screen, thread draft and focus after cancelled channel creation. Food ordering does not add history when its active Bag action is tapped again.
+- Agent management uses Tasks, Active and Review; detail and creation replace the list with their own Back and primary action.
+- Wallpaper generation separates Preview from Direction, retains the selected result and exposes the other generated choices.
+- The 3D workspace separates Viewport from Inspector. Viewport tools remain reachable without covering the model.
+- EV keeps Range & battery, Cabin and Media readings available. Details slide in above those controls on phones, with a clear return to the scene. Desktop details occupy one third of the workspace.
+- Satellite operations separates Map, Assets and Pass details. Telemetry remains available at every size.
+- The Website header uses Vlak paper, ink and hairlines with its active underline on the divider. Mobile navigation uses a disclosure menu and one-column reading flow, with Escape and focus return.
+- Transit has one responsive planner, itinerary, saved-day and profile state, without a platform switch.
+- Mobile OS shows both phones side by side on desktop and in a horizontal scroll-snap track on compact screens. There is no study-level switch. iPhone navigation keeps the Home gesture, App Library, contextual back, grouped Settings and separate Control and Notification Centers. Android retains its All Apps drawer, three-button navigation, app bars, floating actions and Quick Settings. The iOS visual language uses paper surfaces, Vlak glyphs and restrained type without replacing its platform structure. Vertical Home scrolling remains native, an App Library swipe does not move the phone track, and a status-bar swipe keeps the other phone reachable.
+- Music player exposes Library, Playing and Queue on mobile. The selected recording, transport, Sound settings and queue survive navigation.
+- Documentation uses a readable contents disclosure below 840px. On desktop, heading marks reveal labels on approach or focus. Clicking a heading or the Contents control pins it; Escape dismisses it. Paragraphs and lists use Inter at weight 350. Reading controls have no hover fill; the outline keeps its proximity reveal. Reader settings reuse the site chrome’s SettingsMark and canonical Vlak Popover, Field, ToggleGroup and Button components. Explicit Light and Dark use the exact token palettes; Auto inherits the site without changing its theme. There is no layout-grid preference.
 
-Use Vlak Button, Card, Icon, Input, InputGroup, and ToggleGroup where applicable. Keep structural regions flush and controls at the 4px radius. Body copy is 15–16px on phones, text inputs are at least 16px, and targets are at least 44 × 44px. Selection changes the full control surface. Do not add simulated device status bars outside the explicit platform comparison.
+Desktop specimens adapt between 612 and 816px tall; phone frames follow the stable viewport with a 480px minimum. Boards fill their frame. Long content scrolls inside its screen, independently of headers, primary actions and bottom navigation. Back preserves state and restores focus. Each route documents its adaptation in `mobilePatterns`.
 
-Specialist workspaces also compose the relevant domain components. Their desktop specimens adapt between 612 and 816px tall; phones retain the shared viewport-based frame. Each board fills that frame with independently scrolling content and reachable actions. Specialized plots, board geometry, routing, molecular illustrations and musical grids keep their own useful visual structure within Vlak.
+## Media and service boundaries
 
-Headers, bottom navigation, and primary actions must remain separate from the scrolling content. Back preserves the selected item and restores focus. Phone specimen height follows the stable viewport, with a 480px minimum; long details scroll inside their screen. Reduced motion must preserve every transition's end state. Each detail page documents its mobile component adaptation in `mobilePatterns`.
+Fleet management needs `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`, documented in `apps/www/.env.example`. Its fallback is a labeled schematic, and Mapbox attribution remains visible. Vehicle positions and operational readings are samples even when geographic tiles and routes come from Mapbox.
 
-`scripts/e2e-mobile-interfaces.mjs` exercises the earlier 13 flows at 320 × 568, 390 × 844, 430 × 932, and a narrow specimen inside a 1024px desktop page. It checks touch targets, duplicated chrome, overflow, reachable navigation, and the main state-changing journey. `scripts/e2e-agents.mjs` covers task creation, approvals, pause/resume, focus, and accessibility. `scripts/e2e-interfaces.mjs` covers the shared gallery, detail pages, and desktop regressions.
+Food ordering uses verified restaurant references for Joe's Kitchen, Neder, La Dune and Jacky's. Restaurant and dish photographs are generated illustrations. Prices and service details distinguish sourced snapshots from samples; delivery and checkout remain illustrative.
 
-`scripts/e2e-specialist-interfaces.mjs` covers the eight new workspaces at 320, 390, 1024 and 1440px, including light/dark accessibility, local persistence, exact data changes, downloads and actual synthesized audio. Its science, engineering, care and music helpers exercise complete journeys separately from layout checks.
+Mobile OS music uses real local oscillators and keeps its app and system controls synchronized with actual audio suspension, unsuccessful resume and recovery.
 
-Before shipping, check all study routes at phone and desktop widths, including 320px. Verify one main landmark and page heading, no horizontal page overflow, primary local interactions, clipboard feedback, design-guide URL, component links, and the build anchor. Scope container queries to the owning study. Run the site typecheck and production build.
+The Music Player has 23 verified recordings. Official previews are individually initiated promotional streams with direct store links, the approved badge and courtesy credit. They do not auto-advance or become downloadable full tracks. User-attached files stay local and support full queue playback.
+
+The Sound graph probes remote-media CORS support on selection. Play and audio-context resume stay in the user action; a pending or refused probe keeps immediate native playback available without creating a media source. It never fabricates visualizer readings. Reduced motion holds the spectrum still.
+
+The 3D Workspace and EV share an attributed geometry-only Evoque under CC BY 4.0. Their screen-space feature contours use 1.05px lines with a narrow silhouette hull, and surfaces match the composited viewport paper through stable CSS token colors. EV's Journey streetscape is an original looping illustration, not mapped Utrecht geometry. Lights can switch the site theme and restore it; repeated toggles must keep all material colors consistent. The robot and battery geometry are independently authored illustrations.
+
+Athena's licensed bust is cropped above the helmet and below the shoulders, has no pause button and honors reduced motion. Creator links, license links and modification notes sit below Components used, with asset provenance in the repository. Three.js and Mapbox are site dependencies, not runtime additions to the component package.
+
+## Verification contract and checkpoint
+
+The fresh delivery package checkpoint passes 1,095 tests, build, typecheck, size budget and tarball smoke, with all 528 generated files byte-stable. Biome reports zero errors across 793 files; the example check passes 167 isolated examples and 92 new previews. These package results do not substitute for testing the latest application source.
+
+The fresh production export passes all 192 study layout/accessibility cases, the eight specialist studies' complete local workflows, established mobile journeys, shared gallery/chrome checks and About integration. Current EV journeys, Render controls and the shared vehicle lifecycle pass. Native Mobile OS gestures and real audio interruption/recovery are covered. Documentation's canonical popover, exact local palettes, forced colors, scale bounds and focus paths pass their focused eight-case check.
+
+The delivery refresh runner recorded one Music Player direct-audio timeout. Its replacement regression passed all eight width/theme cases with trusted keyboard activation, immediate direct playback requests during pending or refused CORS probes, and no unintended audio graph creation. Keep the original nonzero run in the evidence. The dedicated Agents rerun passes after fixing directory redirects in the local test server. Inspiration still requires confirmation of its updated caption/order and focus assertions. The first-eight title-divider fix is source-verified at all four widths in both themes, with zero edge gaps and unchanged content geometry; its final production export is pending. The newer main-branch media-control alignment changes also require merging, regeneration, a final build and focused media/gallery checks. These are the remaining validation items, not untested application workflows.
+
+For the fresh export, set `SITE_URL` and optionally `PLAYWRIGHT_EXECUTABLE_PATH`, then use the relevant runners:
+
+- `scripts/e2e-interface-refresh.mjs`: all 24 studies at 320, 390, 1024 and 1440px, with layout and accessibility in both themes and focused app flows in light mode at each width. Room/Bag return paths also run at the two phone widths. `INTERFACES` selects a bounded subset.
+- `scripts/e2e-specialist-interfaces.mjs`: the eight specialist application layouts in both themes, with local persistence, exact data, downloads and synthesized-audio workflows in light mode at each width.
+- `scripts/e2e-render-controls.mjs` and `scripts/e2e-vehicle.mjs`: actual geometry, line treatments, mesh, camera fit, turntable, failure/retry and context cleanup.
+- `scripts/e2e-interface-chrome.mjs`, `scripts/e2e-interfaces.mjs` and `scripts/e2e-mobile-interfaces.mjs`: shared navigation, gallery behavior, flush dividers, target sizes and established responsive journeys.
+- The domain and application helpers remain callable separately for focused regression checks, including Mobile OS, Documentation, Music Player, robotics and Mapbox.
+
+Before recording a final pass, test the current production export at phone and desktop widths, including a narrow desktop specimen. Check one main landmark and page heading, page and specimen overflow, 44px reach, keyboard navigation, state changes, failures, clipboard/download feedback, source and component links, the Build anchor and light/dark/reduced-motion behavior. Review actual screenshots. Run the site typecheck and production build; record exact results after integration.

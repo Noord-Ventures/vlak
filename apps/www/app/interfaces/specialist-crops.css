@@ -1,6 +1,6 @@
 .if-sc { position: absolute; inset: 0; overflow: hidden; padding: 20px; color: var(--text); font-size: 12px; background: var(--bg); container-type: inline-size; }
 .if-sc * { box-sizing: border-box; }
-.if-sc-top { display: flex; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--divider); font-size: 11px; white-space: nowrap; }
+.if-sc-top { display: flex; justify-content: space-between; gap: 12px; margin-inline: -20px; padding-inline: 20px; padding-bottom: 14px; border-bottom: 1px solid var(--divider); font-size: 11px; white-space: nowrap; }
 .if-sc-top > span:last-child { color: var(--text-secondary); }
 .if-sc svg { fill: none; stroke: currentColor; stroke-width: 1; }
 .if-sc strong { display: block; font-size: 25px; font-weight: 500; line-height: 1.2; letter-spacing: -.04em; margin-top: 8px; }

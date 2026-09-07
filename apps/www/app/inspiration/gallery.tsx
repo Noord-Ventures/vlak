@@ -187,7 +187,7 @@ export function Gallery({ embedded = false, captions = {} }: { embedded?: boolea
           select(next);
           document.getElementById(`study-select-${next}`)?.focus({ preventScroll: true });
         }}>
-          {studies.map((item, index) => <ReferenceTile key={item.id} study={item} caption={captions[item.image]} index={index} selected={active === index} onSelect={select} />)}
+          {studies.map((item, index) => <ReferenceTile key={item.id} study={item} caption={captions[item.image]} index={index} selected={active === index} onSelect={select} showImage={!embedded} />)}
         </div>
       </section>
 

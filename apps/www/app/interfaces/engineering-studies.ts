@@ -4,15 +4,15 @@ export const engineeringStudies = [
     law: "A robot debugging workspace with deterministic telemetry, joint drafts, mission records and an event log.",
     story: "A commissioning desk for an illustrative inspection arm. The live viewport and joint readings share a deterministic local clock. Selecting a joint opens its draft target; a separate confirmation applies that target to the simulation. Mission review and diagnostic events remain close to the machine view.",
     what: "Robotics workspace", type: "Telemetry viewport, joint inspector, mission review", module: "Grid system",
-    ink: "A monochrome machine drawing, instrument grid and full-surface joint selection.",
+    ink: "Cel-shaded mechanical housings, precise ink outlines and full-surface joint selection.",
     use: "Pause telemetry → select a joint → edit and confirm a simulated target → inspect the event",
     field: "An instrument viewport beside a focused inspector and a persistent simulation transport.",
     note: "Telemetry and motion are deterministic local examples. No robot, controller or remote service is connected. Targets change the illustration only after explicit simulation confirmation; mission review does not execute a mission. Changes reset on reload.",
-    components: ["Button", "Card", "Icon", "Toggle group", "Joint panel", "Robot pose", "Robot mission queue", "Alarm panel"],
+    components: ["Button", "Card", "Icon", "Select", "Toggle group", "Joint panel", "Robot pose", "Robot mission queue", "Alarm panel"],
     modifications: [
       "Joint panel edits one selected joint while the separate viewport keeps reported readings visible. A second Vlak Button confirms the request in the local simulator.",
       "Robot pose, Robot mission queue and Alarm panel occupy focused inspector views. Mission review and alarm acknowledgement update local records and append diagnostic events.",
-      "A custom vector arm and timeline visualize the sample clock. The drawing is illustrative, not a kinematic solver. Reduced motion pauses the automatic sample stream; manual stepping remains available.",
+      "An original Three.js inspection arm uses shared forward kinematics for its nested joint pivots and tool readout. Native controls select camera views, playback speed, gripper state and sample trace. Reduced motion pauses automatic playback; a live vector projection remains available if WebGL fails.",
     ],
   },
   {

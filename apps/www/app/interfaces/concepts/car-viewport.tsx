@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { sceneColor } from "./scene-color";
 import { Button } from "@noorddev/vlak-react";
-import { loadVehicleViewer, vehicleModel, type ViewerApi, type ViewerCamera, type ViewerMaterial } from "./vehicle-viewer";
 
 type ViewportProps = {
   rotating: boolean;
@@ -12,202 +12,298 @@ type ViewportProps = {
   onStatusChange?: (status: "loading" | "ready" | "error") => void;
 };
 
+const modelUrl = "/interfaces/concepts/evoque-monochrome.glb";
+
 export function CarViewport(props: ViewportProps) {
   const mountRef = React.useRef<HTMLDivElement>(null);
-  const iframeRef = React.useRef<HTMLIFrameElement>(null);
   const options = React.useRef(props);
   options.current = props;
+  const refresh = React.useRef(() => {});
   const [status, setStatus] = React.useState<"loading" | "ready" | "error">("loading");
   const [attempt, setAttempt] = React.useState(0);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: changing attempt intentionally reinitializes the third-party viewer
+  // biome-ignore lint/correctness/useExhaustiveDependencies: retry recreates the renderer; all live controls use options and refresh
   React.useEffect(() => {
     const mount = mountRef.current;
-    const iframe = iframeRef.current;
-    if (!mount || !iframe) return;
-
+    if (!mount) return;
     let disposed = false;
-    let api: ViewerApi | undefined;
-    let ready = false;
-    let hovering = false;
-    let cameraPending = false;
-    let homeCamera: ViewerCamera | undefined;
-    let paint: ViewerMaterial | undefined;
-    let previousMaterial: ViewportProps["material"] | undefined;
-    let previousWireframe: boolean | undefined;
-    let previousReset = options.current.resetKey;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
+    let release = () => {};
+    const request = new AbortController();
     const report = (next: "loading" | "ready" | "error") => {
       if (disposed) return;
       setStatus(next);
       options.current.onStatusChange?.(next);
     };
-    const fail = () => {
-      if (disposed) return;
-      ready = false;
-      api?.stop();
-      report("error");
-    };
     report("loading");
-    const timeout = window.setTimeout(fail, 45000);
+    const timeout = window.setTimeout(() => { request.abort(); report("error"); }, 30000);
 
-    const rotateCamera = (angle: number, duration = 0) => {
-      if (!api || !ready || cameraPending) return;
-      cameraPending = true;
-      api.getCameraLookAt((error, camera) => {
-        cameraPending = false;
-        if (disposed || error || !ready) return;
-        const x = camera.position[0] - camera.target[0];
-        const y = camera.position[1] - camera.target[1];
-        api?.setCameraLookAt([
-          camera.target[0] + x * Math.cos(angle) - y * Math.sin(angle),
-          camera.target[1] + x * Math.sin(angle) + y * Math.cos(angle),
-          camera.position[2],
-        ], camera.target, duration);
+    Promise.all([
+      import("three"),
+      import("three/addons/controls/OrbitControls.js"),
+      import("three/addons/loaders/GLTFLoader.js"),
+      import("./drive-model"),
+    ]).then(async ([THREE, { OrbitControls }, { GLTFLoader }, { createDriveModel }]) => {
+      if (disposed || request.signal.aborted) return;
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
+      const canvas = renderer.domElement;
+      canvas.className = "rw-vehicle-canvas";
+      canvas.setAttribute("aria-hidden", "true");
+      canvas.dataset.renderer = "three";
+      canvas.dataset.modelUrl = modelUrl;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      renderer.setClearColor(0x000000, 0);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      mount.prepend(canvas);
+
+      const scene = new THREE.Scene();
+      const geometries = new Set<InstanceType<typeof THREE.BufferGeometry>>();
+      const materials = new Set<InstanceType<typeof THREE.Material>>();
+      const vehicleMaterials = new Set<InstanceType<typeof THREE.MeshBasicMaterial>>();
+      let released = false;
+      let disposeControls = () => {};
+      let disposeGradient = () => {};
+      release = () => {
+        if (released) return;
+        released = true;
+        disposeControls();
+        geometries.forEach(geometry => { geometry.dispose(); });
+        materials.forEach(material => { material.dispose(); });
+        disposeGradient();
+        renderer.dispose();
+        renderer.forceContextLoss();
+        canvas.remove();
+      };
+      const response = await fetch(modelUrl, { signal: request.signal });
+      if (!response.ok) throw new Error("Vehicle asset unavailable");
+      const asset = await new GLTFLoader().parseAsync(await response.arrayBuffer(), "/interfaces/concepts/");
+      const sourceModel = asset.scene;
+      const sourceMaterials = new Set<InstanceType<typeof THREE.Material>>();
+      let triangles = 0;
+      let vertices = 0;
+      let meshes = 0;
+      sourceModel.traverse(object => {
+        if (!(object instanceof THREE.Mesh)) return;
+        geometries.add(object.geometry);
+        const parts = Array.isArray(object.material) ? object.material : [object.material];
+        parts.forEach(material => { materials.add(material); sourceMaterials.add(material); });
+        triangles += (object.geometry.index?.count ?? object.geometry.attributes.position!.count) / 3;
+        vertices += object.geometry.attributes.position!.count;
+        meshes += 1;
       });
-    };
-
-    const applyOptions = () => {
-      if (!api || !ready) return;
-      const current = options.current;
-      if (current.wireframe !== previousWireframe) {
-        api.setWireframe(current.wireframe, { color: "202020FF" });
-        previousWireframe = current.wireframe;
+      if (disposed || request.signal.aborted) {
+        // Parsing may finish after an unmount or timeout, after release already ran.
+        geometries.forEach(geometry => { geometry.dispose(); });
+        materials.forEach(material => { material.dispose(); });
+        release();
+        return;
       }
-      if (paint && current.material !== previousMaterial) {
-        const color = current.material === "clay" ? [0.62, 0.60, 0.54] : [0.13, 0.14, 0.14];
-        for (const name of ["DiffuseColor", "DiffusePBR", "AlbedoPBR"]) {
-          if (paint.channels[name]) paint.channels[name] = { ...paint.channels[name], color };
+      if (!meshes) throw new Error("Vehicle geometry missing");
+      const prepared = createDriveModel(sourceModel);
+      const model = prepared.root;
+      prepared.battery.visible = prepared.cover.visible = prepared.connectors.visible = false;
+      disposeGradient = () => prepared.gradient.dispose();
+      geometries.clear(); materials.clear();
+      model.traverse(object => {
+        if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
+          geometries.add(object.geometry);
+          for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
+            materials.add(material);
+            if (object.userData.vehicleSurface && material instanceof THREE.MeshBasicMaterial) vehicleMaterials.add(material);
+          }
         }
-        api.setMaterial(paint);
-        previousMaterial = current.material;
-      }
-      if (current.resetKey !== previousReset && homeCamera) {
-        api.setCameraLookAt(homeCamera.position, homeCamera.target, reducedMotion.matches ? 0 : 0.3);
-        previousReset = current.resetKey;
-      }
-    };
+      });
+      Object.values(prepared.materials).forEach(material => { materials.add(material); });
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3());
+      const scale = 4.5 / Math.max(size.x, size.y, size.z);
+      model.scale.multiplyScalar(scale);
+      bounds.setFromObject(model);
+      const center = bounds.getCenter(new THREE.Vector3());
+      model.position.add(new THREE.Vector3(-center.x, -bounds.min.y, -center.z));
+      bounds.setFromObject(model);
+      bounds.getSize(size);
+      scene.add(model);
 
-    const fitCamera = () => {
-      if (disposed || !ready || !api) return;
-      api.recenterCamera((error) => {
-        if (disposed || error) return;
-        api?.getCameraLookAt((cameraError, camera) => {
-          if (disposed || cameraError) return;
-          const home = homeCamera ?? camera;
-          const direction = home.position.map((value, index) => value - home.target[index]!);
-          const distance = Math.hypot(...camera.position.map((value, index) => value - camera.target[index]!));
-          const scale = distance / Math.max(Math.hypot(...direction), 0.001);
-          homeCamera = {
-            position: [
-              camera.target[0] + direction[0]! * scale,
-              camera.target[1] + direction[1]! * scale,
-              camera.target[2] + direction[2]! * scale,
-            ],
-            target: camera.target,
-          };
+      const grid = new THREE.GridHelper(12, 24, 0x888888, 0x888888);
+      grid.position.y = -.02; grid.material.transparent = true; grid.material.opacity = .09;
+      scene.add(grid); geometries.add(grid.geometry); materials.add(grid.material);
+      const camera = new THREE.PerspectiveCamera(36, 1, .01, 100);
+      const controls = new OrbitControls(camera, canvas);
+      controls.enablePan = false;
+      controls.enableDamping = false;
+      controls.minPolarAngle = .15;
+      controls.maxPolarAngle = Math.PI / 2 - .025;
+      controls.zoomSpeed = .7;
+      const target = new THREE.Vector3(0, size.y * .46, 0);
+      const direction = new THREE.Vector3(-1.15, .35, 1.35).normalize();
+      // Collapse the actual vertices into a rotation-safe radial profile once.
+      // This avoids the empty corners of a global box making the car too small.
+      const profile: number[] = [];
+      const vertex = new THREE.Vector3();
+      model.updateMatrixWorld(true);
+      model.traverse(object => {
+        if (!(object instanceof THREE.Mesh) || !object.userData.vehicleSurface) return;
+        const positions = object.geometry.attributes.position!;
+        for (let index = 0; index < positions.count; index++) {
+          vertex.fromBufferAttribute(positions, index).applyMatrix4(object.matrixWorld).sub(target);
+          profile.push(Math.hypot(vertex.x, vertex.z), vertex.y);
+        }
+      });
+      let home = new THREE.Vector3();
+      let dirty = true;
+      let hovering = false;
+      let visible = true;
+      let hasArea = true;
+      let lost = false;
+      let frame = 0;
+      let lastFrame = 0;
+      let previousMaterial = "";
+      let previousWireframe: boolean | undefined;
+      let previousReset = options.current.resetKey;
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      const forced = window.matchMedia("(forced-colors: active)");
+      const fail = () => { if (lost || disposed) return; lost = true; cancelAnimationFrame(frame); report("error"); };
+      const palette = () => {
+        const tokens = getComputedStyle(mount);
+        const color = sceneColor(tokens.getPropertyValue("--text"));
+        const dark = color.r + color.g + color.b > 1.5;
+        const paper = sceneColor(tokens.getPropertyValue("--table-alt"), tokens.getPropertyValue("--bg"));
+        const ink = options.current.material === "graphite" ? (dark ? 0xe0e0e0 : 0x252525) : (dark ? 0xa2a2a2 : 0x525252);
+        for (const material of [prepared.materials.paint,prepared.materials.glass,prepared.materials.rubber,prepared.materials.alloy,prepared.materials.trim,prepared.materials.lamp]) material.color.copy(paper);
+        prepared.materials.silhouette.color.setHex(ink);
+        prepared.materials.edge.color.setHex(ink);
+        prepared.materials.vehicleEdge.color.setHex(ink);
+        prepared.materials.vehicleEdge.opacity = options.current.material === "graphite" ? 1 : .88;
+        prepared.materials.edge.opacity = options.current.material === "graphite" ? .86 : .66;
+        for (const [source, material] of prepared.vehicleMaterials) {
+          const base = source as InstanceType<typeof THREE.MeshBasicMaterial>;
+          const copy = material as InstanceType<typeof THREE.MeshBasicMaterial>;
+          copy.color.copy(base.color); copy.opacity = base.opacity;
+        }
+        vehicleMaterials.forEach(material => {
+          material.wireframe = options.current.wireframe;
+          if (options.current.wireframe) { material.color.setHex(ink); material.transparent = true; material.opacity = .23; }
+          else { material.transparent = false; material.opacity = 1; }
         });
-      });
-    };
-
-    const onReady = () => {
-      if (disposed || !api) return;
-      window.clearTimeout(timeout);
-      ready = true;
-      api.setBackground({ color: [0.37, 0.37, 0.35] });
-      api.getCameraLookAt((error, camera) => {
-        if (!disposed && !error) {
-          homeCamera = camera;
-          fitCamera();
+        model.traverse(object => { if (object.userData.vehicleContour) object.visible = !options.current.wireframe; });
+        grid.material.color.setHex(dark ? 0xbbbbbb : 0x555555);
+        canvas.dataset.theme = dark ? "dark" : "light";
+        canvas.dataset.paper = paper.getHexString();
+        canvas.dataset.lineInk = prepared.materials.silhouette.color.getHexString();
+        dirty = true;
+      };
+      const theme = () => palette();
+      const reset = () => {
+        controls.target.copy(target); camera.position.copy(home); controls.update(); dirty = true;
+      };
+      const resize = () => {
+        const { width, height } = mount.getBoundingClientRect();
+        hasArea = width > 0 && height > 0;
+        if (!hasArea) return;
+        camera.aspect = width / height;
+        // Each profile point stays inside all four frustum planes through a full orbit.
+        const sphere = bounds.getBoundingSphere(new THREE.Sphere());
+        const halfVertical = THREE.MathUtils.degToRad(camera.fov / 2);
+        const halfHorizontal = Math.atan(Math.tan(halfVertical) * camera.aspect);
+        const sin = direction.y, cos = Math.sqrt(1 - sin * sin);
+        const vertical = 1 / Math.tan(halfVertical), horizontal = 1 / Math.tan(halfHorizontal);
+        const horizontalFactor = Math.hypot(cos, horizontal);
+        let distance = 0;
+        for (let index = 0; index < profile.length; index += 2) {
+          const radius = profile[index]!, y = profile[index + 1]!;
+          distance = Math.max(distance,
+            radius * horizontalFactor + y * sin,
+            radius * Math.abs(cos - sin * vertical) + y * (sin + cos * vertical),
+            radius * Math.abs(cos + sin * vertical) + y * (sin - cos * vertical));
         }
-      });
-      api.getMaterialList((error, materials) => {
-        if (disposed || error) return;
-        // The creator's paint material is distinct from glass, trim and wheels.
-        paint = materials.find((material) => material.name === "Carro_Pintura");
+        distance *= 1.06;
+        home = target.clone().addScaledVector(direction, distance);
+        canvas.dataset.home = home.toArray().map(value => value.toFixed(6)).join(",");
+        controls.minDistance = sphere.radius * 1.05;
+        controls.maxDistance = distance * 2.5;
+        camera.updateProjectionMatrix(); renderer.setSize(width, height, false); reset();
+      };
+      const applyOptions = () => {
+        const current = options.current;
+        if (previousMaterial !== current.material || previousWireframe !== current.wireframe) {
+          palette(); previousMaterial = current.material; previousWireframe = current.wireframe;
+        }
+        if (previousReset !== current.resetKey) { previousReset = current.resetKey; reset(); }
+      };
+      refresh.current = () => { applyOptions(); dirty = true; };
+      const rotate = (angle: number) => {
+        camera.position.sub(controls.target).applyAxisAngle(THREE.Object3D.DEFAULT_UP, angle).add(controls.target);
+        controls.update(); dirty = true;
+      };
+      const keydown = (event: KeyboardEvent) => {
+        if (event.target !== mount || !["ArrowLeft", "ArrowRight", "+", "-", "Home"].includes(event.key)) return;
+        event.preventDefault();
+        if (event.key === "Home") reset();
+        else if (event.key === "ArrowLeft" || event.key === "ArrowRight") rotate(event.key === "ArrowLeft" ? -.18 : .18);
+        else {
+          const offset = camera.position.clone().sub(controls.target);
+          offset.setLength(THREE.MathUtils.clamp(offset.length() * (event.key === "+" ? .9 : 1.1), controls.minDistance, controls.maxDistance));
+          camera.position.copy(controls.target).add(offset); controls.update(); dirty = true;
+        }
+      };
+      const enter = () => { hovering = true; };
+      const leave = () => { hovering = false; };
+      const change = () => { dirty = true; };
+      const contextLost = (event: Event) => { event.preventDefault(); fail(); };
+      const observer = new ResizeObserver(resize); observer.observe(mount);
+      const intersection = new IntersectionObserver(entries => { visible = entries[0]?.isIntersecting ?? true; dirty = true; }); intersection.observe(mount);
+      const mutations = new MutationObserver(changes => { if (changes.some(change => change.target instanceof Element && change.target.contains(mount))) theme(); });
+      mutations.observe(document.documentElement, { attributes: true, subtree: true, attributeFilter: ["class", "data-theme"] });
+      controls.addEventListener("change", change);
+      mount.addEventListener("keydown", keydown);
+      canvas.addEventListener("pointerenter", enter); canvas.addEventListener("pointerleave", leave);
+      canvas.addEventListener("webglcontextlost", contextLost);
+      reduced.addEventListener("change", change); forced.addEventListener("change", theme);
+      canvas.dataset.triangles = String(triangles); canvas.dataset.vertices = String(vertices);
+      canvas.dataset.materials = String(sourceMaterials.size); canvas.dataset.meshes = String(meshes);
+      const render = (time: number) => {
+        if (disposed || lost) return;
+        frame = requestAnimationFrame(render);
+        const delta = Math.min((time - lastFrame) / 1000, .05); lastFrame = time;
+        if (!visible || !hasArea || document.hidden) return;
         applyOptions();
-      });
-      applyOptions();
-      report("ready");
-    };
-
-    if (!navigator.onLine) {
+        if (options.current.rotating && !reduced.matches && !hovering && !mount.contains(document.activeElement)) rotate(delta * .16);
+        if (!dirty) return;
+        try { renderer.render(scene, camera); } catch { fail(); return; }
+        // These diagnostics describe the rendered objects, not requested UI state.
+        canvas.dataset.surfaceColor = [...vehicleMaterials][0]?.color.getHexString();
+        canvas.dataset.wireframeMaterials = String([...vehicleMaterials].filter(material => material.wireframe).length);
+        canvas.dataset.camera = camera.position.toArray().map(value => value.toFixed(6)).join(",");
+        canvas.dataset.target = controls.target.toArray().map(value => value.toFixed(6)).join(",");
+        canvas.dataset.renderedTriangles = String(renderer.info.render.triangles);
+        canvas.dataset.renderedLines = String(renderer.info.render.lines);
+        canvas.dataset.frames = String(renderer.info.render.frame);
+        dirty = false;
+      };
+      disposeControls = () => {
+        cancelAnimationFrame(frame); observer.disconnect(); intersection.disconnect(); mutations.disconnect();
+        refresh.current = () => {};
+        controls.removeEventListener("change", change); controls.dispose();
+        mount.removeEventListener("keydown", keydown);
+        canvas.removeEventListener("pointerenter", enter); canvas.removeEventListener("pointerleave", leave);
+        canvas.removeEventListener("webglcontextlost", contextLost);
+        reduced.removeEventListener("change", change); forced.removeEventListener("change", theme);
+      };
+      theme(); resize(); applyOptions();
+      render(performance.now());
       window.clearTimeout(timeout);
-      fail();
-    } else {
-      loadVehicleViewer().then((Sketchfab) => {
-        if (disposed) return;
-        const viewer = new Sketchfab("1.12.1", iframe);
-        viewer.init(vehicleModel.id, {
-          autostart: 1,
-          camera: 0,
-          dnt: 1,
-          scrollwheel: 0,
-          ui_stop: 0,
-          success(viewerApi) {
-            if (disposed) { viewerApi.stop(); return; }
-            api = viewerApi;
-            api.addEventListener("viewerready", onReady);
-            api.addEventListener("error", fail);
-            api.start();
-          },
-          error: fail,
-        });
-      }).catch(() => {
-        window.clearTimeout(timeout);
-        fail();
-      });
-    }
-
-    const enter = () => { hovering = true; };
-    const leave = () => { hovering = false; };
-    iframe.addEventListener("pointerenter", enter);
-    iframe.addEventListener("pointerleave", leave);
-    const keydown = (event: KeyboardEvent) => {
-      if (event.target !== mount || (event.key !== "ArrowLeft" && event.key !== "ArrowRight")) return;
-      event.preventDefault();
-      rotateCamera(event.key === "ArrowLeft" ? -0.18 : 0.18, reducedMotion.matches ? 0 : 0.15);
-    };
-    mount.addEventListener("keydown", keydown);
-    let resizeTimer = 0;
-    const observer = new ResizeObserver(() => {
-      window.clearTimeout(resizeTimer);
-      resizeTimer = window.setTimeout(fitCamera, 150);
-    });
-    observer.observe(iframe);
-
-    // The documented camera API drives the turntable. Native drag/zoom remains
-    // available, and hovering or focusing the viewer pauses the turntable.
-    const turntable = window.setInterval(() => {
-      if (disposed || !ready || document.hidden) return;
-      applyOptions();
-      if (options.current.rotating && !reducedMotion.matches && !hovering && document.activeElement !== iframe) rotateCamera(0.01);
-    }, 100);
-
-    return () => {
-      disposed = true;
-      ready = false;
-      window.clearTimeout(timeout);
-      window.clearInterval(turntable);
-      window.clearTimeout(resizeTimer);
-      observer.disconnect();
-      iframe.removeEventListener("pointerenter", enter);
-      iframe.removeEventListener("pointerleave", leave);
-      mount.removeEventListener("keydown", keydown);
-      api?.removeEventListener("viewerready", onReady);
-      api?.removeEventListener("error", fail);
-      api?.stop();
-    };
+      if (!lost) report("ready");
+    }).catch(() => { release(); window.clearTimeout(timeout); report("error"); });
+    return () => { disposed = true; request.abort(); window.clearTimeout(timeout); release(); };
   }, [attempt]);
 
-  return <div className="cx-live-model cx-vehicle-viewport" ref={mountRef} tabIndex={0} role="region" aria-label="Interactive vehicle model. Drag to orbit or focus this region and use the arrow keys." data-viewer-status={status}>
-    <iframe key={attempt} ref={iframeRef} className="cx-vehicle-frame" title="3D vehicle model by tonielpro520" allow="autoplay; fullscreen; xr-spatial-tracking" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" />
-    {status !== "ready" && <div className="cx-vehicle-status" role="status">
+  React.useEffect(() => { refresh.current(); });
+
+  return <div className="rw-live-model rw-vehicle-viewport" ref={mountRef} tabIndex={0} role="region" aria-label="Interactive vehicle model. Drag or use left and right arrow keys to orbit. Use plus and minus to zoom, and Home to reset." data-viewer-status={status}>
+    {status !== "ready" && <div className="rw-vehicle-status" role="status">
       <b>{status === "loading" ? "Loading vehicle model" : "The 3D model could not load"}</b>
-      <p>{status === "loading" ? "Preparing the detailed model and its materials." : "This viewer needs an internet connection and WebGL. Retry, or open the model on Sketchfab."}</p>
-      {status === "error" && <div><Button variant="ghost" onClick={() => setAttempt((value) => value + 1)}>Retry viewer</Button><a href={vehicleModel.url} target="_blank" rel="noreferrer">Open model ↗</a></div>}
+      <p>{status === "loading" ? "Preparing the detailed model and its materials." : "Check your connection and WebGL availability, then retry the local model."}</p>
+      {status === "error" && <Button variant="ghost" onClick={() => setAttempt(value => value + 1)}>Retry viewer</Button>}
     </div>}
-    <p className="cx-vehicle-credit"><a href={vehicleModel.url} target="_blank" rel="noreferrer">Model by tonielpro520</a><span>·</span><a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a><span>· Paint adapted</span></p>
   </div>;
 }

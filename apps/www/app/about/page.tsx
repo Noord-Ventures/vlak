@@ -234,10 +234,6 @@ export default function AboutPage() {
                 {noord.door.replace("https://", "")}
               </a>
               {" · "}
-              <a href={noord.host} {...sx("", about.link)}>
-                {noord.host.replace("https://", "")}
-              </a>
-              {" · "}
               <a href={person.repo} {...sx("", about.link)}>
                 github.com/Noord-Ventures/vlak
               </a>

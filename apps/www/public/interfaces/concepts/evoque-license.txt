@@ -1,0 +1,13 @@
+2022 Land Rover Range Rover Evoque
+Creator: tonielpro520
+Source: https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa
+Creator profile: https://sketchfab.com/tonielpro520
+License: Creative Commons Attribution 4.0 International
+https://creativecommons.org/licenses/by/4.0/
+
+Downloaded through the creator's official Sketchfab download on 7 September 2026.
+Vlak adaptations: removed textures and unused texture coordinates, welded identical
+position/normal pairs, and applied monochrome materials. All 204,453 triangles in
+the downloaded GLB are retained. The interactive EV example separates wheel
+assemblies for rotation. Its battery geometry and energy values are illustrative
+local examples, not specifications for the creator's vehicle model.

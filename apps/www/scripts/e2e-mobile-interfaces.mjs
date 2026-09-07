@@ -2,9 +2,10 @@
 // SITE_URL=http://localhost:3000 node scripts/e2e-mobile-interfaces.mjs
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
+import { checkDriveStyle } from "./drive-style-e2e.mjs";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const allSlugs = ["agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
+const allSlugs = ["agents", "graphics", "render", "drive", "orbit", "frontier"];
 const slugs = process.env.INTERFACES ? process.env.INTERFACES.split(",").map(slug => slug.trim()).filter(Boolean) : allSlugs;
 assert(slugs.length > 0 && slugs.every(slug => allSlugs.includes(slug)), "INTERFACES must contain known interface slugs");
 const browser = await chromium.launch({
@@ -16,7 +17,7 @@ const errors = [];
 async function fit(page, label) {
   const layout = await page.locator(".if-specimen").evaluate(frame => {
     const screen = frame.getBoundingClientRect();
-    const visible = element => !!element.getClientRects().length && getComputedStyle(element).visibility !== "hidden";
+    const visible = element => !!element.getClientRects().length && getComputedStyle(element).visibility !== "hidden" && !element.closest('[aria-hidden="true"]');
     return {
       pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       frameOverflow: frame.scrollWidth - frame.clientWidth,
@@ -26,7 +27,7 @@ async function fit(page, label) {
         const rect = element.getBoundingClientRect();
         return rect.width < 43.5 || rect.height < 43.5;
       }).map(element => element.getAttribute("aria-label") || element.textContent?.trim() || element.tagName),
-      offscreenDocks: Array.from(frame.querySelectorAll(".cx-mobile-nav, .am-mobile-nav, .sc-dash-mobile-nav, .sc-night-mobile-nav, .sc-wall-mobile-tabs")).filter(visible).filter(element => {
+      offscreenDocks: Array.from(frame.querySelectorAll(".rw-mobile-nav, .ev-mobile-nav, .so-mobile-nav, .wg-mobile-nav, .am-mobile-nav")).filter(visible).filter(element => {
         const rect = element.getBoundingClientRect();
         return rect.bottom > screen.bottom + 1 || rect.left < screen.left - 1 || rect.right > screen.right + 1;
       }).map(element => element.getAttribute("aria-label")),
@@ -37,17 +38,6 @@ async function fit(page, label) {
   assert.equal(layout.legacyChrome, 0, `${label}: duplicated status/header chrome`);
   assert.deepEqual(layout.shortTargets, [], `${label}: touch targets below 44px`);
   assert.deepEqual(layout.offscreenDocks, [], `${label}: primary navigation outside the screen`);
-}
-
-async function commentDock(page, label) {
-  const geometry = await page.locator(".sc-wall-comment-dock").evaluate(form => {
-    const input = form.querySelector("input").getBoundingClientRect();
-    const button = form.querySelector("button").getBoundingClientRect();
-    return { inputHeight: input.height, buttonHeight: button.height, topDifference: Math.abs(input.top - button.top) };
-  });
-  assert(geometry.inputHeight >= 43.5, `${label}: comment input is below 44px (${geometry.inputHeight}px)`);
-  assert(Math.abs(geometry.inputHeight - geometry.buttonHeight) <= 1, `${label}: comment input and send button heights differ`);
-  assert(geometry.topDifference <= 1, `${label}: comment input and send button are vertically misaligned`);
 }
 
 async function flow(page, slug) {
@@ -68,47 +58,36 @@ async function flow(page, slug) {
     assert(!(await frame.getByRole("complementary", { name: "Composition direction" }).isVisible()));
     await nav.getByRole("button", { name: "Direction", exact: true }).click();
     await frame.getByLabel("Variation seed").fill("Geometric field for a phone");
-    await frame.getByRole("button", { name: "Phone", exact: true }).click();
-    await frame.getByRole("button", { name: "Generate", exact: true }).click();
+    await frame.getByLabel("Canvas format", { exact: true }).selectOption("phone");
+    await frame.getByRole("button", { name: "Generate set", exact: true }).click();
     assert(await frame.getByRole("region", { name: "Wallpaper previews" }).isVisible());
     assert(!(await frame.getByRole("complementary", { name: "Composition direction" }).isVisible()));
-    assert.equal(await frame.locator(".cx-results > button:visible").count(), 1);
+    assert.equal(await frame.locator(".wg-stage > svg:visible").count(), 1);
     await frame.getByRole("group", { name: "Choose composition" }).getByRole("button").nth(1).click();
   }
   if (slug === "render") {
     const nav = frame.getByRole("navigation", { name: "Model workspace" });
-    assert(!(await frame.locator(".cx-render > aside").isVisible()));
+    assert(!(await frame.locator(".rw-inspector").isVisible()));
     await nav.getByRole("button", { name: "Inspector", exact: true }).click();
-    assert(await frame.locator(".cx-render > aside").isVisible());
-    assert(!(await frame.locator(".cx-render > .cx-workspace").isVisible()));
+    assert(await frame.locator(".rw-inspector").isVisible());
+    assert(!(await frame.locator(".rw-viewport").isVisible()));
     await nav.getByRole("button", { name: "Viewport", exact: true }).click();
     assert(await frame.getByRole("navigation", { name: "Viewport tools" }).isVisible());
   }
   if (slug === "drive") {
-    const nav = frame.getByRole("navigation", { name: "Vehicle workspace" });
-    assert(!(await frame.locator(".cx-ev-panels").isVisible()));
-    await nav.getByRole("button", { name: "Controls", exact: true }).click();
-    await frame.getByRole("button", { name: "Raise temperature", exact: true }).click();
-    assert(!(await frame.locator(".cx-ev-vehicle").isVisible()));
-    await nav.getByRole("button", { name: "Media", exact: true }).click();
-    assert(await frame.getByText("Fortress Down", { exact: true }).isVisible());
-    await frame.getByRole("group", { name: "Playback controls" }).getByRole("button", { name: /pause/i }).click();
-    await nav.getByRole("button", { name: "Vehicle", exact: true }).click();
-    await frame.getByRole("button", { name: "Journey", exact: true }).click();
-    await frame.getByRole("button", { name: "Start route", exact: true }).click();
-    assert(await frame.getByRole("button", { name: "End route", exact: true }).isVisible());
+    await checkDriveStyle({ page, base, fail: message => { throw new Error(message); } });
   }
   if (slug === "orbit") {
     const nav = frame.getByRole("navigation", { name: "Observation workspace" });
     assert(!(await frame.getByRole("complementary", { name: "Observation assets" }).isVisible()));
     await nav.getByRole("button", { name: "Assets", exact: true }).click();
-    await frame.locator(".cx-orbit-asset").filter({ hasText: "Helios-7" }).click();
+    await frame.locator(".so-asset").filter({ hasText: "Helios-7" }).click();
     await nav.getByRole("button", { name: "Pass details", exact: true }).click();
     assert(await frame.getByRole("region", { name: "Helios-7 pass details" }).isVisible());
     await frame.getByRole("button", { name: "Queue capture", exact: true }).click();
     assert(await frame.getByRole("button", { name: "Capture queued", exact: true }).isVisible());
     await nav.getByRole("button", { name: "Map", exact: true }).click();
-    assert(!(await frame.locator(".cx-orbit-inspector").isVisible()));
+    assert(!(await frame.locator(".so-pass").isVisible()));
   }
   if (slug === "frontier") {
     const menu = frame.locator(".cx-frontier-menu-toggle");
@@ -117,96 +96,6 @@ async function flow(page, slug) {
     await frame.getByRole("navigation", { name: "Company sections" }).getByRole("button", { name: "Research", exact: true }).click();
     assert(!(await frame.getByRole("navigation", { name: "Company sections" }).isVisible()));
     assert(await frame.getByRole("region", { name: "Research" }).isVisible());
-  }
-  if (slug === "platforms") {
-    assert.equal(await frame.locator(".cx-phone:visible").count(), 1);
-    assert(await frame.getByRole("article", { name: "iOS travel app" }).isVisible());
-    await frame.getByRole("button", { name: "Android", exact: true }).click();
-    assert.equal(await frame.locator(".cx-phone:visible").count(), 1);
-    const phone = frame.getByRole("article", { name: "Android travel app" });
-    await phone.getByRole("button", { name: "Save trip", exact: true }).click();
-    await phone.getByRole("button", { name: "You", exact: true }).click();
-    assert(await phone.getByText("Rotterdam trip saved", { exact: true }).isVisible());
-  }
-  if (slug === "line") {
-    await frame.locator('[data-chat="brief"]').click();
-    assert(!(await frame.getByRole("complementary", { name: "Chats", exact: true }).isVisible()));
-    await frame.getByLabel("Message", { exact: true }).fill("How does the imagery shape the song?");
-    await frame.getByRole("button", { name: "Send", exact: true }).click();
-    await frame.getByRole("button", { name: "Conversation info", exact: true }).click();
-    assert(await frame.getByRole("complementary", { name: "Inspector", exact: true }).isVisible());
-    assert(!(await frame.locator(".sc-ai-dock").isVisible()));
-    await frame.locator(".sc-ai-inspector-back").click();
-    assert(await frame.getByText("How does the imagery shape the song?", { exact: true }).isVisible());
-    await frame.getByRole("button", { name: "Back to chats", exact: true }).click();
-    assert(await frame.getByRole("complementary", { name: "Chats", exact: true }).isVisible());
-  }
-  if (slug === "room") {
-    await frame.locator('[data-channel="desk"]').click();
-    await frame.getByLabel("Message", { exact: true }).fill("The mobile proof is ready.");
-    await frame.getByRole("button", { name: "Send", exact: true }).click();
-    await frame.locator(".sc-room-msg").first().click();
-    assert(!(await frame.getByRole("region", { name: "Channel", exact: true }).isVisible()));
-    await frame.getByLabel("Reply in thread", { exact: true }).fill("Reviewed on a phone.");
-    await frame.getByRole("button", { name: "Send reply", exact: true }).click();
-    assert(await frame.getByText("Reviewed on a phone.", { exact: false }).isVisible());
-    await frame.getByRole("button", { name: "Back to conversation", exact: true }).click();
-    assert(await frame.locator(".sc-room-msg").filter({ hasText: "The mobile proof is ready." }).isVisible());
-    await frame.getByRole("button", { name: "Back to channels", exact: true }).click();
-    assert(await frame.locator(".sc-room-rail").isVisible());
-  }
-  if (slug === "wall") {
-    await frame.getByRole("button", { name: "Like Mara’s post", exact: true }).first().click();
-    assert.equal(await frame.getByRole("button", { name: "Like Mara’s post", exact: true }).first().getAttribute("aria-pressed"), "true");
-    await frame.getByRole("button", { name: "Comments on Mara’s post", exact: true }).first().click();
-    assert(!(await frame.locator(".sc-wall-feed").isVisible()));
-    await commentDock(page, "wall mobile");
-    await frame.getByLabel("Add a comment", { exact: true }).fill("The composition reads well on a phone.");
-    await frame.getByRole("button", { name: "Post comment", exact: true }).click();
-    assert(await frame.getByText("The composition reads well on a phone.", { exact: false }).isVisible());
-    await frame.locator(".sc-wall-mobile-back").click();
-    await frame.getByRole("navigation", { name: "Journal sections" }).getByRole("button", { name: "People", exact: true }).click();
-    assert(await frame.locator(".sc-wall-rail").isVisible());
-    assert(!(await frame.locator(".sc-wall-feed").isVisible()));
-  }
-  if (slug === "press") {
-    const mobile = frame.getByRole("region", { name: "Mobile production workspace" });
-    await mobile.getByRole("button", { name: "This month", exact: true }).click();
-    await mobile.getByRole("navigation", { name: "Production sections" }).getByRole("button", { name: "Jobs", exact: true }).click();
-    await mobile.locator(".sc-dash-mobile-job").first().click();
-    assert(await mobile.getByRole("heading", { name: "Production brief", exact: true }).isVisible());
-    await mobile.getByRole("button", { name: "Mark reviewed", exact: true }).click();
-    assert(await mobile.getByRole("button", { name: "Undo review", exact: true }).isVisible());
-    await mobile.getByRole("button", { name: "Back", exact: true }).click();
-    await mobile.getByRole("navigation", { name: "Production sections" }).getByRole("button", { name: "Invoices", exact: true }).click();
-    assert(await mobile.getByRole("heading", { name: "Open invoices", exact: true }).isVisible());
-  }
-  if (slug === "night") {
-    await frame.getByRole("navigation", { name: "Dispatch sections" }).getByRole("button", { name: "Vehicles", exact: true }).click();
-    await frame.locator(".sc-night-unit").filter({ hasText: "Van 19" }).click();
-    assert(!(await frame.locator(".sc-night-rail").isVisible()));
-    await frame.getByRole("button", { name: "View trip", exact: true }).click();
-    assert(!(await frame.locator(".sc-night-field").isVisible()));
-    assert(await frame.getByRole("complementary", { name: "Trip", exact: true }).isVisible());
-    await frame.getByRole("button", { name: "Show on map", exact: true }).click();
-    assert(await frame.locator(".sc-night-mobile-vehicle").getByRole("heading", { name: "Van 19", exact: true }).isVisible());
-  }
-  if (slug === "evening") {
-    const mobile = frame.getByRole("region", { name: "Mobile food ordering" });
-    await mobile.getByRole("button", { name: "Open food filters", exact: true }).click();
-    await mobile.getByRole("button", { name: "Vegetarian", exact: true }).click();
-    await mobile.getByRole("button", { name: "Reset preferences", exact: true }).click();
-    await fit(page, "food filters");
-    await mobile.getByRole("button", { name: /Show \d+ kitchens/ }).click();
-    await mobile.locator(".sc-food-mobile-store button").first().click();
-    await mobile.locator(".sc-food-mobile-dish-row").first().click();
-    await mobile.getByRole("button", { name: /Add to bag/ }).click();
-    await mobile.getByRole("button", { name: /View bag/ }).click();
-    assert(await mobile.getByText("Demo only", { exact: true }).isVisible());
-    await mobile.getByRole("button", { name: /Place demo order/ }).click();
-    assert(await mobile.getByRole("heading", { name: "Your demo order is ready", exact: true }).isVisible());
-    await mobile.getByRole("button", { name: "Keep browsing", exact: true }).click();
-    assert(await mobile.getByRole("heading", { name: "Kitchens near you", exact: true }).isVisible());
   }
   await fit(page, `${slug} after interaction`);
 }
@@ -229,17 +118,6 @@ try {
       console.log(`${width}×${height} ${colorScheme}: ${slug} mobile flow passed`);
     }
     await page.close();
-  }
-  if (slugs.includes("wall")) {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
-    await page.goto(`${base}/interfaces/wall/`, { waitUntil: "networkidle" });
-    await page.getByRole("button", { name: "Comments on Mara’s post", exact: true }).first().click();
-    await commentDock(page, "wall desktop");
-    await page.getByLabel("Add a comment", { exact: true }).fill("The desktop proof is ready.");
-    await page.getByRole("button", { name: "Post comment", exact: true }).click();
-    assert(await page.getByText("The desktop proof is ready.", { exact: false }).isVisible());
-    await page.close();
-    console.log("1440×1000: wall desktop comment sizing and submission passed");
   }
   assert.deepEqual(errors, [], "No runtime errors during mobile flows");
   console.log("All mobile interface flows passed");

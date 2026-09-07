@@ -17,7 +17,7 @@
 .ge-reference-label span, .ge-reference-label p { color: var(--text); font-size: 12px; }
 .ge-reference-label strong { display: block; margin-block: 6px; font-size: 18px; font-weight: 500; letter-spacing: -.025em; }
 .ge-region-form { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; }
-.ge-region-scroll, .ge-evidence-scroll, .ge-note-scroll { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 20px 16px; }
+.ge-region-scroll, .ge-evidence-scroll, .ge-note-scroll { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; --ge-scroll-inset: 16px; padding: 20px var(--ge-scroll-inset); }
 .ge .rs-genomic-region-field-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .ge .rs-genomic-region-field-fields > :first-child { grid-column: 1 / -1; }
 .ge .rs-genomic-region-field-label, .ge .rs-genomic-region-field-control { min-width: 0; }
@@ -43,7 +43,7 @@
 .ge-view { padding: 9px 24px; border-block: 1px solid var(--divider); }
 .ge-view > span { font-size: 12px; color: var(--text-secondary); }
 .ge .rs-toggle { min-width: 44px; min-height: 44px; padding-inline: 12px; font-size: 13px; }
-.ge-evidence-scroll { padding: 20px 24px; }
+.ge-evidence-scroll { --ge-scroll-inset: 24px; }
 .ge .ge-selection-card { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--divider); }
 .ge-selection-card > div { min-width: 0; display: grid; gap: 6px; }
 .ge-selection-card span { font-size: 12px; color: var(--text-secondary); }
@@ -56,7 +56,7 @@
 .ge-notes-head { display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--divider); padding: 16px 20px; }
 .ge-notes-head h2 { font-size: 20px; font-weight: 500; letter-spacing: -.025em; }
 .ge-note-form { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; }
-.ge-note-scroll { display: flex; flex-direction: column; gap: 24px; padding: 22px 24px; }
+.ge-note-scroll { display: flex; flex-direction: column; gap: 24px; --ge-scroll-inset: 24px; padding-block: 22px; }
 .ge .ge-locus-card { display: grid; gap: 8px; padding-bottom: 20px; border-bottom: 1px solid var(--divider); }
 .ge-locus-card > span, .ge-locus-card p { font-size: 13px; color: var(--text-secondary); }
 .ge-locus-card > strong { font-size: 56px; font-weight: 400; line-height: 1; letter-spacing: -.055em; }
@@ -74,7 +74,7 @@
   .ge-body { grid-template-columns: 230px minmax(0, 1fr) 288px; }
   .ge-notes, .ge[data-screen="notes"] .ge-notes { display: grid; border-inline-start: 1px solid var(--divider); }
   .ge[data-screen="notes"] .ge-evidence { display: grid; }
-  .ge-note-scroll { padding: 18px; }
+  .ge-note-scroll { --ge-scroll-inset: 18px; padding-block: 18px; }
   .ge-note-actions { padding-inline: 16px; }
 }
 @container genome (max-width: 640px) {
@@ -88,7 +88,7 @@
   .ge[data-screen="evidence"] .ge-evidence, .ge[data-screen="notes"] .ge-notes { display: grid; }
   .ge-reference-label { padding: 14px 16px; }
   .ge-reference-label p { display: none; }
-  .ge-region-scroll { padding: 18px 16px; }
+  .ge-region-scroll { padding-block: 18px; }
   .ge .rs-genomic-region-field-copy, .ge .rs-genomic-region-field-label { font-size: 14px; }
   .ge .rs-genomic-region-field-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ge .rs-genomic-region-field-fields > :first-child { grid-column: 1 / -1; }
@@ -99,7 +99,7 @@
   .ge-context { padding-inline: 16px; }
   .ge-view { padding-inline: 16px; }
   .ge-view > span { display: none; }
-  .ge-evidence-scroll, .ge-note-scroll { padding: 18px 16px; }
+  .ge-evidence-scroll, .ge-note-scroll { --ge-scroll-inset: 16px; padding-block: 18px; }
   .ge .ge-selection-card { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .ge-selection-card > div:first-child { grid-column: 1 / -1; }
   .ge-evidence-actions, .ge-note-actions { padding: 12px 16px; }
@@ -113,3 +113,19 @@
 }
 @media (forced-colors: active) { .ge-contig-track > span { background: Highlight; } }
 @media (prefers-reduced-motion: reduce) { .ge *, .ge *::before, .ge *::after { scroll-behavior: auto; transition-duration: 0s; } }
+
+/* Full-width evidence and annotation rules, with inset text. */
+.ge .ge-contract, .ge .ge-selection-card, .ge .ge-locus-card, .ge-annotation-list li {
+  margin-inline: calc(-1 * var(--ge-scroll-inset));
+  padding-inline: var(--ge-scroll-inset);
+}
+.ge .ge-contract { border-inline: 0; }
+.ge .rs-coverage-inspector-table {
+  width: calc(100% + 2 * var(--ge-scroll-inset));
+  margin-inline: calc(-1 * var(--ge-scroll-inset));
+}
+.ge .rs-coverage-inspector-cell:first-child { padding-inline-start: var(--ge-scroll-inset); }
+.ge .rs-coverage-inspector-cell:last-child { padding-inline-end: var(--ge-scroll-inset); }
+.ge .rs-sequence-alignment-scroll { max-width: none; margin-inline: calc(-1 * var(--ge-scroll-inset)); }
+.ge .rs-sequence-alignment-table { min-width: 100%; }
+.ge .rs-sequence-alignment-heading:first-child { padding-inline-start: var(--ge-scroll-inset); }

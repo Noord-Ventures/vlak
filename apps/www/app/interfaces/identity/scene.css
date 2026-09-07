@@ -24,7 +24,7 @@
 .id-rail-reference { display: flex; flex-wrap: wrap; gap: 4px 12px; justify-content: space-between; font-size: 11px; color: var(--text-secondary); padding-top: 16px; border-top: 1px solid var(--divider); }
 .id-rail-reference strong { font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
 .id-workspace { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-width: 0; min-height: 0; }
-.id-scroll { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; min-height: 0; padding: 30px 36px; }
+.id-scroll { --id-inset: 36px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; min-height: 0; padding: 30px 36px; }
 .id-screen-title { margin-bottom: 28px; }
 .id-screen-title h2 { font-size: clamp(25px, 2.7vw, 36px); font-weight: 500; letter-spacing: -.055em; line-height: 1.13; outline-offset: 5px; margin-bottom: 12px; }
 .id-screen-title p { color: var(--text-secondary); max-width: 52ch; }
@@ -72,7 +72,7 @@
   .id-local .rs-icon { display: none; }
   .id-body { grid-template-columns: minmax(0, 1fr); }
   .id-rail { display: none; }
-  .id-scroll { padding: 24px 16px; }
+  .id-scroll { --id-inset: 16px; padding: 24px 16px; }
   .id-screen-title { margin-bottom: 24px; }
   .id-screen-title h2 { font-size: 29px; }
   .id-screen-title p { font-size: 15px; }
@@ -96,3 +96,9 @@
 @media (forced-colors: active) {
   .id-app .id-steps button[aria-current="step"], .id-document, .id-receipt-mark { background: Highlight; color: HighlightText; forced-color-adjust: none; }
 }
+
+.id-rail-reference { margin-inline: -20px; padding-inline: 20px; }
+.id-inline-note, .id-evidence-meter, .id-confirm { margin-inline: calc(-1 * var(--id-inset)); padding-inline: var(--id-inset); }
+.id-scroll .rs-evidence-checklist { margin-inline: calc(-1 * var(--id-inset)); }
+.id-scroll .rs-evidence-checklist > p { padding-inline: var(--id-inset); }
+.id-scroll .rs-evidence-checklist-item { padding-inline: var(--id-inset); }

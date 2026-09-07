@@ -15,7 +15,7 @@ function sourceFor(slug: InterfaceSlug) {
 
 export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; children: ReactNode }) {
   const proto = interfaceBySlug(slug)!;
-  const workbench = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music"].includes(slug);
+  const workbench = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "render", "drive", "orbit", "line", "press", "wall", "night", "evening", "room", "graphics", "platforms", "mobile-os", "documentation", "music-player"].includes(slug);
   const ordered = orderedInterfaces;
   const next = ordered[(ordered.findIndex((item) => item.slug === slug) + 1) % ordered.length]!;
   const source = sourceFor(slug);
@@ -28,7 +28,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
             <h1 id={`${slug}-name`}>{proto.title}</h1>
             <a className="rs-btn-primary if-build-link" href="#build-with-vlak">Build with Vlak <span aria-hidden="true">↓</span></a>
           </header>
-          <div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, slug === "drive" && interfaces.vehicleSpecimen, workbench && interfaces.workbenchSpecimen)}>{children}</div>
+          <div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, workbench && interfaces.workbenchSpecimen)}>{children}</div>
           <div className="if-study-caption"><p>{proto.use}</p><a href={source}>View source <span aria-hidden="true">↗</span></a></div>
         </section>
         <div className="if-detail-content">
@@ -47,6 +47,8 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
                   </Link></li>
                 ))}
               </ul>
+              {(slug === "render" || slug === "drive") && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa" target="_blank" rel="noreferrer">2022 Land Rover Range Rover Evoque</a> by <a href="https://sketchfab.com/tonielpro520" target="_blank" rel="noreferrer">tonielpro520</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Materials and presentation adapted for Vlak.</p>}
+              {slug === "frontier" && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/bust-of-athena-6f372d03e69b48ee8901bdc6e48f17b5" target="_blank" rel="noreferrer">Bust of Athena</a> by <a href="https://sketchfab.com/yugengen" target="_blank" rel="noreferrer">yugengen</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Adapted into an animated contour drawing for Vlak.</p>}
             </div>
           </section>
           <StartBuilding title={proto.title} slug={slug} source={source} />
@@ -60,7 +62,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
           </section>
           <nav className="if-next-study" aria-label="Explore interfaces">
             <Link href="/interfaces/">All interfaces <span aria-hidden="true">↗</span></Link>
-            <Link href={`/interfaces/${next.slug}/`}><span>Next study</span><strong>{next.title} <span aria-hidden="true">→</span></strong></Link>
+            <Link href={`/interfaces/${next.slug}/`}><span>Next study</span><strong>{next.title}<span className="if-next-arrow" aria-hidden="true">→</span></strong></Link>
           </nav>
         </div>
       </main>

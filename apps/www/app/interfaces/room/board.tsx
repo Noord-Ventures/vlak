@@ -1,324 +1,142 @@
 "use client";
 
 import * as React from "react";
-import { Button, Icon, Input, InputGroup } from "@noorddev/vlak-react";
-import { Brand } from "../mark";
-import { Face, type FaceId } from "../people";
-import { interfaceBySlug } from "../catalog";
-import { InspectorClose } from "../inspector-close";
+import { Avatar, Button, Card, Icon, Input, Textarea } from "@noorddev/vlak-react";
 
-const WHAT = interfaceBySlug("room")!.what;
-
-const CHANNELS = [
-  { id: "desk", name: "studio", count: 12, preview: "12 members · New client feedback" },
-  { id: "press", name: "production", count: 4, preview: "4 members · Print proofs ready" },
-  { id: "yard", name: "deliveries", count: 2, preview: "2 members · Morning collection" },
+type Reply = { id: string; author: string; initials: string; text: string; time: string };
+type Message = Reply & { replies: Reply[]; acknowledged?: boolean; pinned?: boolean };
+type Channel = { id: string; name: string; topic: string; messages: Message[]; draft: string };
+type Screen = "channels" | "chat" | "thread" | "create" | "about";
+const PEOPLE = [{ name: "Mara", initials: "MR", role: "Design" }, { name: "Tomas", initials: "TK", role: "Production" }, { name: "Inez", initials: "IV", role: "Research" }, { name: "You", initials: "YO", role: "Workspace member" }];
+const INITIAL: Channel[] = [
+  { id: "studio", name: "studio", topic: "The place for work in progress, small decisions, and a second pair of eyes.", draft: "", messages: [
+    { id: "s1", author: "Tomas", initials: "TK", time: "09:14", text: "The client approved the poster direction. Two small changes to the event details before we send it to print.", replies: [
+      { id: "s1-r1", author: "Mara", initials: "MR", time: "09:15", text: "Is that the venue address and opening time?" },
+      { id: "s1-r2", author: "Tomas", initials: "TK", time: "09:16", text: "Exactly. Everything else is approved." },
+    ] },
+    { id: "s2", author: "Mara", initials: "MR", time: "09:22", text: "The updated proof is ready to review. I’ve marked both changes in the margin.", replies: [], pinned: true },
+    { id: "s3", author: "Inez", initials: "IV", time: "09:26", text: "I’ll check the event details against the brief after our morning review.", replies: [] },
+  ] },
+  { id: "production", name: "production", topic: "Print proofs, final checks, and production handoffs.", draft: "", messages: [
+    { id: "p1", author: "Tomas", initials: "TK", time: "08:41", text: "The first print proof is ready. Can someone check the smaller type at actual size?", replies: [{ id: "p1-r1", author: "Inez", initials: "IV", time: "08:50", text: "Checking now. Please wait before starting the full run." }] },
+    { id: "p2", author: "Mara", initials: "MR", time: "08:52", text: "I’ve left the latest sheet on the review table, next to the marked-up proof.", replies: [] },
+  ] },
+  { id: "research", name: "research", topic: "Interview notes and questions worth following up.", draft: "", messages: [
+    { id: "r1", author: "Inez", initials: "IV", time: "Yesterday", text: "Three interviews are transcribed. I’ve pulled out the moments where people switched tools to finish a task.", replies: [] },
+    { id: "r2", author: "Mara", initials: "MR", time: "Yesterday", text: "Let’s use those examples in Thursday’s review. They’ll help us ask more concrete questions.", replies: [] },
+  ] },
 ];
-
-const PEOPLE: { id: FaceId; name: string; state: string; mark: "user-check" | "activity" | "moon" | "users"; extra?: boolean }[] = [
-  { id: "aziez", name: "Mara", state: "In a meeting", mark: "activity" },
-  { id: "jenny", name: "Inez", state: "Away", mark: "moon" },
-  { id: "koen", name: "Elias", state: "In a meeting", mark: "activity", extra: true },
-  { id: "gianpiero", name: "Tomas", state: "Available", mark: "user-check", extra: true },
-];
-
-type Msg = { id: string; who: FaceId; name: string; text: string; when: string; replies: number };
-
-const LINES: Record<string, Msg[]> = {
-  desk: [
-    { id: "d1", who: "gianpiero", name: "Tomas", text: "The client approved the poster direction. Two small changes to the event details before we send it to print.", when: "09:14", replies: 2 },
-    { id: "d2", who: "aziez", name: "Mara", text: "The updated proof is ready to review. I’ve marked both changes.", when: "09:16", replies: 0 },
-    { id: "d3", who: "jenny", name: "Inez", text: "Seen. I’ll review it after lunch.", when: "09:18", replies: 1 },
-    { id: "d4", who: "koen", name: "Elias", text: "I’ve booked Friday’s print slot. We need final approval by Thursday at 15:00.", when: "09:19", replies: 0 },
-  ],
-  press: [
-    { id: "p1", who: "gianpiero", name: "Tomas", text: "The first print proof is ready. Can someone check the smaller type?", when: "08:41", replies: 1 },
-    { id: "p2", who: "jenny", name: "Inez", text: "Checking now. Please wait before starting the full run.", when: "08:50", replies: 0 },
-    { id: "p3", who: "koen", name: "Elias", text: "Ink density looks good on the latest sheet.", when: "08:52", replies: 0 },
-  ],
-  yard: [
-    { id: "y1", who: "aziez", name: "Mara", text: "The courier is back. All six packages were delivered.", when: "07:12", replies: 1 },
-    { id: "y2", who: "koen", name: "Elias", text: "Thanks. The next collection is at 14:00.", when: "07:20", replies: 0 },
-  ],
-};
-
-const THREAD: Record<string, { who: FaceId; name: string; text: string }[]> = {
-  d1: [
-    { who: "aziez", name: "Mara", text: "Is that the venue address and opening time?" },
-    { who: "gianpiero", name: "Tomas", text: "Exactly. Everything else is approved." },
-  ],
-  d3: [{ who: "koen", name: "Elias", text: "I have it." }],
-  p1: [{ who: "jenny", name: "Inez", text: "I’ll check it at actual size." }],
-  y1: [{ who: "koen", name: "Elias", text: "Logged." }],
-};
 
 export function Board() {
-  const [channel, setChannel] = React.useState("desk");
-  const [pane, setPane] = React.useState<"none" | "thread" | "person">("none");
-  const [line, setLine] = React.useState("d1");
-  const [who, setWho] = React.useState<FaceId>("aziez");
-  const [draft, setDraft] = React.useState("");
-  const [extra, setExtra] = React.useState<Record<string, Msg[]>>({});
-  const [phonePane, setPhonePane] = React.useState<"channels" | "chat">("channels");
-  const [threadDraft, setThreadDraft] = React.useState("");
-  const [threadExtra, setThreadExtra] = React.useState<typeof THREAD>({});
-  const board = React.useRef<HTMLElement>(null);
-  const lines = React.useRef<HTMLDivElement>(null);
-  const replyList = React.useRef<HTMLDivElement>(null);
-  const history = React.useRef<{ pane: typeof pane; line: string; who: FaceId; trigger: HTMLElement | null }[]>([]);
-  const box = React.useRef<HTMLInputElement>(null);
-  const room = CHANNELS.find((row) => row.id === channel) ?? CHANNELS[0]!;
-  const messages = [...(LINES[channel] ?? LINES.desk!), ...(extra[channel] ?? [])];
-  const person = PEOPLE.find((row) => row.id === who) ?? PEOPLE[0]!;
-  const selected = messages.find((row) => row.id === line) ?? messages[0]!;
-  const replies = [...(THREAD[line] ?? []), ...(threadExtra[line] ?? [])];
+  const [channels, setChannels] = React.useState<Channel[]>(INITIAL);
+  const [selectedId, setSelectedId] = React.useState("studio");
+  const [screen, setScreen] = React.useState<Screen>("channels");
+  const [threadId, setThreadId] = React.useState<string | null>(null);
+  const [replyDrafts, setReplyDrafts] = React.useState<Record<string, string>>({});
+  const [query, setQuery] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [topic, setTopic] = React.useState("");
+  const [error, setError] = React.useState("");
+  const [announcement, setAnnouncement] = React.useState("");
+  const counter = React.useRef(0);
+  const messageBox = React.useRef<HTMLTextAreaElement>(null);
+  const replyBox = React.useRef<HTMLTextAreaElement>(null);
+  const nameBox = React.useRef<HTMLInputElement>(null);
+  const heading = React.useRef<HTMLHeadingElement>(null);
+  const threadHeading = React.useRef<HTMLHeadingElement>(null);
+  const channelRows = React.useRef(new Map<string, HTMLButtonElement>());
+  const threadButtons = React.useRef(new Map<string, HTMLButtonElement>());
+  const messageScroll = React.useRef<HTMLDivElement>(null);
+  const replyScroll = React.useRef<HTMLDivElement>(null);
+  const createButton = React.useRef<HTMLButtonElement>(null);
+  const aboutButton = React.useRef<HTMLButtonElement>(null);
+  const editorReturn = React.useRef<{ screen: Screen; threadId: string | null }>({ screen: "channels", threadId: null });
+  const current = channels.find(channel => channel.id === selectedId)!;
+  const selectedMessage = current.messages.find(message => message.id === threadId);
+  const visible = channels.filter(channel => channel.name.toLowerCase().includes(query.toLowerCase()));
+  const editing = screen === "create" || screen === "about";
+  const replyDraft = threadId ? replyDrafts[threadId] ?? "" : "";
 
-  function focusMobileBack() {
-    requestAnimationFrame(() => {
-      const back = board.current?.querySelector<HTMLButtonElement>(".sc-room-mobile-back");
-      if (back?.getClientRects().length) back.focus();
-    });
+  function updateChannel(update: (channel: Channel) => Channel) {
+    setChannels(rows => rows.map(channel => channel.id === selectedId ? update(channel) : channel));
   }
-
-  function openPane(next: "thread" | "person", personId?: FaceId) {
-    history.current.push({ pane, line, who, trigger: document.activeElement instanceof HTMLElement ? document.activeElement : null });
-    setPane(next);
-    if (personId) setWho(personId);
-    focusMobileBack();
+  function openChannel(id: string) {
+    setSelectedId(id); setScreen("chat"); setThreadId(null); setError("");
+    requestAnimationFrame(() => heading.current?.focus({ preventScroll: true }));
   }
-
-  function closePane() {
-    const previous = history.current.pop();
-    setPane(previous?.pane ?? "none");
-    if (previous) {
-      setWho(previous.who);
-      setLine(previous.line);
-    }
-    requestAnimationFrame(() => {
-      if (previous?.trigger?.isConnected) previous.trigger.focus();
-      else {
-        const key = previous?.trigger?.dataset.focusKey;
-        if (key) board.current?.querySelector<HTMLButtonElement>(`[data-focus-key="${key}"]`)?.focus();
-      }
-    });
-  }
-
-  function openChannel(id: string, compose = false) {
-    setChannel(id);
-    setPane("none");
-    setLine((LINES[id] ?? LINES.desk!)[0]!.id);
-    setPhonePane("chat");
-    history.current = [];
-    if (compose) requestAnimationFrame(() => box.current?.focus());
-    else focusMobileBack();
-  }
-
   function backToChannels() {
-    setPhonePane("channels");
-    requestAnimationFrame(() => board.current?.querySelector<HTMLButtonElement>(`[data-channel="${channel}"]`)?.focus());
+    setScreen("channels"); setThreadId(null);
+    requestAnimationFrame(() => channelRows.current.get(selectedId)?.focus({ preventScroll: true }));
   }
-
-  function sendReply(event: React.FormEvent) {
+  function openThread(message: Message) {
+    setThreadId(message.id); setScreen("thread");
+    requestAnimationFrame(() => threadHeading.current?.focus({ preventScroll: true }));
+  }
+  function closeThread() {
+    const id = threadId;
+    setScreen("chat"); setThreadId(null);
+    requestAnimationFrame(() => { if (id) threadButtons.current.get(id)?.focus({ preventScroll: true }); });
+  }
+  function send(event?: React.FormEvent) {
+    event?.preventDefault();
+    const text = current.draft.trim(); if (!text) return;
+    updateChannel(channel => ({ ...channel, draft: "", messages: [...channel.messages, { id: `message-${++counter.current}`, author: "You", initials: "YO", text, time: "Now", replies: [] }] }));
+    setAnnouncement(`Message added to ${current.name}. It stays in this local workspace.`);
+    requestAnimationFrame(() => { if (messageScroll.current) messageScroll.current.scrollTop = messageScroll.current.scrollHeight; messageBox.current?.focus({ preventScroll: true }); });
+  }
+  function sendReply(event?: React.FormEvent) {
+    event?.preventDefault();
+    const text = replyDraft.trim(); if (!text || !threadId) return;
+    const reply: Reply = { id: `reply-${++counter.current}`, author: "You", initials: "YO", text, time: "Now" };
+    updateChannel(channel => ({ ...channel, messages: channel.messages.map(message => message.id === threadId ? { ...message, replies: [...message.replies, reply] } : message) }));
+    setReplyDrafts(drafts => ({ ...drafts, [threadId]: "" })); setAnnouncement("Reply added to this thread.");
+    requestAnimationFrame(() => { if (replyScroll.current) replyScroll.current.scrollTop = replyScroll.current.scrollHeight; replyBox.current?.focus({ preventScroll: true }); });
+  }
+  function toggleFlag(message: Message, flag: "acknowledged" | "pinned") {
+    updateChannel(channel => ({ ...channel, messages: channel.messages.map(item => item.id === message.id ? { ...item, [flag]: !item[flag] } : item) }));
+    setAnnouncement(flag === "pinned" ? message.pinned ? "Message unpinned." : "Message pinned in this channel." : message.acknowledged ? "Your acknowledgement was removed." : "You acknowledged this message.");
+  }
+  function createChannel() {
+    if (editing) return;
+    editorReturn.current = { screen, threadId };
+    setName(""); setTopic(""); setError(""); setThreadId(null); setScreen("create");
+    requestAnimationFrame(() => nameBox.current?.focus({ preventScroll: true }));
+  }
+  function editChannel() {
+    editorReturn.current = { screen, threadId };
+    setName(current.name); setTopic(current.topic); setError(""); setThreadId(null); setScreen("about");
+    requestAnimationFrame(() => nameBox.current?.focus({ preventScroll: true }));
+  }
+  function closeEditor() {
+    const isNew = screen === "create";
+    setScreen(editorReturn.current.screen); setThreadId(editorReturn.current.threadId); setError("");
+    requestAnimationFrame(() => (isNew ? createButton.current : aboutButton.current)?.focus({ preventScroll: true }));
+  }
+  function saveChannel(event: React.FormEvent) {
     event.preventDefault();
-    if (!threadDraft.trim()) return;
-    setThreadExtra((current) => ({ ...current, [line]: [...(current[line] ?? []), { who: "jenny", name: "You", text: threadDraft.trim() }] }));
-    setThreadDraft("");
-    requestAnimationFrame(() => replyList.current?.scrollTo({ top: replyList.current.scrollHeight }));
+    const cleaned = name.trim();
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(cleaned)) { setError("Use lowercase letters, numbers, and single hyphens between words."); nameBox.current?.focus(); return; }
+    if (channels.some(channel => channel.name === cleaned && (screen === "create" || channel.id !== selectedId))) { setError("A channel with this name already exists."); nameBox.current?.focus(); return; }
+    if (screen === "create") {
+      const id = `channel-${++counter.current}`;
+      setChannels(rows => [...rows, { id, name: cleaned, topic: topic.trim(), draft: "", messages: [] }]); setSelectedId(id); setQuery("");
+      setAnnouncement(`Channel ${cleaned} created in this tab.`);
+    } else { updateChannel(channel => ({ ...channel, name: cleaned, topic: topic.trim() })); setAnnouncement("Channel details updated."); }
+    setScreen("chat"); setError("");
+    requestAnimationFrame(() => heading.current?.focus({ preventScroll: true }));
+  }
+  function composerKey(event: React.KeyboardEvent<HTMLTextAreaElement>, action: () => void) {
+    if (event.key === "Enter" && (event.metaKey || event.ctrlKey) && !event.nativeEvent.isComposing) { event.preventDefault(); action(); }
   }
 
-  function send() {
-    const text = draft.trim();
-    if (!text) return;
-    setDraft("");
-    const msg: Msg = {
-      id: `you-${Date.now()}`,
-      who: "jenny",
-      name: "Inez",
-      text,
-      when: "Now",
-      replies: 0,
-    };
-    setExtra((map) => ({ ...map, [channel]: [...(map[channel] ?? []), msg] }));
-    setLine(msg.id);
-    requestAnimationFrame(() => lines.current?.scrollTo({ top: lines.current.scrollHeight }));
-  }
-
-  return (
-    <section ref={board} className="if-board sc-room" data-pane={phonePane} data-inspecting={pane !== "none"} aria-label={WHAT}>
-      <header className="sc-room-mobile-head">
-        {pane !== "none" || phonePane === "chat" ? <Button variant="ghost" className="sc-room-mobile-back" style={{ width: 44, padding: 0 }} aria-label={pane !== "none" ? "Back to conversation" : "Back to channels"} onClick={pane !== "none" ? closePane : backToChannels}><Icon name="arrow-left" size={16} /></Button> : null}
-        <div><h2>{pane === "person" ? person.name : pane === "thread" ? "Thread" : phonePane === "chat" ? `#${room.name}` : "Studio workspace"}</h2>
-          <p>{pane === "person" ? person.state : pane === "thread" ? `#${room.name} · ${replies.length} ${replies.length === 1 ? "reply" : "replies"}` : phonePane === "chat" ? `${room.count} members` : "Channels and people"}</p>
-        </div>
-        {pane === "none" && phonePane === "channels" ? <Button variant="ghost" style={{ width: 44, padding: 0 }} aria-label="Message studio" onClick={() => openChannel("desk", true)}><Icon name="edit" size={16} /></Button> : null}
-      </header>
-      <aside className="sc-room-rail" aria-label="People">
-        <div className="sc-room-brand">
-          <Brand slug="room" />
-          <p className="sc-room-voice">Studio workspace</p>
-        </div>
-        <p className="sc-room-label if-ico-row">
-          <Icon name="hash" size={12} />
-          Channels
-        </p>
-        {CHANNELS.map((row) => (
-          <button
-            key={row.id}
-            data-channel={row.id}
-            type="button"
-            className="sc-room-ch"
-            aria-current={channel === row.id && pane !== "person"}
-            onClick={() => openChannel(row.id)}
-          >
-            <b className="if-ico-row">
-              <Icon name="hash" size={16} />
-              <span className="sc-room-ch-hash"># </span>
-              {row.name}
-            </b>
-            <i className="sc-room-ch-count">{row.count}</i>
-            <span className="sc-room-v1-copy">{row.preview}</span>
-          </button>
-        ))}
-        <p className="sc-room-label if-ico-row">
-          <Icon name="users" size={12} />
-          People
-        </p>
-        {PEOPLE.map((row) => (
-          <button
-            key={row.id}
-            type="button"
-            className={`sc-room-person${row.extra ? " sc-room-extra" : ""}`}
-            aria-current={who === row.id && pane === "person"}
-            onClick={() => openPane("person", row.id)}
-          >
-            <Face who={row.id} />
-            <span>
-              <b>{row.name}</b>
-              <i className="if-ico-row">
-                <Icon name={row.mark} size={12} />
-                {row.state}
-              </i>
-            </span>
-          </button>
-        ))}
-      </aside>
-
-      <section className="sc-room-chat" aria-label="Channel">
-        <header className="sc-room-head">
-          <p className="if-ico-row">
-            <Icon name="hash" size={16} />
-            {room.name}
-          </p>
-          <span className="if-ico-row">
-            <Icon name="users" size={12} />
-            {room.count} members
-          </span>
-        </header>
-        <div className="sc-room-lines" ref={lines}>
-          {messages.map((row) => (
-            <button
-              key={row.id}
-              type="button"
-              className="sc-room-msg"
-              aria-current={line === row.id && pane === "thread"}
-              aria-label={`Open thread from ${row.name}: ${row.text}`}
-              onClick={() => {
-                setLine(row.id);
-                setThreadDraft("");
-                openPane("thread", row.who);
-              }}
-            >
-              <Face who={row.who} />
-              <span>
-                <b>
-                  {row.name}{" "}
-                  <em className="if-ico-row">
-                    <Icon name="clock" size={12} />
-                    {row.when}
-                  </em>
-                </b>
-                {row.text}
-                  <i className={`if-ico-row${row.replies + (threadExtra[row.id]?.length ?? 0) === 0 ? " sc-room-start-reply" : ""}`}>
-                    <Icon name="reply" size={12} />
-                    {row.replies + (threadExtra[row.id]?.length ?? 0) || "Reply"} {row.replies + (threadExtra[row.id]?.length ?? 0) > 0 ? row.replies + (threadExtra[row.id]?.length ?? 0) === 1 ? "reply" : "replies" : ""}
-                  </i>
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <form
-        className="sc-room-dock"
-        onSubmit={(event) => {
-          event.preventDefault();
-          send();
-        }}
-      >
-        <InputGroup className="sc-room-field">
-          <span className="sc-room-field-mark" aria-hidden="true"><Icon name="message" size={16} /></span>
-          <Input
-            ref={box}
-            value={draft}
-            placeholder={`Message #${room.name}`}
-            aria-label="Message"
-            enterKeyHint="send"
-            onChange={(event) => setDraft(event.target.value)}
-          />
-        </InputGroup>
-        <Button type="submit" size="sm" style={{ width: "auto" }} disabled={!draft.trim()}>
-          <Icon name="send" size={16} />
-          Send
-        </Button>
-      </form>
-
-      <aside className={`if-inspect${pane !== "none" ? " is-open" : ""}`} aria-label="Thread">
-        {pane !== "none" ? <InspectorClose onClick={closePane} /> : null}
-        {pane === "thread" ? (
-          <div key={selected.id} className="sc-room-thread sc-fresh">
-          <div className="sc-room-inspect" ref={replyList}>
-            <p className="sc-room-label if-ico-row">
-              <Icon name="reply" size={12} />
-              Thread
-            </p>
-            <article className="sc-room-thread-original"><b>{selected.name}</b><p className="sc-room-lead">{selected.text}</p></article>
-            <div className="sc-room-reply-list" aria-live="polite" aria-relevant="additions">
-            {replies.length === 0 ? <p className="sc-room-no-replies">No replies yet. Start the conversation below.</p> : null}
-            {replies.map((row, index) => (
-              <article key={`${row.name}-${index}`} className="sc-room-reply">
-                <Face who={row.who} />
-                <span>
-                  {row.name === "You" ? <b>You</b> : <button type="button" className="sc-room-reply-author" data-focus-key={`reply-${index}`} onClick={() => openPane("person", row.who)}>{row.name}</button>}
-                  {row.text}
-                </span>
-              </article>
-            ))}
-            </div>
-          </div>
-          <form className="sc-room-reply-dock" onSubmit={sendReply}>
-            <Input value={threadDraft} aria-label="Reply in thread" placeholder="Reply in thread" enterKeyHint="send" onChange={(event) => setThreadDraft(event.target.value)} />
-            <Button type="submit" style={{ width: 44, padding: 0 }} aria-label="Send reply" disabled={!threadDraft.trim()}><Icon name="send" size={16} /></Button>
-          </form>
-          </div>
-        ) : null}
-        {pane === "person" ? (
-          <div key={person.id} className="sc-room-inspect sc-fresh">
-            <p className="sc-room-label if-ico-row">
-              <Icon name="user" size={12} />
-              Person
-            </p>
-            <div className="sc-room-card">
-              <Face who={person.id} size={48} />
-              <b>{person.name}</b>
-              <i className="if-ico-row">
-                <Icon name={person.mark} size={12} />
-                {person.state}
-              </i>
-            </div>
-            <p>{person.name} is part of the studio team. Select a message to read their conversation.</p>
-          </div>
-        ) : null}
-      </aside>
-    </section>
-  );
+  return <section className="tc" data-screen={screen} data-thread={Boolean(selectedMessage)} data-editing={editing} aria-label="Studio conversation workspace">
+    <header className="tc-header"><div className="tc-workspace"><span className="tc-mark"><Icon name="layers" size={16} /></span><div><strong>North studio</strong><span>One place for the work</span></div></div><Button ref={createButton} className="tc-create" variant="ghost" aria-label="New channel" disabled={editing} onClick={createChannel}><Icon name="plus" size={16} /><span>New channel</span></Button></header>
+    <div className="tc-body">
+      <aside className="tc-sidebar" aria-label="Workspace channels"><div className="tc-search"><Input aria-label="Find channels" placeholder="Find a channel" value={query} onChange={event => setQuery(event.target.value)} /></div><div className="tc-list-head"><h2>Channels</h2><span>{visible.length}</span></div><div className="tc-channels">{visible.map(channel => <button key={channel.id} type="button" className="tc-channel-row" data-channel={channel.id} aria-current={channel.id === selectedId ? "true" : undefined} ref={element => { if (element) channelRows.current.set(channel.id, element); else channelRows.current.delete(channel.id); }} onClick={() => openChannel(channel.id)}><span><Icon name="hash" size={16} /><strong>{channel.name}</strong><Icon name="chevron-right" size={12} /></span><span>{channel.messages.length ? channel.messages.at(-1)?.text : "A new space for your team"}</span></button>)}{!visible.length && <p className="tc-empty-search">No channels match “{query}”.</p>}</div><div className="tc-team"><h3>In this workspace</h3>{PEOPLE.map(person => <div className="tc-person" key={person.name}><Avatar initials={person.initials} aria-hidden="true" /><div><strong>{person.name}</strong><span>{person.role}</span></div></div>)}</div><div className="tc-sidebar-foot"><Icon name="lock" size={12} />Local sample workspace</div></aside>
+      {editing ? <form className="tc-editor" onSubmit={saveChannel}><header className="tc-editor-head"><Button className="tc-icon" variant="ghost" aria-label={screen === "create" ? "Cancel new channel" : "Back to channel"} onClick={closeEditor}><Icon name="arrow-left" size={16} /></Button><div><span className="tc-eyebrow">North studio</span><h2>{screen === "create" ? "Create a channel" : "Channel details"}</h2></div></header><div className="tc-editor-scroll"><p>{screen === "create" ? "Give a shared conversation a clear home. New channels are added to this local workspace." : "Keep the name and purpose useful for everyone in this sample workspace."}</p><Input ref={nameBox} label="Channel name" required maxLength={40} value={name} aria-invalid={Boolean(error)} feedback={error || "Lowercase words, separated by hyphens."} onChange={event => { setName(event.target.value); setError(""); }} placeholder="project-notes" /><Textarea label="Channel purpose" maxLength={300} rows={4} value={topic} onChange={event => setTopic(event.target.value)} placeholder="What belongs here?" /><Card className="tc-editor-note"><Icon name="users" size={24} /><h3>A shared place, in this tab</h3><p>Names and messages are sample data. Your edits do not send notifications or invite anyone.</p></Card></div><footer className="tc-editor-actions"><Button type="submit" disabled={!name.trim()}>{screen === "create" ? "Create channel" : "Save changes"}<Icon name="arrow-right" size={16} /></Button><Button variant="ghost" onClick={closeEditor}>Cancel</Button></footer></form> : <>
+        <section className="tc-channel" aria-label="Channel conversation"><header className="tc-channel-head"><Button className="tc-back tc-icon" variant="ghost" aria-label="Back to channels" onClick={backToChannels}><Icon name="arrow-left" size={16} /></Button><div><span className="tc-eyebrow">North studio / Channel</span><h2 tabIndex={-1} ref={heading}><Icon name="hash" size={24} />{current.name}</h2></div><Button ref={aboutButton} variant="ghost" className="tc-icon" aria-label="Channel details" onClick={editChannel}><Icon name="info" size={16} /></Button></header><div className="tc-message-scroll" ref={messageScroll}><div className="tc-message-measure"><div className="tc-channel-intro"><p>{current.topic || "A new space for your team’s conversation."}</p><span>Sample conversation · Today</span></div>{current.messages.length ? current.messages.map(message => <article className="tc-message" data-message={message.id} key={message.id}><div className="tc-message-author"><Avatar initials={message.initials} aria-hidden="true" /><strong>{message.author}</strong><span>{message.time}</span>{message.pinned && <span className="tc-pinned"><Icon name="bookmark" size={12} />Pinned</span>}</div><p>{message.text}</p><div className="tc-message-actions"><Button className="tc-open-thread" variant="ghost" ref={element => { if (element) threadButtons.current.set(message.id, element); else threadButtons.current.delete(message.id); }} aria-label={`Open thread from ${message.author}: ${message.text}`} onClick={() => openThread(message)}><Icon name="reply" size={16} /><span>{message.replies.length ? `${message.replies.length} ${message.replies.length === 1 ? "reply" : "replies"}` : "Reply"}</span></Button><Button className="tc-ack tc-icon" variant="ghost" aria-label={message.acknowledged ? `Remove acknowledgement for ${message.author}’s message` : `Acknowledge ${message.author}’s message`} aria-pressed={Boolean(message.acknowledged)} onClick={() => toggleFlag(message, "acknowledged")}><Icon name="check" size={16} /></Button></div></article>) : <div className="tc-empty"><Icon name="message" size={24} /><h3>The conversation starts here</h3><p>Share a question, a decision, or a little work in progress.</p></div>}</div></div><form className="tc-composer" onSubmit={send}><Textarea ref={messageBox} aria-label="Message channel" placeholder={`Message #${current.name}`} value={current.draft} rows={2} maxLength={2000} onChange={event => updateChannel(channel => ({ ...channel, draft: event.target.value }))} onKeyDown={event => composerKey(event, send)} /><div><span>Local messages · ⌘ / Ctrl + Enter</span><Button type="submit" disabled={!current.draft.trim()}><span>Send</span><Icon name="send" size={16} /></Button></div></form></section>
+        {selectedMessage ? <section className="tc-thread" aria-label="Message thread"><header className="tc-thread-head"><Button variant="ghost" className="tc-icon" aria-label="Back to channel" onClick={closeThread}><Icon name="arrow-left" size={16} /></Button><div><span className="tc-eyebrow">#{current.name}</span><h2 ref={threadHeading} tabIndex={-1}>Thread</h2></div><span>{selectedMessage.replies.length} {selectedMessage.replies.length === 1 ? "reply" : "replies"}</span></header><div className="tc-reply-scroll" ref={replyScroll}><article className="tc-thread-original"><div className="tc-message-author"><Avatar initials={selectedMessage.initials} aria-hidden="true" /><strong>{selectedMessage.author}</strong><span>{selectedMessage.time}</span></div><p>{selectedMessage.text}</p><Button variant="ghost" className="tc-pin" aria-pressed={Boolean(selectedMessage.pinned)} onClick={() => toggleFlag(selectedMessage, "pinned")}><Icon name="bookmark" size={16} />{selectedMessage.pinned ? "Pinned message" : "Pin message"}</Button></article><div className="tc-replies">{selectedMessage.replies.length ? selectedMessage.replies.map(reply => <article className="tc-reply" key={reply.id}><div className="tc-message-author"><Avatar initials={reply.initials} aria-hidden="true" /><strong>{reply.author}</strong><span>{reply.time}</span></div><p>{reply.text}</p></article>) : <p className="tc-no-replies">No replies yet. Keep the follow-up here, with its context.</p>}</div></div><form className="tc-reply-composer" onSubmit={sendReply}><Textarea ref={replyBox} aria-label="Reply in thread" placeholder="Add a reply…" rows={2} maxLength={2000} value={replyDraft} onChange={event => { if (threadId) setReplyDrafts(drafts => ({ ...drafts, [threadId]: event.target.value })); }} onKeyDown={event => composerKey(event, sendReply)} /><Button type="submit" disabled={!replyDraft.trim()} aria-label="Send reply">Reply<Icon name="send" size={16} /></Button></form></section> : <aside className="tc-context" aria-label="Channel overview"><span className="tc-context-mark"><Icon name="hash" size={24} /></span><span className="tc-eyebrow">A little context</span><h2>Good work happens in the open</h2><p>Keep questions near the work. Use a thread when the conversation needs a closer look.</p><div className="tc-context-facts"><div><span>Messages</span><strong>{current.messages.length}</strong></div><div><span>Pinned notes</span><strong>{current.messages.filter(message => message.pinned).length}</strong></div><div><span>Sample members</span><strong>{PEOPLE.length}</strong></div></div><Button variant="ghost" onClick={editChannel}>Edit channel details<Icon name="arrow-right" size={16} /></Button></aside>}
+      </>}
+    </div><footer className="tc-footer"><span><Icon name="terminal" size={12} />Local demo</span><span>Messages stay in this tab</span></footer><p className="tc-announcement" role="status">{announcement}</p>
+  </section>;
 }

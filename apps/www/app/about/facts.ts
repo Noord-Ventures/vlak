@@ -396,7 +396,7 @@ export const noord = {
 };
 
 export const person = {
-  heading: "Renato Valdés Olmos",
+  heading: "Renn",
   url: "https://www.renatovaldes.com/",
   copyright: "MIT © Noord / Renato Valdés-Olmos",
   year: "2026",

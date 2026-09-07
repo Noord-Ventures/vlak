@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 
 /** Local application and patient journeys, using the runner's viewport and page. */
-export async function checkCareInterfaces({ page, base, fail }) {
+export async function checkCareInterfaces({ page, base, fail, slugs = ["identity", "patient"] }) {
   const check = async (name, run) => {
     try { await run(); }
     catch (error) { fail(`care interface ${name}: ${error instanceof Error ? error.message : String(error)}`); }
@@ -45,7 +45,7 @@ export async function checkCareInterfaces({ page, base, fail }) {
     assert.deepEqual(geometry.shortControls, [], "a visible control has less than 44px reach");
   };
 
-  await check("identity applicant to receipt", async () => {
+  if (slugs.includes("identity")) await check("identity applicant to receipt", async () => {
     const frame = await prepare("identity");
     const name = frame.getByRole("textbox", { name: "Full name", exact: true });
     await name.fill("   ");
@@ -84,7 +84,7 @@ export async function checkCareInterfaces({ page, base, fail }) {
     await fit(frame, ".id-actions,.id-footer");
   });
 
-  await check("patient readings, care, and visit note", async () => {
+  if (slugs.includes("patient")) await check("patient readings, care, and visit note", async () => {
     const frame = await prepare("patient");
     const nav = () => frame.locator(".pt-rail nav:visible,.pt-mobile-nav:visible");
     await activate(nav().getByRole("button", { name: "Readings", exact: true }));
@@ -103,6 +103,13 @@ export async function checkCareInterfaces({ page, base, fail }) {
     assert.equal(await frame.getByRole("heading", { name: "What’s on your mind?", exact: true }).isVisible(), true);
     await frame.getByRole("textbox", { name: "Your visit note", exact: true }).fill("Ask about the sample sleep record and prepare questions for the visit.");
     await choose(frame.getByRole("combobox", { name: "Preferred conversation format", exact: true }), 2);
+    assert.match(await frame.locator(".pt-draft-status").textContent(), /Unsaved draft/);
+    await activate(frame.getByRole("button", { name: "Back", exact: true }));
+    await page.waitForFunction(() => document.activeElement?.textContent?.includes("Edit visit note"));
+    assert.equal(await frame.getByText("Ask about the sample sleep record and prepare questions for the visit.", { exact: true }).count(), 0, "Back silently saved an unfinished draft");
+    await activate(edit);
+    assert.equal(await frame.getByRole("textbox", { name: "Your visit note", exact: true }).inputValue(), "Ask about the sample sleep record and prepare questions for the visit.", "Back lost the unsaved visit draft");
+    assert.match(await frame.getByRole("combobox", { name: "Preferred conversation format", exact: true }).textContent(), /Video conversation/, "Back lost the unsaved visit preference");
     await fit(frame, ".pt-detail-head,.pt-detail-actions,.pt-footer");
     await activate(frame.getByRole("button", { name: "Save note", exact: true }));
     assert.equal(await frame.getByText("Ask about the sample sleep record and prepare questions for the visit.", { exact: true }).isVisible(), true);

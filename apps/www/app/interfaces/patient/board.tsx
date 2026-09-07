@@ -44,6 +44,7 @@ export function PatientBoard() {
   const visitId = useId();
   const focusScreen = useRef(false);
   const closeFocus = useRef(false);
+  const visitDraftStarted = useRef(false);
   const preferenceLabel = useId();
   const reportLabel = useId();
   useEffect(() => {
@@ -64,7 +65,11 @@ export function PatientBoard() {
     if (focusScreen.current) { headingRef.current?.focus(); scrollRef.current?.scrollTo({ top: 0 }); focusScreen.current = false; }
   }, [screen]);
   const navigate = (next: Screen) => { if (screen !== next) focusScreen.current = true; setScreen(next); setNotice(""); };
-  const openVisit = (origin: HTMLElement) => { returnFocus.current = origin.id; setNoteDraft(record.note); setPreferenceDraft(record.preference); setNotice(""); setDetail(true); };
+  const openVisit = (origin: HTMLElement) => {
+    returnFocus.current = origin.id;
+    if (!visitDraftStarted.current) { setNoteDraft(record.note); setPreferenceDraft(record.preference); visitDraftStarted.current = true; }
+    setNotice(""); setDetail(true);
+  };
   const closeVisit = () => { closeFocus.current = true; setDetail(false); };
   const preference = preferences.find(option => option.value === record.preference)?.label ?? "No preference saved";
   const visitCard = <AppointmentCard appointmentTitle="A conversation about you" dateLabel="Saturday, 12 September" timeLabel="10:30–11:00" timeZone="UTC+01" clinician="Dr. Sam Ellis · Fictional clinician" location="Northmere practice" status="Sample appointment">
@@ -99,9 +104,10 @@ export function PatientBoard() {
           <div className="pt-medication"><h3 className="pt-subheading">Medication record</h3><MedicationSchedule dateLabel="Monday, 7 September · Sample schedule" timeZone="UTC+01" items={[{ id: "sample-dose", name: "Sample medication", dose: "1 tablet · Fictional prescription", timeLabel: "08:00", status: record.taken ? "Recorded as taken locally" : "No dose record supplied", instructions: "A demonstration entry; no medicine is prescribed by this example.", actions: [{ id: record.taken ? "clear" : "taken", label: record.taken ? "Clear local dose record" : "Record sample as taken" }] }]} onAction={(_, action) => { setRecord(current => ({ ...current, taken: action === "taken" })); setNotice(action === "taken" ? "Sample dose recorded as taken locally." : "Local dose record cleared."); }} /></div>
         </>}
       </div>}
-      {detail && <form className="pt-detail" onSubmit={event => { event.preventDefault(); setRecord(current => ({ ...current, note: noteDraft.trim(), preference: preferenceDraft })); closeVisit(); setNotice("Visit note and preference saved locally. Nothing was sent to the practice."); }}>
+      {detail && <form className="pt-detail" onSubmit={event => { event.preventDefault(); setRecord(current => ({ ...current, note: noteDraft.trim(), preference: preferenceDraft })); visitDraftStarted.current = false; closeVisit(); setNotice("Visit note and preference saved locally. Nothing was sent to the practice."); }}>
         <div className="pt-detail-head"><Button type="button" variant="ghost" onClick={closeVisit}><Icon name="arrow-left" />Back</Button><span>Visit preparation</span><span className="pt-detail-date">12 September</span></div>
         <div className="pt-detail-scroll"><span className="pt-eyebrow">A conversation about you</span><h2 ref={detailHeadingRef} tabIndex={-1}>What’s on your mind?</h2><p className="pt-detail-intro">Keep a few thoughts ready for Dr. Sam Ellis. Your note stays in this browser.</p>
+          <p className="pt-draft-status">{noteDraft.trim() !== record.note || preferenceDraft !== record.preference ? "Unsaved draft · kept in this tab when you go back" : "Saved note · edit below and save your changes"}</p>
           <Textarea label="Your visit note" name="visitNote" value={noteDraft} maxLength={2000} onChange={event => setNoteDraft(event.currentTarget.value)} rows={6} feedback={`${noteDraft.length} / 2,000 characters · Use fictional information`} />
           <div className="pt-visit-summary"><Icon name="calendar" size={24} /><div><strong>Saturday, 12 September · 10:30</strong><span>Northmere practice · UTC+01</span></div><span>Sample appointment</span></div>
           <div className="pt-preference-field"><span id={preferenceLabel}>Preferred conversation format</span><Select aria-labelledby={preferenceLabel} name="visitPreference" fullWidth value={preferenceDraft} options={preferences} onValueChange={setPreferenceDraft} /><p>This saves a personal preference only. The sample appointment is unchanged.</p></div>

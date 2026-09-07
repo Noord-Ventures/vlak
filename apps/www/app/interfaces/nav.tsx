@@ -4,19 +4,29 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MobileToc } from "@/components/toc-mobile";
 import { sx } from "@/lib/sx";
-import { interfaces, orderedInterfaces } from "./catalog";
+import { interfaces } from "./catalog";
 import { interfaces as ifx } from "./interfaces.stylex";
-
-const navInterfaces = orderedInterfaces;
 
 function here(pathname: string, href: string) {
   return pathname === href || pathname === `${href}/`;
 }
 
+function navigationLabel(label: string) {
+  const labels: Record<string, string> = {
+    "Genome mapping workspace": "Genome Mapping",
+    "Protein sequence workbench": "Protein Sequence",
+  };
+  return labels[label] ?? label.replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+}
+
+const navInterfaces = [...interfaces].sort((a, b) =>
+  navigationLabel(a.what).localeCompare(navigationLabel(b.what), "en", { numeric: true, sensitivity: "base" }),
+);
+
 function currentLabel(pathname: string) {
   if (here(pathname, "/interfaces")) return "Interfaces";
   const slug = pathname.split("/")[2];
-  return interfaces.find((item) => item.slug === slug)?.what ?? "Interfaces";
+  return navigationLabel(interfaces.find((item) => item.slug === slug)?.what ?? "Interfaces");
 }
 
 export function InterfacesNav({ rail = true }: { rail?: boolean }) {
@@ -39,7 +49,7 @@ export function InterfacesNav({ rail = true }: { rail?: boolean }) {
             className="toc-mobile-item"
             aria-current={here(pathname, href) ? "page" : undefined}
           >
-            {item.what}
+            {navigationLabel(item.what)}
           </Link>
         );
       })}
@@ -57,7 +67,7 @@ export function InterfacesNav({ rail = true }: { rail?: boolean }) {
             const href = `/interfaces/${item.slug}`;
             return (
               <Link key={item.slug} href={href} {...sx("", ifx.railLink)} aria-current={here(pathname, href) ? "page" : undefined}>
-                {item.what}
+                {navigationLabel(item.what)}
               </Link>
             );
           })}

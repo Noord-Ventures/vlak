@@ -37,7 +37,7 @@
 .mi-view { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 24px; border-bottom: 1px solid var(--divider); }
 .mi-view > span { font-size: 12px; color: var(--text-secondary); }
 .mi .rs-toggle { min-width: 44px; min-height: 44px; font-size: 13px; padding-inline: 10px; }
-.mi-detail-scroll, .mi-note-scroll { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; padding: 22px 24px; scrollbar-width: thin; }
+.mi-detail-scroll, .mi-note-scroll { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; --mi-scroll-inset: 24px; padding: 22px var(--mi-scroll-inset); scrollbar-width: thin; }
 .mi .rs-colony-plate > * { order: 3; }
 .mi .rs-colony-plate > figcaption { order: 0; }
 .mi .rs-colony-plate > .rs-colony-plate-count { order: 1; }
@@ -73,7 +73,7 @@
   .mi-body { grid-template-columns: 196px minmax(0, 1fr) 300px; }
   .mi-notebook, .mi[data-screen="notebook"] .mi-notebook { display: grid; border-inline-start: 1px solid var(--divider); }
   .mi[data-screen="notebook"] .mi-detail { display: grid; }
-  .mi-note-scroll { padding: 18px; }
+  .mi-note-scroll { --mi-scroll-inset: 18px; padding-block: 18px; }
 }
 @container microbiology (max-width: 640px) {
   .mi-header { padding-inline: 14px; }
@@ -94,7 +94,7 @@
   .mi-review-state { display: none; }
   .mi-view { padding: 9px 16px; }
   .mi-view > span { display: none; }
-  .mi-detail-scroll, .mi-note-scroll { padding: 18px 16px; }
+  .mi-detail-scroll, .mi-note-scroll { --mi-scroll-inset: 16px; padding-block: 18px; }
   .mi .rs-colony-plate-graphic { width: min(100%, 18rem); flex-basis: 18rem; margin-inline: auto; }
   .mi .rs-colony-plate-list { flex-basis: 100%; }
   .mi-detail-actions, .mi-note-actions { padding: 12px 16px; }
@@ -111,3 +111,11 @@
   .mi-culture[aria-current="true"] { background: Highlight; color: HighlightText; }
 }
 @media (prefers-reduced-motion: reduce) { .mi *, .mi *::before, .mi *::after { scroll-behavior: auto; transition-duration: 0s; } }
+
+/* Record sections share the scroll pane edges; their content retains its inset. */
+.mi .mi-record-card, .mi-source-note, .mi-saved-notes li,
+.mi .rs-culture-log-metadata, .mi .rs-culture-log-observation {
+  margin-inline: calc(-1 * var(--mi-scroll-inset));
+  padding-inline: var(--mi-scroll-inset);
+}
+.mi .mi-record-card { border-inline: 0; }

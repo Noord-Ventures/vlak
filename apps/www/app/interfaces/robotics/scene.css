@@ -59,7 +59,7 @@
 .rb-desktop-tabs { padding: 10px 16px; border-bottom: 1px solid var(--divider); }
 .rb-desktop-tabs .rs-toggle-group { width: 100%; }
 .rb-desktop-tabs .rs-toggle { flex: 1; }
-.rb-inspector-scroll { min-height: 0; flex: 1; padding: 20px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; display: flex; flex-direction: column; gap: 18px; }
+.rb-inspector-scroll { min-height: 0; flex: 1; --rb-scroll-inset: 20px; padding: 20px var(--rb-scroll-inset); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; display: flex; flex-direction: column; gap: 18px; }
 .rb .rs-joint-panel-joint { grid-template-columns: minmax(0,1fr); }
 .rb .rs-joint-panel-reading { font-size: 22px; }
 .rb .rs-joint-panel-copy, .rb .rs-robot-pose-copy { font-size: 11px; }
@@ -98,7 +98,7 @@
   .rb-inspector-head { padding: 12px; }
   .rb .rb-back { display: inline-flex; }
   .rb-desktop-tabs { display: none; }
-  .rb-inspector-scroll { padding: 18px 16px; }
+  .rb-inspector-scroll { --rb-scroll-inset: 16px; padding-block: 18px; }
   .rb-stage { min-height: 210px; }
   .rb-stage-label { inset-block-start: 12px; inset-inline-start: 16px; }
   .rb-stage-label strong { font-size: 18px; }
@@ -121,3 +121,76 @@
 @media (forced-colors: active) { .rb .rb-joint-row[aria-pressed="true"], .rb .rb-mobile-nav > button[aria-pressed="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; } .rb-joint-active { fill: Highlight; } }
 
 .rb-stage-label span, .rb-stage-foot { color: var(--text); }
+
+/* Diagnostic and joint records fill the inspector; editors remain inset. */
+.rb-events, .rb .rs-joint-panel-list, .rb .rs-alarm-panel-list,
+.rb .rs-robot-mission-queue-list { margin-inline: calc(-1 * var(--rb-scroll-inset)); }
+.rb .rb-event, .rb .rs-joint-panel-joint, .rb .rs-alarm-panel-item,
+.rb .rs-robot-mission-queue-step { padding-inline: var(--rb-scroll-inset); }
+.rb .rs-robot-mission-queue-list { padding-inline: 0; list-style-position: inside; }
+.rb .rs-robot-mission-queue-head { margin-top: 6px; }
+
+/* The articulated view is an edge-to-edge region; its controls and records form flush bands. */
+.rb-monitor { grid-template-rows: 42px minmax(270px,1fr) auto auto auto 80px; }
+.rb-stage { min-height: 270px; }
+.rb-scene { position: relative; width: 100%; min-height: 200px; flex: 1; overflow: hidden; color: var(--text); }
+.rb-scene > canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+.rb-scene-fallback { position: absolute; inset: 0; width: 100%; height: 100%; display: none; }
+.rb-scene-fallback[data-visible="true"] { display: block; }
+.rb-scene-fallback path { fill: none; stroke: var(--control-border); stroke-width: 1; }
+.rb-scene-fallback polyline { fill: none; stroke: var(--text); stroke-width: 18; stroke-linejoin: round; }
+.rb-scene-fallback circle { fill: var(--bg); stroke: var(--text); stroke-width: 2; }
+.rb-scene-state { position: absolute; inset-inline: 16px; inset-block-end: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; font-size: 11px; text-align: center; }
+.rb-scene-camera { position: absolute; inset-block-start: 17px; inset-inline-end: 16px; display: flex; align-items: center; gap: 5px; font-size: 10px; }
+.rb-scene-camera[data-available="false"] { font-weight: 500; }
+.rb-stage-label { z-index: 1; }
+.rb-stage-label strong { font-size: 17px; }
+.rb-stage-foot { flex: none; padding: 6px 14px; background: var(--bg); border-top: 1px solid var(--divider); }
+.rb-scene-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 14px; border-top: 1px solid var(--divider); }
+.rb-scene-tools > .rs-select { flex: 1; max-width: 180px; min-width: 0; --rs-select-min-width: 0; }
+.rb-scene-tools > div:last-child { display: flex; gap: 4px; }
+.rb .rb-scene-tools .rs-btn-ghost { padding: 8px; }
+.rb .rb-scene-tools [aria-pressed="true"], .rb .rb-mechanism [data-closed="true"] { color: var(--bg); background: var(--text); }
+.rb-mechanism { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 16px; border-top: 1px solid var(--divider); }
+.rb-mechanism > span { display: grid; gap: 3px; }
+.rb-mechanism strong { font-size: 10px; font-weight: 500; }
+.rb-tip { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.rb-joint-list { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.rb .rb-joint-row { grid-template-columns: minmax(0,1fr) 16px; gap: 5px; padding: 12px 14px; border-inline-end: 1px solid var(--divider); }
+.rb .rb-joint-row:last-child { border-inline-end: 0; }
+.rb-joint-index, .rb-joint-row > span:nth-child(2) small { display: none; }
+.rb-joint-row > span:nth-child(2) { grid-column: 1; font-size: 12px; }
+.rb-joint-row > strong { grid-column: 1; display: flex; gap: 5px; align-items: baseline; font-size: 20px; text-align: start; }
+.rb-joint-row > svg { grid-column: 2; grid-row: 1 / 3; }
+.rb-trace { gap: 0 12px; }
+.rb-trace > div { display: flex; align-items: center; gap: 12px; font-size: 10px; }
+.rb-trace .rs-select { --rs-select-min-width: 70px; margin-inline-start: auto; }
+.rb-trace .rs-select .rs-dropdown { min-height: 44px; padding-inline: 10px 28px; }
+.rb-trace svg { height: 20px; }
+@container robotics (max-width: 640px) {
+  .rb-monitor { grid-template-rows: 38px minmax(260px,1fr) auto auto auto 84px; }
+  .rb-stage { min-height: 260px; }
+  .rb-stage-label { inset-block-start: 12px; inset-inline-start: 14px; }
+  .rb-stage-label strong { font-size: 16px; }
+  .rb-stage-label span { max-width: 140px; font-size: 10px; }
+  .rb-scene-camera { inset-block-start: 13px; inset-inline-end: 12px; font-size: 10px; }
+  .rb-scene-tools { padding-inline: 12px; }
+  .rb-scene-tools .rs-dropdown { font-size: 13px; }
+  .rb-mechanism { padding-inline: 12px; }
+  .rb-mechanism strong { font-size: 11px; }
+  .rb-tip { font-size: 11px; }
+  .rb .rb-joint-row { padding: 12px 10px; grid-template-columns: minmax(0,1fr); }
+  .rb-joint-row > span:nth-child(2) { font-size: 12px; }
+  .rb-joint-row > strong { font-size: 18px; flex-wrap: wrap; gap: 0 3px; }
+  .rb-joint-row > svg { display: none; }
+  .rb-trace { padding-inline: 12px; }
+  .rb-trace > div { font-size: 11px; gap: 4px; }
+}
+@media (forced-colors: active) {
+  .rb-scene > canvas { display: none; }
+  .rb-scene-fallback { display: block; }
+  .rb .rb-scene-tools [aria-pressed="true"], .rb .rb-mechanism [data-closed="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+}
+
+.rb-trace .rs-select { min-width: 70px; width: 82px; flex: none; }
+.rb .rb-mechanism > button { font-size: 11px; padding-inline: 8px; }

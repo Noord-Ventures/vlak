@@ -61,7 +61,7 @@
 .cb-desktop-tabs { flex: none; padding: 10px 12px; border-bottom: 1px solid var(--divider); }
 .cb-desktop-tabs .rs-toggle-group { width: 100%; }
 .cb-desktop-tabs .rs-toggle { flex: 1; }
-.cb-inspector-scroll { flex: 1; min-height: 0; padding: 18px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; display: flex; flex-direction: column; gap: 18px; }
+.cb-inspector-scroll { flex: 1; min-height: 0; --cb-scroll-inset: 18px; padding: 18px var(--cb-scroll-inset); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; display: flex; flex-direction: column; gap: 18px; }
 .cb-assistant-intro { display: flex; align-items: start; gap: 10px; }
 .cb-assistant-mark { display: grid; place-items: center; width: 32px; height: 32px; border: 1px solid var(--divider); flex: none; }
 .cb-assistant-intro strong { font-size: 13px; font-weight: 500; }
@@ -128,7 +128,7 @@
   .cb-inspector-head { padding: 12px; }
   .cb .cb-back { display: inline-flex; }
   .cb-desktop-tabs { display: none; }
-  .cb-inspector-scroll { padding: 16px; }
+  .cb-inspector-scroll { --cb-scroll-inset: 16px; padding-block: 16px; }
   .cb .rs-input, .cb .rs-dropdown, .cb .rs-textarea { font-size: 16px; }
   .cb-assistant-intro strong { font-size: 16px; }
   .cb-assistant-intro p, .cb-copy, .cb-quoted, .cb-stale, .cb-feedback, .cb-field, .cb .rs-pad-inspector-detail, .cb .rs-pad-inspector-term, .cb .rs-pad-inspector-note, .cb .rs-design-rule-results-detail, .cb .rs-design-rule-results-term, .cb .rs-design-rule-results-note, .cb .rs-assembly-variant-matrix-note { font-size: 15px; }
@@ -149,3 +149,30 @@
 }
 
 .cb-board-top > strong, .cb-board-bottom { color: var(--text); }
+
+/* Imported records and proposal diffs use continuous pane-wide rules. */
+.cb-diff, .cb .cb-stale, .cb .cb-feedback, .cb .rs-pad-inspector-properties {
+  margin-inline: calc(-1 * var(--cb-scroll-inset));
+  padding-inline: var(--cb-scroll-inset);
+}
+.cb .cb-stale, .cb .cb-feedback { border-inline: 0; }
+.cb-history, .cb .rs-design-rule-results-list { margin-inline: calc(-1 * var(--cb-scroll-inset)); }
+.cb-history h3, .cb .cb-history-row { padding-inline: var(--cb-scroll-inset); }
+.cb .rs-design-rule-results-list { gap: 0; }
+.cb .rs-design-rule-results-item { padding-inline: var(--cb-scroll-inset); border-inline: 0; }
+.cb .rs-design-rule-results-item + .rs-design-rule-results-item { border-top: 0; }
+.cb .rs-pad-inspector-table {
+  width: calc(100% + 2 * var(--cb-scroll-inset));
+  margin-inline: calc(-1 * var(--cb-scroll-inset));
+}
+.cb .rs-pad-inspector-caption { padding-inline: var(--cb-scroll-inset); }
+.cb .rs-pad-inspector-cell:first-child { padding-inline-start: var(--cb-scroll-inset); }
+.cb .rs-pad-inspector-cell:last-child { padding-inline-end: var(--cb-scroll-inset); }
+.cb .rs-assembly-variant-matrix-viewport {
+  max-width: none;
+  margin-inline: calc(-1 * var(--cb-scroll-inset));
+  border-inline: 0;
+}
+.cb .rs-assembly-variant-matrix-header:first-child { padding-inline-start: var(--cb-scroll-inset); }
+.cb .rs-assembly-variant-matrix-header:last-child,
+.cb .rs-assembly-variant-matrix-cell:last-child { padding-inline-end: var(--cb-scroll-inset); }

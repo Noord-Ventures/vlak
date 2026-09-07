@@ -165,12 +165,6 @@ export const interfaces = stylex.create({
     boxShadow: "none",
     overflow: "hidden",
   },
-  vehicleSpecimen: {
-    height: {
-      default: 720,
-      [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
-    },
-  },
   workbenchSpecimen: {
     height: {
       default: "clamp(612px, calc(100svh - 180px), 816px)",
@@ -217,47 +211,5 @@ export const interfaces = stylex.create({
     padding: 0,
     borderWidth: 0,
     boxShadow: "none",
-  },
-  v1Status: {
-    display: {
-      default: "none",
-      [phone]: "flex",
-    },
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: 44,
-    paddingInline: 20,
-    fontSize: "0.75rem",
-    color: "var(--text)",
-    backgroundColor: "var(--bg)",
-  },
-  v1Nav: {
-    display: {
-      default: "none",
-      [phone]: "flex",
-    },
-    alignItems: "center",
-    justifyContent: "space-between",
-    height: 48,
-    paddingInline: 16,
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "var(--divider)",
-    backgroundColor: "var(--bg)",
-  },
-  v1Title: {
-    margin: 0,
-    fontSize: "1rem",
-    fontWeight: 600,
-    letterSpacing: "-0.02em",
-  },
-  v1Action: {
-    appearance: "none",
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    color: "var(--text-secondary)",
-    minHeight: 44,
-    padding: 0,
-    cursor: "pointer",
   },
 });

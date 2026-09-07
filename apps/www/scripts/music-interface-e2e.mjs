@@ -9,8 +9,57 @@ async function show(page, name) {
 export async function checkMusicInterface({ page, base, fail }) {
   try {
     await page.goto(`${base}/interfaces/music/`, { waitUntil: "networkidle" });
+    await page.waitForFunction(() => Object.keys(document.querySelector(".mu-controls button") ?? {}).some(key => key.startsWith("__reactProps")));
+    const mobileTrack = page.getByRole("combobox", { name: "Track to launch", exact: true });
+    if (await mobileTrack.isVisible()) {
+      const selectTrack = async name => {
+        await mobileTrack.click();
+        await page.getByRole("option", { name, exact: true }).click();
+      };
+      for (const [name, firstClip] of [["Drum machine", "Four on the floor"], ["Closed hats", "In between"], ["Round bass", "Rooted"], ["Soft keys", "Soft edges"]]) {
+        await selectTrack(name);
+        assert(await page.getByRole("button", { name: `Launch ${firstClip}, ${name}`, exact: true }).isVisible(), `phone launcher cannot reach ${name}`);
+        assert.equal(await page.locator(".mu-clip:visible").count(), 4, "phone launcher should present all four clips for the chosen track");
+        const fit = await page.locator(".mu-matrix-viewport").evaluate(element => element.scrollWidth - element.clientWidth);
+        assert(fit <= 1, "phone launcher still requires panning a desktop matrix");
+      }
+      const lastClip = page.getByRole("button", { name: "Launch Night air, Soft keys", exact: true });
+      await lastClip.click();
+      await page.getByRole("heading", { name: "Night air", exact: true }).waitFor({ state: "visible" });
+      await page.waitForFunction(() => {
+        const viewport = document.querySelector(".mu-workspace")?.getBoundingClientRect();
+        const heading = document.querySelector(".mu-editor h2")?.getBoundingClientRect();
+        return viewport && heading && heading.top >= viewport.top && heading.bottom <= viewport.bottom;
+      });
+      assert.equal(await page.getByRole("textbox", { name: "Clip name", exact: true }).inputValue(), "Night air");
+      await page.getByRole("button", { name: "Back to session clips", exact: true }).click();
+      await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Launch Night air, Soft keys");
+      assert(await lastClip.evaluate(element => {
+        const viewport = element.closest(".mu-workspace").getBoundingClientRect(), target = element.getBoundingClientRect();
+        return target.top >= viewport.top && target.bottom <= viewport.bottom;
+      }), "Back lost the phone launcher's reading position");
+      await page.locator(".mu-track-heading:visible").click();
+      assert(await page.getByRole("group", { name: "Soft keys channel", exact: true }).isVisible());
+      await page.getByRole("button", { name: "Back to session tracks", exact: true }).click();
+      await page.waitForFunction(() => document.activeElement?.classList.contains("mu-track-heading"));
+      await selectTrack("Drum machine");
+      assert(await page.getByRole("status", { name: "Play position", exact: true }).isVisible(), "phone transport hides the actual play position");
+    }
     await show(page, "Clip");
     const editor = page.getByRole("region", { name: "Clip editor", exact: true });
+    if (await page.getByRole("navigation", { name: "Music workspace", exact: true }).isVisible()) {
+      const targets = await editor.locator(".mu-step").evaluateAll(elements => elements.map(element => { const box = element.getBoundingClientRect(); return { x: box.x, y: box.y, right: box.right, width: box.width, height: box.height }; }));
+      const pattern = await editor.locator(".mu-pattern-viewport").boundingBox();
+      assert(pattern);
+      assert.equal(new Set(targets.map(target => Math.round(target.y))).size, 4, "phone step editor is not grouped into four beats");
+      assert.equal(targets.length, 16);
+      assert(targets.every(target => target.width >= 44 && target.height >= 44 && target.x >= pattern.x && target.right <= pattern.x + pattern.width + 1), "phone step controls are too small or require horizontal panning");
+      const sixteenth = editor.getByRole("button", { name: "Step 16", exact: true });
+      const previous = await sixteenth.getAttribute("aria-pressed");
+      await sixteenth.click();
+      assert.notEqual(await sixteenth.getAttribute("aria-pressed"), previous, "the final phone beat is not editable");
+      await sixteenth.click();
+    }
     const second = editor.getByRole("button", { name: "Step 2", exact: true });
     assert.equal(await second.getAttribute("aria-pressed"), "false");
     await second.focus(); await page.keyboard.press("Space");

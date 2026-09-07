@@ -1,0 +1,10 @@
+{
+  "title": "Bust of Athena",
+  "author": "yugengen (https://sketchfab.com/yugengen)",
+  "source": "https://sketchfab.com/3d-models/bust-of-athena-6f372d03e69b48ee8901bdc6e48f17b5",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "originalSha256": "9da9ceac2d8515b8c81d369fd74cb61c3650ff469c6b502bce8be7323441ddb3",
+  "adaptation": "Textures and materials removed; geometry normalized and welded. Thin surface-section, crease and silhouette curves derived for an animated line portrait. Static fallback projected from the same geometry.",
+  "preparation": "node apps/www/scripts/prepare-athena-model.mjs /path/to/bust_of_athena.glb"
+}
