@@ -8,7 +8,7 @@ import { webglArgs } from "./e2e-render-controls.mjs";
 // Capture the actual EV renderer. The fallback and gallery show the same object as the live scene.
 const base = process.env.SITE_URL ?? "http://localhost:3016";
 const publicDirectory = fileURLToPath(new URL("../public/interfaces/concepts/", import.meta.url));
-const manifestPath = fileURLToPath(new URL("../../../docs/assets/evoque-line-preview-2026-09-07.json", import.meta.url));
+const manifestPath = fileURLToPath(new URL("../../../docs/assets/evoque-line-preview-2026-09-08.json", import.meta.url));
 const captures = {};
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH, args: webglArgs });
 try {
@@ -26,7 +26,7 @@ try {
     await page.mouse.move(0, 0);
     const state = await canvas.evaluate(element => ({ ...element.dataset }));
     assert.equal(state.cameraStyle,"side");assert.equal(state.wheels,"4");assert.equal(await canvas.locator("canvas").count(),1);
-    const filename = `evoque-line-side-${theme}-v2.png`;
+    const filename = `evoque-line-side-${theme}-v3.png`;
     const png = await canvas.screenshot({ path: `${publicDirectory}${filename}` });
     captures[theme] = { filename, sha256: createHash("sha256").update(png).digest("hex"), width: png.readUInt32BE(16), height: png.readUInt32BE(20), camera: state.camera, paper:state.paper };
     console.log(`${theme}: ${captures[theme].width} × ${captures[theme].height}, paper ${state.paper}`);
@@ -37,7 +37,7 @@ await writeFile(manifestPath, `${JSON.stringify({
   method:"Unretouched Chromium screenshots of the actual Three.js EV scene in its side view, reduced motion.",
   source:"https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa",
   creator:"tonielpro520",license:"https://creativecommons.org/licenses/by/4.0/",
-  adaptations:"An original abstract shell and curated curves follow the licensed Evoque's silhouette and measured wheelbase. Fine trim, badges, grille mesh and wheel details have been omitted; the source mesh is no longer downloaded at runtime. Attribution is retained under Components used.",
+  adaptations:"An original simplified shell follows the licensed Evoque's measured wheelbase, roof, glazing and shoulder contours. Curated lamp, vent, handle and wheel outlines retain its identity; fine trim, badges and grille mesh are omitted. The source mesh is not downloaded at runtime. Attribution is retained under Components used.",
   rendering:{featureContours:"LineSegments2 / LineMaterial",lineWidthCssPixels:1.05,paperSurfacePolygonOffset:true},
   captureCommand:"SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-vehicle-previews.mjs",
   captures,

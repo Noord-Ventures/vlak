@@ -31,7 +31,7 @@ export function DriveVehicle({ mode, lights, locked, navigating, load, charge, c
     <div className="ev-visual-caption"><span>{mode==="vehicle"?"Vehicle 01":mode==="journey"?"Home → Utrecht Centraal":"Traction battery / 12 modules"}</span><span>{viewLabel}</span></div>
     <div className="ev-model-viewport">
       <div ref={host} className="ev-scene" role="img" aria-label={`${mode === "energy" ? "Illustrative electric battery pack" : "Evoque line model"}, ${viewLabel.toLowerCase()}`} aria-hidden={status!=="ready"} />
-      {status!=="ready"&&<div className="ev-scene-fallback"><img src="/interfaces/concepts/evoque-line-side-light-v2.png" alt="Electric vehicle concept, side-profile line illustration" draggable="false" /><span role="status">{status==="loading"?"Preparing 3D view…":"3D unavailable. Showing the concept illustration."}</span></div>}
+      {status!=="ready"&&<div className="ev-scene-fallback"><img src="/interfaces/concepts/evoque-line-side-light-v3.png" alt="Electric vehicle concept, side-profile line illustration" draggable="false" /><span role="status">{status==="loading"?"Preparing 3D view…":"3D unavailable. Showing the concept illustration."}</span></div>}
       {mode==="energy"&&<div className="ev-energy-labels"><span>01 / Pack cover</span><span>02 / Charge per module</span><span>03 / Current bus</span></div>}
       {mode==="journey"&&<span className="ev-scene-route">{navigating?"Journey simulation running":"Journey preview · Looping streetscape"} · Via A2</span>}
     </div>
