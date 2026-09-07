@@ -102,7 +102,7 @@ export function DocumentationBoard() {
       container.scrollTo({ top: section ? top : 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" }); heading.focus({ preventScroll: true });
     });
   }
-  const navigation = (compact = true) => article ? <ArticleContents key={article.id} guide={article} activeSection={activeSection} compact={compact} expanded={contentsNearby || contentsFocused} onReadSection={readSection} onBack={() => showIndex()} /> : <nav aria-label="Guide categories" className="dc-navigation">{categories.map(item => <Button key={item} variant="ghost" aria-current={category === item ? "page" : undefined} onClick={() => showIndex(item)}>{item}</Button>)}<p className="dc-rail-note">Working notes<br />for building interfaces</p></nav>;
+  const navigation = (compact = true) => article ? <ArticleContents key={article.id} guide={article} activeSection={activeSection} textScale={scale / 100} compact={compact} expanded={contentsNearby || contentsFocused} onReadSection={readSection} onBack={() => showIndex()} /> : <nav aria-label="Guide categories" className="dc-navigation">{categories.map(item => <Button key={item} variant="ghost" aria-current={category === item ? "page" : undefined} onClick={() => showIndex(item)}>{item}</Button>)}<p className="dc-rail-note">Working notes<br />for building interfaces</p></nav>;
   const next = article ? guides[(guides.indexOf(article) + 1) % guides.length]! : null;
 
   return <section ref={root} className="dc" aria-label="Documentation reading workspace" data-view={article ? "article" : "index"} data-appearance={appearance} data-menu={menuOpen} data-scrolled={progress > 0} style={{ "--dc-scale": scale / 100 } as React.CSSProperties} onPointerMove={event => {

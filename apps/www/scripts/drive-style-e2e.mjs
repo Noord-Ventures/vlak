@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { checkDriveCameraTransition } from "./drive-camera-e2e.mjs";
 
 /** Exercise the EV workspace through visible, keyboard-operable Vlak controls. */
 export async function checkDriveStyle({ page, base, fail }) {
@@ -74,7 +75,9 @@ export async function checkDriveStyle({ page, base, fail }) {
     await page.waitForFunction(width => Math.abs(document.querySelector('.ev-vehicle').clientWidth - width) <= 1, closedWidth);
     await waitForScene(() => document.querySelector('.ev-scene')?.dataset.rendered === 'true');
     assert.equal(await scene.locator('canvas[data-engine="three"]').count(), 1);
-    assert(Number(await scene.getAttribute('data-triangles')) > 10000, 'Vehicle must render detailed 3D geometry');
+    const triangles = Number(await scene.getAttribute('data-triangles'));
+    assert(triangles > 5000 && triangles < 60000, 'Curved line model stays within the simplified geometry budget');
+    assert.equal(await page.evaluate(() => performance.getEntriesByType('resource').some(resource => new URL(resource.name).pathname.endsWith('/evoque-monochrome.glb'))), false, 'The schematic renders without downloading the detailed Evoque GLB');
     const lock = root.getByRole("button", { name: "Door lock", exact: true });
     await activate(lock); assert.equal(await lock.getAttribute("aria-pressed"), "false");
     assert.match(await root.locator(".ev-profile figcaption").textContent(), /Doors unlocked/);
@@ -105,6 +108,7 @@ export async function checkDriveStyle({ page, base, fail }) {
     }
     assert(Number(await scene.getAttribute('data-contour-width')) >= 1, 'Main contours use a stable CSS-pixel width');
     assert.equal(await scene.getAttribute("data-camera-style"), "side", "Vehicle uses the side-profile camera");
+    if (page.viewportSize()?.width === 1440 && originalTheme === "light") await checkDriveCameraTransition({ page, root, scene });
     const profileScale = await scene.evaluate(element => element.clientHeight / Number(element.dataset.span));
     await mode("Journey");
     assert(await scene.evaluate(element => element.clientHeight / Number(element.dataset.span)) < profileScale * .5, "Journey must zoom substantially farther out");

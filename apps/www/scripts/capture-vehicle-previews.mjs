@@ -1,42 +1,44 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
-import { openVehicle, inspectVehicle, webglArgs } from "./e2e-render-controls.mjs";
+import { webglArgs } from "./e2e-render-controls.mjs";
 
-// Capture the real renderer at its stationary home camera, without image processing.
+// Capture the actual EV renderer. The fallback and gallery show the same object as the live scene.
 const base = process.env.SITE_URL ?? "http://localhost:3016";
 const publicDirectory = fileURLToPath(new URL("../public/interfaces/concepts/", import.meta.url));
-const manifestPath = fileURLToPath(new URL("../../../docs/assets/vehicle-render-preview-2026-09-07.json", import.meta.url));
-const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
+const manifestPath = fileURLToPath(new URL("../../../docs/assets/evoque-line-preview-2026-09-07.json", import.meta.url));
 const captures = {};
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH, args: webglArgs });
 try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce", deviceScaleFactor: 1 });
-  await openVehicle(page, base);
-  const canvas = page.locator(".rw-vehicle-canvas");
+  const page = await browser.newPage({ viewport: { width: 1600, height: 1100 }, reducedMotion: "reduce", deviceScaleFactor: 1 });
+  await page.goto(`${base}/interfaces/drive/`, { waitUntil: "networkidle" });
+  await page.waitForFunction(() => Object.keys(document.querySelector(".ev") ?? {}).some(key => key.startsWith("__reactProps")));
+  const canvas = page.locator(".ev-scene");
+  await canvas.scrollIntoViewIfNeeded();
+  await page.waitForFunction(() => document.querySelector(".ev-scene")?.dataset.rendered === "true");
   for (const theme of ["light", "dark"]) {
     await page.evaluate(value => { document.documentElement.dataset.theme = value; }, theme);
-    await page.waitForFunction(value => document.querySelector(".rw-vehicle-canvas")?.dataset.theme === value, theme);
-    await page.getByRole("button", { name: "Reset camera", exact: true }).click();
-    await page.waitForFunction(() => { const canvas = document.querySelector(".rw-vehicle-canvas"); return canvas?.dataset.camera === canvas?.dataset.home; });
+    await page.waitForFunction(value => {
+      const scene=document.querySelector(".ev-scene");return scene?.dataset.theme === value && scene.dataset.settled === "true";
+    }, theme);
     await page.mouse.move(0, 0);
-    await page.waitForTimeout(300);
-    const state = await inspectVehicle(page);
-    assert.equal(state.lineInk, theme === "light" ? "525252" : "a2a2a2");
-    assert.equal(state.surfaceColor, state.paper);
-    assert.equal(state.wireframeMaterials, "0");
-    const filename = `vehicle-line-preview-${theme}-v1.png`;
+    const state = await canvas.evaluate(element => ({ ...element.dataset }));
+    assert.equal(state.cameraStyle,"side");assert.equal(state.wheels,"4");assert.equal(await canvas.locator("canvas").count(),1);
+    const filename = `evoque-line-side-${theme}-v2.png`;
     const png = await canvas.screenshot({ path: `${publicDirectory}${filename}` });
-    captures[theme] = { filename, sha256: createHash("sha256").update(png).digest("hex"), width: png.readUInt32BE(16), height: png.readUInt32BE(20), camera: state.position, target: state.target };
-    manifest.colors[theme] = { paper: state.paper, line: state.lineInk };
-    console.log(`${theme}: ${captures[theme].width} × ${captures[theme].height}, paper ${state.paper}, line ${state.lineInk}`);
+    captures[theme] = { filename, sha256: createHash("sha256").update(png).digest("hex"), width: png.readUInt32BE(16), height: png.readUInt32BE(20), camera: state.camera, paper:state.paper };
+    console.log(`${theme}: ${captures[theme].width} × ${captures[theme].height}, paper ${state.paper}`);
   }
 } finally { await browser.close(); }
-manifest.refreshed = new Date().toISOString();
-manifest.method = "Actual Chromium screenshots of the local Three.js vehicle canvas, Fine lines, stationary home camera, reduced motion. No generated or retouched geometry.";
-manifest.rendering = { featureContours: "LineSegments2 / LineMaterial", lineWidthCssPixels: 1.05, reverseHullOffset: 0.009, paperSurfacePolygonOffset: true, palette: "sceneColor composites --table-alt over --bg" };
-manifest.captureCommand = "SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-vehicle-previews.mjs";
-manifest.captures = captures;
-await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+await writeFile(manifestPath, `${JSON.stringify({
+  created:new Date().toISOString(),
+  method:"Unretouched Chromium screenshots of the actual Three.js EV scene in its side view, reduced motion.",
+  source:"https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa",
+  creator:"tonielpro520",license:"https://creativecommons.org/licenses/by/4.0/",
+  adaptations:"An original abstract shell and curated curves follow the licensed Evoque's silhouette and measured wheelbase. Fine trim, badges, grille mesh and wheel details have been omitted; the source mesh is no longer downloaded at runtime. Attribution is retained under Components used.",
+  rendering:{featureContours:"LineSegments2 / LineMaterial",lineWidthCssPixels:1.05,paperSurfacePolygonOffset:true},
+  captureCommand:"SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-vehicle-previews.mjs",
+  captures,
+},null,2)}\n`);

@@ -28,6 +28,7 @@ const marks = {
   music: "music",
   documentation: "file-text",
   "music-player": "music",
+  "video-player": "video",
 } as const;
 
 /** Product marks use the current Vlak icon family. */

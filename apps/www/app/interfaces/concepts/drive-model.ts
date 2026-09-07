@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { arrangeDriveCar } from "./drive-car";
 
-/** Original battery illustration paired with the licensed Evoque vehicle geometry. */
-export function createDriveModel(car: THREE.Group) {
+/** Original battery illustration paired with the abstract Evoque line model. */
+export function createDriveModel() {
   const root = new THREE.Group();
   const battery = new THREE.Group();
   const cover = new THREE.Group();
@@ -23,7 +23,7 @@ export function createDriveModel(car: THREE.Group) {
   const silhouette = new THREE.MeshBasicMaterial({ color: 0x505050, side: THREE.BackSide, toneMapped: false });
   const materials = { paint, glass, rubber, alloy, cell, edge, detail, lamp, trim, chargeFill, silhouette, vehicleEdge };
   for (const surface of [paint, glass, rubber, alloy, trim, lamp]) { surface.polygonOffset = true; surface.polygonOffsetFactor = 1; surface.polygonOffsetUnits = 1; }
-  const { body, runningGear, wheels } = arrangeDriveCar(car, materials);
+  const { body, runningGear, wheels } = arrangeDriveCar(materials);
   const line = (parent: THREE.Object3D, points: number[][], material = edge, closed = false) => {
     const geometry = new THREE.BufferGeometry().setFromPoints(points.map(point => new THREE.Vector3(point[0], point[1], point[2])));
     const object = closed ? new THREE.LineLoop(geometry, material) : new THREE.Line(geometry, material);

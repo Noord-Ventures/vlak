@@ -198,7 +198,7 @@ const originalInterfaces = [
     ink: "Paper and ink surfaces, monochrome vehicle linework and clear status records.",
     use: "Choose a vehicle view → adjust the cabin → control media",
     field: "Vehicle and journey views beside focused climate, charging and media panels.",
-    note: "Three.js renders the licensed 204,453-triangle Evoque model locally. The electric system, battery assembly, vehicle settings and journey are fictional simulations, independent of the source vehicle's engineering. The player shows Fortress Down by Loathe; playback controls are simulated and do not stream audio.",
+    note: "Three.js renders an abstract line model measured from the licensed Evoque geometry. The electric system, battery assembly, vehicle settings and journey are fictional simulations, independent of the source vehicle's engineering. The player shows Fortress Down by Loathe; playback controls are simulated and do not stream audio.",
     components: ["Button", "Card", "Icon", "Progress", "Toggle group", "Metric", "Number field", "Playback controls", "Media scrubber", "Connection status"],
     modifications: [
       "Flush working panels separate the vehicle visualization from local controls. Metrics present range and battery records; a focused inspector keeps cabin, charging and media actions readable.",
@@ -308,6 +308,26 @@ const originalInterfaces = [
     ],
   },
   {
+    slug: "video-player",
+    title: "Video player",
+    voice: "Give music videos a quiet place to play.",
+    law: "A screening room for three selected music videos with a focused playlist and playback controls.",
+    story: "Watch Loathe’s Two-Way Mirror, Foals’ Spanish Sahara and Woodkid’s Iron through their official artist and publisher uploads on YouTube and Vimeo. A compact playlist sits beside the picture, while Vlak playback controls follow the actual player’s time, volume and state. The embedded player retains its native captions, quality and viewing controls.",
+    what: "Video player",
+    type: "Music video playlist, viewing room and playback preferences",
+    module: "Grid system",
+    ink: "A full-width picture, monochrome thumbnails, paper and ink controls, and flush playlist rows.",
+    use: "Choose a music video → watch → move through the playlist",
+    field: "A focused viewing room beside three selected official music videos.",
+    note: "Official videos stream through YouTube and Vimeo embedded players. Availability, captions and playback options depend on the publisher, region and browser. Each video includes a direct publisher link if embedded playback is unavailable.",
+    components: ["Button", "Icon", "Media scrubber", "Native select", "Playback controls", "Slider"],
+    modifications: [
+      "Playback controls, Media scrubber and Slider operate the official YouTube and Vimeo player APIs. Position, duration, volume and buffered ranges follow the real player.",
+      "The playlist keeps the selected film, artist and official publisher together. Previous and next actions move between the three videos without introducing a separate library workflow.",
+      "Native select exposes the current video’s available playback speeds. The embedded players retain native captions, quality and full-screen controls; direct links remain available if embedding is restricted.",
+    ],
+  },
+  {
     slug: "music-player",
     title: "Music player",
     voice: "Keep the music, artwork and listening queue together.",
@@ -384,5 +404,6 @@ export const mobilePatterns: Record<InterfaceSlug, string> = {
   "mobile-os": "On mobile, the platform picker shows one device at a time. App content scrolls independently while Home, Back, Recents and system controls remain reachable. Each platform preserves its own local records and navigation state.",
   platforms: "On mobile, one full-width travel app keeps Plan, Today, and Profile in bottom navigation; journey details have a pinned save action and Back focus restoration. The same stations, profile, preferences, and saved trips persist between screens. Native date entry receives its own full-width row.",
   documentation: "On mobile, the document index and reader use the full specimen width. A disclosure exposes navigation or article contents; reader settings and Back stay reachable while the text scrolls independently.",
+  "video-player": "On mobile, Watching and Playlist become separate full-width screens. The video keeps its natural aspect ratio, transport stays reachable, and volume receives its own row. Opening Playlist pauses the picture and preserves the selected video and position.",
   "music-player": "On mobile, Library, Playing and Queue use focused screens with persistent transport access. Playback and queue state survive navigation, and artwork keeps a readable, bounded scale.",
 };
