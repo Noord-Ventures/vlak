@@ -22,14 +22,14 @@ export const domainCollections = [
     groups: [
       { title: "Measurements and quantities", description: "Keep a measured value with its unit, uncertainty, and source. Capture quantities without silently converting them.", components: ["measurement-value", "quantity-field"] },
       { title: "Experimental work", description: "Select a sample position, follow an experimental run, and inspect a spectrum alongside the underlying values.", components: ["experiment-run", "spectrum-plot"] },
-      { title: "Microscopy", description: "Navigate supplied stack positions and edit an acquisition sequence with explicit channel, exposure, time and depth units.", components: ["stack-navigator", "acquisition-sequencer"] },
+      { title: "Microscopy", description: "Review named stage positions in an explicit coordinate frame, navigate supplied stacks and edit acquisition sequences with declared units.", components: ["stage-position-list", "stack-navigator", "acquisition-sequencer"] },
       { title: "Genomics", description: "Enter a genomic region, inspect supplied sequence alignments and compare exact coverage counts.", components: ["genomic-region-field", "sequence-alignment", "coverage-inspector"] },
     ],
     contracts: [
-      { title: "Keep coordinate conventions explicit", description: "Genomic regions and supplied loci use 1-based inclusive coordinates. Alignment selections use 1-based aligned columns, including supplied gap columns. Stack values are zero-based indexes into supplied positions; the displayed ordinal starts at one. The host owns coordinate conversion and reference identity." },
+      { title: "Keep coordinate conventions explicit", description: "Genomic regions and supplied loci use 1-based inclusive coordinates. Alignment selections use 1-based aligned columns, including supplied gap columns. Stack values are zero-based indexes into supplied positions; the displayed ordinal starts at one. Stage positions retain immutable identifiers, supplied frame identity and per-axis units; missing coordinates are not zero. The host owns coordinate conversion and reference identity." },
       { title: "Preserve measurement meaning", description: "Supply the unit, uncertainty label, precision, and provenance that belong to the measurement. A missing value is distinct from zero. The application owns significant-figure rules and scientific interpretation." },
       { title: "Convert explicitly", description: "QuantityField changes the selected unit and amount independently. It does not convert units. Perform validated conversion in the application and update the complete controlled value together." },
-      { title: "Keep instrument work outside the view", description: "Plate selections and experiment actions emit intent. The application controls sample records, instrument access, execution, persistence, and confirmed step status." },
+      { title: "Keep instrument work outside the view", description: "Stage selection requires controlled value and onValueChange props. Inclusion, order, removal and experiment actions request changes; the host supplies accepted records. Selection never confirms stage motion or acquired frames. The application controls instrument access, execution, persistence and confirmed step status." },
       { title: "Show the evidence behind a plot", description: "Supply finite points, axis labels, units, and any peak annotations. SpectrumPlot provides a data table and does not identify substances, fit peaks, or infer scientific conclusions." },
     ],
   },

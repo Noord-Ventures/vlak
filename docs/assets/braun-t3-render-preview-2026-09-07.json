@@ -1,0 +1,66 @@
+{
+  "created": "2026-09-07",
+  "sourceModel": "/interfaces/concepts/braun-t3-monochrome.glb",
+  "creator": "ludwigangulodi",
+  "source": "https://sketchfab.com/3d-models/radio-t3-aad3d54384904cfc9b3df8791d254c5c",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "adaptations": "Unused texture coordinates removed; indices losslessly repacked from 32-bit to 16-bit. All positions, normals, triangles, meshes and scene transforms retained. Monochrome line materials are applied at runtime.",
+  "files": [
+    "apps/www/public/interfaces/concepts/braun-t3-line-preview-light-v1.png",
+    "apps/www/public/interfaces/concepts/braun-t3-line-preview-dark-v1.png"
+  ],
+  "colors": {
+    "light": {
+      "paper": "f5f3ed",
+      "line": "525252"
+    },
+    "dark": {
+      "paper": "161412",
+      "line": "a2a2a2"
+    }
+  },
+  "refreshed": "2026-09-07T13:51:28.970Z",
+  "method": "Actual Chromium screenshots of the local Three.js Braun T3 canvas, Fine lines, stationary home camera, reduced motion. No generated or retouched geometry.",
+  "rendering": {
+    "featureContours": "LineSegments2 / LineMaterial",
+    "lineWidthCssPixels": 1.05,
+    "reverseHullOffsetFraction": 0.00133,
+    "paperSurfacePolygonOffset": true,
+    "palette": "sceneColor composites --table-alt over --bg"
+  },
+  "captureCommand": "SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-render-previews.mjs",
+  "captures": {
+    "light": {
+      "filename": "braun-t3-line-preview-light-v1.png",
+      "sha256": "79b5e5883edf253aef15d2a0b07780f3dea889a6a77091f1bcd658abeed5b016",
+      "width": 909,
+      "height": 591,
+      "camera": [
+        3.536226,
+        3.327325,
+        7.85828
+      ],
+      "target": [
+        0,
+        2.07,
+        0
+      ]
+    },
+    "dark": {
+      "filename": "braun-t3-line-preview-dark-v1.png",
+      "sha256": "e986d264bd315ad0ee871210c1e659f94085d9a1885e3cd834dcb8feb96d02f5",
+      "width": 909,
+      "height": 591,
+      "camera": [
+        3.536226,
+        3.327325,
+        7.85828
+      ],
+      "target": [
+        0,
+        2.07,
+        0
+      ]
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "source": "radio_t3.glb (original Sketchfab download retained separately)",
+  "sourceBytes": 1289424,
+  "sourceSha256": "de3dae8133db12ce207eb42398cdaffc3bf8a533367656153d35e4221f1eefe3",
+  "optimized": "apps/www/public/interfaces/concepts/braun-t3-monochrome.glb",
+  "optimizedBytes": 871796,
+  "optimizedSha256": "f0977ca4bdb85091181fa36a0fa00842dcdff4535560aaf2755ab118b32d2573",
+  "reductionPercent": 32.39,
+  "triangles": 32027,
+  "vertices": 28180,
+  "meshes": 3,
+  "materials": 1,
+  "images": 0,
+  "parts": [
+    {
+      "name": "Object_0",
+      "triangles": 7117,
+      "vertices": 6764,
+      "node": "Object_2",
+      "bounds": {
+        "min": [
+          0.0007171630858948674,
+          -96.47136497497559,
+          54.972084045410085
+        ],
+        "max": [
+          82.00071716308594,
+          53.52863502502445,
+          98.20104014873509
+        ]
+      }
+    },
+    {
+      "name": "Object_1",
+      "triangles": 13458,
+      "vertices": 13001,
+      "node": "Object_3",
+      "bounds": {
+        "min": [
+          0.0007171630859090783,
+          -96.47136497497559,
+          71.67137145996087
+        ],
+        "max": [
+          82.00071716308594,
+          53.528635025024435,
+          96.4720840454102
+        ]
+      }
+    },
+    {
+      "name": "Object_2",
+      "triangles": 11452,
+      "vertices": 8415,
+      "node": "Object_4",
+      "bounds": {
+        "min": [
+          6.304222106933551,
+          -88.97136497497559,
+          54.0612831115722
+        ],
+        "max": [
+          66.00071716308594,
+          55.79102516174319,
+          98.20104014873509
+        ]
+      }
+    }
+  ],
+  "modifications": "Unused texture coordinates removed; indices losslessly repacked from 32-bit to 16-bit. All positions, normals, triangles, meshes and scene transforms retained. Monochrome line materials are applied at runtime.",
+  "sourceMetadata": {
+    "author": "ludwigangulodi (https://sketchfab.com/ludwigangulodi)",
+    "license": "CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)",
+    "source": "https://sketchfab.com/3d-models/radio-t3-aad3d54384904cfc9b3df8791d254c5c",
+    "title": "Radio T3"
+  },
+  "exactGeometryCheck": "All positions, normals, indices and world transforms compared equal in loaded original and optimized GLBs.",
+  "bounds": {
+    "min": [
+      0.0007171630858948674,
+      -96.47136497497559,
+      54.0612831115722
+    ],
+    "max": [
+      82.00071716308594,
+      55.79102516174319,
+      98.20104014873509
+    ],
+    "size": [
+      82.00000000000004,
+      152.26239013671878,
+      44.13975703716289
+    ]
+  },
+  "productDesign": {
+    "designers": [
+      "Dieter Rams",
+      "Hochschule f\u00fcr Gestaltung, Ulm"
+    ],
+    "year": 1958,
+    "manufacturer": "Braun AG",
+    "reference": "https://www.moma.org/collection/works/4134"
+  },
+  "visualInspection": {
+    "geometry": "The perforated grille, circular tuning dial, raised dial markers and case remain visible with all texture coordinates removed. The model contains no images or textures.",
+    "sourceUnits": "Bounds are recorded in unverified source units, not asserted physical measurements.",
+    "presentation": "Paper-colored faces, 1.05px screen-space feature contours and a silhouette hull offset by0.00133 of the source longest dimension."
+  }
+}

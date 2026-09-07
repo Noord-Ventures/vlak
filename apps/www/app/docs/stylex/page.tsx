@@ -1,13 +1,14 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/stylex", {
   title: "StyleX",
   description: "Write your own leaves against Vlak tokens, compile them with Vite or Next, or skip the compiler.",
   alternates: { canonical: `${DOOR}/docs/stylex/` },
-};
+});
 
 const leaf = `import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "@noorddev/vlak-react/tokens.stylex";

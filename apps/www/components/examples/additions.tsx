@@ -16,6 +16,7 @@ import { Use as RasterBandMixer } from "./raster-band-mixer/use";
 import { Use as Patchbay } from "./patchbay/use";
 import { Use as KerningPairEditor } from "./kerning-pair-editor/use";
 import { Use as StackNavigator } from "./stack-navigator/use";
+import { Use as StagePositionList } from "./stage-position-list/use";
 import { Use as AcquisitionSequencer } from "./acquisition-sequencer/use";
 import { Use as SequenceAlignment } from "./sequence-alignment/use";
 import { Use as CoverageInspector } from "./coverage-inspector/use";
@@ -113,6 +114,7 @@ export const additions: Record<string, ComponentType> = {
   "patchbay": Patchbay,
   "kerning-pair-editor": KerningPairEditor,
   "stack-navigator": StackNavigator,
+  "stage-position-list": StagePositionList,
   "acquisition-sequencer": AcquisitionSequencer,
   "sequence-alignment": SequenceAlignment,
   "coverage-inspector": CoverageInspector,

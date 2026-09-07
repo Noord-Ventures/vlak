@@ -9,9 +9,11 @@ import { CrumbBar } from "@/components/crumb-bar";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteAnalytics } from "@/components/site-analytics";
-import { catalogComponents } from "@noorddev/vlak";
+import { catalogComponents, domainCollections } from "@noorddev/vlak";
+import { interfaces } from "./interfaces/catalog";
 import { publicSitePaths } from "@/lib/site-analytics";
 import { social } from "./social";
+import { HOST, LAW, WORD } from "./specimen";
 
 export const metadata: Metadata = social;
 
@@ -32,6 +34,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": `${HOST}/#website`,
+          url: `${HOST}/`,
+          name: WORD,
+          description: LAW,
+          inLanguage: "en",
+        }).replace(/</g, "\\u003c") }} />
         <style dangerouslySetInnerHTML={{ __html: crumbPin }} />
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <a href="#main" className="skip-link">
@@ -44,6 +55,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SiteAnalytics publicPaths={[
           ...publicSitePaths,
           ...catalogComponents.map(({ name }) => `/components/${name}`),
+          ...domainCollections.map(({ name }) => `/docs/${name}`),
+          ...interfaces.map(({ slug }) => `/interfaces/${slug}`),
         ]} />
       </body>
     </html>

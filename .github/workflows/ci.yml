@@ -73,8 +73,12 @@ jobs:
       - run: pnpm --filter www exec playwright install chromium --with-deps
       - name: Every catalogue entry has an isolated example
         run: node apps/www/scripts/check-examples.mjs
+      - name: Site state and planning integrity
+        run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs
       - name: Build the site
         run: pnpm --filter www build
+      - name: Canonical pages, sharing metadata, sitemap and agent links
+        run: node apps/www/scripts/check-discovery.mjs
       - name: axe, keyboard, and phone checks over the export
         run: pnpm --filter www e2e
       - uses: actions/upload-artifact@v4

@@ -4103,6 +4103,79 @@
         }
       ]
     },
+    "stage-position-list": {
+      "exports": [
+        {
+          "name": "StagePositionList",
+          "kind": "component",
+          "description": "Supplied stage coordinates and controlled plan edits. No stage motion or coordinate conversion occurs.",
+          "extends": "Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\">",
+          "ref": "HTMLFieldSetElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "coordinateFrame",
+              "type": "StageCoordinateFrame | null",
+              "required": true
+            },
+            {
+              "name": "units",
+              "type": "StagePositionUnits",
+              "required": true
+            },
+            {
+              "name": "positions",
+              "type": "readonly StagePosition[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string | null",
+              "required": false,
+              "default": "null",
+              "description": "Controlled selected record identifier; pair with onValueChange for inspection. Missing or unknown identifiers never select a fallback."
+            },
+            {
+              "name": "onValueChange",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "onEnabledChange",
+              "type": "(id: string, enabled: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onOrderChange",
+              "type": "(ids: readonly string[]) => void",
+              "required": false,
+              "description": "Requests an order of existing identifiers without changing records."
+            },
+            {
+              "name": "onRemove",
+              "type": "(id: string) => void",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "readOnly",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Prevents record edits; inspection selection remains available."
+            }
+          ]
+        }
+      ]
+    },
     "stack-navigator": {
       "exports": [
         {

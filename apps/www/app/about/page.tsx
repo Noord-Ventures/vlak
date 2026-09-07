@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { CopyControl } from "@/components/code-block";
@@ -22,11 +23,11 @@ import { about } from "./about.stylex";
 import { referenceCaptions } from "./reference-captions";
 import "./about.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/about", {
   title: "About",
   description: "The method, design lineage, and practical constraints behind Vlak.",
   alternates: { canonical: `${DOOR}/about/` },
-};
+});
 
 function Kicker({ children, id, nav }: { children: ReactNode; id?: string; nav?: boolean }) {
   return (

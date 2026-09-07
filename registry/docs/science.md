@@ -18,8 +18,9 @@ Select a sample position, follow an experimental run, and inspect a spectrum alo
 
 ## Microscopy
 
-Navigate supplied stack positions and edit an acquisition sequence with explicit channel, exposure, time and depth units.
+Review named stage positions in an explicit coordinate frame, navigate supplied stacks and edit acquisition sequences with declared units.
 
+- [Stage position list](https://vlak.dev/docs/stage-position-list.md): Reviews supplied named stage positions with an explicit coordinate frame, per-axis units, inclusion state and controlled selection, reorder and removal requests.
 - [Stack navigator](https://vlak.dev/docs/stack-navigator.md): Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.
 - [Acquisition sequencer](https://vlak.dev/docs/acquisition-sequencer.md): Edits supplied capture steps, exact exposure, time, depth and channel values, and distinguishes requested actions from recorded run state.
 
@@ -35,7 +36,7 @@ Enter a genomic region, inspect supplied sequence alignments and compare exact c
 
 ### Keep coordinate conventions explicit
 
-Genomic regions and supplied loci use 1-based inclusive coordinates. Alignment selections use 1-based aligned columns, including supplied gap columns. Stack values are zero-based indexes into supplied positions; the displayed ordinal starts at one. The host owns coordinate conversion and reference identity.
+Genomic regions and supplied loci use 1-based inclusive coordinates. Alignment selections use 1-based aligned columns, including supplied gap columns. Stack values are zero-based indexes into supplied positions; the displayed ordinal starts at one. Stage positions retain immutable identifiers, supplied frame identity and per-axis units; missing coordinates are not zero. The host owns coordinate conversion and reference identity.
 
 ### Preserve measurement meaning
 
@@ -47,7 +48,7 @@ QuantityField changes the selected unit and amount independently. It does not co
 
 ### Keep instrument work outside the view
 
-Plate selections and experiment actions emit intent. The application controls sample records, instrument access, execution, persistence, and confirmed step status.
+Stage selection requires controlled value and onValueChange props. Inclusion, order, removal and experiment actions request changes; the host supplies accepted records. Selection never confirms stage motion or acquired frames. The application controls instrument access, execution, persistence and confirmed step status.
 
 ### Show the evidence behind a plot
 

@@ -1,14 +1,15 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { catalogComponents } from "@noorddev/vlak";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/accessibility", {
   title: "Accessibility",
   description: "What every Vlak component commits to, how to name things, how to test, and the pattern behind each control.",
   alternates: { canonical: `${DOOR}/docs/accessibility/` },
-};
+});
 
 /**
  * The APG or platform pattern behind each interactive component. The

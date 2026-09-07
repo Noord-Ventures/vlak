@@ -1,14 +1,15 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { vlakTokens } from "@noorddev/vlak";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/theming", {
   title: "Theming",
   description: "Tokens as custom properties, the dark scheme, the module grid, and the text scale.",
   alternates: { canonical: `${DOOR}/docs/theming/` },
-};
+});
 
 const { color, grid, radius, motion, control } = vlakTokens;
 

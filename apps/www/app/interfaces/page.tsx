@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { chrome } from "@/app/site.stylex";
@@ -9,11 +10,11 @@ import { interfaces as ifx } from "./interfaces.stylex";
 import { DOOR } from "../specimen";
 import "./interfaces.css";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/interfaces", {
   title: "Interfaces",
   description: "Explore working interface studies, inspect their components, and build your own with Vlak. React, CSS, and source included.",
   alternates: { canonical: `${DOOR}/interfaces/` },
-};
+});
 
 export default function InterfacesPage() {
   const cover = sx("cover", chrome.cover);

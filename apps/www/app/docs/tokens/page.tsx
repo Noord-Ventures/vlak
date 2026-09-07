@@ -1,14 +1,15 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { concentricInner, vlakTokens } from "@noorddev/vlak";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/docs/tokens", {
   title: "Tokens",
   description: "The neutral scale, the type scale, the grid, radius, motion, and the control scale.",
   alternates: { canonical: `${DOOR}/docs/tokens/` },
-};
+});
 
 export default function TokensPage() {
   const { color, type, grid, radius, motion, control, breakpoints } = vlakTokens;

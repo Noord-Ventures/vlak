@@ -16,6 +16,7 @@ import { checkSiteRails } from "./site-rails-e2e.mjs";
 import { checkSpecialists } from "./specialist-e2e.mjs";
 import { checkActivityRingDelight } from "./activity-rings-e2e.mjs";
 import { checkDomainSpecialists } from "./domain-specialist-e2e.mjs";
+import { checkMicroscopyInterface } from "./microscopy-interface-e2e.mjs";
 
 const require = createRequire(import.meta.url);
 const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
@@ -46,7 +47,10 @@ for (const section of ["components", "interfaces", "docs", "about"]) {
   if (image.toString("ascii", 1, 4) !== "PNG") fail(`${section}: Open Graph image is not a PNG`);
   if (image.readUInt32BE(16) !== 1200 || image.readUInt32BE(20) !== 630) fail(`${section}: Open Graph image is not 1200 × 630`);
   if (!html.includes(`/${section}/opengraph-image`)) fail(`${section}: page does not reference its custom Open Graph image`);
-  if (!html.includes(`/${section}/twitter-image`)) fail(`${section}: page does not reference its custom Twitter image`);
+  const twitterImage = html.match(/<meta name="twitter:image" content="([^"]+)"/)?.[1];
+  const twitterPath = twitterImage ? new URL(twitterImage, "https://vlak.dev").pathname : "";
+  // OG and Twitter share the same section poster; verify the referenced asset, not its filename.
+  if (!twitterPath.startsWith(`/${section}/`) || !existsSync(join(out, twitterPath)) || !readFileSync(join(out, twitterPath)).equals(image)) fail(`${section}: Twitter does not reference its custom section poster`);
   socialImages.push(image.toString("base64"));
 }
 if (new Set(socialImages).size !== socialImages.length) fail("landing pages reuse the same social image");
@@ -59,7 +63,7 @@ const browser = await chromium.launch(
 
 /* axe on every page, desktop. */
 const docs = ["", "frameworks/", "theming/", "tokens/", "layers/", "stylex/", "accessibility/", "health/", "civic/", "science/", "creative/", "engineering/", "geospatial/", "robotics/", "electronics/", "microbiology/", "agents/"].map((d) => `/docs/${d}`);
-const pages = ["/", ...docs, "/components/", "/about/", "/interfaces/", "/interfaces/evening/", ...catalogComponents.map((c) => `/components/${c.name}/`)];
+const pages = ["/", ...docs, "/components/", "/about/", "/interfaces/", "/interfaces/evening/", "/interfaces/microscopy/", ...catalogComponents.map((c) => `/components/${c.name}/`)];
 const desk = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 for (const path of pages) {
   const errors = [];
@@ -286,6 +290,12 @@ await checkSiteRails({ browser, base, fail });
 await checkSpecialists({ browser, base, fail });
 await checkActivityRingDelight({ browser, base, fail });
 await checkDomainSpecialists({ browser, base, fail });
+for (const width of [390, 1280]) {
+  const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: "reduce", acceptDownloads: true });
+  page.on("pageerror", error => fail(`microscopy ${width}px: ${error.message}`));
+  await checkMicroscopyInterface({ page, base, fail });
+  await page.close();
+}
 
 await browser.close();
 server.close();

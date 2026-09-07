@@ -92,6 +92,7 @@ const healthCases: Record<string, Case> = {
 };
 
 const domainCases: Record<string, Case> = {
+  StagePositionList: { tag: "fieldset", props: { label: "Stage positions", coordinateFrame: { id: "stage", label: "Stage frame" }, units: { x: "µm", y: "µm", z: "µm" }, positions: [] } },
   JointPanel: { tag: "fieldset", props: {"label": "Robot joints", "joints": []} },
   RobotPose: { tag: "fieldset", props: {"label": "Recorded pose", "poses": []} },
   RobotMissionQueue: { tag: "fieldset", props: {"label": "Inspection mission", "steps": []} },

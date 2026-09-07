@@ -1,0 +1,163 @@
+import assert from "node:assert/strict";
+import { initialPlan, parsePlan } from "../app/interfaces/microscopy/plan.ts";
+
+/** Actual local planner flows; the caller supplies the browser, viewport and theme. */
+export async function checkMicroscopyInterface({ page, base, fail }) {
+  const activate = async control => {
+    await control.press("Enter");
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  };
+  const open = async () => {
+    await page.goto(`${base.replace(/\/$/, "")}/interfaces/microscopy/`, { waitUntil: "networkidle" });
+    if (page.viewportSize()?.width === 1024) await page.addStyleTag({ content: ".if-specimen { width:620px; max-width:100%; }" });
+    await page.locator('.mc[data-ready="true"]').waitFor();
+    return page.locator(".mc");
+  };
+  const navigate = async (board, label) => {
+    const width = await board.evaluate(element => element.getBoundingClientRect().width);
+    await activate(board.locator(width <= 640 ? ".mc-mobile-nav" : ".mc-tabs").getByRole("button", { name: label, exact: true }));
+  };
+  const downloadPlan = async board => {
+    const pending = page.waitForEvent("download");
+    await activate(board.getByRole("button", { name: "Export draft", exact: true }));
+    const download = await pending;
+    const stream = await download.createReadStream(); const chunks = [];
+    for await (const chunk of stream) chunks.push(chunk);
+    assert.equal(download.suggestedFilename(), "microscopy-plan.json");
+    return parsePlan(Buffer.concat(chunks).toString("utf8"));
+  };
+  const importFile = async (board, value, name = "test-plan.json") => {
+    await board.locator('input[type="file"]').setInputFiles({ name, mimeType: "application/json", buffer: Buffer.from(typeof value === "string" ? value : JSON.stringify(value)) });
+  };
+  const check = async (label, run) => { try { await run(); } catch (error) { fail(`microscopy ${label}: ${error instanceof Error ? error.stack ?? error.message : String(error)}`); } };
+
+  await check("position drafts, keyboard order, sequence and stack", async () => {
+    const board = await open();
+    const first = board.getByRole("radio", { name: "Upper field (site-01)", exact: true });
+    await first.focus(); await page.keyboard.press("ArrowDown");
+    const center = board.getByRole("radio", { name: "Center field (site-02)", exact: true });
+    assert.equal(await center.isChecked(), true);
+    await activate(board.getByRole("button", { name: "Center field (site-02): Move up", exact: true }));
+    assert.equal(await center.isChecked(), true, "selection changed on reorder");
+    assert.equal(await board.locator(".rs-stage-position-list-row").first().getAttribute("aria-label"), "Center field (site-02)");
+    await activate(board.getByRole("button", { name: "Center field (site-02): Move down", exact: true }));
+    const include = board.getByRole("checkbox", { name: "Center field (site-02): Include", exact: true });
+    await include.press("Space");
+    assert.match(await board.locator(".mc-workflow-foot").textContent(), /80 planned frames/);
+    await include.press("Space");
+    await activate(board.getByRole("button", { name: "Edit position", exact: true }));
+    const x = board.getByRole("spinbutton", { name: "X coordinate amount", exact: true });
+    await x.fill("12.5");
+    await activate(board.getByRole("button", { name: "Back to positions", exact: true }));
+    assert.equal(await board.getByRole("button", { name: "Edit position", exact: true }).evaluate(element => element === document.activeElement), true);
+    await activate(board.getByRole("button", { name: "Edit position", exact: true }));
+    assert.equal(await x.inputValue(), "12.5");
+    assert.equal(await board.locator('[data-plan-path="positions.site-02.x"]').getByText("Working value: 0 µm", { exact: true }).count(), 1);
+    await navigate(board, "Review");
+    assert.equal(await board.getByRole("button", { name: "Mark plan reviewed", exact: true }).isDisabled(), true);
+    assert.equal((await downloadPlan(board)).positions[1].x, 0, "export included an unapplied editor draft");
+    await importFile(board, '{"schema":"bad"}');
+    await board.getByRole("alert").waitFor();
+    assert.match(await board.getByRole("alert").textContent(), /preserved/);
+    await navigate(board, "Positions");
+    assert.equal(await x.inputValue(), "12.5", "failed import erased a draft");
+    await activate(board.getByRole("button", { name: "Discard changes", exact: true }));
+    assert.equal(await x.inputValue(), "0");
+    await x.fill("13.75");
+    await activate(board.getByRole("button", { name: "Apply position", exact: true }));
+    assert.equal(await board.getByText("Working value: 13.75 µm", { exact: true }).count(), 1);
+    await activate(board.getByRole("button", { name: "Back to positions", exact: true }));
+    await activate(board.getByRole("button", { name: "Add position", exact: true }));
+    await navigate(board, "Review");
+    await activate(board.getByRole("button", { name: "Position 4: supply the X coordinate within the file format limit.", exact: true }));
+    assert.equal(await x.evaluate(element => element === document.activeElement), true, "review issue did not focus its field");
+    await x.fill("0"); await board.getByRole("spinbutton", { name: "Y coordinate amount", exact: true }).fill("0"); await board.getByRole("spinbutton", { name: "Z coordinate amount", exact: true }).fill("0");
+    await activate(board.getByRole("button", { name: "Apply position", exact: true }));
+    await activate(board.getByRole("button", { name: "Back to positions", exact: true }));
+    await activate(board.getByRole("button", { name: "Position 4 (site-04): Remove", exact: true }));
+    assert.equal(await board.getByRole("radio", { name: "Lower field (site-03)", exact: true }).evaluate(element => element === document.activeElement), true);
+    await navigate(board, "Sequence");
+    await board.getByRole("spinbutton", { name: "Exposure (ms): step 1, Reference", exact: true }).fill("30.5");
+    await activate(board.getByRole("button", { name: "Move step 2, Signal, up", exact: true }));
+    assert.match(await board.locator(".rs-acquisition-sequencer-step").first().textContent(), /Signal/);
+    await navigate(board, "Stack");
+    await board.getByRole("spinbutton", { name: "Depth slice count", exact: true }).fill("3");
+    await board.getByRole("spinbutton", { name: "Time point count", exact: true }).fill("2");
+    const before = await board.getByTestId("mc-preview-values").textContent();
+    await activate(board.getByRole("button", { name: "Next Depth slice position", exact: true }));
+    assert.notEqual(await board.getByTestId("mc-preview-values").textContent(), before);
+    const depthChoice = board.getByRole("combobox", { name: "Depth slice", exact: true });
+    await activate(depthChoice); await depthChoice.press("Home"); await activate(depthChoice);
+    assert.match(await board.getByTestId("mc-preview-values").textContent(), /Planned ZNot supplied/, "cleared stack selection silently selected the first slice");
+    await activate(board.getByRole("button", { name: "Next Depth slice position", exact: true }));
+    assert.match(await board.locator(".mc-workflow-foot").textContent(), /36 planned frames/);
+    await navigate(board, "Review");
+    assert.equal(await board.getByTestId("mc-review-frames").textContent(), "36 planned frames");
+    assert.match(await board.locator(".mc-review-equation").textContent(), /1\.359 s total exposure/);
+    await activate(board.getByRole("button", { name: "Mark plan reviewed", exact: true }));
+    assert.equal(await board.getByRole("button", { name: "Reviewed locally", exact: true }).isDisabled(), true);
+    const exported = await downloadPlan(board);
+    assert.equal(exported.positions[1].x, 13.75); assert.equal(exported.z.count, 3); assert.equal(exported.t.count, 2); assert.equal(exported.steps[1].exposure, 30.5);
+    assert.equal("status" in exported.steps[0], false);
+    assert.equal(await board.getByText("Acquisition state: Not acquired", { exact: true }).count(), 1);
+    await navigate(board, "Sequence");
+    await board.getByRole("spinbutton", { name: "Exposure (ms): step 1, Signal", exact: true }).fill("");
+    await navigate(board, "Review");
+    await activate(board.getByRole("button", { name: "Signal: supply a nonnegative exposure within the file format limit.", exact: true }));
+    assert.equal(await board.getByRole("spinbutton", { name: "Exposure (ms): step 1, Signal", exact: true }).evaluate(element => element === document.activeElement), true);
+  });
+
+  await check("validated import, prototype-like IDs, exact small values and null units", async () => {
+    const board = await open();
+    await navigate(board, "Review");
+    const imported = initialPlan(); imported.title = "Imported lattice";
+    imported.positions = [{ id: "constructor", name: "Tiny field", x: 0.0001, y: -0.0001, z: 0.0001, enabled: true }];
+    imported.units.z = null; imported.z = { start: 0, step: 0, count: 1 }; imported.t = { start: 0, step: 0, count: 1 };
+    imported.steps = [{ ...imported.steps[0], exposure: 0 }];
+    await importFile(board, imported);
+    await board.getByRole("button", { name: "Apply import", exact: true }).waitFor();
+    assert.equal(await board.getByRole("textbox", { name: "Plan title", exact: true }).inputValue(), initialPlan().title, "selection replaced a plan before Apply");
+    await activate(board.getByRole("button", { name: "Cancel import", exact: true }));
+    assert.equal(await board.getByRole("textbox", { name: "Plan title", exact: true }).inputValue(), initialPlan().title);
+    await importFile(board, imported);
+    await activate(board.getByRole("button", { name: "Apply import", exact: true }));
+    assert.equal(await board.getByRole("textbox", { name: "Plan title", exact: true }).inputValue(), "Imported lattice");
+    assert.equal(await board.getByRole("button", { name: "Mark plan reviewed", exact: true }).isDisabled(), true);
+    await navigate(board, "Stack");
+    assert.match(await board.getByTestId("mc-preview-values").textContent(), /Planned ZNot supplied/);
+    await navigate(board, "Positions");
+    assert.equal(await board.getByRole("radio", { name: "Tiny field (constructor)", exact: true }).isChecked(), true);
+    await activate(board.getByRole("button", { name: "Edit position", exact: true }));
+    const x = board.getByRole("spinbutton", { name: "X coordinate amount", exact: true });
+    assert.equal(await x.inputValue(), "0.0001");
+    await x.fill("0.0002");
+    const zUnit = board.getByRole("combobox", { name: "Z coordinate unit", exact: true });
+    await activate(zUnit); await zUnit.press("End"); await activate(zUnit);
+    await activate(board.getByRole("button", { name: "Back to positions", exact: true }));
+    await activate(board.getByRole("button", { name: "Edit position", exact: true }));
+    assert.equal(await x.inputValue(), "0.0002");
+    assert.equal(await zUnit.textContent(), "µm");
+    await activate(board.getByRole("button", { name: "Apply position", exact: true }));
+    assert.equal(await board.getByText("Working value: 0.0002 µm", { exact: true }).count(), 1);
+    await navigate(board, "Stack");
+    assert.match(await board.getByTestId("mc-preview-values").textContent(), /Planned Z0\.0001 µm/);
+    await navigate(board, "Review");
+    const exported = await downloadPlan(board);
+    assert.equal(exported.positions[0].id, "constructor"); assert.equal(exported.positions[0].x, 0.0002); assert.equal(exported.units.z, "µm");
+    assert.equal(await board.getByRole("button", { name: "Mark plan reviewed", exact: true }).isDisabled(), false);
+    const invalid = { ...exported, acquired: true };
+    await importFile(board, invalid);
+    await board.getByRole("alert").waitFor();
+    assert.match(await board.getByRole("alert").textContent(), /unsupported field/);
+    assert.equal((await downloadPlan(board)).positions[0].x, 0.0002);
+    const long = structuredClone(exported);
+    long.title = "A".repeat(96); long.stage.label = "S".repeat(96); long.coordinateFrame.label = "F".repeat(96);
+    long.positions[0].name = "P".repeat(96); long.channels[0].label = "C".repeat(96); long.steps[0].label = "E".repeat(96);
+    await importFile(board, long); await activate(board.getByRole("button", { name: "Apply import", exact: true }));
+    for (const label of ["Positions", "Sequence", "Stack", "Review"]) {
+      await navigate(board, label);
+      const overflow = await board.evaluate(element => [element, ...element.querySelectorAll(".mc-workflow,.mc-workflow-scroll,.mc-preview-scroll")].filter(node => node.checkVisibility()).map(node => ({ className: node.className, overflow: node.scrollWidth - node.clientWidth })).filter(record => record.overflow > 1));
+      assert.deepEqual(overflow, [], `valid long labels widened ${label}`);
+    }
+  });
+}

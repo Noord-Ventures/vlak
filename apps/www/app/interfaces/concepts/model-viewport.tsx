@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { sceneColor } from "./scene-color";
+import { renderAsset } from "./render-asset";
 import { Button } from "@noorddev/vlak-react";
 
 type ViewportProps = {
@@ -12,9 +13,9 @@ type ViewportProps = {
   onStatusChange?: (status: "loading" | "ready" | "error") => void;
 };
 
-const modelUrl = "/interfaces/concepts/evoque-monochrome.glb";
+const modelUrl = renderAsset.url;
 
-export function CarViewport(props: ViewportProps) {
+export function ModelViewport(props: ViewportProps) {
   const mountRef = React.useRef<HTMLDivElement>(null);
   const options = React.useRef(props);
   options.current = props;
@@ -41,12 +42,12 @@ export function CarViewport(props: ViewportProps) {
       import("three"),
       import("three/addons/controls/OrbitControls.js"),
       import("three/addons/loaders/GLTFLoader.js"),
-      import("./drive-model"),
-    ]).then(async ([THREE, { OrbitControls }, { GLTFLoader }, { createDriveModel }]) => {
+      import("./object-model"),
+    ]).then(async ([THREE, { OrbitControls }, { GLTFLoader }, { createObjectModel }]) => {
       if (disposed || request.signal.aborted) return;
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
       const canvas = renderer.domElement;
-      canvas.className = "rw-vehicle-canvas";
+      canvas.className = "rw-object-canvas";
       canvas.setAttribute("aria-hidden", "true");
       canvas.dataset.renderer = "three";
       canvas.dataset.modelUrl = modelUrl;
@@ -58,23 +59,21 @@ export function CarViewport(props: ViewportProps) {
       const scene = new THREE.Scene();
       const geometries = new Set<InstanceType<typeof THREE.BufferGeometry>>();
       const materials = new Set<InstanceType<typeof THREE.Material>>();
-      const vehicleMaterials = new Set<InstanceType<typeof THREE.MeshBasicMaterial>>();
+      const surfaceMaterials = new Set<InstanceType<typeof THREE.MeshBasicMaterial>>();
       let released = false;
       let disposeControls = () => {};
-      let disposeGradient = () => {};
       release = () => {
         if (released) return;
         released = true;
         disposeControls();
         geometries.forEach(geometry => { geometry.dispose(); });
         materials.forEach(material => { material.dispose(); });
-        disposeGradient();
         renderer.dispose();
         renderer.forceContextLoss();
         canvas.remove();
       };
       const response = await fetch(modelUrl, { signal: request.signal });
-      if (!response.ok) throw new Error("Vehicle asset unavailable");
+      if (!response.ok) throw new Error("Object asset unavailable");
       const asset = await new GLTFLoader().parseAsync(await response.arrayBuffer(), "/interfaces/concepts/");
       const sourceModel = asset.scene;
       const sourceMaterials = new Set<InstanceType<typeof THREE.Material>>();
@@ -97,18 +96,16 @@ export function CarViewport(props: ViewportProps) {
         release();
         return;
       }
-      if (!meshes) throw new Error("Vehicle geometry missing");
-      const prepared = createDriveModel(sourceModel);
+      if (!meshes) throw new Error("Object geometry missing");
+      const prepared = createObjectModel(sourceModel);
       const model = prepared.root;
-      prepared.battery.visible = prepared.cover.visible = prepared.connectors.visible = false;
-      disposeGradient = () => prepared.gradient.dispose();
       geometries.clear(); materials.clear();
       model.traverse(object => {
         if (object instanceof THREE.Mesh || object instanceof THREE.Line) {
           geometries.add(object.geometry);
           for (const material of Array.isArray(object.material) ? object.material : [object.material]) {
             materials.add(material);
-            if (object.userData.vehicleSurface && material instanceof THREE.MeshBasicMaterial) vehicleMaterials.add(material);
+            if (object.userData.objectSurface && material instanceof THREE.MeshBasicMaterial) surfaceMaterials.add(material);
           }
         }
       });
@@ -135,14 +132,14 @@ export function CarViewport(props: ViewportProps) {
       controls.maxPolarAngle = Math.PI / 2 - .025;
       controls.zoomSpeed = .7;
       const target = new THREE.Vector3(0, size.y * .46, 0);
-      const direction = new THREE.Vector3(-1.15, .35, 1.35).normalize();
+      const direction = new THREE.Vector3(.45, .16, 1).normalize();
       // Collapse the actual vertices into a rotation-safe radial profile once.
-      // This avoids the empty corners of a global box making the car too small.
+      // This avoids the empty corners of a global box making the object too small.
       const profile: number[] = [];
       const vertex = new THREE.Vector3();
       model.updateMatrixWorld(true);
       model.traverse(object => {
-        if (!(object instanceof THREE.Mesh) || !object.userData.vehicleSurface) return;
+        if (!(object instanceof THREE.Mesh) || !object.userData.objectSurface) return;
         const positions = object.geometry.attributes.position!;
         for (let index = 0; index < positions.count; index++) {
           vertex.fromBufferAttribute(positions, index).applyMatrix4(object.matrixWorld).sub(target);
@@ -157,6 +154,7 @@ export function CarViewport(props: ViewportProps) {
       let lost = false;
       let frame = 0;
       let lastFrame = 0;
+      let paletteState = { theme: "light", paper: "", lineInk: "" };
       let previousMaterial = "";
       let previousWireframe: boolean | undefined;
       let previousReset = options.current.resetKey;
@@ -169,27 +167,18 @@ export function CarViewport(props: ViewportProps) {
         const dark = color.r + color.g + color.b > 1.5;
         const paper = sceneColor(tokens.getPropertyValue("--table-alt"), tokens.getPropertyValue("--bg"));
         const ink = options.current.material === "graphite" ? (dark ? 0xe0e0e0 : 0x252525) : (dark ? 0xa2a2a2 : 0x525252);
-        for (const material of [prepared.materials.paint,prepared.materials.glass,prepared.materials.rubber,prepared.materials.alloy,prepared.materials.trim,prepared.materials.lamp]) material.color.copy(paper);
+        prepared.materials.surface.color.copy(paper);
         prepared.materials.silhouette.color.setHex(ink);
-        prepared.materials.edge.color.setHex(ink);
-        prepared.materials.vehicleEdge.color.setHex(ink);
-        prepared.materials.vehicleEdge.opacity = options.current.material === "graphite" ? 1 : .88;
-        prepared.materials.edge.opacity = options.current.material === "graphite" ? .86 : .66;
-        for (const [source, material] of prepared.vehicleMaterials) {
-          const base = source as InstanceType<typeof THREE.MeshBasicMaterial>;
-          const copy = material as InstanceType<typeof THREE.MeshBasicMaterial>;
-          copy.color.copy(base.color); copy.opacity = base.opacity;
-        }
-        vehicleMaterials.forEach(material => {
+        prepared.materials.edges.color.setHex(ink);
+        prepared.materials.edges.opacity = options.current.material === "graphite" ? 1 : .88;
+        surfaceMaterials.forEach(material => {
           material.wireframe = options.current.wireframe;
           if (options.current.wireframe) { material.color.setHex(ink); material.transparent = true; material.opacity = .23; }
           else { material.transparent = false; material.opacity = 1; }
         });
-        model.traverse(object => { if (object.userData.vehicleContour) object.visible = !options.current.wireframe; });
+        model.traverse(object => { if (object.userData.objectContour) object.visible = !options.current.wireframe; });
         grid.material.color.setHex(dark ? 0xbbbbbb : 0x555555);
-        canvas.dataset.theme = dark ? "dark" : "light";
-        canvas.dataset.paper = paper.getHexString();
-        canvas.dataset.lineInk = prepared.materials.silhouette.color.getHexString();
+        paletteState = { theme: dark ? "dark" : "light", paper: paper.getHexString(), lineInk: prepared.materials.silhouette.color.getHexString() };
         dirty = true;
       };
       const theme = () => palette();
@@ -221,7 +210,20 @@ export function CarViewport(props: ViewportProps) {
         canvas.dataset.home = home.toArray().map(value => value.toFixed(6)).join(",");
         controls.minDistance = sphere.radius * 1.05;
         controls.maxDistance = distance * 2.5;
-        camera.updateProjectionMatrix(); renderer.setSize(width, height, false); reset();
+        camera.updateProjectionMatrix(); renderer.setSize(width, height, false); prepared.materials.edges.resolution.set(width, height); reset();
+        camera.updateMatrixWorld(true);
+        const fit = [Infinity, Infinity, -Infinity, -Infinity];
+        model.traverse(object => {
+          if (!(object instanceof THREE.Mesh) || !object.userData.objectSurface) return;
+          const positions = object.geometry.attributes.position!;
+          for (let index = 0; index < positions.count; index++) {
+            vertex.fromBufferAttribute(positions, index).applyMatrix4(object.matrixWorld).project(camera);
+            fit[0] = Math.min(fit[0]!, vertex.x); fit[1] = Math.min(fit[1]!, vertex.y);
+            fit[2] = Math.max(fit[2]!, vertex.x); fit[3] = Math.max(fit[3]!, vertex.y);
+          }
+        });
+        canvas.dataset.homeFit = fit.map(value => value.toFixed(6)).join(",");
+        canvas.dataset.viewportWidth = String(width); canvas.dataset.viewportHeight = String(height);
       };
       const applyOptions = () => {
         const current = options.current;
@@ -270,9 +272,10 @@ export function CarViewport(props: ViewportProps) {
         if (options.current.rotating && !reduced.matches && !hovering && !mount.contains(document.activeElement)) rotate(delta * .16);
         if (!dirty) return;
         try { renderer.render(scene, camera); } catch { fail(); return; }
-        // These diagnostics describe the rendered objects, not requested UI state.
-        canvas.dataset.surfaceColor = [...vehicleMaterials][0]?.color.getHexString();
-        canvas.dataset.wireframeMaterials = String([...vehicleMaterials].filter(material => material.wireframe).length);
+        // Commit one completed-frame snapshot; a palette change alone is not a rendered frame.
+        Object.assign(canvas.dataset, paletteState);
+        canvas.dataset.surfaceColor = [...surfaceMaterials][0]?.color.getHexString();
+        canvas.dataset.wireframeMaterials = String([...surfaceMaterials].filter(material => material.wireframe).length);
         canvas.dataset.camera = camera.position.toArray().map(value => value.toFixed(6)).join(",");
         canvas.dataset.target = controls.target.toArray().map(value => value.toFixed(6)).join(",");
         canvas.dataset.renderedTriangles = String(renderer.info.render.triangles);
@@ -299,9 +302,9 @@ export function CarViewport(props: ViewportProps) {
 
   React.useEffect(() => { refresh.current(); });
 
-  return <div className="rw-live-model rw-vehicle-viewport" ref={mountRef} tabIndex={0} role="region" aria-label="Interactive vehicle model. Drag or use left and right arrow keys to orbit. Use plus and minus to zoom, and Home to reset." data-viewer-status={status}>
-    {status !== "ready" && <div className="rw-vehicle-status" role="status">
-      <b>{status === "loading" ? "Loading vehicle model" : "The 3D model could not load"}</b>
+  return <div className="rw-live-model rw-object-viewport" ref={mountRef} tabIndex={0} role="region" aria-label="Interactive Braun T3 radio model. Drag or use left and right arrow keys to orbit. Use plus and minus to zoom, and Home to reset." data-viewer-status={status}>
+    {status !== "ready" && <div className="rw-object-status" role="status">
+      <b>{status === "loading" ? "Loading Braun T3 model" : "The 3D model could not load"}</b>
       <p>{status === "loading" ? "Preparing the detailed model and its materials." : "Check your connection and WebGL availability, then retry the local model."}</p>
       {status === "error" && <Button variant="ghost" onClick={() => setAttempt(value => value + 1)}>Retry viewer</Button>}
     </div>}

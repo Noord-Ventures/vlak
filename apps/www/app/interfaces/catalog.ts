@@ -169,21 +169,21 @@ const originalInterfaces = [
   {
     slug: "render",
     title: "3D workspace",
-    voice: "Inspect a live vehicle model in a 3D workspace.",
-    law: "A modeling workspace with a live vehicle viewport, model tree and focused property inspector.",
-    story: "A modeling workspace built around a detailed production vehicle. Orbit the model, inspect its mesh and compare line treatments. A Vlak context header, flush viewport tools and a readable property inspector keep the model and its settings connected.",
+    voice: "Inspect an industrial design object in a 3D workspace.",
+    law: "A modeling workspace with a live Braun T3 radio, model tree and focused property inspector.",
+    story: "A modeling workspace built around the Braun T3 pocket radio. Orbit the model, inspect its mesh and compare line treatments. A Vlak context header, flush viewport tools and a readable property inspector keep the model and its settings connected.",
     what: "3D workspace",
     type: "Viewport, toolbars, object properties",
     module: "Grid system",
     ink: "Paper and ink controls, hairline panel boundaries and matching model contours.",
     use: "Rotate the model → show the mesh → adjust the linework",
     field: "A dominant live viewport beside a structured model inspector and a shared status footer.",
-    note: "The licensed 204,453-triangle vehicle model renders locally with Three.js and WebGL. Background-colored faces and fine contours match the EV study. Line intensity can be adjusted in the viewer. Geometry editing and production rendering are outside this study's scope.",
+    note: "The licensed 32,027-triangle radio model renders locally with Three.js and WebGL. Background-colored faces and fine contours match the EV study. Line intensity can be adjusted in the viewer. Geometry editing and production rendering are outside this study's scope.",
     components: ["Button", "Card", "Icon", "Tree view", "Property grid", "Description list"],
     modifications: [
       "Vlak Buttons form a readable viewport toolbar. Centered Icons and full-surface selected states identify auto-rotation, mesh view and camera reset.",
       "Tree view selects the inspector section. Property grid edits line intensity, mesh and rotation settings; Description list aligns the mesh metadata.",
-      "Three.js renders the locally hosted vehicle model. Vlak controls change its camera, wireframe and materials; loading and retry remain part of the workspace, and model attribution sits below Components used.",
+      "Three.js renders the locally hosted radio model. Vlak controls change its camera, wireframe and materials; loading and retry remain part of the workspace, and model attribution sits below Components used.",
     ],
   },
   {
@@ -329,9 +329,30 @@ const originalInterfaces = [
   },
 ] as const;
 
+const microscopyStudy = {
+  slug: "microscopy",
+  title: "Microscopy acquisition planner",
+  voice: "Keep the planned acquisition explicit.",
+  law: "Plan stage positions, exposure sequences and multidimensional stacks before an acquisition.",
+  story: "Prepare a bounded acquisition plan with named stage positions, capture steps and depth and time axes. Inspect the planned coordinates, review the frame count and total exposure, then export the working plan as JSON. Import validates a candidate before replacing the current draft.",
+  what: "Microscopy",
+  type: "Stage positions, exposure sequence, stack preview and plan review",
+  module: "Grid system",
+  ink: "A monochrome stage diagram, precise coordinates and flush planning controls.",
+  use: "Edit positions and capture steps → inspect the planned stack → review and export",
+  field: "A stage and stack preview beside a focused planning workflow.",
+  note: "All records are local planning examples. No microscope is connected, no images are acquired and no movement is commanded. Total exposure is an arithmetic sum, not a wall-clock acquisition estimate. JSON exports retain the actual plan and its coordinate units.",
+  components: ["Button", "Icon", "Input", "Select", "Quantity field", "Stage position list", "Acquisition sequencer", "Stack navigator"],
+  modifications: [
+    "Stage position list keeps selection, inclusion and order tied to stable record IDs. Quantity field edits supplied coordinates and exposures without treating missing values as zero.",
+    "Acquisition sequencer defines the ordered capture steps. Stack navigator inspects planned depth and time coordinates while keeping every frame marked Not acquired.",
+    "Review validates the working plan before export. Import stages a bounded JSON candidate; malformed files preserve the current records and unsaved position draft.",
+  ],
+} as const;
+
 const specialistStudies = [...scienceStudies, ...engineeringStudies, ...careStudies, ...musicStudies] as const;
-export const interfaces = [...originalInterfaces, ...specialistStudies] as const;
-export const orderedInterfaces = [...specialistStudies, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
+export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy] as const;
+export const orderedInterfaces = [...specialistStudies, microscopyStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
 
 export type InterfaceSlug = (typeof interfaces)[number]["slug"];
 
@@ -343,6 +364,7 @@ export function interfaceBySlug(slug: string) {
 
 /** Each compact workspace changes its flow, not just its column widths. */
 export const mobilePatterns: Record<InterfaceSlug, string> = {
+  microscopy: "On mobile, Positions, Sequence, Stack and Review are focused screens. Opening a position replaces the list with its editor; Back preserves the unsaved draft, while Apply and Discard remain explicit. The planned stack and import/export controls stay available without shrinking the desktop workspace.",
   ...scienceMobilePatterns,
   ...engineeringMobilePatterns,
   ...careMobilePatterns,

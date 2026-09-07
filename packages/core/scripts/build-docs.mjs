@@ -368,6 +368,8 @@ function llmsIndex() {
     ``,
     `## Docs`,
     ``,
+    `- [Design brief](${HOST}/design.md): Vlak's design principles, layout, typography, controls, and implementation constraints`,
+    `- [Interfaces](${HOST}/interfaces.md): working interface studies with source, component links, and interaction briefs`,
     `- [Guide](${docUrl("guide")}): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents`,
     `- [Component index](${docUrl("index")}): the catalogue by category`,
     `- [Health guide](${docUrl("health")}): health, wellness, and care components with data and action contracts`,

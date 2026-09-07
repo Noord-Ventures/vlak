@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { vlakCategories, catalogComponents, domainCollections } from "@noorddev/vlak";
@@ -13,10 +14,11 @@ function iconGroupSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata("/components", {
   title: "Components",
+  description: `${catalogComponents.length} components, each with a live preview, install path, props, keyboard behavior, and accessibility notes.`,
   alternates: { canonical: `${DOOR}/components/` },
-};
+});
 
 export default function ComponentsPage() {
   return (

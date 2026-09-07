@@ -1,6 +1,6 @@
 # Vlak components
 
-166 components in 18 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+167 components in 18 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -173,6 +173,7 @@
 - [Quantity field](quantity-field.md): A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.
 - [Experiment run](experiment-run.md): Supplied experiment metadata, conditions and ordered protocol steps with explicit statuses and controlled recording actions.
 - [Spectrum plot](spectrum-plot.md): A supplied numeric spectrum with labelled axes, caller-provided peak annotations and a complete paginated data table.
+- [Stage position list](stage-position-list.md): Reviews supplied named stage positions with an explicit coordinate frame, per-axis units, inclusion state and controlled selection, reorder and removal requests.
 - [Stack navigator](stack-navigator.md): Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.
 - [Acquisition sequencer](acquisition-sequencer.md): Edits supplied capture steps, exact exposure, time, depth and channel values, and distinguishes requested actions from recorded run state.
 - [Sequence alignment](sequence-alignment.md): Displays a bounded window of already aligned reference and read strings, with supplied genomic positions, gaps and keyboard region selection.

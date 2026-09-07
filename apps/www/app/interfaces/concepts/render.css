@@ -29,17 +29,17 @@
 .rw-model-host { position: relative; display: grid; grid-template-rows: minmax(0, 1fr); min-width: 0; min-height: 0; overflow: hidden; background: var(--table-alt); }
 .rw-live-model { min-width: 0; min-height: 0; outline-offset: -3px; }
 .rw-live-model:focus-visible { outline: 2px solid var(--text); }
-.rw-vehicle-viewport { display: grid; grid-template-rows: minmax(0, 1fr); position: relative; min-width: 0; min-height: 0; height: 100%; overflow: hidden; }
-.rw-vehicle-canvas { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; border: 0; touch-action: none; }
-.rw-vehicle-viewport[data-viewer-status="error"] .rw-vehicle-canvas { visibility: hidden; }
-.rw-vehicle-status { position: absolute; grid-area: 1 / 1; inset: 0; display: grid; align-content: center; justify-items: start; padding: clamp(18px, 3cqw, 36px); overflow-y: auto; overscroll-behavior: contain; background: var(--control-fill); color: var(--text); }
-.rw-vehicle-status > b { font-size: 20px; font-weight: 500; line-height: 1.2; letter-spacing: -.025em; }
-.rw-vehicle-status > p { font-size: 14px; line-height: 1.45; margin-block: 12px 20px; max-width: 38ch; }
-.rw-vehicle-status > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
-.rw-vehicle-status a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; color: inherit; text-underline-offset: 3px; }
-.rw-vehicle-status a { font-size: 14px; }
+.rw-object-viewport { display: grid; grid-template-rows: minmax(0, 1fr); position: relative; min-width: 0; min-height: 0; height: 100%; overflow: hidden; }
+.rw-object-canvas { display: block; width: 100%; height: 100%; min-width: 0; min-height: 0; border: 0; touch-action: none; }
+.rw-object-viewport[data-viewer-status="error"] .rw-object-canvas { visibility: hidden; }
+.rw-object-status { position: absolute; grid-area: 1 / 1; inset: 0; display: grid; align-content: center; justify-items: start; padding: clamp(18px, 3cqw, 36px); overflow-y: auto; overscroll-behavior: contain; background: var(--control-fill); color: var(--text); }
+.rw-object-status > b { font-size: 20px; font-weight: 500; line-height: 1.2; letter-spacing: -.025em; }
+.rw-object-status > p { font-size: 14px; line-height: 1.45; margin-block: 12px 20px; max-width: 38ch; }
+.rw-object-status > div { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; }
+.rw-object-status a { display: inline-flex; align-items: center; min-width: 44px; min-height: 44px; color: inherit; text-underline-offset: 3px; }
+.rw-object-status a { font-size: 14px; }
 .rw-viewer-loading { display: grid; place-items: center; min-height: 0; padding: 20px; background: var(--control-fill); color: var(--text); font-size: 14px; }
-.rw-vehicle-status a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.rw-object-status a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 .rw-transport { min-height: 68px; padding: 10px 16px; border-top: 1px solid var(--divider); }
 .rw-transport > div { display: grid; gap: 3px; min-width: 0; }
 .rw-transport strong { font-size: 13px; font-weight: 500; }
@@ -92,10 +92,10 @@
   .rw-viewbar { padding: 8px 12px; gap: 8px; }
   .rw-view-label strong { font-size: 13px; }
   .rw-tools { gap: 5px; }
-  .rw-vehicle-status { padding: 20px 16px; }
-  .rw-vehicle-status > b { font-size: 21px; }
-  .rw-vehicle-status > p { font-size: 15px; }
-  .rw-vehicle-status .rs-btn-ghost, .rw-vehicle-status a { font-size: 14px; }
+  .rw-object-status { padding: 20px 16px; }
+  .rw-object-status > b { font-size: 21px; }
+  .rw-object-status > p { font-size: 15px; }
+  .rw-object-status .rs-btn-ghost, .rw-object-status a { font-size: 14px; }
   .rw-transport { padding: 10px 14px; min-height: 66px; }
   .rw-transport > div > span { font-size: 12px; }
   .rw-current-material { display: none; }
@@ -119,5 +119,5 @@
 @media (prefers-reduced-motion: reduce) { .rw *, .rw *::before, .rw *::after { transition: none; animation: none; scroll-behavior: auto; } }
 @media (forced-colors: active) {
   .rw .rw-tool[aria-pressed="true"], .rw .rs-tree-view-selected, .rw .rw-mobile-nav > button[aria-pressed="true"] { background: Highlight; border-color: Highlight; color: HighlightText; forced-color-adjust: none; }
-  .rw-vehicle-status, .rw-viewer-loading { background: Canvas; color: CanvasText; }
+  .rw-object-status, .rw-viewer-loading { background: Canvas; color: CanvasText; }
 }

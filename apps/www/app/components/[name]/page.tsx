@@ -1,3 +1,4 @@
+import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { catalogComponents, type VlakComponent, type VlakExport, type VlakPropsJson } from "@noorddev/vlak";
@@ -24,7 +25,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { name } = await params;
   const component = catalogComponents.find((c) => c.name === name);
-  return { title: component?.title ?? "Components", description: component?.description };
+  if (!component) notFound();
+  return pageMetadata(`/components/${name}`, { title: component.title, description: component.description });
 }
 
 function pascal(name: string) {

@@ -4,14 +4,15 @@ import * as React from "react";
 import dynamic from "next/dynamic";
 import { Button, Card, DescriptionList, Icon, PropertyGrid, TreeView } from "@noorddev/vlak-react";
 import type { PropertyValues } from "@noorddev/vlak-react";
+import { renderAsset } from "./render-asset";
 
-const CarViewport = dynamic(
-  () => import("./car-viewport").then(module => module.CarViewport),
+const ModelViewport = dynamic(
+  () => import("./model-viewport").then(module => module.ModelViewport),
   { ssr: false, loading: () => <div className="rw-viewer-loading" role="status">Preparing the model viewport…</div> },
 );
 
 type Screen = "viewport" | "inspector";
-type Inspector = "vehicle" | "surface" | "viewport";
+type Inspector = "object" | "surface" | "viewport";
 
 export function RenderBoard() {
   const [screen, setScreen] = React.useState<Screen>("viewport");
@@ -75,9 +76,9 @@ export function RenderBoard() {
     if (restoreFocus) requestAnimationFrame(() => viewportButton.current?.focus({ preventScroll: true }));
   }
 
-  return <section className="rw" data-screen={screen} data-viewer-status={status} aria-label="Vehicle modeling workspace">
+  return <section className="rw" data-screen={screen} data-viewer-status={status} aria-label="Object modeling workspace">
     <header className="rw-header">
-      <div className="rw-project"><span className="rw-project-mark"><Icon name="box" size={24} /></span><div><strong>Vehicle study 01</strong><span>Surface and viewport inspection</span></div></div>
+      <div className="rw-project"><span className="rw-project-mark"><Icon name="box" size={24} /></span><div><strong>Braun T3 · 1958</strong><span>Surface and viewport inspection</span></div></div>
       <span className="rw-connection" role="status"><span aria-hidden="true" data-ready={ready} />{statusLabel}</span>
     </header>
 
@@ -90,27 +91,27 @@ export function RenderBoard() {
             <Button variant="ghost" className="rw-tool" disabled={!ready} aria-label="Reset camera" title="Reset camera" onClick={() => { setResetKey(value => value + 1); setAnnouncement("Camera reset requested."); }}><Icon name="camera" size={16} /></Button>
           </nav>
         </div>
-        <div className="rw-model-host"><CarViewport rotating={playing} wireframe={wireframe} material={material} resetKey={resetKey} onStatusChange={setStatus} /></div>
+        <div className="rw-model-host"><ModelViewport rotating={playing} wireframe={wireframe} material={material} resetKey={resetKey} onStatusChange={setStatus} /></div>
         <div className="rw-transport"><Button variant="ghost" className="rw-tool" disabled={!ready || reducedMotion} aria-label={playing ? "Pause turntable" : "Play turntable"} onClick={toggleRotation}><Icon name={playing ? "pause" : "play"} size={16} /></Button><div><strong>Turntable</strong><span>{turntableLabel}</span></div><span className="rw-current-material">{materialLabel}</span></div>
       </section>
 
-      <aside className="rw-inspector" aria-label="Vehicle inspector">
-        <header className="rw-inspector-head"><Button variant="ghost" className="rw-back rw-tool" aria-label="Back to viewport" onClick={() => showViewport(true)}><Icon name="arrow-left" size={16} /></Button><div><span className="rw-eyebrow">Vehicle study 01</span><h2 ref={inspectorHeading} tabIndex={-1}>Model inspector</h2></div><Icon name="settings" size={16} /></header>
+      <aside className="rw-inspector" aria-label="Object inspector">
+        <header className="rw-inspector-head"><Button variant="ghost" className="rw-back rw-tool" aria-label="Back to viewport" onClick={() => showViewport(true)}><Icon name="arrow-left" size={16} /></Button><div><span className="rw-eyebrow">Braun T3 · 1958</span><h2 ref={inspectorHeading} tabIndex={-1}>Model inspector</h2></div><Icon name="settings" size={16} /></header>
         <div className="rw-inspector-scroll">
-          <div className="rw-scene-tree"><h3 id={treeLabel}>Scene collection</h3><TreeView label="Model inspector" value={inspector} onValueChange={value => { if (value === "vehicle" || value === "surface" || value === "viewport") setInspector(value); }} defaultExpanded={["vehicle"]} nodes={[{ id: "vehicle", label: "Vehicle study 01", children: [{ id: "surface", label: "Surface" }, { id: "viewport", label: "Viewport" }] }]} /></div>
+          <div className="rw-scene-tree"><h3 id={treeLabel}>Scene collection</h3><TreeView label="Model inspector" value={inspector} onValueChange={value => { if (value === "object" || value === "surface" || value === "viewport") setInspector(value); }} defaultExpanded={["object"]} nodes={[{ id: "object", label: "Braun T3 · 1958", children: [{ id: "surface", label: "Surface" }, { id: "viewport", label: "Viewport" }] }]} /></div>
           <section className="rw-properties" aria-labelledby={`${treeLabel}-properties`}>
             <h3 id={`${treeLabel}-properties`}>{inspector === "viewport" ? "Viewport settings" : inspector === "surface" ? "Surface properties" : "Model overview"}</h3>
-            {inspector === "vehicle" ? <p className="rw-panel-copy">A complete vehicle asset. Choose Surface to compare line treatments, or Viewport to inspect its mesh and orbit settings.</p> : <PropertyGrid label={inspector === "viewport" ? "Viewport" : "Surface"} value={{ material, wireframe, rotating: playing }} onValueChange={updateProperties} fields={inspector === "viewport" ? [{ id: "wireframe", label: "Show mesh", type: "switch", disabled: !ready }, { id: "rotating", label: "Auto-rotate", type: "switch", disabled: !ready || reducedMotion }] : [{ id: "material", label: "Line treatment", type: "select", disabled: !ready, options: [{ value: "clay", label: "Fine lines" }, { value: "graphite", label: "Ink lines" }] }]} />}
+            {inspector === "object" ? <p className="rw-panel-copy">The T3 radio, designed by Dieter Rams and Hochschule für Gestaltung, Ulm. Its grille, tuning dial and case are supplied model geometry. Choose Surface or Viewport to inspect its presentation.</p> : <PropertyGrid label={inspector === "viewport" ? "Viewport" : "Surface"} value={{ material, wireframe, rotating: playing }} onValueChange={updateProperties} fields={inspector === "viewport" ? [{ id: "wireframe", label: "Show mesh", type: "switch", disabled: !ready }, { id: "rotating", label: "Auto-rotate", type: "switch", disabled: !ready || reducedMotion }] : [{ id: "material", label: "Line treatment", type: "select", disabled: !ready, options: [{ value: "clay", label: "Fine lines" }, { value: "graphite", label: "Ink lines" }] }]} />}
             {reducedMotion && inspector === "viewport" && <p className="rw-panel-copy">Automatic orbit is off while reduced motion is enabled. Camera keys and dragging remain available.</p>}
           </section>
-          <Card className="rw-model-facts"><h3>Asset details</h3><DescriptionList items={[{ id: "triangles", label: "Triangles", value: "204,453" }, { id: "vertices", label: "Vertices", value: "147,374" }, { id: "materials", label: "Materials", value: "21" }]} /></Card>
+          <Card className="rw-model-facts"><h3>Asset details</h3><DescriptionList items={[{ id: "triangles", label: "Triangles", value: renderAsset.triangles.toLocaleString("en") }, { id: "vertices", label: "Vertices", value: renderAsset.vertices.toLocaleString("en") }, { id: "materials", label: "Source materials", value: String(renderAsset.materials) }]} /></Card>
           <p className="rw-panel-copy">Drag the model to orbit, or focus the viewport and use the left and right arrow keys. The turntable pauses while you interact with the viewer.</p>
         </div>
         <footer className="rw-inspector-foot"><Icon name="info" size={16} /><span>Live viewer controls. Geometry editing is outside this study.</span></footer>
       </aside>
     </div>
 
-    <footer className="rw-footer"><span><Icon name="box" size={12} />204,453 triangles · 21 materials</span><span>{wireframe ? "Mesh" : "Line drawing"} · {materialLabel}</span></footer>
+    <footer className="rw-footer"><span><Icon name="box" size={12} />{renderAsset.triangles.toLocaleString("en")} triangles · {renderAsset.meshes} meshes</span><span>{wireframe ? "Mesh" : "Line drawing"} · {materialLabel}</span></footer>
     <nav className="rw-mobile-nav" aria-label="Model workspace"><Button ref={viewportButton} variant="ghost" aria-pressed={screen === "viewport"} onClick={() => showViewport()}><Icon name="grid" size={16} /><span>Viewport</span></Button><Button variant="ghost" aria-pressed={screen === "inspector"} onClick={showInspector}><Icon name="settings" size={16} /><span>Inspector</span></Button></nav>
     <p className="rw-announcement" role="status">{announcement}</p>
   </section>;

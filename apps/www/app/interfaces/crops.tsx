@@ -5,6 +5,7 @@ import { type InterfaceSlug, interfaceBySlug } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { DocumentationCrop } from "./documentation/crop";
 import { MusicPlayerCrop } from "./music-player/crop";
+import { MicroscopyCrop } from "./microscopy/crop";
 import { ChatCrop, DashboardCrop, SocialCrop, FleetCrop, FoodCrop, TeamCrop, WallpaperCrop, MobileOSCrop, TransitCrop } from "./workflow-crops";
 import "./agents/crop.css";
 import "./concepts/render-crop.css";
@@ -33,9 +34,9 @@ function AgentsCrop() {
 
 function RenderCrop() {
   return <div className="if-crop-scene if-crop-render">
-    <header className="if-crop-console-head"><Icon name="layers" size={16} /><div><strong>Vehicle study 01</strong><span>Surface inspection</span></div><span>Fine lines</span></header>
-    <div className="if-crop-model-view rw-crop-model"><img className="rw-crop-light" src="/interfaces/concepts/vehicle-line-preview-light-v1.png" alt="" /><img className="rw-crop-dark" src="/interfaces/concepts/vehicle-line-preview-dark-v1.png" alt="" /><div className="if-crop-model-tools">{(["refresh", "grid", "camera"] as const).map(name => <i key={name}><Icon name={name} size={16} /></i>)}</div></div>
-    <footer className="if-crop-console-foot"><span>Perspective view</span><span>204,453 triangles</span></footer>
+    <header className="if-crop-console-head"><Icon name="layers" size={16} /><div><strong>Braun T3 · 1958</strong><span>Surface inspection</span></div><span>Fine lines</span></header>
+    <div className="if-crop-model-view rw-crop-model"><img className="rw-crop-light" src="/interfaces/concepts/braun-t3-line-preview-light-v1.png" alt="" /><img className="rw-crop-dark" src="/interfaces/concepts/braun-t3-line-preview-dark-v1.png" alt="" /><div className="if-crop-model-tools">{(["refresh", "grid", "camera"] as const).map(name => <i key={name}><Icon name={name} size={16} /></i>)}</div></div>
+    <footer className="if-crop-console-foot"><span>Perspective view</span><span>32,027 triangles</span></footer>
   </div>;
 }
 
@@ -106,6 +107,7 @@ const CROPS: Record<InterfaceSlug, () => ReactNode> = {
   music: MusicCrop,
   documentation: DocumentationCrop,
   "music-player": MusicPlayerCrop,
+  microscopy: MicroscopyCrop,
 };
 
 export function InterfaceCrop({ slug }: { slug: InterfaceSlug }) {

@@ -1095,6 +1095,25 @@ body{
 .rs-raster-band-mixer-control{min-width:0;width:100%;min-height:var(--hit)}
 .rs-raster-band-mixer-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}
 
+/* ── stage-position-list: generated from packages/react/src/components/stage-position-list.tsx ── */
+.rs-stage-position-list{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-stage-position-list-legend{padding:0;margin-bottom:0.75rem;font-weight:600;font-size:0.875rem}
+.rs-stage-position-list-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
+.rs-stage-position-list-items{list-style-type:none;margin:0;padding:0;min-width:0}
+.rs-stage-position-list-row{padding-block:1rem;padding-inline:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);min-width:0}
+.rs-stage-position-list-row:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+.rs-stage-position-list-selected{background-color:var(--table-alt)}
+@media (forced-colors: active){.rs-stage-position-list-selected{background-color:Canvas}}
+.rs-stage-position-list-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem 1rem;min-width:0}
+.rs-stage-position-list-identity{display:grid;min-width:0;overflow-wrap:anywhere;font-size:0.875rem}
+.rs-stage-position-list-coordinates{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:0.5rem 1rem;margin-block:0.75rem;margin-inline:0}
+.rs-stage-position-list-coordinate{min-width:0;overflow-wrap:anywhere}
+.rs-stage-position-list-axis{margin:0;color:var(--text-secondary);font-size:0.75rem}
+.rs-stage-position-list-number{margin:0;font-size:0.875rem;font-variant-numeric:tabular-nums}
+.rs-stage-position-list-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}
+.rs-stage-position-list-action{min-width:var(--hit);min-height:var(--hit);width:auto}
+.rs-stage-position-list-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
 /* ── stack-navigator: generated from packages/react/src/components/stack-navigator.tsx ── */
 .rs-stack-navigator{display:grid;gap:1rem;min-width:0;padding:0;margin:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-stack-navigator-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}
