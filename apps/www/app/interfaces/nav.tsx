@@ -4,10 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MobileToc } from "@/components/toc-mobile";
 import { sx } from "@/lib/sx";
-import { interfaces } from "./catalog";
+import { interfaces, orderedInterfaces } from "./catalog";
 import { interfaces as ifx } from "./interfaces.stylex";
 
-const navInterfaces = [...interfaces.slice(6), ...interfaces.slice(0, 6)];
+const navInterfaces = orderedInterfaces;
 
 function here(pathname: string, href: string) {
   return pathname === href || pathname === `${href}/`;

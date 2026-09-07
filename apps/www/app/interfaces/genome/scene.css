@@ -1,0 +1,115 @@
+.ge { container: genome / inline-size; display: grid; grid-template-rows: 64px minmax(0, 1fr) auto; height: 100%; min-height: 0; min-width: 0; overflow: hidden; background: var(--bg); color: var(--text); font-size: 14px; line-height: 1.45; }
+.ge *, .ge *::before, .ge *::after { box-sizing: border-box; }
+.ge h2, .ge h3, .ge p { margin: 0; }
+.ge button, .ge input, .ge textarea { font-family: inherit; }
+.ge .rs-btn-primary, .ge .rs-btn-ghost { min-width: 44px; min-height: 44px; width: auto; height: auto; padding: 10px 12px; font-size: 13px; flex-shrink: 0; }
+.ge .rs-input, .ge .rs-textarea { font-size: 16px; }
+.ge .rs-card { min-width: 0; max-width: none; border-radius: 0; }
+.ge-header, .ge-project, .ge-view, .ge-evidence-actions, .ge-note-actions, .ge-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.ge-header { padding: 10px 20px; border-bottom: 1px solid var(--divider); }
+.ge-project { justify-content: flex-start; }
+.ge-project > div { display: grid; }
+.ge-project strong { font-weight: 500; }
+.ge-project span, .ge-eyebrow, .ge-status { color: var(--text-secondary); font-size: 12px; }
+.ge-body { display: grid; grid-template-columns: 244px minmax(0, 1fr); min-height: 0; }
+.ge-region { display: grid; grid-template-rows: auto minmax(0, 1fr); border-inline-end: 1px solid var(--divider); min-height: 0; min-width: 0; }
+.ge-reference-label { padding: 20px 16px; border-bottom: 1px solid var(--divider); background: var(--control-fill); }
+.ge-reference-label span, .ge-reference-label p { color: var(--text); font-size: 12px; }
+.ge-reference-label strong { display: block; margin-block: 6px; font-size: 18px; font-weight: 500; letter-spacing: -.025em; }
+.ge-region-form { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; }
+.ge-region-scroll, .ge-evidence-scroll, .ge-note-scroll { min-height: 0; min-width: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; padding: 20px 16px; }
+.ge .rs-genomic-region-field-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ge .rs-genomic-region-field-fields > :first-child { grid-column: 1 / -1; }
+.ge .rs-genomic-region-field-label, .ge .rs-genomic-region-field-control { min-width: 0; }
+.ge .ge-contract { display: grid; gap: 9px; margin-top: 24px; padding: 14px; border: 1px solid var(--divider); }
+.ge-contract strong { font-size: 13px; font-weight: 500; }
+.ge-contract p, .ge-reference-index p { font-size: 13px; color: var(--text-secondary); }
+.ge-reference-index { padding-top: 24px; }
+.ge-reference-index h2 { font-size: 13px; font-weight: 500; margin-bottom: 9px; }
+.ge-reference-index p + p { margin-top: 12px; }
+.ge-region-actions { padding: 12px 16px; border-top: 1px solid var(--divider); }
+.ge-region-actions button { width: 100%; }
+.ge-evidence { display: grid; grid-template-rows: auto auto auto minmax(0, 1fr) auto; min-height: 0; min-width: 0; }
+.ge-evidence-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 12px 24px 8px; }
+.ge-evidence-head h2 { font-size: 32px; font-weight: 400; line-height: 1; letter-spacing: -.05em; font-variant-numeric: tabular-nums; margin-block: 9px; }
+.ge-evidence-head h2 > span { color: var(--text-secondary); padding-inline: 10px; }
+.ge h2:focus { outline: none; }
+.ge-evidence-head p { color: var(--text-secondary); font-size: 12px; }
+.ge-bounded { font-size: 12px; padding: 4px 7px; border: 1px solid var(--divider); }
+.ge-context { padding: 4px 24px 12px; }
+.ge-contig-track { position: relative; height: 13px; border: 1px solid var(--control-border); background: var(--control-fill); }
+.ge-contig-track > span { position: absolute; inset-block: 2px; background: var(--text); }
+.ge-context > div:last-child { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--text-secondary); }
+.ge-view { padding: 9px 24px; border-block: 1px solid var(--divider); }
+.ge-view > span { font-size: 12px; color: var(--text-secondary); }
+.ge .rs-toggle { min-width: 44px; min-height: 44px; padding-inline: 12px; font-size: 13px; }
+.ge-evidence-scroll { padding: 20px 24px; }
+.ge .ge-selection-card { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 14px; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--divider); }
+.ge-selection-card > div { min-width: 0; display: grid; gap: 6px; }
+.ge-selection-card span { font-size: 12px; color: var(--text-secondary); }
+.ge-selection-card strong { font-weight: 400; font-size: 19px; overflow-wrap: anywhere; }
+.ge-evidence-actions { padding: 12px 24px; border-top: 1px solid var(--divider); background: var(--control-fill); }
+.ge-evidence-actions > span { font-size: 12px; }
+.ge-notes { display: none; grid-template-rows: auto minmax(0, 1fr); min-height: 0; min-width: 0; }
+.ge[data-screen="notes"] .ge-notes { display: grid; }
+.ge[data-screen="notes"] .ge-evidence { display: none; }
+.ge-notes-head { display: flex; gap: 12px; align-items: center; border-bottom: 1px solid var(--divider); padding: 16px 20px; }
+.ge-notes-head h2 { font-size: 20px; font-weight: 500; letter-spacing: -.025em; }
+.ge-note-form { display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; }
+.ge-note-scroll { display: flex; flex-direction: column; gap: 24px; padding: 22px 24px; }
+.ge .ge-locus-card { display: grid; gap: 8px; padding-bottom: 20px; border-bottom: 1px solid var(--divider); }
+.ge-locus-card > span, .ge-locus-card p { font-size: 13px; color: var(--text-secondary); }
+.ge-locus-card > strong { font-size: 56px; font-weight: 400; line-height: 1; letter-spacing: -.055em; }
+.ge-annotation-list h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+.ge-annotation-list p { font-size: 13px; color: var(--text-secondary); }
+.ge-annotation-list ol { list-style: none; padding: 0; margin: 0; }
+.ge-annotation-list li { border-top: 1px solid var(--divider); padding-block: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ge-note-total { display: grid; gap: 12px; font-size: 13px; }
+.ge-note-actions { padding: 12px 24px; border-top: 1px solid var(--divider); }
+.ge-note-actions > span { color: var(--text-secondary); font-size: 12px; }
+.ge-status { min-height: 30px; padding-inline: 16px; border-top: 1px solid var(--divider); font-size: 11px; }
+.ge .ge-mobile, .ge-mobile-nav { display: none; }
+.ge-announcement { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@container genome (min-width: 1100px) {
+  .ge-body { grid-template-columns: 230px minmax(0, 1fr) 288px; }
+  .ge-notes, .ge[data-screen="notes"] .ge-notes { display: grid; border-inline-start: 1px solid var(--divider); }
+  .ge[data-screen="notes"] .ge-evidence { display: grid; }
+  .ge-note-scroll { padding: 18px; }
+  .ge-note-actions { padding-inline: 16px; }
+}
+@container genome (max-width: 640px) {
+  .ge-header { padding-inline: 14px; }
+  .ge-header .rs-btn-ghost { width: 44px; padding-inline: 0; }
+  .ge-header .rs-btn-ghost > span { display: none; }
+  .ge-body { grid-template-columns: minmax(0, 1fr); }
+  .ge-region { border-inline-end: 0; }
+  .ge-evidence, .ge-notes { display: none; }
+  .ge[data-screen="evidence"] .ge-region, .ge[data-screen="notes"] .ge-region { display: none; }
+  .ge[data-screen="evidence"] .ge-evidence, .ge[data-screen="notes"] .ge-notes { display: grid; }
+  .ge-reference-label { padding: 14px 16px; }
+  .ge-reference-label p { display: none; }
+  .ge-region-scroll { padding: 18px 16px; }
+  .ge .rs-genomic-region-field-copy, .ge .rs-genomic-region-field-label { font-size: 14px; }
+  .ge .rs-genomic-region-field-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ge .rs-genomic-region-field-fields > :first-child { grid-column: 1 / -1; }
+  .ge .ge-mobile { display: inline-flex; }
+  .ge-evidence-head { padding: 14px 16px 10px; align-items: center; justify-content: flex-start; }
+  .ge-evidence-head h2 { font-size: 31px; }
+  .ge-bounded { display: none; }
+  .ge-context { padding-inline: 16px; }
+  .ge-view { padding-inline: 16px; }
+  .ge-view > span { display: none; }
+  .ge-evidence-scroll, .ge-note-scroll { padding: 18px 16px; }
+  .ge .ge-selection-card { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ge-selection-card > div:first-child { grid-column: 1 / -1; }
+  .ge-evidence-actions, .ge-note-actions { padding: 12px 16px; }
+  .ge-evidence-actions > span { display: none; }
+  .ge-evidence-actions > button { width: 100%; }
+  .ge-notes-head { padding: 12px 16px; }
+  .ge-mobile-nav { display: flex; align-items: stretch; border-top: 1px solid var(--divider); padding: 6px; gap: 6px; }
+  .ge-mobile-nav > button { flex: 1; font-size: 13px; }
+  .ge-status { display: none; }
+  .ge-note-scroll, .ge-evidence-scroll, .ge-annotation-list li { font-size: 15px; }
+}
+@media (forced-colors: active) { .ge-contig-track > span { background: Highlight; } }
+@media (prefers-reduced-motion: reduce) { .ge *, .ge *::before, .ge *::after { scroll-behavior: auto; transition-duration: 0s; } }

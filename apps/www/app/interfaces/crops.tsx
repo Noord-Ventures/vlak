@@ -5,6 +5,7 @@ import { type InterfaceSlug, interfaceBySlug } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { Mark } from "./mark";
 import "./agents/crop.css";
+import { MicrobiologyCrop, GenomeCrop, ProteinCrop, RoboticsCrop, CircuitryCrop, IdentityCrop, PatientCrop, MusicCrop } from "./specialist-crops";
 
 function Lockup({ slug }: { slug: InterfaceSlug }) {
   const proto = interfaceBySlug(slug)!;
@@ -196,6 +197,14 @@ const CROPS: Record<InterfaceSlug, () => ReactNode> = {
   orbit: OrbitCrop,
   frontier: FrontierCrop,
   platforms: PlatformsCrop,
+  microbiology: MicrobiologyCrop,
+  genome: GenomeCrop,
+  protein: ProteinCrop,
+  robotics: RoboticsCrop,
+  circuitry: CircuitryCrop,
+  identity: IdentityCrop,
+  patient: PatientCrop,
+  music: MusicCrop,
 };
 
 export function InterfaceCrop({ slug }: { slug: InterfaceSlug }) {

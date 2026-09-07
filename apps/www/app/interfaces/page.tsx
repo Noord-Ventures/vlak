@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { chrome } from "@/app/site.stylex";
 import { sx } from "@/lib/sx";
-import { interfaces } from "./catalog";
+import { orderedInterfaces } from "./catalog";
 import { InterfaceCrop } from "./crops";
 import { InterfacesNav } from "./nav";
 import { interfaces as ifx } from "./interfaces.stylex";
@@ -28,7 +28,7 @@ export default function InterfacesPage() {
           <div className="if-index-links"><Link href="/docs/">Start building <span aria-hidden="true">→</span></Link><a href="/design.md">Get the design brief <span aria-hidden="true">↗</span></a></div>
         </header>
         <div {...sx("if-list", ifx.list)}>
-          {[...interfaces.slice(6), ...interfaces.slice(0, 6)].map((item, index) => (
+          {orderedInterfaces.map((item, index) => (
             <Link key={item.slug} href={`/interfaces/${item.slug}`} {...sx("if-tile", ifx.tile)}>
               <InterfaceCrop slug={item.slug} />
               <div {...sx("if-tile-matter", ifx.tileMatter)}>

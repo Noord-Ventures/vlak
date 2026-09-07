@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const slugs = ["agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
+const slugs = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
@@ -73,7 +73,7 @@ try {
   const page = await context.newPage();
   await page.goto(base + "/interfaces/", { waitUntil: "networkidle" });
   assert.equal(await page.locator(".if-tile").count(), slugs.length);
-  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /agents/);
+  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /microbiology/);
   await page.goto(base + "/interfaces/graphics/", { waitUntil: "networkidle" });
   await page.locator(".if-build-link").click();
   await page.waitForFunction(() => location.hash === "#build-with-vlak");

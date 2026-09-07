@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { chrome } from "@/app/site.stylex";
 import { sx } from "@/lib/sx";
-import { type InterfaceSlug, interfaceBySlug, interfaces as catalog, mobilePatterns } from "./catalog";
+import { type InterfaceSlug, interfaceBySlug, orderedInterfaces, mobilePatterns } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { InterfacesNav } from "./nav";
 import { StartBuilding } from "./start-building";
@@ -15,7 +15,8 @@ function sourceFor(slug: InterfaceSlug) {
 
 export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; children: ReactNode }) {
   const proto = interfaceBySlug(slug)!;
-  const ordered = [...catalog.slice(6), ...catalog.slice(0, 6)];
+  const workbench = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music"].includes(slug);
+  const ordered = orderedInterfaces;
   const next = ordered[(ordered.findIndex((item) => item.slug === slug) + 1) % ordered.length]!;
   const source = sourceFor(slug);
   return (
@@ -27,7 +28,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
             <h1 id={`${slug}-name`}>{proto.title}</h1>
             <a className="rs-btn-primary if-build-link" href="#build-with-vlak">Build with Vlak <span aria-hidden="true">↓</span></a>
           </header>
-          <div {...sx("if-specimen", interfaces.specimen, slug === "drive" && interfaces.vehicleSpecimen)}>{children}</div>
+          <div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, slug === "drive" && interfaces.vehicleSpecimen, workbench && interfaces.workbenchSpecimen)}>{children}</div>
           <div className="if-study-caption"><p>{proto.use}</p><a href={source}>View source <span aria-hidden="true">↗</span></a></div>
         </section>
         <div className="if-detail-content">

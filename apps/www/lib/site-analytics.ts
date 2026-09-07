@@ -8,6 +8,8 @@ export const publicSitePaths = [
   "/interfaces/evening", "/interfaces/frontier", "/interfaces/graphics", "/interfaces/line",
   "/interfaces/night", "/interfaces/orbit", "/interfaces/platforms", "/interfaces/press",
   "/interfaces/render", "/interfaces/room", "/interfaces/wall", "/swag",
+  "/interfaces/microbiology", "/interfaces/genome", "/interfaces/protein", "/interfaces/robotics",
+  "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
 ];
 
 type EventName = "docs_click" | "get_started_click" | "github_click" | "install_copy" | "network_click";

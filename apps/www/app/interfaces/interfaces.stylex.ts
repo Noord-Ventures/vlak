@@ -171,6 +171,12 @@ export const interfaces = stylex.create({
       [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
     },
   },
+  workbenchSpecimen: {
+    height: {
+      default: "clamp(612px, calc(100svh - 180px), 816px)",
+      [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
+    },
+  },
   matter: {
     maxWidth: 592,
     paddingTop: 32,

@@ -4,7 +4,7 @@ What it is, how to get there, what done looks like.
 
 Writers: the studies live in `app/interfaces/catalog.ts`. Each proto is its own folder and route. The section is a first-class nav sibling of Components, Docs, and About, not a page inside a component.
 
-Each interface is a fictional app with a descriptive English name. The gallery, side rail, and detail headings use those names. Stable route slugs are implementation details, not product brands. Newer concepts appear first, starting with agent management.
+Each interface is a fictional app with a descriptive English name. The gallery, side rail, and detail headings use those names. Stable route slugs are implementation details, not product brands. The eight specialist workspaces appear first, followed by the earlier concepts and communication studies.
 
 Landing cards are poster crops — a clipped fragment of that UI, not a tiny full-page shrink, not a title-only frame. Type in a crop wraps on a word. A composer or photograph may run off the card; a letter may not. Captions follow the English names.
 
@@ -20,6 +20,14 @@ Each app has two to three levels of use: list → detail → one level deeper. I
 
 | Surface | Route | Click path | Done |
 | --- | --- | --- | --- |
+| Microbiology notebook | `/interfaces/microbiology` | Culture → plate marker → observation | Preserve source counts and missing coordinates, record a note and request a local review. |
+| Genome mapping workspace | `/interfaces/genome` | Region → alignment or coverage → annotation | Inspect a bounded sample region, select an exact locus, save annotations and export their actual JSON records. |
+| Protein sequence workbench | `/interfaces/protein` | Sequence → residue → variant comparison | Edit a deliberately nonfunctional toy sequence, compare exact substitutions and review explicit local constraints. The ribbon is illustrative; no folding or design model runs. |
+| Robotics workspace | `/interfaces/robotics` | Robot state → joint target → confirmation or event | Pause, resume and step sample telemetry; keep requested joint targets separate from reported and confirmed values. |
+| Circuit board workspace | `/interfaces/circuitry` | Board pad → prompt → editable proposal | Local prompt templates prepare explicit net/assembly proposals. Apply the reviewed changes to the local board draft; imported rule checks retain their supplied status. |
+| Identity application | `/interfaces/identity` | Applicant → evidence → review → receipt | Native validation, sample evidence and a local receipt; no government submission. Browser persistence reports whether storage succeeds. |
+| Patient dashboard | `/interfaces/patient` | Overview → readings or care → visit preparation | Inspect sample readings, update a local care record, and save a visit note or preference. Data and storage are local to the example. |
+| Music session | `/interfaces/music` | Clip → pattern → mix or export | Four synthesized tracks play on the Web Audio clock. Clips, tempo, gain, pan, mute, solo and tone change the sound. Export renders a real stereo wave file. |
 | Interfaces index | `/interfaces` | Corner → Interfaces | Lists the studies. Title occupies a 204 cell. At scroll 0 the H1 top shares the rail first-row line. Each card is a poster crop on the 204, then the English name. Index tiles are chrome-square (radius 0), same lock as Components `.rs-card`. Vertical gap is two gutters so the stack is looser than a flush cage. The field under the title and around the crops reads as the module. |
 | AI chat | `/interfaces/line` | Interfaces → AI chat | Inbox → conversation → response or information. A full-width reading screen and pinned composer replace the desktop panes on mobile. |
 | Dashboard | `/interfaces/press` | Interfaces → Dashboard | Overview → jobs or invoices → brief. Bottom navigation and a focused production overview replace the desktop dashboard on mobile. |
@@ -52,8 +60,12 @@ The specimen container, not only the browser width, determines the layout. At 64
 
 Use Vlak Button, Card, Icon, Input, InputGroup, and ToggleGroup where applicable. Keep structural regions flush and controls at the 4px radius. Body copy is 15–16px on phones, text inputs are at least 16px, and targets are at least 44 × 44px. Selection changes the full control surface. Do not add simulated device status bars outside the explicit platform comparison.
 
+Specialist workspaces also compose the relevant domain components. Their desktop specimens adapt between 612 and 816px tall; phones retain the shared viewport-based frame. Each board fills that frame with independently scrolling content and reachable actions. Specialized plots, board geometry, routing, molecular illustrations and musical grids keep their own useful visual structure within Vlak.
+
 Headers, bottom navigation, and primary actions must remain separate from the scrolling content. Back preserves the selected item and restores focus. Phone specimen height follows the stable viewport, with a 480px minimum; long details scroll inside their screen. Reduced motion must preserve every transition's end state. Each detail page documents its mobile component adaptation in `mobilePatterns`.
 
-`scripts/e2e-mobile-interfaces.mjs` exercises all 13 flows at 320 × 568, 390 × 844, 430 × 932, and a narrow specimen inside a 1024px desktop page. It checks touch targets, duplicated chrome, overflow, reachable navigation, and the main state-changing journey. `scripts/e2e-agents.mjs` covers task creation, approvals, pause/resume, focus, and accessibility. `scripts/e2e-interfaces.mjs` covers the shared gallery, detail pages, and desktop regressions.
+`scripts/e2e-mobile-interfaces.mjs` exercises the earlier 13 flows at 320 × 568, 390 × 844, 430 × 932, and a narrow specimen inside a 1024px desktop page. It checks touch targets, duplicated chrome, overflow, reachable navigation, and the main state-changing journey. `scripts/e2e-agents.mjs` covers task creation, approvals, pause/resume, focus, and accessibility. `scripts/e2e-interfaces.mjs` covers the shared gallery, detail pages, and desktop regressions.
+
+`scripts/e2e-specialist-interfaces.mjs` covers the eight new workspaces at 320, 390, 1024 and 1440px, including light/dark accessibility, local persistence, exact data changes, downloads and actual synthesized audio. Its science, engineering, care and music helpers exercise complete journeys separately from layout checks.
 
 Before shipping, check all study routes at phone and desktop widths, including 320px. Verify one main landmark and page heading, no horizontal page overflow, primary local interactions, clipboard feedback, design-guide URL, component links, and the build anchor. Scope container queries to the owning study. Run the site typecheck and production build.

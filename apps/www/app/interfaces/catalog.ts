@@ -1,4 +1,9 @@
-export const interfaces = [
+import { scienceStudies, scienceMobilePatterns } from "./science-studies";
+import { engineeringStudies, engineeringMobilePatterns } from "./engineering-studies";
+import { careStudies, careMobilePatterns } from "./care-studies";
+import { musicStudies, musicMobilePatterns } from "./music-studies";
+
+const originalInterfaces = [
   {
     slug: "line",
     title: "AI chat",
@@ -267,6 +272,10 @@ export const interfaces = [
   },
 ] as const;
 
+const specialistStudies = [...scienceStudies, ...engineeringStudies, ...careStudies, ...musicStudies] as const;
+export const interfaces = [...originalInterfaces, ...specialistStudies] as const;
+export const orderedInterfaces = [...specialistStudies, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
+
 export type InterfaceSlug = (typeof interfaces)[number]["slug"];
 
 export const INTERFACE_SLUGS = interfaces.map((item) => item.slug);
@@ -277,6 +286,10 @@ export function interfaceBySlug(slug: string) {
 
 /** Each compact workspace changes its flow, not just its column widths. */
 export const mobilePatterns: Record<InterfaceSlug, string> = {
+  ...scienceMobilePatterns,
+  ...engineeringMobilePatterns,
+  ...careMobilePatterns,
+  ...musicMobilePatterns,
   agents: "On mobile, bottom navigation switches Tasks, Active, and Review. Opening a task replaces the workspace header and summaries with a full-height detail screen. Approvals and new-task submission stay in a bottom action area while the content scrolls.",
   line: "On mobile, the chat list opens into a full-width conversation with a pinned composer. Conversation information and response details use their own screen with Back navigation. Text entry stays at 16px and focus returns to the control that opened the screen.",
   room: "On mobile, channels open into a conversation, and a message opens into a separate thread screen with its own reply field. A contextual header replaces the desktop rail, and Back preserves the current channel and conversation.",

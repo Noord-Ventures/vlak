@@ -535,6 +535,8 @@ body:has(.if-index) {
 }
 
 /* Detail: Vlak chrome around a boxed product UI. Not almost-fullscreen. */
+.if-specimen.if-workbench { height: clamp(612px, calc(100svh - 180px), 816px); }
+@media (max-width: 640px) { .if-specimen.if-workbench { height: clamp(480px, calc(100svh - 148px), 720px); min-height: 480px; } }
 .if-specimen {
   container-type: inline-size;
   margin-top: 0;
