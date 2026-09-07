@@ -81,12 +81,13 @@ jobs:
         run: node apps/www/scripts/check-discovery.mjs
       - name: axe, keyboard, and phone checks over the export
         run: pnpm --filter www e2e
-      - name: EV, documentation and music video interactions
+      - name: Mobile navigation, EV, documentation and music video interactions
         run: |
           python3 -m http.server 3016 --directory apps/www/out > /tmp/vlak-interface-server.log 2>&1 &
           INTERFACE_SERVER_PID=$!
           trap 'kill "$INTERFACE_SERVER_PID"' EXIT
           curl --retry 10 --retry-connrefused --retry-delay 1 -fsS http://localhost:3016/interfaces/ > /dev/null
+          SITE_URL=http://localhost:3016 node apps/www/scripts/mobile-navigation-e2e.mjs
           INTERFACES=drive,documentation,video-player SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
       - uses: actions/upload-artifact@v4
         if: always()

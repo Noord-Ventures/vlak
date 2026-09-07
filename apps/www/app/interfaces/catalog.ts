@@ -312,7 +312,7 @@ const originalInterfaces = [
     title: "Video player",
     voice: "Give music videos a quiet place to play.",
     law: "A screening room for three selected music videos with a focused playlist and playback controls.",
-    story: "Watch Loathe’s Two-Way Mirror, Foals’ Spanish Sahara and Woodkid’s Iron through their official artist and publisher uploads on YouTube and Vimeo. A compact playlist sits beside the picture, while Vlak playback controls follow the actual player’s time, volume and state. The embedded player retains its native captions, quality and viewing controls.",
+    story: "A quiet space for watching, with the playlist close at hand and room for the picture. Playback controls stay within reach as you move between films.",
     what: "Video player",
     type: "Music video playlist, viewing room and playback preferences",
     module: "Grid system",

@@ -257,6 +257,15 @@ export function SiteChrome() {
   React.useEffect(() => setOpen(false), [pathname]);
   React.useEffect(() => setMenuOpen(false), [pathname]);
   React.useEffect(() => {
+    const onNavigation = (event: Event) => {
+      const panel = (event as CustomEvent<string>).detail;
+      if (panel !== "site") setOpen(false);
+      if (panel !== "appearance") setMenuOpen(false);
+    };
+    window.addEventListener("vlak:navigation-open", onNavigation);
+    return () => window.removeEventListener("vlak:navigation-open", onNavigation);
+  }, []);
+  React.useEffect(() => {
     const onScroll = () => setAtTop(window.scrollY <= 4);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -282,7 +291,7 @@ export function SiteChrome() {
     return () => {
       document.body.style.overflow = "";
       document.removeEventListener("keydown", onKey);
-      navToggleRef.current?.focus();
+      if (navPanelRef.current?.contains(document.activeElement)) navToggleRef.current?.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -351,7 +360,10 @@ export function SiteChrome() {
           aria-haspopup="dialog"
           aria-expanded={menuOpen}
           aria-controls="appearanceMenu"
-          onClick={() => setMenuOpen((value) => !value)}
+          onClick={() => {
+            if (!menuOpen) window.dispatchEvent(new CustomEvent("vlak:navigation-open", { detail: "appearance" }));
+            setMenuOpen((value) => !value);
+          }}
         >
           <SettingsMark />
         </button>
@@ -374,7 +386,10 @@ export function SiteChrome() {
         aria-expanded={open}
         aria-controls="navPanel"
         aria-label={open ? "Close menu" : "Open menu"}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          if (!open) window.dispatchEvent(new CustomEvent("vlak:navigation-open", { detail: "site" }));
+          setOpen((value) => !value);
+        }}
       >
         <svg className="nav-toggle-icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
           <path d="M2 7H18" />
