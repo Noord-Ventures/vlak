@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { chromium } from "playwright";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const slugs = ["agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "line", "press", "wall", "night", "evening", "room"];
+const slugs = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "mobile-os", "documentation", "music-player", "line", "press", "wall", "night", "evening", "room"];
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
@@ -45,10 +45,10 @@ try {
             return box.left < section.left || box.right > section.right;
           }).map(button => button.textContent),
           links: Array.from(document.querySelectorAll(".if-component-list a"), el => el.getAttribute("href")),
-          controlRadii: Array.from(document.querySelectorAll(".cx-graphics > header button, .cx-graphics > aside > button, .cx-graphics textarea, .cx-segments"), el => getComputedStyle(el).borderRadius),
-          clippedFormats: Array.from(document.querySelectorAll(".cx-format-label")).filter(label => {
+          controlRadii: Array.from(document.querySelectorAll(".wg-header button, .wg-generate button, .wg textarea, .wg select"), el => getComputedStyle(el).borderRadius),
+          clippedFormats: Array.from(document.querySelectorAll(".wg-viewbar strong")).filter(label => {
             if (!label.getClientRects().length) return false;
-            const button = label.closest("button").getBoundingClientRect();
+            const button = label.closest(".wg-viewbar").getBoundingClientRect();
             const text = label.getBoundingClientRect();
             return text.left < button.left + 6 || text.right > button.right - 6;
           }).map(label => label.textContent),
@@ -73,7 +73,7 @@ try {
   const page = await context.newPage();
   await page.goto(base + "/interfaces/", { waitUntil: "networkidle" });
   assert.equal(await page.locator(".if-tile").count(), slugs.length);
-  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /agents/);
+  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /microbiology/);
   await page.goto(base + "/interfaces/graphics/", { waitUntil: "networkidle" });
   await page.locator(".if-build-link").click();
   await page.waitForFunction(() => location.hash === "#build-with-vlak");
@@ -97,14 +97,14 @@ try {
   }
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto(base + "/interfaces/orbit/", { waitUntil: "networkidle" });
-  const selectedAsset = page.locator(".cx-orbit-asset").first();
+  const selectedAsset = page.locator(".so-asset").first();
   await selectedAsset.focus();
   const selectedAssetStyle = await selectedAsset.evaluate(element => {
     const style = getComputedStyle(element);
-    return { borderLeftWidth: style.borderLeftWidth, boxShadow: style.boxShadow, outlineStyle: style.outlineStyle };
+    return { borderLeftWidth: style.borderLeftWidth, boxShadow: style.boxShadow };
   });
-  assert.deepEqual(selectedAssetStyle, { borderLeftWidth: "0px", boxShadow: "none", outlineStyle: "none" }, "Orbit selection must use a full-surface fill, never a leading stripe");
-  const assetRows = await page.locator(".cx-orbit-asset").evaluateAll(elements => elements.map(element => {
+  assert.deepEqual(selectedAssetStyle, { borderLeftWidth: "0px", boxShadow: "none" }, "Orbit selection must use a full-surface fill, never a leading stripe");
+  const assetRows = await page.locator(".so-asset").evaluateAll(elements => elements.map(element => {
     const box = element.getBoundingClientRect();
     const children = Array.from(element.children, child => child.getBoundingClientRect());
     return { top: box.top, bottom: box.bottom, contentTop: Math.min(...children.map(child => child.top)), contentBottom: Math.max(...children.map(child => child.bottom)) };
@@ -113,35 +113,22 @@ try {
     assert(row.contentTop >= row.top && row.contentBottom <= row.bottom, `Orbit asset ${index + 1} content must stay inside its row`);
     if (index > 0) assert(row.top >= assetRows[index - 1].bottom, `Orbit asset ${index + 1} must not overlap the previous row`);
   }
-  await page.goto(base + "/interfaces/frontier/", { waitUntil: "networkidle" });
-  assert.notEqual(await page.locator(".cx-frontier-ring-a").evaluate(element => getComputedStyle(element).animationName), "none", "Frontier hero graphic should animate when motion is allowed");
   await page.goto(base + "/interfaces/drive/", { waitUntil: "networkidle" });
-  const valueTops = await page.locator(".cx-ev-panels .rs-metric-reading, .cx-ev-panels .rs-number-field-row").evaluateAll(elements => elements.map(element => Math.round(element.getBoundingClientRect().top)));
-  assert.equal(valueTops.length, 3, "Range, battery, and cabin use shared value tracks");
-  assert.equal(new Set(valueTops).size, 1, `EV values should share one baseline, got ${valueTops.join(", ")}`);
-  const temperatureControls = await page.locator(".cx-ev-cabin-field .rs-number-field-controls button").evaluateAll(elements => elements.map(element => {
+  const valueTops = await page.locator(".ev-readings .rs-metric-reading").evaluateAll(elements => elements.map(element => Math.round(element.getBoundingClientRect().top)));
+  assert.equal(valueTops.length, 2, "Range/battery and cabin retain the shared Metric primitive");
+  assert.equal(new Set(valueTops).size, 1, `EV numeric readings share a baseline, got ${valueTops.join(", ")}`);
+  assert.equal(await page.locator(".ev-readings > button").count(), 3, "Range/battery, Cabin and Media provide three detail triggers");
+  await page.getByRole("button", { name: "Cabin comfort", exact: true }).click();
+  const temperatureControls = await page.locator(".ev-temperature .rs-number-field-controls button").evaluateAll(elements => elements.map(element => {
     const box = element.getBoundingClientRect();
-    return { top: box.top, left: box.left };
+    return { left: box.left, right: box.right, width: box.width, height: box.height };
   }));
   assert.equal(temperatureControls.length, 2);
-  assert(temperatureControls[1].top > temperatureControls[0].top, "Temperature controls should stack vertically");
-  assert.equal(temperatureControls[0].left, temperatureControls[1].left, "Temperature controls should share a right edge");
-  await page.getByRole("button", { name: "Journey", exact: true }).click();
-  assert(await page.locator(".cx-ev-journey-map").isVisible(), "Journey should show its perspective map HUD");
-  await page.getByRole("button", { name: "Start route", exact: true }).click();
-  assert(await page.getByRole("button", { name: "End route", exact: true }).isVisible(), "Journey route action should update immediately");
-  await page.getByRole("button", { name: "Energy", exact: true }).click();
-  assert(await page.locator(".cx-ev-energy-cutaway").isVisible(), "Energy should show the vehicle battery cutaway");
-  assert.equal(await page.locator(".cx-ev-battery-pack i[data-charged='true']").count(), 10);
-  assert.equal(await page.getByRole("group", { name: "Playback controls" }).count(), 1, "Playback should use the Vlak Button group");
-  await page.goto(base + "/interfaces/platforms/", { waitUntil: "networkidle" });
-  const platformFonts = await page.evaluate(() => ({
-    ios: getComputedStyle(document.querySelector(".cx-phone.ios")).fontFamily,
-    android: getComputedStyle(document.querySelector(".cx-phone.android")).fontFamily,
-  }));
-  assert.match(platformFonts.ios, /-apple-system|SF Pro Display|Inter/);
-  assert.match(platformFonts.android, /Roboto|Noto Sans/);
-  console.log("EV HUDs, aligned controls, standard playback group, and platform fonts passed");
+  assert(temperatureControls.every(box => box.width >= 44 && box.height >= 44), "Temperature controls need 44px targets");
+  assert(temperatureControls[1].left >= temperatureControls[0].right, "Temperature controls should not overlap");
+  await page.locator('.ev-readings').getByRole('button', { name: 'Media', exact: true }).click();
+  assert.equal(await page.getByRole("group", { name: "Playback controls" }).count(), 1, "Playback uses the Vlak Button group");
+  console.log("EV shared Metrics, detail triggers, padded controls and playback group passed");
   await page.evaluate(() => Object.defineProperty(navigator.clipboard, "writeText", { configurable: true, value: () => Promise.reject(new Error("denied")) }));
   await page.locator(".if-install .if-copy-action button").click();
   assert(await page.getByRole("status").filter({ hasText: "Clipboard unavailable" }).isVisible(), "Clipboard failure should expose copyable text");

@@ -16,6 +16,17 @@ const marks = {
   orbit: "globe",
   frontier: "code",
   platforms: "smartphone",
+  "mobile-os": "grid",
+  microbiology: "grid",
+  genome: "list",
+  protein: "layers",
+  robotics: "activity",
+  circuitry: "code",
+  identity: "user-check",
+  patient: "activity",
+  music: "music",
+  documentation: "file-text",
+  "music-player": "music",
 } as const;
 
 /** Product marks use the current Vlak icon family. */

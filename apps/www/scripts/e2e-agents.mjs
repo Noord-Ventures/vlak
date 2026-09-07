@@ -98,10 +98,13 @@ try {
   }
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
   await page.goto(`${base}/interfaces/`, { waitUntil: "networkidle" });
-  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /\/agents\/?$/);
-  await page.locator(".if-tile").first().click();
+  const agentTile = page.locator(".if-tile[href='/interfaces/agents'], .if-tile[href='/interfaces/agents/']");
+  assert.equal(await agentTile.count(), 1, "The gallery has one Agent management study");
+  await agentTile.click();
   await page.waitForURL(/\/interfaces\/agents\/?$/);
-  assert(await page.locator(".if-rail a[aria-current='page']").filter({ hasText: "Agent management" }).isVisible());
+  const current = page.locator(".if-rail a[aria-current='page']");
+  assert(await current.isVisible());
+  assert.match(await current.getAttribute("href"), /\/agents\/?$/);
   for (const link of await page.locator(".if-component-list a").all()) {
     assert((await page.request.get(base + await link.getAttribute("href"))).ok());
   }

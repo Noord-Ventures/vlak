@@ -1,0 +1,98 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "clip-timeline",
+  "type": "registry:component",
+  "title": "Clip timeline",
+  "description": "Positions supplied clips within a declared duration, with contained horizontal scrolling, accessible selection, and optional seeking.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/clip-timeline.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface ClipTrack { id: string; label: string }\nexport interface TimelineClip { id: string; trackId: string; label: string; start: number; duration: number }\nexport interface ClipTimelineProps extends React.HTMLAttributes<HTMLDivElement> {\n  label: React.ReactNode;\n  tracks: ClipTrack[];\n  clips: TimelineClip[];\n  duration: number;\n  unit: \"seconds\" | \"frames\";\n  position?: number | null;\n  selectedClipId?: string | null;\n  onSeek?: (position: number) => void;\n  onSelectClip?: (id: string) => void;\n  disabled?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, maxWidth: \"100%\", color: vlak.ink },\n  label: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  note: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n  seek: { display: \"grid\", gap: \"0.25rem\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  range: { margin: 0, minHeight: vlak.hit, minWidth: vlak.hit, width: \"100%\", accentColor: vlak.ink },\n  viewport: { maxWidth: \"100%\", minWidth: 0, overflowX: \"auto\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  track: { minWidth: \"24rem\", padding: \"0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, display: \"grid\", gap: \"0.5rem\" },\n  clips: { display: \"grid\", gap: \"0.375rem\" },\n  lane: { minWidth: 0, height: vlak.hit, position: \"relative\", backgroundColor: vlak.tableAlt },\n  clip: { position: \"absolute\", top: 0, bottom: 0, minWidth: 0, boxSizing: \"border-box\", backgroundColor: vlak.paper, borderWidth: 0, boxShadow: `inset 0 0 0 1px ${vlak.controlBorder}`, color: vlak.ink, overflow: \"hidden\", whiteSpace: \"nowrap\", textOverflow: \"ellipsis\", padding: 0 },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  rows: { display: \"grid\", gap: \"0.25rem\", listStyleType: \"none\", margin: 0, padding: 0 },\n  button: { textAlign: \"start\", minWidth: vlak.hit, minHeight: vlak.hit, padding: \"0.625rem 0.75rem\", width: \"100%\", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, fontSize: vlak.controlFs, fontFamily: \"inherit\", lineHeight: 1.45, cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n});\n\n/** Supplied clip positions, with separate reachable selection and seek controls. */\nexport const ClipTimeline = React.forwardRef<HTMLDivElement, ClipTimelineProps>(function ClipTimeline({ label, tracks, clips, duration, unit, position, selectedClipId, onSeek, onSelectClip, disabled, className, style, ...props }, ref) {\n  const labelId = React.useId();\n  const validDuration = Number.isFinite(duration) && duration > 0 && (unit !== \"frames\" || Number.isInteger(duration));\n  const clipEnd = (clip: TimelineClip) => {\n    const end = clip.start + clip.duration;\n    const tolerance = Number.EPSILON * Math.max(Math.abs(clip.start), Math.abs(clip.duration), Math.abs(duration)) * 4;\n    return unit === \"seconds\" && end > duration && end - duration <= tolerance ? duration : end;\n  };\n  const validClip = (clip: TimelineClip) => validDuration && Number.isFinite(clip.start) && Number.isFinite(clip.duration) && clip.start >= 0 && clip.duration > 0 && clipEnd(clip) <= duration && (unit !== \"frames\" || (Number.isInteger(clip.start) && Number.isInteger(clip.duration)));\n  const validPosition = position != null && Number.isFinite(position) && position >= 0 && position <= duration && (unit !== \"frames\" || Number.isInteger(position));\n  const root = rs([\"rs-clip-timeline\", className], styles.root);\n  const heading = rs([\"rs-clip-timeline-label\"], styles.label);\n  const note = rs([\"rs-clip-timeline-note\"], styles.note);\n  const seek = rs([\"rs-clip-timeline-seek\"], styles.seek);\n  const range = rs([\"rs-clip-timeline-range\"], styles.range);\n  const viewport = rs([\"rs-clip-timeline-viewport\"], styles.viewport);\n  const trackStyle = rs([\"rs-clip-timeline-track\"], styles.track);\n  const lanes = rs([\"rs-clip-timeline-clips\"], styles.clips);\n  const lane = rs([\"rs-clip-timeline-lane\"], styles.lane);\n  const rows = rs([\"rs-clip-timeline-rows\"], styles.rows);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <p id={labelId} className={heading.className} style={heading.style}>{label}</p>\n    {!validDuration ? <p className={note.className} style={note.style}>Timeline duration unavailable</p> : <p className={note.className} style={note.style}>0 to {duration} {unit}</p>}\n    {onSeek && validDuration && <label className={seek.className} style={seek.style}><span>{validPosition ? `Position: ${position} ${unit}` : \"Choose a position\"}</span><input type=\"range\" aria-label={`Seek in ${unit}`} min={0} max={duration} step={unit === \"frames\" ? 1 : 0.01} value={validPosition ? position : 0} disabled={disabled} className={range.className} style={range.style} onChange={(event) => onSeek(Number(event.currentTarget.value))} /></label>}\n    {tracks.length === 0 && <p className={note.className} style={note.style}>No tracks supplied</p>}\n    {tracks.length > 0 && <div role=\"region\" aria-labelledby={labelId} tabIndex={0} className={viewport.className} style={viewport.style}>{tracks.map((track) => <div key={track.id} className={trackStyle.className} style={trackStyle.style}>\n      <span className={note.className} style={note.style}>{track.label}</span>\n      <div aria-hidden=\"true\" className={lanes.className} style={lanes.style}>{clips.filter((clip) => clip.trackId === track.id && validClip(clip)).map((clip) => {\n        const selected = clip.id === selectedClipId;\n        const paint = rs([\"rs-clip-timeline-clip\", selected && \"rs-clip-timeline-selected\"], styles.clip, selected && styles.selected);\n        return <div key={clip.id} className={lane.className} style={lane.style}><span className={paint.className} style={{ ...paint.style, insetInlineStart: `${clip.start / duration * 100}%`, width: `${clip.duration / duration * 100}%` }}>{clip.label}</span></div>;\n      })}</div>\n      {clips.every((clip) => clip.trackId !== track.id) && <span className={note.className} style={note.style}>No clips</span>}\n    </div>)}</div>}\n    {clips.length === 0 && <p className={note.className} style={note.style}>No clips supplied</p>}\n    <ul className={rows.className} style={rows.style}>{clips.map((clip) => {\n      const selected = clip.id === selectedClipId;\n      const button = rs([\"rs-clip-timeline-button\", selected && \"rs-clip-timeline-selected\"], styles.button, selected && styles.selected);\n      const track = tracks.find((item) => item.id === clip.trackId);\n      const text = `${clip.label} · ${track?.label ?? \"Unknown track\"} · ${validClip(clip) ? `${clip.start}–${clipEnd(clip)} ${unit}` : \"Invalid interval\"}`;\n      return <li key={clip.id}>{onSelectClip ? <button type=\"button\" disabled={disabled} aria-pressed={selected} className={button.className} style={button.style} onClick={() => onSelectClip(clip.id)}>{text}</button> : <span className={note.className} style={note.style}>{text}</span>}</li>;\n    })}</ul>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/clip-timeline.tsx"
+    },
+    {
+      "path": "vlak/styles/clip-timeline.css",
+      "content": "/* ── clip-timeline: generated from packages/react/src/components/clip-timeline.tsx ── */\n.rs-clip-timeline{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text)}\n.rs-clip-timeline-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-clip-timeline-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n.rs-clip-timeline-seek{display:grid;gap:0.25rem;font-size:var(--control-label);line-height:1.45}\n.rs-clip-timeline-range{margin:0;min-height:var(--hit);min-width:var(--hit);width:100%;accent-color:var(--text)}\n.rs-clip-timeline-viewport{max-width:100%;min-width:0;overflow-x:auto;border-width:1px;border-style:solid;border-color:var(--divider);outline-color:var(--text);outline-offset:2px}\n.rs-clip-timeline-viewport:focus-visible{outline-width:2px;outline-style:solid}\n.rs-clip-timeline-track{min-width:24rem;padding:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);display:grid;gap:0.5rem}\n.rs-clip-timeline-clips{display:grid;gap:0.375rem}\n.rs-clip-timeline-lane{min-width:0;height:var(--hit);position:relative;background-color:var(--table-alt)}\n.rs-clip-timeline-clip{position:absolute;top:0;bottom:0;min-width:0;box-sizing:border-box;background-color:var(--bg);border-width:0;box-shadow:inset 0 0 0 1px var(--control-border);color:var(--text);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding:0}\n.rs-clip-timeline-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-clip-timeline-selected{background-color:Highlight;color:HighlightText}}\n.rs-clip-timeline-rows{display:grid;gap:0.25rem;list-style-type:none;margin:0;padding:0}\n.rs-clip-timeline-button{text-align:start;min-width:var(--hit);min-height:var(--hit);padding:0.625rem 0.75rem;width:100%;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:var(--control-fs);font-family:inherit;line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-clip-timeline-button:focus-visible{outline-width:2px;outline-style:solid}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/clip-timeline.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-clip-timeline",
+        "rs-clip-timeline-label",
+        "rs-clip-timeline-note",
+        "rs-clip-timeline-seek",
+        "rs-clip-timeline-range",
+        "rs-clip-timeline-viewport",
+        "rs-clip-timeline-track",
+        "rs-clip-timeline-clips",
+        "rs-clip-timeline-lane",
+        "rs-clip-timeline-clip",
+        "rs-clip-timeline-selected",
+        "rs-clip-timeline-rows",
+        "rs-clip-timeline-button"
+      ],
+      "snippet": "<div class=\"rs-clip-timeline\"><p class=\"rs-clip-timeline-label\" id=\"assembly-label\">Assembly</p><p class=\"rs-clip-timeline-note\">0 to 60 seconds</p><div class=\"rs-clip-timeline-viewport\" role=\"region\" aria-labelledby=\"assembly-label\" tabindex=\"0\"><div class=\"rs-clip-timeline-track\"><span>Video</span><div class=\"rs-clip-timeline-lane\" aria-hidden=\"true\"><span class=\"rs-clip-timeline-clip\" style=\"inset-inline-start:10%;width:30%\">Opening</span></div></div></div><ul class=\"rs-clip-timeline-rows\"><li><span>Opening · Video · 6–24 seconds</span></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ClipTimeline",
+        "Video timeline",
+        "Audio timeline",
+        "Track timeline",
+        "Clip selection",
+        "Edit timeline"
+      ],
+      "example": "import { ClipTimeline } from \"@noorddev/vlak-react\";\n\n<ClipTimeline label=\"Assembly\" duration={60} unit=\"seconds\" tracks={[{ id: \"video\", label: \"Video\" }]} clips={[{ id: \"opening\", trackId: \"video\", label: \"Opening\", start: 6, duration: 18 }]} />",
+      "usage": {
+        "use": [
+          "Caller-owned tracks and clips measured explicitly in seconds or whole frames.",
+          "onSelectClip for selection requests and onSeek for a native position control; update the supplied selectedClipId and position.",
+          "Separate rows within each track keep overlapping clips visible without implying an edit."
+        ],
+        "avoid": [
+          "Expecting drag editing, playback, trimming, or a media backend.",
+          "Hiding invalid or unassigned clips; their text records remain visible."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the optional seek control, scrollable track region, and selection buttons."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Uses native seeking on the range input; arrow keys scroll the focused track region."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests selection from a focused clip button."
+        }
+      ],
+      "a11y": [
+        "Clip graphics are decorative and accompanied by complete text records with track, start, end, and unit.",
+        "Every selectable clip has a separate 44px button, including clips whose plotted duration is less than one pixel.",
+        "The horizontal viewport remains inside the component and can receive keyboard focus.",
+        "Invalid duration or clip intervals do not produce misleading geometry; the ref and native attributes reach the root div."
+      ]
+    }
+  }
+}

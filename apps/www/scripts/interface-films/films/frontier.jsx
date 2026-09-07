@@ -48,7 +48,7 @@ const cards = (start, prefix) =>
 
 export default {
 	slug: "frontier",
-	title: "Frontier model company",
+	title: "Athena Labs",
 	Component: ConceptBoard,
 	props: { kind: "frontier" },
 	rootSelector: ".cx-frontier",
@@ -123,11 +123,11 @@ export default {
 			),
 			surface: true,
 		},
-		// The original artwork owns its transforms and animation; reveal it as one piece.
+		// The Three portrait owns its transforms and depth-tested hairlines; reveal it as one piece.
 		{
 			...cue(
-				"original-artwork",
-				".cx-frontier-graphic",
+				"athena-line-portrait",
+				".athena-portrait",
 				4.14,
 				{},
 				undefined,
@@ -220,7 +220,7 @@ export default {
 			volume: 0.28,
 			assert: {
 				selector: ".cx-frontier > section .rs-card-title",
-				text: "Aster 2",
+				text: "Athena 2",
 			},
 		},
 		{
@@ -243,8 +243,15 @@ export default {
 		{ after: "explore-model", cues: cards(21.05, "models") },
 		{ after: "research", cues: cards(27.05, "research-return") },
 	],
+	async ready(root) {
+		const deadline = performance.now() + 10000;
+		while (root.querySelector(".athena-portrait")?.dataset.ready !== "true" && performance.now() < deadline) await new Promise(resolve => setTimeout(resolve, 30));
+		if (!root.querySelector('.athena-portrait[data-ready="true"] canvas')) throw new Error("Athena line portrait is unavailable");
+	},
 	inspect(root) {
 		return {
+			portraitRenderer: root.querySelector(".athena-canvas canvas")?.dataset.renderer,
+			portraitAngle: root.querySelector(".athena-canvas canvas")?.dataset.angle,
 			section: root
 				.querySelector(":scope > section")
 				?.getAttribute("aria-label"),

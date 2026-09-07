@@ -1,0 +1,15 @@
+/* ── reference-range: generated from packages/react/src/components/reference-range.tsx ── */
+.rs-reference-range{display:grid;gap:0.5rem;width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-reference-range-head{margin:0;display:flex;align-items:baseline;flex-wrap:wrap;justify-content:space-between;gap:0.25rem 1rem;font-size:0.875rem}
+.rs-reference-range-label{font-weight:500}
+.rs-reference-range-value{font-variant-numeric:tabular-nums;font-size:1.25rem;font-weight:500;line-height:1.2;text-align:end;margin-inline-start:auto}
+.rs-reference-range-track{position:relative;height:1.5rem;margin-inline:0.3125rem}
+.rs-reference-range-track::before{content:'';position:absolute;inset-inline:0;top:50%;height:1px;transform:translateY(-50%);background-color:var(--control-border)}
+@media (forced-colors: active){.rs-reference-range-track::before{background-color:CanvasText}}
+.rs-reference-range-interval{position:absolute;inset-inline-start:20%;width:60%;height:0.5rem;top:50%;transform:translateY(-50%);background-color:var(--divider);border-width:1px;border-style:solid;border-color:var(--control-border);box-sizing:border-box}
+@media (forced-colors: active){.rs-reference-range-interval{background-color:Canvas}}
+.rs-reference-range-marker{position:absolute;top:50%;transform:translateY(-50%);height:0.625rem;width:0.625rem;margin-inline-start:-0.3125rem;background-color:var(--text);border-width:1px;border-style:solid;border-color:var(--text);box-sizing:border-box}
+@media (forced-colors: active){.rs-reference-range-marker{background-color:CanvasText}}
+.rs-reference-range-bounds{display:flex;align-items:baseline;flex-wrap:wrap;justify-content:space-between;gap:0.25rem 1rem;margin:0;font-size:0.75rem;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.rs-reference-range-bound-value{text-align:end;margin-inline-start:auto}
+.rs-reference-range-description{margin:0;font-size:0.75rem;color:var(--text-secondary)}

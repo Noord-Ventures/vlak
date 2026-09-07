@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "identity-document",
+  "type": "registry:component",
+  "title": "Identity document",
+  "description": "Displays a supplied credential, masked identifier, issuer, dates, and verification status without exposing a raw identifier.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/identity-document.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface IdentityDocumentProps extends React.HTMLAttributes<HTMLDivElement> {\n  documentTitle: string;\n  holderName: React.ReactNode;\n  /** A display-safe, already-masked identifier. This component does not mask raw data. */\n  maskedIdentifier?: string | null;\n  identifierLabel?: string;\n  issuer?: React.ReactNode;\n  issuedLabel?: React.ReactNode;\n  expiresLabel?: React.ReactNode;\n  /** Supplied record or verification status. Expiry is never calculated. */\n  status: React.ReactNode;\n  statusDetail?: React.ReactNode;\n  /** Working links or application-owned actions. No reveal or copy action is generated. */\n  children?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, boxSizing: \"border-box\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, padding: \"1.25rem\", display: \"grid\", gap: \"1.25rem\", color: vlak.ink, backgroundColor: vlak.paper, overflowWrap: \"anywhere\", lineHeight: 1.45 },\n  header: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", alignItems: \"baseline\", gap: \"0.75rem\" },\n  title: { margin: 0, fontWeight: 600, fontSize: \"0.875rem\" },\n  status: { borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, padding: \"0.25rem 0.5rem\", fontSize: \"0.75rem\" },\n  holder: { margin: 0, fontSize: \"1.375rem\", fontWeight: 500, letterSpacing: \"-0.03em\", lineHeight: 1.25 },\n  fields: { margin: 0, display: \"grid\", gridTemplateColumns: { default: \"repeat(2, minmax(0, 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"1rem\" },\n  field: { minWidth: 0 },\n  label: { margin: 0, color: vlak.gray, fontSize: \"0.75rem\" },\n  value: { margin: 0, marginTop: \"0.25rem\", fontSize: \"0.875rem\", fontVariantNumeric: \"tabular-nums\" },\n  detail: { margin: 0, color: vlak.gray, maxWidth: \"66ch\", fontSize: \"0.875rem\" },\n  actions: { borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, paddingTop: \"1rem\", display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\n\n/** A credential record using only the supplied, display-safe identity information. */\nexport const IdentityDocument = React.forwardRef<HTMLDivElement, IdentityDocumentProps>(function IdentityDocument(\n  { documentTitle, holderName, maskedIdentifier, identifierLabel = \"Document number\", issuer, issuedLabel, expiresLabel, status, statusDetail, children, className, style, ...props }, ref,\n) {\n  const root = rs([\"rs-identity-document\", className], styles.root);\n  const header = rs([\"rs-identity-document-header\"], styles.header);\n  const title = rs([\"rs-identity-document-title\"], styles.title);\n  const statusStyle = rs([\"rs-identity-document-status\"], styles.status);\n  const holder = rs([\"rs-identity-document-holder\"], styles.holder);\n  const fields = rs([\"rs-identity-document-fields\"], styles.fields);\n  const field = rs([\"rs-identity-document-field\"], styles.field);\n  const label = rs([\"rs-identity-document-label\"], styles.label);\n  const value = rs([\"rs-identity-document-value\"], styles.value);\n  const detail = rs([\"rs-identity-document-detail\"], styles.detail);\n  const actions = rs([\"rs-identity-document-actions\"], styles.actions);\n  return <div ref={ref} role=\"group\" aria-label={documentTitle} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...header}><p {...title}>{documentTitle}</p><span {...statusStyle}>{status ?? \"Status not supplied\"}</span></div>\n    <p {...holder}>{holderName ?? \"Holder not supplied\"}</p>\n    <dl {...fields}>\n      <div {...field}><dt {...label}>{identifierLabel}</dt><dd {...value}>{maskedIdentifier?.trim() ? maskedIdentifier : \"Identifier not supplied\"}</dd></div>\n      <div {...field}><dt {...label}>Issuer</dt><dd {...value}>{issuer ?? \"Issuer not supplied\"}</dd></div>\n      <div {...field}><dt {...label}>Issued</dt><dd {...value}>{issuedLabel ?? \"Issue date not supplied\"}</dd></div>\n      <div {...field}><dt {...label}>Expires</dt><dd {...value}>{expiresLabel ?? \"Expiry date not supplied\"}</dd></div>\n    </dl>\n    {statusDetail != null && <p {...detail}>{statusDetail}</p>}\n    {children != null && <div {...actions}>{children}</div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/identity-document.tsx"
+    },
+    {
+      "path": "vlak/styles/identity-document.css",
+      "content": "/* ── identity-document: generated from packages/react/src/components/identity-document.tsx ── */\n.rs-identity-document{width:100%;min-width:0;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--divider);padding:1.25rem;display:grid;gap:1.25rem;color:var(--text);background-color:var(--bg);overflow-wrap:anywhere;line-height:1.45}\n.rs-identity-document-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.75rem}\n.rs-identity-document-title{margin:0;font-weight:600;font-size:0.875rem}\n.rs-identity-document-status{border-width:1px;border-style:solid;border-color:var(--divider);padding:0.25rem 0.5rem;font-size:0.75rem}\n.rs-identity-document-holder{margin:0;font-size:1.375rem;font-weight:500;letter-spacing:-0.03em;line-height:1.25}\n.rs-identity-document-fields{margin:0;display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem}\n@media (max-width: 640px){.rs-identity-document-fields{grid-template-columns:minmax(0, 1fr)}}\n.rs-identity-document-field{min-width:0}\n.rs-identity-document-label{margin:0;color:var(--text-secondary);font-size:0.75rem}\n.rs-identity-document-value{margin:0;margin-top:0.25rem;font-size:0.875rem;font-variant-numeric:tabular-nums}\n.rs-identity-document-detail{margin:0;color:var(--text-secondary);max-width:66ch;font-size:0.875rem}\n.rs-identity-document-actions{border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem;display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/identity-document.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "civic",
+      "classes": [
+        "rs-identity-document",
+        "rs-identity-document-header",
+        "rs-identity-document-title",
+        "rs-identity-document-status",
+        "rs-identity-document-holder",
+        "rs-identity-document-fields",
+        "rs-identity-document-field",
+        "rs-identity-document-label",
+        "rs-identity-document-value",
+        "rs-identity-document-detail",
+        "rs-identity-document-actions"
+      ],
+      "snippet": "<div class=\"rs-identity-document\" role=\"group\" aria-label=\"Residence document\"><div class=\"rs-identity-document-header\"><p class=\"rs-identity-document-title\">Residence document</p><span class=\"rs-identity-document-status\">Verification pending</span></div><p class=\"rs-identity-document-holder\">Robin Ellis</p><dl class=\"rs-identity-document-fields\"><div class=\"rs-identity-document-field\"><dt class=\"rs-identity-document-label\">Document number</dt><dd class=\"rs-identity-document-value\">•••• 2048</dd></div></dl></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "IdentityDocument",
+        "Credential record",
+        "Identity card",
+        "Residence permit",
+        "Identity verification",
+        "Document summary"
+      ],
+      "example": "import { IdentityDocument } from \"@noorddev/vlak-react\";\n\n<IdentityDocument documentTitle=\"Residence document\" holderName=\"Robin Ellis\" maskedIdentifier=\"•••• 2048\" issuer=\"Example civic office\" issuedLabel=\"12 June 2025\" expiresLabel=\"12 June 2030\" status=\"Verification pending\" statusDetail=\"Status supplied by the example record service\" />",
+      "usage": {
+        "use": [
+          "Identity documents, professional credentials, and permit records using an already-masked display identifier.",
+          "Supply verification status and date labels from the host; add real links or actions as children."
+        ],
+        "avoid": [
+          "Passing a full identifier and expecting this component to redact it. It renders maskedIdentifier exactly as supplied.",
+          "Inferring validity from an expiry date, or providing a cosmetic reveal button without an authorized source."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Supplied native links and buttons keep their keyboard behavior. The document adds no tab stop."
+        }
+      ],
+      "a11y": [
+        "A named group and description list preserve document fields in reading order.",
+        "Missing identifier, issuer, and dates are explicitly labelled as not supplied. Status is visible text.",
+        "Root attributes, className, style, and the div ref pass through. Supply child controls with at least 44px targets."
+      ]
+    }
+  }
+}

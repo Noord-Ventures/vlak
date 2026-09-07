@@ -1,0 +1,69 @@
+.wf-crop { position: absolute; inset: 0; display: grid; grid-template-rows: 48px minmax(0, 1fr) 38px; background: var(--bg); color: var(--text); font-size: 12px; }
+.wf-crop *, .wf-crop *::before, .wf-crop *::after { box-sizing: border-box; }
+.wf-crop > header, .wf-crop > footer { display: flex; align-items: center; gap: 9px; padding-inline: 16px; }
+.wf-crop > header { border-bottom: 1px solid var(--divider); }
+.wf-crop > footer { border-top: 1px solid var(--divider); justify-content: space-between; font-size: 11px; }
+.wf-crop strong { font-weight: 500; }
+.wf-crop > header > span { margin-left: auto; font-size: 10px; color: var(--text-secondary); }
+.wf-crop > header .rs-icon { flex: none; }
+.wf-crop-body { min-height: 0; min-width: 0; overflow: hidden; }
+.wf-crop-message { display: grid; align-content: center; gap: 12px; height: 100%; padding: 16px 20px; }
+.wf-crop-message > span { color: var(--text-secondary); font-size: 10px; }
+.wf-crop-message > strong { font-size: 19px; line-height: 1.2; letter-spacing: -.025em; }
+.wf-crop-message > p { margin: 0; line-height: 1.4; color: var(--text-secondary); font-size: 12px; }
+.wf-crop-message > div { display: flex; align-items: center; gap: 6px; font-size: 10px; }
+.wf-crop-metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--control-fill); border-bottom: 1px solid var(--divider); }
+.wf-crop-metrics > div { padding: 12px 16px; display: grid; gap: 8px; }
+.wf-crop-metrics > div + div { border-left: 1px solid var(--divider); }
+.wf-crop-metrics span { font-size: 10px; }
+.wf-crop-metrics strong { font-size: 27px; line-height: 1; letter-spacing: -.04em; }
+.wf-crop-metrics small { font-size: 15px; font-weight: 400; color: var(--text-secondary); margin-left: 3px; }
+.wf-crop-list > div { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 9px 16px; border-bottom: 1px solid var(--divider); }
+.wf-crop-list > div > span { font-size: 10px; color: var(--text-secondary); }
+.wf-crop-list > div > span:last-child { margin-left: auto; }
+.wf-crop-photo { height: 100%; }
+.wf-crop-photo img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.wf-crop-map { height: 100%; position: relative; background: var(--control-fill); }
+.wf-crop-map > svg { width: 100%; height: 100%; display: block; }
+.wf-crop-streets { fill: none; stroke: var(--bg); stroke-width: 12px; }
+.wf-crop-route { fill: none; stroke: var(--text); stroke-width: 2; }
+.wf-crop-map circle { fill: var(--text); stroke: var(--bg); stroke-width: 3; }
+.wf-crop-water { fill: var(--bg); stroke: var(--divider); }
+.wf-crop-map text { fill: var(--text-secondary); font-size: 9px; }
+.wf-crop-map-pin { position: absolute; left: 33%; top: 35%; transform: translate(-50%, -100%); display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid var(--text); border-radius: 4px; background: var(--text); color: var(--bg); }
+.wf-crop-map-pin::after { content: ""; position: absolute; left: calc(50% - 3px); bottom: -4px; width: 6px; height: 6px; background: var(--text); transform: rotate(45deg); }
+.wf-crop-map-pin strong { font-size: 11px; font-variant-numeric: tabular-nums; }
+.wf-crop-map > span { position: absolute; left: 16px; bottom: 14px; display: flex; align-items: center; gap: 6px; padding: 6px 8px; background: var(--bg); font-size: 10px; }
+.wf-crop-map i { width: 5px; height: 5px; background: var(--text); border-radius: 50%; }
+.wf-crop-food { display: grid; grid-template-columns: 42% minmax(0, 1fr); height: calc(100% - 42px); }
+.wf-crop-food > img { width: 100%; height: 100%; object-fit: cover; min-height: 0; }
+.wf-crop-food > div { display: flex; flex-direction: column; justify-content: center; padding: 16px; gap: 10px; }
+.wf-crop-food span, .wf-crop-food small { color: var(--text-secondary); font-size: 10px; }
+.wf-crop-food strong { font-size: 19px; line-height: 1.15; letter-spacing: -.025em; }
+.wf-crop-dish { min-height: 42px; display: flex; align-items: center; justify-content: space-between; padding: 9px 16px; border-top: 1px solid var(--divider); }
+.wf-crop-team { display: grid; height: 100%; align-content: center; }
+.wf-crop-team > div { display: flex; gap: 10px; padding: 12px 16px; }
+.wf-crop-team > div > span:first-child { display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--divider); flex: none; font-size: 9px; }
+.wf-crop-team strong { display: block; font-size: 11px; }
+.wf-crop-team small { margin-left: 6px; color: var(--text-secondary); font-size: 9px; font-weight: 400; }
+.wf-crop-team p { font-size: 12px; line-height: 1.4; margin: 5px 0 0; }
+.wf-crop-team > .wf-crop-thread { align-items: center; border-block: 1px solid var(--divider); background: var(--control-fill); font-size: 10px; }
+.wf-crop-thread > .rs-icon:last-child { margin-left: auto; }
+.wf-crop-wallpaper { height: 100%; padding: 16px; background: var(--control-fill); }
+.wf-crop-wallpaper svg { display: block; width: 100%; height: 100%; }
+.wf-crop-os { padding: 16px; display: grid; gap: 18px; height: 100%; align-content: center; }
+.wf-crop-os > div:first-child { display: grid; gap: 4px; }
+.wf-crop-os > div:first-child > strong { font-size: 28px; line-height: 1; letter-spacing: -.04em; }
+.wf-crop-os > div:first-child > span { font-size: 10px; color: var(--text-secondary); }
+.wf-crop-apps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.wf-crop-apps > div { display: grid; justify-items: center; gap: 5px; }
+.wf-crop-apps > div > span { width: 36px; height: 36px; border: 1px solid var(--control-border); border-radius: 8px; display: grid; place-items: center; }
+.wf-crop-apps small { font-size: 9px; }
+.wf-crop-transit { display: grid; align-content: center; height: 100%; gap: 12px; padding: 16px; }
+.wf-crop-transit > span { font-size: 10px; color: var(--text-secondary); }
+.wf-crop-transit > strong { font-size: 22px; line-height: 1.15; letter-spacing: -.035em; }
+.wf-crop-transit > div { display: flex; gap: 12px; align-items: center; border-block: 1px solid var(--divider); margin-inline: -16px; padding: 12px 16px; }
+.wf-crop-transit b { font-size: 20px; font-weight: 400; }
+.wf-crop-transit small { display: block; margin-top: 4px; color: var(--text-secondary); font-size: 10px; }
+.wf-crop-transit > div .rs-icon { margin-left: auto; }
+.wf-crop-transit p { display: flex; gap: 6px; align-items: center; font-size: 10px; margin: 0; }

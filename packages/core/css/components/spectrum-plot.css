@@ -1,0 +1,22 @@
+/* ── spectrum-plot: generated from packages/react/src/components/spectrum-plot.tsx ── */
+.rs-spectrum-plot{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-spectrum-plot-label{font-size:0.875rem;font-weight:600}
+.rs-spectrum-plot-description{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
+.rs-spectrum-plot-scroll{overflow-x:auto;max-width:100%;min-width:0;overscroll-behavior-x:contain;outline-color:var(--text);outline-offset:2px}
+.rs-spectrum-plot-scroll:focus-visible{outline-width:2px;outline-style:solid}
+.rs-spectrum-plot-svg{display:block;width:100%;min-width:24rem;height:auto;direction:ltr;color:var(--text)}
+@media (forced-colors: active){.rs-spectrum-plot-svg{color:CanvasText}}
+.rs-spectrum-plot-axis{fill:none;stroke:currentColor;stroke-width:1}
+.rs-spectrum-plot-grid{fill:none;stroke:var(--divider);stroke-width:1}
+.rs-spectrum-plot-trace{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
+.rs-spectrum-plot-point{fill:currentColor;stroke:currentColor;stroke-width:1}
+.rs-spectrum-plot-annotation{fill:currentColor;font-size:20px;font-family:inherit}
+.rs-spectrum-plot-ticks{fill:currentColor;font-size:20px;font-variant-numeric:tabular-nums;font-family:inherit}
+.rs-spectrum-plot-x-label{margin:0;text-align:center;font-size:0.75rem}
+.rs-spectrum-plot-peaks{margin:0;padding-inline-start:1.5rem;font-size:0.75rem}
+.rs-spectrum-plot-summary{min-height:var(--hit);min-width:var(--hit);display:list-item;align-content:center;cursor:pointer;font-size:0.875rem;outline-color:var(--text);outline-offset:2px}
+.rs-spectrum-plot-summary:focus-visible{outline-width:2px;outline-style:solid}
+.rs-spectrum-plot-table{width:100%;border-collapse:collapse;font-size:0.75rem;font-variant-numeric:tabular-nums}
+.rs-spectrum-plot-cell{padding:0.5rem;text-align:start;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:400}
+.rs-spectrum-plot-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding-block:0.5rem;font-size:0.75rem}
+.rs-spectrum-plot-button{flex-shrink:0}

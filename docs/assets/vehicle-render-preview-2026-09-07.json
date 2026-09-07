@@ -1,0 +1,66 @@
+{
+  "created": "2026-09-07",
+  "method": "Actual Chromium screenshots of the local Three.js vehicle canvas, Fine lines, stationary home camera, reduced motion. No generated or retouched geometry.",
+  "sourceModel": "/interfaces/concepts/evoque-monochrome.glb",
+  "creator": "tonielpro520",
+  "source": "https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "adaptations": "Textures removed from the licensed model; Vlak paper and ink line materials and a quiet technical grid applied. Rendered screenshots are used by the 3D workspace gallery crop. Attribution remains below Components used on the interface detail page.",
+  "files": [
+    "apps/www/public/interfaces/concepts/vehicle-line-preview-light-v1.png",
+    "apps/www/public/interfaces/concepts/vehicle-line-preview-dark-v1.png"
+  ],
+  "colors": {
+    "light": {
+      "paper": "f5f3ed",
+      "line": "525252"
+    },
+    "dark": {
+      "paper": "161412",
+      "line": "a2a2a2"
+    }
+  },
+  "refreshed": "2026-09-07T12:02:54.969Z",
+  "rendering": {
+    "featureContours": "LineSegments2 / LineMaterial",
+    "lineWidthCssPixels": 1.05,
+    "reverseHullOffset": 0.009,
+    "paperSurfacePolygonOffset": true,
+    "palette": "sceneColor composites --table-alt over --bg"
+  },
+  "captureCommand": "SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-vehicle-previews.mjs",
+  "captures": {
+    "light": {
+      "filename": "vehicle-line-preview-light-v1.png",
+      "sha256": "4b91d610e005978174c6ffcc64c936e429495a7c1c9391d5c9001e2a5370a45c",
+      "width": 909,
+      "height": 591,
+      "camera": [
+        -3.601983,
+        2.01712,
+        4.228415
+      ],
+      "target": [
+        0,
+        0.920864,
+        0
+      ]
+    },
+    "dark": {
+      "filename": "vehicle-line-preview-dark-v1.png",
+      "sha256": "6bf6beeab4ca70e589628eef69105a7d5d6af693258f58b0f0a5771d047a5e44",
+      "width": 909,
+      "height": 591,
+      "camera": [
+        -3.601983,
+        2.01712,
+        4.228415
+      ],
+      "target": [
+        0,
+        0.920864,
+        0
+      ]
+    }
+  }
+}

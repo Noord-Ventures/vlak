@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Button, Icon, Textarea, ToggleGroup } from "@noorddev/vlak-react";
-import { MobileStudyNav, focusMobileMode } from "./mobile-navigation";
+import { Button, Icon, NativeSelect, Slider, Textarea } from "@noorddev/vlak-react";
+
 
 type Format = "widescreen" | "desktop" | "phone";
 
@@ -95,7 +95,7 @@ function WallpaperArt({ wallpaper, format }: { wallpaper: Wallpaper; format: For
   const gridLines = Array.from({ length: wallpaper.grid - 1 }, (_, index) => (index + 1) / wallpaper.grid);
   const stripes = Array.from({ length: 7 }, (_, index) => index);
   return (
-    <svg className="cx-wallpaper-art" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={wallpaper.name}>
+    <svg className="wg-art" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={wallpaper.name}>
       <rect width={width} height={height} fill={wallpaper.background} />
       <g stroke={wallpaper.quiet} strokeWidth="1" opacity="0.48">
         {gridLines.map((line) => <line key={`v-${line}`} x1={line * width} x2={line * width} y2={height} />)}
@@ -152,7 +152,7 @@ function drawWallpaper(context: CanvasRenderingContext2D, wallpaper: Wallpaper, 
 }
 
 export function WallpaperGenerator() {
-  const rootRef = React.useRef<HTMLDivElement>(null);
+  const rootRef = React.useRef<HTMLElement>(null);
   const [mobileView, setMobileView] = React.useState("preview");
   const [selected, setSelected] = React.useState(0);
   const [prompt, setPrompt] = React.useState("A quiet geometric field for focused work, with one cobalt signal.");
@@ -174,7 +174,7 @@ export function WallpaperGenerator() {
     setSelected(0);
     setStatus("Three new wallpapers ready.");
     setMobileView("preview");
-    focusMobileMode(rootRef.current, "preview");
+    requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>('[data-mobile-mode="preview"]')?.focus({ preventScroll: true }));
   }
 
   function exportSelected() {
@@ -208,21 +208,28 @@ export function WallpaperGenerator() {
     }, "image/png");
   }
 
-  return <div ref={rootRef} className="cx cx-graphics" data-mobile-view={mobileView}>
-    <header><span>Three compositions, one starting point</span><Button className="cx-export-action" variant="ghost" size="sm" style={{ borderRadius: "var(--radius-sm)" }} disabled={exporting} onClick={exportSelected}>{exporting ? "Exporting…" : "Export 6K"}</Button></header>
-    <aside aria-label="Composition direction">
-      <p className="cx-label">Direction</p>
-      <div className="cx-direction"><Textarea label="Variation seed" style={{ borderRadius: "var(--radius-sm)", minHeight: 0 }} value={prompt} onChange={(event) => setPrompt(event.target.value)} /></div>
-      <div className="cx-format-field">
-        <p className="cx-label">Canvas</p>
-        <ToggleGroup className="cx-segments" aria-label="Canvas format" style={{ borderRadius: "var(--radius-sm)", height: "auto" }} value={format} onValueChange={(value) => setFormat(value as Format)} options={(Object.keys(formats) as Format[]).map(value => ({ value, label: <span className="cx-format-label">{value === "widescreen" ? <><span className="cx-desktop-only">Widescreen</span><span className="cx-mobile-only">Wide</span></> : formats[value].label}</span> }))} />
-        <small className="cx-output-size">{formats[format].width} × {formats[format].height} · PNG</small>
-      </div>
-      <label className="cx-variation">Variation<input type="range" min="0" max="100" value={variation} onChange={(event) => setVariation(Number(event.target.value))} /></label>
-      <Button style={{ borderRadius: "var(--radius-sm)" }} onClick={generate}><Icon name="image" size={16}/>Generate</Button>
-      <p className="cx-generation-status" aria-live="polite">{status}</p>
-    </aside>
-    <div className="cx-workspace" role="region" aria-label="Wallpaper previews"><div className="cx-results">{results.map((wallpaper, index) => <button type="button" key={wallpaper.id} className={selected === index ? "on" : ""} aria-pressed={selected === index} onClick={() => setSelected(index)}><WallpaperArt wallpaper={wallpaper} format={format}/><span>{String(index + 1).padStart(2, "0")} · {wallpaper.name}</span></button>)}</div><div className="cx-mobile-compositions"><span>Composition</span><ToggleGroup aria-label="Choose composition" value={String(selected)} onValueChange={(value) => setSelected(Number(value))} options={results.map((wallpaper, index) => ({ value: String(index), label: String(index + 1), "aria-label": wallpaper.name }))}/></div></div>
-    <MobileStudyNav label="Wallpaper workspace" value={mobileView} onValueChange={setMobileView} options={[{ value: "preview", label: "Preview", icon: "image" }, { value: "direction", label: "Direction", icon: "settings" }]}/>
-  </div>;
+  const current = results[selected]!;
+  return <section ref={rootRef} className="wg" data-mobile-view={mobileView} aria-label="Wallpaper studio">
+    <header className="wg-header"><div className="wg-project"><Icon name="image" size={24} /><div><strong>Field studies</strong><span>Collection {String(generation + 1).padStart(2, "0")}</span></div></div><Button className="wg-export" variant="ghost" size="sm" disabled={exporting} onClick={exportSelected}><Icon name="download" size={16} />{exporting ? "Exporting…" : "Export 6K"}</Button></header>
+    <div className="wg-body">
+      <aside className="wg-direction" aria-label="Composition direction">
+        <div className="wg-panel-head"><div><span>Generator</span><h2>Shape the field</h2></div><Icon name="sliders" size={16} /></div>
+        <div className="wg-direction-scroll">
+          <Textarea label="Variation seed" rows={4} maxLength={500} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
+          <p className="wg-hint">Your words seed the shapes and palette. Every set is drawn locally.</p>
+          <div className="wg-format"><NativeSelect label="Canvas format" value={format} onChange={(event) => setFormat(event.target.value as Format)}>{(Object.keys(formats) as Format[]).map(value => <option key={value} value={value}>{formats[value].label}</option>)}</NativeSelect><span className="wg-output-size">{formats[format].width} × {formats[format].height} · PNG</span></div>
+          <div className="wg-variation"><div><span>Variation</span><output>{variation}</output></div><Slider aria-label="Variation" min={0} max={100} value={variation} onValueChange={setVariation} /><p className="wg-hint">Shift the arrangement without changing your direction.</p></div>
+          <div className="wg-spec"><span>Output</span><strong>Full-resolution artwork</strong><p>6,144 pixels on the long edge. Ready for your screen.</p></div>
+        </div>
+        <div className="wg-generate"><Button onClick={generate}><Icon name="refresh" size={16} />Generate set</Button></div>
+      </aside>
+      <section className="wg-preview" aria-label="Wallpaper previews">
+        <div className="wg-viewbar"><div><span>{String(selected + 1).padStart(2, "0")} / 03</span><strong>{current.name}</strong></div><span>{formats[format].label}</span></div>
+        <div className="wg-stage" data-format={format}><WallpaperArt wallpaper={current} format={format} /></div>
+        <div className="wg-compositions" role="group" aria-label="Choose composition">{results.map((wallpaper, index) => <Button variant="ghost" key={wallpaper.id} aria-label={wallpaper.name} aria-pressed={selected === index} onClick={() => { setSelected(index); setStatus(`${wallpaper.name} selected.`); }}><div className="wg-thumb" aria-hidden="true"><WallpaperArt wallpaper={wallpaper} format={format} /></div><span><b>{String(index + 1).padStart(2, "0")}</b><span>{wallpaper.name}</span>{selected === index ? <Icon name="check" size={16} /> : null}</span></Button>)}</div>
+      </section>
+    </div>
+    <nav className="wg-mobile-nav" aria-label="Wallpaper workspace">{([['preview', 'Preview', 'image'], ['direction', 'Direction', 'sliders']] as const).map(([value, label, icon]) => <Button key={value} variant="ghost" data-mobile-mode={value} aria-pressed={mobileView === value} onClick={() => setMobileView(value)}><Icon name={icon} size={16} />{label}</Button>)}</nav>
+    <footer className="wg-footer"><span role="status">{status}</span><span>Local generator</span></footer>
+  </section>;
 }

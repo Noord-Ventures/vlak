@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "joint-panel",
+  "type": "registry:component",
+  "title": "Joint panel",
+  "description": "Pairs host-reported joint positions with independent draft targets, supplied units and limits, and an explicit request action.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/joint-panel.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Input } from \"./input\";\nimport { Button } from \"./button\";\n\nexport interface JointRecord { id: string; label: string; unit: string; reported: number | null; minimum: number | null; maximum: number | null }\nexport type JointTargets = Record<string, number | null>;\nexport interface JointPanelProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: string;\n  joints: readonly JointRecord[];\n  value?: JointTargets;\n  defaultValue?: JointTargets;\n  onValueChange?: (targets: JointTargets) => void;\n  /** Requests the complete draft. Motion and confirmation belong to the host. */\n  onRequestTargets?: (targets: JointTargets) => void;\n  pending?: boolean;\n  confirmedLabel?: React.ReactNode;\n  timeLabel?: React.ReactNode;\n  description?: React.ReactNode;\n  readOnly?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: \"1rem\", fontWeight: 600 },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n  list: { listStyleType: \"none\", margin: 0, padding: 0, display: \"grid\" },\n  joint: { display: \"grid\", gridTemplateColumns: { default: \"minmax(0, 1fr) minmax(7rem, 1fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem 1.25rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  title: { margin: 0, fontSize: \"0.875rem\", fontWeight: 500 },\n  reading: { margin: \"0.375rem 0\", fontSize: \"1.25rem\", fontVariantNumeric: \"tabular-nums\", overflowWrap: \"anywhere\" },\n  field: { display: \"grid\", alignContent: \"start\", gap: \"0.375rem\", minWidth: 0, fontSize: \"0.75rem\" },\n  input: { minWidth: vlak.hit, width: \"100%\", fontVariantNumeric: \"tabular-nums\" },\n  button: { justifySelf: \"start\" },\n});\nconst finite = (value: number | null | undefined): value is number => value != null && Number.isFinite(value);\nconst bounded = (joint: JointRecord) => finite(joint.minimum) && finite(joint.maximum) && joint.minimum <= joint.maximum;\nconst errorFor = (joint: JointRecord, value: number | null | undefined) => !bounded(joint) ? \"Joint limits unavailable\" : value == null ? \"Enter a target\" : !finite(value) ? \"Target unavailable\" : value < joint.minimum! || value > joint.maximum! ? `Target must be between ${joint.minimum} and ${joint.maximum} ${joint.unit}` : \"\";\n\n/** Draft joint targets remain separate from host-reported positions and request confirmation. */\nexport const JointPanel = React.forwardRef<HTMLFieldSetElement, JointPanelProps>(function JointPanel({ label, joints, value, defaultValue = {}, onValueChange, onRequestTargets, pending = false, confirmedLabel, timeLabel, description, readOnly = false, disabled, name, form, className, style, children, ...props }, ref) {\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<JointTargets, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const merged = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const valid = joints.length <= 64 && joints.every(joint => joint.id.trim() && joint.label.trim() && joint.unit.trim()) && new Set(joints.map(joint => joint.id)).size === joints.length;\n  const unlisted = Object.keys(current).filter(key => !joints.some(joint => joint.id === key));\n  const ready = valid && joints.length > 0 && unlisted.length === 0 && joints.every(joint => !errorFor(joint, current[joint.id]));\n  const locked = disabled || pending;\n  const root = rs([\"rs-joint-panel\", className], styles.root);\n  const legend = rs([\"rs-joint-panel-legend\"], styles.legend);\n  const copy = rs([\"rs-joint-panel-copy\"], styles.copy);\n  const list = rs([\"rs-joint-panel-list\"], styles.list);\n  const jointStyle = rs([\"rs-joint-panel-joint\"], styles.joint);\n  const title = rs([\"rs-joint-panel-title\"], styles.title);\n  const reading = rs([\"rs-joint-panel-reading\"], styles.reading);\n  const field = rs([\"rs-joint-panel-field\"], styles.field);\n  const input = rs([\"rs-joint-panel-input\"], styles.input);\n  const button = rs([\"rs-joint-panel-button\"], styles.button);\n  return <fieldset {...props} ref={merged} disabled={locked} name={name} form={form} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>{description != null && <p {...copy}>{description}</p>}\n    <p {...copy}>Reported at: {timeLabel ?? \"Time not supplied\"}</p>\n    {!valid ? <p {...copy}>Joint records unavailable: supply unique identifiers, labels, units, and at most 64 joints.</p> : !joints.length ? <p {...copy}>No joint records supplied</p> : <ul {...list}>{joints.map((joint, index) => {\n      const target = current[joint.id];\n      const error = errorFor(joint, target);\n      return <li key={joint.id} {...jointStyle}>\n        <div><p {...title}>{joint.label}</p><p {...reading}>Reported: {finite(joint.reported) ? `${joint.reported} ${joint.unit}` : joint.reported == null ? \"Not supplied\" : \"Unavailable\"}</p><p {...copy}>{bounded(joint) ? `Limits: ${joint.minimum} to ${joint.maximum} ${joint.unit}` : \"Joint limits unavailable\"}</p></div>\n        <label {...field}>Draft target ({joint.unit})<Input {...input} plain type=\"number\" step=\"any\" required readOnly={readOnly} disabled={locked} name={name ? `${name}.${joint.id}` : undefined} form={form} value={finite(target) ? target : \"\"} min={bounded(joint) ? joint.minimum! : undefined} max={bounded(joint) ? joint.maximum! : undefined} aria-label={`${joint.label} draft target (${joint.unit})`} aria-invalid={!!error || undefined} aria-describedby={`${id}-${index}-target`} ref={node => node?.setCustomValidity(error)} onChange={event => { if (!readOnly && !locked) setValue({ ...current, [joint.id]: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null }); }} /><span {...copy} id={`${id}-${index}-target`}>{error || \"Draft only\"}</span></label>\n      </li>;\n    })}</ul>}\n    {unlisted.length > 0 && <p {...copy}>Draft contains unlisted joints: {unlisted.join(\", \")}</p>}\n    {onRequestTargets && <Button {...button} type=\"button\" disabled={locked || readOnly || !ready} onClick={() => { if (ready && !locked && !readOnly) onRequestTargets(current); }}>Request targets</Button>}\n    {confirmedLabel != null && <p {...copy}>Host confirmation: {confirmedLabel}</p>}\n    <p {...copy} role=\"status\">{pending ? \"Target request pending; reported positions unchanged\" : readOnly ? \"Read only\" : \"Editing a target does not move a joint. The host handles motion and reports its result.\"}</p>{children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/joint-panel.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/joint-panel.css",
+      "content": "/* ── joint-panel: generated from packages/react/src/components/joint-panel.tsx ── */\n.rs-joint-panel{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-joint-panel-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}\n.rs-joint-panel-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n.rs-joint-panel-list{list-style-type:none;margin:0;padding:0;display:grid}\n.rs-joint-panel-joint{display:grid;grid-template-columns:minmax(0, 1fr) minmax(7rem, 1fr);gap:0.75rem 1.25rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n@media (max-width: 640px){.rs-joint-panel-joint{grid-template-columns:minmax(0, 1fr)}}\n.rs-joint-panel-title{margin:0;font-size:0.875rem;font-weight:500}\n.rs-joint-panel-reading{margin:0.375rem 0;font-size:1.25rem;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}\n.rs-joint-panel-field{display:grid;align-content:start;gap:0.375rem;min-width:0;font-size:0.75rem}\n.rs-joint-panel-input{min-width:var(--hit);width:100%;font-variant-numeric:tabular-nums}\n.rs-joint-panel-button{justify-self:start}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/joint-panel.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "robotics",
+      "classes": [
+        "rs-joint-panel",
+        "rs-joint-panel-legend",
+        "rs-joint-panel-copy",
+        "rs-joint-panel-list",
+        "rs-joint-panel-joint",
+        "rs-joint-panel-title",
+        "rs-joint-panel-reading",
+        "rs-joint-panel-field",
+        "rs-joint-panel-input",
+        "rs-joint-panel-button"
+      ],
+      "snippet": "<fieldset class=\"rs-joint-panel\"><legend class=\"rs-joint-panel-legend\">Arm joints</legend><p class=\"rs-joint-panel-copy\">Reported at: 12:00:00.125</p><ul class=\"rs-joint-panel-list\"><li class=\"rs-joint-panel-joint\"><div><p class=\"rs-joint-panel-title\">Shoulder</p><p class=\"rs-joint-panel-reading\">Reported: 12.5 deg</p><p class=\"rs-joint-panel-copy\">Limits: -90 to 90 deg</p></div><label class=\"rs-joint-panel-field\">Draft target (deg)<input class=\"rs-input rs-input-full rs-joint-panel-input\" type=\"number\" step=\"any\" min=\"-90\" max=\"90\" value=\"0\" aria-label=\"Shoulder draft target (deg)\" /></label></li></ul><button class=\"rs-btn-primary rs-joint-panel-button\" type=\"button\">Request targets</button></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "JointPanel",
+        "Robot joint targets",
+        "Joint monitor",
+        "Joint position editor",
+        "Robot axis targets"
+      ],
+      "example": "import { JointPanel } from \"@noorddev/vlak-react\";\n\n<JointPanel label=\"Arm joints\" name=\"targets\" timeLabel=\"12:00:00.125\"\n  joints={[{ id: \"shoulder\", label: \"Shoulder\", unit: \"deg\", reported: 12.5, minimum: -90, maximum: 90 }, { id: \"slide\", label: \"Slide\", unit: \"m\", reported: 0, minimum: 0, maximum: 0.5 }]}\n  defaultValue={{ shoulder: 0, slide: 0 }}\n  onRequestTargets={targets => console.log(\"Requested targets\", targets)} />",
+      "usage": {
+        "use": [
+          "Reported joint positions and a separate draft target map keyed by joint identifier.",
+          "value/defaultValue/onValueChange for controlled editing or an isolated prototype; drafts never inherit missing values from reported positions.",
+          "Finite minimum and maximum values in each joint's supplied unit. A complete valid draft is required before requesting targets.",
+          "onRequestTargets to ask the host to apply a draft; pending and confirmedLabel describe independently supplied request state.",
+          "Missing, non-finite, duplicate, and unlisted records receive explicit feedback. No motion or limit policy is inferred."
+        ],
+        "avoid": [
+          "Treating a successful click as confirmed robot movement.",
+          "Using the component as a motion planner, interlock, unit converter, or source of joint limits."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through target inputs and the request button."
+        },
+        {
+          "keys": "Arrow up, Arrow down",
+          "does": "Uses native number-input stepping within the supplied limits."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused request button when the complete draft is valid."
+        }
+      ],
+      "a11y": [
+        "The fieldset and legend name the joint group; each target names its joint and unit.",
+        "Vlak Input and Button provide consistent control sizing, focus treatment, and native keyboard behavior.",
+        "Native validity and visible messages identify missing or out-of-bounds targets; reported zero remains distinct from missing data.",
+        "Named inputs submit per-joint drafts. Form reset restores uncontrolled defaults, read-only drafts still submit, and pending controls are disabled.",
+        "The ref, native fieldset attributes, className, and style reach the root fieldset."
+      ]
+    }
+  }
+}

@@ -11,6 +11,13 @@ const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const url = process.env.INSPIRATION_URL ?? "http://localhost:3100/inspiration/";
 const screenshots = process.env.INSPIRATION_SCREENSHOTS ?? "/tmp/vlak-inspiration-qa";
 const last = studies.length - 1;
+// Shared About captions identify these references by studio or movement;
+// the collection keeps the work attribution used by the scene's status.
+const captionNames = {
+  "co-westerik": "Total Design",
+  "schiphol-signage": "Benno Wissing",
+  "neue-grafik": "International Typographic Style",
+};
 mkdirSync(screenshots, { recursive: true });
 const failures = [];
 const passed = [];
@@ -87,7 +94,7 @@ try {
       assert.equal(await desktop.locator(".inspiration-stage").getAttribute("data-work-id"), studies[i].id);
       const tile = desktop.locator(`#study-select-${i}`);
       assert.equal(await tile.getAttribute("data-work-id"), studies[i].id);
-      assert.equal(await tile.locator(".reference-tile-artist").innerText(), studies[i].artist);
+      assert.equal(await tile.locator(".reference-tile-artist").innerText(), captionNames[studies[i].id] ?? studies[i].artist);
       const work = await tile.locator(".reference-tile-work").innerText();
       assert.ok(work.includes(studies[i].title) && work.includes(studies[i].year));
       assert.equal(await tile.locator(".reference-tile-description").innerText(), studies[i].description);
@@ -109,6 +116,7 @@ try {
     await desktop.screenshot({ path: `${screenshots}/desktop-daylight.png`, fullPage: true });
   });
   await check("previous and next loop and retain keyboard focus", async () => {
+    await open(desktop);
     const previous = desktop.getByRole("button", { name: "Previous work", exact: true });
     const next = desktop.getByRole("button", { name: "Next work", exact: true });
     await previous.focus(); await desktop.keyboard.press("Enter");
@@ -119,6 +127,7 @@ try {
     assert.equal(await next.evaluate((el) => document.activeElement === el), true);
   });
   await check("filmstrip supports arrows, Home and End with visible focus", async () => {
+    await open(desktop);
     await desktop.locator("#study-select-0").focus();
     for (const [key, index] of [["ArrowRight", 1], ["ArrowLeft", 0], ["ArrowLeft", last], ["Home", 0], ["End", last], ["Home", 0]]) {
       await desktop.keyboard.press(key);

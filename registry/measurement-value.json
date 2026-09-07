@@ -1,0 +1,78 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "measurement-value",
+  "type": "registry:component",
+  "title": "Measurement value",
+  "description": "A supplied scientific reading with units, symmetric uncertainty, optional scientific notation and explicit availability.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/measurement-value.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface MeasurementValueProps extends React.HTMLAttributes<HTMLDivElement> {\n  label: React.ReactNode;\n  /** Strings preserve supplied significant figures. Non-finite numbers are unavailable. */\n  value?: number | string | null;\n  unit?: string;\n  /** A supplied symmetric, non-negative uncertainty in the same unit as value. */\n  uncertainty?: number | null;\n  uncertaintyLabel?: React.ReactNode;\n  /** Scientific notation changes numeric formatting only; supplied strings are unchanged. */\n  notation?: \"plain\" | \"scientific\";\n  status?: \"recorded\" | \"pending\" | \"unavailable\";\n  source?: React.ReactNode;\n  description?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  label: { margin: 0, fontSize: \"0.875rem\", fontWeight: 500 },\n  reading: { margin: 0, display: \"flex\", flexWrap: \"wrap\", alignItems: \"baseline\", gap: \"0.375rem\", fontVariantNumeric: \"tabular-nums\" },\n  value: { fontSize: \"1.75rem\", fontWeight: 500, letterSpacing: \"-0.035em\", lineHeight: 1.2 },\n  uncertainty: { fontSize: \"1rem\" },\n  unit: { fontSize: \"0.875rem\", color: vlak.gray },\n  context: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, maxWidth: \"66ch\" },\n});\n\n/** A supplied scientific reading without inferred precision, confidence or unit conversion. */\nexport const MeasurementValue = React.forwardRef<HTMLDivElement, MeasurementValueProps>(function MeasurementValue({ label, value, unit, uncertainty, uncertaintyLabel, notation = \"plain\", status = \"recorded\", source, description, className, style, children, ...props }, ref) {\n  const valid = typeof value === \"number\" ? Number.isFinite(value) : typeof value === \"string\" && value.trim().length > 0;\n  const state = status === \"recorded\" && !valid ? \"unavailable\" : status;\n  const validUncertainty = typeof uncertainty === \"number\" && Number.isFinite(uncertainty) && uncertainty >= 0;\n  const format = (number: number) => notation === \"scientific\" ? number.toExponential() : String(number);\n  const root = rs([\"rs-measurement-value\", className], styles.root);\n  const heading = rs([\"rs-measurement-value-label\"], styles.label);\n  const reading = rs([\"rs-measurement-value-reading\"], styles.reading);\n  const amount = rs([\"rs-measurement-value-number\"], styles.value);\n  const error = rs([\"rs-measurement-value-uncertainty\"], styles.uncertainty);\n  const unitStyle = rs([\"rs-measurement-value-unit\"], styles.unit);\n  const context = rs([\"rs-measurement-value-context\"], styles.context);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }} data-status={state}>\n    <p {...heading}>{label}</p>\n    {state === \"recorded\" ? <p {...reading}><span {...amount}>{typeof value === \"number\" ? format(value) : value}</span>{validUncertainty && <span {...error}>± {format(uncertainty)}</span>}{unit && <span {...unitStyle}>{unit}</span>}</p> : <p {...context}>{state === \"pending\" ? \"Measurement pending\" : \"Measurement unavailable\"}</p>}\n    {state === \"recorded\" && uncertainty != null && <p {...context}>{validUncertainty ? (uncertaintyLabel ?? \"Supplied uncertainty\") : \"Uncertainty unavailable\"}</p>}\n    {source != null && <div {...context}>{source}</div>}\n    {description != null && <div {...context}>{description}</div>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/measurement-value.tsx"
+    },
+    {
+      "path": "vlak/styles/measurement-value.css",
+      "content": "/* ── measurement-value: generated from packages/react/src/components/measurement-value.tsx ── */\n.rs-measurement-value{display:grid;gap:0.5rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-measurement-value-label{margin:0;font-size:0.875rem;font-weight:500}\n.rs-measurement-value-reading{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.375rem;font-variant-numeric:tabular-nums}\n.rs-measurement-value-number{font-size:1.75rem;font-weight:500;letter-spacing:-0.035em;line-height:1.2}\n.rs-measurement-value-uncertainty{font-size:1rem}\n.rs-measurement-value-unit{font-size:0.875rem;color:var(--text-secondary)}\n.rs-measurement-value-context{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/measurement-value.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "science",
+      "classes": [
+        "rs-measurement-value",
+        "rs-measurement-value-label",
+        "rs-measurement-value-reading",
+        "rs-measurement-value-number",
+        "rs-measurement-value-uncertainty",
+        "rs-measurement-value-unit",
+        "rs-measurement-value-context"
+      ],
+      "snippet": "<div class=\"rs-measurement-value\"><p class=\"rs-measurement-value-label\">Sample mass</p><p class=\"rs-measurement-value-reading\"><span class=\"rs-measurement-value-number\">1.230</span><span class=\"rs-measurement-value-uncertainty\">± 0.005</span><span class=\"rs-measurement-value-unit\">g</span></p><p class=\"rs-measurement-value-context\">Supplied uncertainty</p></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Scientific measurement",
+        "Uncertainty display",
+        "Measured value",
+        "Scientific notation",
+        "Metrology reading"
+      ],
+      "example": "import { MeasurementValue } from \"@noorddev/vlak-react\";\n\n<MeasurementValue label=\"Sample mass\" value=\"1.230\" uncertainty={0.005} unit=\"g\" source=\"Balance record, sample 042\" />\n<MeasurementValue label=\"Small reading\" value={0.0000123} notation=\"scientific\" unit=\"A\" />\n<MeasurementValue label=\"Next measurement\" status=\"pending\" />",
+      "usage": {
+        "use": [
+          "Scientific observations with application-supplied uncertainty and units.",
+          "Pass a string to preserve significant figures such as 1.230; scientific notation formats numeric inputs without selecting a precision.",
+          "Use uncertaintyLabel to name the supplied uncertainty convention."
+        ],
+        "avoid": [
+          "Inferring significant figures, a confidence level, a distribution or unit conversions.",
+          "Treating zero as missing, or using a negative uncertainty to express asymmetric bounds."
+        ]
+      },
+      "keyboard": [],
+      "a11y": [
+        "The reading, plus-minus uncertainty, unit and source remain visible text.",
+        "Pending and unavailable states suppress the numeric reading. Zero is preserved, while empty strings and non-finite values are unavailable.",
+        "Negative or non-finite uncertainty is explicitly unavailable without hiding a valid reading.",
+        "The div ref, native attributes, className and style pass through. No automatic announcements or interactive stops are added."
+      ]
+    }
+  }
+}

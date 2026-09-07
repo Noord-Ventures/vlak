@@ -1,0 +1,103 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "check-in",
+  "type": "registry:component",
+  "title": "Check-in",
+  "description": "Collects one supplied text answer with native radio controls, 44px targets, and an explicit unanswered state.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/check-in.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { Button } from \"./button\";\n\nexport interface CheckInOption {\n  value: string;\n  label: string;\n  disabled?: boolean;\n}\n\nexport interface CheckInProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onChange\" | \"defaultValue\"> {\n  label: React.ReactNode;\n  description?: React.ReactNode;\n  /** Text answers supplied by the application. Values must be unique. */\n  options: CheckInOption[];\n  /** null is an unanswered check-in. */\n  value?: string | null;\n  defaultValue?: string | null;\n  onValueChange?: (value: string | null) => void;\n  required?: boolean;\n  readOnly?: boolean;\n  clearable?: boolean;\n  clearLabel?: string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, borderWidth: 0, padding: 0, margin: 0, color: vlak.ink },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  description: { margin: 0, color: vlak.gray, fontSize: vlak.controlFs, lineHeight: 1.45, maxWidth: \"66ch\" },\n  choices: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  choice: { position: \"relative\", display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: \"0.875rem\", paddingBlock: \"0.5rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, boxSizing: \"border-box\", backgroundColor: vlak.paper, color: vlak.ink, fontSize: vlak.controlFs, lineHeight: 1.45, cursor: \"pointer\", outlineWidth: { default: null, \":focus-within\": 2 }, outlineStyle: { default: null, \":focus-within\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  unavailable: { cursor: \"default\", opacity: { default: 0.55, [mq.forcedColors]: 1 } },\n  input: { position: \"absolute\", inset: \"-1px\", width: \"calc(100% + 2px)\", height: \"calc(100% + 2px)\", opacity: 0, margin: 0, cursor: \"inherit\" },\n  clear: { justifySelf: \"start\", minWidth: vlak.hit, minHeight: vlak.hit, width: \"auto\", maxWidth: \"100%\" },\n});\n\n/** A named text choice without an inferred clinical score. */\nexport const CheckIn = React.forwardRef<HTMLFieldSetElement, CheckInProps>(function CheckIn({\n  label, description, options, value, defaultValue = null, onValueChange, required, readOnly = false, clearable = true, clearLabel = \"Clear answer\", name, form, disabled, className, style, \"aria-describedby\": ariaDescribedBy, ...props\n}, ref) {\n  const [, refreshAfterReset] = React.useReducer((revision: number) => revision + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<string | null, HTMLFieldSetElement>(value, defaultValue, onValueChange, refreshAfterReset);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const descriptionId = `${id}-description`;\n  const readonlyId = `${id}-readonly`;\n  const describedBy = [ariaDescribedBy, description != null && descriptionId, readOnly && readonlyId].filter(Boolean).join(\" \") || undefined;\n  const root = rs([\"rs-check-in\", className], styles.root);\n  const legend = rs([\"rs-check-in-legend\"], styles.legend);\n  const copy = rs([\"rs-check-in-description\"], styles.description);\n  const choices = rs([\"rs-check-in-choices\"], styles.choices);\n  const input = rs([\"rs-check-in-input\"], styles.input);\n  const clear = rs([\"rs-check-in-clear\"], styles.clear);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} aria-describedby={describedBy} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    {description != null && <p id={descriptionId} className={copy.className} style={copy.style}>{description}</p>}\n    {readOnly && <p id={readonlyId} className={copy.className} style={copy.style}>Read only</p>}\n    {options.length === 0 && <p className={copy.className} style={copy.style}>No answers available</p>}\n    <div className={choices.className} style={choices.style}>{options.map((option) => {\n      const selected = current === option.value;\n      const unavailable = disabled || option.disabled || readOnly;\n      const choice = rs([\"rs-check-in-choice\", selected && \"rs-check-in-selected\", unavailable && \"rs-check-in-unavailable\"], styles.choice, selected && styles.selected, unavailable && styles.unavailable);\n      return <label key={option.value} className={choice.className} style={choice.style}>\n        <span>{option.label}</span>\n        <input type=\"radio\" name={name ?? id} form={form} value={option.value} checked={selected} required={required} disabled={disabled || option.disabled} readOnly={readOnly} aria-disabled={readOnly || undefined} aria-describedby={describedBy} className={input.className} style={input.style}\n          onClick={(event) => { if (readOnly) event.preventDefault(); }}\n          onKeyDown={(event) => { if (readOnly && [\"ArrowLeft\", \"ArrowRight\", \"ArrowUp\", \"ArrowDown\", \" \"].includes(event.key)) event.preventDefault(); }}\n          onChange={() => { if (!readOnly) setValue(option.value); }} />\n      </label>;\n    })}</div>\n    {clearable && <Button variant=\"ghost\" size=\"sm\" disabled={disabled || readOnly || current == null} {...clear} onClick={() => setValue(null)}>{clearLabel}</Button>}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/check-in.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/check-in.css",
+      "content": "/* ── check-in: generated from packages/react/src/components/check-in.tsx ── */\n.rs-check-in{display:grid;gap:0.75rem;min-width:0;border-width:0;padding:0;margin:0;color:var(--text)}\n.rs-check-in-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-check-in-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}\n.rs-check-in-choices{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-check-in-choice{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);padding-inline:0.875rem;padding-block:0.5rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);box-sizing:border-box;background-color:var(--bg);color:var(--text);font-size:var(--control-fs);line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-check-in-choice:focus-within{outline-width:2px;outline-style:solid}\n.rs-check-in-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-check-in-selected{background-color:Highlight;color:HighlightText}}\n.rs-check-in-unavailable{cursor:default;opacity:0.55}\n@media (forced-colors: active){.rs-check-in-unavailable{opacity:1}}\n.rs-check-in-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);opacity:0;margin:0;cursor:inherit}\n.rs-check-in-clear{justify-self:start;min-width:var(--hit);min-height:var(--hit);width:auto;max-width:100%}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/check-in.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-check-in",
+        "rs-check-in-legend",
+        "rs-check-in-description",
+        "rs-check-in-choices",
+        "rs-check-in-choice",
+        "rs-check-in-selected",
+        "rs-check-in-unavailable",
+        "rs-check-in-input",
+        "rs-check-in-clear"
+      ],
+      "snippet": "<fieldset class=\"rs-check-in\"><legend class=\"rs-check-in-legend\">How is your energy?</legend><p class=\"rs-check-in-description\">Choose the answer that fits right now.</p><div class=\"rs-check-in-choices\"><label class=\"rs-check-in-choice\"><span>Low</span><input class=\"rs-check-in-input\" type=\"radio\" name=\"energy\" value=\"low\" /></label><label class=\"rs-check-in-choice rs-check-in-selected\"><span>Steady</span><input class=\"rs-check-in-input\" type=\"radio\" name=\"energy\" value=\"steady\" checked /></label><label class=\"rs-check-in-choice\"><span>High</span><input class=\"rs-check-in-input\" type=\"radio\" name=\"energy\" value=\"high\" /></label></div><button class=\"rs-btn-ghost rs-btn-sm rs-check-in-clear\" type=\"button\">Clear answer</button></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "CheckIn",
+        "Mood check-in",
+        "Energy check-in",
+        "Wellness check-in",
+        "Text rating",
+        "Self report"
+      ],
+      "example": "import { CheckIn } from \"@noorddev/vlak-react\";\n\n<CheckIn label=\"How is your energy?\" description=\"Choose the answer that fits right now.\" name=\"energy\" options={[{ value: \"low\", label: \"Low\" }, { value: \"steady\", label: \"Steady\" }, { value: \"high\", label: \"High\" }]} defaultValue={null} />",
+      "usage": {
+        "use": [
+          "A daily mood, comfort, or energy check-in with application-owned wording.",
+          "Unique option values and explicit labels for every answer.",
+          "value, defaultValue, and onValueChange with null for an unanswered check-in; name and form submit the selected string."
+        ],
+        "avoid": [
+          "Inventing a clinical questionnaire, diagnostic interpretation, or score from the selected position.",
+          "Treating an unanswered check-in as a negative answer."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves into the native radio group and then to the available clear action."
+        },
+        {
+          "keys": "Arrow keys, Space",
+          "does": "Uses native radio selection; read-only answers prevent changes."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused clear action."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the answer group; native radios use visible text labels and share a name.",
+        "Every answer covers at least 44px in each dimension, with a focus ring and full-fill selection. Vlak Button supplies the optional clear action.",
+        "Descriptions reach the group and each answer. Read-only controls retain the submitted value and announce their unavailable state.",
+        "Disabled controls do not submit; required uses native radio validation. Form reset restores uncontrolled defaults and preserves controlled values.",
+        "The forwarded ref reaches the fieldset; native fieldset attributes, className, and style pass through."
+      ]
+    }
+  }
+}

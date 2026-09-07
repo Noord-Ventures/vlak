@@ -1,145 +1,68 @@
-// Network integration checks for the actual licensed Vehicle embed.
-// Build and serve the site first, then:
-// SITE_URL=http://localhost:3100 PLAYWRIGHT_EXECUTABLE_PATH=/path/to/chrome node apps/www/scripts/e2e-vehicle.mjs
+// Integration checks for the actual local licensed model and WebGL renderer.
+// Build and serve the site first, then set SITE_URL and PLAYWRIGHT_EXECUTABLE_PATH.
 import assert from "node:assert/strict";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium } from "playwright";
+import { webglArgs, distance, inspectVehicle, checkVehicleControls } from "./e2e-render-controls.mjs";
 
 const base = (process.env.SITE_URL ?? "http://localhost:3100").replace(/\/$/, "");
 const artifacts = await mkdtemp(join(tmpdir(), "vlak-vehicle-"));
-const browser = await chromium.launch(
-  process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : undefined,
-);
-const distance = (a, b) => Math.hypot(...a.map((value, index) => value - b[index]));
-const radius = (camera) => distance(camera.position, camera.target);
-const errors = [];
-
-async function openViewer(page) {
-  await page.goto(base + "/interfaces/render/", { waitUntil: "domcontentloaded" });
-  await page.locator(".cx-render").scrollIntoViewIfNeeded();
-}
-async function ready(page) {
-  await page.waitForSelector('[data-viewer-status="ready"]', { timeout: 60000 });
-}
-async function inspect(page, method) {
-  return page.evaluate((name) => new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error("Viewer API response timed out: " + name)), 10000);
-    window.vehicleQaApi[name]((error, value) => {
-      clearTimeout(timeout);
-      if (error) reject(new Error(String(error)));
-      else resolve(value);
-    });
-  }), method);
-}
-
+const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH, args: webglArgs });
 try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
-  page.on("pageerror", (error) => errors.push(error.message));
-  // Capture the public API returned to the app without adding test hooks to
-  // production code or reading private state inside the cross-origin viewer.
-  await page.addInitScript(() => {
-    let viewerConstructor;
-    Object.defineProperty(window, "Sketchfab", {
-      configurable: true,
-      get: () => viewerConstructor,
-      set(value) {
-        viewerConstructor = value;
-        const original = value.prototype.init;
-        value.prototype.init = function (id, options) {
-          return original.call(this, id, { ...options, success(api) {
-            window.vehicleQaApi = api;
-            options.success(api);
-          } });
-        };
-      },
-    });
-  });
-  await openViewer(page);
-  await ready(page);
-  assert.match(await page.locator(".cx-vehicle-frame").getAttribute("src"), /034600db0cc94d64a7f3ccb19c7799fa/);
-  await page.getByRole("button", { name: "Pause turntable", exact: true }).click();
-  await page.getByRole("button", { name: "Reset camera", exact: true }).click();
-  await page.waitForTimeout(500);
-  const home = await inspect(page, "getCameraLookAt");
-  await page.waitForTimeout(400);
-  assert.ok(distance(home.position, (await inspect(page, "getCameraLookAt")).position) < 0.000001, "Paused camera must stay still");
-
-  const initialPaint = (await inspect(page, "getMaterialList")).find((item) => item.name === "Carro_Pintura").channels.AlbedoPBR.color;
-  await page.locator(".cx-render").screenshot({ path: join(artifacts, "clay-desktop.png") });
-  await page.getByRole("button", { name: "Warm clay", exact: false }).click();
-  await page.waitForTimeout(300);
-  const graphitePaint = (await inspect(page, "getMaterialList")).find((item) => item.name === "Carro_Pintura").channels.AlbedoPBR.color;
-  assert.ok(graphitePaint.reduce((a, b) => a + b, 0) < initialPaint.reduce((a, b) => a + b, 0), "Graphite must darken the actual paint material");
-  await page.getByRole("button", { name: "Show mesh", exact: true }).click();
-  await page.waitForTimeout(1400);
-  assert.equal((await inspect(page, "getWireframe")).enabled, true);
-  await page.locator(".cx-render").screenshot({ path: join(artifacts, "mesh-desktop.png") });
-  await page.getByRole("button", { name: "Show mesh", exact: true }).click();
-  await page.waitForTimeout(200);
-  assert.equal((await inspect(page, "getWireframe")).enabled, false);
-
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  const errors = [];
+  page.on("pageerror", error => errors.push(error.message));
+  await checkVehicleControls({ page, base, artifacts });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.waitForFunction(() => !document.querySelector('.rw-tools button[aria-label="Auto-rotate model"]')?.disabled);
+  const before = await inspectVehicle(page);
   await page.getByRole("button", { name: "Play turntable", exact: true }).click();
   await page.mouse.move(0, 0);
-  await page.waitForTimeout(650);
-  assert.ok(distance(home.position, (await inspect(page, "getCameraLookAt")).position) > 0.05, "Turntable must move the actual model camera");
+  await page.waitForFunction(position => {
+    const next = document.querySelector(".rw-vehicle-canvas")?.dataset.camera.split(",").map(Number);
+    return next && Math.hypot(...next.map((value, index) => value - position[index])) > .05;
+  }, before.position);
+  await page.locator(".rw-live-model").focus();
+  const focused = await inspectVehicle(page);
+  await page.waitForTimeout(250);
+  assert(distance(focused.position, (await inspectVehicle(page)).position) < .00001, "Focus must pause the turntable");
   await page.getByRole("button", { name: "Pause turntable", exact: true }).click();
   await page.getByRole("button", { name: "Reset camera", exact: true }).click();
-  await page.waitForTimeout(500);
-  assert.ok(distance(home.position, (await inspect(page, "getCameraLookAt")).position) < 0.00001, "Reset must restore the fitted starting view");
-
-  const layout = await page.evaluate(() => {
-    const frame = document.querySelector(".cx-vehicle-frame").getBoundingClientRect();
-    const credit = document.querySelector(".cx-vehicle-credit").getBoundingClientRect();
-    const timeline = document.querySelector(".cx-timeline").getBoundingClientRect();
-    return { creditBelowFrame: credit.top >= frame.bottom, timelineBelowCredit: timeline.top >= credit.bottom, overflow: document.documentElement.scrollWidth - innerWidth };
-  });
-  assert.equal(layout.creditBelowFrame, true, "Credit must not cover the native viewer");
-  assert.equal(layout.timelineBelowCredit, true, "Turntable must not cover native controls or credit");
-  assert.equal(layout.overflow, 0);
-  const smallTargets = await page.evaluate(() => [...document.querySelectorAll(".cx-render button, .cx-render a[href]")]
-    .filter((element) => element.getClientRects().length)
-    .map((element) => ({ label: element.getAttribute("aria-label") ?? element.textContent.trim(), width: element.getBoundingClientRect().width, height: element.getBoundingClientRect().height }))
-    .filter((target) => target.width < 44 || target.height < 44));
-  assert.deepEqual(smallTargets, [], "Workspace controls and credit links must have 44px targets");
-
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.waitForTimeout(250);
-  assert.equal(await page.getByRole("button", { name: "Play turntable", exact: true }).isDisabled(), true);
-  assert.match(await page.locator(".cx-timeline").innerText(), /Reduced motion/);
-  await page.locator(".cx-live-model").focus();
-  await page.keyboard.press("ArrowRight");
-  await page.waitForTimeout(300);
-  assert.ok(distance(home.position, (await inspect(page, "getCameraLookAt")).position) > 0.05, "Arrow key must orbit the real camera");
-
+  await page.waitForFunction(() => { const canvas = document.querySelector(".rw-vehicle-canvas"); return canvas?.dataset.camera === canvas?.dataset.home; });
+  const home = await inspectVehicle(page);
+  await page.waitForTimeout(200);
+  assert(distance(home.position, (await inspectVehicle(page)).position) < .00001, "Paused camera must stay still");
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator(".cx-render").scrollIntoViewIfNeeded();
-  await page.waitForTimeout(600);
-  const portraitCamera = await inspect(page, "getCameraLookAt");
-  assert.ok(radius(portraitCamera) > radius(home) * 1.1, "Portrait resize must refit the model instead of cropping it");
-  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth), 0);
-  await page.locator(".cx-render").screenshot({ path: join(artifacts, "graphite-phone.png") });
-  await page.waitForTimeout(400);
-  assert.ok(distance(portraitCamera.position, (await inspect(page, "getCameraLookAt")).position) < 0.00001, "Resize fitting must settle");
-  assert.deepEqual(errors, [], "The integrated page should not emit JavaScript errors");
+  await page.locator(".rw").scrollIntoViewIfNeeded();
+  await page.waitForFunction(before => { const canvas = document.querySelector(".rw-vehicle-canvas"); return canvas?.dataset.camera === canvas?.dataset.home && canvas?.dataset.camera !== before; }, home.camera);
+  const phone = await inspectVehicle(page);
+  assert(distance(phone.position, phone.target) > distance(home.position, home.target), "Portrait camera must refit the whole asset");
+  await page.locator(".rw").screenshot({ path: join(artifacts, "phone-dark.png") });
+  assert.deepEqual(errors, []);
   await page.close();
 
-  const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
-  const unavailable = await context.newPage();
-  await context.route("**/sketchfab-viewer-*.js", (route) => route.abort("internetdisconnected"));
-  await openViewer(unavailable);
-  await unavailable.waitForSelector('[data-viewer-status="error"]', { timeout: 15000 });
-  assert.match(await unavailable.locator(".cx-vehicle-status").innerText(), /internet connection and WebGL/);
-  assert.equal(await unavailable.getByRole("button", { name: "Show mesh", exact: true }).isDisabled(), true);
-  await unavailable.locator(".cx-render").screenshot({ path: join(artifacts, "offline-fallback.png") });
-  await context.unroute("**/sketchfab-viewer-*.js");
+  const unavailable = await browser.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
+  await unavailable.route("**/evoque-monochrome.glb", route => route.abort("internetdisconnected"));
+  await unavailable.goto(`${base}/interfaces/render/`, { waitUntil: "domcontentloaded" });
+  await unavailable.locator('.rw-vehicle-viewport[data-viewer-status="error"]').waitFor({ timeout: 15000 });
+  assert.match(await unavailable.locator(".rw-vehicle-status").innerText(), /connection and WebGL/);
+  assert(await unavailable.getByRole("button", { name: "Show mesh", exact: true }).isDisabled());
+  await unavailable.locator(".rw").screenshot({ path: join(artifacts, "unavailable-phone.png") });
+  await unavailable.unroute("**/evoque-monochrome.glb");
   await unavailable.getByRole("button", { name: "Retry viewer", exact: true }).click();
-  await ready(unavailable);
-  assert.equal(await unavailable.getByRole("button", { name: "Show mesh", exact: true }).isEnabled(), true);
-  await context.close();
-  console.log("Vehicle integration passed: real camera, paint, wireframe, responsive fit, reduced motion, offline fallback and retry");
-  console.log("Screenshots: " + artifacts);
-} finally {
-  await browser.close();
-}
+  await unavailable.waitForFunction(() => document.querySelector(".rw")?.dataset.viewerStatus === "ready" && Number(document.querySelector(".rw-vehicle-canvas")?.dataset.renderedTriangles) >= 204453);
+  assert(await unavailable.getByRole("button", { name: "Show mesh", exact: true }).isEnabled());
+  assert.equal(await unavailable.locator(".rw-vehicle-canvas").count(), 1);
+  // A source harness may expose its React root to verify unmount disposal directly.
+  if (await unavailable.evaluate(() => !!window.renderRoot)) {
+    const canvas = await unavailable.locator(".rw-vehicle-canvas").elementHandle();
+    await unavailable.evaluate(() => window.renderRoot.unmount());
+    assert.equal(await canvas.evaluate(element => element.isConnected), false);
+    assert.equal(await canvas.evaluate(element => element.getContext("webgl2").isContextLost()), true, "Unmount must release the graphics context");
+  }
+  await unavailable.close();
+  console.log("Vehicle integration passed: real mesh, paint and camera; turntable, focus pause, responsive fit, reduced motion, asset failure, retry and renderer cleanup");
+  console.log(`Screenshots: ${artifacts}`);
+} finally { await browser.close(); }

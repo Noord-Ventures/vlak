@@ -1,0 +1,9 @@
+/* ── health-metric: generated from packages/react/src/components/health-metric.tsx ── */
+.rs-health-metric{display:grid;gap:0.5rem;min-width:0;color:var(--text);padding-block:1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);line-height:1.45;overflow-wrap:anywhere}
+.rs-health-metric-label{margin:0;font-size:0.875rem;font-weight:500}
+.rs-health-metric-reading{margin:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:0.5rem;font-variant-numeric:tabular-nums}
+.rs-health-metric-value{font-size:2rem;line-height:1.2;font-weight:500;letter-spacing:-0.04em}
+.rs-health-metric-unit{font-size:0.875rem;color:var(--text-secondary)}
+.rs-health-metric-status{margin:0;font-size:0.75rem;font-weight:500}
+.rs-health-metric-meta{margin:0;font-size:0.75rem;color:var(--text-secondary);display:flex;flex-wrap:wrap;gap:0.25rem 0.75rem}
+.rs-health-metric-description{margin:0;font-size:0.875rem;max-width:66ch}

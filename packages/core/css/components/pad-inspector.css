@@ -1,0 +1,12 @@
+/* ── pad-inspector: generated from packages/react/src/components/pad-inspector.tsx ── */
+.rs-pad-inspector{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-pad-inspector-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
+.rs-pad-inspector-label{display:grid;gap:0.375rem;min-width:0;font-size:var(--control-label)}
+.rs-pad-inspector-control{min-width:0;width:100%;min-height:var(--hit)}
+.rs-pad-inspector-properties{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 8rem), 1fr));gap:0.875rem;margin:0;padding-block:0.875rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
+.rs-pad-inspector-term{color:var(--text-secondary);font-size:var(--control-label)}
+.rs-pad-inspector-detail{margin:0;font-size:var(--control-fs);overflow-wrap:anywhere}
+.rs-pad-inspector-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:var(--control-label)}
+.rs-pad-inspector-caption{text-align:start;font-size:var(--control-fs);font-weight:600;padding-bottom:0.5rem}
+.rs-pad-inspector-cell{text-align:start;vertical-align:top;padding-block:0.625rem;padding-inline-end:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:400;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rs-pad-inspector-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);overflow-wrap:anywhere;max-width:66ch}

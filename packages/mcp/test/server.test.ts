@@ -84,4 +84,38 @@ describe("vlak-mcp", () => {
     const { resources } = await client.listResources();
     expect(resources.map((r) => r.uri)).toContain("vlak://docs/button");
   });
+
+  it("discovers health components and supplies their shared data contracts", async () => {
+    const health = await client.readResource({ uri: "vlak://docs/health" });
+    expect(resourceText(health)).toContain("Confirm recorded actions");
+    const { resources } = await client.listResources();
+    expect(resources.map(resource => resource.uri)).toContain("vlak://docs/health");
+    const listed = textOf(await client.callTool({ name: "list_components", arguments: { category: "health" } }));
+    expect(listed).toContain('"medication-schedule"');
+    expect(listed).toContain('"check-in"');
+    expect(listed).not.toContain('"button"');
+  });
+
+  it("discovers specialised collections and their application contracts", async () => {
+    const { resources } = await client.listResources();
+    for (const [category, component, contract] of [
+      ["civic", "benefit-program", "Supply policy decisions"],
+      ["science", "spectrum-plot", "Show the evidence behind a plot"],
+      ["creative", "channel-strip", "Connect controls to an engine"],
+      ["engineering", "alarm-panel", "Preserve independent states"],
+      ["geospatial", "raster-band-mixer", "Assignment is distinct from reprojection"],
+      ["robotics", "joint-panel", "Keep coordinate frames explicit"],
+      ["electronics", "pad-inspector", "Preserve independent assembly flags"],
+      ["microbiology", "colony-plate", "Distinguish annotations from source counts"],
+    ] as const) {
+      expect(resources.map(resource => resource.uri)).toContain(`vlak://docs/${category}`);
+      expect(resourceText(await client.readResource({ uri: `vlak://docs/${category}` }))).toContain(contract);
+      const listed = JSON.parse(textOf(await client.callTool({ name: "list_components", arguments: { category } })));
+      expect(listed.components.map((item: { name: string }) => item.name)).toContain(component);
+      expect(listed.components.every((item: { category: string }) => item.category === category)).toBe(true);
+      const detail = JSON.parse(textOf(await client.callTool({ name: "get_component", arguments: { name: component } })));
+      expect(detail.docs).toContain("## Props");
+      expect(detail.example).toBeTruthy();
+    }
+  });
 });

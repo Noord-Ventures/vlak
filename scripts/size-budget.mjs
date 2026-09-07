@@ -23,12 +23,13 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 
 /* [label, path or directory + filter, gzipped budget in bytes] */
 const budgets = [
-  // The 40-component expansion increases the whole-catalog artifacts. Keep
-  // the existing Button and atomic CSS budgets, and add leaf-specific caps
-  // so growth in the catalog cannot hide a regression in a common control.
-  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 24 * 1024],
+  // The 166-component catalog adds industrial, geospatial, robotics, electronics
+  // and microbiology workbenches. Aggregate costs are about 28.6 KB CSS,
+  // 199.5 KB JS and 100.7 KB CLI; individual leaf budgets still bound each addition.
+  // Keep atomic CSS and existing control caps; bound every new leaf separately.
+  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 29 * 1024],
   ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024],
-  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 136 * 1024],
+  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 205 * 1024],
   ["@noorddev/vlak-react components/button.js", "packages/react/dist/components/button.js", 4 * 1024],
   ["@noorddev/vlak-react components/number-field.js", "packages/react/dist/components/number-field.js", 3 * 1024],
   ["@noorddev/vlak-react components/playback-controls.js", "packages/react/dist/components/playback-controls.js", 2 * 1024],
@@ -37,7 +38,21 @@ const budgets = [
   ["@noorddev/vlak-react components/media-player.js", "packages/react/dist/components/media-player.js", 5 * 1024],
   ["@noorddev/vlak-react components/scheduler.js", "packages/react/dist/components/scheduler.js", 6 * 1024],
   ["@noorddev/vlak-react components/file-upload.js", "packages/react/dist/components/file-upload.js", 5 * 1024],
-  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 64 * 1024],
+  ...["health-metric", "reference-range", "lab-results", "symptom-diary", "check-in", "habit-tracker", "sleep-timeline", "activity-goal", "patient-banner", "medication-schedule", "appointment-card", "care-plan"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  // Rings include first-view animation and visibility-aware encouragement controls.
+  ["@noorddev/vlak-react components/activity-rings.js", "packages/react/dist/components/activity-rings.js", 5 * 1024],
+  ...["identity-document", "tax-summary", "benefit-program", "application-status", "evidence-checklist", "measurement-value", "quantity-field", "experiment-run", "audio-meter", "channel-strip", "parameter-knob", "timecode-field", "clip-timeline", "render-queue", "layer-stack", "color-inspector", "spacing-control"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  ...["well-plate", "spectrum-plot"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 4 * 1024]),
+  ...["assembly-variant-matrix", "coordinate-reference-field", "datum-transform-picker", "stack-navigator", "acquisition-sequencer", "coverage-inspector", "genomic-region-field", "alarm-panel", "work-offset-panel"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  ...["raster-band-mixer", "patchbay", "kerning-pair-editor", "sequence-alignment", "design-rule-results"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 4 * 1024]),
+  ...["joint-panel", "robot-pose", "robot-mission-queue", "pad-inspector", "colony-plate", "culture-log"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 104 * 1024],
 ];
 
 let failed = false;

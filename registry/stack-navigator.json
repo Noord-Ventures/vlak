@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "stack-navigator",
+  "type": "registry:component",
+  "title": "Stack navigator",
+  "description": "Navigates supplied depth, time, channel and stage-position axes while preserving exact physical readings and indexed positions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/stack-navigator.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Button } from \"./button\";\nimport { Select } from \"./select\";\n\nexport interface StackPosition { value?: number | string | null; label?: string; disabled?: boolean }\nexport interface StackAxis { id: string; label: string; unit?: string; positions: readonly StackPosition[] }\n/** Zero-based supplied position indexes. null means no selected position. */\nexport type StackSelection = Readonly<Record<string, number | null>>;\nexport interface StackNavigatorProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: React.ReactNode;\n  axes: readonly StackAxis[];\n  value?: StackSelection;\n  defaultValue?: StackSelection;\n  onValueChange?: (value: StackSelection) => void;\n  description?: React.ReactNode;\n  readOnly?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"1rem\", minWidth: 0, padding: 0, margin: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: \"0.875rem\", fontWeight: 600 },\n  axis: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  label: { fontSize: \"0.75rem\", fontWeight: 500 },\n  row: { display: \"grid\", gridTemplateColumns: \"auto minmax(0, 1fr) auto\", gap: \"0.5rem\", minWidth: 0 },\n  step: { minWidth: vlak.hit, minHeight: vlak.hit, width: vlak.hit, paddingInline: 0 },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n});\nconst physicalValue = (position: StackPosition, unit?: string) => {\n  const valid = typeof position.value === \"number\" ? Number.isFinite(position.value) : typeof position.value === \"string\" && position.value.trim().length > 0;\n  return valid ? `${position.value}${unit ? ` ${unit}` : \"\"}` : \"Physical value unavailable\";\n};\n/** Navigates supplied stack coordinates without calculating stage positions or calling an instrument. */\nexport const StackNavigator = React.forwardRef<HTMLFieldSetElement, StackNavigatorProps>(function StackNavigator({ label, axes, value, defaultValue = {}, onValueChange, description, readOnly = false, name, form, disabled, className, style, children, ...props }, ref) {\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<StackSelection, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const merged = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const valid = axes.length <= 8 && axes.reduce((total, axis) => total + axis.positions.length, 0) <= 8192 && axes.every(axis => axis.id.trim()) && new Set(axes.map(axis => axis.id)).size === axes.length;\n  const root = rs([\"rs-stack-navigator\", className], styles.root);\n  const legend = rs([\"rs-stack-navigator-legend\"], styles.legend);\n  const axisStyle = rs([\"rs-stack-navigator-axis\"], styles.axis);\n  const labelStyle = rs([\"rs-stack-navigator-label\"], styles.label);\n  const row = rs([\"rs-stack-navigator-row\"], styles.row);\n  const step = rs([\"rs-stack-navigator-step\"], styles.step);\n  const copy = rs([\"rs-stack-navigator-copy\"], styles.copy);\n  return <fieldset {...props} ref={merged} name={name} form={form} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>{description != null && <div {...copy}>{description}</div>}\n    {!valid ? <p {...copy}>Stack unavailable: supply unique axes, at most 8 axes and 8192 positions</p> : axes.length === 0 ? <p {...copy}>No stack axes supplied</p> : axes.map((axis, axisIndex) => {\n      const index = current[axis.id];\n      const selected = index != null && Number.isSafeInteger(index) && index >= 0 && index < axis.positions.length;\n      let previous = -1;\n      if (selected) for (let candidate = 0; candidate < index; candidate++) if (!axis.positions[candidate]?.disabled) previous = candidate;\n      const next = axis.positions.findIndex((position, candidate) => (!selected || candidate > index) && !position.disabled);\n      const inputName = name ? `${name}.${axis.id}` : undefined;\n      return <div key={axis.id} {...axisStyle}>\n        <span {...labelStyle} id={`${id}-${axisIndex}-label`}>{axis.label}</span>\n        <div {...row}><Button {...step} variant=\"ghost\" disabled={disabled || readOnly || previous < 0} aria-label={`Previous ${axis.label} position`} onClick={() => setValue({ ...current, [axis.id]: previous })}>−</Button>\n          <Select fullWidth name={inputName} form={form} disabled={disabled || !axis.positions.length} readOnly={readOnly} value={selected ? String(index) : \"\"} aria-labelledby={`${id}-${axisIndex}-label`} aria-describedby={`${id}-${axisIndex}-value`} options={[{ value: \"\", label: \"Choose position\" }, ...axis.positions.map((position, candidate) => ({ value: String(candidate), label: `${candidate + 1} / ${axis.positions.length} · ${physicalValue(position, axis.unit)}${position.label ? ` · ${position.label}` : \"\"}`, disabled: position.disabled }))]} onValueChange={nextValue => setValue({ ...current, [axis.id]: nextValue === \"\" ? null : Number(nextValue) })} />\n          <Button {...step} variant=\"ghost\" disabled={disabled || readOnly || next < 0} aria-label={`Next ${axis.label} position`} onClick={() => setValue({ ...current, [axis.id]: next })}>+</Button></div>\n        <p {...copy} id={`${id}-${axisIndex}-value`}>{selected ? `Position ${index + 1} of ${axis.positions.length}; ${physicalValue(axis.positions[index]!, axis.unit)}` : !axis.positions.length ? \"No positions supplied\" : index == null ? \"No position selected\" : \"Selected position unavailable\"}</p>\n      </div>;\n    })}{children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/stack-navigator.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/stack-navigator.css",
+      "content": "/* ── stack-navigator: generated from packages/react/src/components/stack-navigator.tsx ── */\n.rs-stack-navigator{display:grid;gap:1rem;min-width:0;padding:0;margin:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-stack-navigator-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}\n.rs-stack-navigator-axis{display:grid;gap:0.5rem;min-width:0}\n.rs-stack-navigator-label{font-size:0.75rem;font-weight:500}\n.rs-stack-navigator-row{display:grid;grid-template-columns:auto minmax(0, 1fr) auto;gap:0.5rem;min-width:0}\n.rs-stack-navigator-step{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding-inline:0}\n.rs-stack-navigator-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/stack-navigator.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "science",
+      "classes": [
+        "rs-stack-navigator",
+        "rs-stack-navigator-legend",
+        "rs-stack-navigator-axis",
+        "rs-stack-navigator-label",
+        "rs-stack-navigator-row",
+        "rs-stack-navigator-step",
+        "rs-stack-navigator-copy"
+      ],
+      "snippet": "<fieldset class=\"rs-stack-navigator\"><legend class=\"rs-stack-navigator-legend\">Image stack</legend><div class=\"rs-stack-navigator-axis\"><p class=\"rs-stack-navigator-label\">Depth</p><p class=\"rs-stack-navigator-copy\">Position 1 of 3; -1 µm</p></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "select",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Image stack controls",
+        "Z-stack navigator",
+        "Microscopy axes",
+        "Multidimensional image navigator",
+        "Stage position selector"
+      ],
+      "example": "import { StackNavigator } from \"@noorddev/vlak-react\";\n\n<StackNavigator label=\"Image stack\" name=\"stack\" axes={[\n  { id: \"depth\", label: \"Depth\", unit: \"µm\", positions: [{ value: -1 }, { value: 0 }, { value: 1 }] },\n  { id: \"time\", label: \"Time\", unit: \"s\", positions: [{ value: 0 }, { value: 5 }, { value: 10 }] },\n  { id: \"channel\", label: \"Channel\", positions: [{ value: \"Phase\" }, { value: \"Channel 2\" }] },\n  { id: \"stage\", label: \"Stage position\", unit: \"µm\", positions: [{ value: \"x 12.5, y -1.5\" }] },\n]} defaultValue={{ depth: 1, time: 0, channel: 0, stage: 0 }} />",
+      "usage": {
+        "use": [
+          "Image stacks with explicit axis labels, sampled physical values and known position indexes.",
+          "Selection values are zero-based indexes; displayed position counts are one-based. Physical values are never calculated from spacing.",
+          "name submits one selected index per axis. Controlled values remain caller-owned; native form reset restores uncontrolled defaults."
+        ],
+        "avoid": [
+          "Calling an instrument, calculating stage motion, or inferring positions from an index.",
+          "More than 8 axes or 8192 total positions; the component reports the bound rather than truncating axes."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between enabled previous, position-select and next controls."
+        },
+        {
+          "keys": "Arrow keys, Home, End, typing",
+          "does": "Opens and navigates the position list; disabled positions are skipped."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Confirms the active list option or activates the focused previous or next button."
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the position list without changing selection."
+        }
+      ],
+      "a11y": [
+        "Every axis has a visible select label and a text description containing the exact displayed index and physical value.",
+        "Zero and negative physical positions remain visible. Missing or invalid readings are explicitly unavailable.",
+        "Each input and button has a 44px target and visible focus; no axis is selected implicitly.",
+        "Read-only values remain submitted through hidden fields, while disabled fieldsets do not submit.",
+        "The fieldset ref, form association, native attributes, className and style pass through.",
+        "The shared Select and Button primitives supply combobox navigation and control styling; native form values remain available through the Select backing control."
+      ]
+    }
+  }
+}

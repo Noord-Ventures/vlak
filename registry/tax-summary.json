@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tax-summary",
+  "type": "registry:component",
+  "title": "Tax summary",
+  "description": "Separates supplied assessment line items from authoritative totals in a semantic two-column table.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/tax-summary.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface TaxSummaryItem {\n  id: string;\n  label: React.ReactNode;\n  /** A formatted amount including its currency/sign. No arithmetic is performed. */\n  amount: React.ReactNode;\n  detail?: React.ReactNode;\n}\n\nexport interface TaxSummaryTotal {\n  id: string;\n  label: React.ReactNode;\n  /** The host's assessed amount, not a sum of the displayed line items. */\n  amount: React.ReactNode;\n}\n\nexport interface TaxSummaryProps extends React.HTMLAttributes<HTMLDivElement> {\n  label: string;\n  periodLabel: React.ReactNode;\n  reference?: React.ReactNode;\n  status: React.ReactNode;\n  items: readonly TaxSummaryItem[];\n  totals: readonly TaxSummaryTotal[];\n  dueLabel?: React.ReactNode;\n  note?: React.ReactNode;\n  itemsEmptyLabel?: React.ReactNode;\n  totalsEmptyLabel?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  header: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.5rem 1rem\", marginBottom: \"1rem\", fontSize: \"0.875rem\" },\n  status: { fontWeight: 600 },\n  reference: { color: vlak.gray, fontVariantNumeric: \"tabular-nums\" },\n  table: { width: \"100%\", borderCollapse: \"collapse\", tableLayout: \"fixed\", fontSize: \"0.875rem\" },\n  caption: { textAlign: \"start\", paddingBottom: \"1rem\", fontSize: \"1.125rem\", fontWeight: 600 },\n  period: { display: \"block\", fontSize: \"0.875rem\", fontWeight: 400, color: vlak.gray, marginTop: \"0.25rem\" },\n  column: { textAlign: \"start\", paddingBlock: \"0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, fontSize: \"0.75rem\", fontWeight: 500, color: vlak.gray },\n  rowLabel: { textAlign: \"start\", fontWeight: 400, verticalAlign: \"top\", paddingBlock: \"1rem\", paddingInlineEnd: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  amount: { textAlign: \"end\", verticalAlign: \"top\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, fontVariantNumeric: \"tabular-nums\", width: \"38%\" },\n  detail: { display: \"block\", color: vlak.gray, fontSize: \"0.75rem\", marginTop: \"0.25rem\" },\n  total: { backgroundColor: vlak.tableAlt, fontWeight: 600 },\n  footer: { display: \"grid\", gap: \"0.5rem\", marginTop: \"1rem\", fontSize: \"0.875rem\" },\n  note: { margin: 0, color: vlak.gray, maxWidth: \"66ch\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", marginTop: \"1rem\" },\n});\n\n/** A supplied assessment with distinct line items and authoritative totals. */\nexport const TaxSummary = React.forwardRef<HTMLDivElement, TaxSummaryProps>(function TaxSummary(\n  { label, periodLabel, reference, status, items, totals, dueLabel, note, itemsEmptyLabel = \"Assessment lines not supplied\", totalsEmptyLabel = \"Totals not supplied\", children, className, style, ...props }, ref,\n) {\n  const root = rs([\"rs-tax-summary\", className], styles.root);\n  const header = rs([\"rs-tax-summary-header\"], styles.header);\n  const statusStyle = rs([\"rs-tax-summary-status\"], styles.status);\n  const referenceStyle = rs([\"rs-tax-summary-reference\"], styles.reference);\n  const table = rs([\"rs-tax-summary-table\"], styles.table);\n  const caption = rs([\"rs-tax-summary-caption\"], styles.caption);\n  const period = rs([\"rs-tax-summary-period\"], styles.period);\n  const column = rs([\"rs-tax-summary-column\"], styles.column);\n  const amountColumn = rs([\"rs-tax-summary-column\", \"rs-tax-summary-amount\"], styles.column, styles.amount);\n  const rowLabel = rs([\"rs-tax-summary-row-label\"], styles.rowLabel);\n  const amount = rs([\"rs-tax-summary-amount\"], styles.amount);\n  const detail = rs([\"rs-tax-summary-detail\"], styles.detail);\n  const total = rs([\"rs-tax-summary-total\"], styles.total);\n  const footer = rs([\"rs-tax-summary-footer\"], styles.footer);\n  const noteStyle = rs([\"rs-tax-summary-note\"], styles.note);\n  const actions = rs([\"rs-tax-summary-actions\"], styles.actions);\n  return <div ref={ref} role=\"group\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...header}><span {...statusStyle}>{status ?? \"Status not supplied\"}</span><span {...referenceStyle}>{reference ?? \"Assessment reference not supplied\"}</span></div>\n    <table {...table}>\n      <caption {...caption}>{label}<span {...period}>{periodLabel ?? \"Assessment period not supplied\"}</span></caption>\n      <thead><tr><th scope=\"col\" {...column}>Item</th><th scope=\"col\" {...amountColumn}>Amount</th></tr></thead>\n      <tbody>{items.length > 0 ? items.map(item => <tr key={item.id}><th scope=\"row\" {...rowLabel}>{item.label}{item.detail != null && <span {...detail}>{item.detail}</span>}</th><td {...amount}>{item.amount ?? \"Amount not supplied\"}</td></tr>) : <tr><td colSpan={2} {...rowLabel}>{itemsEmptyLabel}</td></tr>}</tbody>\n      <tfoot>{totals.length > 0 ? totals.map(item => <tr key={item.id} {...total}><th scope=\"row\" {...rowLabel}>{item.label}</th><td {...amount}>{item.amount ?? \"Amount not supplied\"}</td></tr>) : <tr><td colSpan={2} {...rowLabel}>{totalsEmptyLabel}</td></tr>}</tfoot>\n    </table>\n    <div {...footer}><span>{dueLabel ?? \"Payment timing not supplied\"}</span>{note != null && <p {...noteStyle}>{note}</p>}</div>\n    {children != null && <div {...actions}>{children}</div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/tax-summary.tsx"
+    },
+    {
+      "path": "vlak/styles/tax-summary.css",
+      "content": "/* ── tax-summary: generated from packages/react/src/components/tax-summary.tsx ── */\n.rs-tax-summary{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-tax-summary-header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;margin-bottom:1rem;font-size:0.875rem}\n.rs-tax-summary-status{font-weight:600}\n.rs-tax-summary-reference{color:var(--text-secondary);font-variant-numeric:tabular-nums}\n.rs-tax-summary-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:0.875rem}\n.rs-tax-summary-caption{text-align:start;padding-bottom:1rem;font-size:1.125rem;font-weight:600}\n.rs-tax-summary-period{display:block;font-size:0.875rem;font-weight:400;color:var(--text-secondary);margin-top:0.25rem}\n.rs-tax-summary-column{text-align:start;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:0.75rem;font-weight:500;color:var(--text-secondary)}\n.rs-tax-summary-row-label{text-align:start;font-weight:400;vertical-align:top;padding-block:1rem;padding-inline-end:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-tax-summary-amount{text-align:end;vertical-align:top;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-variant-numeric:tabular-nums;width:38%}\n.rs-tax-summary-detail{display:block;color:var(--text-secondary);font-size:0.75rem;margin-top:0.25rem}\n.rs-tax-summary-total{background-color:var(--table-alt);font-weight:600}\n.rs-tax-summary-footer{display:grid;gap:0.5rem;margin-top:1rem;font-size:0.875rem}\n.rs-tax-summary-note{margin:0;color:var(--text-secondary);max-width:66ch}\n.rs-tax-summary-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/tax-summary.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "civic",
+      "classes": [
+        "rs-tax-summary",
+        "rs-tax-summary-header",
+        "rs-tax-summary-status",
+        "rs-tax-summary-reference",
+        "rs-tax-summary-table",
+        "rs-tax-summary-caption",
+        "rs-tax-summary-period",
+        "rs-tax-summary-column",
+        "rs-tax-summary-row-label",
+        "rs-tax-summary-amount",
+        "rs-tax-summary-detail",
+        "rs-tax-summary-total",
+        "rs-tax-summary-footer",
+        "rs-tax-summary-note",
+        "rs-tax-summary-actions"
+      ],
+      "snippet": "<div class=\"rs-tax-summary\" role=\"group\" aria-label=\"Annual assessment\"><div class=\"rs-tax-summary-header\"><span class=\"rs-tax-summary-status\">Provisional</span><span class=\"rs-tax-summary-reference\">Example 204</span></div><table class=\"rs-tax-summary-table\"><caption class=\"rs-tax-summary-caption\">Annual assessment<span class=\"rs-tax-summary-period\">2025</span></caption><thead><tr><th scope=\"col\" class=\"rs-tax-summary-column\">Item</th><th scope=\"col\" class=\"rs-tax-summary-amount\">Amount</th></tr></thead><tbody><tr><th scope=\"row\" class=\"rs-tax-summary-row-label\">Assessed amount</th><td class=\"rs-tax-summary-amount\">€ 240.00</td></tr></tbody><tfoot><tr class=\"rs-tax-summary-total\"><th scope=\"row\" class=\"rs-tax-summary-row-label\">Amount payable</th><td class=\"rs-tax-summary-amount\">€ 240.00</td></tr></tfoot></table></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "TaxSummary",
+        "Tax assessment",
+        "Assessment statement",
+        "Municipal charges",
+        "Tax bill",
+        "Refund statement"
+      ],
+      "example": "import { TaxSummary } from \"@noorddev/vlak-react\";\n\n<TaxSummary label=\"Annual assessment\" periodLabel=\"2025\" reference=\"Example 204\" status=\"Provisional\" items={[{ id: \"assessment\", label: \"Assessed amount\", amount: \"€ 240.00\", detail: \"Supplied by the example authority\" }]} totals={[{ id: \"payable\", label: \"Amount payable\", amount: \"€ 240.00\" }]} dueLabel=\"Payment date not supplied\" note=\"Fictional amounts; no tax calculation is performed\" />",
+      "usage": {
+        "use": [
+          "Tax assessments, municipal charges, and other supplied statements with separate line items and totals.",
+          "Pass fully formatted amounts, signs, currencies, period, payment timing, and status from the authoritative source."
+        ],
+        "avoid": [
+          "Computing taxes, estimating refunds, summing amounts, or assuming a missing total is zero.",
+          "Generating a payment action or deadline without an application-owned destination or supplied terms."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Only supplied child controls enter the tab order and retain native keyboard behavior."
+        }
+      ],
+      "a11y": [
+        "A caption names the table; scope attributes associate row and column headers with amount cells.",
+        "Line items use tbody and supplied totals use tfoot. Amounts remain literal readable text.",
+        "Missing line items, totals, reference, and timing have explicit text. No numeric or financial status is inferred.",
+        "Native div attributes and refs pass through; child action targets should be at least 44px."
+      ]
+    }
+  }
+}

@@ -1,4 +1,6 @@
 export { vlakTokens, type VlakTokens } from "./tokens";
+export { domainCollections } from "./domains";
+export { healthWorkflows, healthDataContract } from "./health";
 export {
   concentricInner,
   concentricInnerCss,

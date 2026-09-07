@@ -1,6 +1,6 @@
 # Vlak
 
-Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 114 components ship as React, CSS, vendored StyleX source, and machine-readable data.
+Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 166 components ship as React, CSS, vendored StyleX source, and machine-readable data.
 
 [vlak.dev](https://vlak.dev) · [github.com/Noord-Ventures/vlak](https://github.com/Noord-Ventures/vlak)
 
@@ -47,7 +47,7 @@ Vlak treats an interface as a field rather than a stack of cards. Paper, ink, gr
 - **StyleX first.** Atomic, typed, compiled away. Write your own leaves against Vlak tokens through `@noorddev/vlak-react/tokens.stylex`.
 - **Platform first.** `<dialog>`, `<details>`, the Popover API, scroll snap, native inputs. JavaScript only where the platform has nothing.
 - **Accessibility tested.** APG patterns for listbox, menu, grid, and tabs. Focus rings, 3:1 control contrast, reduced motion, forced colours. Every interactive component has an axe test.
-- **Size budget.** 12 KB gzipped for the whole React stylesheet. Zero runtime dependencies beyond React and `@stylexjs/stylex`.
+- **Size budget.** 16 KB gzipped for the whole React stylesheet. Zero runtime dependencies beyond React and `@stylexjs/stylex`.
 - **Layered.** All CSS sits in cascade layers, so your overrides win without `!important`.
 - **Logical properties.** Every leaf paints its inline axis with logical properties. Set `dir="rtl"` and the system mirrors.
 - **Tokens as data.** Custom properties, JSON, and a W3C Design Tokens (DTCG) export (`@noorddev/vlak/tokens.dtcg`) for Style Dictionary, Figma Variables, and Tokens Studio.
@@ -60,7 +60,7 @@ Everything a coding agent needs is machine-readable and served from the same reg
 | Surface | Where |
 |---|---|
 | Index for language models | [vlak.dev/llms.txt](https://vlak.dev/llms.txt), [llms-full.txt](https://vlak.dev/llms-full.txt) |
-| One markdown page per component, tokens, and the guide | `vlak.dev/docs/<name>.md`, `/docs/tokens.md`, `/docs/guide.md` |
+| One markdown page per component, tokens, and the guides | `vlak.dev/docs/<name>.md`, `/docs/tokens.md`, `/docs/guide.md`, `/docs/health.md`, `/docs/civic.md`, `/docs/science.md`, `/docs/creative.md` |
 | shadcn registry items | `vlak.dev/r/<name>.json`, index at `/r/index.json` |
 | Props extracted from the types | `@noorddev/vlak/props` (JSON) |
 | CLI | `npx @noorddev/vlak-cli list --json`, `search <term> --json`, `docs <name>`, `tokens --json` |

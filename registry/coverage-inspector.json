@@ -1,0 +1,110 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "coverage-inspector",
+  "type": "registry:component",
+  "title": "Coverage inspector",
+  "description": "Shows supplied per-locus depth, base and strand counts with an exact position selector, bounded plot and complete depth table.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/coverage-inspector.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\n\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface CoverageLocus {\n  position: number;\n  depth: number | null;\n  bases?: Readonly<Record<string, number | null>>;\n  forward?: number | null;\n  reverse?: number | null;\n}\nexport interface CoverageInspectorProps extends Omit<React.HTMLAttributes<HTMLElement>, \"defaultValue\"> {\n  label: string;\n  contig: string;\n  reference?: string;\n  loci: readonly CoverageLocus[];\n  /** A supplied one-based position, not an array index. */\n  value?: number | null;\n  defaultValue?: number | null;\n  onValueChange?: (position: number | null) => void;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, color: vlak.ink, lineHeight: 1.45 },\n  title: { fontSize: \"0.875rem\", fontWeight: 600 },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n  plot: { display: \"block\", width: \"100%\", height: \"auto\", direction: \"ltr\", color: { default: vlak.ink, [mq.forcedColors]: \"CanvasText\" } },\n  stem: { stroke: \"currentColor\", strokeWidth: 2, fill: \"none\" },\n  point: { stroke: \"currentColor\", strokeWidth: 1, fill: \"currentColor\" },\n  missing: { stroke: \"currentColor\", strokeWidth: 1, fill: { default: vlak.paper, [mq.forcedColors]: \"Canvas\" } },\n  axis: { display: \"flex\", justifyContent: \"space-between\", gap: \"1rem\", fontSize: \"0.75rem\", color: vlak.gray, direction: \"ltr\", fontVariantNumeric: \"tabular-nums\" },\n  field: { display: \"grid\", gap: \"0.375rem\", fontSize: \"0.75rem\" },\n  select: { width: \"100%\", minWidth: 0 },\n  counts: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(5rem, 1fr))\", gap: \"0.75rem\", margin: 0, fontSize: \"0.75rem\" },\n  value: { margin: 0, marginTop: \"0.25rem\", fontSize: \"1rem\", fontVariantNumeric: \"tabular-nums\" },\n  summary: { display: \"list-item\", minWidth: vlak.hit, minHeight: vlak.hit, alignContent: \"center\", fontSize: \"0.875rem\", cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  table: { borderCollapse: \"collapse\", width: \"100%\", fontSize: \"0.75rem\", fontVariantNumeric: \"tabular-nums\" },\n  cell: { padding: \"0.5rem\", textAlign: \"start\", fontWeight: 400, borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n});\nconst isCount = (value: number | null | undefined): value is number => value != null && Number.isSafeInteger(value) && value >= 0;\nconst countLabel = (value: number | null | undefined) => value == null ? \"Not supplied\" : isCount(value) ? String(value) : \"Unavailable\";\n/** Supplied coverage and counts, with missing depth distinct from recorded zero and no variant calls. */\nexport const CoverageInspector = React.forwardRef<HTMLElement, CoverageInspectorProps>(function CoverageInspector({ label, contig, reference, loci, value, defaultValue, onValueChange, className, style, children, ...props }, ref) {\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const id = React.useId();\n  const [selected, setSelected, figureRef] = useInputValue<number | null, HTMLElement>(value, defaultValue === undefined ? (loci[0]?.position ?? null) : defaultValue, onValueChange, refresh);\n  const merged = useMergedRefs(ref, figureRef);\n  const valid = loci.length <= 512 && loci.every(locus => Number.isSafeInteger(locus.position) && locus.position >= 1) && new Set(loci.map(locus => locus.position)).size === loci.length;\n  const record = valid ? loci.find(locus => locus.position === selected) : undefined;\n  const start = valid && loci.length ? Math.min(...loci.map(locus => locus.position)) : 0;\n  const end = valid && loci.length ? Math.max(...loci.map(locus => locus.position)) : 0;\n  const maximum = valid ? Math.max(1, ...loci.map(locus => isCount(locus.depth) ? locus.depth : 0)) : 1;\n  const baseCounts = record?.bases ? Object.entries(record.bases) : [];\n  const root = rs([\"rs-coverage-inspector\", className], styles.root);\n  const title = rs([\"rs-coverage-inspector-title\"], styles.title);\n  const copy = rs([\"rs-coverage-inspector-copy\"], styles.copy);\n  const plot = rs([\"rs-coverage-inspector-plot\"], styles.plot);\n  const stem = rs([\"rs-coverage-inspector-stem\"], styles.stem);\n  const point = rs([\"rs-coverage-inspector-point\"], styles.point);\n  const missing = rs([\"rs-coverage-inspector-missing\"], styles.missing);\n  const axis = rs([\"rs-coverage-inspector-axis\"], styles.axis);\n  const field = rs([\"rs-coverage-inspector-label\"], styles.field);\n  const select = rs([\"rs-coverage-inspector-select\"], styles.select);\n  const counts = rs([\"rs-coverage-inspector-counts\"], styles.counts);\n  const valueStyle = rs([\"rs-coverage-inspector-value\"], styles.value);\n  const summary = rs([\"rs-coverage-inspector-summary\"], styles.summary);\n  const table = rs([\"rs-coverage-inspector-table\"], styles.table);\n  const cell = rs([\"rs-coverage-inspector-cell\"], styles.cell);\n  return <figure {...props} ref={merged} className={root.className} style={{ ...root.style, ...style }}>\n    <figcaption {...title}>{label}</figcaption><p {...copy}>{reference ? `${reference} · ` : \"\"}{contig} · 1-based positions</p>\n    {!valid ? <p {...copy}>Coverage unavailable: supply at most 512 unique positive integer positions</p> : !loci.length ? <p {...copy}>No coverage records supplied</p> : <>\n      <p {...copy}>Supplied depth. Open markers indicate missing or unavailable depth; filled markers include recorded zero.</p>\n      <svg {...plot} viewBox=\"0 0 600 112\" aria-hidden=\"true\" focusable=\"false\">{loci.map(locus => {\n        const x = start === end ? 300 : 8 + (locus.position - start) / (end - start) * 584;\n        const y = 102 - (isCount(locus.depth) ? locus.depth / maximum : 0) * 94;\n        return <g key={locus.position}>{isCount(locus.depth) ? <><path {...stem} d={`M${x} 102V${y}`} /><circle {...point} cx={x} cy={y} r={2} /></> : <circle {...missing} cx={x} cy={102} r={3} />}</g>;\n      })}</svg><div {...axis}><span>{start}</span><span>{end}</span></div>\n      <div {...field}><span id={`${id}-position-label`}>Inspect position</span><Select {...select} fullWidth aria-labelledby={`${id}-position-label`} value={record ? String(record.position) : \"\"} onValueChange={next => setSelected(next ? Number(next) : null)} options={[{ value: \"\", label: \"Choose position\" }, ...loci.map(locus => ({ value: String(locus.position), label: `${locus.position} · Depth ${countLabel(locus.depth)}` }))]} /></div>\n      {record ? <>\n        <dl {...counts}>{[[\"Depth\", record.depth], [\"Forward strand\", record.forward], [\"Reverse strand\", record.reverse]].map(([name, value]) => <div key={String(name)}><dt>{name}</dt><dd {...valueStyle}>{countLabel(value as number | null | undefined)}</dd></div>)}</dl>\n        {baseCounts.length > 16 ? <p {...copy}>Base counts unavailable: supply at most 16 symbols per locus</p> : baseCounts.length ? <dl {...counts} aria-label=\"Supplied base counts\">{baseCounts.map(([base, count]) => <div key={base}><dt>{base}</dt><dd {...valueStyle}>{countLabel(count)}</dd></div>)}</dl> : <p {...copy}>Base counts not supplied</p>}\n      </> : <p {...copy}>{selected == null ? \"No position selected\" : \"Selected position unavailable\"}</p>}\n      <details><summary {...summary}>Depth table, {loci.length} positions</summary><table {...table}><caption>{contig}, supplied coverage</caption><thead><tr><th {...cell} scope=\"col\">Position</th><th {...cell} scope=\"col\">Depth</th></tr></thead><tbody>{loci.map(locus => <tr key={locus.position}><th {...cell} scope=\"row\">{locus.position}</th><td {...cell}>{countLabel(locus.depth)}</td></tr>)}</tbody></table></details>\n    </>}{children}\n  </figure>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/coverage-inspector.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/coverage-inspector.css",
+      "content": "/* ── coverage-inspector: generated from packages/react/src/components/coverage-inspector.tsx ── */\n.rs-coverage-inspector{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45}\n.rs-coverage-inspector-title{font-size:0.875rem;font-weight:600}\n.rs-coverage-inspector-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n.rs-coverage-inspector-plot{display:block;width:100%;height:auto;direction:ltr;color:var(--text)}\n@media (forced-colors: active){.rs-coverage-inspector-plot{color:CanvasText}}\n.rs-coverage-inspector-stem{stroke:currentColor;stroke-width:2;fill:none}\n.rs-coverage-inspector-point{stroke:currentColor;stroke-width:1;fill:currentColor}\n.rs-coverage-inspector-missing{stroke:currentColor;stroke-width:1;fill:var(--bg)}\n@media (forced-colors: active){.rs-coverage-inspector-missing{fill:Canvas}}\n.rs-coverage-inspector-axis{display:flex;justify-content:space-between;gap:1rem;font-size:0.75rem;color:var(--text-secondary);direction:ltr;font-variant-numeric:tabular-nums}\n.rs-coverage-inspector-label{display:grid;gap:0.375rem;font-size:0.75rem}\n.rs-coverage-inspector-select{width:100%;min-width:0}\n.rs-coverage-inspector-counts{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.75rem;margin:0;font-size:0.75rem}\n.rs-coverage-inspector-value{margin:0;margin-top:0.25rem;font-size:1rem;font-variant-numeric:tabular-nums}\n.rs-coverage-inspector-summary{display:list-item;min-width:var(--hit);min-height:var(--hit);align-content:center;font-size:0.875rem;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-coverage-inspector-summary:focus-visible{outline-width:2px;outline-style:solid}\n.rs-coverage-inspector-table{border-collapse:collapse;width:100%;font-size:0.75rem;font-variant-numeric:tabular-nums}\n.rs-coverage-inspector-cell{padding:0.5rem;text-align:start;font-weight:400;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/coverage-inspector.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "science",
+      "classes": [
+        "rs-coverage-inspector",
+        "rs-coverage-inspector-title",
+        "rs-coverage-inspector-copy",
+        "rs-coverage-inspector-plot",
+        "rs-coverage-inspector-stem",
+        "rs-coverage-inspector-point",
+        "rs-coverage-inspector-missing",
+        "rs-coverage-inspector-axis",
+        "rs-coverage-inspector-label",
+        "rs-coverage-inspector-select",
+        "rs-coverage-inspector-counts",
+        "rs-coverage-inspector-value",
+        "rs-coverage-inspector-summary",
+        "rs-coverage-inspector-table",
+        "rs-coverage-inspector-cell"
+      ],
+      "snippet": "<figure class=\"rs-coverage-inspector\"><figcaption class=\"rs-coverage-inspector-title\">Coverage window</figcaption><p class=\"rs-coverage-inspector-copy\">chr7 · 1-based positions</p><div class=\"rs-coverage-inspector-label\"><span id=\"coverage-position-label\">Inspect position</span><div class=\"rs-select rs-select-fluid rs-coverage-inspector-select\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"coverage-position-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\"><span>101 · Depth 0</span></button></div></div><dl class=\"rs-coverage-inspector-counts\"><div><dt>Depth</dt><dd class=\"rs-coverage-inspector-value\">0</dd></div></dl></figure>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Read depth inspector",
+        "Per-base coverage",
+        "Strand count inspector",
+        "Locus coverage",
+        "Genomic depth plot"
+      ],
+      "example": "import { CoverageInspector } from \"@noorddev/vlak-react\";\n\n<CoverageInspector label=\"Coverage window\" contig=\"chr7\" reference=\"Example reference\" loci={[\n  { position: 101, depth: 0, bases: { A: 0, C: 0 }, forward: 0, reverse: 0 },\n  { position: 102, depth: null },\n  { position: 103, depth: 24, bases: { A: 20, C: 4 }, forward: 12, reverse: 12 },\n]} defaultValue={103} />",
+      "usage": {
+        "use": [
+          "A bounded window of up to 512 unique one-based loci with caller-supplied counts.",
+          "Inspect base and strand counts independently; the component does not sum them or reconcile them with depth.",
+          "Use null for missing counts. Zero means an explicitly recorded count of zero."
+        ],
+        "avoid": [
+          "Calling variants, assigning significance, or applying coverage thresholds.",
+          "Treating absent counts as zero, or supplying fractional and negative counts as valid depth."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the Vlak position selector and native depth-table disclosure."
+        },
+        {
+          "keys": "Arrow keys, typing",
+          "does": "Opens and navigates the Vlak position selector by arrow keys and typeahead. Escape closes its menu."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Chooses a highlighted locus or opens and closes the focused native depth disclosure."
+        }
+      ],
+      "a11y": [
+        "The decorative plot has a complete visible depth table; open markers distinguish unavailable depth from recorded zero.",
+        "Vlak Select provides a 44px trigger and listbox for exact supplied genomic positions. Selected depth, base and strand counts use description lists.",
+        "Non-finite, negative and non-integer counts are unavailable; missing counts are explicitly not supplied.",
+        "At most 16 base symbols are displayed per selected locus. Invalid or oversized locus windows are reported without truncation.",
+        "The figure ref and native attributes pass through; selection supports controlled values and native form reset."
+      ]
+    }
+  }
+}

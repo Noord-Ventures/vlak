@@ -31,6 +31,20 @@ export type { ViewerImage } from "./components/image-viewer";
 export type { ComposedMessage } from "./components/message-composer";
 export { rs } from "./rs";
 export { vlak, phone, mobileGrid, rail, wide, vlakFont, vlakMono } from "./tokens.stylex";
+export { HealthMetric, type HealthMetricProps } from "./components/health-metric";
+export { ReferenceRange, type ReferenceRangeProps } from "./components/reference-range";
+export { LabResults, type LabResultsProps, type LabResult } from "./components/lab-results";
+export { SymptomDiary, type SymptomDiaryProps, type SymptomEntry } from "./components/symptom-diary";
+export { CheckIn, type CheckInProps, type CheckInOption } from "./components/check-in";
+export { HabitTracker, type HabitTrackerProps, type HabitDay, type HabitStatus } from "./components/habit-tracker";
+export { SleepTimeline, type SleepTimelineProps, type SleepInterval, type SleepState } from "./components/sleep-timeline";
+export { ActivityGoal, type ActivityGoalProps } from "./components/activity-goal";
+export { ActivityRings, type ActivityRingsProps, type ActivityRingGoal } from "./components/activity-rings";
+export { PatientBanner, type PatientBannerProps, type PatientBannerIdentifier, type PatientBannerContextItem } from "./components/patient-banner";
+export { MedicationSchedule, type MedicationScheduleProps, type MedicationScheduleItem, type MedicationScheduleAction } from "./components/medication-schedule";
+export { AppointmentCard, type AppointmentCardProps } from "./components/appointment-card";
+export { CarePlan, type CarePlanProps, type CarePlanTask } from "./components/care-plan";
+
 export {
   Icon,
   Icons,
@@ -233,3 +247,43 @@ export {
   type RefItemProps,
   type CiteBoxProps,
 } from "./components/refs";
+
+export { IdentityDocument, type IdentityDocumentProps } from "./components/identity-document";
+export { TaxSummary, type TaxSummaryProps, type TaxSummaryItem, type TaxSummaryTotal } from "./components/tax-summary";
+export { BenefitProgram, type BenefitProgramProps, type BenefitProgramCriterion } from "./components/benefit-program";
+export { ApplicationStatus, type ApplicationStatusProps, type ApplicationMilestone } from "./components/application-status";
+export { EvidenceChecklist, type EvidenceChecklistProps, type EvidenceChecklistItem, type EvidenceChecklistAction } from "./components/evidence-checklist";
+export { MeasurementValue, type MeasurementValueProps } from "./components/measurement-value";
+export { QuantityField, type QuantityFieldProps, type QuantityValue, type QuantityUnit } from "./components/quantity-field";
+export { WellPlate, type WellPlateProps, type WellPosition, type WellRecord } from "./components/well-plate";
+export { ExperimentRun, type ExperimentRunProps, type ExperimentCondition, type ExperimentAction, type ExperimentStep } from "./components/experiment-run";
+export { SpectrumPlot, type SpectrumPlotProps, type SpectrumPoint, type SpectrumPeak } from "./components/spectrum-plot";
+export { AudioMeter, type AudioMeterProps, type AudioMeterChannel } from "./components/audio-meter";
+export { ChannelStrip, type ChannelStripProps, type ChannelStripValue } from "./components/channel-strip";
+export { ParameterKnob, type ParameterKnobProps } from "./components/parameter-knob";
+export { TimecodeField, type TimecodeFieldProps } from "./components/timecode-field";
+export { ClipTimeline, type ClipTimelineProps, type ClipTrack, type TimelineClip } from "./components/clip-timeline";
+export { RenderQueue, type RenderQueueProps, type RenderJob, type RenderJobStatus } from "./components/render-queue";
+export { LayerStack, type LayerStackProps, type CreativeLayer } from "./components/layer-stack";
+export { ColorInspector, type ColorInspectorProps, type InspectorColor } from "./components/color-inspector";
+export { SpacingControl, type SpacingControlProps, type SpacingValue } from "./components/spacing-control";
+export { AssemblyVariantMatrix, type AssemblyReference, type AssemblyVariant, type AssemblyVariantState, type AssemblyVariantMatrixProps } from "./components/assembly-variant-matrix";
+export { CoordinateReferenceField, type CoordinateReferenceOption, type CoordinateReferenceAxis, type CoordinateReferenceValue, type CoordinateReferenceFieldProps } from "./components/coordinate-reference-field";
+export { DatumTransformPicker, type DatumTransformGrid, type DatumTransformation, type DatumTransformPickerProps } from "./components/datum-transform-picker";
+export { RasterBandMixer, type RasterSourceBand, type RasterChannelMapping, type RasterStretch, type RasterBandConfiguration, type RasterBandMixerProps } from "./components/raster-band-mixer";
+export { Patchbay, type PatchPort, type PatchConnection, type PatchbayProps } from "./components/patchbay";
+export { KerningPairEditor, type KerningPair, type KerningOffsets, type KerningPairEditorProps } from "./components/kerning-pair-editor";
+export { StackNavigator, type StackPosition, type StackAxis, type StackSelection, type StackNavigatorProps } from "./components/stack-navigator";
+export { AcquisitionSequencer, type AcquisitionChannel, type AcquisitionStepAction, type AcquisitionStep, type AcquisitionSequencerProps } from "./components/acquisition-sequencer";
+export { SequenceAlignment, type AlignedRead, type AlignmentSelection, type SequenceAlignmentProps } from "./components/sequence-alignment";
+export { GenomicRegionField, type GenomicContig, type GenomicRegion, type GenomicRegionFieldProps } from "./components/genomic-region-field";
+export { AlarmPanel, type AlarmAction, type AlarmFilter, type AlarmRecord, type AlarmPanelProps } from "./components/alarm-panel";
+export { WorkOffsetPanel, type WorkOffsetAxis, type WorkOffsetSystem, type WorkOffsetValue, type WorkOffsetPanelProps } from "./components/work-offset-panel";
+export { CoverageInspector, type CoverageInspectorProps, type CoverageLocus } from "./components/coverage-inspector";
+export { JointPanel, type JointRecord, type JointTargets, type JointPanelProps } from "./components/joint-panel";
+export { RobotPose, type RobotPoseComponent, type RobotPoseRecord, type RobotPoseProps } from "./components/robot-pose";
+export { RobotMissionQueue, type RobotMissionAction, type RobotMissionStep, type RobotMissionQueueProps } from "./components/robot-mission-queue";
+export { PadInspector, type PadInspectorMeasurement, type PadInspectorPad, type PadInspectorProps } from "./components/pad-inspector";
+export { DesignRuleResults, type DesignRuleSeverity, type DesignRuleStatus, type DesignRuleLocation, type DesignRuleViolation, type DesignRuleFilter, type DesignRuleResultsProps } from "./components/design-rule-results";
+export { ColonyPlate, type ColonyMarker, type ColonyPlateProps } from "./components/colony-plate";
+export { CultureLog, type CultureCondition, type CultureAction, type CultureObservation, type CultureLogProps } from "./components/culture-log";

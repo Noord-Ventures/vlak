@@ -1,0 +1,15 @@
+/* ── patchbay: generated from packages/react/src/components/patchbay.tsx ── */
+.rs-patchbay{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
+.rs-patchbay-legend{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
+.rs-patchbay-viewport{min-width:0;max-width:100%;overflow:auto;border-width:1px;border-style:solid;border-color:var(--divider)}
+.rs-patchbay-table{width:100%;border-collapse:collapse;font-size:var(--control-label);line-height:1.45}
+.rs-patchbay-header{text-align:start;vertical-align:top;min-width:7rem;padding:0.625rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:500}
+.rs-patchbay-detail{display:block;font-weight:400;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}
+.rs-patchbay-cell{text-align:center;vertical-align:top;padding:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-patchbay-control{position:relative;display:inline-grid;place-items:center;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);cursor:pointer;outline-color:var(--text);outline-offset:2px}
+.rs-patchbay-control:focus-within{outline-width:2px;outline-style:solid}
+.rs-patchbay-connected{background-color:var(--text);color:var(--bg)}
+@media (forced-colors: active){.rs-patchbay-connected{background-color:Highlight;color:HighlightText}}
+.rs-patchbay-blocked{cursor:default;border-style:dashed}
+.rs-patchbay-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);margin:0;opacity:0;cursor:inherit}
+.rs-patchbay-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;max-width:66ch}

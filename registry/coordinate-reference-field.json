@@ -1,0 +1,104 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "coordinate-reference-field",
+  "type": "registry:component",
+  "title": "Coordinate reference field",
+  "description": "Two or three numeric coordinate axes with supplied units and a reference selector that preserves entered values when assigning a reference.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/coordinate-reference-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\nimport { Input } from \"./input\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface CoordinateReferenceOption { value: string; label: string; description?: React.ReactNode; disabled?: boolean }\nexport interface CoordinateReferenceAxis { id: string; label: string; unit?: string | null; min?: number; max?: number }\nexport interface CoordinateReferenceValue { reference: string | null; coordinates: Record<string, number | null> }\nexport interface CoordinateReferenceFieldProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: React.ReactNode;\n  /** Two or three axes in the supplied coordinate order. Units are never inferred. */\n  axes: readonly CoordinateReferenceAxis[];\n  references: readonly CoordinateReferenceOption[];\n  value?: CoordinateReferenceValue;\n  defaultValue?: CoordinateReferenceValue;\n  /** Assigning a reference preserves every numeric value. The host owns reprojection. */\n  onValueChange?: (value: CoordinateReferenceValue) => void;\n  description?: React.ReactNode;\n  referenceLabel?: string;\n  unknownReferenceLabel?: string;\n  required?: boolean;\n  readOnly?: boolean;\n}\n\nconst initial: CoordinateReferenceValue = { reference: null, coordinates: {} };\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.875rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: vlak.controlFs, fontWeight: 600 },\n  axes: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(min(100%, 9rem), 1fr))\", gap: \"0.75rem\" },\n  field: { display: \"grid\", alignContent: \"start\", gap: \"0.375rem\", minWidth: 0, fontSize: vlak.controlLabel },\n  control: { minWidth: 0, width: \"100%\", minHeight: vlak.hit },\n  note: { margin: 0, color: vlak.gray, fontSize: vlak.controlLabel, maxWidth: \"66ch\", overflowWrap: \"anywhere\" },\n});\n\n/** Numeric coordinates and an explicitly assigned reference, without implicit conversion. */\nexport const CoordinateReferenceField = React.forwardRef<HTMLFieldSetElement, CoordinateReferenceFieldProps>(function CoordinateReferenceField({ label, axes, references, value, defaultValue = initial, onValueChange, description, referenceLabel = \"Coordinate reference\", unknownReferenceLabel = \"Unknown reference\", required, readOnly, disabled, name, form, className, style, children, \"aria-describedby\": ariaDescribedBy, ...props }, ref) {\n  const id = React.useId();\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<CoordinateReferenceValue, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const reference = references.find(option => option.value === current.reference);\n  const unknown = current.reference != null && !reference;\n  const unavailable = unknown || reference?.disabled === true;\n  const validOptions = axes.length >= 2 && axes.length <= 3 && axes.every(axis => axis.id.length > 0) && new Set(axes.map(axis => axis.id)).size === axes.length && references.every(option => option.value.length > 0) && new Set(references.map(option => option.value)).size === references.length;\n  const describedBy = [ariaDescribedBy, `${id}-assignment`, description != null && `${id}-description`, readOnly && `${id}-readonly`].filter(Boolean).join(\" \");\n  const root = rs([\"rs-coordinate-reference-field\", className], styles.root);\n  const legend = rs([\"rs-coordinate-reference-field-legend\"], styles.legend);\n  const fields = rs([\"rs-coordinate-reference-field-axes\"], styles.axes);\n  const field = rs([\"rs-coordinate-reference-field-label\"], styles.field);\n  const control = rs([\"rs-coordinate-reference-field-control\"], styles.control);\n  const note = rs([\"rs-coordinate-reference-field-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} aria-describedby={describedBy} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>\n    {description != null && <p {...note} id={`${id}-description`}>{description}</p>}\n    <p {...note} id={`${id}-assignment`}>Assigning a reference keeps the entered coordinates. Conversion is handled by the application.</p>\n    {readOnly && <p {...note} id={`${id}-readonly`}>Read only</p>}\n    {!validOptions ? <p {...note}>Supply two or three uniquely named axes and unique, non-empty reference identifiers.</p> : <>\n      <div {...field}><span id={`${id}-reference-label`}>{referenceLabel}</span><Select {...control} fullWidth name={name ? `${name}.reference` : undefined} form={form} value={unavailable ? \"\" : current.reference ?? \"\"} disabled={disabled} readOnly={readOnly} required={required || unavailable} aria-invalid={unavailable || undefined} aria-labelledby={`${id}-reference-label`} aria-describedby={`${describedBy} ${id}-reference`} options={[{ value: \"\", label: unavailable ? `Unavailable reference: ${current.reference}` : unknownReferenceLabel }, ...references.map(option => ({ value: option.value, label: option.label, disabled: option.disabled }))]} onValueChange={next => { if (!readOnly && !disabled) setValue({ ...current, reference: next || null }); }} /></div>\n      <p {...note} id={`${id}-reference`}>{unavailable ? `Reference unavailable: ${current.reference}` : reference?.description ?? (reference ? reference.value : unknownReferenceLabel)}</p>\n      <div {...fields}>{axes.map((axis, index) => {\n        const amount = current.coordinates[axis.id];\n        const finite = amount != null && Number.isFinite(amount);\n        const invalid = amount != null && !finite;\n        const hintId = `${id}-axis-${index}`;\n        return <label {...field} key={axis.id}><span id={`${hintId}-label`}>{axis.label}{axis.unit ? ` (${axis.unit})` : \"\"}</span><Input plain {...control} type=\"number\" name={name ? `${name}.coordinates.${axis.id}` : undefined} form={form} value={finite ? amount : \"\"} min={axis.min} max={axis.max} step=\"any\" required={required} readOnly={readOnly} aria-invalid={invalid || undefined} aria-labelledby={`${hintId}-label`} aria-describedby={`${describedBy} ${hintId}`} ref={node => { node?.setCustomValidity(invalid ? \"Coordinate unavailable. Enter a finite number.\" : \"\"); }} onChange={event => { if (!readOnly && !disabled) setValue({ ...current, coordinates: { ...current.coordinates, [axis.id]: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null } }); }} /><span {...note} id={hintId}>{invalid ? \"Coordinate unavailable\" : amount == null ? \"Not supplied\" : axis.unit ? `Unit: ${axis.unit}` : \"Unit not supplied\"}</span></label>;\n      })}</div>\n    </>}\n    {children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/coordinate-reference-field.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/coordinate-reference-field.css",
+      "content": "/* ── coordinate-reference-field: generated from packages/react/src/components/coordinate-reference-field.tsx ── */\n.rs-coordinate-reference-field{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-coordinate-reference-field-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}\n.rs-coordinate-reference-field-axes{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.75rem}\n.rs-coordinate-reference-field-label{display:grid;align-content:start;gap:0.375rem;min-width:0;font-size:var(--control-label)}\n.rs-coordinate-reference-field-control{min-width:0;width:100%;min-height:var(--hit)}\n.rs-coordinate-reference-field-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/coordinate-reference-field.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "geospatial",
+      "classes": [
+        "rs-coordinate-reference-field",
+        "rs-coordinate-reference-field-legend",
+        "rs-coordinate-reference-field-axes",
+        "rs-coordinate-reference-field-label",
+        "rs-coordinate-reference-field-control",
+        "rs-coordinate-reference-field-note"
+      ],
+      "snippet": "<fieldset class=\"rs-coordinate-reference-field\"><legend class=\"rs-coordinate-reference-field-legend\">Survey point</legend><p class=\"rs-coordinate-reference-field-note\">Assigning a reference keeps the entered coordinates.</p><div class=\"rs-coordinate-reference-field-label\"><span id=\"geo-coordinate-reference-label\">Coordinate reference</span><div class=\"rs-select rs-select-fluid rs-coordinate-reference-field-control\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"geo-coordinate-reference-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\">Site grid</button></div></div><div class=\"rs-coordinate-reference-field-axes\"><label class=\"rs-coordinate-reference-field-label\">Easting (m)<input class=\"rs-input rs-input-full rs-coordinate-reference-field-control\" name=\"point.coordinates.east\" type=\"number\" step=\"any\" value=\"120.5\" /></label><label class=\"rs-coordinate-reference-field-label\">Northing (m)<input class=\"rs-input rs-input-full rs-coordinate-reference-field-control\" name=\"point.coordinates.north\" type=\"number\" step=\"any\" value=\"48.25\" /></label></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "input",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Coordinate input",
+        "Reference system selector",
+        "Survey point field",
+        "Projected coordinate",
+        "Latitude longitude field"
+      ],
+      "example": "import { CoordinateReferenceField } from \"@noorddev/vlak-react\";\n\n<CoordinateReferenceField\n  label=\"Recorded survey point\"\n  name=\"point\"\n  axes={[{ id: \"east\", label: \"Easting\", unit: \"m\" }, { id: \"north\", label: \"Northing\", unit: \"m\" }]}\n  references={[{ value: \"site\", label: \"Site grid\" }, { value: \"project\", label: \"Project grid\" }]}\n  defaultValue={{ reference: \"site\", coordinates: { east: 120.5, north: 48.25 } }}\n/>",
+      "usage": {
+        "use": [
+          "Survey points and imported coordinates whose reference, axis order and units are supplied by the application.",
+          "Supply two or three axes in coordinate order with unique, non-empty identifiers; reference values must also be unique and non-empty.",
+          "Use value and onValueChange for application-owned conversion. Changing the reference requests only a new identifier and preserves the numeric coordinates.",
+          "name submits reference as name.reference and each axis as name.coordinates followed by its identifier. null represents a missing coordinate or reference."
+        ],
+        "avoid": [
+          "Inferring a reference from numeric ranges, treating a reference assignment as reprojection or guessing axis units.",
+          "Using a latitude or longitude bound for a projected axis unless the application supplies that constraint."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the reference selector and coordinate inputs in supplied axis order."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Opens and navigates the Vlak selector. Enter or Space chooses a reference without converting numeric values; Escape closes the menu."
+        },
+        {
+          "keys": "Typing",
+          "does": "Edits numeric coordinates using the native number inputs."
+        }
+      ],
+      "a11y": [
+        "The fieldset legend names the coordinate group. Vlak Select and Input provide shared control paint; every numeric input has a visible axis label, supplied unit and 44px target.",
+        "Unknown references, missing coordinates and non-finite numbers have explicit text. Zero is retained. Invalid supplied values participate in native form validation.",
+        "Required and supplied axis bounds use native validation. No geographic constraints are inferred.",
+        "Uncontrolled values follow native form reset, including external forms; controlled values remain with the application.",
+        "Read-only valid values still submit. Disabled fields do not submit. The fieldset ref, native attributes, className and style pass through."
+      ]
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "patchbay",
+  "type": "registry:component",
+  "title": "Patchbay",
+  "description": "Connects supplied source and destination ports through a keyboard-navigable matrix, with signal types, channel groups, and blocked-route reasons.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/patchbay.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface PatchPort { id: string; label: string; group?: string; signalType: string }\nexport interface PatchConnection { sourceId: string; destinationId: string }\nexport interface PatchbayProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\"> {\n  label: React.ReactNode;\n  sources: PatchPort[];\n  destinations: PatchPort[];\n  value?: PatchConnection[];\n  defaultValue?: PatchConnection[];\n  onValueChange?: (connections: PatchConnection[]) => void;\n  /** Additional host constraints. Matching signal types are required by default. */\n  getBlockReason?: (source: PatchPort, destination: PatchPort) => string | null;\n  readOnly?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink },\n  legend: { marginBottom: \"0.75rem\", padding: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  viewport: { minWidth: 0, maxWidth: \"100%\", overflow: \"auto\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider },\n  table: { width: \"100%\", borderCollapse: \"collapse\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  header: { textAlign: \"start\", verticalAlign: \"top\", minWidth: \"7rem\", padding: \"0.625rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, fontWeight: 500 },\n  detail: { display: \"block\", fontWeight: 400, color: vlak.gray, fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  cell: { textAlign: \"center\", verticalAlign: \"top\", padding: \"0.5rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  control: { position: \"relative\", display: \"inline-grid\", placeItems: \"center\", minWidth: vlak.hit, minHeight: vlak.hit, boxSizing: \"border-box\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, cursor: \"pointer\", outlineWidth: { default: null, \":focus-within\": 2 }, outlineStyle: { default: null, \":focus-within\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  connected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  blocked: { cursor: \"default\", borderStyle: \"dashed\" },\n  input: { position: \"absolute\", inset: \"-1px\", width: \"calc(100% + 2px)\", height: \"calc(100% + 2px)\", margin: 0, opacity: 0, cursor: \"inherit\" },\n  note: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45, maxWidth: \"66ch\" },\n});\n\n/** A connection matrix for supplied ports; the caller owns the routing engine. */\nexport const Patchbay = React.forwardRef<HTMLFieldSetElement, PatchbayProps>(function Patchbay({ label, sources, destinations, value, defaultValue = [], onValueChange, getBlockReason, readOnly, disabled, name, form, className, style, ...props }, ref) {\n  const id = React.useId();\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<PatchConnection[], HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const [focusIndex, setFocusIndex] = React.useState(0);\n  const controls = React.useRef(new Map<number, HTMLInputElement>());\n  const cells = sources.flatMap((source) => destinations.map((destination) => {\n    const connected = current.some((connection) => connection.sourceId === source.id && connection.destinationId === destination.id);\n    const reason = !source.signalType.trim() || !destination.signalType.trim() ? \"Signal type unavailable.\" : source.signalType !== destination.signalType ? `Signal types differ: ${source.signalType} to ${destination.signalType}.` : getBlockReason?.(source, destination) ?? null;\n    return { source, destination, connected, reason, blocked: Boolean(disabled || readOnly || (reason && !connected)) };\n  }));\n  const tabIndex = cells[focusIndex] && !cells[focusIndex]!.blocked ? focusIndex : cells.findIndex((cell) => !cell.blocked);\n  const unknown = current.filter((connection) => !sources.some((source) => source.id === connection.sourceId) || !destinations.some((destination) => destination.id === connection.destinationId));\n  const moveFocus = (event: React.KeyboardEvent<HTMLInputElement>, index: number) => {\n    const columns = destinations.length;\n    const key = event.key;\n    if (![\"ArrowLeft\", \"ArrowRight\", \"ArrowUp\", \"ArrowDown\", \"Home\", \"End\"].includes(key)) return;\n    event.preventDefault();\n    const rowStart = Math.floor(index / columns) * columns;\n    let target = key === \"Home\" ? (event.ctrlKey ? 0 : rowStart) : key === \"End\" ? (event.ctrlKey ? cells.length - 1 : rowStart + columns - 1) : index + (key === \"ArrowUp\" ? -columns : key === \"ArrowDown\" ? columns : key === \"ArrowLeft\" ? -1 : 1);\n    const direction = key === \"ArrowLeft\" || key === \"ArrowUp\" || key === \"End\" ? -1 : 1;\n    const stride = key === \"ArrowUp\" || key === \"ArrowDown\" ? columns : 1;\n    while (target >= 0 && target < cells.length) {\n      if ((key === \"ArrowLeft\" || key === \"ArrowRight\" || ((key === \"Home\" || key === \"End\") && !event.ctrlKey)) && Math.floor(target / columns) !== Math.floor(index / columns)) break;\n      if (!cells[target]!.blocked) { controls.current.get(target)?.focus(); break; }\n      target += direction * stride;\n    }\n  };\n  const root = rs([\"rs-patchbay\", className], styles.root);\n  const legend = rs([\"rs-patchbay-legend\"], styles.legend);\n  const viewport = rs([\"rs-patchbay-viewport\"], styles.viewport);\n  const table = rs([\"rs-patchbay-table\"], styles.table);\n  const header = rs([\"rs-patchbay-header\"], styles.header);\n  const detail = rs([\"rs-patchbay-detail\"], styles.detail);\n  const cellStyle = rs([\"rs-patchbay-cell\"], styles.cell);\n  const input = rs([\"rs-patchbay-input\"], styles.input);\n  const note = rs([\"rs-patchbay-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    {sources.length === 0 || destinations.length === 0 ? <p className={note.className} style={note.style}>Supply source and destination ports to edit connections.</p> : <div className={viewport.className} style={viewport.style}>\n      <table className={table.className} style={table.style}><thead><tr><th scope=\"col\" className={header.className} style={header.style}>Source / destination</th>{destinations.map((port) => <th key={port.id} scope=\"col\" className={header.className} style={header.style}>{port.label}<span className={detail.className} style={detail.style}>{[port.group, port.signalType].filter(Boolean).join(\" · \")}</span></th>)}</tr></thead><tbody>{sources.map((source, row) => <tr key={source.id}>\n        <th scope=\"row\" className={header.className} style={header.style}>{source.label}<span className={detail.className} style={detail.style}>{[source.group, source.signalType].filter(Boolean).join(\" · \")}</span></th>\n        {destinations.map((destination, column) => {\n          const index = row * destinations.length + column;\n          const cell = cells[index]!;\n          const control = rs([\"rs-patchbay-control\", cell.connected && \"rs-patchbay-connected\", cell.blocked && \"rs-patchbay-blocked\"], styles.control, cell.connected && styles.connected, cell.blocked && styles.blocked);\n          return <td key={destination.id} className={cellStyle.className} style={cellStyle.style}>\n            <label className={control.className} style={control.style}><span aria-hidden=\"true\">{cell.connected ? \"✓\" : cell.reason ? \"×\" : \"+\"}</span><input ref={(node) => { if (node) controls.current.set(index, node); else controls.current.delete(index); }} type=\"checkbox\" name={name} form={form} value={JSON.stringify([source.id, destination.id])} checked={cell.connected} disabled={cell.blocked} tabIndex={index === tabIndex ? 0 : -1} aria-label={`${source.label} to ${destination.label}`} aria-describedby={cell.reason ? `${id}-reason-${index}` : undefined} className={input.className} style={input.style} onFocus={() => setFocusIndex(index)} onKeyDown={(event) => moveFocus(event, index)} onChange={() => setValue(cell.connected ? current.filter((connection) => connection.sourceId !== source.id || connection.destinationId !== destination.id) : [...current, { sourceId: source.id, destinationId: destination.id }])} /></label>\n            {cell.reason && <span id={`${id}-reason-${index}`} className={detail.className} style={detail.style}>{cell.reason}{cell.connected ? \" Existing connection can be removed.\" : \"\"}</span>}\n          </td>;\n        })}\n      </tr>)}</tbody></table>\n    </div>}\n    {readOnly && <p className={note.className} style={note.style}>Read only</p>}\n    {unknown.length > 0 && <div className={note.className} style={note.style}>Connections with unavailable ports:<ul>{unknown.map((connection, index) => <li key={index}>{connection.sourceId} to {connection.destinationId}</li>)}</ul></div>}\n    {name && current.filter((connection) => readOnly || unknown.includes(connection)).map((connection, index) => <input key={index} type=\"hidden\" name={name} form={form} value={JSON.stringify([connection.sourceId, connection.destinationId])} />)}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/patchbay.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/patchbay.css",
+      "content": "/* ── patchbay: generated from packages/react/src/components/patchbay.tsx ── */\n.rs-patchbay{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}\n.rs-patchbay-legend{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-patchbay-viewport{min-width:0;max-width:100%;overflow:auto;border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-patchbay-table{width:100%;border-collapse:collapse;font-size:var(--control-label);line-height:1.45}\n.rs-patchbay-header{text-align:start;vertical-align:top;min-width:7rem;padding:0.625rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:500}\n.rs-patchbay-detail{display:block;font-weight:400;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}\n.rs-patchbay-cell{text-align:center;vertical-align:top;padding:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-patchbay-control{position:relative;display:inline-grid;place-items:center;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-patchbay-control:focus-within{outline-width:2px;outline-style:solid}\n.rs-patchbay-connected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-patchbay-connected{background-color:Highlight;color:HighlightText}}\n.rs-patchbay-blocked{cursor:default;border-style:dashed}\n.rs-patchbay-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);margin:0;opacity:0;cursor:inherit}\n.rs-patchbay-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/patchbay.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-patchbay",
+        "rs-patchbay-legend",
+        "rs-patchbay-viewport",
+        "rs-patchbay-table",
+        "rs-patchbay-header",
+        "rs-patchbay-detail",
+        "rs-patchbay-cell",
+        "rs-patchbay-control",
+        "rs-patchbay-connected",
+        "rs-patchbay-blocked",
+        "rs-patchbay-input",
+        "rs-patchbay-note"
+      ],
+      "snippet": "<fieldset class=\"rs-patchbay\"><legend class=\"rs-patchbay-legend\">Studio routing</legend><div class=\"rs-patchbay-viewport\"><table class=\"rs-patchbay-table\"><thead><tr><th class=\"rs-patchbay-header\" scope=\"col\">Source / destination</th><th class=\"rs-patchbay-header\" scope=\"col\">Monitor left<span class=\"rs-patchbay-detail\">Outputs · audio</span></th></tr></thead><tbody><tr><th class=\"rs-patchbay-header\" scope=\"row\">Mix left<span class=\"rs-patchbay-detail\">Mix bus · audio</span></th><td class=\"rs-patchbay-cell\"><label class=\"rs-patchbay-control rs-patchbay-connected\"><span aria-hidden=\"true\">✓</span><input class=\"rs-patchbay-input\" type=\"checkbox\" checked aria-label=\"Mix left to Monitor left\" /></label></td></tr></tbody></table></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Patchbay",
+        "Routing matrix",
+        "Audio routing",
+        "Crosspoint matrix",
+        "Connection matrix",
+        "Signal patching"
+      ],
+      "example": "import { Patchbay } from \"@noorddev/vlak-react\";\n\n<Patchbay label=\"Studio routing\" name=\"routes\"\n  sources={[{ id: \"mix-l\", label: \"Mix left\", group: \"Mix bus\", signalType: \"audio\" }]}\n  destinations={[{ id: \"out-l\", label: \"Monitor left\", group: \"Outputs\", signalType: \"audio\" }, { id: \"clock\", label: \"Clock\", signalType: \"control\" }]}\n  defaultValue={[{ sourceId: \"mix-l\", destinationId: \"out-l\" }]} />",
+      "usage": {
+        "use": [
+          "An audio or signal-routing matrix whose ports and confirmed connections come from the host.",
+          "value/defaultValue/onValueChange for controlled routing requests or a local prototype; the host applies real routing changes.",
+          "Signal type strings must match; getBlockReason can add a host-specific restriction with a visible explanation.",
+          "Existing incompatible connections can be disconnected; routes involving unavailable ports remain explicitly listed and preserved."
+        ],
+        "avoid": [
+          "Assuming the component creates audio streams, manages clocking, or configures a routing engine.",
+          "Silently deleting host connections when a port temporarily disappears."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Enters the connection matrix at one enabled checkbox, then leaves the matrix."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Moves focus through enabled crosspoints in the same row or column."
+        },
+        {
+          "keys": "Home, End",
+          "does": "Moves to the first or last enabled crosspoint in the row; Control includes the whole matrix."
+        },
+        {
+          "keys": "Space",
+          "does": "Toggles the focused connection through the native checkbox."
+        }
+      ],
+      "a11y": [
+        "Native table headers identify sources and destinations; every checkbox also names both ports.",
+        "Connection targets are at least 44px, with a full-surface checked state and forced-colors support.",
+        "Blocked crosspoints expose reasons in text and descriptions. Roving focus skips disabled cells.",
+        "Named checkboxes submit connection pairs; read-only hidden values preserve existing routes. Form reset restores uncontrolled defaults.",
+        "The ref and native fieldset attributes reach the root fieldset."
+      ]
+    }
+  }
+}

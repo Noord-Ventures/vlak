@@ -1,0 +1,13 @@
+/* ── experiment-run: generated from packages/react/src/components/experiment-run.tsx ── */
+.rs-experiment-run{display:grid;gap:1rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
+.rs-experiment-run-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem}
+.rs-experiment-run-title{margin:0;font-size:1rem;font-weight:600}
+.rs-experiment-run-context{margin:0;font-size:0.75rem;color:var(--text-secondary)}
+.rs-experiment-run-conditions{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:1rem;margin:0;padding-block:1rem;border-block-width:1px;border-block-style:solid;border-block-color:var(--divider)}
+@media (max-width: 640px){.rs-experiment-run-conditions{grid-template-columns:minmax(0, 1fr)}}
+.rs-experiment-run-value{margin:0;margin-top:0.25rem;font-size:0.875rem;font-variant-numeric:tabular-nums}
+.rs-experiment-run-list{list-style-type:decimal;padding-inline-start:1.5rem;margin:0}
+.rs-experiment-run-step{padding-block:0.75rem;padding-inline-start:0.25rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:0.875rem}
+.rs-experiment-run-details{margin-block:0.5rem;font-size:0.875rem;max-width:66ch}
+.rs-experiment-run-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem}
+.rs-experiment-run-action{flex-shrink:0}

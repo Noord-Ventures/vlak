@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "lab-results",
+  "type": "registry:component",
+  "title": "Lab results",
+  "description": "A named collection of supplied laboratory results with units, reference intervals, report times and amendment notes.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/reference-range.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/lab-results.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { ReferenceRange } from \"./reference-range\";\n\nexport type LabResultStatus = \"final\" | \"pending\" | \"unavailable\" | \"amended\";\n\nexport interface LabResult {\n  id: string;\n  name: string;\n  value?: number | string | null;\n  unit?: string;\n  status?: LabResultStatus;\n  /** A supplied textual result flag or contextual status. No flag is calculated. */\n  statusLabel?: React.ReactNode;\n  minimum?: number | null;\n  maximum?: number | null;\n  rangeLabel?: string;\n  dateTime?: string;\n  timeLabel?: string;\n  note?: React.ReactNode;\n}\n\nexport interface LabResultsProps extends Omit<React.HTMLAttributes<HTMLUListElement>, \"results\"> {\n  /** Accessible collection name. */\n  label: string;\n  results: readonly LabResult[];\n  emptyLabel?: string;\n}\n\nconst styles = stylex.create({\n  root: { listStyleType: \"none\", margin: 0, padding: 0, width: \"100%\", minWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  item: { display: \"grid\", gap: \"0.75rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, overflowWrap: \"anywhere\" },\n  head: { display: \"flex\", alignItems: \"baseline\", justifyContent: \"space-between\", flexWrap: \"wrap\", gap: \"0.25rem 1rem\" },\n  name: { margin: 0, fontSize: \"0.875rem\", fontWeight: 600 },\n  status: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray },\n  reading: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", alignItems: \"baseline\", gap: \"0.25rem 1rem\", margin: 0, fontSize: \"1.25rem\", fontWeight: 500, lineHeight: 1.2, fontVariantNumeric: \"tabular-nums\" },\n  readingLabel: { fontSize: \"0.875rem\", lineHeight: 1.45 },\n  readingValue: { textAlign: \"end\", marginInlineStart: \"auto\" },\n  unit: { fontSize: \"0.875rem\", color: vlak.gray },\n  note: { margin: 0, fontSize: \"0.875rem\", maxWidth: \"66ch\" },\n  time: { fontSize: \"0.75rem\", color: vlak.gray },\n});\n\n/** Supplied laboratory results with explicit report states and optional reference intervals. */\nexport const LabResults = React.forwardRef<HTMLUListElement, LabResultsProps>(function LabResults({ label, results, emptyLabel = \"No results available\", className, style, children, ...props }, ref) {\n  const root = rs([\"rs-lab-results\", className], styles.root);\n  const itemStyle = rs([\"rs-lab-results-item\"], styles.item);\n  const head = rs([\"rs-lab-results-head\"], styles.head);\n  const name = rs([\"rs-lab-results-name\"], styles.name);\n  const statusStyle = rs([\"rs-lab-results-status\"], styles.status);\n  const reading = rs([\"rs-lab-results-reading\"], styles.reading);\n  const readingLabel = rs([\"rs-lab-results-reading-label\"], styles.readingLabel);\n  const readingValue = rs([\"rs-lab-results-reading-value\"], styles.readingValue);\n  const unit = rs([\"rs-lab-results-unit\"], styles.unit);\n  const note = rs([\"rs-lab-results-note\"], styles.note);\n  const time = rs([\"rs-lab-results-time\"], styles.time);\n  const labels: Record<LabResultStatus, string> = { final: \"Final\", pending: \"Pending\", unavailable: \"Unavailable\", amended: \"Amended\" };\n  return <ul ref={ref} aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {results.length === 0 && <li {...itemStyle}>{emptyLabel}</li>}\n    {results.map(result => {\n      const hasValue = typeof result.value === \"number\" ? Number.isFinite(result.value) : typeof result.value === \"string\" && result.value.trim().length > 0;\n      const requestedStatus = result.status ?? \"final\";\n      const status = !hasValue && requestedStatus === \"final\" ? \"unavailable\" : requestedStatus;\n      const showValue = hasValue && (status === \"final\" || status === \"amended\");\n      const hasRange = result.minimum != null || result.maximum != null;\n      return <li key={result.id} {...itemStyle} data-status={status}>\n        <div {...head}><p {...name}>{result.name}</p><p {...statusStyle}>{labels[status]}{result.statusLabel != null && <> · {result.statusLabel}</>}</p></div>\n        {showValue && hasRange && typeof result.value === \"number\"\n          ? <ReferenceRange label=\"Result\" value={result.value} minimum={result.minimum} maximum={result.maximum} unit={result.unit} rangeLabel={result.rangeLabel} />\n          : showValue && <p {...reading}><span {...readingLabel}>Result</span><span {...readingValue}>{result.value}{result.unit && <> <span {...unit}>{result.unit}</span></>}</span></p>}\n        {status === \"amended\" && !hasValue && <p {...note}>Result unavailable</p>}\n        {(result.dateTime || result.timeLabel) && <time {...time} dateTime={result.dateTime}>{result.timeLabel ?? result.dateTime}</time>}\n        {result.note != null && <div {...note}>{result.note}</div>}\n      </li>;\n    })}\n    {children}\n  </ul>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/lab-results.tsx"
+    },
+    {
+      "path": "vlak/styles/lab-results.css",
+      "content": "/* ── lab-results: generated from packages/react/src/components/lab-results.tsx ── */\n.rs-lab-results{list-style-type:none;margin:0;padding:0;width:100%;min-width:0;color:var(--text);line-height:1.45}\n.rs-lab-results-item{display:grid;gap:0.75rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);overflow-wrap:anywhere}\n.rs-lab-results-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.25rem 1rem}\n.rs-lab-results-name{margin:0;font-size:0.875rem;font-weight:600}\n.rs-lab-results-status{margin:0;font-size:0.75rem;color:var(--text-secondary)}\n.rs-lab-results-reading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.25rem 1rem;margin:0;font-size:1.25rem;font-weight:500;line-height:1.2;font-variant-numeric:tabular-nums}\n.rs-lab-results-reading-label{font-size:0.875rem;line-height:1.45}\n.rs-lab-results-reading-value{text-align:end;margin-inline-start:auto}\n.rs-lab-results-unit{font-size:0.875rem;color:var(--text-secondary)}\n.rs-lab-results-note{margin:0;font-size:0.875rem;max-width:66ch}\n.rs-lab-results-time{font-size:0.75rem;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/lab-results.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-lab-results",
+        "rs-lab-results-item",
+        "rs-lab-results-head",
+        "rs-lab-results-name",
+        "rs-lab-results-status",
+        "rs-lab-results-reading",
+        "rs-lab-results-reading-label",
+        "rs-lab-results-reading-value",
+        "rs-lab-results-unit",
+        "rs-lab-results-note",
+        "rs-lab-results-time"
+      ],
+      "snippet": "<ul class=\"rs-lab-results\" aria-label=\"Latest report\">\n  <li class=\"rs-lab-results-item\" data-status=\"amended\"><div class=\"rs-lab-results-head\"><p class=\"rs-lab-results-name\">Reported measurement</p><p class=\"rs-lab-results-status\">Amended</p></div><p class=\"rs-lab-results-reading\"><span class=\"rs-lab-results-reading-label\">Result</span><span class=\"rs-lab-results-reading-value\">24 <span class=\"rs-lab-results-unit\">units</span></span></p><p class=\"rs-lab-results-note\">Replaces the earlier report</p></li>\n  <li class=\"rs-lab-results-item\" data-status=\"pending\"><div class=\"rs-lab-results-head\"><p class=\"rs-lab-results-name\">Additional analysis</p><p class=\"rs-lab-results-status\">Pending</p></div></li>\n</ul>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "reference-range",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Laboratory report",
+        "Lab panel",
+        "Test results",
+        "Patient results",
+        "Pathology results",
+        "Diagnostic report"
+      ],
+      "example": "import { LabResults } from \"@noorddev/vlak-react\";\n\n<LabResults label=\"Latest report\" results={[\n  { id: \"reported\", name: \"Reported measurement\", value: 24, unit: \"units\", minimum: 20, maximum: 30, status: \"amended\", note: \"Replaces the earlier report\" },\n  { id: \"analysis\", name: \"Additional analysis\", status: \"pending\" },\n  { id: \"sample\", name: \"Sample analysis\", status: \"unavailable\", note: \"The laboratory did not release a result\" },\n]} />",
+      "usage": {
+        "use": [
+          "Review numeric and qualitative results from an existing report.",
+          "Supply report states and flags from the source; the component never derives them from a reading.",
+          "Attach note to explain an amendment or unavailable result; provide stable result ids."
+        ],
+        "avoid": [
+          "Calculating diagnoses, critical-result alerts or treatment recommendations.",
+          "Implying that final means clinically normal or that an amended value is the original report.",
+          "Using the synthetic example values as clinical reference intervals."
+        ]
+      },
+      "keyboard": [],
+      "a11y": [
+        "The root is a native list named by label, with one item per result and a forwarded list ref.",
+        "Final, pending, unavailable and amended states are explicit text; caller-supplied flags supplement the report state.",
+        "Pending and unavailable results hide any supplied value. Zero and qualitative result strings remain valid readings.",
+        "Numeric reference intervals reuse ReferenceRange, including its visible text equivalent and invalid-bound handling.",
+        "An amended report without a reading explicitly says result unavailable. No live announcements are added automatically."
+      ]
+    }
+  }
+}

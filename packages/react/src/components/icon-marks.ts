@@ -187,6 +187,9 @@ export const iconNames = [
   "equal",
   "box",
   "truck",
+  "car",
+  "van",
+  "bicycle",
   "activity",
   "crosshair",
   "pin",
@@ -497,11 +500,33 @@ export const marks: Record<DrawnName, MarkEl[]> = {
   slash: [p("M5 13 L11 3")],
   equal: [p("M3.5 6 H12.5"), p("M3.5 10 H12.5")],
   box: [r(3.5, 3.5, 9, 9)],
+  /* Transportation shares a wheel baseline and a side profile on the same module. */
   truck: [
-    r(2.5, 5, 7.5, 5.5),
-    p("M10 6.5 H13.5 V10.5 H10"),
-    o(5.5, 12.5, 1.25),
-    o(12, 12.5, 1.25),
+    r(1.5, 4, 8, 5.5),
+    p("M9.5 6 H12 L14.5 8.5 V9.5 H9.5 Z"),
+    p("M10.5 6 V8 H14"),
+    o(4.5, 11, 1.5),
+    o(11.5, 11, 1.5),
+  ],
+  car: [
+    p("M1.5 9.5 V8 L3.5 7.5 L5 4.5 H10 L12 7.5 L14.5 8 V9.5 Z"),
+    p("M3.5 7.5 H12 M7.5 4.5 V7.5"),
+    o(4.5, 11, 1.5),
+    o(11.5, 11, 1.5),
+  ],
+  van: [
+    p("M1.5 4.5 H10.5 L14.5 8 V9.5 H1.5 Z"),
+    p("M9 4.5 V9.5"),
+    p("M10.5 5.75 V7.5 H12.5 Z"),
+    o(4.5, 11, 1.5),
+    o(11.5, 11, 1.5),
+  ],
+  bicycle: [
+    o(3.5, 11, 2.5),
+    o(12.5, 11, 2.5),
+    p("M3.5 11 L6.5 6.5 H11 L8 11 H3.5 M6.5 6.5 L8 11"),
+    p("M6.5 6.5 L6 4.5 M4.75 4.5 H7.5"),
+    p("M10.5 3.5 H12.5 V5 H11 L12.5 11"),
   ],
   activity: [p("M2.5 8 H4.5 L6.5 4 L9.5 12 L11.5 8 H13.5")],
   crosshair: [
@@ -521,6 +546,33 @@ export const marks: Record<DrawnName, MarkEl[]> = {
  * Every other mark continues to derive its fill directly from `marks`.
  */
 export const filledMarks: Partial<Record<DrawnName, MarkEl[]>> = {
+  truck: [
+    marks.truck[0]!, marks.truck[1]!,
+    p("M10.5 7 H11.7 L13.2 8.5 H10.5 Z"),
+    marks.truck[3]!, marks.truck[4]!,
+  ],
+  car: [
+    marks.car[0]!, p("M5.6 5.5 H9.45 L10.45 7 H4.85 Z"),
+    marks.car[2]!, marks.car[3]!,
+  ],
+  van: [
+    marks.van[0]!, marks.van[1]!, marks.van[2]!,
+    marks.van[3]!, marks.van[4]!,
+  ],
+  bicycle: [
+    marks.bicycle[0]!, o(3.5, 11, 1.25),
+    marks.bicycle[1]!, o(12.5, 11, 1.25),
+    // Closed 1.25-unit frame members leave the wheel and frame apertures open.
+    p("M2.98 10.65 L5.98 6.15 L7.02 6.85 L4.02 11.35 Z"),
+    r(6.5, 5.875, 4.5, 1.25),
+    p("M10.48 6.15 L7.48 10.65 L8.52 11.35 L11.52 6.85 Z"),
+    r(3.5, 10.375, 4.5, 1.25),
+    p("M5.91 6.7 L7.41 11.2 L8.59 10.8 L7.09 6.3 Z"),
+    p("M5.4 4.65 L5.9 6.65 L7.1 6.35 L6.6 4.35 Z"),
+    r(4.75, 3.875, 2.75, 1.25),
+    p("M10.5 2.875 H13.125 V5.625 H11 V4.375 H11.875 V4.125 H10.5 Z"),
+    p("M10.394 5.15 L11.894 11.15 L13.106 10.85 L11.606 4.85 Z"),
+  ],
   // Keep the fold inside the paper plane so its pointed endpoint stays solid.
   send: [marks.send[0]!, p("M5.5 8 H10.5")],
   link: [r(2.25, 5.5, 6.5, 5), r(3.75, 7, 3.5, 2), r(7.25, 5.5, 6.5, 5), r(8.75, 7, 3.5, 2)],
@@ -703,6 +755,10 @@ export const smallFilledCutouts: FilledCutouts = { trash: [3, 4] };
  * and does not depend on light or dark theme colors.
  */
 export const filledCutouts: FilledCutouts = {
+  truck: [2],
+  car: [1],
+  van: [1, 2],
+  bicycle: [1, 3],
   link: [1, 3],
   unlink: [1, 3, 4],
   search: [1],
@@ -863,6 +919,7 @@ export const iconGroups: IconGroup[] = [
   { title: "Status", names: ["info", "warning", "error", "help", "ban", "success", "slash", "equal"] },
   { title: "Time", names: ["calendar", "clock", "history", "timer"] },
   { title: "Settings", names: ["sliders", "cog", "lock", "unlock", "key", "shield", "eye", "eye-off"] },
+  { title: "Transportation", names: ["truck", "car", "van", "bicycle"] },
   { title: "Commerce", names: ["cart", "bag", "credit-card", "tag", "dollar", "package", "receipt", "percent", "wallet"] },
   {
     title: "Layout",
@@ -896,7 +953,6 @@ export const iconGroups: IconGroup[] = [
       "map",
       "building",
       "box",
-      "truck",
       "activity",
       "crosshair",
       "trending-up",

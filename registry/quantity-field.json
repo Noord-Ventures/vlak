@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "quantity-field",
+  "type": "registry:component",
+  "title": "Quantity field",
+  "description": "A 44px Vlak numeric input and styled unit selector with controlled quantity values, form submission and reset support.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/quantity-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\nimport { Input } from \"./input\";\n\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface QuantityValue { amount: number | null; unit: string | null }\nexport interface QuantityUnit { value: string; label: string; disabled?: boolean }\nexport interface QuantityFieldProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: React.ReactNode;\n  units: readonly QuantityUnit[];\n  value?: QuantityValue;\n  defaultValue?: QuantityValue;\n  /** Requests a quantity change. A unit change preserves the amount; the host owns conversion. */\n  onValueChange?: (value: QuantityValue) => void;\n  description?: React.ReactNode;\n  /** Input names: name submits the amount; unitName defaults to name + '.unit'. */\n  unitName?: string;\n  amountLabel?: string;\n  unitLabel?: string;\n  unitPlaceholder?: string;\n  min?: number;\n  max?: number;\n  step?: number | \"any\";\n  required?: boolean;\n  readOnly?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.5rem\", fontWeight: 500, fontSize: \"0.875rem\" },\n  row: { display: \"grid\", gridTemplateColumns: \"minmax(0, 2fr) minmax(0, 1fr)\", gap: \"0.75rem\" },\n  field: { display: \"grid\", gap: \"0.375rem\", minWidth: 0, fontSize: \"0.75rem\", color: vlak.gray },\n  control: { width: \"100%\", minWidth: 0, fontVariantNumeric: \"tabular-nums\" },\n  description: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, maxWidth: \"66ch\" },\n});\n\n/** A native numeric input and unit selector. Selection never converts the amount. */\nexport const QuantityField = React.forwardRef<HTMLFieldSetElement, QuantityFieldProps>(function QuantityField({ label, units, value, defaultValue = { amount: null, unit: null }, onValueChange, description, name, unitName = name ? `${name}.unit` : undefined, form, amountLabel = \"Amount\", unitLabel = \"Unit\", unitPlaceholder = \"Choose unit\", min, max, step = \"any\", required, readOnly = false, disabled, className, style, \"aria-describedby\": ariaDescribedBy, children, ...props }, ref) {\n  const [, refresh] = React.useReducer((revision: number) => revision + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<QuantityValue, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const describedBy = [ariaDescribedBy, description != null && `${id}-description`, readOnly && `${id}-readonly`].filter(Boolean).join(\" \") || undefined;\n  const validAmount = current.amount != null && Number.isFinite(current.amount);\n  const validUnit = current.unit != null && units.some(unit => unit.value === current.unit);\n  const root = rs([\"rs-quantity-field\", className], styles.root);\n  const legend = rs([\"rs-quantity-field-legend\"], styles.legend);\n  const row = rs([\"rs-quantity-field-row\"], styles.row);\n  const field = rs([\"rs-quantity-field-label\"], styles.field);\n  const control = rs([\"rs-quantity-field-control\"], styles.control);\n  const copy = rs([\"rs-quantity-field-description\"], styles.description);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} aria-describedby={describedBy} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>\n    {description != null && <p {...copy} id={`${id}-description`}>{description}</p>}\n    {readOnly && <p {...copy} id={`${id}-readonly`}>Read only</p>}\n    <div {...row}>\n      <label {...field}><span>{amountLabel}</span><Input plain {...control} type=\"number\" name={name} form={form} value={validAmount ? current.amount! : \"\"} min={min} max={max} step={step} required={required} readOnly={readOnly} disabled={disabled} aria-describedby={describedBy} onChange={event => { if (!readOnly) setValue({ amount: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null, unit: current.unit }); }} /></label>\n      <div {...field}><span id={`${id}-unit-label`}>{unitLabel}</span><Select fullWidth aria-labelledby={`${id}-unit-label`} name={unitName} form={form} value={validUnit ? current.unit! : \"\"} required={required} disabled={disabled} readOnly={readOnly} aria-describedby={describedBy} onValueChange={next => setValue({ amount: current.amount, unit: next || null })} options={[{ value: \"\", label: unitPlaceholder }, ...units]} /></div>\n    </div>\n    {current.amount != null && !validAmount && <p {...copy}>Amount unavailable</p>}\n    {current.unit != null && !validUnit && <p {...copy}>Unit unavailable</p>}\n    {children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/quantity-field.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/quantity-field.css",
+      "content": "/* ── quantity-field: generated from packages/react/src/components/quantity-field.tsx ── */\n.rs-quantity-field{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-quantity-field-legend{padding:0;margin-bottom:0.5rem;font-weight:500;font-size:0.875rem}\n.rs-quantity-field-row{display:grid;grid-template-columns:minmax(0, 2fr) minmax(0, 1fr);gap:0.75rem}\n.rs-quantity-field-label{display:grid;gap:0.375rem;min-width:0;font-size:0.75rem;color:var(--text-secondary)}\n.rs-quantity-field-control{width:100%;min-width:0;font-variant-numeric:tabular-nums}\n.rs-quantity-field-description{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/quantity-field.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "science",
+      "classes": [
+        "rs-quantity-field",
+        "rs-quantity-field-legend",
+        "rs-quantity-field-row",
+        "rs-quantity-field-label",
+        "rs-quantity-field-control",
+        "rs-quantity-field-description"
+      ],
+      "snippet": "<fieldset class=\"rs-quantity-field\"><legend class=\"rs-quantity-field-legend\">Sample volume</legend><div class=\"rs-quantity-field-row\"><label class=\"rs-quantity-field-label\">Amount<input class=\"rs-input rs-input-full rs-quantity-field-control\" name=\"volume\" type=\"number\" step=\"any\" value=\"250\" /></label><div class=\"rs-quantity-field-label\"><span id=\"quantity-unit-label\">Unit</span><div class=\"rs-select rs-select-fluid\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"quantity-unit-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\"><span>µL</span></button></div></div></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "select",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Unit input",
+        "Scientific input",
+        "Dimensioned number",
+        "Amount and unit",
+        "Measurement input"
+      ],
+      "example": "import { QuantityField } from \"@noorddev/vlak-react\";\n\n<QuantityField label=\"Sample volume\" name=\"volume\" units={[{ value: \"ul\", label: \"µL\" }, { value: \"ml\", label: \"mL\" }]} defaultValue={{ amount: 250, unit: \"ul\" }} min={0} required description=\"Enter the amount and its unit\" />",
+      "usage": {
+        "use": [
+          "Dimensioned quantities with explicit unit choices and native numeric constraints.",
+          "name submits the amount and unitName submits the unit, defaulting to name followed by .unit.",
+          "Supply value and onValueChange when the application converts units or persists the result; unit selection alone keeps the supplied amount unchanged.",
+          "null represents a missing amount or unit. Unit option values must be unique and non-empty."
+        ],
+        "avoid": [
+          "Assuming that choosing a different unit automatically converts the amount.",
+          "Relying on formatting to establish scientific precision or dimensional compatibility."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between the amount input and unit selector."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Uses native number stepping or opens and navigates the Vlak unit selector. Enter or Space confirms a unit; Escape closes its menu."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the quantity. Vlak Input and Select have visible labels, descriptions and 44px targets.",
+        "Required, min, max and step use native validation. Invalid supplied numbers and unknown units have explicit text states.",
+        "Native form reset restores uncontrolled defaults and leaves controlled values with the application.",
+        "Read-only quantities preserve the submitted amount and unit while preventing edits. Disabled quantities do not submit.",
+        "The fieldset ref and native attributes pass through; no unit is chosen implicitly."
+      ]
+    }
+  }
+}

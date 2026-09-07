@@ -1,0 +1,82 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "patient-banner",
+  "type": "registry:component",
+  "title": "Patient banner",
+  "description": "Keeps a supplied patient identity, identifiers, and recorded context together in a responsive band.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/patient-banner.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface PatientBannerIdentifier {\n  id: string;\n  label: React.ReactNode;\n  value: React.ReactNode;\n}\n\nexport interface PatientBannerContextItem {\n  id: string;\n  label: React.ReactNode;\n  /** Supply the recorded value or an explicit unknown/not-reviewed statement. */\n  value: React.ReactNode;\n}\n\nexport interface PatientBannerProps extends React.HTMLAttributes<HTMLDivElement> {\n  /** Caller-supplied identity. No age or other demographic values are inferred. */\n  patientName: string;\n  identifiers?: readonly PatientBannerIdentifier[];\n  contextItems?: readonly PatientBannerContextItem[];\n  identifiersEmptyLabel?: React.ReactNode;\n  /** Missing context never means that no allergies or alerts exist. */\n  contextEmptyLabel?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, boxSizing: \"border-box\", color: vlak.ink, backgroundColor: vlak.paper, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, padding: \"1.25rem\", display: \"flex\", flexDirection: \"column\", gap: \"1rem\", overflowWrap: \"anywhere\" },\n  name: { margin: 0, fontSize: \"1.375rem\", fontWeight: 600, lineHeight: 1.25, letterSpacing: \"-0.035em\" },\n  identifiers: { margin: 0, display: \"flex\", flexWrap: \"wrap\", gap: \"0.75rem 2rem\" },\n  field: { minWidth: 0, display: \"flex\", flexDirection: \"column\", gap: \"0.25rem\" },\n  label: { margin: 0, color: vlak.gray, fontSize: \"0.75rem\", lineHeight: 1.45 },\n  value: { margin: 0, fontSize: \"0.875rem\", lineHeight: 1.45, fontVariantNumeric: \"tabular-nums\" },\n  context: { margin: 0, display: \"grid\", gridTemplateColumns: { default: \"repeat(auto-fit, minmax(min(100%, 12rem), 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"1rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, paddingTop: \"1rem\" },\n  missing: { margin: 0, fontSize: \"0.875rem\", color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** A supplied patient identity and explicitly recorded context, without clinical inference. */\nexport const PatientBanner = React.forwardRef<HTMLDivElement, PatientBannerProps>(function PatientBanner(\n  { patientName, identifiers = [], contextItems = [], identifiersEmptyLabel = \"Identifiers not supplied\", contextEmptyLabel = \"Patient context not supplied\", children, className, style, ...props }, ref,\n) {\n  const root = rs([\"rs-patient-banner\", className], styles.root);\n  const name = rs([\"rs-patient-banner-name\"], styles.name);\n  const identifiersStyle = rs([\"rs-patient-banner-identifiers\"], styles.identifiers);\n  const field = rs([\"rs-patient-banner-field\"], styles.field);\n  const label = rs([\"rs-patient-banner-label\"], styles.label);\n  const value = rs([\"rs-patient-banner-value\"], styles.value);\n  const context = rs([\"rs-patient-banner-context\"], styles.context);\n  const missing = rs([\"rs-patient-banner-missing\"], styles.missing);\n  return <div ref={ref} role=\"group\" aria-label={patientName} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <p {...name}>{patientName}</p>\n    {identifiers.length > 0 ? <dl {...identifiersStyle}>{identifiers.map(item => <div key={item.id} {...field}><dt {...label}>{item.label}</dt><dd {...value}>{item.value}</dd></div>)}</dl> : <p {...missing}>{identifiersEmptyLabel}</p>}\n    {contextItems.length > 0 ? <dl {...context}>{contextItems.map(item => <div key={item.id} {...field}><dt {...label}>{item.label}</dt><dd {...value}>{item.value}</dd></div>)}</dl> : <p {...missing}>{contextEmptyLabel}</p>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/patient-banner.tsx"
+    },
+    {
+      "path": "vlak/styles/patient-banner.css",
+      "content": "/* ── patient-banner: generated from packages/react/src/components/patient-banner.tsx ── */\n.rs-patient-banner{width:100%;min-width:0;box-sizing:border-box;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);padding:1.25rem;display:flex;flex-direction:column;gap:1rem;overflow-wrap:anywhere}\n.rs-patient-banner-name{margin:0;font-size:1.375rem;font-weight:600;line-height:1.25;letter-spacing:-0.035em}\n.rs-patient-banner-identifiers{margin:0;display:flex;flex-wrap:wrap;gap:0.75rem 2rem}\n.rs-patient-banner-field{min-width:0;display:flex;flex-direction:column;gap:0.25rem}\n.rs-patient-banner-label{margin:0;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}\n.rs-patient-banner-value{margin:0;font-size:0.875rem;line-height:1.45;font-variant-numeric:tabular-nums}\n.rs-patient-banner-context{margin:0;display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 12rem), 1fr));gap:1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem}\n@media (max-width: 640px){.rs-patient-banner-context{grid-template-columns:minmax(0, 1fr)}}\n.rs-patient-banner-missing{margin:0;font-size:0.875rem;color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/patient-banner.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-patient-banner",
+        "rs-patient-banner-name",
+        "rs-patient-banner-identifiers",
+        "rs-patient-banner-field",
+        "rs-patient-banner-label",
+        "rs-patient-banner-value",
+        "rs-patient-banner-context",
+        "rs-patient-banner-missing"
+      ],
+      "snippet": "<div class=\"rs-patient-banner\" role=\"group\" aria-label=\"Robin Ellis\"><p class=\"rs-patient-banner-name\">Robin Ellis</p><dl class=\"rs-patient-banner-identifiers\"><div class=\"rs-patient-banner-field\"><dt class=\"rs-patient-banner-label\">Patient ID</dt><dd class=\"rs-patient-banner-value\">Demo 042</dd></div></dl><dl class=\"rs-patient-banner-context\"><div class=\"rs-patient-banner-field\"><dt class=\"rs-patient-banner-label\">Allergies</dt><dd class=\"rs-patient-banner-value\">Not reviewed</dd></div></dl></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "PatientBanner",
+        "Patient header",
+        "Patient summary",
+        "Clinical context",
+        "EHR header"
+      ],
+      "example": "import { PatientBanner } from \"@noorddev/vlak-react\";\n\n<PatientBanner patientName=\"Robin Ellis\" identifiers={[{ id: \"record\", label: \"Patient ID\", value: \"Demo 042\" }]} contextItems={[{ id: \"allergies\", label: \"Allergies\", value: \"Not reviewed\" }, { id: \"language\", label: \"Preferred language\", value: \"English, as recorded\" }]} />",
+      "usage": {
+        "use": [
+          "Patient record headers and care workspaces where identity and recorded context must stay together.",
+          "Supply explicit values such as Unknown, Not reviewed, or None recorded according to the actual source record."
+        ],
+        "avoid": [
+          "Inferring age from a birth date or treating missing context as no allergies.",
+          "Urgent notifications that need a live announcement; the banner is static context."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "None",
+          "does": "Static identity and description lists add no keyboard stop. Any supplied child controls keep their native behavior."
+        }
+      ],
+      "a11y": [
+        "The patient name labels a group; identifiers and context use dl, dt, and dd in reading order.",
+        "Unknown and none-recorded distinctions are supplied as visible text. Empty defaults describe missing data without making clinical claims.",
+        "The root forwards its div ref, native attributes, className, and style."
+      ]
+    }
+  }
+}

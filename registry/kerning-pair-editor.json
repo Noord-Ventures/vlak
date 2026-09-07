@@ -1,0 +1,115 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "kerning-pair-editor",
+  "type": "registry:component",
+  "title": "Kerning pair editor",
+  "description": "Edits supplied glyph-pair offsets in font units, with baseline and edited previews, bounded keyboard nudging, and one-step undo.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/kerning-pair-editor.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Select } from \"./select\";\nimport { Input } from \"./input\";\nimport { Button } from \"./button\";\n\nexport interface KerningPair { id: string; left: string; right: string; label?: string }\nexport type KerningOffsets = Record<string, number | null>;\nexport interface KerningPairEditorProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\"> {\n  label: React.ReactNode;\n  pairs: KerningPair[];\n  fontFamily: string;\n  unitsPerEm: number;\n  baselineOffsets?: KerningOffsets;\n  value?: KerningOffsets;\n  defaultValue?: KerningOffsets;\n  onValueChange?: (offsets: KerningOffsets) => void;\n  activePairId?: string | null;\n  defaultActivePairId?: string | null;\n  onActivePairChange?: (id: string | null) => void;\n  min?: number;\n  max?: number;\n  readOnly?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  toolbar: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"end\", gap: \"0.5rem\" },\n  field: { display: \"grid\", flexGrow: 1, minWidth: \"8rem\", gap: \"0.375rem\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  input: { minWidth: vlak.hit, width: \"100%\", fontVariantNumeric: \"tabular-nums\" },\n  button: { minHeight: vlak.hit },\n  previews: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(10rem, 1fr))\", gap: \"0.75rem\" },\n  preview: { display: \"grid\", gap: \"0.375rem\", alignContent: \"start\", minWidth: 0, margin: 0, padding: \"0.875rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider },\n  glyphs: { display: \"flex\", alignItems: \"baseline\", minWidth: 0, overflow: \"auto\", whiteSpace: \"nowrap\", fontSize: \"4rem\", lineHeight: 1.45, fontKerning: \"none\", fontVariantLigatures: \"none\", color: { default: vlak.ink, [mq.forcedColors]: \"CanvasText\" } },\n  glyph: { flexShrink: 0 },\n  note: { margin: 0, fontSize: vlak.controlLabel, lineHeight: 1.45, color: vlak.gray },\n});\n\n/** Explicit pair offsets with browser font previews, without font-file editing or shaping. */\nexport const KerningPairEditor = React.forwardRef<HTMLFieldSetElement, KerningPairEditorProps>(function KerningPairEditor({ label, pairs, fontFamily, unitsPerEm, baselineOffsets = {}, value, defaultValue = {}, onValueChange, activePairId, defaultActivePairId, onActivePairChange, min = -unitsPerEm, max = unitsPerEm, readOnly, disabled, name, form, className, style, ...props }, ref) {\n  const id = React.useId();\n  const [undo, setUndo] = React.useState<{ id: string; value: number | null | undefined; after: number | null } | null>(null);\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const reset = () => { setUndo(null); refresh(); };\n  const [current, setValue, fieldRef] = useInputValue<KerningOffsets, HTMLFieldSetElement>(value, defaultValue, onValueChange, reset);\n  const [active, setActive, selectionRef] = useInputValue<string | null, HTMLFieldSetElement>(activePairId, defaultActivePairId ?? pairs[0]?.id ?? null, onActivePairChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef, selectionRef);\n  const index = pairs.findIndex((pair) => pair.id === active);\n  const pair = pairs[index];\n  const offset = pair ? current[pair.id] : undefined;\n  const baseline = pair ? baselineOffsets[pair.id] : undefined;\n  const validUnits = Number.isFinite(unitsPerEm) && unitsPerEm > 0 && fontFamily.trim() !== \"\";\n  const validBounds = Number.isFinite(min) && Number.isFinite(max) && min <= max;\n  const validOffset = offset != null && Number.isFinite(offset);\n  const validBaseline = baseline != null && Number.isFinite(baseline);\n  const offsetInBounds = validOffset && offset >= min && offset <= max;\n  const edit = (next: number | null) => {\n    if (!pair || readOnly || disabled) return;\n    setUndo({ id: pair.id, value: current[pair.id], after: next });\n    setValue({ ...current, [pair.id]: next });\n  };\n  const restore = () => {\n    if (!undo) return;\n    const next = { ...current };\n    if (undo.value === undefined) delete next[undo.id]; else next[undo.id] = undo.value;\n    setValue(next);\n    setUndo(null);\n  };\n  const root = rs([\"rs-kerning-pair-editor\", className], styles.root);\n  const legend = rs([\"rs-kerning-pair-editor-legend\"], styles.legend);\n  const toolbar = rs([\"rs-kerning-pair-editor-toolbar\"], styles.toolbar);\n  const field = rs([\"rs-kerning-pair-editor-field\"], styles.field);\n  const input = rs([\"rs-kerning-pair-editor-input\"], styles.input);\n  const button = rs([\"rs-kerning-pair-editor-button\"], styles.button);\n  const previews = rs([\"rs-kerning-pair-editor-previews\"], styles.previews);\n  const preview = rs([\"rs-kerning-pair-editor-preview\"], styles.preview);\n  const glyphs = rs([\"rs-kerning-pair-editor-glyphs\"], styles.glyphs);\n  const glyph = rs([\"rs-kerning-pair-editor-glyph\"], styles.glyph);\n  const note = rs([\"rs-kerning-pair-editor-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    {pairs.length === 0 ? <p className={note.className} style={note.style}>No glyph pairs supplied</p> : <>\n      <div className={toolbar.className} style={toolbar.style}>\n        <div className={field.className} style={field.style}><span id={`${id}-pair`}>Pair</span><Select fullWidth aria-labelledby={`${id}-pair`} value={pair?.id ?? \"\"} disabled={disabled} options={[{ value: \"\", label: \"Choose a pair\" }, ...pairs.map(item => ({ value: item.id, label: item.label ?? `${item.left} / ${item.right}` }))]} onValueChange={next => setActive(next || null)} /></div>\n        <Button variant=\"ghost\" type=\"button\" disabled={disabled || index <= 0} className={button.className} style={button.style} onClick={() => setActive(pairs[index - 1]!.id)}>Previous pair</Button>\n        <Button variant=\"ghost\" type=\"button\" disabled={disabled || index >= pairs.length - 1} className={button.className} style={button.style} onClick={() => setActive(pairs[index + 1]!.id)}>Next pair</Button>\n      </div>\n      {!validUnits && <p className={note.className} style={note.style}>Supply a font family and positive units per em to preview spacing.</p>}\n      {!validBounds && <p className={note.className} style={note.style}>Offset bounds unavailable</p>}\n      {pair ? <>\n        <p className={note.className} style={note.style}>{fontFamily || \"Font unavailable\"}{validUnits ? ` · ${unitsPerEm} units per em` : \"\"}</p>\n        <div className={previews.className} style={previews.style}>{([{ title: \"Baseline\", value: baseline, valid: validBaseline }, { title: \"Edited\", value: offset, valid: validOffset }] as const).map((item) => <figure key={item.title} className={preview.className} style={preview.style}>\n          <figcaption className={note.className} style={note.style}>{item.title}: {item.valid ? `${item.value} units` : item.value == null ? \"not supplied\" : \"unavailable\"}</figcaption>\n          {validUnits && item.valid && Number.isFinite(item.value! / unitsPerEm) && <div role=\"img\" aria-label={`${pair.left} followed by ${pair.right}, ${item.title.toLowerCase()} offset ${item.value} units`} className={glyphs.className} style={{ ...glyphs.style, fontFamily }}><span aria-hidden=\"true\" className={glyph.className} style={glyph.style}>{pair.left}</span><span aria-hidden=\"true\" className={glyph.className} style={{ ...glyph.style, marginInlineStart: `${item.value! / unitsPerEm}em` }}>{pair.right}</span></div>}\n        </figure>)}</div>\n        <label className={field.className} style={field.style}>Offset (font units)<Input plain type=\"number\" form={form} name={name ? `${name}.${pair.id}` : undefined} value={validOffset ? offset : \"\"} min={validBounds ? min : undefined} max={validBounds ? max : undefined} step=\"any\" readOnly={readOnly} disabled={disabled || !validBounds || !validUnits} aria-invalid={validOffset && !offsetInBounds || undefined} aria-describedby={`${id}-keys`} className={input.className} style={input.style} onChange={(event) => edit(event.currentTarget.value === \"\" ? null : Number(event.currentTarget.value))} onKeyDown={(event) => {\n          if (readOnly || !validBounds || !validUnits || ![\"ArrowLeft\", \"ArrowRight\"].includes(event.key)) return;\n          event.preventDefault();\n          const delta = (event.key === \"ArrowLeft\" ? -1 : 1) * (event.shiftKey ? 10 : 1);\n          edit(Math.max(min, Math.min(max, (validOffset ? offset : 0) + delta)));\n        }} /></label>\n        <p id={`${id}-keys`} className={note.className} style={note.style}>{validOffset && !offsetInBounds ? `Offset is outside the supplied ${min} to ${max} bounds. ` : \"\"}Left and right arrows adjust one unit. Hold Shift for ten units.</p>\n        <div className={toolbar.className} style={toolbar.style}><Button variant=\"ghost\" type=\"button\" disabled={disabled || readOnly || !validBaseline || !validBounds || baseline! < min || baseline! > max || baseline === offset} className={button.className} style={button.style} onClick={() => edit(baseline!)}>Reset to baseline</Button><Button variant=\"ghost\" type=\"button\" disabled={disabled || readOnly || undo == null || !pairs.some((item) => item.id === undo.id) || current[undo.id] !== undo.after} className={button.className} style={button.style} onClick={restore}>Undo last edit</Button></div>\n      </> : <p className={note.className} style={note.style}>Choose a pair to edit its offset.</p>}\n    </>}\n    {name && pairs.filter((item) => item.id !== pair?.id).map((item) => current[item.id] != null && Number.isFinite(current[item.id]) ? <input key={item.id} type=\"hidden\" form={form} name={`${name}.${item.id}`} value={current[item.id]!} /> : null)}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/kerning-pair-editor.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/kerning-pair-editor.css",
+      "content": "/* ── kerning-pair-editor: generated from packages/react/src/components/kerning-pair-editor.tsx ── */\n.rs-kerning-pair-editor{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}\n.rs-kerning-pair-editor-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-kerning-pair-editor-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:0.5rem}\n.rs-kerning-pair-editor-field{display:grid;flex-grow:1;min-width:8rem;gap:0.375rem;font-size:var(--control-label);line-height:1.45}\n.rs-kerning-pair-editor-input{min-width:var(--hit);width:100%;font-variant-numeric:tabular-nums}\n.rs-kerning-pair-editor-button{min-height:var(--hit)}\n.rs-kerning-pair-editor-previews{display:grid;grid-template-columns:repeat(auto-fit, minmax(10rem, 1fr));gap:0.75rem}\n.rs-kerning-pair-editor-preview{display:grid;gap:0.375rem;align-content:start;min-width:0;margin:0;padding:0.875rem;border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-kerning-pair-editor-glyphs{display:flex;align-items:baseline;min-width:0;overflow:auto;white-space:nowrap;font-size:4rem;line-height:1.45;font-kerning:none;font-variant-ligatures:none;color:var(--text)}\n@media (forced-colors: active){.rs-kerning-pair-editor-glyphs{color:CanvasText}}\n.rs-kerning-pair-editor-glyph{flex-shrink:0}\n.rs-kerning-pair-editor-note{margin:0;font-size:var(--control-label);line-height:1.45;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/kerning-pair-editor.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-kerning-pair-editor",
+        "rs-kerning-pair-editor-legend",
+        "rs-kerning-pair-editor-toolbar",
+        "rs-kerning-pair-editor-field",
+        "rs-kerning-pair-editor-input",
+        "rs-kerning-pair-editor-button",
+        "rs-kerning-pair-editor-previews",
+        "rs-kerning-pair-editor-preview",
+        "rs-kerning-pair-editor-glyphs",
+        "rs-kerning-pair-editor-glyph",
+        "rs-kerning-pair-editor-note"
+      ],
+      "snippet": "<fieldset class=\"rs-kerning-pair-editor\"><legend class=\"rs-kerning-pair-editor-legend\">Pair spacing</legend><div class=\"rs-kerning-pair-editor-previews\"><figure class=\"rs-kerning-pair-editor-preview\"><figcaption class=\"rs-kerning-pair-editor-note\">Edited: -80 units</figcaption><div class=\"rs-kerning-pair-editor-glyphs\" style=\"font-family:Georgia,serif\" role=\"img\" aria-label=\"A followed by V, edited offset -80 units\"><span class=\"rs-kerning-pair-editor-glyph\" aria-hidden=\"true\">A</span><span class=\"rs-kerning-pair-editor-glyph\" aria-hidden=\"true\" style=\"margin-inline-start:-0.08em\">V</span></div></figure></div><label class=\"rs-kerning-pair-editor-field\">Offset (font units)<input class=\"rs-input rs-input-full rs-kerning-pair-editor-input\" type=\"number\" value=\"-80\" min=\"-1000\" max=\"1000\" step=\"any\" /></label></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "input",
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "KerningPairEditor",
+        "Kerning editor",
+        "Glyph pair spacing",
+        "Font pair editor",
+        "Pair adjustment"
+      ],
+      "example": "import { KerningPairEditor } from \"@noorddev/vlak-react\";\n\n<KerningPairEditor label=\"Pair spacing\" name=\"kerning\" fontFamily=\"Georgia, serif\" unitsPerEm={1000}\n  pairs={[{ id: \"av\", left: \"A\", right: \"V\" }, { id: \"to\", left: \"T\", right: \"o\" }]}\n  baselineOffsets={{ av: -60, to: -40 }} defaultValue={{ av: -80, to: -50 }} />",
+      "usage": {
+        "use": [
+          "Supplied glyph strings, a caller-selected font family, and explicit units per em.",
+          "value/defaultValue/onValueChange as a map from pair id to offset; null or an absent entry means not supplied.",
+          "baselineOffsets to compare and reset a pair; missing baselines never imply zero.",
+          "Optional min/max bounds default to negative and positive units per em; typed values retain native validation.",
+          "activePairId/defaultActivePairId/onActivePairChange for caller-owned pair navigation."
+        ],
+        "avoid": [
+          "Treating the preview as a font shaping engine, font-file editor, or source of baseline kerning.",
+          "Assuming a requested font is installed; the browser uses its normal font fallback.",
+          "Undoing external host changes; undo is available only while the latest requested edit remains current."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the pair selector, navigation, offset editor, reset, and undo actions."
+        },
+        {
+          "keys": "Arrow left, Arrow right",
+          "does": "Nudges the focused offset by one font unit within the supplied bounds."
+        },
+        {
+          "keys": "Shift + Arrow left, Shift + Arrow right",
+          "does": "Nudges the focused offset by ten font units."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused previous, next, reset, or undo button."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the editor; Vlak Select and Input controls have 44px targets.",
+        "Baseline and edited offsets remain text, and each pair preview has an accessible description.",
+        "Preview spacing is offset divided by units per em; intrinsic browser kerning and ligatures are disabled for the comparison.",
+        "Missing or invalid font units suppress geometry; typed out-of-bounds values expose native validity and a visible explanation.",
+        "The ref and native attributes reach the fieldset. Named offsets submit per pair; reset restores uncontrolled offsets and clears undo."
+      ]
+    }
+  }
+}

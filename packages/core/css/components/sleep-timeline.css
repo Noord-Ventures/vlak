@@ -1,0 +1,19 @@
+/* ── sleep-timeline: generated from packages/react/src/components/sleep-timeline.tsx ── */
+.rs-sleep-timeline{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text)}
+.rs-sleep-timeline-caption{display:grid;gap:0.375rem}
+.rs-sleep-timeline-label{font-size:var(--control-fs);font-weight:600;line-height:1.45}
+.rs-sleep-timeline-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}
+.rs-sleep-timeline-chart{display:flex;width:100%;height:2rem;border-width:1px;border-style:solid;border-color:var(--control-border);box-sizing:border-box;overflow:hidden}
+.rs-sleep-timeline-segment{position:relative;height:100%;min-width:0;flex-shrink:0;box-sizing:border-box;overflow:hidden}
+.rs-sleep-timeline-segment::after{content:"";position:absolute;top:0;bottom:0;inset-inline-end:0;width:1px;background-color:var(--control-border);pointer-events:none}
+@media (forced-colors: active){.rs-sleep-timeline-segment::after{background-color:CanvasText}}
+.rs-sleep-timeline-asleep{background-color:var(--text)}
+@media (forced-colors: active){.rs-sleep-timeline-asleep{background-color:CanvasText}}
+.rs-sleep-timeline-awake{background-color:var(--bg)}
+@media (forced-colors: active){.rs-sleep-timeline-awake{background-color:Canvas}}
+.rs-sleep-timeline-unknown{background-color:var(--table-alt);background-image:repeating-linear-gradient(135deg, transparent, transparent 4px, var(--control-border) 4px, var(--control-border) 5px);border-bottom-width:0;border-bottom-style:dotted;border-bottom-color:CanvasText}
+@media (forced-colors: active){.rs-sleep-timeline-unknown{background-color:Canvas;background-image:none;border-bottom-width:3px}}
+.rs-sleep-timeline-axis{display:flex;justify-content:space-between;gap:1rem;font-size:var(--control-label);line-height:1.45;color:var(--text-secondary)}
+.rs-sleep-timeline-list{display:grid;gap:0;list-style-type:none;padding:0;margin:0;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
+.rs-sleep-timeline-interval{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.25rem 1rem;padding-block:0.625rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:var(--control-fs);line-height:1.45}
+.rs-sleep-timeline-period{color:var(--text-secondary);font-variant-numeric:tabular-nums}

@@ -1,0 +1,8 @@
+/* ── stack-navigator: generated from packages/react/src/components/stack-navigator.tsx ── */
+.rs-stack-navigator{display:grid;gap:1rem;min-width:0;padding:0;margin:0;border-width:0;color:var(--text);line-height:1.45}
+.rs-stack-navigator-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}
+.rs-stack-navigator-axis{display:grid;gap:0.5rem;min-width:0}
+.rs-stack-navigator-label{font-size:0.75rem;font-weight:500}
+.rs-stack-navigator-row{display:grid;grid-template-columns:auto minmax(0, 1fr) auto;gap:0.5rem;min-width:0}
+.rs-stack-navigator-step{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding-inline:0}
+.rs-stack-navigator-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}

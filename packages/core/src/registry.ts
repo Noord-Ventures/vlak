@@ -11,6 +11,23 @@ import { dataAdditions } from "./registry-data-additions.ts";
 import { navigationAdditions } from "./registry-navigation-additions.ts";
 import { inputAdditions } from "./registry-input-additions.ts";
 import { mediaAdditions } from "./registry-media-additions.ts";
+import { healthObservations } from "./registry-health-observations.ts";
+import { healthWellness } from "./registry-health-wellness.ts";
+import { healthCare } from "./registry-health-care.ts";
+import { healthRings } from "./registry-health-rings.ts";
+
+import { civicComponents } from "./registry-civic.ts";
+import { scienceComponents } from "./registry-science.ts";
+import { creativeComponents } from "./registry-creative.ts";
+
+import { geospatialComponents } from "./registry-geospatial.ts";
+import { scienceSpecialists } from "./registry-science-specialist.ts";
+import { workbenchComponents } from "./registry-workbench.ts";
+import { engineeringComponents } from "./registry-engineering.ts";
+
+import { roboticsComponents } from "./registry-robotics.ts";
+import { electronicsComponents } from "./registry-electronics.ts";
+import { microbiologyComponents } from "./registry-microbiology.ts";
 
 export type { VlakComponent } from "./schema";
 
@@ -19,6 +36,20 @@ export const vlakComponents: VlakComponent[] = [
   ...navigationAdditions,
   ...inputAdditions,
   ...mediaAdditions,
+  ...healthObservations,
+  ...healthWellness,
+  ...healthRings,
+  ...healthCare,
+  ...civicComponents,
+  ...scienceComponents,
+  ...creativeComponents,
+  ...geospatialComponents,
+  ...scienceSpecialists,
+  ...workbenchComponents,
+  ...engineeringComponents,
+  ...roboticsComponents,
+  ...electronicsComponents,
+  ...microbiologyComponents,
   {
     name: "button",
     title: "Button",
@@ -571,7 +602,7 @@ const [page, setPage] = useState(1);
     title: "Select",
     description: "Selects one option from an overlay. The closed trigger carries a chevron.",
     category: "forms",
-    classes: ["rs-select", "rs-select-list"],
+    classes: ["rs-select", "rs-select-list", "rs-select-fluid", "rs-select-native", "rs-select-feedback"],
     css: ["components/select.css"],
     react: "components/select.tsx",
         registryDependencies: ["dropdown-menu"],
@@ -592,8 +623,8 @@ const [city, setCity] = useState("alkmaar");
   onValueChange={setCity}
 />`,
     usage: {
-      use: ["One choice from a list of five or more when the labels are short.", "Lists that benefit from type-ahead and a consistent overlay across platforms."],
-      avoid: ["Free text or filtering; use Combobox.", "Native form posts and phones where the platform picker is better; use NativeSelect."],
+      use: ["One choice from a list of five or more when the labels are short.", "Lists that benefit from type-ahead and a consistent overlay across platforms.", "Use fullWidth in compound field layouts. name and form support native submission; required uses native validation and reset restores uncontrolled defaults. readOnly preserves the submitted selection.", "Mark unavailable options disabled; they stay visible and are skipped by keyboard navigation."],
+      avoid: ["Free text or filtering; use Combobox.", "A platform picker when it is specifically preferred; use NativeSelect."],
     },
     keyboard: [
       { keys: "Arrow down, Arrow up, Enter, Space", does: "Opens the list on the selected option" },

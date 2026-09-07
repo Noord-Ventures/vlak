@@ -6,6 +6,7 @@ import * as React from "react";
 import { Button, ToggleGroup } from "@noorddev/vlak-react";
 import { chrome } from "@/app/site.stylex";
 import { sx } from "@/lib/sx";
+import { SettingsMark } from "./settings-mark";
 import { VlakMark } from "./vlak-mark";
 
 type Scheme = "light" | "dark" | "auto";
@@ -102,6 +103,15 @@ function useSettings() {
     return () => media.removeEventListener("change", onChange);
   }, [scheme]);
 
+  React.useEffect(() => {
+    const onTheme = (event: Event) => {
+      const next = (event as CustomEvent<unknown>).detail;
+      if (next === "light" || next === "dark" || next === "auto") setScheme(next);
+    };
+    window.addEventListener("vlak:theme", onTheme);
+    return () => window.removeEventListener("vlak:theme", onTheme);
+  }, []);
+
   const selectScheme = (next: Scheme) => {
     setScheme(next);
     try {
@@ -130,27 +140,6 @@ function useSettings() {
   };
 
   return { scheme, selectScheme, grid, selectGrid, textIndex, stepText };
-}
-
-/* Same sliders mark as the top-right control on renatovaldes.com. One glyph, no track. */
-function SettingsMark() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      aria-hidden="true"
-      stroke="currentColor"
-      strokeWidth="1"
-      strokeLinecap="butt"
-      strokeLinejoin="miter"
-    >
-      <path d="M2 4.5h5M11 4.5h3M2 11.5h3M9 11.5h5" />
-      <circle cx="9" cy="4.5" r="1.9" />
-      <circle cx="7" cy="11.5" r="1.9" />
-    </svg>
-  );
 }
 
 /* Settings are Vlak controls: a label, a ToggleGroup for each choice,
@@ -387,11 +376,10 @@ export function SiteChrome() {
         aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className="nav-toggle-icon" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </span>
+        <svg className="nav-toggle-icon" viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+          <path d="M2 7H18" />
+          <path d="M2 13H18" />
+        </svg>
       </Button>
       <nav
         id="navPanel"

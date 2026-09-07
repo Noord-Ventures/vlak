@@ -292,7 +292,7 @@ describe("Icon", () => {
   });
 
   it("ships a complete family on the same 16 module", () => {
-    expect(iconNames.length).toBe(151);
+    expect(iconNames.length).toBe(154);
     const { container } = render(
       iconNames.map((name) => (
         <Icon key={name} name={name} size={12} />

@@ -11,11 +11,13 @@ Page: https://vlak.dev/components/select/
 
 - One choice from a list of five or more when the labels are short.
 - Lists that benefit from type-ahead and a consistent overlay across platforms.
+- Use fullWidth in compound field layouts. name and form support native submission; required uses native validation and reset restores uncontrolled defaults. readOnly preserves the submitted selection.
+- Mark unavailable options disabled; they stay visible and are skipped by keyboard navigation.
 
 ## When not to
 
 - Free text or filtering; use Combobox.
-- Native form posts and phones where the platform picker is better; use NativeSelect.
+- A platform picker when it is specifically preferred; use NativeSelect.
 
 ## Install
 
@@ -87,6 +89,11 @@ Forwards `ref` to the `HTMLDivElement`.
 | `placeholder` | `ReactNode` | `"Select…"` |  |
 | `onValueChange` | `(value: string) => void` |  |  |
 | `disabled` | `boolean` |  |  |
+| `fullWidth` | `boolean` | `false` | Fill a compound field without imposing a minimum column width. |
+| `name` | `string` |  |  |
+| `form` | `string` |  |  |
+| `required` | `boolean` | `false` |  |
+| `readOnly` | `boolean` | `false` |  |
 
 ## Keyboard
 
@@ -110,7 +117,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-select`, `rs-select-list`
+`rs-select`, `rs-select-list`, `rs-select-fluid`, `rs-select-native`, `rs-select-feedback`
 
 ## Dependencies
 

@@ -1,0 +1,14 @@
+/* ── work-offset-panel: generated from packages/react/src/components/work-offset-panel.tsx ── */
+.rs-work-offset-panel{width:100%;min-width:0;margin:0;padding:0;border-width:0;display:grid;gap:0.75rem;color:var(--text);line-height:1.45}
+.rs-work-offset-panel-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}
+.rs-work-offset-panel-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere}
+.rs-work-offset-panel-field{display:grid;gap:0.375rem;min-width:0;font-size:0.875rem}
+.rs-work-offset-panel-control{width:100%;min-width:0;font-variant-numeric:tabular-nums}
+.rs-work-offset-panel-viewport{overflow-x:auto;min-width:0;max-width:100%;outline-color:var(--text);outline-offset:2px}
+.rs-work-offset-panel-viewport:focus-visible{outline-width:2px;outline-style:solid}
+.rs-work-offset-panel-table{width:100%;min-width:23rem;border-collapse:collapse;font-size:0.875rem;font-variant-numeric:tabular-nums}
+.rs-work-offset-panel-caption{text-align:start;font-size:0.75rem;color:var(--text-secondary);padding-bottom:0.5rem}
+.rs-work-offset-panel-cell{padding:0.625rem 0.375rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);text-align:end;font-weight:400;vertical-align:middle}
+.rs-work-offset-panel-axis{text-align:start;font-weight:500}
+.rs-work-offset-panel-offset{min-width:7rem;width:35%}
+.rs-work-offset-panel-button{justify-self:start}

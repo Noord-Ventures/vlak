@@ -1,0 +1,113 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "work-offset-panel",
+  "type": "registry:component",
+  "title": "Work offset panel",
+  "description": "Reported machine and work coordinates alongside editable draft offsets, explicit axis units and a host-owned apply request.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/work-offset-panel.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\nimport { Input } from \"./input\";\nimport { Button } from \"./button\";\n\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface WorkOffsetAxis { id: string; label: string; unit: string; machine: number | null; work: number | null }\nexport interface WorkOffsetSystem { id: string; label: string; disabled?: boolean }\nexport interface WorkOffsetValue { systemId: string | null; offsets: Record<string, number | null> }\nexport interface WorkOffsetPanelProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\"> {\n  label: string;\n  axes: readonly WorkOffsetAxis[];\n  systems: readonly WorkOffsetSystem[];\n  /** Actual active system reported by the controller, independent of the draft selection. */\n  activeSystemId: string | null;\n  value?: WorkOffsetValue;\n  defaultValue?: WorkOffsetValue;\n  onValueChange?: (value: WorkOffsetValue) => void;\n  /** Request a complete offset update; machine control and coordinate calculations belong to the host. */\n  onApply?: (value: WorkOffsetValue) => void;\n  offsetState?: \"active\" | \"suspended\" | \"unknown\";\n  pending?: boolean;\n  readOnly?: boolean;\n  description?: React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, display: \"grid\", gap: \"0.75rem\", color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: \"1rem\", fontWeight: 600 },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\" },\n  field: { display: \"grid\", gap: \"0.375rem\", minWidth: 0, fontSize: \"0.875rem\" },\n  control: { width: \"100%\", minWidth: 0, fontVariantNumeric: \"tabular-nums\" },\n  viewport: { overflowX: \"auto\", minWidth: 0, maxWidth: \"100%\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  table: { width: \"100%\", minWidth: \"23rem\", borderCollapse: \"collapse\", fontSize: \"0.875rem\", fontVariantNumeric: \"tabular-nums\" },\n  caption: { textAlign: \"start\", fontSize: \"0.75rem\", color: vlak.gray, paddingBottom: \"0.5rem\" },\n  cell: { padding: \"0.625rem 0.375rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, textAlign: \"end\", fontWeight: 400, verticalAlign: \"middle\" },\n  axis: { textAlign: \"start\", fontWeight: 500 },\n  offset: { minWidth: \"7rem\", width: \"35%\" },\n  button: { justifySelf: \"start\" },\n});\nconst formatPosition = (value: number | null) => value == null ? \"Unknown\" : Number.isFinite(value) ? String(value) : \"Unavailable\";\n\n/** Edit a proposed offset while retaining independently supplied machine and work positions. */\nexport const WorkOffsetPanel = React.forwardRef<HTMLFieldSetElement, WorkOffsetPanelProps>(function WorkOffsetPanel({ label, axes, systems, activeSystemId, value, defaultValue = { systemId: null, offsets: {} }, onValueChange, onApply, offsetState = \"unknown\", pending = false, readOnly = false, disabled, description, name, form, className, style, children, ...props }, ref) {\n  const [, refresh] = React.useReducer((revision: number) => revision + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<WorkOffsetValue, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const id = React.useId();\n  const system = systems.find(item => item.id === current.systemId);\n  const active = systems.find(item => item.id === activeSystemId);\n  const listedAxes = new Set(axes.map(axis => axis.id));\n  const hasUnlistedOffset = Object.keys(current.offsets).some(axis => !listedAxes.has(axis));\n  const canApply = !hasUnlistedOffset && !!system && !system.disabled && axes.length > 0 && axes.every(axis => current.offsets[axis.id] != null && Number.isFinite(current.offsets[axis.id]));\n  const root = rs([\"rs-work-offset-panel\", className], styles.root);\n  const legend = rs([\"rs-work-offset-panel-legend\"], styles.legend);\n  const copy = rs([\"rs-work-offset-panel-copy\"], styles.copy);\n  const field = rs([\"rs-work-offset-panel-field\"], styles.field);\n  const control = rs([\"rs-work-offset-panel-control\"], styles.control);\n  const viewport = rs([\"rs-work-offset-panel-viewport\"], styles.viewport);\n  const table = rs([\"rs-work-offset-panel-table\"], styles.table);\n  const caption = rs([\"rs-work-offset-panel-caption\"], styles.caption);\n  const cell = rs([\"rs-work-offset-panel-cell\"], styles.cell);\n  const axisCell = rs([\"rs-work-offset-panel-cell\", \"rs-work-offset-panel-axis\"], styles.cell, styles.axis);\n  const offset = rs([\"rs-work-offset-panel-cell\", \"rs-work-offset-panel-offset\"], styles.cell, styles.offset);\n  const button = rs([\"rs-work-offset-panel-button\"], styles.button);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled || pending} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>\n    {description != null && <p {...copy}>{description}</p>}\n    <p {...copy}>Active system: {active?.label ?? (activeSystemId == null ? \"Unknown\" : `${activeSystemId} (not listed)`)} · Offsets {offsetState}</p>\n    <div {...field}><span id={`${id}-system-label`}>Draft coordinate system</span><Select fullWidth aria-labelledby={`${id}-system-label`} name={name ? `${name}.system` : undefined} form={form} value={system ? current.systemId! : \"\"} disabled={disabled || pending} readOnly={readOnly} onValueChange={next => setValue({ ...current, systemId: next || null })} options={[{ value: \"\", label: \"Choose a system\" }, ...systems.map(item => ({ value: item.id, label: item.label, disabled: item.disabled }))]} /></div>\n    {current.systemId != null && !system && <p {...copy}>Draft system unavailable: {current.systemId}</p>}\n    <div {...viewport} role=\"region\" aria-labelledby={`${id}-axes`} tabIndex={0}><table {...table}>\n      <caption {...caption} id={`${id}-axes`}>{label}, axis positions and draft offsets</caption>\n      <thead><tr><th {...axisCell} scope=\"col\">Axis</th><th {...cell} scope=\"col\">Machine</th><th {...cell} scope=\"col\">Work</th><th {...offset} scope=\"col\">Draft offset</th></tr></thead>\n      <tbody>{axes.map(axis => {\n        const amount = current.offsets[axis.id];\n        const valid = amount != null && Number.isFinite(amount);\n        return <tr key={axis.id}><th {...axisCell} scope=\"row\">{axis.label}<br /><span {...copy}>{axis.unit}</span></th><td {...cell}>{formatPosition(axis.machine)}</td><td {...cell}>{formatPosition(axis.work)}</td><td {...offset}><Input plain {...control} type=\"number\" step=\"any\" aria-label={`${axis.label} offset (${axis.unit})`} aria-invalid={amount != null && !valid || undefined} name={name ? `${name}.${axis.id}` : undefined} form={form} readOnly={readOnly} disabled={disabled || pending} value={valid ? amount : \"\"} onChange={event => { if (!readOnly) setValue({ ...current, offsets: { ...current.offsets, [axis.id]: Number.isFinite(event.currentTarget.valueAsNumber) ? event.currentTarget.valueAsNumber : null } }); }} />{amount != null && !valid && <p {...copy}>Offset unavailable</p>}</td></tr>;\n      })}</tbody>\n    </table></div>\n    {!axes.length && <p {...copy}>No axis positions supplied</p>}\n    {hasUnlistedOffset && <p {...copy}>Draft contains offsets for unlisted axes</p>}\n    {onApply && <Button {...button} type=\"button\" disabled={disabled || pending || readOnly || !canApply} onClick={() => onApply(current)}>Apply offsets</Button>}\n    <p {...copy} role=\"status\">{pending ? \"Offset update pending\" : readOnly ? \"Read only\" : \"Draft edits leave the reported positions unchanged until the host confirms an update.\"}</p>\n    {children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/work-offset-panel.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/work-offset-panel.css",
+      "content": "/* ── work-offset-panel: generated from packages/react/src/components/work-offset-panel.tsx ── */\n.rs-work-offset-panel{width:100%;min-width:0;margin:0;padding:0;border-width:0;display:grid;gap:0.75rem;color:var(--text);line-height:1.45}\n.rs-work-offset-panel-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}\n.rs-work-offset-panel-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere}\n.rs-work-offset-panel-field{display:grid;gap:0.375rem;min-width:0;font-size:0.875rem}\n.rs-work-offset-panel-control{width:100%;min-width:0;font-variant-numeric:tabular-nums}\n.rs-work-offset-panel-viewport{overflow-x:auto;min-width:0;max-width:100%;outline-color:var(--text);outline-offset:2px}\n.rs-work-offset-panel-viewport:focus-visible{outline-width:2px;outline-style:solid}\n.rs-work-offset-panel-table{width:100%;min-width:23rem;border-collapse:collapse;font-size:0.875rem;font-variant-numeric:tabular-nums}\n.rs-work-offset-panel-caption{text-align:start;font-size:0.75rem;color:var(--text-secondary);padding-bottom:0.5rem}\n.rs-work-offset-panel-cell{padding:0.625rem 0.375rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);text-align:end;font-weight:400;vertical-align:middle}\n.rs-work-offset-panel-axis{text-align:start;font-weight:500}\n.rs-work-offset-panel-offset{min-width:7rem;width:35%}\n.rs-work-offset-panel-button{justify-self:start}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/work-offset-panel.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "engineering",
+      "classes": [
+        "rs-work-offset-panel",
+        "rs-work-offset-panel-legend",
+        "rs-work-offset-panel-copy",
+        "rs-work-offset-panel-field",
+        "rs-work-offset-panel-control",
+        "rs-work-offset-panel-viewport",
+        "rs-work-offset-panel-table",
+        "rs-work-offset-panel-caption",
+        "rs-work-offset-panel-cell",
+        "rs-work-offset-panel-axis",
+        "rs-work-offset-panel-offset",
+        "rs-work-offset-panel-button"
+      ],
+      "snippet": "<fieldset class=\"rs-work-offset-panel\"><legend class=\"rs-work-offset-panel-legend\">Work coordinates</legend><p class=\"rs-work-offset-panel-copy\">Active system: G54 · Offsets active</p><div class=\"rs-work-offset-panel-field\"><span id=\"work-offset-system-label\">Draft coordinate system</span><div class=\"rs-select rs-select-fluid\"><button type=\"button\" class=\"rs-dropdown\" role=\"combobox\" aria-labelledby=\"work-offset-system-label\" aria-expanded=\"false\" aria-haspopup=\"listbox\"><span>G54</span></button></div></div><label class=\"rs-work-offset-panel-field\">X offset (mm)<input class=\"rs-input rs-input-full rs-work-offset-panel-control\" type=\"number\" step=\"any\" value=\"125\" /></label></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "select",
+        "button",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Machine coordinates",
+        "Work coordinate system",
+        "Fixture offsets",
+        "Machining offsets",
+        "Coordinate readout"
+      ],
+      "example": "import { WorkOffsetPanel } from \"@noorddev/vlak-react\";\n\n<WorkOffsetPanel label=\"Work coordinates\" name=\"fixture\" activeSystemId=\"g54\" offsetState=\"active\" systems={[{ id: \"g54\", label: \"G54\" }, { id: \"g55\", label: \"G55\" }]} axes={[\n  { id: \"x\", label: \"X\", unit: \"mm\", machine: 145, work: 20 },\n  { id: \"y\", label: \"Y\", unit: \"mm\", machine: 60, work: 10 },\n]} defaultValue={{ systemId: \"g54\", offsets: { x: 125, y: 50 } }} />",
+      "usage": {
+        "use": [
+          "Editing a supplied offset record while keeping actual machine and work readings visible.",
+          "Supply both reported coordinate sets independently; rotations and additional offsets belong to the controller, so no machine-to-work subtraction is inferred.",
+          "value and onValueChange let the host load offsets for a chosen draft system. Uncontrolled system changes retain the entered offsets; they do not fetch another system's record.",
+          "onApply requests a complete finite draft containing only the listed axes and a known enabled system. activeSystemId, offsetState and actual readings change only when supplied by the host.",
+          "name submits name.system and name.axisId values. External form association and native reset are supported."
+        ],
+        "avoid": [
+          "Interpreting an apply request as controller acceptance, machine movement or persistence.",
+          "Treating missing coordinates as zero, or suspended offsets as zeroed offsets. The host owns controller access, validation and interlocks."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the system selector, scroll region, axis offset inputs and apply action."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Opens and navigates the Vlak system selector, steps number inputs or scrolls the focused table region. Escape closes the selector."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Confirms a highlighted system or requests the focused Apply offsets action when a complete draft is available."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the editor. A captioned table separates actual readings from draft values, with axis units in each accessible input name.",
+        "Unknown, unavailable and zero readings remain distinct. Invalid supplied offsets are marked and prevent apply.",
+        "Vlak Select, Input and Button retain 44px targets; narrow layouts scroll the table inside a focusable, uniquely named region.",
+        "Read-only values remain submittable; disabled or pending controls do not submit. Native reset restores uncontrolled defaults without overwriting controlled values.",
+        "The fieldset ref, native attributes, className and style pass through."
+      ]
+    }
+  }
+}

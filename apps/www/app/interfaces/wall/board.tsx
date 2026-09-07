@@ -1,13 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Button, Card, Icon, Input } from "@noorddev/vlak-react";
-import { Brand } from "../mark";
+import { Button, Card, Icon, Input, Select, Textarea, ToggleGroup } from "@noorddev/vlak-react";
 import { Face, type FaceId } from "../people";
-import { interfaceBySlug } from "../catalog";
-import { InspectorClose } from "../inspector-close";
-
-const WHAT = interfaceBySlug("wall")!.what;
 
 type Post = {
   id: string;
@@ -20,7 +15,7 @@ type Post = {
   likes: number;
 };
 
-type Inspect = { kind: "post"; id: string } | { kind: "profile"; who: FaceId } | null;
+type Inspect = { kind: "post"; id: string } | { kind: "profile"; who: FaceId } | { kind: "compose" } | null;
 
 const FEED: Post[] = [
   {
@@ -114,202 +109,88 @@ const COMMENTS: Record<string, { who: FaceId; name: string; text: string }[]> = 
 };
 
 export function Board() {
-  const [post, setPost] = React.useState("m1");
+  const [posts, setPosts] = React.useState(FEED);
   const [inspect, setInspect] = React.useState<Inspect>(null);
-  const [phonePane, setPhonePane] = React.useState<"feed" | "people">("feed");
+  const [screen, setScreen] = React.useState<"feed" | "people">("feed");
+  const [filter, setFilter] = React.useState("all");
+  const [contributor, setContributor] = React.useState("all");
   const [liked, setLiked] = React.useState<string[]>([]);
+  const [following, setFollowing] = React.useState<FaceId[]>(["aziez", "jenny"]);
   const [comments, setComments] = React.useState(COMMENTS);
   const [draft, setDraft] = React.useState("");
+  const [postDraft, setPostDraft] = React.useState("");
+  const [notice, setNotice] = React.useState("Fictional studio · Changes stay in this tab");
   const board = React.useRef<HTMLElement>(null);
-  const history = React.useRef<{ inspect: Inspect; trigger: HTMLElement | null }[]>([]);
+  const heading = React.useRef<HTMLHeadingElement>(null);
+  const detailHeading = React.useRef<HTMLHeadingElement>(null);
   const commentList = React.useRef<HTMLDivElement>(null);
-  const item = FEED.find((row) => row.id === (inspect?.kind === "post" ? inspect.id : post)) ?? FEED[0]!;
-  const personId = inspect?.kind === "profile" ? inspect.who : item.who;
-  const person = PEOPLE.find((row) => row.id === personId) ?? PEOPLE[0]!;
-  const notes = comments[inspect?.kind === "post" ? inspect.id : post] ?? [];
+  const postSequence = React.useRef(0);
+  const history = React.useRef<{ inspect: Inspect; trigger: HTMLElement | null }[]>([]);
+  const composeId = React.useId();
+  const item = posts.find(row => row.id === (inspect?.kind === "post" ? inspect.id : "m1")) ?? posts[0]!;
+  const person = PEOPLE.find(row => row.id === (inspect?.kind === "profile" ? inspect.who : item.who)) ?? PEOPLE[0]!;
+  const notes = comments[item.id] ?? [];
+  const visible = posts.filter(row => (contributor === "all" || row.who === contributor) && (filter === "all" || Boolean(row.photo)));
 
-  function openInspector(next: Exclude<Inspect, null>) {
+  function open(next: Exclude<Inspect, null>) {
     history.current.push({ inspect, trigger: document.activeElement instanceof HTMLElement ? document.activeElement : null });
     setInspect(next);
-    requestAnimationFrame(() => {
-      const back = board.current?.querySelector<HTMLButtonElement>(".sc-wall-mobile-back");
-      if (back?.getClientRects().length) back.focus();
-    });
+    if (next.kind === "post") setDraft("");
+    requestAnimationFrame(() => detailHeading.current?.focus({ preventScroll: true }));
   }
-
-  function closeInspector() {
+  function back() {
     const previous = history.current.pop();
     setInspect(previous?.inspect ?? null);
     requestAnimationFrame(() => {
       if (previous?.trigger?.isConnected) previous.trigger.focus();
       else {
-        const key = previous?.trigger?.dataset.focusKey;
-        if (key) board.current?.querySelector<HTMLButtonElement>(`[data-focus-key="${key}"]`)?.focus();
+        const key = previous?.trigger?.dataset.sfFocus;
+        const target = key ? [...(board.current?.querySelectorAll<HTMLButtonElement>("[data-sf-focus]") ?? [])].find(element => element.dataset.sfFocus === key) : null;
+        (target ?? heading.current)?.focus();
       }
     });
   }
-
+  function browse(next: "feed" | "people") {
+    setScreen(next); setInspect(null); history.current = [];
+    requestAnimationFrame(() => heading.current?.focus({ preventScroll: true }));
+  }
   function addComment(event: React.FormEvent) {
     event.preventDefault();
-    if (!draft.trim()) return;
-    setComments((current) => ({ ...current, [item.id]: [...(current[item.id] ?? []), { who: "jenny", name: "You", text: draft.trim() }] }));
-    setDraft("");
+    const text = draft.trim(); if (!text) return;
+    setComments(current => ({ ...current, [item.id]: [...(current[item.id] ?? []), { who: "jenny", name: "You", text }] }));
+    setDraft(""); setNotice("Comment added locally");
     requestAnimationFrame(() => commentList.current?.scrollTo({ top: commentList.current.scrollHeight }));
   }
-
-  function openPost(id: string) {
-    setPost(id);
-    setDraft("");
-    openInspector({ kind: "post", id });
+  function publish(event: React.FormEvent) {
+    event.preventDefault();
+    const text = postDraft.trim(); if (!text) return;
+    setPosts(current => [{ id: `local-${++postSequence.current}`, who: "jenny", name: "You", when: "Just now", text, likes: 0 }, ...current]);
+    setPostDraft(""); setContributor("all"); setFilter("all"); browse("feed");
+    setNotice("Your update was published in this local feed");
+    requestAnimationFrame(() => board.current?.querySelector(".sf-stream")?.scrollTo({ top: 0 }));
   }
-
-  function openProfile(id: FaceId) {
-    openInspector({ kind: "profile", who: id });
+  function toggleLike(row: Post) {
+    setLiked(current => current.includes(row.id) ? current.filter(id => id !== row.id) : [...current, row.id]);
+    setNotice(liked.includes(row.id) ? "Like removed locally" : "Like added locally");
   }
+  const peopleList = <div className="sf-people-list">{PEOPLE.map(row => <Button key={row.id} variant="ghost" className="sf-person" data-sf-focus={`person-${row.id}`} onClick={() => open({ kind: "profile", who: row.id })}><Face who={row.id} /><span><strong>{row.name}</strong><span>{row.line}</span></span><Icon name="arrow-right" /></Button>)}</div>;
 
-  return (
-    <section ref={board} className="if-board sc-wall" data-pane={phonePane} data-inspecting={Boolean(inspect)} aria-label={WHAT}>
-      <header className="sc-wall-mobile-head">
-        {inspect ? <Button variant="ghost" className="sc-wall-mobile-back" style={{ width: "auto", padding: "0 8px" }} onClick={closeInspector}>
-          <Icon name="arrow-left" size={16} />Back
-        </Button> : null}
-        <div><h2>{inspect ? inspect.kind === "post" ? "Comments" : person.name : phonePane === "feed" ? "Studio journal" : "People"}</h2>
-          {!inspect ? <p>{phonePane === "feed" ? "Work in progress, shared together" : "Four people in your studio"}</p> : null}
-        </div>
-      </header>
-      <aside className="sc-wall-rail" aria-label="People">
-        <div className="sc-wall-brand">
-          <Brand slug="wall" />
-          <p className="sc-wall-voice">Studio feed</p>
-        </div>
-        <p className="sc-wall-label if-ico-row">
-          <Icon name="users" size={12} />
-          People
-        </p>
-        {PEOPLE.map((row) => (
-          <button
-            key={row.id}
-            type="button"
-            className="sc-wall-person"
-            aria-current={inspect?.kind === "profile" && inspect.who === row.id}
-            onClick={() => openProfile(row.id)}
-          >
-            <Face who={row.id} />
-            <span>
-              <b>{row.name}</b>
-              <i>{row.line}</i>
-            </span>
-          </button>
-        ))}
-      </aside>
-
-      <section className="sc-wall-feed" aria-label="Feed">
-        <div className="sc-wall-faces" role="group" aria-label="People">
-          {PEOPLE.map((row) => (
-            <button
-              key={row.id}
-              type="button"
-              className="sc-wall-person"
-              aria-current={inspect?.kind === "profile" && inspect.who === row.id}
-              onClick={() => openProfile(row.id)}
-            >
-              <Face who={row.id} />
-              <span>
-                <b>{row.name}</b>
-              </span>
-            </button>
-          ))}
-        </div>
-        <header className="sc-wall-head">
-          <p className="if-ico-row">
-            <Icon name="rows" size={16} />
-            Today
-          </p>
-        </header>
-        <div className="sc-wall-stream">
-          {FEED.map((row) => (
-            <article key={row.id}>
-              <Card className={`sc-wall-card${post === row.id ? " is-on" : ""}${["m1", "m3", "m4", "m5"].includes(row.id) ? " sc-wall-v1" : ""}`}>
-              <button type="button" className="sc-wall-open" aria-label={`Read ${row.name}’s post and comments`} onClick={() => openPost(row.id)}>
-                {row.photo ? <img src={row.photo} alt="" loading="lazy" decoding="async" /> : null}
-                <span className="sc-wall-v1-line">
-                  {row.name} · {row.when}
-                </span>
-                <span className="sc-wall-who">
-                  <Face who={row.who} />
-                  <b>{row.name}</b>
-                  <i className="if-ico-row">
-                    <Icon name="clock" size={12} />
-                    {row.when}
-                  </i>
-                </span>
-                <p>{row.text}</p>
-              </button>
-              <div className="sc-wall-actions">
-                <Button variant="ghost" aria-label={`Like ${row.name}’s post`} aria-pressed={liked.includes(row.id)} style={{ width: "auto", padding: "0 10px" }} onClick={() => setLiked((current) => current.includes(row.id) ? current.filter((id) => id !== row.id) : [...current, row.id])}>
-                  <Icon name="thumbs-up" size={16} />{row.likes + Number(liked.includes(row.id))}
-                </Button>
-                <Button variant="ghost" aria-label={`Comments on ${row.name}’s post`} style={{ width: "auto", padding: "0 10px" }} onClick={() => openPost(row.id)}>
-                  <Icon name="message" size={16} />{(comments[row.id] ?? []).length}<span>comments</span>
-                </Button>
-              </div>
-              </Card>
-            </article>
-          ))}
-        </div>
+  return <section ref={board} className="sf" data-screen={screen} data-detail={inspect?.kind ?? "none"} aria-label="Studio journal workspace">
+    <header className="sf-header"><div className="sf-context"><span className="sf-mark"><Icon name="rows" size={24} /></span><div><strong>Studio 03</strong><span>A shared work journal</span></div></div><Button className="sf-create" onClick={() => open({ kind: "compose" })}><Icon name="plus" /><span>New post</span></Button></header>
+    <div className="sf-body">
+      <section className="sf-main" aria-label={screen === "feed" ? "Studio feed" : "Studio people"}>
+        <header className="sf-main-header"><div><span className="sf-eyebrow">Tuesday, 8 September</span><h2 ref={heading} tabIndex={-1}>{screen === "feed" ? "In the studio" : "The people behind it"}</h2></div><nav className="sf-desktop-nav" aria-label="Journal sections"><Button variant="ghost" aria-pressed={screen === "feed"} onClick={() => browse("feed")}>Feed</Button><Button variant="ghost" aria-pressed={screen === "people"} onClick={() => browse("people")}>People</Button></nav></header>
+        {screen === "feed" ? <><div className="sf-filters"><ToggleGroup aria-label="Post type" value={filter} options={[{ value: "all", label: "All updates" }, { value: "photos", label: "Photos" }]} onValueChange={setFilter} /><Select aria-label="Contributor" fullWidth value={contributor} options={[{ value: "all", label: "Everyone" }, ...PEOPLE.map(row => ({ value: row.id, label: row.name }))]} onValueChange={setContributor} /></div><div className="sf-stream">
+          <p className="sf-feed-count">{visible.length} {visible.length === 1 ? "update" : "updates"} · Work in progress</p>
+          {visible.length ? visible.map(row => <article key={row.id} className="sf-post" data-post={row.id}><Card><div className="sf-post-head"><Button variant="ghost" className="sf-author" aria-label={`View ${row.name === "You" ? "Inez" : row.name}’s profile`} data-sf-focus={`author-${row.id}`} onClick={() => open({ kind: "profile", who: row.who })}><Face who={row.who} /><span><strong>{row.name}</strong><span>{row.when}</span></span></Button><span className="sf-post-tag">Studio update</span></div><p className="sf-post-copy">{row.text}</p>{row.photo && <Button variant="ghost" className="sf-post-photo" aria-label={`Read ${row.name}’s post and comments`} data-sf-focus={`photo-${row.id}`} onClick={() => open({ kind: "post", id: row.id })}><img src={row.photo} alt="Printed poster compositions from the fictional studio" loading="lazy" /></Button>}<div className="sf-post-actions"><Button variant="ghost" aria-label={`Like ${row.name}’s post`} aria-pressed={liked.includes(row.id)} onClick={() => toggleLike(row)}><Icon name="thumbs-up" /><span>{row.likes + Number(liked.includes(row.id))}</span></Button><Button variant="ghost" data-sf-focus={`comments-${row.id}`} aria-label={`Comments on ${row.name}’s post`} onClick={() => open({ kind: "post", id: row.id })}><Icon name="message" /><span>{(comments[row.id] ?? []).length} comments</span></Button></div></Card></article>) : <div className="sf-empty"><Icon name="rows" size={24} /><h3>No updates in this view</h3><p>Try a different contributor or include text updates.</p><Button variant="ghost" onClick={() => { setContributor("all"); setFilter("all"); }}>Show all updates</Button></div>}
+        </div></> : <div className="sf-people-screen"><p>Four collaborators sharing ideas, proofs, and progress.</p>{peopleList}<p className="sf-small">All people and posts in this example are fictional.</p></div>}
       </section>
-
-      <nav className="sc-wall-mobile-tabs" aria-label="Journal sections">
-        <Button variant="ghost" aria-pressed={phonePane === "feed"} style={{ width: "auto" }} onClick={() => setPhonePane("feed")}><Icon name="rows" size={16} />Feed</Button>
-        <Button variant="ghost" aria-pressed={phonePane === "people"} style={{ width: "auto" }} onClick={() => setPhonePane("people")}><Icon name="users" size={16} />People</Button>
-      </nav>
-
-      <aside className={`if-inspect${inspect ? " is-open" : ""}`} aria-label={inspect?.kind === "profile" ? "Profile" : "Comments"}>
-        {inspect ? <InspectorClose onClick={closeInspector} /> : null}
-        {inspect?.kind === "profile" ? (
-          <div key={person.id} className="sc-wall-inspect sc-fresh">
-            <p className="sc-wall-label if-ico-row">
-              <Icon name="user" size={12} />
-              Profile
-            </p>
-            <div className="sc-wall-face">
-              <Face who={person.id} size={48} />
-              <b>{person.name}</b>
-              <i>{person.line}</i>
-            </div>
-            <p>{person.name} shares work in progress and updates from the studio.</p>
-          </div>
-        ) : inspect?.kind === "post" ? (
-          <div key={item.id} className="sc-wall-comments sc-fresh">
-          <div className="sc-wall-inspect" ref={commentList}>
-            <p className="sc-wall-label if-ico-row">
-              <Icon name="message" size={12} />
-              Comments
-            </p>
-            <article className="sc-wall-original">
-              <b>{item.name}</b>
-              <p>{item.text}</p>
-              {item.photo ? <img src={item.photo} alt="Printed poster composition" /> : null}
-            </article>
-            <div className="sc-wall-note-list" aria-live="polite" aria-relevant="additions">
-            {notes.map((row, index) => (
-              <article key={`${row.name}-${index}`} className="sc-wall-note">
-                <Face who={row.who} />
-                <span>
-                  {row.name === "You" ? <b>You</b> : <button type="button" className="sc-wall-note-author" data-focus-key={`comment-${index}`} onClick={() => openProfile(row.who)}>{row.name}</button>}
-                  {row.text}
-                </span>
-              </article>
-            ))}
-            </div>
-          </div>
-          <form className="sc-wall-comment-dock" onSubmit={addComment}>
-            <Input value={draft} aria-label="Add a comment" placeholder="Add a comment" enterKeyHint="send" onChange={(event) => setDraft(event.target.value)} />
-            <Button type="submit" style={{ width: 44, padding: 0 }} aria-label="Post comment" disabled={!draft.trim()}><Icon name="send" size={16} /></Button>
-          </form>
-          </div>
-        ) : null}
+      <aside className="sf-side" aria-label={inspect?.kind === "post" ? "Comments" : inspect?.kind === "profile" ? "Contributor profile" : inspect?.kind === "compose" ? "New post" : "Studio context"}>
+        {inspect ? <header className="sf-detail-header"><Button variant="ghost" className="sf-back" onClick={back}><Icon name="arrow-left" />Back</Button><h2 ref={detailHeading} tabIndex={-1}>{inspect.kind === "post" ? "Conversation" : inspect.kind === "profile" ? "Contributor" : "Share an update"}</h2></header> : null}
+        {!inspect ? <div className="sf-context-scroll"><span className="sf-eyebrow">Your circle</span><h2>Good work is shared</h2><p>A place for the small things that move a project forward.</p>{peopleList}<div className="sf-studio-note"><Icon name="pin" /><h3>On the studio table</h3><p>Autumn poster proofs, a new paper stock, and the final foyer selection.</p></div><span className="sf-small">Fictional people · Local example</span></div> : inspect.kind === "profile" ? <div className="sf-profile"><Face who={person.id} size={48} /><div><h3>{person.name}</h3><p>{person.line}</p></div><p>{person.name} shares work in progress and thoughtful notes from the studio.</p><div className="sf-profile-stats"><span><strong>{posts.filter(row => row.who === person.id).length}</strong> updates</span><span>Studio member</span></div><Button variant={following.includes(person.id) ? "ghost" : "primary"} aria-pressed={following.includes(person.id)} aria-label={`Follow ${person.name}`} onClick={() => { setFollowing(current => current.includes(person.id) ? current.filter(id => id !== person.id) : [...current, person.id]); setNotice(following.includes(person.id) ? `${person.name} removed from your local circle` : `${person.name} added to your local circle`); }}><Icon name={following.includes(person.id) ? "check" : "plus"} />Follow {person.name}</Button><span className="sf-small">{following.includes(person.id) ? "Following in this local example" : "Not following"}</span><Button variant="ghost" onClick={() => { setContributor(person.id); setFilter("all"); browse("feed"); }}>View {person.name}’s updates<Icon name="arrow-right" /></Button></div> : inspect.kind === "post" ? <><div className="sf-conversation" ref={commentList}><article className="sf-original"><span className="sf-eyebrow">{item.name} · {item.when}</span><p>{item.text}</p>{item.photo && <img src={item.photo} alt="Printed poster composition" />}</article><h3>{notes.length} {notes.length === 1 ? "comment" : "comments"}</h3><div className="sf-comments">{notes.map((row, index) => <article className="sf-comment" key={`${row.name}-${index}`}><Face who={row.who} /><div>{row.name === "You" ? <strong>You</strong> : <Button variant="ghost" className="sf-comment-author" data-sf-focus={`comment-${index}`} onClick={() => open({ kind: "profile", who: row.who })}>{row.name}</Button>}<p>{row.text}</p></div></article>)}</div></div><form className="sf-comment-dock" onSubmit={addComment}><Input value={draft} aria-label="Add a comment" placeholder="Add a comment" maxLength={500} enterKeyHint="send" onChange={event => setDraft(event.target.value)} /><Button type="submit" aria-label="Post comment" disabled={!draft.trim()}><Icon name="send" /></Button></form></> : <form id={composeId} className="sf-compose" onSubmit={publish}><div className="sf-compose-content"><div className="sf-compose-person"><Face who="jenny" /><span><strong>You</strong><span>Sharing with your studio</span></span></div><label htmlFor={`${composeId}-text`}>Your update</label><Textarea id={`${composeId}-text`} value={postDraft} onChange={event => setPostDraft(event.target.value)} placeholder="What are you working on?" rows={6} maxLength={1000} required /><span className="sf-small">{postDraft.length}/1000 characters · Text only</span><p>This creates a post in this browser tab. No external account is connected.</p></div><div className="sf-compose-actions"><Button variant="ghost" onClick={back}>Cancel</Button><Button type="submit" disabled={!postDraft.trim()}><Icon name="send" />Publish locally</Button></div></form>}
       </aside>
-    </section>
-  );
+    </div>
+    <nav className="sf-mobile-nav" aria-label="Journal sections"><Button variant="ghost" aria-pressed={screen === "feed" && !inspect} onClick={() => browse("feed")}><Icon name="rows" />Feed</Button><Button variant="ghost" aria-pressed={screen === "people" && !inspect} onClick={() => browse("people")}><Icon name="users" />People</Button></nav>
+    <footer className="sf-footer"><span role="status">{notice}</span><span>No connected social account</span></footer>
+  </section>;
 }

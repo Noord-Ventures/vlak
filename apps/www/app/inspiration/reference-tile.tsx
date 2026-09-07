@@ -11,6 +11,7 @@ export interface ReferenceTileProps {
   caption?: ReferenceCaption;
   index: number;
   selected: boolean;
+  showImage?: boolean;
   onSelect: (index: number) => void;
 }
 
@@ -20,7 +21,7 @@ const workType: CSSProperties = { ...metaType, fontSize: "0.875rem", fontWeight:
 const bodyType: CSSProperties = { ...metaType, fontSize: "0.875rem", textWrap: "pretty" };
 
 /** One flat selectable reference, with its context kept beside the thumbnail. */
-export function ReferenceTile({ study, caption, index, selected, onSelect }: ReferenceTileProps) {
+export function ReferenceTile({ study, caption, index, selected, onSelect, showImage = true }: ReferenceTileProps) {
   const artist = caption?.name ?? study.artist;
   const work = `${study.title}, ${study.year}`;
   const note = caption?.mark.startsWith(`${work}.`)
@@ -43,11 +44,11 @@ export function ReferenceTile({ study, caption, index, selected, onSelect }: Ref
           <CardLabel style={metaType}>{String(index + 1).padStart(2, "0")}</CardLabel>
           <CardLabel style={metaType}>{study.kind}</CardLabel>
         </span>
-        <span className="inspiration-thumbnail-image">
+        {showImage && <span className="inspiration-thumbnail-image">
           <img src={study.poster ?? study.image} alt="" loading="lazy" onError={(event) => {
             if (event.currentTarget.getAttribute("src") !== study.image) event.currentTarget.src = study.image;
           }} />
-        </span>
+        </span>}
         <span className="reference-tile-identity">
           <CardLabel className="reference-tile-artist" style={artistType}>{artist}</CardLabel>
           {caption && <CardLabel className="reference-tile-dates" style={metaType}>{caption.years} · {caption.place}</CardLabel>}

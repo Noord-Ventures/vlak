@@ -1,0 +1,10 @@
+/* ── parameter-knob: generated from packages/react/src/components/parameter-knob.tsx ── */
+.rs-parameter-knob{display:inline-grid;justify-items:center;gap:0.5rem;min-width:5rem;color:var(--text)}
+.rs-parameter-knob-label{font-size:var(--control-fs);line-height:1.45;font-weight:500}
+.rs-parameter-knob-control{position:relative;width:4rem;height:4rem;border-radius:50%;border-width:1px;border-style:solid;border-color:var(--control-border);box-sizing:border-box;background-color:var(--bg);outline-color:var(--text);outline-offset:3px}
+.rs-parameter-knob-control:focus-within{outline-width:2px;outline-style:solid}
+.rs-parameter-knob-pointer{position:absolute;inset:0.5rem;pointer-events:none}
+.rs-parameter-knob-pointer::after{content:"";position:absolute;width:2px;height:0.875rem;inset-inline-start:calc(50% - 1px);top:0;background-color:var(--text)}
+@media (forced-colors: active){.rs-parameter-knob-pointer::after{background-color:CanvasText}}
+.rs-parameter-knob-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);margin:0;opacity:0;cursor:ew-resize}
+.rs-parameter-knob-value{font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;font-variant-numeric:tabular-nums}

@@ -1,0 +1,29 @@
+/* ── activity-rings: generated from packages/react/src/components/activity-rings.tsx ── */
+@keyframes rs-anim-ring-build{from{stroke-dashoffset:100;opacity:0}to{opacity:1}}
+@keyframes rs-anim-encouragement-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+.rs-activity-rings{margin:0;width:100%;min-width:0;color:var(--text);line-height:1.45}
+.rs-activity-rings-caption{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.25rem 1rem;margin-bottom:1rem;font-size:var(--control-fs);font-weight:600}
+.rs-activity-rings-body{display:flex;flex-wrap:wrap;align-items:center;gap:1.5rem 2rem}
+.rs-activity-rings-graphic{display:block;flex-shrink:0;width:10.5rem;height:10.5rem;max-width:100%;overflow:visible}
+.rs-activity-rings-track{fill:none;stroke:var(--divider)}
+@media (forced-colors: active){.rs-activity-rings-track{stroke:CanvasText}}
+.rs-activity-rings-arc{fill:none;stroke:var(--text);stroke-linecap:round;forced-color-adjust:none}
+@media (forced-colors: active){.rs-activity-rings-arc{stroke:Highlight}}
+.rs-activity-rings-motion{animation-name:rs-anim-ring-build;animation-duration:1s;animation-timing-function:cubic-bezier(0.16, 1, 0.3, 1);animation-fill-mode:backwards;transition-property:stroke-dashoffset;transition-duration:0.6s;transition-timing-function:cubic-bezier(0.16, 1, 0.3, 1)}
+@media (prefers-reduced-motion: reduce){.rs-activity-rings-motion{animation-name:none;transition-duration:0s}}
+.rs-activity-rings-waiting{animation-play-state:paused}
+.rs-activity-rings-encouragement{display:flex;align-items:center;gap:0.5rem;margin-top:1.25rem;min-height:var(--hit);max-width:66ch}
+.rs-activity-rings-encouragement-text{margin:0;flex:1 1 auto;min-width:0;font-size:0.875rem;line-height:1.45;color:var(--text-secondary);overflow-wrap:anywhere;animation-name:rs-anim-encouragement-in;animation-duration:0.3s;animation-timing-function:ease-out}
+@media (prefers-reduced-motion: reduce){.rs-activity-rings-encouragement-text{animation-name:none}}
+.rs-activity-rings-pause{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:var(--hit);min-height:var(--hit);padding:0;background-color:transparent;color:var(--text-secondary);border-width:0;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:2px}
+.rs-activity-rings-pause:focus-visible{outline-width:2px;outline-style:solid}
+.rs-activity-rings-pause-icon{width:0.875rem;height:0.875rem;fill:currentColor}
+.rs-activity-rings-list{list-style-type:none;margin:0;padding:0;display:grid;gap:1rem;flex:1 1 10rem;min-width:0}
+.rs-activity-rings-item{display:grid;grid-template-columns:1.25rem minmax(0, 1fr);align-items:baseline;column-gap:0.625rem;overflow-wrap:anywhere}
+.rs-activity-rings-index{font-size:0.75rem;color:var(--text-secondary);font-variant-numeric:tabular-nums}
+.rs-activity-rings-label{margin:0;font-size:var(--control-fs);font-weight:500}
+.rs-activity-rings-value{margin:0.125rem 0 0;font-size:1.25rem;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+.rs-activity-rings-target{font-size:0.875rem;color:var(--text-secondary);letter-spacing:normal}
+.rs-activity-rings-note{margin:0.25rem 0 0;font-size:0.75rem;font-weight:400;color:var(--text-secondary)}
+.rs-activity-rings-description{margin:1rem 0 0;font-size:0.875rem;color:var(--text-secondary);max-width:66ch}
+.rs-activity-rings-progress{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border-width:0}

@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "colony-plate",
+  "type": "registry:component",
+  "title": "Colony plate",
+  "description": "A bounded plate diagram and keyboard-selectable list of supplied colony markers, with the source count kept separate from annotation totals.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/colony-plate.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Button } from \"./button\";\n\nexport interface ColonyMarker {\n  id: string;\n  label: string;\n  /** Normalized plate coordinates from 0 to 100, with the origin at the upper left. */\n  x: number | null;\n  y: number | null;\n  description?: React.ReactNode;\n  disabled?: boolean;\n}\nexport interface ColonyPlateProps extends Omit<React.HTMLAttributes<HTMLElement>, \"defaultValue\"> {\n  label: string;\n  markers: readonly ColonyMarker[];\n  plateId?: string;\n  source?: React.ReactNode;\n  /** The source's recorded count, independent of the number of supplied marker records. */\n  recordedCount?: number | null;\n  value?: string | null;\n  defaultValue?: string | null;\n  onValueChange?: (id: string | null) => void;\n  readOnly?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  title: { fontSize: \"0.875rem\", fontWeight: 600 },\n  copy: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, maxWidth: \"66ch\" },\n  count: { margin: 0, fontSize: \"1.5rem\", fontVariantNumeric: \"tabular-nums\", letterSpacing: \"-0.02em\" },\n  body: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"start\", gap: \"1rem 1.5rem\", minWidth: 0 },\n  graphic: { display: \"block\", flex: \"0 1 15rem\", width: \"15rem\", maxWidth: \"100%\", height: \"auto\", color: { default: vlak.ink, [mq.forcedColors]: \"CanvasText\" } },\n  dish: { fill: { default: vlak.paper, [mq.forcedColors]: \"Canvas\" }, stroke: \"currentColor\", strokeWidth: 1 },\n  marker: { fill: \"currentColor\", stroke: \"currentColor\", strokeWidth: 1 },\n  chosen: { fill: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" }, stroke: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, strokeWidth: 3 },\n  list: { listStyleType: \"none\", margin: 0, padding: 0, display: \"grid\", gap: \"0.5rem\", flex: \"1 1 10rem\", minWidth: 0 },\n  record: { display: \"grid\", gap: \"0.25rem\", minWidth: 0, fontSize: \"0.75rem\" },\n  control: { display: \"block\", width: \"100%\", minWidth: vlak.hit, minHeight: vlak.hit, boxSizing: \"border-box\", textAlign: \"start\", padding: \"0.625rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: \"inherit\", fontSize: \"0.875rem\", lineHeight: 1.45, overflowWrap: \"anywhere\", cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  static: { paddingBlock: \"0.5rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  details: { margin: 0, fontSize: \"0.75rem\", maxWidth: \"66ch\" },\n  clear: { minWidth: vlak.hit, minHeight: vlak.hit, width: \"auto\", justifySelf: \"start\" },\n});\nconst positioned = (marker: ColonyMarker) => marker.x != null && marker.y != null && Number.isFinite(marker.x) && Number.isFinite(marker.y) && Math.hypot(marker.x - 50, marker.y - 50) <= 50;\n/** A supplied plate record. Marker positions and source count are never detected or inferred. */\nexport const ColonyPlate = React.forwardRef<HTMLElement, ColonyPlateProps>(function ColonyPlate({ label, markers, plateId, source, recordedCount, value, defaultValue = null, onValueChange, readOnly = false, className, style, children, ...props }, ref) {\n  const [current, setCurrent, figureRef] = useInputValue<string | null, HTMLElement>(value, defaultValue, onValueChange);\n  const merged = useMergedRefs(ref, figureRef);\n  const id = React.useId();\n  const bounded = markers.length <= 256;\n  const valid = bounded && markers.every(marker => marker.id.trim()) && new Set(markers.map(marker => marker.id)).size === markers.length;\n  const plotted = valid ? markers.filter(positioned) : [];\n  const selected = valid ? markers.find(marker => marker.id === current) : undefined;\n  const root = rs([\"rs-colony-plate\", className], styles.root);\n  const title = rs([\"rs-colony-plate-title\"], styles.title);\n  const copy = rs([\"rs-colony-plate-copy\"], styles.copy);\n  const count = rs([\"rs-colony-plate-count\"], styles.count);\n  const body = rs([\"rs-colony-plate-body\"], styles.body);\n  const graphic = rs([\"rs-colony-plate-graphic\"], styles.graphic);\n  const dish = rs([\"rs-colony-plate-dish\"], styles.dish);\n  const list = rs([\"rs-colony-plate-list\"], styles.list);\n  const record = rs([\"rs-colony-plate-record\"], styles.record);\n  const staticStyle = rs([\"rs-colony-plate-static\"], styles.static);\n  const details = rs([\"rs-colony-plate-details\"], styles.details);\n  const clear = rs([\"rs-colony-plate-clear\"], styles.clear);\n  return <figure {...props} ref={merged} className={root.className} style={{ ...root.style, ...style }}>\n    <figcaption {...title}>{label}</figcaption>{plateId != null && <p {...copy}>Plate: {plateId.trim() || \"Not supplied\"}</p>}\n    <p {...count}>Source count: {recordedCount == null ? \"Not supplied\" : Number.isSafeInteger(recordedCount) && recordedCount >= 0 ? recordedCount : \"Unavailable\"}</p>\n    {source != null && <div {...copy}>{source}</div>}\n    <p {...copy}>{markers.length} marker records supplied{valid ? `; ${plotted.length} positioned` : \"\"}</p>\n    {!valid ? <p {...copy}>{bounded ? \"Plate markers unavailable: supply unique non-empty record identifiers\" : \"Plate markers unavailable: supply at most 256 records\"}</p> : <>\n      <p {...copy}>Coordinates are percentages, measured from the upper left. The dish center is 50, 50.</p>\n      <div {...body}><svg {...graphic} viewBox=\"0 0 240 240\" aria-hidden=\"true\" focusable=\"false\"><circle {...dish} cx={120} cy={120} r={108} />{plotted.map(marker => {\n        const active = marker.id === current;\n        const paint = rs([\"rs-colony-plate-marker\", active && \"rs-colony-plate-chosen\"], styles.marker, active && styles.chosen);\n        return <circle key={marker.id} {...paint} cx={12 + marker.x! * 2.16} cy={12 + marker.y! * 2.16} r={active ? 5 : 3} />;\n      })}</svg>{markers.length > 0 ? <ol {...list} aria-label={`${label}, supplied marker records`}>{markers.map((marker, index) => {\n        const active = marker.id === current;\n        const control = rs([\"rs-colony-plate-control\", active && \"rs-colony-plate-selected\"], styles.control, active && styles.selected);\n        const position = positioned(marker) ? `x ${marker.x}%, y ${marker.y}%` : marker.x == null || marker.y == null ? \"Position not supplied\" : \"Position unavailable\";\n        const markerLabel = marker.label.trim() || \"Unlabelled record\";\n        return <li key={marker.id} {...record}>\n          {readOnly ? <div {...staticStyle}>{index + 1}. {markerLabel}{active ? \" (selected)\" : \"\"}</div> : <button {...control} type=\"button\" disabled={marker.disabled} aria-pressed={active} aria-label={`Select ${index + 1}. ${markerLabel}`} aria-describedby={`${id}-${index}-position`} onClick={() => setCurrent(marker.id)}>{index + 1}. {markerLabel}</button>}\n          <p {...copy} id={`${id}-${index}-position`}>{position}</p>{marker.description != null && <div {...details}>{marker.description}</div>}\n        </li>;\n      })}</ol> : <p {...copy}>No marker records supplied</p>}</div>\n      <p {...copy} role=\"status\">{selected ? `Selected record: ${selected.label.trim() || \"Unlabelled record\"}` : current == null ? \"No record selected\" : \"Selected record unavailable\"}</p>\n      {!readOnly && <Button {...clear} variant=\"ghost\" disabled={current == null} onClick={() => setCurrent(null)}>Clear selection</Button>}\n    </>}{children}\n  </figure>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/colony-plate.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/colony-plate.css",
+      "content": "/* ── colony-plate: generated from packages/react/src/components/colony-plate.tsx ── */\n.rs-colony-plate{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-colony-plate-title{font-size:0.875rem;font-weight:600}\n.rs-colony-plate-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}\n.rs-colony-plate-count{margin:0;font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}\n.rs-colony-plate-body{display:flex;flex-wrap:wrap;align-items:start;gap:1rem 1.5rem;min-width:0}\n.rs-colony-plate-graphic{display:block;flex:0 1 15rem;width:15rem;max-width:100%;height:auto;color:var(--text)}\n@media (forced-colors: active){.rs-colony-plate-graphic{color:CanvasText}}\n.rs-colony-plate-dish{fill:var(--bg);stroke:currentColor;stroke-width:1}\n@media (forced-colors: active){.rs-colony-plate-dish{fill:Canvas}}\n.rs-colony-plate-marker{fill:currentColor;stroke:currentColor;stroke-width:1}\n.rs-colony-plate-chosen{fill:var(--bg);stroke:var(--text);stroke-width:3}\n@media (forced-colors: active){.rs-colony-plate-chosen{fill:HighlightText;stroke:Highlight}}\n.rs-colony-plate-list{list-style-type:none;margin:0;padding:0;display:grid;gap:0.5rem;flex:1 1 10rem;min-width:0}\n.rs-colony-plate-record{display:grid;gap:0.25rem;min-width:0;font-size:0.75rem}\n.rs-colony-plate-control{display:block;width:100%;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;text-align:start;padding:0.625rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-colony-plate-control:focus-visible{outline-width:2px;outline-style:solid}\n.rs-colony-plate-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-colony-plate-selected{background-color:Highlight;color:HighlightText}}\n.rs-colony-plate-static{padding-block:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-colony-plate-details{margin:0;font-size:0.75rem;max-width:66ch}\n.rs-colony-plate-clear{min-width:var(--hit);min-height:var(--hit);width:auto;justify-self:start}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/colony-plate.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "microbiology",
+      "classes": [
+        "rs-colony-plate",
+        "rs-colony-plate-title",
+        "rs-colony-plate-copy",
+        "rs-colony-plate-count",
+        "rs-colony-plate-body",
+        "rs-colony-plate-graphic",
+        "rs-colony-plate-dish",
+        "rs-colony-plate-list",
+        "rs-colony-plate-record",
+        "rs-colony-plate-static",
+        "rs-colony-plate-details",
+        "rs-colony-plate-clear",
+        "rs-colony-plate-marker",
+        "rs-colony-plate-chosen",
+        "rs-colony-plate-control",
+        "rs-colony-plate-selected"
+      ],
+      "snippet": "<figure class=\"rs-colony-plate\"><figcaption class=\"rs-colony-plate-title\">Colony annotations</figcaption><p class=\"rs-colony-plate-count\">Source count: 12</p><p class=\"rs-colony-plate-copy\">1 marker records supplied; 1 positioned</p><ol class=\"rs-colony-plate-list\" aria-label=\"Supplied marker records\"><li class=\"rs-colony-plate-record\"><div class=\"rs-colony-plate-static\">1. Colony 01</div><p class=\"rs-colony-plate-copy\">x 28%, y 32%</p></li></ol></figure>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Colony annotations",
+        "Petri dish map",
+        "Colony record viewer",
+        "Agar plate annotations",
+        "Plate colony inspector"
+      ],
+      "example": "import { ColonyPlate } from \"@noorddev/vlak-react\";\n\n<ColonyPlate label=\"Colony annotations\" plateId=\"P-042\" recordedCount={12} source=\"Imported source count and four annotated records\" markers={[\n  { id: \"c1\", label: \"Colony 01\", x: 28, y: 32, description: \"Source annotation: circular outline\" },\n  { id: \"c2\", label: \"Colony 02\", x: 62, y: 26, description: \"Source annotation: raised center\" },\n  { id: \"c3\", label: \"Colony 03\", x: 55, y: 68 },\n  { id: \"c4\", label: \"Colony 04\", x: null, y: null },\n]} defaultValue=\"c2\" />",
+      "usage": {
+        "use": [
+          "Inspect supplied colony annotations and source counts without running an image analysis algorithm.",
+          "recordedCount is the original source count. The exact number of supplied marker records and positioned records are labelled separately; neither substitutes for the source count.",
+          "Supply unique marker identifiers and normalized x/y percentages from the upper left. The circular plate has center 50, 50 and radius 50.",
+          "Select a record using value and onValueChange, or use defaultValue for local selection. Native form reset restores uncontrolled selection. readOnly keeps the same record list without selection controls."
+        ],
+        "avoid": [
+          "Inferring a colony count from marker records, missing annotations or a blank diagram.",
+          "Identifying organisms, segmenting images or suggesting culture procedures from these records.",
+          "Supplying more than 256 markers; the component reports the bound without showing a partial list."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through enabled record-selection buttons and the clear-selection button."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Selects the focused supplied record or clears the selection; controlled selection waits for the host."
+        }
+      ],
+      "a11y": [
+        "The figure caption names the plate. The decorative diagram is paired with a complete ordered list of record labels, exact coordinates and supplied descriptions.",
+        "Missing, non-finite and out-of-dish positions retain their list records and have explicit availability text. Only positioned markers are drawn; their exact number is shown.",
+        "Every control is at least 44px with a visible focus ring. Selected record buttons use a full fill and aria-pressed, including in forced colors.",
+        "Source count zero remains zero. Missing source counts and invalid negative or unsafe counts receive separate text; no count is inferred from the diagram.",
+        "Duplicate or empty identifiers and oversized inputs produce an explanation. Native attributes, figure ref, className and style pass through. Selection buttons do not submit forms."
+      ]
+    }
+  }
+}

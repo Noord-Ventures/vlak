@@ -1,0 +1,116 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "design-rule-results",
+  "type": "registry:component",
+  "title": "Design rule results",
+  "description": "Supplied board-check violations with severity and status filters, object and location details, and host-confirmed selection and resolution actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/design-rule-results.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Select } from \"./select\";\nimport { Button } from \"./button\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport type DesignRuleSeverity = \"error\" | \"warning\" | \"info\";\nexport type DesignRuleStatus = \"open\" | \"resolved\" | \"excluded\";\nexport interface DesignRuleLocation { x: number | null; y: number | null; unit: string | null }\nexport interface DesignRuleViolation {\n  id: string;\n  title: string;\n  severity: DesignRuleSeverity | null;\n  status: DesignRuleStatus | null;\n  rule?: string | null;\n  layer?: string | null;\n  net?: string | null;\n  location?: DesignRuleLocation | null;\n  objects?: readonly string[];\n  description?: React.ReactNode;\n  canResolve?: boolean;\n  pending?: boolean;\n  disabled?: boolean;\n}\nexport interface DesignRuleFilter { severity: DesignRuleSeverity | \"all\" | \"unknown\"; status: DesignRuleStatus | \"all\" | \"unknown\" }\nexport interface DesignRuleResultsProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"onSelect\"> {\n  label: React.ReactNode;\n  violations: readonly DesignRuleViolation[];\n  filter?: DesignRuleFilter;\n  defaultFilter?: DesignRuleFilter;\n  onFilterChange?: (filter: DesignRuleFilter) => void;\n  selectedId?: string | null;\n  /** Requests selection in the host board viewer; selectedId remains host-owned. */\n  onSelect?: (id: string) => void;\n  /** Requests resolution of an open result. Confirmed status never changes locally. */\n  onResolve?: (id: string) => void;\n  runLabel?: React.ReactNode;\n  description?: React.ReactNode;\n}\n\nconst initial: DesignRuleFilter = { severity: \"all\", status: \"all\" };\nconst severityLabels: Record<DesignRuleSeverity, string> = { error: \"Error\", warning: \"Warning\", info: \"Information\" };\nconst statusLabels: Record<DesignRuleStatus, string> = { open: \"Open\", resolved: \"Resolved\", excluded: \"Excluded\" };\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.875rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  legend: { padding: 0, marginBottom: \"0.75rem\", fontSize: vlak.controlFs, fontWeight: 600 },\n  filters: { display: \"grid\", gridTemplateColumns: { default: \"repeat(2, minmax(0, 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem\" },\n  field: { display: \"grid\", minWidth: 0, gap: \"0.375rem\", fontSize: vlak.controlLabel },\n  control: { minWidth: 0, width: \"100%\", minHeight: vlak.hit },\n  list: { display: \"grid\", gap: \"0.75rem\", listStyle: \"none\", padding: 0, margin: 0 },\n  item: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, padding: \"0.875rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider },\n  selected: { backgroundColor: vlak.tableAlt, borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"Highlight\" } },\n  title: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, overflowWrap: \"anywhere\" },\n  properties: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(min(100%, 8rem), 1fr))\", gap: \"0.625rem\", margin: 0 },\n  term: { color: vlak.gray, fontSize: vlak.controlLabel },\n  detail: { margin: 0, fontSize: vlak.controlLabel, fontVariantNumeric: \"tabular-nums\", overflowWrap: \"anywhere\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  action: { minHeight: vlak.hit, maxWidth: \"100%\" },\n  note: { margin: 0, color: vlak.gray, fontSize: vlak.controlLabel, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n});\n\nfunction supplied(value: string | null | undefined) { return value?.trim() ? value : \"Not supplied\"; }\nfunction coordinate(value: number | null) { return value == null ? \"Not supplied\" : Number.isFinite(value) ? String(value) : \"Unavailable\"; }\n\n/** Supplied rule-check outcomes with local or controlled filters and host-confirmed actions. */\nexport const DesignRuleResults = React.forwardRef<HTMLFieldSetElement, DesignRuleResultsProps>(function DesignRuleResults({ label, violations, filter, defaultFilter = initial, onFilterChange, selectedId, onSelect, onResolve, runLabel, description, disabled, name, form, className, style, children, \"aria-describedby\": ariaDescribedBy, ...props }, ref) {\n  const id = React.useId();\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setFilter, fieldRef] = useInputValue<DesignRuleFilter, HTMLFieldSetElement>(filter, defaultFilter, onFilterChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const validRecords = violations.every(item => item.id.length > 0) && new Set(violations.map(item => item.id)).size === violations.length;\n  const visible = violations.filter(item => (current.severity === \"all\" || (current.severity === \"unknown\" ? item.severity == null : item.severity === current.severity)) && (current.status === \"all\" || (current.status === \"unknown\" ? item.status == null : item.status === current.status)));\n  const describedBy = [ariaDescribedBy, description != null && `${id}-description`, `${id}-count`].filter(Boolean).join(\" \");\n  const root = rs([\"rs-design-rule-results\", className], styles.root);\n  const legend = rs([\"rs-design-rule-results-legend\"], styles.legend);\n  const filters = rs([\"rs-design-rule-results-filters\"], styles.filters);\n  const field = rs([\"rs-design-rule-results-label\"], styles.field);\n  const control = rs([\"rs-design-rule-results-control\"], styles.control);\n  const list = rs([\"rs-design-rule-results-list\"], styles.list);\n  const title = rs([\"rs-design-rule-results-title\"], styles.title);\n  const properties = rs([\"rs-design-rule-results-properties\"], styles.properties);\n  const term = rs([\"rs-design-rule-results-term\"], styles.term);\n  const detail = rs([\"rs-design-rule-results-detail\"], styles.detail);\n  const actions = rs([\"rs-design-rule-results-actions\"], styles.actions);\n  const action = rs([\"rs-design-rule-results-action\"], styles.action);\n  const note = rs([\"rs-design-rule-results-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} aria-describedby={describedBy} className={root.className} style={{ ...root.style, ...style }}>\n    <legend {...legend}>{label}</legend>\n    {runLabel != null && <p {...note}>{runLabel}</p>}\n    {description != null && <p {...note} id={`${id}-description`}>{description}</p>}\n    <div {...filters}>\n      <div {...field}><span id={`${id}-severity-label`}>Severity</span><Select {...control} fullWidth name={name ? `${name}.severity` : undefined} form={form} value={current.severity} disabled={disabled} aria-labelledby={`${id}-severity-label`} options={[{ value: \"all\", label: \"All severities\" }, { value: \"error\", label: \"Error\" }, { value: \"warning\", label: \"Warning\" }, { value: \"info\", label: \"Information\" }, { value: \"unknown\", label: \"Unknown severity\" }]} onValueChange={next => { if (!disabled) setFilter({ ...current, severity: next as DesignRuleFilter[\"severity\"] }); }} /></div>\n      <div {...field}><span id={`${id}-status-label`}>Result status</span><Select {...control} fullWidth name={name ? `${name}.status` : undefined} form={form} value={current.status} disabled={disabled} aria-labelledby={`${id}-status-label`} options={[{ value: \"all\", label: \"All statuses\" }, { value: \"open\", label: \"Open\" }, { value: \"resolved\", label: \"Resolved\" }, { value: \"excluded\", label: \"Excluded\" }, { value: \"unknown\", label: \"Unknown status\" }]} onValueChange={next => { if (!disabled) setFilter({ ...current, status: next as DesignRuleFilter[\"status\"] }); }} /></div>\n    </div>\n    <p {...note} id={`${id}-count`} aria-live=\"polite\">{validRecords ? `${visible.length} of ${violations.length} results` : \"Result records unavailable\"}</p>\n    {!validRecords ? <p {...note}>Result identifiers must be unique and non-empty.</p> : <>\n      <ul {...list}>{visible.map((item, index) => {\n        const row = rs([\"rs-design-rule-results-item\", selectedId === item.id && \"rs-design-rule-results-selected\"], styles.item, selectedId === item.id && styles.selected);\n        const detailsId = `${id}-result-${index}`;\n        const blocked = disabled || item.disabled || item.pending;\n        const fields = [[\"Result identifier\", item.id], [\"Severity\", item.severity == null ? \"Unknown\" : severityLabels[item.severity] ?? \"Unknown\"], [\"Confirmed status\", item.status == null ? \"Unknown\" : statusLabels[item.status] ?? \"Unknown\"], [\"Rule\", supplied(item.rule)], [\"Layer\", supplied(item.layer)], [\"Net\", supplied(item.net)]];\n        return <li {...row} key={item.id}>\n          <p {...title}>{item.title}{selectedId === item.id ? \" · Selected\" : \"\"}</p>\n          {item.description != null && <div {...note}>{item.description}</div>}\n          <div id={detailsId}><dl {...properties}>{fields.map(([key, value]) => <div key={key}><dt {...term}>{key}</dt><dd {...detail}>{value}</dd></div>)}<div><dt {...term}>Location</dt><dd {...detail}>{item.location ? `X: ${coordinate(item.location.x)}, Y: ${coordinate(item.location.y)}; unit: ${supplied(item.location.unit)}` : \"Not supplied\"}</dd></div><div><dt {...term}>Objects</dt><dd {...detail}>{item.objects == null ? \"Not supplied\" : item.objects.length === 0 ? \"None recorded\" : item.objects.join(\", \")}</dd></div></dl></div>\n          {item.pending && <p {...note}>Update pending</p>}\n          {(onSelect || onResolve && item.status === \"open\" && item.canResolve !== false) && <div {...actions} aria-busy={item.pending || undefined}>\n            {onSelect && <Button variant=\"ghost\" {...action} type=\"button\" disabled={blocked} aria-label={`Select result ${item.id}: ${item.title}`} aria-describedby={detailsId} onClick={() => onSelect(item.id)}>Select</Button>}\n            {onResolve && item.status === \"open\" && item.canResolve !== false && <Button variant=\"ghost\" {...action} type=\"button\" disabled={blocked} aria-label={`Request resolution for ${item.id}: ${item.title}`} aria-describedby={detailsId} onClick={() => onResolve(item.id)}>Request resolution</Button>}\n          </div>}\n        </li>;\n      })}</ul>\n      {violations.length === 0 ? <p {...note}>No rule-check results supplied</p> : visible.length === 0 ? <p {...note}>No results match these filters</p> : null}\n      {selectedId != null && !violations.some(item => item.id === selectedId) && <p {...note}>Selected result unavailable: {selectedId}</p>}\n    </>}\n    {children}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/design-rule-results.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/design-rule-results.css",
+      "content": "/* ── design-rule-results: generated from packages/react/src/components/design-rule-results.tsx ── */\n.rs-design-rule-results{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}\n.rs-design-rule-results-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}\n.rs-design-rule-results-filters{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem}\n@media (max-width: 640px){.rs-design-rule-results-filters{grid-template-columns:minmax(0, 1fr)}}\n.rs-design-rule-results-label{display:grid;min-width:0;gap:0.375rem;font-size:var(--control-label)}\n.rs-design-rule-results-control{min-width:0;width:100%;min-height:var(--hit)}\n.rs-design-rule-results-list{display:grid;gap:0.75rem;list-style:none;padding:0;margin:0}\n.rs-design-rule-results-item{display:grid;gap:0.75rem;min-width:0;padding:0.875rem;border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-design-rule-results-selected{background-color:var(--table-alt);border-color:var(--control-border)}\n@media (forced-colors: active){.rs-design-rule-results-selected{border-color:Highlight}}\n.rs-design-rule-results-title{margin:0;font-size:var(--control-fs);font-weight:600;overflow-wrap:anywhere}\n.rs-design-rule-results-properties{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 8rem), 1fr));gap:0.625rem;margin:0}\n.rs-design-rule-results-term{color:var(--text-secondary);font-size:var(--control-label)}\n.rs-design-rule-results-detail{margin:0;font-size:var(--control-label);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}\n.rs-design-rule-results-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-design-rule-results-action{min-height:var(--hit);max-width:100%}\n.rs-design-rule-results-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);overflow-wrap:anywhere;max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/design-rule-results.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "electronics",
+      "classes": [
+        "rs-design-rule-results",
+        "rs-design-rule-results-legend",
+        "rs-design-rule-results-filters",
+        "rs-design-rule-results-label",
+        "rs-design-rule-results-control",
+        "rs-design-rule-results-list",
+        "rs-design-rule-results-item",
+        "rs-design-rule-results-selected",
+        "rs-design-rule-results-title",
+        "rs-design-rule-results-properties",
+        "rs-design-rule-results-term",
+        "rs-design-rule-results-detail",
+        "rs-design-rule-results-actions",
+        "rs-design-rule-results-action",
+        "rs-design-rule-results-note"
+      ],
+      "snippet": "<fieldset class=\"rs-design-rule-results\"><legend class=\"rs-design-rule-results-legend\">Reported design rules</legend><p class=\"rs-design-rule-results-note\">Synthetic check run 042</p><ul class=\"rs-design-rule-results-list\"><li class=\"rs-design-rule-results-item\"><p class=\"rs-design-rule-results-title\">Copper clearance</p><dl class=\"rs-design-rule-results-properties\"><div><dt class=\"rs-design-rule-results-term\">Severity</dt><dd class=\"rs-design-rule-results-detail\">Error</dd></div><div><dt class=\"rs-design-rule-results-term\">Confirmed status</dt><dd class=\"rs-design-rule-results-detail\">Open</dd></div><div><dt class=\"rs-design-rule-results-term\">Layer</dt><dd class=\"rs-design-rule-results-detail\">Front copper</dd></div><div><dt class=\"rs-design-rule-results-term\">Location</dt><dd class=\"rs-design-rule-results-detail\">X: 24.5, Y: 18; unit: mm</dd></div></dl></li></ul></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Board rule check",
+        "Circuit board violations",
+        "Clearance results",
+        "Design-rule review",
+        "Board verification results"
+      ],
+      "example": "import { DesignRuleResults } from \"@noorddev/vlak-react\";\n\n<DesignRuleResults label=\"Reported design rules\" runLabel=\"Synthetic check run 042\" violations={[\n  { id: \"clearance-1\", title: \"Copper clearance\", severity: \"error\", status: \"open\", rule: \"Supplied clearance rule\", layer: \"Front copper\", net: \"Supply\", location: { x: 24.5, y: 18, unit: \"mm\" }, objects: [\"J1 pad 1\", \"Track 17\"] },\n  { id: \"label-2\", title: \"Silkscreen overlap\", severity: \"warning\", status: \"excluded\", layer: \"Front silkscreen\", objects: [\"J1 reference\", \"J1 outline\"] },\n]} />",
+      "usage": {
+        "use": [
+          "Reviewing a bounded set of results supplied by a board design-rule checker.",
+          "Supply unique result ids, the confirmed severity and status, and any available layer, net, object and location records. Null severity or status means unknown.",
+          "onSelect requests host selection; selectedId confirms it. onResolve requests resolution of an open result unless canResolve is false. Pending and disabled records cannot invoke actions.",
+          "Use filter and onFilterChange for host-owned filters; uncontrolled filters start from defaultFilter. Named filters submit as name.severity and name.status."
+        ],
+        "avoid": [
+          "Treating an action click as a resolved board defect or treating an excluded result as resolved.",
+          "Inferring that an empty result array means a check ran or passed. The component does not run rules, edit the board or invent clearance limits."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the Vlak filter selectors and available action buttons."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Navigates a focused filter's choices."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Chooses a filter or requests the focused selection or resolution action."
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes an open filter selector."
+        }
+      ],
+      "a11y": [
+        "A fieldset legend names the results. Vlak Select and Button provide shared control paint, focus states and 44px targets.",
+        "Visible description lists distinguish reported severity, confirmed status, layer, net and coordinate units. Action names include the unique result id and title.",
+        "The polite count distinguishes filtered results from the complete supplied set. Empty results and unmatched filters use different messages.",
+        "Selected records use a full-surface fill and Selected text. Pending actions keep confirmed data readable and disable the action controls.",
+        "Native form reset restores uncontrolled filters; controlled filters remain with the application. Disabled fieldsets omit filter values and block actions.",
+        "The fieldset ref, native attributes, className and style pass through."
+      ]
+    }
+  }
+}

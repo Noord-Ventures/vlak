@@ -14,10 +14,8 @@
 }
 @media (min-width: 900px) { .toc-rail { display: flex; } }
 
-/* Catalog rail does not set --ml. Do not zero --ml here.
-   Detail keeps the live 204 inset at ≥1024 (site.css .site-layout).
-   Catalog index zeros --ml at 1024–1439 so 796 / two 388 fit;
-   ≥1440 restores the airy first 204. No hamburger under 900. */
+/* The shared --rail-inset owns the origin on every page level.
+   Layout widths can differ without shifting navigation columns. */
 
 .toc {
   width: 184px; flex-shrink: 0;

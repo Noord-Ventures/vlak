@@ -1,0 +1,94 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "care-plan",
+  "type": "registry:component",
+  "title": "Care plan",
+  "description": "Lists supplied care tasks, owners, due labels, and statuses with controlled completion requests.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/checkbox.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/care-plan.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Checkbox } from \"./checkbox\";\n\nexport interface CarePlanTask {\n  id: string;\n  title: string;\n  owner?: React.ReactNode;\n  dueLabel?: React.ReactNode;\n  /** The application's recorded status. Not inferred from a due date. */\n  status: React.ReactNode;\n  description?: React.ReactNode;\n  /** Omit for unknown completion; a control requires an explicit boolean. */\n  completed?: boolean;\n  pending?: boolean;\n  pendingLabel?: React.ReactNode;\n  disabled?: boolean;\n}\n\nexport interface CarePlanProps extends React.HTMLAttributes<HTMLDivElement> {\n  tasks: readonly CarePlanTask[];\n  description?: React.ReactNode;\n  emptyLabel?: React.ReactNode;\n  /** Requests a change only. Persist it and return updated tasks from the caller. */\n  onCompletedChange?: (taskId: string, completed: boolean) => void;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, overflowWrap: \"anywhere\", lineHeight: 1.45 },\n  description: { margin: 0, marginBottom: \"1rem\", maxWidth: \"66ch\", fontSize: \"0.875rem\", color: vlak.gray },\n  list: { margin: 0, padding: 0, listStyle: \"none\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  row: { display: \"flex\", flexDirection: \"column\", gap: \"0.75rem\", paddingBlock: \"1.25rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  title: { margin: 0, fontSize: \"1rem\", fontWeight: 600, lineHeight: 1.3 },\n  check: { fontWeight: 600, minHeight: vlak.hit, minWidth: vlak.hit, marginBlock: \"-0.375rem\" },\n  detail: { margin: 0, maxWidth: \"66ch\", fontSize: \"0.875rem\" },\n  metadata: { margin: 0, display: \"grid\", gridTemplateColumns: { default: \"repeat(3, minmax(0, 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.75rem 1rem\" },\n  field: { minWidth: 0 },\n  label: { margin: 0, color: vlak.gray, fontSize: \"0.75rem\" },\n  value: { margin: 0, marginTop: \"0.25rem\", fontSize: \"0.875rem\" },\n  pending: { fontSize: \"0.875rem\", color: vlak.gray },\n  empty: { margin: 0, paddingBlock: \"1.25rem\", color: vlak.gray, fontSize: \"0.875rem\" },\n});\n\n/** A supplied care task list with controlled completion requests and explicit pending states. */\nexport const CarePlan = React.forwardRef<HTMLDivElement, CarePlanProps>(function CarePlan(\n  { tasks, description, emptyLabel = \"No care tasks supplied\", onCompletedChange, children, className, style, ...props }, ref,\n) {\n  const baseId = React.useId();\n  const root = rs([\"rs-care-plan\", className], styles.root);\n  const descriptionStyle = rs([\"rs-care-plan-description\"], styles.description);\n  const list = rs([\"rs-care-plan-list\"], styles.list);\n  const row = rs([\"rs-care-plan-row\"], styles.row);\n  const title = rs([\"rs-care-plan-title\"], styles.title);\n  const check = rs([\"rs-care-plan-check\"], styles.check);\n  const detail = rs([\"rs-care-plan-detail\"], styles.detail);\n  const metadata = rs([\"rs-care-plan-metadata\"], styles.metadata);\n  const field = rs([\"rs-care-plan-field\"], styles.field);\n  const label = rs([\"rs-care-plan-label\"], styles.label);\n  const value = rs([\"rs-care-plan-value\"], styles.value);\n  const pending = rs([\"rs-care-plan-pending\"], styles.pending);\n  const empty = rs([\"rs-care-plan-empty\"], styles.empty);\n  return <div ref={ref} role=\"group\" aria-label=\"Care plan\" {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {description != null && <p {...descriptionStyle}>{description}</p>}\n    {tasks.length === 0 ? <p {...empty}>{emptyLabel}</p> : <ul {...list}>{tasks.map((task, index) => {\n      const statusId = `${baseId}-${index}-status`;\n      return <li key={task.id} {...row} aria-busy={task.pending || undefined}>\n        {onCompletedChange && typeof task.completed === \"boolean\" ? <Checkbox {...check} label={task.title} checked={task.completed} disabled={task.pending || task.disabled} aria-describedby={statusId} onCheckedChange={completed => onCompletedChange(task.id, completed)} /> : <p {...title}>{task.title}</p>}\n        {task.description != null && <p {...detail}>{task.description}</p>}\n        <dl {...metadata}>\n          <div {...field}><dt {...label}>Owner</dt><dd {...value}>{task.owner ?? \"Owner not supplied\"}</dd></div>\n          <div {...field}><dt {...label}>Due</dt><dd {...value}>{task.dueLabel ?? \"Due date not supplied\"}</dd></div>\n          <div {...field}><dt {...label}>Status</dt><dd {...value} id={statusId}>{task.status}</dd></div>\n        </dl>\n        <span role=\"status\" aria-live=\"polite\" {...pending}>{task.pending ? (task.pendingLabel ?? \"Task update pending\") : null}</span>\n      </li>;\n    })}</ul>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/care-plan.tsx"
+    },
+    {
+      "path": "vlak/styles/care-plan.css",
+      "content": "/* ── care-plan: generated from packages/react/src/components/care-plan.tsx ── */\n.rs-care-plan{width:100%;min-width:0;color:var(--text);overflow-wrap:anywhere;line-height:1.45}\n.rs-care-plan-description{margin:0;margin-bottom:1rem;max-width:66ch;font-size:0.875rem;color:var(--text-secondary)}\n.rs-care-plan-list{margin:0;padding:0;list-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-care-plan-row{display:flex;flex-direction:column;gap:0.75rem;padding-block:1.25rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-care-plan-title{margin:0;font-size:1rem;font-weight:600;line-height:1.3}\n.rs-care-plan-check{font-weight:600;min-height:var(--hit);min-width:var(--hit);margin-block:-0.375rem}\n.rs-care-plan-detail{margin:0;max-width:66ch;font-size:0.875rem}\n.rs-care-plan-metadata{margin:0;display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:0.75rem 1rem}\n@media (max-width: 640px){.rs-care-plan-metadata{grid-template-columns:minmax(0, 1fr)}}\n.rs-care-plan-field{min-width:0}\n.rs-care-plan-label{margin:0;color:var(--text-secondary);font-size:0.75rem}\n.rs-care-plan-value{margin:0;margin-top:0.25rem;font-size:0.875rem}\n.rs-care-plan-pending{font-size:0.875rem;color:var(--text-secondary)}\n.rs-care-plan-empty{margin:0;padding-block:1.25rem;color:var(--text-secondary);font-size:0.875rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/care-plan.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-care-plan",
+        "rs-care-plan-description",
+        "rs-care-plan-list",
+        "rs-care-plan-row",
+        "rs-care-plan-title",
+        "rs-care-plan-check",
+        "rs-care-plan-detail",
+        "rs-care-plan-metadata",
+        "rs-care-plan-field",
+        "rs-care-plan-label",
+        "rs-care-plan-value",
+        "rs-care-plan-pending",
+        "rs-care-plan-empty"
+      ],
+      "snippet": "<div class=\"rs-care-plan\" role=\"group\" aria-label=\"Care plan\"><ul class=\"rs-care-plan-list\"><li class=\"rs-care-plan-row\"><p class=\"rs-care-plan-title\">Confirm the next visit</p><dl class=\"rs-care-plan-metadata\"><div class=\"rs-care-plan-field\"><dt class=\"rs-care-plan-label\">Owner</dt><dd class=\"rs-care-plan-value\">Robin Ellis</dd></div><div class=\"rs-care-plan-field\"><dt class=\"rs-care-plan-label\">Due</dt><dd class=\"rs-care-plan-value\">17 September</dd></div><div class=\"rs-care-plan-field\"><dt class=\"rs-care-plan-label\">Status</dt><dd class=\"rs-care-plan-value\">Open</dd></div></dl></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "checkbox",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "CarePlan",
+        "Care tasks",
+        "Patient checklist",
+        "Care coordination",
+        "Treatment task list"
+      ],
+      "example": "import { CarePlan } from \"@noorddev/vlak-react\";\n\n<CarePlan tasks={[{ id: \"visit\", title: \"Confirm the next visit\", owner: \"Robin Ellis\", dueLabel: \"17 September\", status: \"Open\", completed: false }]} />\n\n// Pass onCompletedChange(taskId, completed) to request changes.\n// The caller persists completion and supplies updated tasks and pending states.",
+      "usage": {
+        "use": [
+          "Existing care plans with named owners and application-supplied deadlines and task status.",
+          "Supply an explicit completed boolean and onCompletedChange to enable a completion control."
+        ],
+        "avoid": [
+          "Generating treatment plans or deriving task urgency from dates.",
+          "Treating an unknown completion state as unchecked or showing success before the caller updates the record."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between enabled completion checkboxes when editing is available."
+        },
+        {
+          "keys": "Space",
+          "does": "Requests a completion change through onCompletedChange. The checkbox stays at the supplied value until the caller updates it."
+        }
+      ],
+      "a11y": [
+        "Task labels name native checkboxes with at least 44px label targets; the recorded status describes each checkbox.",
+        "Pending or disabled tasks cannot be changed. Pending text is visible in a polite status region with aria-busy on the task.",
+        "Tasks with unknown completion or no change callback render as static text, without an invented checkbox state.",
+        "Owner and due-date omissions are explicitly marked as not supplied. Dates are never parsed or inferred."
+      ]
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "assembly-variant-matrix",
+  "type": "registry:component",
+  "title": "Assembly variant matrix",
+  "description": "Edits independent population, bill-of-materials, and placement flags per reference and assembly variant, preserving unspecified choices.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/select.json",
+    "https://vlak.dev/r/dropdown-menu.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/assembly-variant-matrix.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Select } from \"./select\";\n\nexport interface AssemblyReference { id: string; label: string; partLabel?: string }\nexport interface AssemblyVariant { id: string; label: string }\nexport interface AssemblyVariantState { referenceId: string; variantId: string; populated: boolean | null; includeInBom: boolean | null; includeInPlacement: boolean | null }\nexport interface AssemblyVariantMatrixProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\"> {\n  label: React.ReactNode;\n  references: AssemblyReference[];\n  variants: AssemblyVariant[];\n  value?: AssemblyVariantState[];\n  defaultValue?: AssemblyVariantState[];\n  onValueChange?: (cells: AssemblyVariantState[]) => void;\n  readOnly?: boolean;\n}\n\nconst flags = [{ key: \"populated\", label: \"Populated\" }, { key: \"includeInBom\", label: \"In bill of materials\" }, { key: \"includeInPlacement\", label: \"In placement file\" }] as const;\nconst flagLabel = (value: boolean | null | undefined) => value === true ? \"Yes\" : value === false ? \"No\" : \"Unspecified\";\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, padding: 0, borderWidth: 0, color: vlak.ink },\n  legend: { marginBottom: \"0.75rem\", padding: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  viewport: { minWidth: 0, maxWidth: \"100%\", overflow: \"auto\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider },\n  table: { width: \"100%\", borderCollapse: \"collapse\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  header: { padding: \"0.75rem\", minWidth: \"7rem\", textAlign: \"start\", verticalAlign: \"top\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, fontWeight: 600 },\n  part: { display: \"block\", fontSize: vlak.controlLabel, color: vlak.gray, fontWeight: 400, lineHeight: 1.45 },\n  cell: { padding: \"0.5rem\", minWidth: \"12rem\", verticalAlign: \"top\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  summary: { boxSizing: \"border-box\", minWidth: vlak.hit, minHeight: vlak.hit, padding: \"0.625rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, cursor: \"pointer\", backgroundColor: vlak.paper, color: vlak.ink, outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  details: { \"::details-content\": { color: { default: vlak.ink, [mq.forcedColors]: \"CanvasText\" } } },\n  editor: { display: \"grid\", gap: \"0.625rem\", paddingTop: \"0.75rem\" },\n  field: { display: \"grid\", gap: \"0.25rem\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  select: { minWidth: 0, width: \"100%\" },\n  note: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** Independent fitted, bill-of-materials and placement choices per reference and variant. */\nexport const AssemblyVariantMatrix = React.forwardRef<HTMLFieldSetElement, AssemblyVariantMatrixProps>(function AssemblyVariantMatrix({ label, references, variants, value, defaultValue = [], onValueChange, readOnly, disabled, name, form, className, style, ...props }, ref) {\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<AssemblyVariantState[], HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const unknown = current.filter((cell) => !references.some((reference) => reference.id === cell.referenceId) || !variants.some((variant) => variant.id === cell.variantId));\n  const root = rs([\"rs-assembly-variant-matrix\", className], styles.root);\n  const legend = rs([\"rs-assembly-variant-matrix-legend\"], styles.legend);\n  const viewport = rs([\"rs-assembly-variant-matrix-viewport\"], styles.viewport);\n  const table = rs([\"rs-assembly-variant-matrix-table\"], styles.table);\n  const header = rs([\"rs-assembly-variant-matrix-header\"], styles.header);\n  const part = rs([\"rs-assembly-variant-matrix-part\"], styles.part);\n  const cellStyle = rs([\"rs-assembly-variant-matrix-cell\"], styles.cell);\n  const details = rs([\"rs-assembly-variant-matrix-details\"], styles.details);\n  const summary = rs([\"rs-assembly-variant-matrix-summary\"], styles.summary);\n  const editor = rs([\"rs-assembly-variant-matrix-editor\"], styles.editor);\n  const field = rs([\"rs-assembly-variant-matrix-field\"], styles.field);\n  const select = rs([\"rs-assembly-variant-matrix-select\"], styles.select);\n  const note = rs([\"rs-assembly-variant-matrix-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={legend.className} style={legend.style}>{label}</legend>\n    {references.length === 0 || variants.length === 0 ? <p className={note.className} style={note.style}>Supply references and variants to edit assembly choices.</p> : <div className={viewport.className} style={viewport.style}><table className={table.className} style={table.style}>\n      <thead><tr><th scope=\"col\" className={header.className} style={header.style}>Reference / variant</th>{variants.map((variant) => <th key={variant.id} scope=\"col\" className={header.className} style={header.style}>{variant.label}</th>)}</tr></thead>\n      <tbody>{references.map((reference) => <tr key={reference.id}><th scope=\"row\" className={header.className} style={header.style}>{reference.label}{reference.partLabel && <span className={part.className} style={part.style}>{reference.partLabel}</span>}</th>{variants.map((variant) => {\n        const matches = current.filter((cell) => cell.referenceId === reference.id && cell.variantId === variant.id);\n        const cell = matches[0];\n        const duplicate = matches.length > 1;\n        const context = `${reference.label} in ${variant.label}`;\n        return <td key={variant.id} className={cellStyle.className} style={cellStyle.style}>\n          {duplicate ? <p className={note.className} style={note.style}>Conflicting records for {context}</p> : <details className={details.className} style={details.style}>\n            <summary aria-label={`Edit ${context}`} className={summary.className} style={summary.style}><span>Edit {context}</span><span className={part.className} style={part.style}>{cell ? `Populated: ${flagLabel(cell.populated)} · Bill: ${flagLabel(cell.includeInBom)} · Placement: ${flagLabel(cell.includeInPlacement)}` : \"Not specified\"}</span></summary>\n            <div className={editor.className} style={editor.style}>{flags.map((flag) => <div key={flag.key} className={field.className} style={field.style}><span>{flag.label}</span><Select fullWidth options={[{ value: \"\", label: \"Unspecified\" }, { value: \"yes\", label: \"Yes\" }, { value: \"no\", label: \"No\" }]} aria-label={`${flag.label}, ${context}`} name={name ? `${name}.${reference.id}.${variant.id}.${flag.key}` : undefined} form={form} value={cell?.[flag.key] === true ? \"yes\" : cell?.[flag.key] === false ? \"no\" : \"\"} disabled={disabled} readOnly={readOnly} className={select.className} style={select.style} onValueChange={(nextValue) => {\n              const next = { referenceId: reference.id, variantId: variant.id, populated: null, includeInBom: null, includeInPlacement: null, ...cell, [flag.key]: nextValue === \"\" ? null : nextValue === \"yes\" };\n              setValue(cell ? current.map((record) => record === cell ? next : record) : [...current, next]);\n            }} /></div>)}</div>\n          </details>}\n        </td>;\n      })}</tr>)}</tbody>\n    </table></div>}\n    <p className={note.className} style={note.style}>{readOnly ? \"Read only. \" : \"\"}Population, bill of materials, and placement choices are independent.</p>\n    {unknown.length > 0 && <div className={note.className} style={note.style}>Records with unavailable references or variants:<ul>{unknown.map((cell, index) => <li key={index}>{cell.referenceId} in {cell.variantId}</li>)}</ul></div>}\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/assembly-variant-matrix.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/assembly-variant-matrix.css",
+      "content": "/* ── assembly-variant-matrix: generated from packages/react/src/components/assembly-variant-matrix.tsx ── */\n.rs-assembly-variant-matrix{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}\n.rs-assembly-variant-matrix-legend{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-assembly-variant-matrix-viewport{min-width:0;max-width:100%;overflow:auto;border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-assembly-variant-matrix-table{width:100%;border-collapse:collapse;font-size:var(--control-label);line-height:1.45}\n.rs-assembly-variant-matrix-header{padding:0.75rem;min-width:7rem;text-align:start;vertical-align:top;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:600}\n.rs-assembly-variant-matrix-part{display:block;font-size:var(--control-label);color:var(--text-secondary);font-weight:400;line-height:1.45}\n.rs-assembly-variant-matrix-cell{padding:0.5rem;min-width:12rem;vertical-align:top;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-assembly-variant-matrix-summary{box-sizing:border-box;min-width:var(--hit);min-height:var(--hit);padding:0.625rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);cursor:pointer;background-color:var(--bg);color:var(--text);outline-color:var(--text);outline-offset:2px}\n.rs-assembly-variant-matrix-summary:focus-visible{outline-width:2px;outline-style:solid}\n.rs-assembly-variant-matrix-details::details-content{color:var(--text)}\n@media (forced-colors: active){.rs-assembly-variant-matrix-details::details-content{color:CanvasText}}\n.rs-assembly-variant-matrix-editor{display:grid;gap:0.625rem;padding-top:0.75rem}\n.rs-assembly-variant-matrix-field{display:grid;gap:0.25rem;font-size:var(--control-label);line-height:1.45}\n.rs-assembly-variant-matrix-select{min-width:0;width:100%}\n.rs-assembly-variant-matrix-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/assembly-variant-matrix.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "electronics",
+      "classes": [
+        "rs-assembly-variant-matrix",
+        "rs-assembly-variant-matrix-legend",
+        "rs-assembly-variant-matrix-viewport",
+        "rs-assembly-variant-matrix-table",
+        "rs-assembly-variant-matrix-header",
+        "rs-assembly-variant-matrix-part",
+        "rs-assembly-variant-matrix-cell",
+        "rs-assembly-variant-matrix-details",
+        "rs-assembly-variant-matrix-summary",
+        "rs-assembly-variant-matrix-editor",
+        "rs-assembly-variant-matrix-field",
+        "rs-assembly-variant-matrix-select",
+        "rs-assembly-variant-matrix-note"
+      ],
+      "snippet": "<fieldset class=\"rs-assembly-variant-matrix\"><legend class=\"rs-assembly-variant-matrix-legend\">Assembly options</legend><div class=\"rs-assembly-variant-matrix-viewport\"><table class=\"rs-assembly-variant-matrix-table\"><thead><tr><th class=\"rs-assembly-variant-matrix-header\" scope=\"col\">Reference / variant</th><th class=\"rs-assembly-variant-matrix-header\" scope=\"col\">Pilot</th></tr></thead><tbody><tr><th class=\"rs-assembly-variant-matrix-header\" scope=\"row\">R1<span class=\"rs-assembly-variant-matrix-part\">10 kΩ resistor</span></th><td class=\"rs-assembly-variant-matrix-cell\"><details class=\"rs-assembly-variant-matrix-details\"><summary class=\"rs-assembly-variant-matrix-summary\">Edit R1 in Pilot<span class=\"rs-assembly-variant-matrix-part\">Not specified</span></summary><div class=\"rs-assembly-variant-matrix-editor\"><div class=\"rs-assembly-variant-matrix-field\"><span>Populated</span><div class=\"rs-select rs-select-fluid rs-assembly-variant-matrix-select\"><button class=\"rs-dropdown\" role=\"combobox\" aria-label=\"Populated, R1 in Pilot\" aria-haspopup=\"listbox\" aria-expanded=\"false\" type=\"button\">Unspecified</button></div></div></div></details></td></tr></tbody></table></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "select",
+        "dropdown-menu",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AssemblyVariantMatrix",
+        "Assembly options",
+        "Population matrix",
+        "Bill of materials variants",
+        "Placement options",
+        "Reference variant table"
+      ],
+      "example": "import { AssemblyVariantMatrix } from \"@noorddev/vlak-react\";\n\n<AssemblyVariantMatrix label=\"Assembly options\" name=\"assembly\"\n  references={[{ id: \"r1\", label: \"R1\", partLabel: \"10 kΩ resistor\" }]}\n  variants={[{ id: \"pilot\", label: \"Pilot\" }, { id: \"production\", label: \"Production\" }]}\n  defaultValue={[{ referenceId: \"r1\", variantId: \"pilot\", populated: true, includeInBom: true, includeInPlacement: true }, { referenceId: \"r1\", variantId: \"production\", populated: false, includeInBom: true, includeInPlacement: false }]} />",
+      "usage": {
+        "use": [
+          "Caller-owned assembly references, part labels, and named build variants.",
+          "Three independent boolean-or-null flags: population, bill-of-materials inclusion, and placement-file inclusion.",
+          "value/defaultValue/onValueChange to receive the proposed cell array; editing one flag leaves the other flags unchanged.",
+          "Missing cells begin unspecified. Conflicting duplicate cells and unavailable references remain visible rather than being silently merged."
+        ],
+        "avoid": [
+          "Inferring bill-of-materials or placement policy from the populated flag.",
+          "Assuming the component generates manufacturing files or changes a board design.",
+          "Treating unspecified flags as excluded or not populated."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through native cell summaries and controls in expanded editors."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Opens or closes the focused cell's native details editor."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Opens and navigates the Vlak selector between Unspecified, Yes, and No; Enter confirms the highlighted choice."
+        }
+      ],
+      "a11y": [
+        "Native row and column headers identify each reference and variant; cell editor summaries repeat that context.",
+        "Each independent Vlak Select has a flag-specific name including its reference and variant, and a 44px target.",
+        "Compact summaries expose all three flags in text; no color or population shortcut carries policy.",
+        "Native details reveal the editor without focus traps; Vlak Select supplies the choice menu, and overflow remains inside the matrix.",
+        "Named controls submit each flag separately. Read-only values and native form reset are supported; the ref reaches the fieldset."
+      ]
+    }
+  }
+}

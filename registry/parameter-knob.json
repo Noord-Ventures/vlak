@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "parameter-knob",
+  "type": "registry:component",
+  "title": "Parameter knob",
+  "description": "Displays a rotary parameter over a native horizontal range input, with named values, units, and a 64px control.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/parameter-knob.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface ParameterKnobProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"onChange\" | \"min\" | \"max\" | \"step\"> {\n  label: React.ReactNode;\n  value?: number;\n  defaultValue?: number;\n  onValueChange?: (value: number) => void;\n  min?: number;\n  max?: number;\n  step?: number;\n  unit?: string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"inline-grid\", justifyItems: \"center\", gap: \"0.5rem\", minWidth: \"5rem\", color: vlak.ink },\n  label: { fontSize: vlak.controlFs, lineHeight: 1.45, fontWeight: 500 },\n  control: { position: \"relative\", width: \"4rem\", height: \"4rem\", borderRadius: \"50%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, boxSizing: \"border-box\", backgroundColor: vlak.paper, outlineWidth: { default: null, \":focus-within\": 2 }, outlineStyle: { default: null, \":focus-within\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 3 },\n  pointer: { position: \"absolute\", inset: \"0.5rem\", pointerEvents: \"none\", \"::after\": { content: '\"\"', position: \"absolute\", width: 2, height: \"0.875rem\", insetInlineStart: \"calc(50% - 1px)\", top: 0, backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"CanvasText\" } } },\n  input: { position: \"absolute\", inset: \"-1px\", width: \"calc(100% + 2px)\", height: \"calc(100% + 2px)\", margin: 0, opacity: 0, cursor: \"ew-resize\" },\n  value: { fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45, fontVariantNumeric: \"tabular-nums\" },\n});\n\n/** A rotary display driven by a native horizontal range input. */\nexport const ParameterKnob = React.forwardRef<HTMLInputElement, ParameterKnobProps>(function ParameterKnob({\n  label, value, defaultValue, onValueChange, min = 0, max = 100, step = 1, unit, id, disabled, readOnly, className, style, onKeyDown, onClick, ...props\n}, ref) {\n  const autoId = React.useId();\n  const inputId = id ?? autoId;\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, inputRef] = useInputValue<number, HTMLInputElement>(value, defaultValue ?? min, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, inputRef);\n  const stepCount = (max - min) / step;\n  const validRange = Number.isFinite(min) && Number.isFinite(max) && Number.isFinite(max - min) && max > min && Number.isFinite(step) && step > 0 && Number.isFinite(stepCount) && stepCount <= Number.MAX_SAFE_INTEGER;\n  const validValue = Number.isFinite(current);\n  const usable = validRange && validValue;\n  const lastStep = validRange ? Math.floor(stepCount + Number.EPSILON * Math.max(1, stepCount) * 4) : 0;\n  const snap = (next: number) => {\n    const bounded = Math.max(min, Math.min(max, next));\n    const index = Math.max(0, Math.min(lastStep, Math.round((bounded - min) / step)));\n    return Number((min + index * step).toPrecision(12));\n  };\n  const snapped = usable ? snap(current) : 0;\n  const root = rs([\"rs-parameter-knob\"], styles.root);\n  const caption = rs([\"rs-parameter-knob-label\"], styles.label);\n  const control = rs([\"rs-parameter-knob-control\"], styles.control);\n  const pointer = rs([\"rs-parameter-knob-pointer\"], styles.pointer);\n  const input = rs([\"rs-parameter-knob-input\", className], styles.input);\n  const output = rs([\"rs-parameter-knob-value\"], styles.value);\n  return <div className={root.className} style={root.style}>\n    <label htmlFor={inputId} className={caption.className} style={caption.style}>{label}</label>\n    <div className={control.className} style={control.style}>\n      {usable && <span aria-hidden=\"true\" className={pointer.className} style={{ ...pointer.style, transform: `rotate(${-135 + ((snapped - min) / (max - min)) * 270}deg)` }} />}\n      <input {...props} ref={mergedRef} id={inputId} type=\"range\" min={usable ? min : 0} max={usable ? max : 1} step={usable ? step : 1} value={snapped} disabled={disabled || !usable} readOnly={readOnly} aria-disabled={readOnly || undefined} aria-valuetext={usable ? `${snapped}${unit ? ` ${unit}` : \"\"}` : \"Unavailable\"} className={input.className} style={{ ...input.style, ...style }}\n        onClick={(event) => { onClick?.(event); if (readOnly) event.preventDefault(); }}\n        onKeyDown={(event) => { onKeyDown?.(event); if (readOnly && [\"ArrowUp\", \"ArrowDown\", \"ArrowLeft\", \"ArrowRight\", \"Home\", \"End\", \"PageUp\", \"PageDown\"].includes(event.key)) event.preventDefault(); }}\n        onChange={(event) => { if (!readOnly && usable) setValue(snap(Number(event.currentTarget.value))); }} />\n    </div>\n    <span className={output.className} style={output.style}>{!validRange ? \"Invalid range\" : !validValue ? \"Unavailable\" : `${snapped}${unit ? ` ${unit}` : \"\"}`}</span>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/parameter-knob.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/parameter-knob.css",
+      "content": "/* ── parameter-knob: generated from packages/react/src/components/parameter-knob.tsx ── */\n.rs-parameter-knob{display:inline-grid;justify-items:center;gap:0.5rem;min-width:5rem;color:var(--text)}\n.rs-parameter-knob-label{font-size:var(--control-fs);line-height:1.45;font-weight:500}\n.rs-parameter-knob-control{position:relative;width:4rem;height:4rem;border-radius:50%;border-width:1px;border-style:solid;border-color:var(--control-border);box-sizing:border-box;background-color:var(--bg);outline-color:var(--text);outline-offset:3px}\n.rs-parameter-knob-control:focus-within{outline-width:2px;outline-style:solid}\n.rs-parameter-knob-pointer{position:absolute;inset:0.5rem;pointer-events:none}\n.rs-parameter-knob-pointer::after{content:\"\";position:absolute;width:2px;height:0.875rem;inset-inline-start:calc(50% - 1px);top:0;background-color:var(--text)}\n@media (forced-colors: active){.rs-parameter-knob-pointer::after{background-color:CanvasText}}\n.rs-parameter-knob-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);margin:0;opacity:0;cursor:ew-resize}\n.rs-parameter-knob-value{font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;font-variant-numeric:tabular-nums}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/parameter-knob.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-parameter-knob",
+        "rs-parameter-knob-label",
+        "rs-parameter-knob-control",
+        "rs-parameter-knob-pointer",
+        "rs-parameter-knob-input",
+        "rs-parameter-knob-value"
+      ],
+      "snippet": "<div class=\"rs-parameter-knob\"><label class=\"rs-parameter-knob-label\" for=\"mix-knob\">Mix</label><div class=\"rs-parameter-knob-control\"><span class=\"rs-parameter-knob-pointer\" aria-hidden=\"true\" style=\"transform:rotate(0deg)\"></span><input class=\"rs-parameter-knob-input\" id=\"mix-knob\" type=\"range\" min=\"0\" max=\"100\" step=\"1\" value=\"50\" aria-valuetext=\"50%\" /></div><span class=\"rs-parameter-knob-value\">50%</span></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ParameterKnob",
+        "Rotary control",
+        "Dial",
+        "Audio knob",
+        "Parameter dial"
+      ],
+      "example": "import { ParameterKnob } from \"@noorddev/vlak-react\";\n\n<ParameterKnob label=\"Mix\" name=\"mix\" min={0} max={100} step={1} defaultValue={35} unit=\"%\" />",
+      "usage": {
+        "use": [
+          "A compact bounded parameter with an explicit label, step, and unit.",
+          "value/defaultValue/onValueChange and native form attributes; the ref reaches the range input.",
+          "Horizontal pointer movement and the browser's native range keyboard behavior."
+        ],
+        "avoid": [
+          "Implying circular pointer dragging; the dial is a visual representation of a horizontal range.",
+          "Non-finite values or invalid bounds; they render an unavailable disabled control."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the native range input and its visible dial ring."
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Uses native range stepping and bounds unless read-only."
+        }
+      ],
+      "a11y": [
+        "The native range uses the visible label and exposes min, max, step, and value text including the unit.",
+        "The full 64px dial is the input target; the pointer graphic is decorative.",
+        "Form reset restores uncontrolled defaults and preserves controlled values.",
+        "The ref, native input attributes, className, and style reach the range input."
+      ]
+    }
+  }
+}

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { vlakCategories, catalogComponents } from "@noorddev/vlak";
+import { vlakCategories, catalogComponents, domainCollections } from "@noorddev/vlak";
 import { Icon, iconGroups } from "@noorddev/vlak-react";
 import { chrome } from "@/app/site.stylex";
 import { DocsNav } from "@/components/docs-nav";
 import { Preview } from "@/components/preview";
 import { sx } from "@/lib/sx";
+import { categoryTitle } from "@/lib/category-title";
 import { DOOR } from "../specimen";
 
 function iconGroupSlug(title: string) {
@@ -60,13 +61,20 @@ export default function ComponentsPage() {
               </section>
             );
           }
+          const collection = domainCollections.find(item => item.name === category);
           const items = catalogComponents.filter((c) => c.category === category);
           if (items.length === 0) return null;
           return (
             <section key={category} id={category}>
               <h2 className="rs-t-title catalog-group">
-                {category.charAt(0).toUpperCase() + category.slice(1)}
+                {categoryTitle(category)}
               </h2>
+              {category === "health" && (
+                <p className="rs-t-body">
+                  Readings, daily routines, and care workflows. <Link href="/docs/health" className="rs-link">Building health software</Link>
+                </p>
+              )}
+              {collection && <p className="rs-t-body">{collection.description} <Link href={`/docs/${category}`} className="rs-link">Read the collection guide</Link></p>}
               <div {...sx("gallery", chrome.gallery)}>
                 {items.map((c) => (
                   <div key={c.name} {...sx("gallery-item", chrome.galleryItem)}>

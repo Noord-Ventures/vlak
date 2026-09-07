@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sleep-timeline",
+  "type": "registry:component",
+  "title": "Sleep timeline",
+  "description": "Displays supplied sleep, wake, and unknown intervals with explicit time labels, monochrome segments, and a complete text record.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/sleep-timeline.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport type SleepState = \"asleep\" | \"awake\" | \"unknown\";\n\nexport interface SleepInterval {\n  id: string;\n  /** Numeric offsets in minutes on the same caller-owned timeline. */\n  start: number;\n  end: number;\n  /** Explicit display labels, including dates or timezone when needed. */\n  startLabel: string;\n  endLabel: string;\n  state: SleepState;\n}\n\nexport interface SleepTimelineProps extends React.HTMLAttributes<HTMLElement> {\n  label: React.ReactNode;\n  description?: React.ReactNode;\n  intervals: SleepInterval[];\n  /** Visible window in minutes. All intervals must fit within it. */\n  start: number;\n  end: number;\n  startLabel: string;\n  endLabel: string;\n}\n\nconst stateLabels: Record<SleepState, string> = { asleep: \"Asleep\", awake: \"Awake\", unknown: \"Unknown\" };\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, margin: 0, color: vlak.ink },\n  caption: { display: \"grid\", gap: \"0.375rem\" },\n  label: { fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  description: { margin: 0, color: vlak.gray, fontSize: vlak.controlFs, lineHeight: 1.45, maxWidth: \"66ch\" },\n  chart: { display: \"flex\", width: \"100%\", height: \"2rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, boxSizing: \"border-box\", overflow: \"hidden\" },\n  // A separator must never enlarge an interval whose allotted width is below 1px.\n  segment: {\n    position: \"relative\", height: \"100%\", minWidth: 0, flexShrink: 0, boxSizing: \"border-box\", overflow: \"hidden\",\n    \"::after\": { content: '\"\"', position: \"absolute\", top: 0, bottom: 0, insetInlineEnd: 0, width: vlak.hairline, backgroundColor: { default: vlak.controlBorder, [mq.forcedColors]: \"CanvasText\" }, pointerEvents: \"none\" },\n  },\n  asleep: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"CanvasText\" } },\n  awake: { backgroundColor: { default: vlak.paper, [mq.forcedColors]: \"Canvas\" } },\n  unknown: { backgroundColor: { default: vlak.tableAlt, [mq.forcedColors]: \"Canvas\" }, backgroundImage: { default: `repeating-linear-gradient(135deg, transparent, transparent 4px, ${vlak.controlBorder} 4px, ${vlak.controlBorder} 5px)`, [mq.forcedColors]: \"none\" }, borderBottomWidth: { default: 0, [mq.forcedColors]: 3 }, borderBottomStyle: \"dotted\", borderBottomColor: \"CanvasText\" },\n  axis: { display: \"flex\", justifyContent: \"space-between\", gap: \"1rem\", fontSize: vlak.controlLabel, lineHeight: 1.45, color: vlak.gray },\n  list: { display: \"grid\", gap: 0, listStyleType: \"none\", padding: 0, margin: 0, borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  interval: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"baseline\", justifyContent: \"space-between\", gap: \"0.25rem 1rem\", paddingBlock: \"0.625rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, fontSize: vlak.controlFs, lineHeight: 1.45 },\n  period: { color: vlak.gray, fontVariantNumeric: \"tabular-nums\" },\n});\n\ntype Segment = { start: number; end: number; startLabel: string; endLabel: string; state: SleepState; gap?: boolean };\n\n/** Supplied sleep and wake intervals, with gaps exposed as unrecorded time. */\nexport const SleepTimeline = React.forwardRef<HTMLElement, SleepTimelineProps>(function SleepTimeline({\n  label, description, intervals, start, end, startLabel, endLabel, className, style, ...props\n}, ref) {\n  const duration = end - start;\n  const validWindow = Number.isFinite(start) && Number.isFinite(end) && Number.isFinite(duration) && duration > 0;\n  const validIntervals = intervals.every((interval) => Number.isFinite(interval.start) && Number.isFinite(interval.end) && interval.end > interval.start && interval.start >= start && interval.end <= end && Object.hasOwn(stateLabels, interval.state));\n  const ordered = [...intervals].sort((left, right) => left.start - right.start);\n  const overlap = validIntervals && ordered.some((interval, index) => index > 0 && interval.start < ordered[index - 1]!.end);\n  const problem = !validWindow ? \"Timeline unavailable: the time window is invalid.\" : !validIntervals ? \"Timeline unavailable: an interval is invalid or outside the time window.\" : overlap ? \"Timeline unavailable: intervals overlap.\" : null;\n  const segments: Segment[] = [];\n  if (problem == null) {\n    let cursor = start;\n    let cursorLabel = startLabel;\n    for (const interval of ordered) {\n      if (interval.start > cursor) segments.push({ start: cursor, end: interval.start, startLabel: cursorLabel, endLabel: interval.startLabel, state: \"unknown\", gap: true });\n      segments.push(interval);\n      cursor = interval.end;\n      cursorLabel = interval.endLabel;\n    }\n    if (cursor < end) segments.push({ start: cursor, end, startLabel: cursorLabel, endLabel, state: \"unknown\", gap: true });\n  }\n  const root = rs([\"rs-sleep-timeline\", className], styles.root);\n  const caption = rs([\"rs-sleep-timeline-caption\"], styles.caption);\n  const heading = rs([\"rs-sleep-timeline-label\"], styles.label);\n  const copy = rs([\"rs-sleep-timeline-description\"], styles.description);\n  const chart = rs([\"rs-sleep-timeline-chart\"], styles.chart);\n  const axis = rs([\"rs-sleep-timeline-axis\"], styles.axis);\n  const list = rs([\"rs-sleep-timeline-list\"], styles.list);\n  const row = rs([\"rs-sleep-timeline-interval\"], styles.interval);\n  const period = rs([\"rs-sleep-timeline-period\"], styles.period);\n  const records = problem == null ? segments : intervals;\n  return <figure {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <figcaption className={caption.className} style={caption.style}>\n      <span className={heading.className} style={heading.style}>{label}</span>\n      {description != null && <span className={copy.className} style={copy.style}>{description}</span>}\n    </figcaption>\n    {problem != null ? <p className={copy.className} style={copy.style}>{problem}</p> : <div aria-hidden=\"true\" className={chart.className} style={chart.style}>{segments.map((segment, index) => {\n      const asleep = segment.state === \"asleep\";\n      const awake = segment.state === \"awake\";\n      const unknown = segment.state === \"unknown\";\n      const paint = rs([\"rs-sleep-timeline-segment\", asleep && \"rs-sleep-timeline-asleep\", awake && \"rs-sleep-timeline-awake\", unknown && \"rs-sleep-timeline-unknown\"], styles.segment, asleep && styles.asleep, awake && styles.awake, unknown && styles.unknown);\n      return <span key={index} className={paint.className} style={{ ...paint.style, width: `${((segment.end - segment.start) / duration) * 100}%` }} />;\n    })}</div>}\n    <div className={axis.className} style={axis.style}><span>{startLabel}</span><span>{endLabel}</span></div>\n    {intervals.length === 0 && <p className={copy.className} style={copy.style}>No sleep intervals recorded</p>}\n    {records.length > 0 && <ul className={list.className} style={list.style}>{records.map((interval, index) => <li key={index} className={row.className} style={row.style}>\n      <span>{\"gap\" in interval && interval.gap ? \"Unrecorded\" : Object.hasOwn(stateLabels, interval.state) ? stateLabels[interval.state] : \"Unknown state\"}</span>\n      <span className={period.className} style={period.style}>{interval.startLabel} to {interval.endLabel}</span>\n    </li>)}</ul>}\n  </figure>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/sleep-timeline.tsx"
+    },
+    {
+      "path": "vlak/styles/sleep-timeline.css",
+      "content": "/* ── sleep-timeline: generated from packages/react/src/components/sleep-timeline.tsx ── */\n.rs-sleep-timeline{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text)}\n.rs-sleep-timeline-caption{display:grid;gap:0.375rem}\n.rs-sleep-timeline-label{font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-sleep-timeline-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}\n.rs-sleep-timeline-chart{display:flex;width:100%;height:2rem;border-width:1px;border-style:solid;border-color:var(--control-border);box-sizing:border-box;overflow:hidden}\n.rs-sleep-timeline-segment{position:relative;height:100%;min-width:0;flex-shrink:0;box-sizing:border-box;overflow:hidden}\n.rs-sleep-timeline-segment::after{content:\"\";position:absolute;top:0;bottom:0;inset-inline-end:0;width:1px;background-color:var(--control-border);pointer-events:none}\n@media (forced-colors: active){.rs-sleep-timeline-segment::after{background-color:CanvasText}}\n.rs-sleep-timeline-asleep{background-color:var(--text)}\n@media (forced-colors: active){.rs-sleep-timeline-asleep{background-color:CanvasText}}\n.rs-sleep-timeline-awake{background-color:var(--bg)}\n@media (forced-colors: active){.rs-sleep-timeline-awake{background-color:Canvas}}\n.rs-sleep-timeline-unknown{background-color:var(--table-alt);background-image:repeating-linear-gradient(135deg, transparent, transparent 4px, var(--control-border) 4px, var(--control-border) 5px);border-bottom-width:0;border-bottom-style:dotted;border-bottom-color:CanvasText}\n@media (forced-colors: active){.rs-sleep-timeline-unknown{background-color:Canvas;background-image:none;border-bottom-width:3px}}\n.rs-sleep-timeline-axis{display:flex;justify-content:space-between;gap:1rem;font-size:var(--control-label);line-height:1.45;color:var(--text-secondary)}\n.rs-sleep-timeline-list{display:grid;gap:0;list-style-type:none;padding:0;margin:0;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-sleep-timeline-interval{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.25rem 1rem;padding-block:0.625rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:var(--control-fs);line-height:1.45}\n.rs-sleep-timeline-period{color:var(--text-secondary);font-variant-numeric:tabular-nums}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/sleep-timeline.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-sleep-timeline",
+        "rs-sleep-timeline-caption",
+        "rs-sleep-timeline-label",
+        "rs-sleep-timeline-description",
+        "rs-sleep-timeline-chart",
+        "rs-sleep-timeline-segment",
+        "rs-sleep-timeline-asleep",
+        "rs-sleep-timeline-awake",
+        "rs-sleep-timeline-unknown",
+        "rs-sleep-timeline-axis",
+        "rs-sleep-timeline-list",
+        "rs-sleep-timeline-interval",
+        "rs-sleep-timeline-period"
+      ],
+      "snippet": "<figure class=\"rs-sleep-timeline\"><figcaption class=\"rs-sleep-timeline-caption\"><span class=\"rs-sleep-timeline-label\">Last night</span></figcaption><div class=\"rs-sleep-timeline-chart\" aria-hidden=\"true\"><span class=\"rs-sleep-timeline-segment rs-sleep-timeline-asleep\" style=\"width:75%\"></span><span class=\"rs-sleep-timeline-segment rs-sleep-timeline-awake\" style=\"width:25%\"></span></div><div class=\"rs-sleep-timeline-axis\"><span>22:30</span><span>06:30</span></div><ul class=\"rs-sleep-timeline-list\"><li class=\"rs-sleep-timeline-interval\"><span>Asleep</span><span class=\"rs-sleep-timeline-period\">22:30 to 04:30</span></li><li class=\"rs-sleep-timeline-interval\"><span>Awake</span><span class=\"rs-sleep-timeline-period\">04:30 to 06:30</span></li></ul></figure>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "SleepTimeline",
+        "Sleep log",
+        "Sleep chart",
+        "Sleep interval",
+        "Sleep record",
+        "Wellness timeline"
+      ],
+      "example": "import { SleepTimeline } from \"@noorddev/vlak-react\";\n\n<SleepTimeline label=\"Last night\" description=\"Recorded intervals, local time\" start={0} end={480} startLabel=\"22:30\" endLabel=\"06:30\" intervals={[\n  { id: \"sleep-1\", start: 0, end: 240, startLabel: \"22:30\", endLabel: \"02:30\", state: \"asleep\" },\n  { id: \"wake-1\", start: 240, end: 255, startLabel: \"02:30\", endLabel: \"02:45\", state: \"awake\" },\n  { id: \"sleep-2\", start: 270, end: 480, startLabel: \"03:00\", endLabel: \"06:30\", state: \"asleep\" },\n]} />",
+      "usage": {
+        "use": [
+          "Display-only sleep records from a caller-owned source, using minute offsets on a single timeline.",
+          "Explicit boundary labels that include the date and timezone when needed.",
+          "Gaps remain unrecorded; supplied unknown intervals retain their unknown state."
+        ],
+        "avoid": [
+          "Inferring sleep stages, diagnosis, or sleep quality from the supplied intervals.",
+          "Silently clipping out-of-window records, merging overlaps, or filling missing time with sleep."
+        ]
+      },
+      "keyboard": [],
+      "a11y": [
+        "A native figure and caption introduce the record. The decorative chart is hidden from assistive technology.",
+        "Every supplied interval and unrecorded gap has a visible text equivalent with start and end labels.",
+        "Overlapping, invalid, or out-of-window intervals produce a visible explanation and suppress the chart while preserving supplied text.",
+        "Sleep, wake, and unknown segments use distinct monochrome fills and boundaries; forced-colors retains a dotted unknown marker.",
+        "The forwarded ref and native attributes reach the figure."
+      ]
+    }
+  }
+}

@@ -1,0 +1,106 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "well-plate",
+  "type": "registry:component",
+  "title": "Well plate",
+  "description": "A labelled laboratory plate with supplied well states, 44px selection controls and keyboard navigation across up to 1536 wells.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/well-plate.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface WellPosition { row: string; column: string }\nexport interface WellRecord extends WellPosition { status: string; label?: string; disabled?: boolean }\nexport interface WellPlateProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  label: string;\n  rows: readonly string[];\n  columns: readonly string[];\n  wells: readonly WellRecord[];\n  value?: WellPosition | null;\n  defaultValue?: WellPosition | null;\n  onValueChange?: (value: WellPosition) => void;\n  description?: React.ReactNode;\n  disabled?: boolean;\n  /** Static well cells add no tab stops; their scroll container remains focusable. */\n  readOnly?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, maxWidth: \"100%\", color: vlak.ink, lineHeight: 1.45 },\n  label: { margin: 0, fontSize: \"0.875rem\", fontWeight: 600 },\n  description: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray, overflowWrap: \"anywhere\", maxWidth: \"66ch\" },\n  scroll: { maxWidth: \"100%\", overflowX: \"auto\", overscrollBehaviorX: \"contain\", padding: \"0.25rem\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  table: { borderCollapse: \"separate\", borderSpacing: \"0.25rem\", width: \"max-content\" },\n  heading: { minWidth: vlak.hit, height: vlak.hit, padding: \"0.25rem\", boxSizing: \"border-box\", fontSize: \"0.75rem\", fontWeight: 500, textAlign: \"center\" },\n  cell: { padding: 0, minWidth: vlak.hit },\n  well: { minHeight: vlak.hit, minWidth: vlak.hit, width: \"100%\", boxSizing: \"border-box\", display: \"grid\", alignContent: \"center\", gap: \"0.125rem\", padding: \"0.5rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: \"inherit\", fontSize: \"0.75rem\", lineHeight: 1.45, cursor: \"pointer\", outlineWidth: { default: null, \":focus-visible\": 2 }, outlineStyle: { default: null, \":focus-visible\": \"solid\" }, outlineColor: vlak.ink, outlineOffset: 2 },\n  selected: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" } },\n  unavailable: { opacity: { default: 0.55, [mq.forcedColors]: 1 }, cursor: \"default\" },\n  static: { cursor: \"default\" },\n  coordinate: { fontWeight: 600, fontVariantNumeric: \"tabular-nums\" },\n});\n\nconst positionKey = (position: WellPosition) => JSON.stringify([position.row, position.column]);\n\n/** A plate of up to 1536 wells, with roving keyboard focus and explicit unrecorded cells. */\nexport const WellPlate = React.forwardRef<HTMLDivElement, WellPlateProps>(function WellPlate({ label, rows, columns, wells, value, defaultValue = null, onValueChange, description, disabled = false, readOnly = false, className, style, children, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const current = value === undefined ? inner : value;\n  const [focused, setFocused] = React.useState<string | null>(null);\n  const controls = React.useRef(new Map<string, HTMLButtonElement>());\n  const id = React.useId();\n  const bounded = rows.length > 0 && columns.length > 0 && rows.length <= 1536 && columns.length <= 1536 && rows.length * columns.length <= 1536 && wells.length <= 1536;\n  const validLayout = bounded && rows.every(row => row.trim()) && columns.every(column => column.trim()) && new Set(rows).size === rows.length && new Set(columns).size === columns.length;\n  const records = new Map<string, WellRecord>();\n  let validRecords = true;\n  if (validLayout) for (const well of wells) {\n    const key = positionKey(well);\n    if (!rows.includes(well.row) || !columns.includes(well.column) || records.has(key)) { validRecords = false; break; }\n    records.set(key, well);\n  }\n  const valid = validLayout && validRecords;\n  const positions = valid ? rows.flatMap(row => columns.map(column => ({ row, column }))) : [];\n  const enabled = positions.filter(position => !disabled && !records.get(positionKey(position))?.disabled);\n  const activeKey = enabled.some(position => positionKey(position) === focused) ? focused : enabled.find(position => current && positionKey(position) === positionKey(current)) ? positionKey(current!) : enabled[0] ? positionKey(enabled[0]) : null;\n  const choose = (position: WellPosition) => { if (value === undefined) setInner(position); onValueChange?.(position); };\n  const navigate = (event: React.KeyboardEvent<HTMLButtonElement>, rowIndex: number, columnIndex: number) => {\n    const rtl = getComputedStyle(event.currentTarget).direction === \"rtl\";\n    let candidates: WellPosition[] = [];\n    if (event.key === \"Home\" || event.key === \"End\") {\n      candidates = event.ctrlKey ? positions : positions.slice(rowIndex * columns.length, (rowIndex + 1) * columns.length);\n      if (event.key === \"End\") candidates = [...candidates].reverse();\n    } else {\n      const rowDelta = event.key === \"ArrowDown\" ? 1 : event.key === \"ArrowUp\" ? -1 : 0;\n      const columnDelta = event.key === \"ArrowRight\" ? (rtl ? -1 : 1) : event.key === \"ArrowLeft\" ? (rtl ? 1 : -1) : 0;\n      if (!rowDelta && !columnDelta) return;\n      for (let row = rowIndex + rowDelta, column = columnIndex + columnDelta; row >= 0 && row < rows.length && column >= 0 && column < columns.length; row += rowDelta, column += columnDelta) candidates.push({ row: rows[row]!, column: columns[column]! });\n    }\n    event.preventDefault();\n    const target = candidates.find(position => !disabled && !records.get(positionKey(position))?.disabled);\n    if (target) { const key = positionKey(target); setFocused(key); controls.current.get(key)?.focus(); }\n  };\n  const root = rs([\"rs-well-plate\", className], styles.root);\n  const heading = rs([\"rs-well-plate-label\"], styles.label);\n  const copy = rs([\"rs-well-plate-description\"], styles.description);\n  const scroll = rs([\"rs-well-plate-scroll\"], styles.scroll);\n  const table = rs([\"rs-well-plate-table\"], styles.table);\n  const header = rs([\"rs-well-plate-heading\"], styles.heading);\n  const cell = rs([\"rs-well-plate-cell\"], styles.cell);\n  const coordinate = rs([\"rs-well-plate-coordinate\"], styles.coordinate);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <p {...heading} id={`${id}-label`}>{label}</p>\n    {description != null && <div {...copy}>{description}</div>}\n    {!valid ? <p {...copy}>{!rows.length || !columns.length ? \"No plate layout supplied\" : !bounded ? \"Plate unavailable: supply at most 1536 wells\" : \"Plate unavailable: row, column or well records are invalid\"}</p> : <>\n      {!readOnly && <p {...copy} id={`${id}-keys`}>Arrow keys move between wells. Enter or Space selects a well.</p>}\n      <div {...scroll} role=\"region\" aria-labelledby={`${id}-label`} tabIndex={readOnly || !enabled.length ? 0 : undefined}><table {...table} role={readOnly ? undefined : \"grid\"} aria-labelledby={`${id}-label`} aria-describedby={readOnly ? undefined : `${id}-keys`}>\n        <thead><tr><th {...header} scope=\"col\">Well</th>{columns.map(column => <th key={column} {...header} scope=\"col\">{column}</th>)}</tr></thead>\n        <tbody>{rows.map((row, rowIndex) => <tr key={row}><th {...header} scope=\"row\">{row}</th>{columns.map((column, columnIndex) => {\n          const position = { row, column };\n          const key = positionKey(position);\n          const record = records.get(key);\n          const selected = current != null && positionKey(current) === key;\n          const unavailable = disabled || record?.disabled;\n          const paint = rs([\"rs-well-plate-well\", selected && \"rs-well-plate-selected\", unavailable && \"rs-well-plate-unavailable\", readOnly && \"rs-well-plate-static\"], styles.well, selected && styles.selected, unavailable && styles.unavailable, readOnly && styles.static);\n          const status = record?.status.trim() || \"Unrecorded\";\n          const contents = <><span {...coordinate}>{record?.label ?? `${row}${column}`}</span><span>{status}</span></>;\n          if (readOnly) return <td key={column} {...cell}><div {...paint}>{contents}{selected && <span>Selected</span>}</div></td>;\n          // Native cells inherit gridcell semantics from the table's grid role;\n          // the contained button owns the roving focus target.\n          return <td key={column} {...cell} aria-selected={selected}><button {...paint} type=\"button\" ref={node => { if (node) controls.current.set(key, node); else controls.current.delete(key); }} disabled={unavailable} tabIndex={key === activeKey ? 0 : -1} aria-label={`Well ${row}, ${column}${record?.label ? `, ${record.label}` : \"\"}: ${status}`} onFocus={() => setFocused(key)} onKeyDown={event => navigate(event, rowIndex, columnIndex)} onClick={() => choose(position)}>{contents}</button></td>;\n        })}</tr>)}</tbody>\n      </table></div>\n    </>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/well-plate.tsx"
+    },
+    {
+      "path": "vlak/styles/well-plate.css",
+      "content": "/* ── well-plate: generated from packages/react/src/components/well-plate.tsx ── */\n.rs-well-plate{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text);line-height:1.45}\n.rs-well-plate-label{margin:0;font-size:0.875rem;font-weight:600}\n.rs-well-plate-description{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}\n.rs-well-plate-scroll{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;padding:0.25rem;outline-color:var(--text);outline-offset:2px}\n.rs-well-plate-scroll:focus-visible{outline-width:2px;outline-style:solid}\n.rs-well-plate-table{border-collapse:separate;border-spacing:0.25rem;width:max-content}\n.rs-well-plate-heading{min-width:var(--hit);height:var(--hit);padding:0.25rem;box-sizing:border-box;font-size:0.75rem;font-weight:500;text-align:center}\n.rs-well-plate-cell{padding:0;min-width:var(--hit)}\n.rs-well-plate-well{min-height:var(--hit);min-width:var(--hit);width:100%;box-sizing:border-box;display:grid;align-content:center;gap:0.125rem;padding:0.5rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);font-family:inherit;font-size:0.75rem;line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}\n.rs-well-plate-well:focus-visible{outline-width:2px;outline-style:solid}\n.rs-well-plate-selected{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-well-plate-selected{background-color:Highlight;color:HighlightText}}\n.rs-well-plate-unavailable{opacity:0.55;cursor:default}\n@media (forced-colors: active){.rs-well-plate-unavailable{opacity:1}}\n.rs-well-plate-static{cursor:default}\n.rs-well-plate-coordinate{font-weight:600;font-variant-numeric:tabular-nums}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/well-plate.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "microbiology",
+      "classes": [
+        "rs-well-plate",
+        "rs-well-plate-label",
+        "rs-well-plate-description",
+        "rs-well-plate-scroll",
+        "rs-well-plate-table",
+        "rs-well-plate-heading",
+        "rs-well-plate-cell",
+        "rs-well-plate-well",
+        "rs-well-plate-selected",
+        "rs-well-plate-unavailable",
+        "rs-well-plate-static",
+        "rs-well-plate-coordinate"
+      ],
+      "snippet": "<div class=\"rs-well-plate\"><p class=\"rs-well-plate-label\">Plate 042</p><div class=\"rs-well-plate-scroll\"><table class=\"rs-well-plate-table\"><caption>Supplied well records</caption><thead><tr><th class=\"rs-well-plate-heading\" scope=\"col\">Well</th><th class=\"rs-well-plate-heading\" scope=\"col\">1</th></tr></thead><tbody><tr><th class=\"rs-well-plate-heading\" scope=\"row\">A</th><td class=\"rs-well-plate-cell\"><div class=\"rs-well-plate-well rs-well-plate-static\"><span class=\"rs-well-plate-coordinate\">A1</span><span>Loaded</span></div></td></tr></tbody></table></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Microplate",
+        "Plate map",
+        "Microtiter plate",
+        "Sample plate",
+        "Assay plate",
+        "Well grid"
+      ],
+      "example": "import { WellPlate } from \"@noorddev/vlak-react\";\n\n<WellPlate label=\"Plate 042\" rows={[\"A\", \"B\", \"C\"]} columns={[\"1\", \"2\", \"3\", \"4\"]} wells={[\n  { row: \"A\", column: \"1\", status: \"Loaded\", label: \"Control\" },\n  { row: \"A\", column: \"2\", status: \"Loaded\", label: \"Sample 042\" },\n  { row: \"B\", column: \"1\", status: \"Reserved\", disabled: true },\n]} defaultValue={{ row: \"A\", column: \"1\" }} />",
+      "usage": {
+        "use": [
+          "Sample placement and plate inspection with application-supplied rows, columns and well states.",
+          "Unique row and column labels and at most one record per coordinate. Missing records are labelled Unrecorded.",
+          "Use value and onValueChange for application-owned selection; readOnly provides a static plate."
+        ],
+        "avoid": [
+          "Inferring empty wells, assay outcomes or sample identities from missing records.",
+          "Layouts larger than 1536 wells; the component reports the limit instead of silently truncating a plate."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Enters the plate at one enabled well and then leaves the grid."
+        },
+        {
+          "keys": "Arrow keys",
+          "does": "Moves focus along a row or column, skipping disabled wells without changing selection."
+        },
+        {
+          "keys": "Home, End",
+          "does": "Moves to the first or last enabled well in the current row."
+        },
+        {
+          "keys": "Ctrl+Home, Ctrl+End",
+          "does": "Moves to the first or last enabled well in the plate."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Selects the focused well. Controlled selection waits for the caller's updated value."
+        }
+      ],
+      "a11y": [
+        "A named grid uses row and column headers, roving button focus and aria-selected cells. Every well name includes its coordinates and supplied state.",
+        "Selected wells use a full fill and controls retain 44px targets. Large plates scroll inside their own container.",
+        "Arrow navigation respects the document reading direction. Disabled wells are skipped; static and fully disabled plates provide one focusable scroll region.",
+        "Duplicate or unknown coordinates and invalid layouts produce a visible explanation instead of an ambiguous plate.",
+        "The root div forwards its ref and native attributes. Selection does not submit a form."
+      ]
+    }
+  }
+}

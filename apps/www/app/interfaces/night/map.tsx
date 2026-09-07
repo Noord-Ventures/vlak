@@ -1,423 +1,147 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import * as THREE from "three";
+import * as React from "react";
+import { Button, Icon, type IconName } from "@noorddev/vlak-react";
+import { applyFleetPalette, loadMapbox, loadStreetRoute, type LngLat, type MapInstance, type StreetRoute } from "./mapbox";
 
-type SceneProps = {
-  selected: string;
-};
+export type MapVehicle = { id: string; name: string; icon: IconName; status: string; position: LngLat; route: readonly LngLat[] };
+const center: LngLat = [-122.3886, 37.7581];
+const baseZoom = 14.5;
+export const fleetZoomLimits = { min: 2 ** (12 - baseZoom), max: 2 ** (18 - baseZoom) };
+const publicToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
+const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const styleURL = (dark: boolean) => `mapbox://styles/mapbox/${dark ? "dark" : "light"}-v11`;
+const routeData = (route?: StreetRoute) => ({ type: "FeatureCollection", features: route ? [{ type: "Feature", properties: { profile: route.profile, source: "Mapbox Directions" }, geometry: route.geometry }] : [] });
+function sketchPoint([lng, lat]: LngLat): [number, number] { return [(lng + 122.397) / .018 * 660, (37.766 - lat) / .016 * 500]; }
 
-const PITCH = 2.2;
-const STREET = 0.58;
-const CITY = 5;
-const SPAN = (CITY * 2 + 1) * PITCH;
-/** City centroid: lots sit on (i + 0.5) * PITCH. */
-const LOOK_X = 1.1;
-const LOOK_Y = 0.15;
-const LOOK_Z = 1.1;
-/** Steeper than the 42° corner dolly so the neighborhood fills the well,
-    not a paper wedge in the top-left. Keep CITY / PITCH. */
-const CAM_DESK = { x: 6.8, y: 16.8, z: 6.8, fov: 46 };
-const CAM_TALL = { x: 7.6, y: 19.2, z: 7.6, fov: 50 };
-
-const UNITS: Record<string, { x: number; z: number; rot: number }> = {
-  "04": { x: 0.16, z: PITCH, rot: 0 },
-  "19": { x: 0.16, z: -PITCH, rot: 0 },
-  "03": { x: -PITCH, z: -0.16, rot: Math.PI / 2 },
-  "11": { x: 0.16, z: -3 * PITCH, rot: 0 },
-};
-
-const TONES = [0xddd8d0, 0xd2cdc5, 0xe4dfd7, 0xcfcac2, 0xdbd6ce, 0xd8d3cb, 0xc8c3bb, 0xe2ddd5, 0xd0cbc3, 0xccc7bf];
-
-function lot(i: number, j: number) {
-  const n = Math.abs((i * 47 + j * 13) % 17);
-  return {
-    h: 0.36 + (n % 8) * 0.14,
-    w: 0.92 + (n % 3) * 0.1,
-    d: 0.92 + ((n + 2) % 3) * 0.1,
-    tone: TONES[n % TONES.length]!,
-    split: n % 5 === 0,
-  };
-}
-
-const BUILDINGS: { x: number; z: number; w: number; d: number; h: number; tone: number }[] = [];
-for (let i = -CITY; i <= CITY; i += 1) {
-  for (let j = -CITY; j <= CITY; j += 1) {
-    if (i === -3 && j === 1) continue;
-    if (j <= -CITY && i >= 2) continue;
-    const cell = lot(i, j);
-    const cx = (i + 0.5) * PITCH;
-    const cz = (j + 0.5) * PITCH;
-    const pad = STREET * 0.42;
-    if (cell.split) {
-      BUILDINGS.push({
-        x: cx - cell.w * 0.28,
-        z: cz,
-        w: cell.w * 0.52,
-        d: cell.d,
-        h: cell.h * 0.82,
-        tone: cell.tone,
-      });
-      BUILDINGS.push({
-        x: cx + cell.w * 0.3,
-        z: cz,
-        w: cell.w * 0.48,
-        d: cell.d * 0.9,
-        h: cell.h * 1.12,
-        tone: TONES[(i + j + 3) % TONES.length]!,
-      });
-    } else {
-      BUILDINGS.push({
-        x: cx,
-        z: cz,
-        w: Math.min(cell.w, PITCH - STREET - pad),
-        d: Math.min(cell.d, PITCH - STREET - pad),
-        h: cell.h,
-        tone: cell.tone,
-      });
-    }
-  }
-}
-
-function facadeTexture() {
-  const canvas = document.createElement("canvas");
-  canvas.width = 64;
-  canvas.height = 128;
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return null;
-  ctx.fillStyle = "#d8d4cc";
-  ctx.fillRect(0, 0, 64, 128);
-  ctx.fillStyle = "rgba(26, 25, 22, 0.12)";
-  for (let y = 10; y < 118; y += 12) {
-    for (let x = 8; x < 58; x += 12) {
-      ctx.fillRect(x, y, 7, 8);
-    }
-  }
-  const tex = new THREE.CanvasTexture(canvas);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.wrapT = THREE.RepeatWrapping;
-  tex.anisotropy = 2;
-  return tex;
-}
-
-function slab(w: number, d: number, h: number, radius = 0.028) {
-  const shape = new THREE.Shape();
-  const hw = w / 2;
-  const hd = d / 2;
-  const r = Math.min(radius, hw, hd);
-  shape.moveTo(-hw + r, -hd);
-  shape.lineTo(hw - r, -hd);
-  shape.quadraticCurveTo(hw, -hd, hw, -hd + r);
-  shape.lineTo(hw, hd - r);
-  shape.quadraticCurveTo(hw, hd, hw - r, hd);
-  shape.lineTo(-hw + r, hd);
-  shape.quadraticCurveTo(-hw, hd, -hw, hd - r);
-  shape.lineTo(-hw, -hd + r);
-  shape.quadraticCurveTo(-hw, -hd, -hw + r, -hd);
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: h,
-    bevelEnabled: true,
-    bevelThickness: 0.01,
-    bevelSize: 0.01,
-    bevelSegments: 2,
-    curveSegments: 6,
-  });
-  geo.rotateX(-Math.PI / 2);
-  return geo;
-}
-
-function vehicle(kind: "van" | "car", ink: number) {
-  const group = new THREE.Group();
-  const body = new THREE.Mesh(
-    slab(kind === "van" ? 0.18 : 0.13, kind === "van" ? 0.34 : 0.24, kind === "van" ? 0.11 : 0.055, 0.024),
-    new THREE.MeshLambertMaterial({ color: ink }),
-  );
-  body.position.y = kind === "van" ? 0.055 : 0.036;
-  body.castShadow = true;
-  group.add(body);
-  if (kind === "van") {
-    const cabin = new THREE.Mesh(
-      slab(0.16, 0.13, 0.09, 0.016),
-      new THREE.MeshLambertMaterial({ color: ink }),
-    );
-    cabin.position.set(0, 0.13, 0.08);
-    cabin.castShadow = true;
-    group.add(cabin);
-  }
-  const wheel = new THREE.CylinderGeometry(0.028, 0.028, 0.032, 8);
-  wheel.rotateZ(Math.PI / 2);
-  const rubber = new THREE.MeshLambertMaterial({ color: 0x1a1916 });
-  const spots: [number, number][] = kind === "van" ? [[-0.08, 0.11], [0.08, 0.11], [-0.08, -0.11], [0.08, -0.11]] : [[-0.055, 0.07], [0.055, 0.07], [-0.055, -0.07], [0.055, -0.07]];
-  spots.forEach(([x, z]) => {
-    const mesh = new THREE.Mesh(wheel, rubber);
-    mesh.position.set(x, 0.028, z);
-    group.add(mesh);
-  });
-  group.userData.body = body;
-  return group;
-}
-
-export function Scene({ selected }: SceneProps) {
-  const host = useRef<HTMLDivElement>(null);
-  const selectedRef = useRef(selected);
-  selectedRef.current = selected;
-
-  useEffect(() => {
-    const root = host.current;
-    if (!root) return;
-
-    let renderer: THREE.WebGLRenderer;
-    try {
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-    } catch {
-      return;
-    }
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0xe8e4dc, 1);
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    root.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0xe8e4dc, 34, 72);
-    const camera = new THREE.PerspectiveCamera(CAM_DESK.fov, 1, 0.2, 120);
-    camera.position.set(CAM_DESK.x, CAM_DESK.y, CAM_DESK.z);
-    camera.lookAt(LOOK_X, LOOK_Y, LOOK_Z);
-
-    scene.add(new THREE.AmbientLight(0xe8e4dc, 0.78));
-    const sun = new THREE.DirectionalLight(0xfff6ea, 0.72);
-    sun.position.set(8, 24, 6);
-    sun.castShadow = true;
-    sun.shadow.mapSize.set(1024, 1024);
-    sun.shadow.camera.near = 2;
-    sun.shadow.camera.far = 50;
-    sun.shadow.camera.left = -18;
-    sun.shadow.camera.right = 18;
-    sun.shadow.camera.top = 18;
-    sun.shadow.camera.bottom = -18;
-    scene.add(sun);
-
-    const paper = new THREE.Mesh(
-      new THREE.PlaneGeometry(56, 56),
-      new THREE.MeshLambertMaterial({ color: 0xe8e4dc }),
-    );
-    paper.rotation.x = -Math.PI / 2;
-    paper.receiveShadow = true;
-    scene.add(paper);
-
-    const street = new THREE.MeshLambertMaterial({ color: 0xc6c2ba });
-    const walk = new THREE.MeshLambertMaterial({ color: 0xdedad2 });
-    const mark = new THREE.MeshBasicMaterial({ color: 0xf3efe7 });
-    const run = SPAN + PITCH;
-
-    for (let n = -CITY; n <= CITY + 1; n += 1) {
-      const ns = new THREE.Mesh(new THREE.PlaneGeometry(STREET, run), street);
-      ns.rotation.x = -Math.PI / 2;
-      ns.position.set(n * PITCH, 0.012, PITCH * 0.5);
-      ns.receiveShadow = true;
-      scene.add(ns);
-      const ew = new THREE.Mesh(new THREE.PlaneGeometry(run, STREET), street);
-      ew.rotation.x = -Math.PI / 2;
-      ew.position.set(PITCH * 0.5, 0.013, n * PITCH);
-      ew.receiveShadow = true;
-      scene.add(ew);
-    }
-
-    for (let n = -CITY; n <= CITY; n += 1) {
-      const slabWalk = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.03, run * 0.92), walk);
-      slabWalk.position.set(n * PITCH - STREET * 0.52, 0.02, PITCH * 0.5);
-      slabWalk.receiveShadow = true;
-      scene.add(slabWalk);
-      const slabWalk2 = slabWalk.clone();
-      slabWalk2.position.x = n * PITCH + STREET * 0.52;
-      scene.add(slabWalk2);
-    }
-
-    const stripe = new THREE.BoxGeometry(0.06, 0.005, 0.28);
-    for (const z of [-PITCH, PITCH, 0]) {
-      for (let i = -3; i <= 3; i += 1) {
-        const bar = new THREE.Mesh(stripe, mark);
-        bar.position.set(i * 0.1, 0.018, z);
-        scene.add(bar);
-      }
-    }
-
-    const water = new THREE.Mesh(
-      new THREE.PlaneGeometry(SPAN + 8, 6.4),
-      new THREE.MeshLambertMaterial({ color: 0xc5d2d8 }),
-    );
-    water.rotation.x = -Math.PI / 2;
-    water.position.set(2.2, 0.01, -CITY * PITCH - 3.4);
-    scene.add(water);
-
-    const park = new THREE.Mesh(
-      new THREE.PlaneGeometry(PITCH - STREET, PITCH - STREET),
-      new THREE.MeshLambertMaterial({ color: 0xd3d8c6 }),
-    );
-    park.rotation.x = -Math.PI / 2;
-    park.position.set((-3 + 0.5) * PITCH, 0.016, (1 + 0.5) * PITCH);
-    scene.add(park);
-
-    const windows = facadeTexture();
-    const roofMat = new THREE.MeshLambertMaterial({ color: 0xb8b3ab });
-    BUILDINGS.forEach((b) => {
-      const mat = new THREE.MeshLambertMaterial({
-        color: b.tone,
-        map: windows ?? undefined,
-      });
-      if (windows) {
-        mat.map = windows.clone();
-        mat.map.repeat.set(Math.max(1, Math.round(b.w * 2.2)), Math.max(1, Math.round(b.h * 2.4)));
-        mat.map.needsUpdate = true;
-      }
-      const mass = new THREE.Mesh(new THREE.BoxGeometry(b.w, b.h, b.d), mat);
-      mass.position.set(b.x, b.h / 2, b.z);
-      mass.castShadow = b.h > 0.7;
-      mass.receiveShadow = true;
-      scene.add(mass);
-      const roof = new THREE.Mesh(new THREE.BoxGeometry(b.w * 0.92, 0.04, b.d * 0.92), roofMat);
-      roof.position.set(b.x, b.h + 0.02, b.z);
-      scene.add(roof);
-    });
-
-    const lampPole = new THREE.CylinderGeometry(0.016, 0.02, 0.62, 8);
-    const lampHead = new THREE.BoxGeometry(0.07, 0.026, 0.1);
-    const inkMat = new THREE.MeshLambertMaterial({ color: 0x1a1916 });
-    for (let n = -4; n <= 4; n += 1) {
-      [-STREET * 0.42, STREET * 0.42].forEach((x) => {
-        const pole = new THREE.Mesh(lampPole, inkMat);
-        pole.position.set(x, 0.33, n * PITCH);
-        pole.castShadow = true;
-        scene.add(pole);
-        const head = new THREE.Mesh(lampHead, inkMat);
-        head.position.set(x + (x < 0 ? 0.03 : -0.03), 0.64, n * PITCH);
-        scene.add(head);
-      });
-      if (n !== 0) {
-        const pole = new THREE.Mesh(lampPole, inkMat);
-        pole.position.set(n * PITCH, 0.33, STREET * 0.42);
-        scene.add(pole);
-        const head = new THREE.Mesh(lampHead, inkMat);
-        head.position.set(n * PITCH, 0.64, STREET * 0.42 + 0.03);
-        scene.add(head);
-      }
-    }
-
-    const curb: [number, number, number][] = [];
-    for (let n = -3; n <= 3; n += 1) {
-      if (n === 0) continue;
-      curb.push([-0.28, n * PITCH * 0.7, Math.PI]);
-      curb.push([0.28, n * PITCH * 0.55, 0]);
-    }
-    curb.forEach(([x, z, rot], i) => {
-      const car = vehicle("car", i % 3 === 0 ? 0x3a3834 : 0x2a2824);
-      car.position.set(x, 0, z);
-      car.rotation.y = rot;
-      scene.add(car);
-    });
-
-    const route = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0.16, 0.03, 4 * PITCH),
-      new THREE.Vector3(0.16, 0.03, PITCH),
-      new THREE.Vector3(0.16, 0.03, -PITCH),
-      new THREE.Vector3(0.16, 0.03, -3 * PITCH),
-      new THREE.Vector3(-PITCH, 0.03, -3 * PITCH),
-      new THREE.Vector3(-PITCH, 0.03, -0.16),
-      new THREE.Vector3(-2 * PITCH, 0.03, -0.16),
-    ]);
-    const path = new THREE.Mesh(
-      new THREE.TubeGeometry(route, 96, 0.018, 8, false),
-      new THREE.MeshBasicMaterial({ color: 0x1a1916, transparent: true, opacity: 0.34 }),
-    );
-    scene.add(path);
-
-    const vans = Object.entries(UNITS).map(([id, pos]) => {
-      const mesh = vehicle("van", 0x1a1916);
-      mesh.position.set(pos.x, 0, pos.z);
-      mesh.rotation.y = pos.rot;
-      scene.add(mesh);
-      return { id, mesh };
-    });
-
-    const traffic: THREE.Group[] = [];
-    for (let i = 0; i < 8; i += 1) {
-      const car = vehicle("car", 0x2a2824);
-      car.userData.t = i / 8;
-      car.userData.axis = i % 3 === 0 ? "ew" : "ns";
-      scene.add(car);
-      traffic.push(car);
-    }
-
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-    const resize = () => {
-      const w = root.clientWidth;
-      const h = root.clientHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / Math.max(h, 1);
-      if (h > w * 1.15) {
-        camera.position.set(CAM_TALL.x, CAM_TALL.y, CAM_TALL.z);
-        camera.fov = CAM_TALL.fov;
-      } else {
-        camera.position.set(CAM_DESK.x, CAM_DESK.y, CAM_DESK.z);
-        camera.fov = CAM_DESK.fov;
-      }
-      camera.lookAt(LOOK_X, LOOK_Y, LOOK_Z);
-      camera.updateProjectionMatrix();
-    };
-    resize();
-
-    let frame = 0;
-    const tick = () => {
-      frame = requestAnimationFrame(tick);
-      if (!still) {
-        traffic.forEach((car) => {
-          car.userData.t = ((car.userData.t as number) + 0.0011) % 1;
-          const t = car.userData.t as number;
-          if (car.userData.axis === "ew") {
-            car.position.set(-4.4 + t * 9.2, 0, 0.16);
-            car.rotation.y = Math.PI / 2;
-          } else {
-            car.position.set(0.16, 0, 5.2 - t * 11.4);
-            car.rotation.y = 0;
-          }
-        });
-      }
-      vans.forEach(({ id, mesh }) => {
-        const on = id === selectedRef.current;
-        mesh.traverse((obj) => {
-          if (obj instanceof THREE.Mesh && obj.geometry.type === "ExtrudeGeometry") {
-            (obj.material as THREE.MeshLambertMaterial).color.setHex(on ? 0xe30613 : 0x1a1916);
-          }
-        });
-      });
-      renderer.render(scene, camera);
-    };
-    tick();
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(root);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      ro.disconnect();
-      scene.traverse((obj) => {
-        if (obj instanceof THREE.Mesh) {
-          obj.geometry.dispose();
-          const mat = obj.material;
-          const list = Array.isArray(mat) ? mat : [mat];
-          list.forEach((item) => {
-            if ("map" in item && item.map) item.map.dispose();
-            item.dispose();
-          });
+export function FleetMap({ vehicles, selected, zoom, onZoomChange, onSelect }: { vehicles: readonly MapVehicle[]; selected?: string; zoom: number; onZoomChange: (zoom: number) => void; onSelect: (id: string) => void }) {
+  const host = React.useRef<HTMLDivElement>(null);
+  const viewer = React.useRef<MapInstance | null>(null);
+  const dispatchingCamera = React.useRef(false);
+  const [status, setStatus] = React.useState<"preview" | "loading" | "ready" | "error">(publicToken.startsWith("pk.") ? "loading" : "preview");
+  const [retry, setRetry] = React.useState(0);
+  const [points, setPoints] = React.useState<Record<string, { x: number; y: number }>>({});
+  const active = vehicles.find(vehicle => vehicle.id === selected);
+  const [routeRetry, setRouteRetry] = React.useState(0);
+  const [routeState, setRouteState] = React.useState<{ key: string; status: "loading" | "ready" | "error"; route?: StreetRoute }>({ key: "", status: "loading" });
+  const routeCache = React.useRef(new Map<string, StreetRoute>());
+  const profile = active?.icon === "bicycle" ? "cycling" : "driving";
+  const start = active?.route[0];
+  const end = active?.route.at(-1);
+  const routeKey = active && start && end ? `${profile}:${start.join(",")};${end.join(",")}` : "";
+  const route = routeState.key === routeKey && routeState.status === "ready" ? routeState.route : undefined;
+  const routeStatus = !routeKey ? "idle" : routeState.key === routeKey ? routeState.status : "loading";
+  const state = React.useRef({ vehicles, selected, zoom, onZoomChange, route }); state.current = { vehicles, selected, zoom, onZoomChange, route };
+  const ready = status === "ready";
+  // biome-ignore lint/correctness/useExhaustiveDependencies: stable endpoint keys avoid new requests when unrelated notes or filters render
+  React.useEffect(() => {
+    if (!publicToken.startsWith("pk.") || !start || !end || !routeKey) return;
+    const cached = routeCache.current.get(routeKey);
+    if (cached) { setRouteState({ key: routeKey, status: "ready", route: cached }); return; }
+    const controller = new AbortController();
+    let cancelled = false;
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+    setRouteState({ key: routeKey, status: "loading" });
+    loadStreetRoute(start, end, profile, publicToken, controller.signal).then(result => {
+      if (cancelled) return;
+      if (routeCache.current.size >= 32) routeCache.current.delete(routeCache.current.keys().next().value!);
+      routeCache.current.set(routeKey, result);
+      setRouteState({ key: routeKey, status: "ready", route: result });
+    }).catch(() => { if (!cancelled) setRouteState({ key: routeKey, status: "error" }); }).finally(() => window.clearTimeout(timeout));
+    return () => { cancelled = true; controller.abort(); window.clearTimeout(timeout); };
+  }, [routeKey, routeRetry]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: A retry deliberately replaces the failed viewer.
+  React.useEffect(() => {
+    if (!publicToken.startsWith("pk.") || !host.current) return;
+    let cancelled = false;
+    let map: MapInstance | undefined;
+    let timeout = 0;
+    let themeObserver: MutationObserver | undefined;
+    let resizeObserver: ResizeObserver | undefined;
+    let appliedStyle = "";
+    let loaded = false;
+    const theme = window.matchMedia("(prefers-color-scheme: dark)");
+    const isDark = () => document.documentElement.dataset.theme === "dark" || (document.documentElement.dataset.theme !== "light" && theme.matches);
+    const project = () => { if (map && !cancelled) setPoints(Object.fromEntries(state.current.vehicles.map(vehicle => [vehicle.id, map!.project(vehicle.position)]))); };
+    const setTheme = () => {
+      const nextStyle = styleURL(isDark());
+      if (map && nextStyle !== appliedStyle) { appliedStyle = nextStyle; map.setStyle(nextStyle, { diff: false }); }
+      else if (map?.isStyleLoaded() && host.current) {
+        const palette = applyFleetPalette(map, host.current);
+        if (map.getSource("fleet-route")) {
+          map.setPaintProperty("fleet-route-halo", "line-color", palette.paper);
+          map.setPaintProperty("fleet-route-line", "line-color", palette.ink);
         }
-      });
-      windows?.dispose();
-      renderer.dispose();
-      root.removeChild(renderer.domElement);
+      }
     };
-  }, []);
-
-  return <div ref={host} className="sc-gl" style={{ width: "100%", height: "100%" }} />;
+    setStatus("loading");
+    loadMapbox().then(sdk => {
+      if (cancelled || !host.current) return;
+      appliedStyle = styleURL(isDark());
+      map = new sdk.Map({ container: host.current, accessToken: publicToken, style: appliedStyle, center, zoom: baseZoom + Math.log2(state.current.zoom), minZoom: 12, maxZoom: 18, attributionControl: true, logoPosition: "bottom-left", cooperativeGestures: true, trackResize: false, dragRotate: false, pitchWithRotate: false, fadeDuration: reduced() ? 0 : 150 });
+      viewer.current = map;
+      map.getCanvas().setAttribute("aria-label", "Map of Dogpatch, San Francisco. Use arrow keys to pan, plus and minus to zoom.");
+      timeout = window.setTimeout(() => { if (!cancelled) setStatus("error"); }, 20000);
+      map.on("load", () => { loaded = true; window.clearTimeout(timeout); if (!cancelled) { setStatus("ready"); project(); } });
+      map.on("move", project);
+      map.on("zoomend", event => { if (map && !cancelled && !dispatchingCamera.current && !event?.fleetControl) state.current.onZoomChange(Number((2 ** (map.getZoom() - baseZoom)).toFixed(6))); });
+      map.on("style.load", () => {
+        if (!map || cancelled) return;
+        if (!host.current) return;
+        const palette = applyFleetPalette(map, host.current);
+        const beforeLabels = map.getStyle().layers?.find(layer => layer.type === "symbol")?.id;
+        map.addSource("fleet-route", { type: "geojson", data: routeData(state.current.route) });
+        map.addLayer({ id: "fleet-route-halo", type: "line", source: "fleet-route", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": palette.paper, "line-width": 6 } }, beforeLabels);
+        map.addLayer({ id: "fleet-route-line", type: "line", source: "fleet-route", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": palette.ink, "line-width": 2.5 } }, beforeLabels);
+        if (loaded) setStatus("ready");
+        project();
+      });
+      map.on("error", () => { if (!cancelled && !map?.isStyleLoaded()) setStatus("error"); });
+      resizeObserver = new ResizeObserver(() => { if (host.current?.clientWidth && host.current.clientHeight) { map?.resize(); project(); } }); resizeObserver.observe(host.current);
+      themeObserver = new MutationObserver(setTheme); themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class", "style"] }); theme.addEventListener("change", setTheme);
+    }).catch(() => { if (!cancelled) setStatus("error"); });
+    return () => { cancelled = true; window.clearTimeout(timeout); resizeObserver?.disconnect(); themeObserver?.disconnect(); theme.removeEventListener("change", setTheme); map?.remove(); viewer.current = null; };
+  }, [retry]);
+  React.useEffect(() => {
+    const map = viewer.current;
+    if (!map || !ready) return;
+    map.getSource("fleet-route")?.setData(routeData(route));
+    setPoints(Object.fromEntries(vehicles.map(vehicle => [vehicle.id, map.project(vehicle.position)])));
+  }, [vehicles, ready, route]);
+  const longitude = active?.position[0];
+  const latitude = active?.position[1];
+  React.useEffect(() => {
+    if (!viewer.current || !ready || !selected || longitude === undefined || latitude === undefined) return;
+    dispatchingCamera.current = true;
+    try { viewer.current.easeTo({ center: [longitude, latitude], zoom: baseZoom + Math.log2(state.current.zoom), duration: reduced() ? 0 : 380 }, { fleetControl: true }); }
+    finally { dispatchingCamera.current = false; }
+  }, [selected, longitude, latitude, ready]);
+  React.useEffect(() => {
+    const map = viewer.current;
+    const next = baseZoom + Math.log2(zoom);
+    if (!map || !ready || Math.abs(map.getZoom() - next) <= 0.00001) return;
+    // Stopping a native camera animation can synchronously emit its final zoom event.
+    dispatchingCamera.current = true;
+    try { map.easeTo({ zoom: next, duration: reduced() ? 0 : 240 }, { fleetControl: true }); }
+    finally { dispatchingCamera.current = false; }
+  }, [zoom, ready]);
+  return <div className="fm-map-view" data-map-status={status} data-route-status={routeStatus} data-route-profile={route?.profile} data-zoom={zoom}>
+    <div ref={host} className="fm-mapbox" aria-hidden={!ready} />
+    {!ready && <div className="fm-map-preview" style={{ transform: `scale(${zoom})` }}><svg className="fm-map-drawing" viewBox="0 0 660 500" preserveAspectRatio="none" aria-label="Schematic preview of supplied Dogpatch vehicle positions. Street routes appear when the map connects." role="img">
+      <rect className="fm-land" width="660" height="500" /><path className="fm-water" d="M475 0H660V500H487L490 402H526V360H493L489 295H540V230H475Z" /><path className="fm-shore" d="M475 0V230H540V295H489L493 360H526V402H490L487 500" />
+      <g className="fm-blocks">{Array.from({ length: 6 }, (_, row) => Array.from({ length: 5 }, (_, column) => <rect key={`${row}-${column}`} x={24 + column * 91} y={22 + row * 81} width={68} height={57} />))}</g>
+      <g className="fm-roads"><path d="M101 0V500M192 0V500M283 0V500M374 0V500M465 0V500M0 92H479M0 173H479M0 254H505M0 335H495M0 416H495" /></g>
+      <g className="fm-street-labels"><text x="25" y="165">20th street</text><text x="25" y="246">22nd street</text><text x="25" y="327">23rd street</text><text x="363" y="475" transform="rotate(-90 363 475)">Third street</text></g>
+      <g className="fm-neighborhoods"><text x="223" y="62">Dogpatch</text><text x="495" y="172">Pier 70</text><text x="514" y="451">San Francisco Bay</text></g>
+    </svg></div>}
+    <div className="fm-marker-layer" style={ready ? undefined : { transform: `scale(${zoom})` }}>{vehicles.map(vehicle => {
+      const point = ready ? points[vehicle.id] : undefined;
+      const [x, y] = sketchPoint(vehicle.position);
+      if (ready && !point) return null;
+      return <Button key={vehicle.id} variant={selected === vehicle.id ? "primary" : "ghost"} className="fm-map-marker" data-vehicle={vehicle.id} style={{ left: point ? point.x : `${x / 6.6}%`, top: point ? point.y : `${y / 5}%` }} aria-label={`Select ${vehicle.name} on map`} aria-pressed={selected === vehicle.id} onClick={() => onSelect(vehicle.id)}><span className="fm-pin-symbol"><Icon name={vehicle.icon} size={24} /></span><span className="fm-pin-id">{vehicle.id}</span><span className="fm-pin-anchor" aria-hidden="true" /></Button>;
+    })}</div>
+    {(!ready || routeStatus !== "error") && <div className="fm-map-readout" role="status"><span>{ready ? route ? `${route.profile === "cycling" ? "Cycling" : "Driving"} route · ${(route.distance / 1000).toFixed(1)} km` : routeStatus === "idle" ? "No selected route" : "Finding street route…" : status === "loading" ? "Loading map" : "Position preview"}</span><span>{ready ? "Mapbox Directions" : "Supplied positions"}</span></div>}
+    {ready && routeStatus === "error" && <div className="fm-map-notice" style={{ insetBlockEnd: 58 }} role="status"><Icon name="map" size={16} /><span>Street route unavailable</span><Button variant="ghost" onClick={() => setRouteRetry(value => value + 1)}>Retry route</Button></div>}
+    {(status === "preview" || status === "error") && <div className="fm-map-notice"><Icon name="map" size={16} /><span>{status === "preview" ? "Mapbox connection pending" : "Base map unavailable"}</span>{status === "error" && <Button variant="ghost" onClick={() => setRetry(value => value + 1)}>Retry</Button>}</div>}
+  </div>;
 }

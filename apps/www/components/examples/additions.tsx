@@ -1,6 +1,60 @@
 "use client";
 
 import type { ComponentType } from "react";
+import { JointPanelUse as JointPanel } from "./joint-panel/use";
+import { RobotPoseUse as RobotPose } from "./robot-pose/use";
+import { RobotMissionQueueUse as RobotMissionQueue } from "./robot-mission-queue/use";
+import { Use as PadInspector } from "./pad-inspector/use";
+import { Use as DesignRuleResults } from "./design-rule-results/use";
+import { Use as ColonyPlate } from "./colony-plate/use";
+import { Use as CultureLog } from "./culture-log/use";
+
+import { Use as AssemblyVariantMatrix } from "./assembly-variant-matrix/use";
+import { Use as CoordinateReferenceField } from "./coordinate-reference-field/use";
+import { Use as DatumTransformPicker } from "./datum-transform-picker/use";
+import { Use as RasterBandMixer } from "./raster-band-mixer/use";
+import { Use as Patchbay } from "./patchbay/use";
+import { Use as KerningPairEditor } from "./kerning-pair-editor/use";
+import { Use as StackNavigator } from "./stack-navigator/use";
+import { Use as AcquisitionSequencer } from "./acquisition-sequencer/use";
+import { Use as SequenceAlignment } from "./sequence-alignment/use";
+import { Use as CoverageInspector } from "./coverage-inspector/use";
+import { Use as GenomicRegionField } from "./genomic-region-field/use";
+import { Use as AlarmPanel } from "./alarm-panel/use";
+import { Use as WorkOffsetPanel } from "./work-offset-panel/use";
+
+import { Use as IdentityDocument } from "./identity-document/use";
+import { Use as TaxSummary } from "./tax-summary/use";
+import { Use as BenefitProgram } from "./benefit-program/use";
+import { Use as ApplicationStatus } from "./application-status/use";
+import { Use as EvidenceChecklist } from "./evidence-checklist/use";
+import { Use as MeasurementValue } from "./measurement-value/use";
+import { Use as QuantityField } from "./quantity-field/use";
+import { Use as WellPlate } from "./well-plate/use";
+import { Use as ExperimentRun } from "./experiment-run/use";
+import { Use as SpectrumPlot } from "./spectrum-plot/use";
+import { Use as AudioMeter } from "./audio-meter/use";
+import { Use as ChannelStrip } from "./channel-strip/use";
+import { Use as ParameterKnob } from "./parameter-knob/use";
+import { Use as TimecodeField } from "./timecode-field/use";
+import { Use as ClipTimeline } from "./clip-timeline/use";
+import { Use as RenderQueue } from "./render-queue/use";
+import { Use as LayerStack } from "./layer-stack/use";
+import { Use as ColorInspector } from "./color-inspector/use";
+import { Use as SpacingControl } from "./spacing-control/use";
+import { Use as HealthMetric } from "./health-metric/use";
+import { Use as ReferenceRange } from "./reference-range/use";
+import { Use as LabResults } from "./lab-results/use";
+import { Use as SymptomDiary } from "./symptom-diary/use";
+import { Use as CheckIn } from "./check-in/use";
+import { Use as HabitTracker } from "./habit-tracker/use";
+import { Use as SleepTimeline } from "./sleep-timeline/use";
+import { Use as ActivityGoal } from "./activity-goal/use";
+import { Use as ActivityRings } from "./activity-rings/use";
+import { Use as PatientBanner } from "./patient-banner/use";
+import { Use as MedicationSchedule } from "./medication-schedule/use";
+import { Use as AppointmentCard } from "./appointment-card/use";
+import { Use as CarePlan } from "./care-plan/use";
 import { Use as PlaybackControls } from "./playback-controls/use";
 import { Use as MediaScrubber } from "./media-scrubber/use";
 import { Use as MediaPlayer } from "./media-player/use";
@@ -44,6 +98,60 @@ import { Use as PropertyGrid } from "./property-grid/use";
 
 /** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
+  "joint-panel": JointPanel,
+  "robot-pose": RobotPose,
+  "robot-mission-queue": RobotMissionQueue,
+  "pad-inspector": PadInspector,
+  "design-rule-results": DesignRuleResults,
+  "colony-plate": ColonyPlate,
+  "culture-log": CultureLog,
+
+  "assembly-variant-matrix": AssemblyVariantMatrix,
+  "coordinate-reference-field": CoordinateReferenceField,
+  "datum-transform-picker": DatumTransformPicker,
+  "raster-band-mixer": RasterBandMixer,
+  "patchbay": Patchbay,
+  "kerning-pair-editor": KerningPairEditor,
+  "stack-navigator": StackNavigator,
+  "acquisition-sequencer": AcquisitionSequencer,
+  "sequence-alignment": SequenceAlignment,
+  "coverage-inspector": CoverageInspector,
+  "genomic-region-field": GenomicRegionField,
+  "alarm-panel": AlarmPanel,
+  "work-offset-panel": WorkOffsetPanel,
+
+  "identity-document": IdentityDocument,
+  "tax-summary": TaxSummary,
+  "benefit-program": BenefitProgram,
+  "application-status": ApplicationStatus,
+  "evidence-checklist": EvidenceChecklist,
+  "measurement-value": MeasurementValue,
+  "quantity-field": QuantityField,
+  "well-plate": WellPlate,
+  "experiment-run": ExperimentRun,
+  "spectrum-plot": SpectrumPlot,
+  "audio-meter": AudioMeter,
+  "channel-strip": ChannelStrip,
+  "parameter-knob": ParameterKnob,
+  "timecode-field": TimecodeField,
+  "clip-timeline": ClipTimeline,
+  "render-queue": RenderQueue,
+  "layer-stack": LayerStack,
+  "color-inspector": ColorInspector,
+  "spacing-control": SpacingControl,
+  "health-metric": HealthMetric,
+  "reference-range": ReferenceRange,
+  "lab-results": LabResults,
+  "symptom-diary": SymptomDiary,
+  "check-in": CheckIn,
+  "habit-tracker": HabitTracker,
+  "sleep-timeline": SleepTimeline,
+  "activity-goal": ActivityGoal,
+  "activity-rings": ActivityRings,
+  "patient-banner": PatientBanner,
+  "medication-schedule": MedicationSchedule,
+  "appointment-card": AppointmentCard,
+  "care-plan": CarePlan,
   "playback-controls": PlaybackControls,
   "media-scrubber": MediaScrubber,
   "media-player": MediaPlayer,

@@ -257,6 +257,23 @@ describe("docs", () => {
     for (const entry of list()) expect(docsFor(entry.name), entry.name).toBeTruthy();
     expect(docsFor("nope")).toBeUndefined();
   });
+
+  it("serves the health composition guide alongside individual health components", () => {
+    expect(docsFor("health")).toContain("# Health, wellness, and care");
+    expect(docsFor("health")).toContain("Confirm recorded actions");
+    expect(docsFor("check-in")).toContain("## Keyboard");
+    expect(search("medication").map(hit => hit.name)).toContain("medication-schedule");
+  });
+
+  it("serves specialist collection guides with their components", () => {
+    for (const [collection, component] of [["civic", "benefit-program"], ["science", "sequence-alignment"], ["creative", "channel-strip"], ["engineering", "alarm-panel"], ["geospatial", "raster-band-mixer"], ["robotics", "joint-panel"], ["electronics", "pad-inspector"], ["microbiology", "colony-plate"]] as const) {
+      expect(docsFor(collection)).toContain("## Data and action contracts");
+      expect(docsFor(collection)).toContain(`/docs/${component}.md`);
+      expect(search(component)[0]?.name).toBe(component);
+      expect(docsFor(component)).toContain("## Keyboard");
+    }
+    expect(search("activity ring").map(hit => hit.name)).toContain("activity-rings");
+  });
 });
 
 describe("search", () => {

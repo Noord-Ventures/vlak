@@ -1,0 +1,75 @@
+.wg { container: wallpaper / inline-size; display: flex; flex-direction: column; height: 100%; min-height: 0; color: var(--text); background: var(--bg); font-size: 13px; line-height: 1.45; }
+.wg *, .wg *::before, .wg *::after { box-sizing: border-box; }
+.wg :is(h2, p) { margin: 0; }
+.wg :is(button, input, select, textarea) { font-family: inherit; }
+.wg button { width: auto; height: auto; min-width: 44px; min-height: 44px; font-size: 13px; line-height: 1.2; padding: 10px 12px; }
+.wg-header .wg-export { flex: none; }
+.wg-header { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--divider); }
+.wg-project { display: flex; align-items: center; gap: 12px; }
+.wg-project > div { display: grid; gap: 1px; }
+.wg-project strong { font-size: 15px; font-weight: 500; }
+.wg-project span { font-size: 11px; color: var(--text-secondary); }
+.wg-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 268px minmax(0, 1fr); }
+.wg-direction { min-height: 0; display: flex; flex-direction: column; border-right: 1px solid var(--divider); }
+.wg-panel-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid var(--divider); }
+.wg-panel-head span { color: var(--text-secondary); font-size: 11px; }
+.wg-panel-head h2 { margin-top: 3px; font-size: 16px; font-weight: 500; }
+.wg-direction-scroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
+.wg .rs-textarea { min-height: 110px; resize: vertical; font-size: 14px; line-height: 1.45; }
+.wg .rs-native-select { height: 44px; }
+.wg .wg-hint { font-size: 12px; color: var(--text-secondary); }
+.wg-direction-scroll > .wg-hint { margin-top: -12px; }
+.wg-output-size { display: block; margin-top: 8px; font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.wg-variation > div:first-child { display: flex; justify-content: space-between; }
+.wg-variation output { font-variant-numeric: tabular-nums; }
+.wg-spec { margin-inline: -20px; padding-inline: 20px; border-top: 1px solid var(--divider); padding-top: 20px; }
+.wg-spec > span { display: block; font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; }
+.wg-spec strong { font-weight: 500; }
+.wg-spec p { margin-top: 5px; font-size: 12px; color: var(--text-secondary); }
+.wg-generate { padding: 14px 20px; border-top: 1px solid var(--divider); }
+.wg-generate button { width: 100%; }
+.wg-preview { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+.wg-viewbar { min-height: 52px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; padding: 8px 20px; border-bottom: 1px solid var(--divider); }
+.wg-viewbar > div { display: flex; gap: 12px; align-items: baseline; }
+.wg-viewbar strong { font-weight: 500; }
+.wg-viewbar span { font-size: 11px; color: var(--text-secondary); }
+.wg-stage { flex: 1; display: grid; place-items: center; min-height: 0; padding: 28px; background-image: linear-gradient(var(--divider) 1px, transparent 1px), linear-gradient(90deg, var(--divider) 1px, transparent 1px); background-size: 36px 36px; overflow: hidden; }
+.wg-art { display: block; width: 100%; height: 100%; min-height: 0; }
+.wg-stage > .wg-art { filter: drop-shadow(0 4px 10px rgb(0 0 0 / .08)); }
+.wg-compositions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px 20px; border-top: 1px solid var(--divider); }
+.wg .wg-compositions > button { min-width: 0; display: flex; flex-direction: column; gap: 0; align-items: stretch; padding: 0; border: 1px solid var(--control-border); overflow: hidden; color: var(--text); background: var(--bg); }
+.wg .wg-compositions > button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.wg-thumb { height: 72px; padding: 6px; background: var(--bg); }
+.wg-compositions > button > span { display: flex; align-items: center; gap: 7px; padding: 10px; text-align: left; font-size: 11px; line-height: 1.25; }
+.wg-compositions b { font-weight: 500; }
+.wg-compositions > button > span > span { flex: 1; }
+.wg-compositions .rs-icon { flex: none; }
+.wg-footer { min-height: 30px; padding: 6px 16px; display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--divider); font-size: 11px; color: var(--text-secondary); }
+.wg-mobile-nav { display: none; }
+@container wallpaper (max-width: 640px) {
+  .wg-header { padding-inline: 14px; }
+  .wg-project { gap: 8px; }
+  .wg-project strong { font-size: 14px; white-space: nowrap; }
+  .wg-header .wg-export { padding-inline: 10px; font-size: 12px; }
+  .wg-header .wg-export .rs-icon { display: none; }
+  .wg-spec { margin-inline: -16px; padding-inline: 16px; }
+  .wg-body { grid-template-columns: minmax(0, 1fr); }
+  .wg-direction { border: 0; }
+  .wg[data-mobile-view="preview"] .wg-direction, .wg[data-mobile-view="direction"] .wg-preview { display: none; }
+  .wg-panel-head { padding: 14px 16px; }
+  .wg-direction-scroll { padding: 16px; }
+  .wg .rs-textarea, .wg .rs-native-select { font-size: 16px; }
+  .wg-generate { padding: 10px 16px; }
+  .wg-viewbar { padding-inline: 14px; }
+  .wg-stage { padding: 16px; }
+  .wg-compositions { padding: 10px 14px; gap: 8px; }
+  .wg-thumb { height: 50px; padding: 4px; }
+  .wg-compositions > button > span { padding: 8px; justify-content: space-between; }
+  .wg-compositions > button > span > span { display: none; }
+  .wg-mobile-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 6px; border-top: 1px solid var(--divider); }
+  .wg .wg-mobile-nav button { min-height: 48px; font-size: 14px; }
+  .wg .wg-mobile-nav button[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .wg-footer > span:last-child { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .wg *, .wg *::before, .wg *::after { transition: none; animation: none; scroll-behavior: auto; } }
+@media (forced-colors: active) { .wg .wg-compositions > button[aria-pressed="true"], .wg .wg-mobile-nav button[aria-pressed="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; } }

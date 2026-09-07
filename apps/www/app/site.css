@@ -5,12 +5,10 @@
    - No header bar. Fixed corner chrome: logo top-left on the first
      grid line (20px), controls top-right, each with a paper-halo
      drop-shadow so they float over content.
-   - The content column starts one module in (margin-left: 204px at
-     the 1024px rail) and the layout width rounds DOWN to whole 204px
-     modules, so edges step from grid line to grid line on resize.
-     Detail keeps that airy first 204. Catalog index zeros --ml at
-     1024–1439 so 388 rail + 796 two-up still fit; at ≥1440 it
-     restores the airy first 204 and keeps the 796 measure.
+   - Every page rail shares --rail-inset: zero on compact desktop,
+     one 204px module from 1440px. Page depth never changes its origin.
+     Reading widths still snap to whole modules; gallery measures can
+     use the remaining viewport.
    - Reading measure is 592px (3 modules); covers occupy the first 204 cell.
    - A fixed 72px crumb bar; breadcrumbs appear once the page cover
      scrolls away. The docs rail lives in components/docs-nav. */
@@ -81,7 +79,10 @@ body {
   background-color: transparent;
   background-image: none;
   --nav-left: 224px;
+  --rail-inset: 0px;
 }
+
+@media (min-width: 1440px) { body { --rail-inset: 204px; } }
 
 /* ── Fixed corner chrome ── */
 .logo-wrap {
@@ -254,17 +255,10 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   color: var(--text-secondary); cursor: pointer; outline: none;
   filter: drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg));
 }
-.nav-toggle-icon { position: relative; display: block; width: 16px; height: 12px; }
-.nav-toggle-icon span {
-  position: absolute; left: 0; right: 0; height: 1.5px; background: currentColor;
-  transition: transform var(--duration) var(--ease), opacity var(--duration) var(--ease);
-}
-.nav-toggle-icon span:nth-child(1) { top: 0; }
-.nav-toggle-icon span:nth-child(2) { top: 5.25px; }
-.nav-toggle-icon span:nth-child(3) { bottom: 0; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(1) { transform: translateY(5.25px) rotate(45deg); }
-.nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(2) { opacity: 0; }
-.nav-toggle[aria-expanded="true"] .nav-toggle-icon span:nth-child(3) { transform: translateY(-5.25px) rotate(-45deg); }
+.nav-toggle-icon { display: block; width: 20px; height: 20px; overflow: visible; }
+.nav-toggle-icon path { fill: none; stroke: currentColor; stroke-width: 1.5px; transform-origin: 10px 10px; transition: transform var(--duration) var(--ease); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon path:first-child { transform: rotate(45deg) translateY(3px); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-icon path:last-child { transform: rotate(-45deg) translateY(-3px); }
 
 .nav-panel {
   position: fixed; top: 64px; left: 0; right: 0; z-index: 205;
@@ -503,9 +497,10 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   .site-crumb-bar .rs-crumbs { flex-wrap: nowrap; }
 }
 
-/* ── Layout: one module in, width snapped to whole modules ── */
+/* ── Layout: shared rail origin, width snapped to whole modules ── */
 .site-layout {
-  --ml: 0px;
+  --ml: var(--rail-inset);
+  margin-left: var(--rail-inset);
   display: flex; gap: var(--gutter); padding: 0 var(--pad);
 }
 @media (min-width: 481px) {
@@ -513,7 +508,6 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
     width: calc(max(round(down, 100vw - var(--ml) - 2*var(--pad) + var(--gutter), 204px), 204px) + var(--gutter));
   }
 }
-@media (min-width: 1024px) { .site-layout { --ml: 204px; margin-left: 204px; } }
 @media (min-width: 1700px) { .site-layout { max-width: 1244px; } }
 @media (max-width: 899px) {
   .site-layout {
@@ -565,25 +559,16 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 
 /* Catalog index: 388-wide cards, 204 demo module. Two columns on
    desktop (796 measure, same as the icon catalog). Phone stays one
-   column. Do not lock a single 388 track. Mid-desktop zeros --ml so
-   388 rail + 796 fit; wide restores the airy first 204 and sizes
-   the layout from the remaining viewport so two-up does not die. */
+   column. All page levels share the rail origin. Wide gallery pages
+   use the remaining viewport to preserve room for two cards. */
 .catalog-page .catalog-group { margin-top: 40px; }
 .catalog-page .site-content {
   width: min(796px, 100%);
   max-width: min(796px, 100%);
 }
-@media (min-width: 1024px) {
-  .site-layout.catalog-page {
-    --ml: 0px;
-    margin-left: 0;
-  }
-}
 @media (min-width: 1440px) {
   .site-layout.catalog-page {
-    --ml: 204px;
-    margin-left: 204px;
-    width: calc(100vw - 204px);
+    width: calc(100vw - var(--rail-inset));
     max-width: none;
   }
 }
@@ -820,7 +805,8 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   color: var(--text); cursor: pointer; font: inherit;
   font-size: 1rem; font-weight: 600; letter-spacing: -.01em; text-align: left;
 }
-.toc-mobile-mark { font-weight: 400; color: var(--text-secondary); }
+.toc-mobile-mark { display: flex; align-items: center; color: var(--text-secondary); }
+.toc-mobile-trigger:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
 .toc-mobile-dismiss {
   position: fixed; inset: 0; z-index: 149;
   background: none; border: none; padding: 0;
@@ -860,9 +846,11 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
     position: sticky;
     top: calc(72px + env(safe-area-inset-top, 0px));
     z-index: 150;
-    background: var(--bg);
-    border-bottom: 1px solid var(--divider-subtle);
+    background: transparent;
+    border-bottom: 1px solid transparent;
+    transition: background-color var(--duration-snap) var(--ease), border-color var(--duration-snap) var(--ease);
   }
+  .toc-mobile[data-scrolled="true"] { background: var(--bg); border-bottom-color: var(--divider-subtle); }
   .toc-mobile-inset {
     margin-top: calc(72px + env(safe-area-inset-top, 0px));
     top: calc(72px + env(safe-area-inset-top, 0px));

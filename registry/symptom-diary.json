@@ -1,0 +1,93 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "symptom-diary",
+  "type": "registry:component",
+  "title": "Symptom diary",
+  "description": "A chronological record of supplied symptoms and intensity descriptions, with notes and 44px native detail disclosures.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/symptom-diary.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface SymptomEntry {\n  id: string;\n  symptom: string;\n  /** ISO timestamp with an explicit offset. Invalid dates sort after dated entries. */\n  dateTime: string;\n  timeLabel?: string;\n  /** A supplied description, such as the person's own intensity scale. */\n  intensity?: string;\n  notes?: React.ReactNode;\n  details?: React.ReactNode;\n  /** Unique accessible disclosure name; defaults to symptom and display time. */\n  detailsLabel?: string;\n  actions?: React.ReactNode;\n}\n\nexport interface SymptomDiaryProps extends React.HTMLAttributes<HTMLOListElement> {\n  entries: readonly SymptomEntry[];\n  emptyLabel?: string;\n  /** Sorts a copy of entries. Equal timestamps retain their supplied order. */\n  order?: \"newest\" | \"oldest\";\n}\n\nconst styles = stylex.create({\n  root: { listStyleType: \"none\", margin: 0, padding: 0, minWidth: 0, color: vlak.ink, lineHeight: 1.45 },\n  item: { display: \"grid\", gridTemplateColumns: { default: \"minmax(7rem, 1fr) minmax(0, 3fr)\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"0.5rem 1rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider, overflowWrap: \"anywhere\" },\n  time: { fontSize: \"0.75rem\", color: vlak.gray, fontVariantNumeric: \"tabular-nums\" },\n  content: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  head: { display: \"flex\", justifyContent: \"space-between\", flexWrap: \"wrap\", alignItems: \"baseline\", gap: \"0.25rem 1rem\" },\n  symptom: { margin: 0, fontSize: \"0.875rem\", fontWeight: 600 },\n  intensity: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray },\n  body: { margin: 0, maxWidth: \"66ch\", fontSize: \"0.875rem\" },\n  summary: { minHeight: vlak.hit, minWidth: vlak.hit, display: \"list-item\", alignContent: \"center\", cursor: \"pointer\", fontSize: \"0.875rem\", borderRadius: vlak.radiusSm, outline: { default: \"none\", \":focus-visible\": `2px solid ${vlak.ink}` }, outlineOffset: 2, paddingInline: \"0.25rem\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\n\n/** A time-ordered record of supplied symptoms, descriptions and native detail disclosures. */\nexport const SymptomDiary = React.forwardRef<HTMLOListElement, SymptomDiaryProps>(function SymptomDiary({ entries, emptyLabel = \"No symptoms recorded\", order = \"newest\", className, style, children, ...props }, ref) {\n  const sorted = entries.map((entry, index) => ({ entry, index, timestamp: Date.parse(entry.dateTime) })).sort((a, b) => {\n    if (Number.isNaN(a.timestamp)) return Number.isNaN(b.timestamp) ? a.index - b.index : 1;\n    if (Number.isNaN(b.timestamp)) return -1;\n    return (order === \"newest\" ? b.timestamp - a.timestamp : a.timestamp - b.timestamp) || a.index - b.index;\n  });\n  const root = rs([\"rs-symptom-diary\", className], styles.root);\n  const item = rs([\"rs-symptom-diary-item\"], styles.item);\n  const time = rs([\"rs-symptom-diary-time\"], styles.time);\n  const content = rs([\"rs-symptom-diary-content\"], styles.content);\n  const head = rs([\"rs-symptom-diary-head\"], styles.head);\n  const symptom = rs([\"rs-symptom-diary-symptom\"], styles.symptom);\n  const intensity = rs([\"rs-symptom-diary-intensity\"], styles.intensity);\n  const body = rs([\"rs-symptom-diary-body\"], styles.body);\n  const summary = rs([\"rs-symptom-diary-summary\"], styles.summary);\n  const actions = rs([\"rs-symptom-diary-actions\"], styles.actions);\n  return <ol ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    {sorted.length === 0 && <li {...item}>{emptyLabel}</li>}\n    {sorted.map(({ entry, timestamp }) => {\n      const displayTime = entry.timeLabel ?? (Number.isNaN(timestamp) ? \"Time not recorded\" : entry.dateTime);\n      return <li key={entry.id} {...item}>\n        <time {...time} dateTime={Number.isNaN(timestamp) ? undefined : entry.dateTime}>{displayTime}</time>\n        <div {...content}>\n          <div {...head}><p {...symptom}>{entry.symptom}</p>{entry.intensity != null && <p {...intensity}>{entry.intensity}</p>}</div>\n          {entry.notes != null && <div {...body}>{entry.notes}</div>}\n          {entry.details != null && <details><summary {...summary} aria-label={entry.detailsLabel ?? `Details for ${entry.symptom}, ${displayTime}`}>Details</summary><div {...body}>{entry.details}</div></details>}\n          {entry.actions != null && <div {...actions}>{entry.actions}</div>}\n        </div>\n      </li>;\n    })}\n    {children}\n  </ol>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/symptom-diary.tsx"
+    },
+    {
+      "path": "vlak/styles/symptom-diary.css",
+      "content": "/* ── symptom-diary: generated from packages/react/src/components/symptom-diary.tsx ── */\n.rs-symptom-diary{list-style-type:none;margin:0;padding:0;min-width:0;color:var(--text);line-height:1.45}\n.rs-symptom-diary-item{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 3fr);gap:0.5rem 1rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);overflow-wrap:anywhere}\n@media (max-width: 640px){.rs-symptom-diary-item{grid-template-columns:minmax(0, 1fr)}}\n.rs-symptom-diary-time{font-size:0.75rem;color:var(--text-secondary);font-variant-numeric:tabular-nums}\n.rs-symptom-diary-content{display:grid;gap:0.5rem;min-width:0}\n.rs-symptom-diary-head{display:flex;justify-content:space-between;flex-wrap:wrap;align-items:baseline;gap:0.25rem 1rem}\n.rs-symptom-diary-symptom{margin:0;font-size:0.875rem;font-weight:600}\n.rs-symptom-diary-intensity{margin:0;font-size:0.75rem;color:var(--text-secondary)}\n.rs-symptom-diary-body{margin:0;max-width:66ch;font-size:0.875rem}\n.rs-symptom-diary-summary{min-height:var(--hit);min-width:var(--hit);display:list-item;align-content:center;cursor:pointer;font-size:0.875rem;border-radius:var(--radius-sm);outline:none;outline-offset:2px;padding-inline:0.25rem}\n.rs-symptom-diary-summary:focus-visible{outline:2px solid var(--text)}\n.rs-symptom-diary-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/symptom-diary.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "health",
+      "classes": [
+        "rs-symptom-diary",
+        "rs-symptom-diary-item",
+        "rs-symptom-diary-time",
+        "rs-symptom-diary-content",
+        "rs-symptom-diary-head",
+        "rs-symptom-diary-symptom",
+        "rs-symptom-diary-intensity",
+        "rs-symptom-diary-body",
+        "rs-symptom-diary-summary",
+        "rs-symptom-diary-actions"
+      ],
+      "snippet": "<ol class=\"rs-symptom-diary\" aria-label=\"Recent symptom entries\"><li class=\"rs-symptom-diary-item\">\n  <time class=\"rs-symptom-diary-time\" datetime=\"2026-09-06T09:00:00+02:00\">6 Sep, 09:00 CEST</time>\n  <div class=\"rs-symptom-diary-content\"><div class=\"rs-symptom-diary-head\"><p class=\"rs-symptom-diary-symptom\">Headache</p><p class=\"rs-symptom-diary-intensity\">Mild, self-reported</p></div><p class=\"rs-symptom-diary-body\">Recorded after breakfast</p><details><summary class=\"rs-symptom-diary-summary\" aria-label=\"Details for Headache, 6 Sep at 09:00 CEST\">Details</summary><p class=\"rs-symptom-diary-body\">No additional context recorded</p></details></div>\n</li></ol>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Symptom journal",
+        "Patient diary",
+        "Symptom history",
+        "Pain diary",
+        "Health journal",
+        "Patient-reported outcomes"
+      ],
+      "example": "import { SymptomDiary } from \"@noorddev/vlak-react\";\n\n<SymptomDiary aria-label=\"Recent symptom entries\" order=\"newest\" entries={[\n  { id: \"morning\", symptom: \"Headache\", dateTime: \"2026-09-06T09:00:00+02:00\", timeLabel: \"6 Sep, 09:00 CEST\", intensity: \"Mild, self-reported\", notes: \"Recorded after breakfast\", details: \"No additional context recorded\" },\n  { id: \"evening\", symptom: \"Fatigue\", dateTime: \"2026-09-05T18:30:00+02:00\", timeLabel: \"5 Sep, 18:30 CEST\", intensity: \"Noticeable, self-reported\", notes: \"Recorded at the end of the workday\" },\n]} />",
+      "usage": {
+        "use": [
+          "Read patient-entered symptom history without converting their descriptions into a diagnosis.",
+          "Supply intensity in words or with a named scale; the component does not create severity categories.",
+          "Use actions for application-owned edit or review controls with accessible names and 44px targets."
+        ],
+        "avoid": [
+          "Triage, diagnosis or urgency inferred from diary text.",
+          "Assuming a missing diary entry means that no symptom occurred.",
+          "Passing ambiguous timestamps; use ISO timestamps with an explicit offset and timeLabel for display."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses each detail summary and any supplied actions"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Opens or closes a focused native detail disclosure"
+        }
+      ],
+      "a11y": [
+        "A native ordered list preserves chronological structure. Order defaults to newest first and never mutates the supplied entries.",
+        "Equal timestamps retain input order; invalid timestamps sort last and have no invalid datetime attribute.",
+        "Each disclosure has a unique default name combining symptom and display time; detailsLabel can supply a more precise name.",
+        "Native details and summary provide keyboard toggling. Summaries have 44px targets and a 2px focus ring.",
+        "Intensity and context remain readable text. There are no inferred clinical flags or automatic announcements."
+      ]
+    }
+  }
+}

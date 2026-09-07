@@ -1,0 +1,10 @@
+/* ── spacing-control: generated from packages/react/src/components/spacing-control.tsx ── */
+.rs-spacing-control{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
+.rs-spacing-control-label{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
+.rs-spacing-control-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.5rem}
+.rs-spacing-control-field{display:grid;gap:0.375rem;font-size:var(--control-label);line-height:1.45}
+.rs-spacing-control-input{width:100%;min-width:0;font-variant-numeric:tabular-nums}
+.rs-spacing-control-link{justify-self:start}
+.rs-spacing-control-linked{background-color:var(--text);color:var(--bg)}
+@media (forced-colors: active){.rs-spacing-control-linked{background-color:Highlight;color:HighlightText}}
+.rs-spacing-control-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}

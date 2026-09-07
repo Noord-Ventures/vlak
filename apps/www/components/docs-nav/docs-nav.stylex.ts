@@ -5,9 +5,8 @@ const at900 = "@media (min-width: 900px)";
 /**
  * Docs rail. 184 groups + 204 secondaries. No paper cover.
  * Secondaries occupy gutter + column (204), end on the 408 module line.
- * Detail inset (--ml 204) stays on .site-layout. Catalog index zeros
- * --ml at 1024–1439 so two 388 cards fit; ≥1440 restores the airy
- * first 204. Do not zero --ml here.
+ * The shared --rail-inset owns the origin at every page level.
+ * Layout widths can differ without shifting these navigation columns.
  */
 export const navStyles = stylex.create({
   rail: {

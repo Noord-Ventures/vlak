@@ -1,0 +1,89 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "benefit-program",
+  "type": "registry:component",
+  "title": "Benefit program",
+  "description": "Keeps programme availability, supplied eligibility, award terms, and criterion assessments separate.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/benefit-program.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface BenefitProgramCriterion {\n  id: string;\n  label: React.ReactNode;\n  /** A supplied assessment for this criterion. It does not determine overall eligibility. */\n  status: React.ReactNode;\n  description?: React.ReactNode;\n}\n\nexport interface BenefitProgramProps extends React.HTMLAttributes<HTMLDivElement> {\n  programName: string;\n  provider?: React.ReactNode;\n  /** Supplied programme availability, separate from a person's eligibility. */\n  status: React.ReactNode;\n  eligibility: React.ReactNode;\n  awardLabel?: React.ReactNode;\n  awardDetails?: React.ReactNode;\n  deadlineLabel?: React.ReactNode;\n  criteria: readonly BenefitProgramCriterion[];\n  description?: React.ReactNode;\n  criteriaEmptyLabel?: React.ReactNode;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\", display: \"grid\", gap: \"1.25rem\" },\n  header: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", alignItems: \"baseline\", gap: \"0.75rem\" },\n  name: { margin: 0, fontSize: \"1.25rem\", fontWeight: 600, lineHeight: 1.3, letterSpacing: \"-0.025em\" },\n  status: { fontSize: \"0.75rem\", padding: \"0.25rem 0.5rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider },\n  detail: { margin: 0, fontSize: \"0.875rem\", color: vlak.gray, maxWidth: \"66ch\" },\n  facts: { margin: 0, display: \"grid\", gridTemplateColumns: { default: \"repeat(2, minmax(0, 1fr))\", [mq.phone]: \"minmax(0, 1fr)\" }, gap: \"1rem\", padding: \"1rem\", backgroundColor: vlak.tableAlt },\n  field: { minWidth: 0 },\n  label: { margin: 0, fontSize: \"0.75rem\", color: vlak.gray },\n  value: { margin: 0, marginTop: \"0.25rem\", fontSize: \"0.875rem\", fontVariantNumeric: \"tabular-nums\" },\n  criteria: { margin: 0, padding: 0, listStyle: \"none\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  criterion: { display: \"grid\", gap: \"0.5rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  criterionHead: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", alignItems: \"baseline\", gap: \"0.5rem 1rem\", fontSize: \"0.875rem\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\n\n/** Programme availability, supplied eligibility, and award terms kept as distinct facts. */\nexport const BenefitProgram = React.forwardRef<HTMLDivElement, BenefitProgramProps>(function BenefitProgram(\n  { programName, provider, status, eligibility, awardLabel, awardDetails, deadlineLabel, criteria, description, criteriaEmptyLabel = \"Eligibility criteria not supplied\", children, className, style, ...props }, ref,\n) {\n  const root = rs([\"rs-benefit-program\", className], styles.root);\n  const header = rs([\"rs-benefit-program-header\"], styles.header);\n  const name = rs([\"rs-benefit-program-name\"], styles.name);\n  const statusStyle = rs([\"rs-benefit-program-status\"], styles.status);\n  const detail = rs([\"rs-benefit-program-detail\"], styles.detail);\n  const facts = rs([\"rs-benefit-program-facts\"], styles.facts);\n  const field = rs([\"rs-benefit-program-field\"], styles.field);\n  const label = rs([\"rs-benefit-program-label\"], styles.label);\n  const value = rs([\"rs-benefit-program-value\"], styles.value);\n  const criteriaStyle = rs([\"rs-benefit-program-criteria\"], styles.criteria);\n  const criterion = rs([\"rs-benefit-program-criterion\"], styles.criterion);\n  const criterionHead = rs([\"rs-benefit-program-criterion-head\"], styles.criterionHead);\n  const actions = rs([\"rs-benefit-program-actions\"], styles.actions);\n  return <div ref={ref} role=\"group\" aria-label={programName} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...header}><p {...name}>{programName}</p><span {...statusStyle}>{status ?? \"Status not supplied\"}</span></div>\n    {description != null && <p {...detail}>{description}</p>}\n    <dl {...facts}>\n      <div {...field}><dt {...label}>Provider</dt><dd {...value}>{provider ?? \"Provider not supplied\"}</dd></div>\n      <div {...field}><dt {...label}>Your eligibility</dt><dd {...value}>{eligibility ?? \"Eligibility not supplied\"}</dd></div>\n      <div {...field}><dt {...label}>Award</dt><dd {...value}>{awardLabel ?? \"Award amount not supplied\"}{awardDetails != null && <p {...detail}>{awardDetails}</p>}</dd></div>\n      <div {...field}><dt {...label}>Application deadline</dt><dd {...value}>{deadlineLabel ?? \"Deadline not supplied\"}</dd></div>\n    </dl>\n    {criteria.length > 0 ? <ul {...criteriaStyle} aria-label=\"Eligibility criteria\">{criteria.map(item => <li key={item.id} {...criterion}><div {...criterionHead}><strong>{item.label}</strong><span>{item.status ?? \"Status not supplied\"}</span></div>{item.description != null && <p {...detail}>{item.description}</p>}</li>)}</ul> : <p {...detail}>{criteriaEmptyLabel}</p>}\n    {children != null && <div {...actions}>{children}</div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/benefit-program.tsx"
+    },
+    {
+      "path": "vlak/styles/benefit-program.css",
+      "content": "/* ── benefit-program: generated from packages/react/src/components/benefit-program.tsx ── */\n.rs-benefit-program{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere;display:grid;gap:1.25rem}\n.rs-benefit-program-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.75rem}\n.rs-benefit-program-name{margin:0;font-size:1.25rem;font-weight:600;line-height:1.3;letter-spacing:-0.025em}\n.rs-benefit-program-status{font-size:0.75rem;padding:0.25rem 0.5rem;border-width:1px;border-style:solid;border-color:var(--divider)}\n.rs-benefit-program-detail{margin:0;font-size:0.875rem;color:var(--text-secondary);max-width:66ch}\n.rs-benefit-program-facts{margin:0;display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem;padding:1rem;background-color:var(--table-alt)}\n@media (max-width: 640px){.rs-benefit-program-facts{grid-template-columns:minmax(0, 1fr)}}\n.rs-benefit-program-field{min-width:0}\n.rs-benefit-program-label{margin:0;font-size:0.75rem;color:var(--text-secondary)}\n.rs-benefit-program-value{margin:0;margin-top:0.25rem;font-size:0.875rem;font-variant-numeric:tabular-nums}\n.rs-benefit-program-criteria{margin:0;padding:0;list-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-benefit-program-criterion{display:grid;gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-benefit-program-criterion-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem;font-size:0.875rem}\n.rs-benefit-program-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/benefit-program.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "civic",
+      "classes": [
+        "rs-benefit-program",
+        "rs-benefit-program-header",
+        "rs-benefit-program-name",
+        "rs-benefit-program-status",
+        "rs-benefit-program-detail",
+        "rs-benefit-program-facts",
+        "rs-benefit-program-field",
+        "rs-benefit-program-label",
+        "rs-benefit-program-value",
+        "rs-benefit-program-criteria",
+        "rs-benefit-program-criterion",
+        "rs-benefit-program-criterion-head",
+        "rs-benefit-program-actions"
+      ],
+      "snippet": "<div class=\"rs-benefit-program\" role=\"group\" aria-label=\"Community project grant\"><div class=\"rs-benefit-program-header\"><p class=\"rs-benefit-program-name\">Community project grant</p><span class=\"rs-benefit-program-status\">Applications open</span></div><dl class=\"rs-benefit-program-facts\"><div class=\"rs-benefit-program-field\"><dt class=\"rs-benefit-program-label\">Your eligibility</dt><dd class=\"rs-benefit-program-value\">Not assessed</dd></div><div class=\"rs-benefit-program-field\"><dt class=\"rs-benefit-program-label\">Award</dt><dd class=\"rs-benefit-program-value\">Award amount not supplied</dd></div></dl><ul class=\"rs-benefit-program-criteria\" aria-label=\"Eligibility criteria\"><li class=\"rs-benefit-program-criterion\"><div class=\"rs-benefit-program-criterion-head\"><strong>Project location</strong><span>Not reviewed</span></div></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "BenefitProgram",
+        "Grant programme",
+        "Subsidy card",
+        "Public benefit",
+        "Funding opportunity",
+        "Eligibility summary"
+      ],
+      "example": "import { BenefitProgram } from \"@noorddev/vlak-react\";\n\n<BenefitProgram programName=\"Community project grant\" provider=\"Example council\" status=\"Applications open\" eligibility=\"Not assessed\" awardLabel=\"Award amount not supplied\" deadlineLabel=\"30 September 2026, as supplied\" criteria={[{ id: \"location\", label: \"Project location\", status: \"Not reviewed\", description: \"Location evidence is reviewed by the provider\" }]} />",
+      "usage": {
+        "use": [
+          "Public benefits, grants, subsidies, and funding opportunities with source-owned eligibility assessments.",
+          "Display programme availability separately from an applicant’s eligibility and the programme’s award terms."
+        ],
+        "avoid": [
+          "Deciding eligibility from criteria, personal data, income, or a model-generated recommendation.",
+          "Implying an award is approved because applications are open or some criteria are satisfied."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Supplied action links and buttons use native keyboard behavior. Criteria are static readable items."
+        }
+      ],
+      "a11y": [
+        "Programme name labels a group; programme facts use a description list and criteria use a named list.",
+        "Eligibility, criterion status, and programme availability are visible text rather than color-only indicators.",
+        "Missing provider, award, deadline, or criteria are explicitly described. Native root attributes and div refs pass through.",
+        "Provide working child controls with at least 44px targets when an application or information action is available."
+      ]
+    }
+  }
+}

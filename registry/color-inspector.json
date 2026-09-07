@@ -1,0 +1,97 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "color-inspector",
+  "type": "registry:component",
+  "title": "Color inspector",
+  "description": "Edits a six-digit hex color and alpha with a data-driven preview, a transparency ground, and native form validation.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/color-inspector.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Input } from \"./input\";\n\nimport { useInputValue } from \"./use-input-value\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface InspectorColor { hex: string; alpha: number | null }\nexport interface ColorInspectorProps extends Omit<React.FieldsetHTMLAttributes<HTMLFieldSetElement>, \"defaultValue\" | \"onChange\"> {\n  label: React.ReactNode;\n  value?: InspectorColor;\n  defaultValue?: InspectorColor;\n  /** Receives editable hex text and alpha, including incomplete values. */\n  onValueChange?: (value: InspectorColor) => void;\n  readOnly?: boolean;\n}\n\nconst initial: InspectorColor = { hex: \"#808080\", alpha: 1 };\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, borderWidth: 0, margin: 0, padding: 0, color: vlak.ink },\n  label: { marginBottom: \"0.75rem\", padding: 0, fontSize: vlak.controlFs, lineHeight: 1.45, fontWeight: 600 },\n  preview: { position: \"relative\", minHeight: \"4rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.controlBorder, backgroundColor: vlak.paper, backgroundImage: `repeating-conic-gradient(${vlak.divider} 0% 25%, transparent 0% 50%)`, backgroundSize: \"1rem 1rem\" },\n  swatch: { position: \"absolute\", inset: 0, forcedColorAdjust: \"none\" },\n  fields: { display: \"grid\", gridTemplateColumns: \"repeat(auto-fit, minmax(8rem, 1fr))\", gap: \"0.75rem\" },\n  field: { display: \"grid\", gap: \"0.375rem\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  input: { width: \"100%\", minWidth: 0, fontVariantNumeric: \"tabular-nums\" },\n  note: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** A data swatch and editable six-digit hex and alpha, on a monochrome shell. */\nexport const ColorInspector = React.forwardRef<HTMLFieldSetElement, ColorInspectorProps>(function ColorInspector({ label, value, defaultValue = initial, onValueChange, readOnly, name, form, disabled, className, style, ...props }, ref) {\n  const id = React.useId();\n  const [, refresh] = React.useReducer((n: number) => n + 1, 0);\n  const [current, setValue, fieldRef] = useInputValue<InspectorColor, HTMLFieldSetElement>(value, defaultValue, onValueChange, refresh);\n  const mergedRef = useMergedRefs(ref, fieldRef);\n  const validHex = /^#[\\da-f]{6}$/i.test(current.hex);\n  const validAlpha = current.alpha != null && Number.isFinite(current.alpha) && current.alpha >= 0 && current.alpha <= 1;\n  const root = rs([\"rs-color-inspector\", className], styles.root);\n  const heading = rs([\"rs-color-inspector-label\"], styles.label);\n  const preview = rs([\"rs-color-inspector-preview\"], styles.preview);\n  const swatch = rs([\"rs-color-inspector-swatch\"], styles.swatch);\n  const fields = rs([\"rs-color-inspector-fields\"], styles.fields);\n  const field = rs([\"rs-color-inspector-field\"], styles.field);\n  const input = rs([\"rs-color-inspector-input\"], styles.input);\n  const note = rs([\"rs-color-inspector-note\"], styles.note);\n  return <fieldset {...props} ref={mergedRef} name={name} form={form} disabled={disabled} className={root.className} style={{ ...root.style, ...style }}>\n    <legend className={heading.className} style={heading.style}>{label}</legend>\n    <div aria-hidden=\"true\" className={preview.className} style={preview.style}>{validHex && validAlpha && <span className={swatch.className} style={{ ...swatch.style, backgroundColor: current.hex, opacity: current.alpha! }} />}</div>\n    <div className={fields.className} style={fields.style}>\n      <label className={field.className} style={field.style}>Hex<Input plain type=\"text\" name={name ? `${name}.hex` : undefined} form={form} value={current.hex} pattern=\"#[0-9a-fA-F]{6}\" required readOnly={readOnly} spellCheck={false} aria-invalid={!validHex || undefined} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => setValue({ ...current, hex: event.currentTarget.value })} /></label>\n      <label className={field.className} style={field.style}>Alpha<Input plain type=\"number\" name={name ? `${name}.alpha` : undefined} form={form} min={0} max={1} step=\"any\" required readOnly={readOnly} value={current.alpha != null && Number.isFinite(current.alpha) ? current.alpha : \"\"} aria-invalid={!validAlpha || undefined} aria-describedby={`${id}-hint`} className={input.className} style={input.style} onChange={(event) => setValue({ ...current, alpha: event.currentTarget.value === \"\" ? null : Number(event.currentTarget.value) })} /></label>\n    </div>\n    <p id={`${id}-hint`} className={note.className} style={note.style}>{!validHex ? \"Enter a six-digit hex color beginning with #.\" : !validAlpha ? \"Enter alpha from 0 to 1.\" : `${current.hex}, alpha ${current.alpha}`}</p>\n  </fieldset>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/color-inspector.tsx"
+    },
+    {
+      "path": "vlak/use-input-value.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Shared state for compound inputs. Native form reset restores uncontrolled defaults. */\nexport function useInputValue<T, E extends HTMLElement>(\n  value: T | undefined,\n  defaultValue: T,\n  onValueChange?: (value: T) => void,\n  onReset?: () => void,\n) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const element = React.useRef<E>(null);\n  const controlled = value !== undefined;\n  const reset = React.useRef({ controlled, defaultValue, onReset });\n  reset.current = { controlled, defaultValue, onReset };\n  React.useEffect(() => {\n    const node = element.current;\n    const form = node && \"form\" in node ? (node as unknown as HTMLInputElement).form : node?.closest(\"form\");\n    if (!form) return;\n    const handleReset = (event: Event) => {\n      queueMicrotask(() => {\n        if (!event.defaultPrevented) {\n          if (!reset.current.controlled) setInner(reset.current.defaultValue);\n          reset.current.onReset?.();\n        }\n      });\n    };\n    form.addEventListener(\"reset\", handleReset);\n    return () => form.removeEventListener(\"reset\", handleReset);\n  }, []);\n  const setValue = (next: T) => {\n    if (!controlled) setInner(next);\n    onValueChange?.(next);\n  };\n  return [controlled ? value : inner, setValue, element] as const;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-input-value.ts"
+    },
+    {
+      "path": "vlak/styles/color-inspector.css",
+      "content": "/* ── color-inspector: generated from packages/react/src/components/color-inspector.tsx ── */\n.rs-color-inspector{display:grid;gap:0.75rem;min-width:0;border-width:0;margin:0;padding:0;color:var(--text)}\n.rs-color-inspector-label{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);line-height:1.45;font-weight:600}\n.rs-color-inspector-preview{position:relative;min-height:4rem;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--bg);background-image:repeating-conic-gradient(var(--divider) 0% 25%, transparent 0% 50%);background-size:1rem 1rem}\n.rs-color-inspector-swatch{position:absolute;inset:0;forced-color-adjust:none}\n.rs-color-inspector-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(8rem, 1fr));gap:0.75rem}\n.rs-color-inspector-field{display:grid;gap:0.375rem;font-size:var(--control-label);line-height:1.45}\n.rs-color-inspector-input{width:100%;min-width:0;font-variant-numeric:tabular-nums}\n.rs-color-inspector-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/color-inspector.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "creative",
+      "classes": [
+        "rs-color-inspector",
+        "rs-color-inspector-label",
+        "rs-color-inspector-preview",
+        "rs-color-inspector-swatch",
+        "rs-color-inspector-fields",
+        "rs-color-inspector-field",
+        "rs-color-inspector-input",
+        "rs-color-inspector-note"
+      ],
+      "snippet": "<fieldset class=\"rs-color-inspector\"><legend class=\"rs-color-inspector-label\">Fill</legend><div class=\"rs-color-inspector-preview\" aria-hidden=\"true\"><span class=\"rs-color-inspector-swatch\" style=\"background-color:#808080;opacity:0.5\"></span></div><div class=\"rs-color-inspector-fields\"><label class=\"rs-color-inspector-field\">Hex<input class=\"rs-input rs-input-full rs-color-inspector-input\" type=\"text\" value=\"#808080\" pattern=\"#[0-9a-fA-F]{6}\" required /></label><label class=\"rs-color-inspector-field\">Alpha<input class=\"rs-input rs-input-full rs-color-inspector-input\" type=\"number\" value=\"0.5\" min=\"0\" max=\"1\" step=\"any\" required /></label></div></fieldset>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "input",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "ColorInspector",
+        "Color input",
+        "Hex editor",
+        "Alpha control",
+        "Fill inspector",
+        "Color swatch"
+      ],
+      "example": "import { ColorInspector } from \"@noorddev/vlak-react\";\n\n<ColorInspector label=\"Fill\" name=\"fill\" defaultValue={{ hex: \"#808080\", alpha: 0.5 }} />",
+      "usage": {
+        "use": [
+          "Application-owned color data; only the swatch uses the supplied hue, while the inspector shell stays monochrome.",
+          "Six-digit hex including #, with alpha from zero transparent to one opaque.",
+          "onValueChange receives editable input; incomplete alpha is null and invalid hex remains available for correction."
+        ],
+        "avoid": [
+          "Assuming color-space conversion, gamut checking, contrast certification, or color-profile management.",
+          "Presenting a valid preview when the supplied color or alpha is invalid."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between the native hex and alpha inputs."
+        },
+        {
+          "keys": "Text editing keys",
+          "does": "Edits or selects hex and alpha values; any alpha precision from 0 to 1 is accepted."
+        }
+      ],
+      "a11y": [
+        "A fieldset and legend name the color; hex and alpha are labelled native controls with 44px targets.",
+        "The decorative swatch has an explicit text equivalent and preserves caller-owned color in forced colors.",
+        "Pattern, required, and numeric bounds supply native form validation; invalid data suppresses the swatch.",
+        "Controlled and uncontrolled values support form reset; the ref and native attributes reach the fieldset."
+      ]
+    }
+  }
+}

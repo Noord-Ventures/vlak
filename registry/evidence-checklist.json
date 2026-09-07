@@ -1,0 +1,96 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "evidence-checklist",
+  "type": "registry:component",
+  "title": "Evidence checklist",
+  "description": "Lists evidence requirements, file records, and supplied verification status with controlled 44px action buttons.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/evidence-checklist.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface EvidenceChecklistAction {\n  id: string;\n  label: string;\n  disabled?: boolean;\n}\n\nexport interface EvidenceChecklistItem {\n  id: string;\n  label: string;\n  /** A supplied required/optional/unknown requirement label. */\n  requirement?: React.ReactNode;\n  /** Record status supplied by the application, never inferred from a filename. */\n  status: React.ReactNode;\n  description?: React.ReactNode;\n  fileName?: React.ReactNode;\n  receivedLabel?: React.ReactNode;\n  actions?: readonly EvidenceChecklistAction[];\n  pending?: boolean;\n  pendingLabel?: React.ReactNode;\n  disabled?: boolean;\n}\n\nexport interface EvidenceChecklistProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"onAction\"> {\n  label: string;\n  items: readonly EvidenceChecklistItem[];\n  /** Application-supplied coverage summary; the component does not count approvals. */\n  summary?: React.ReactNode;\n  emptyLabel?: React.ReactNode;\n  /** Requests an action only; uploads, removals, and resulting statuses belong to the caller. */\n  onAction?: (itemId: string, actionId: string) => void;\n}\n\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  heading: { margin: 0, fontSize: \"1.125rem\", fontWeight: 600, lineHeight: 1.3 },\n  summary: { margin: 0, marginTop: \"0.5rem\", color: vlak.gray, fontSize: \"0.875rem\", maxWidth: \"66ch\" },\n  list: { margin: 0, marginTop: \"1rem\", padding: 0, listStyle: \"none\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  item: { display: \"grid\", gap: \"0.75rem\", paddingBlock: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  head: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.5rem 1rem\", fontSize: \"0.875rem\" },\n  label: { margin: 0, fontWeight: 600 },\n  requirement: { color: vlak.gray, fontSize: \"0.75rem\" },\n  detail: { margin: 0, fontSize: \"0.875rem\", color: vlak.gray, maxWidth: \"66ch\" },\n  record: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem 1rem\", fontSize: \"0.875rem\" },\n  status: { fontSize: \"0.875rem\", fontWeight: 500 },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  action: { minWidth: vlak.hit, minHeight: vlak.hit, height: \"auto\", whiteSpace: \"normal\", lineHeight: 1.3, paddingBlock: \"0.625rem\" },\n  empty: { margin: 0, paddingBlock: \"1rem\", fontSize: \"0.875rem\", color: vlak.gray },\n});\n\n/** Evidence requirements, file records, and verification status with controlled action requests. */\nexport const EvidenceChecklist = React.forwardRef<HTMLDivElement, EvidenceChecklistProps>(function EvidenceChecklist(\n  { label, items, summary, emptyLabel = \"Evidence requirements not supplied\", onAction, children, className, style, ...props }, ref,\n) {\n  const baseId = React.useId();\n  const root = rs([\"rs-evidence-checklist\", className], styles.root);\n  const heading = rs([\"rs-evidence-checklist-heading\"], styles.heading);\n  const summaryStyle = rs([\"rs-evidence-checklist-summary\"], styles.summary);\n  const list = rs([\"rs-evidence-checklist-list\"], styles.list);\n  const itemStyle = rs([\"rs-evidence-checklist-item\"], styles.item);\n  const head = rs([\"rs-evidence-checklist-head\"], styles.head);\n  const itemLabel = rs([\"rs-evidence-checklist-label\"], styles.label);\n  const requirement = rs([\"rs-evidence-checklist-requirement\"], styles.requirement);\n  const detail = rs([\"rs-evidence-checklist-detail\"], styles.detail);\n  const record = rs([\"rs-evidence-checklist-record\"], styles.record);\n  const statusStyle = rs([\"rs-evidence-checklist-status\"], styles.status);\n  const actions = rs([\"rs-evidence-checklist-actions\"], styles.actions);\n  const action = rs([\"rs-evidence-checklist-action\"], styles.action);\n  const empty = rs([\"rs-evidence-checklist-empty\"], styles.empty);\n  return <div ref={ref} role=\"group\" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <p {...heading}>{label}</p>{summary != null && <p {...summaryStyle}>{summary}</p>}\n    {items.length > 0 ? <ul {...list}>{items.map((item, index) => {\n      const requirementId = `${baseId}-${index}-requirement`;\n      const recordId = `${baseId}-${index}-record`;\n      const statusId = `${baseId}-${index}-status`;\n      return <li key={item.id} {...itemStyle}>\n        <div {...head}><p {...itemLabel}>{item.label}</p><span {...requirement} id={requirementId}>{item.requirement ?? \"Requirement not supplied\"}</span></div>\n        {item.description != null && <p {...detail}>{item.description}</p>}\n        <div {...record} id={recordId}><span>{item.fileName ?? \"File details not supplied\"}</span>{item.receivedLabel != null && <span {...detail}>{item.receivedLabel}</span>}</div>\n        <div role=\"status\" aria-live=\"polite\" aria-atomic=\"true\" {...statusStyle}><span id={statusId}>{item.status ?? \"Status not supplied\"}</span>{item.pending && <span> · {item.pendingLabel ?? \"Evidence update pending\"}</span>}</div>\n        {onAction && (item.actions?.length ?? 0) > 0 && <div {...actions} aria-busy={item.pending || undefined}>{item.actions?.map(choice => <Button key={choice.id} {...action} type=\"button\" variant=\"ghost\" disabled={item.pending || item.disabled || choice.disabled} aria-label={`${choice.label}: ${item.label}`} aria-describedby={`${requirementId} ${recordId} ${statusId}`} onClick={() => onAction(item.id, choice.id)}>{choice.label}</Button>)}</div>}\n      </li>;\n    })}</ul> : <p {...empty}>{emptyLabel}</p>}\n    {children}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/evidence-checklist.tsx"
+    },
+    {
+      "path": "vlak/styles/evidence-checklist.css",
+      "content": "/* ── evidence-checklist: generated from packages/react/src/components/evidence-checklist.tsx ── */\n.rs-evidence-checklist{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}\n.rs-evidence-checklist-heading{margin:0;font-size:1.125rem;font-weight:600;line-height:1.3}\n.rs-evidence-checklist-summary{margin:0;margin-top:0.5rem;color:var(--text-secondary);font-size:0.875rem;max-width:66ch}\n.rs-evidence-checklist-list{margin:0;margin-top:1rem;padding:0;list-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-evidence-checklist-item{display:grid;gap:0.75rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-evidence-checklist-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;font-size:0.875rem}\n.rs-evidence-checklist-label{margin:0;font-weight:600}\n.rs-evidence-checklist-requirement{color:var(--text-secondary);font-size:0.75rem}\n.rs-evidence-checklist-detail{margin:0;font-size:0.875rem;color:var(--text-secondary);max-width:66ch}\n.rs-evidence-checklist-record{display:flex;flex-wrap:wrap;gap:0.5rem 1rem;font-size:0.875rem}\n.rs-evidence-checklist-status{font-size:0.875rem;font-weight:500}\n.rs-evidence-checklist-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-evidence-checklist-action{min-width:var(--hit);min-height:var(--hit);height:auto;white-space:normal;line-height:1.3;padding-block:0.625rem}\n.rs-evidence-checklist-empty{margin:0;padding-block:1rem;font-size:0.875rem;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/evidence-checklist.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "civic",
+      "classes": [
+        "rs-evidence-checklist",
+        "rs-evidence-checklist-heading",
+        "rs-evidence-checklist-summary",
+        "rs-evidence-checklist-list",
+        "rs-evidence-checklist-item",
+        "rs-evidence-checklist-head",
+        "rs-evidence-checklist-label",
+        "rs-evidence-checklist-requirement",
+        "rs-evidence-checklist-detail",
+        "rs-evidence-checklist-record",
+        "rs-evidence-checklist-status",
+        "rs-evidence-checklist-actions",
+        "rs-evidence-checklist-action",
+        "rs-evidence-checklist-empty"
+      ],
+      "snippet": "<div class=\"rs-evidence-checklist\" role=\"group\" aria-label=\"Application evidence\"><p class=\"rs-evidence-checklist-heading\">Application evidence</p><ul class=\"rs-evidence-checklist-list\"><li class=\"rs-evidence-checklist-item\"><div class=\"rs-evidence-checklist-head\"><p class=\"rs-evidence-checklist-label\">Proof of address</p><span class=\"rs-evidence-checklist-requirement\">Required by the provider</span></div><div class=\"rs-evidence-checklist-record\">Example-address.pdf</div><div class=\"rs-evidence-checklist-status\" role=\"status\">Awaiting review</div></li></ul></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "EvidenceChecklist",
+        "Document checklist",
+        "Supporting documents",
+        "Evidence requirements",
+        "Application documents",
+        "Verification checklist"
+      ],
+      "example": "import { EvidenceChecklist } from \"@noorddev/vlak-react\";\n\n<EvidenceChecklist label=\"Application evidence\" items={[{ id: \"address\", label: \"Proof of address\", requirement: \"Required by the provider\", fileName: \"Example-address.pdf\", status: \"Awaiting review\" }]} />\n\n// To enable actions, supply item.actions and onAction(itemId, actionId).\n// The host performs uploads or changes and supplies pending and updated status.",
+      "usage": {
+        "use": [
+          "Evidence requirements for permits, grants, benefits, and identity checks.",
+          "Provide explicit actions for working uploads, downloads, replacements, or record changes through the host callback."
+        ],
+        "avoid": [
+          "Marking evidence accepted from a filename or a button click, or inferring requirements from missing values.",
+          "Treating uploads as submitted before the host confirms them, or rendering dead action buttons without a callback."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between enabled evidence action buttons when onAction and item actions are supplied."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests the focused item action without mutating the displayed record. Pending or disabled actions cannot be activated."
+        }
+      ],
+      "a11y": [
+        "Action names contain the visible label and evidence name; descriptions include requirement, file record, and supplied status.",
+        "Record status uses a polite atomic status region. Pending text remains visible and actionable controls are disabled without hiding the existing status.",
+        "No checkboxes or completion percentage are invented from verification status. Missing requirements or file details are explicitly labelled.",
+        "Buttons have at least 44px targets. Native root attributes, className, style, and div refs pass through."
+      ]
+    }
+  }
+}
