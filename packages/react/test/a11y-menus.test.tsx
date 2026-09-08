@@ -483,6 +483,39 @@ describe("Menubar", () => {
 });
 
 describe("Calendar", () => {
+  it.each([
+    [2021, 1, 1, 4],
+    [2026, 8, 1, 5],
+    [2026, 7, 1, 6],
+    [2026, 1, 0, 4],
+  ] as const)("fits %i/%i to its required rows with weekStart=%i", (year, month, weekStart, expectedWeeks) => {
+    render(<Calendar defaultValue={new Date(year, month, 1)} weekStart={weekStart} fixedWeeks={false} />);
+    const grid = screen.getByRole("grid");
+    expect(within(grid).getAllByRole("row")).toHaveLength(expectedWeeks + 1);
+    const cells = within(grid).getAllByRole("gridcell");
+    expect(cells).toHaveLength(expectedWeeks * 7);
+    expect(cells.filter(cell => cell.getAttribute("tabindex") === "0")).toHaveLength(1);
+    const inMonth = cells.filter(cell => !cell.classList.contains("rs-cal-day-out"));
+    expect(inMonth).toHaveLength(new Date(year, month + 1, 0).getDate());
+  });
+
+  it("keeps keyboard focus and selection when a compact month changes its row count", async () => {
+    const user = userEvent.setup(), changed = vi.fn();
+    render(<Calendar defaultValue={new Date(2021, 1, 28)} fixedWeeks={false} onValueChange={changed} />);
+    screen.getByRole("gridcell", { selected: true }).focus();
+    expect(within(screen.getByRole("grid")).getAllByRole("row")).toHaveLength(5);
+    await user.keyboard("{ArrowRight}");
+    const march = screen.getByRole("grid", { name: "March 2021" });
+    expect(within(march).getAllByRole("row")).toHaveLength(6);
+    expect(document.activeElement?.getAttribute("aria-label")).toMatch(/March 1, 2021/);
+    await user.keyboard("{PageUp}{Enter}");
+    const february = screen.getByRole("grid", { name: "February 2021" });
+    expect(within(february).getAllByRole("row")).toHaveLength(5);
+    expect(document.activeElement?.getAttribute("aria-selected")).toBe("true");
+    expect(changed).toHaveBeenCalledTimes(1);
+    expect(changed.mock.calls[0]![0]).toEqual(new Date(2021, 1, 1));
+  });
+
   it("preserves a four-digit early year through month paging and date selection", async () => {
     const user = userEvent.setup();
     const changed = vi.fn();

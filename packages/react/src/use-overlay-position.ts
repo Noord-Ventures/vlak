@@ -9,7 +9,7 @@ export function useOverlayPosition(
   anchor: React.RefObject<HTMLElement | null>,
   point?: { x: number; y: number } | null,
   placement: "bottom" | "inline-end" = "bottom",
-  options?: { popover?: "auto" | "manual"; edge?: number },
+  options?: { popover?: "auto" | "manual"; edge?: number; matchAnchorWidth?: boolean },
 ) {
   const [position, setPosition] = React.useState<React.CSSProperties>({ visibility: "hidden" });
   React.useLayoutEffect(() => {
@@ -33,7 +33,19 @@ export function useOverlayPosition(
       const paint = getComputedStyle(element);
       const borderX = (Number.parseFloat(paint.borderLeftWidth) || 0) + (Number.parseFloat(paint.borderRightWidth) || 0);
       const borderY = (Number.parseFloat(paint.borderTopWidth) || 0) + (Number.parseFloat(paint.borderBottomWidth) || 0);
-      const width = Math.min(Math.max(element.scrollWidth + borderX, target?.width ?? 0), viewportWidth - edge * 2);
+      const matchAnchor = options?.matchAnchorWidth !== false;
+      let panelWidth = element.scrollWidth + borderX;
+      if (!matchAnchor) {
+        // Measure the authored width without the last placement’s viewport clamp.
+        // Restoring it here also keeps resize observation tied to the final layout.
+        const { width, minWidth, maxWidth } = element.style;
+        element.style.width = "";
+        element.style.minWidth = "";
+        element.style.maxWidth = "";
+        panelWidth = element.getBoundingClientRect().width;
+        Object.assign(element.style, { width, minWidth, maxWidth });
+      }
+      const width = Math.min(Math.max(panelWidth, matchAnchor ? target?.width ?? 0 : 0), viewportWidth - edge * 2);
       const height = Math.min(element.scrollHeight + borderY, viewportHeight - edge * 2);
       let left = point?.x ?? target?.left ?? leftEdge;
       let top = point?.y ?? (target ? target.bottom + 6 : topEdge);
@@ -51,7 +63,7 @@ export function useOverlayPosition(
       top = Math.max(topEdge, Math.min(top, bottomEdge - height));
       const next: React.CSSProperties = {
         position: "fixed", inset: "auto", left, top, margin: 0,
-        minWidth: Math.min(target?.width ?? 0, viewportWidth - edge * 2),
+        minWidth: matchAnchor ? Math.min(target?.width ?? 0, viewportWidth - edge * 2) : 0,
         maxWidth: viewportWidth - edge * 2, maxHeight: viewportHeight - edge * 2,
         width, overflow: "auto", visibility: "visible",
       };
@@ -72,6 +84,6 @@ export function useOverlayPosition(
       window.visualViewport?.removeEventListener("resize", place);
       window.visualViewport?.removeEventListener("scroll", place);
     };
-  }, [open, panel, anchor, point?.x, point?.y, placement, options?.popover, options?.edge]);
+  }, [open, panel, anchor, point?.x, point?.y, placement, options?.popover, options?.edge, options?.matchAnchorWidth]);
   return position;
 }

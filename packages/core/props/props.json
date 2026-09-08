@@ -8030,6 +8030,13 @@
               "description": "0 = Sunday, 1 = Monday."
             },
             {
+              "name": "fixedWeeks",
+              "type": "boolean",
+              "required": false,
+              "default": "true",
+              "description": "Keep six week rows. False shows only the four to six rows this month needs."
+            },
+            {
               "name": "autoFocus",
               "type": "boolean",
               "required": false,
