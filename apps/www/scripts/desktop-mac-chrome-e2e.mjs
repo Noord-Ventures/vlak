@@ -10,7 +10,7 @@ const checkShortcutPlacement = async (desktop, mode) => {
   const placement = await desktop.locator(".dos-stage").evaluate(stage => {
     const group = stage.querySelector(".dos-desktop-icons");
     return {
-      leftOffset: group.getBoundingClientRect().left - stage.getBoundingClientRect().left,
+      rightOffset: stage.getBoundingClientRect().right - group.getBoundingClientRect().right,
       icons: [...group.querySelectorAll(".dos-shortcut")].map(element => {
         const icon = element.querySelector("svg").getBoundingClientRect();
         const label = element.querySelector("span").getBoundingClientRect();
@@ -19,7 +19,7 @@ const checkShortcutPlacement = async (desktop, mode) => {
       }),
     };
   });
-  near(placement.leftOffset, 8, `${mode}: shortcut group stays at the desktop's left edge`);
+  near(placement.rightOffset, 8, `${mode}: Mac shortcut group stays at the desktop's right edge`);
   assert.ok(placement.icons.length >= 4, "Mac keeps working desktop shortcuts");
   for (const icon of placement.icons) {
     near(icon.iconCenter, icon.tileCenter, `${mode}: shortcut icon is centered within its tile`);
@@ -162,6 +162,10 @@ export async function checkDesktopMacChrome({ page, base, fail }) {
       const other = page.locator(`.dos[data-platform="${platform}"]`);
       assert.equal(await other.locator(".dos-mac-dock, .dos-mac-menus").count(), 0, `${tab} keeps its own desktop chrome`);
       assert.ok(await other.locator(".dos-taskbar").isVisible(), `${tab} retains its taskbar`);
+      if (await other.locator(".dos-desktop-icons").isVisible()) {
+        const leftOffset = await other.locator(".dos-stage").evaluate(stage => stage.querySelector(".dos-desktop-icons").getBoundingClientRect().left - stage.getBoundingClientRect().left);
+        near(leftOffset, 8, `${tab} keeps its shortcuts at the desktop's left edge`);
+      }
       const opener = other.locator(".dos-apps-trigger:visible").first();
       await opener.click();
       await other.getByRole("dialog").waitFor({ state: "visible" });
@@ -170,6 +174,6 @@ export async function checkDesktopMacChrome({ page, base, fail }) {
     }
     await page.getByRole("tab", { name: "Mac OS", exact: true }).click();
     assert.equal(await terminalInput.inputValue(), "echo Preview keeps this command", "OS tab changes retain Mac application state");
-    console.log(`${page.viewportSize().width}px Mac chrome: shortcuts at the desktop's left edge with centered icons and captions, dock or compact tasks, launch/restore, traditional menu keyboard and dismissal, app state and preview preservation`);
+    console.log(`${page.viewportSize().width}px Mac chrome: shortcuts at the desktop's right edge with centered icons and captions, other platforms retain left placement, dock or compact tasks, launch/restore, traditional menu keyboard and dismissal, app state and preview preservation`);
   } catch (error) { fail(`Mac desktop chrome: ${error.message}`); }
 }
