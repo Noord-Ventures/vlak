@@ -1,0 +1,267 @@
+/* UIKit / pre-glass study. Logical CSS pixels correspond to points in the
+   393 × 852 display; device-chrome.css scales the complete phone. See ios-reference.md. */
+.mo .mo-device[data-platform="ios"] .mo-phone {
+  --mo-ios-grouped: color-mix(in srgb, var(--bg) 93%, var(--text));
+  --mo-ios-secondary-fill: color-mix(in srgb, var(--bg) 88%, var(--text));
+  --mo-ios-tertiary-fill: color-mix(in srgb, var(--bg) 94%, var(--text));
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: calc(17px * var(--mo-text-scale));
+  line-height: 1.29412;
+  letter-spacing: -.022em;
+  -webkit-font-smoothing: antialiased;
+}
+.mo .mo-device[data-platform="ios"] .mo-phone :is(button, input, textarea, select) { font-family: inherit; }
+
+/* Home screen: four 60pt icons per row; a small widget spans two columns. */
+.mo .mo-device[data-platform="ios"] .mo-home {
+  padding: 16px 26px 0;
+  gap: 24px;
+  background: var(--mo-ios-grouped);
+  scrollbar-width: none;
+}
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="home"] {
+  background: var(--mo-ios-grouped);
+}
+.mo .mo-device[data-platform="ios"] .mo-ios-widgets { gap: 18px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-widgets > button {
+  aspect-ratio: 1;
+  min-height: 0;
+  grid-template-rows: 18px 45px 1fr 18px;
+  padding: 16px;
+  gap: 1px;
+  align-items: start;
+  align-content: start;
+  justify-items: start;
+  justify-content: stretch;
+  border: 0;
+  border-radius: 22px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: start;
+}
+.mo .mo-device[data-platform="ios"] .mo-ios-widgets > button > * { justify-self: start; text-align: start; }
+.mo .mo-device[data-platform="ios"] .mo-ios-widgets > button > span { font-size: 14px; line-height: 18px; letter-spacing: -.02em; }
+.mo .mo-device[data-platform="ios"] .mo-ios-widgets > button > strong { margin: 0; font-size: 40px; line-height: 45px; font-weight: 300; letter-spacing: -.035em; }
+.mo .mo-device[data-platform="ios"] .mo-ios-weather-widget > .rs-icon { width: 25px; height: 25px; align-self: end; margin-top: auto; margin-bottom: 1px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-widget > strong { font-size: 42px; line-height: 48px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-widget > span:nth-last-child(2) { margin-top: auto; font-size: 12px; line-height: 16px; font-weight: 600; }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-widget > span:last-child { font-size: 12px; line-height: 16px; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-home-apps { column-gap: 0; row-gap: 22px; margin-inline: -8px; width: calc(100% + 16px); }
+.mo .mo-device[data-platform="ios"] .mo-app-icon { padding: 0; gap: 5px; min-height: 79px; }
+.mo .mo-device[data-platform="ios"] .mo-app-icon > [data-app-icon],
+.mo .mo-device[data-platform="ios"] .mo-dock button > [data-app-icon]:first-child {
+  --mo-glyph-background: var(--bg);
+  --mo-glyph-foreground: var(--text);
+  width: 60px;
+  height: 60px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--mo-glyph-background);
+  color: var(--mo-glyph-foreground);
+  box-shadow: inset 0 0 0 .5px var(--divider);
+  overflow: hidden;
+}
+.mo .mo-device[data-platform="ios"] [data-app-icon] > svg { display: block; width: 60px; height: 60px; }
+.mo .mo-device[data-platform="ios"] .mo-app-icon > [data-app-icon]:is([data-app-icon="phone"], [data-app-icon="messages"], [data-app-icon="mail"], [data-app-icon="music"], [data-app-icon="weather"], [data-app-icon="clock"]),
+.mo .mo-device[data-platform="ios"] .mo-dock button > [data-app-icon]:is([data-app-icon="phone"], [data-app-icon="messages"], [data-app-icon="mail"], [data-app-icon="music"]) {
+  --mo-glyph-background: var(--text);
+  --mo-glyph-foreground: var(--bg);
+}
+.mo .mo-device[data-platform="ios"] .mo-app-icon strong { font-size: 12px; line-height: 14px; font-weight: 400; letter-spacing: 0; }
+.mo .mo-device[data-platform="ios"] .mo-app-icon i { z-index: 1; top: -5px; right: -5px; width: 20px; height: 20px; font-size: 12px; box-shadow: 0 0 0 1px var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-app-icon > [data-app-icon]:has(i) { overflow: visible; }
+.mo .mo-device[data-platform="ios"] .mo-ios-home-tools { position: relative; margin-top: auto; min-height: 52px; padding-bottom: 8px; }
+.mo .mo-device[data-platform="ios"] .mo-search-pill { position: relative; isolation: isolate; min-height: 44px; padding-inline: 13px; gap: 4px; font-size: 13px; font-weight: 500; background: transparent; }
+.mo .mo-device[data-platform="ios"] .mo-search-pill::before { content: ""; position: absolute; inset: 8px 0; z-index: -1; border-radius: 18px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-library-page { position: absolute; inset-inline-end: 12px; height: 44px; opacity: .7; }
+.mo .mo-device[data-platform="ios"] .mo-library-page > .rs-icon { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-dock { min-height: 96px; margin: 0 9px; padding: 18px 15px; gap: 0; border: 0; border-radius: 32px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-dock button { min-width: 60px; min-height: 60px; padding: 0; }
+
+/* UIKit navigation bars: a 44pt compact bar and a separate large-title row. */
+.mo .mo-device[data-platform="ios"] .mo-app-header { height: 44px; min-height: 44px; padding: 0 16px; gap: 0; border: 0; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-app-header > button { z-index: 1; max-width: 128px; min-height: 44px; padding: 0; gap: 3px; font-size: 17px; font-weight: 400; letter-spacing: -.025em; background: transparent; }
+.mo .mo-device[data-platform="ios"] .mo-app-header > button > .rs-icon { width: 22px; height: 26px; stroke-width: 2.3; }
+.mo .mo-device[data-platform="ios"] .mo-app-header h2 { position: absolute; inset-inline: 72px; font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; font-weight: 600; letter-spacing: -.025em; text-align: center; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-root-app="true"] .mo-app-header { display: grid; grid-template-columns: 1fr auto; grid-template-rows: 44px 52px; height: 96px; min-height: 96px; padding: 0 16px; align-items: center; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-root-app="true"] .mo-app-header h2 { position: static; grid-column: 1 / -1; grid-row: 2; align-self: start; padding-top: 2px; text-align: start; font-size: calc(34px * var(--mo-text-scale)); line-height: 41px; letter-spacing: .011em; font-weight: 700; }
+.mo .mo-device[data-platform="ios"] .mo-ios-navigation-actions { grid-column: 2; grid-row: 1; align-self: center; }
+.mo .mo-device[data-platform="ios"] .mo-ios-navigation-actions > button { width: 44px; height: 44px; padding: 10px; border: 0; border-radius: 0; background: transparent; color: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-ios-navigation-actions > button .rs-icon { width: 24px; height: 24px; stroke-width: 1.8; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions { display: flex; gap: 8px; z-index: 1; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > button { width: auto; min-width: 44px; padding: 0; font-size: 17px; font-weight: 600; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > button .rs-icon { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-ghost { font-size: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-ghost .rs-icon { display: block; width: 22px; height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-scroll:not(.mo-home) { padding: 8px 16px 20px; font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-scroll > * + * { margin-top: 24px; }
+.mo .mo-device[data-platform="ios"] .mo-home > * { margin-block: 0; }
+.mo .mo-device[data-platform="ios"] .mo-home > .mo-ios-home-tools { margin-top: auto; }
+.mo .mo-device[data-platform="ios"] .mo-scroll > .mo-ios-search { margin-top: -4px; margin-bottom: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search,
+.mo .mo-device[data-platform="ios"] .mo-app-search { min-height: 44px; height: 44px; padding: 0 10px; border: 4px solid var(--bg); border-radius: 14px; background: var(--mo-ios-secondary-fill); background-clip: padding-box; font-size: 17px; line-height: 22px; letter-spacing: -.025em; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search::placeholder { color: var(--text-secondary); opacity: 1; }
+
+/* Lists use the content baseline for separators, with 17pt body text. */
+.mo .mo-device[data-platform="ios"] .mo-list-row { position: relative; min-height: 60px; margin-top: 0; padding: 10px 16px; gap: 12px; border: 0; background: transparent; }
+.mo .mo-device[data-platform="ios"] .mo-list-row::after { content: ""; position: absolute; height: 1px; inset-inline: 16px 0; bottom: 0; background: var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-list-row:has(> .mo-initials)::after { inset-inline-start: 68px; }
+.mo .mo-device[data-platform="ios"] .mo-list-row strong { font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; font-weight: 600; letter-spacing: -.025em; }
+.mo .mo-device[data-platform="ios"] .mo-list-row > span > span { margin-top: 2px; font-size: calc(15px * var(--mo-text-scale)); line-height: 20px; letter-spacing: -.02em; }
+.mo .mo-device[data-platform="ios"] .mo-list-row > .rs-icon:last-child { width: 12px; height: 18px; color: var(--text-secondary); stroke-width: 2.3; }
+.mo .mo-device[data-platform="ios"] .mo-initials { width: 40px; height: 40px; border: 0; background: var(--mo-ios-secondary-fill); font-size: 17px; font-weight: 400; }
+.mo .mo-device[data-platform="ios"] .mo-contact-row { border: 0; }
+.mo .mo-device[data-platform="ios"] .mo-contact-row .mo-list-row { padding-block: 8px; }
+.mo .mo-device[data-platform="ios"] .mo-contact-row .mo-list-row::after { inset-inline: 52px -44px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"][data-root-app="true"] .mo-list-row { min-height: 84px; align-items: flex-start; padding-block: 14px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"][data-root-app="true"] .mo-list-row > span > span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"] .mo-initials { width: 48px; height: 48px; font-size: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"] .mo-list-row::after { inset-inline-start: 76px; }
+.mo .mo-device[data-platform="ios"] .mo-caption { font-size: calc(13px * var(--mo-text-scale)); line-height: 18px; letter-spacing: -.006em; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row { width: 100%; margin-inline: 0; padding-inline: 16px; min-height: 72px; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:first-of-type { border-radius: 10px 10px 0 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:last-of-type { border-radius: 0 0 10px 10px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:last-of-type::after { display: none; }
+
+/* Inset-grouped Settings. Background groups carry the hierarchy; rows do not
+   add card outlines or extra spacing to the system's 44pt cell height. */
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="settings"], [data-app="notes"][data-root-app="true"]),
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="settings"], [data-app="notes"][data-root-app="true"]) :is(.mo-status-bar, .mo-app-header, .mo-scroll, .mo-ios-gesture-nav) { background: var(--mo-ios-grouped); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"] .mo-scroll { padding-inline: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="settings"], [data-app="notes"]) .mo-ios-search { border-color: var(--mo-ios-grouped); }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group { margin-top: 28px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--bg); overflow: hidden; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group > * + * { margin-top: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group.mo-ios-settings-rows { padding: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row { position: relative; min-height: 44px; padding: 0 16px; gap: 12px; border: 0; border-radius: 0; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-rows > .mo-ios-setting-row + .mo-ios-setting-row { margin-top: 0; border: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row:not(:last-child)::after { content: ""; position: absolute; bottom: 0; inset-inline: 16px 0; height: 1px; background: var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row:has(.mo-ios-setting-glyph):not(:last-child)::after { inset-inline-start: 57px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row > strong { font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; font-weight: 400; letter-spacing: -.025em; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row > span:not(.mo-ios-setting-glyph, .mo-native-switch) { flex: 0 1 auto; font-size: 17px; line-height: 22px; letter-spacing: -.025em; max-width: 38%; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row > .rs-icon:last-child { width: 12px; height: 18px; margin-left: -5px; color: var(--text-secondary); stroke-width: 2.2; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-glyph { width: 29px; height: 29px; border: 0; border-radius: 6px; background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-glyph > .rs-icon { width: 20px; height: 20px; stroke-width: 1.7; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row[aria-pressed="true"] { background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-setting-switch { min-height: 44px; gap: 12px; font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-profile-row { min-height: 88px; padding: 12px 16px; gap: 16px; border: 0; border-radius: 10px; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-profile-row > .mo-initials { width: 60px; height: 60px; font-size: 27px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-profile-row strong { font-size: 22px; line-height: 28px; font-weight: 400; letter-spacing: -.026em; }
+.mo .mo-device[data-platform="ios"] .mo-ios-profile-row > span > span { margin-top: 2px; font-size: 13px; line-height: 18px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-group-label { margin: 28px 16px 7px; font-size: 13px; line-height: 18px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-group-label + .mo-ios-settings-group { margin-top: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group .mo-data-row { width: calc(100% + 16px); min-height: 44px; margin: 0; padding: 10px 16px 10px 0; font-size: 17px; line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group .mo-data-row:last-child { border: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group > .mo-field { padding-block: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group > .mo-field + .mo-field { border-top: 1px solid var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-ios-restore { min-height: 44px; border: 0; border-radius: 10px; background: var(--bg); font-size: 17px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards { padding: 16px 30px 10px; gap: 32px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards > label { position: relative; display: grid; justify-items: center; gap: 12px; min-width: 44px; min-height: 44px; padding: 4px; font-size: 15px; line-height: 20px; cursor: pointer; }
+.mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards > label > input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards > label > i { width: 82px; height: 158px; border-width: 3px; border-color: #5e5e5e; border-radius: 17px; }
+.mo .mo-device[data-platform="ios"] .mo-appearance-check { display: grid; place-items: center; width: 22px; height: 22px; border: 1px solid var(--control-border); border-radius: 50%; }
+.mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards input:checked ~ .mo-appearance-check { border-color: var(--text); background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards input:focus-visible + i { outline: 2px solid var(--text); outline-offset: 4px; }
+
+/* The native adapter keeps a 44pt hit area around the 51 × 31 switch. */
+.mo .mo-device[data-platform="ios"] .mo-native-switch { position: relative; display: inline-grid; place-items: center; flex: 0 0 51px; width: 51px; height: 44px; overflow: visible; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input { position: absolute; inset: 0; z-index: 1; width: 51px; height: 44px; margin: 0; opacity: 0; cursor: pointer; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-track { position: relative; display: block; width: 51px; height: 31px; border: 1px solid var(--control-border); border-radius: 16px; background: var(--mo-ios-secondary-fill); transition: background-color 200ms ease, border-color 200ms ease; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { position: absolute; top: 1px; left: 1px; display: block; width: 27px; height: 27px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px #0003; transition: transform 200ms ease; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track { background: var(--text); border-color: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track .mo-native-switch-thumb { transform: translateX(20px); }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:focus-visible + .mo-native-switch-track { outline: 2px solid var(--text); outline-offset: 3px; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:disabled { cursor: default; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:disabled + .mo-native-switch-track { opacity: .45; }
+
+/* Standard forms retain their real controls, with the inset row layout. */
+.mo .mo-device[data-platform="ios"] .mo-form { gap: 0; }
+.mo .mo-device[data-platform="ios"] .mo-form > .mo-field { display: flex; flex-direction: row; align-items: center; min-height: 52px; gap: 16px; padding-block: 4px; border-bottom: 1px solid var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-form > .mo-field > span { flex: 0 0 104px; margin: 0; font-size: 17px; color: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-form > .mo-field > :is(input, textarea) { min-width: 0; flex: 1; }
+.mo .mo-device[data-platform="ios"] .mo-form > .mo-field:has(textarea) { flex-direction: column; align-items: stretch; }
+.mo .mo-device[data-platform="ios"] .mo-form > .mo-field:has(textarea) > span { flex-basis: auto; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"] .mo-form > .mo-field { display: block; border: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"] .mo-form > .mo-field > span { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"] .mo-form input { font-size: 28px; line-height: 34px; font-weight: 700; }
+.mo .mo-device[data-platform="ios"] .mo-field > span { margin-bottom: 6px; font-size: calc(15px * var(--mo-text-scale)); line-height: 20px; }
+.mo .mo-device[data-platform="ios"] .mo-form .rs-input { border: 0; border-radius: 0; padding-inline: 0; background: transparent; font-size: 17px; line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-form .rs-textarea { min-height: 176px; padding: 8px 0; border: 0; border-radius: 0; background: transparent; font-size: 17px; line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .rs-dropdown { min-height: 44px; border: 0; border-radius: 8px; padding-inline: 12px; background: var(--mo-ios-tertiary-fill); font-size: 17px; }
+.mo .mo-device[data-platform="ios"] .mo-app-actions { min-height: 44px; padding: 0 16px; border-top: 1px solid var(--divider); gap: 12px; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-app-actions > button { min-height: 44px; padding-block: 8px; font-size: 17px; border: 0; border-radius: 8px; }
+
+/* Messages: compact rounded bubbles and a real input inside the composer. */
+.mo .mo-device[data-platform="ios"] .mo-messages { gap: 8px; }
+.mo .mo-device[data-platform="ios"] .mo-message { max-width: 82%; padding: 8px 12px; border: 0; border-radius: 18px 18px 18px 5px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-message-mine { border-radius: 18px 18px 5px 18px; background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-message p { font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; letter-spacing: -.025em; }
+.mo .mo-device[data-platform="ios"] .mo-message > span { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mo .mo-device[data-platform="ios"] .mo-message-compose { align-items: center; gap: 8px; padding-block: 4px; }
+.mo .mo-device[data-platform="ios"] .mo-message-compose .rs-input { height: 44px; min-height: 44px; border: 1px solid var(--control-border); border-radius: 22px; padding: 0 14px; background: transparent; font-size: 17px; }
+.mo .mo-device[data-platform="ios"] .mo-message-compose .rs-btn-primary { width: 44px; height: 44px; padding: 10px; border: 0; border-radius: 50%; background: var(--text); color: var(--bg); }
+
+/* A native tab bar has 49pt content above the device's separate safe area. */
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs { min-height: 49px; height: 49px; padding: 0 8px; gap: 0; border-top: 1px solid var(--divider); background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button { min-height: 48px; height: 48px; padding: 4px 0 2px; gap: 1px; border: 0; background: transparent; color: var(--text-secondary); font-size: 10px; line-height: 12px; font-weight: 400; letter-spacing: .01em; }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button > .rs-icon { width: 26px; height: 26px; }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button[aria-pressed="true"] { color: var(--text); font-weight: 600; }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button[aria-pressed="true"] > .rs-icon { stroke-width: 2; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"] .mo-keypad { max-width: 286px; gap: 16px 19px; }
+.mo .mo-device[data-platform="ios"] .mo-keypad button { width: 76px; height: 76px; min-height: 76px; padding: 0; border-radius: 50%; background: var(--mo-ios-secondary-fill); font-size: 34px; line-height: 41px; font-weight: 400; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="clock"] .mo-clock-face { padding-block: 44px; font-size: 76px; line-height: 90px; letter-spacing: -.025em; font-weight: 200; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="clock"] .mo-app-actions { padding-block: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="clock"] .mo-app-actions > button { flex: 0 0 80px; width: 80px; height: 80px; min-height: 80px; border-radius: 50%; font-size: 15px; }
+
+/* Control Center uses two-column modules on a four-unit grid. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-overlay="quick"],
+.mo .mo-device[data-platform="ios"] .mo-phone[data-overlay="quick"] :is(.mo-scroll, .mo-status-bar, .mo-ios-gesture-nav) { background: var(--mo-ios-grouped); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-overlay="quick"] .mo-scroll { padding: 42px 24px 24px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: auto 72px 72px auto; gap: 16px; align-items: stretch; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-ios-connectivity { grid-column: 1 / 3; grid-row: 1; min-height: 0; aspect-ratio: 1; padding: 14px; gap: 12px; border: 0; border-radius: 32px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-ios-connectivity > button { min-width: 44px; min-height: 44px; padding: 8px; border: 0; border-radius: 50%; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-ios-connectivity > button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-ios-connectivity > button > .rs-icon { width: 27px; height: 27px; stroke-width: 1.7; }
+.mo .mo-device[data-platform="ios"] .mo-ios-media-control { grid-column: 3 / 5; grid-row: 1; min-height: 0; aspect-ratio: 1; padding: 14px 10px 6px; gap: 2px; border: 0; border-radius: 32px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-ios-media-control > strong { margin-top: 6px; font-size: 14px; line-height: 18px; font-weight: 600; }
+.mo .mo-device[data-platform="ios"] .mo-ios-media-control > span { font-size: 12px; line-height: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-media-control > button { width: 44px; height: 44px; padding: 8px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-media-control > button > .rs-icon { width: 27px; height: 27px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-focus-control { grid-column: 1 / 3; grid-row: 3; min-height: 72px; padding: 14px; gap: 9px; border: 0; border-radius: 36px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-ios-focus-control > strong { font-size: 15px; line-height: 18px; font-weight: 600; text-align: start; }
+.mo .mo-device[data-platform="ios"] .mo-ios-focus-control > .rs-icon:first-child { width: 25px; height: 25px; flex-shrink: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-control-sliders { grid-column: 3 / 5; grid-row: 2 / 4; gap: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-control-sliders .mo-field { gap: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-control-sliders .mo-field > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider { height: 160px; border: 0; border-radius: 36px; overflow: hidden; background: linear-gradient(to top, var(--bg) var(--mo-level), var(--mo-ios-secondary-fill) var(--mo-level)); }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider .rs-slider { width: 160px; height: 72px; top: 44px; opacity: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider > .mo-native-range { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0; opacity: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider > .rs-icon { width: 26px; height: 26px; inset-inline-start: calc(50% - 13px); bottom: 17px; pointer-events: none; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-pair { grid-column: 1 / 3; grid-row: 2; gap: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-pair > button,
+.mo .mo-device[data-platform="ios"] .mo-ios-control-shortcuts > button { aspect-ratio: 1; min-height: 72px; padding: 16px; border: 0; border-radius: 50%; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-pair > button > .rs-icon,
+.mo .mo-device[data-platform="ios"] .mo-ios-control-shortcuts > button > .rs-icon { width: 27px; height: 27px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-shortcuts { grid-row: 4; gap: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-pair > button[aria-pressed="true"],
+.mo .mo-device[data-platform="ios"] .mo-ios-focus-control[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-library-groups .mo-app-grid { gap: 14px; padding: 14px; border: 0; border-radius: 26px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-library-groups .mo-app-icon { min-height: 52px; }
+.mo .mo-device[data-platform="ios"] .mo-library-groups .mo-app-icon > [data-app-icon] { width: 52px; height: 52px; border-radius: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-library-groups .mo-app-icon > [data-app-icon] > svg { width: 52px; height: 52px; }
+.mo .mo-device[data-platform="ios"] .mo-library-groups h3 { margin-top: 8px; font-size: 13px; line-height: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .mo .mo-device[data-platform="ios"] :is(.mo-native-switch-track, .mo-native-switch-thumb) { transition: none; }
+}
+@media (forced-colors: active) {
+  .mo .mo-device[data-platform="ios"] .mo-phone { --mo-ios-grouped: Canvas; --mo-ios-secondary-fill: Canvas; --mo-ios-tertiary-fill: Canvas; }
+  .mo .mo-device[data-platform="ios"] :is(.mo-ios-settings-group, .mo-ios-profile-row, .mo-ios-widgets > button, .mo-dock, .mo-ios-connectivity, .mo-ios-media-control) { outline: 1px solid CanvasText; }
+  .mo .mo-device[data-platform="ios"] .mo-native-switch-track { background: Canvas; border-color: CanvasText; forced-color-adjust: none; }
+  .mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { background: CanvasText; }
+  .mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track { background: Highlight; border-color: Highlight; }
+  .mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track .mo-native-switch-thumb { background: HighlightText; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider .rs-slider { opacity: 1; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider > .mo-native-range { opacity: 1; }
+  .mo .mo-device[data-platform="ios"] .mo-app-icon > [data-app-icon],
+  .mo .mo-device[data-platform="ios"] .mo-dock button > [data-app-icon]:first-child { --mo-glyph-background: Canvas; --mo-glyph-foreground: CanvasText; outline: 1px solid CanvasText; }
+}

@@ -5,6 +5,10 @@ import { InterfaceShell } from "../shell";
 import { Board } from "./board";
 import "../interfaces.css";
 import "./scene.css";
+import "./platform-controls.css";
+import "./ios-native.css";
+import "./android-native.css";
+import "./device-chrome.css";
 
 const study = interfaceBySlug("mobile-os");
 export const metadata: Metadata = pageMetadata("/interfaces/mobile-os", { title: study?.title ?? "Mobile OS", description: "Interactive local phone environments with everyday apps, navigation, and settings built with Vlak." });

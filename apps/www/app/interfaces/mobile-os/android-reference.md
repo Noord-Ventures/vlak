@@ -1,0 +1,17 @@
+# Android geometry baseline
+
+Android 15, pre-Expressive Material 3, on a 412 × 915 logical display. CSS pixels represent logical dp; hardware code scales the whole display. The study substitutes the Vlak neutral palette, local sample content and shared application glyphs. It does not claim a pixel-identical copy of Google's proprietary applications.
+
+## Sources and measurements
+
+- [Android 15 SystemUI dimensions](https://raw.githubusercontent.com/aosp-mirror/platform_frameworks_base/android15-release/packages/SystemUI/res/values/dimens.xml): 48dp minimum clickable size; Quick Settings tile height 80dp, horizontal/vertical gap 8dp, leading inset 16dp, icon 20dp and label 14sp; brightness container 48dp; gesture handle width 108dp, radius 2dp and bottom offset 10dp.
+- [Android 15 Launcher3 device profiles](https://android.googlesource.com/platform/packages/apps/Launcher3/+/refs/heads/android15-release/res/xml/device_profiles.xml): Large Phone profile begins at 406dp width, uses 56dp icons, 14.4sp icon labels and 104dp all-apps cells. This study retains four curated home/dock shortcuts, with a five-column app drawer. App-drawer labels are reduced to 12sp to keep the existing longer sample application names readable in five columns.
+- [Google Material switch tokens, v0.192](https://raw.githubusercontent.com/material-components/material-web/main/tokens/versions/v0_192/_md-comp-switch.scss): track 52 × 32dp, 2dp outline, 16dp unselected thumb, 24dp selected thumb. [Google's implementation](https://raw.githubusercontent.com/material-components/material-web/main/tokens/_md-comp-switch.scss) provides the 48dp touch target.
+- [Material Android 1.12 text-field dimensions](https://raw.githubusercontent.com/material-components/material-components-android/1.12.0/lib/java/com/google/android/material/textfield/res/values/dimens.xml) and [Google's outlined-field implementation](https://raw.githubusercontent.com/material-components/material-web/main/tokens/_md-comp-outlined-text-field.scss): 4dp corners, 16dp content inset, 4dp label cutout inset. Single-line containers use the 56dp Material field baseline with 16sp/24sp text and 12sp/16sp floating labels.
+- [Material Android 1.12 app-bar dimensions](https://raw.githubusercontent.com/material-components/material-components-android/1.12.0/lib/java/com/google/android/material/appbar/res/values/dimens.xml) and [top app-bar specification](https://m3.material.io/components/top-app-bar/specs): small app bar 64dp, 22sp title, 24dp icons with 48dp interactive bounds.
+- [Material segmented-button specification](https://m3.material.io/components/segmented-buttons/specs): 40dp visible segment, 48dp touch target, full outer end caps and adjoining 1dp outlines. A pseudo-element paints the 40dp container inside each full 48dp button, preserving the existing ToggleGroup keyboard model.
+- [Material lists specification](https://m3.material.io/components/lists/specs): 56dp single-line and 72dp two-line rows, 16dp horizontal inset, 40dp leading avatar, 16sp title and 14sp supporting text.
+
+## Deliberate adaptations
+
+The neutral launcher digital clock is a curated 192dp widget, not an assertion that this is the default Pixel widget configuration. Notification data, settings categories and app content stay functional and local. Browser, email and messages do not gain real service access. Elevation shadows are removed to match the flat Vlak presentation. The Android search affordance opens the local app drawer and is positioned below the dock.

@@ -1,0 +1,58 @@
+/* Fixed reference drawings. Hardware and logical screen dimensions are independent of the Vlak theme. */
+.if-specimen:has(.mo) { --interface-preview-height: auto; --interface-preview-min-height: 0px; height: auto; min-height: 0; }
+.if-board:has(> .mo) { height: auto; overflow: visible; }
+.mo { height: auto; grid-template-rows: 56px auto 40px; overflow: hidden; }
+.mo-stage { display: grid; grid-template-columns: minmax(0, 411px) minmax(0, 430px); align-items: start; justify-content: center; gap: 48px; padding: 32px 32px 40px; overflow: visible; background: var(--table-alt); }
+.mo-device { display: flex; flex-direction: column; gap: 14px; height: auto; min-width: 0; }
+.mo-device-label { display: flex; height: 20px; padding-inline: 8px; align-items: center; }
+.mo-device-fit { position: relative; width: 100%; min-width: 0; margin-inline: auto; }
+.mo-handset { position: absolute; inset: 0 auto auto 0; transform-origin: top left; padding: 9px; }
+.mo-hardware { position: absolute; inset: 0; border: 1px solid #676767; border-radius: 57px; background: #181818; box-shadow: inset 0 0 0 2px #b0b0b0, inset 0 0 0 3px #323232; pointer-events: none; }
+.mo-device[data-platform="android"] .mo-hardware { border-radius: 44px; background: #202020; box-shadow: inset 0 0 0 2px #888, inset 0 0 0 3px #303030; }
+.mo-side-key { position: absolute; display: block; width: 4px; border: 1px solid #666; background: #aaa; border-radius: 2px; }
+.mo-side-key-power { top: 196px; right: -4px; height: 76px; }
+.mo-side-key-action { top: 104px; left: -4px; height: 26px; }
+.mo-side-key-volume { top: 155px; left: -4px; height: 54px; }
+.mo-side-key-volume-down { top: 224px; left: -4px; height: 54px; }
+.mo-device[data-platform="android"] .mo-side-key-power { top: 155px; height: 48px; }
+.mo-device[data-platform="android"] .mo-side-key-volume { top: 230px; height: 95px; left: auto; right: -4px; }
+.mo-antenna { position: absolute; inset-inline: 0; height: 3px; border-inline: 3px solid #d2d2d2; }
+.mo-antenna-top { top: 70px; }
+.mo-antenna-bottom { bottom: 70px; }
+.mo-earpiece { position: absolute; width: 54px; height: 2px; top: 4px; left: calc(50% - 27px); border-radius: 1px; background: #080808; }
+.mo .mo-device[data-platform="ios"] .mo-phone { width: 393px; height: 852px; border: 0; border-radius: 48px; grid-template-rows: 59px minmax(0, 1fr) 34px; }
+.mo .mo-device[data-platform="android"] .mo-phone { width: 412px; height: 915px; border: 0; border-radius: 35px; grid-template-rows: 48px minmax(0, 1fr) 48px; }
+.mo .mo-device .mo-status-bar { background: transparent; padding-inline: 24px; border: 0; }
+.mo .mo-device .mo-status-bar > button { min-height: 44px; height: 44px; padding: 0; border: 0; background: transparent; color: var(--text); font-family: inherit; font-size: 15px; font-weight: 600; gap: 6px; }
+.mo .mo-device[data-platform="ios"] .mo-status-bar { padding: 5px 27px 0 34px; }
+.mo .mo-device[data-platform="ios"] .mo-status-bar > button { font-size: 17px; }
+.mo .mo-device[data-platform="ios"] .mo-camera-cutout { top: 11px; left: calc(50% - 63px); width: 126px; height: 37px; border-radius: 22px; background: #080808; pointer-events: none; }
+.mo .mo-device[data-platform="ios"] .mo-camera-cutout::after { width: 10px; height: 10px; top: 13px; right: 12px; background: #1c1c1c; box-shadow: inset 0 0 0 2px #121212; }
+.mo .mo-device[data-platform="android"] .mo-camera-cutout { left: calc(50% - 7px); top: 16px; width: 14px; height: 14px; border-radius: 50%; background: #080808; box-shadow: 0 0 0 2px #4c4c4c; }
+.mo-status-signals { display: flex; align-items: center; gap: 5px; }
+.mo .mo-device .mo-status-signals svg { display: block; flex: none; }
+.mo .mo-device[data-platform="ios"] .mo-battery { width: 25px; height: 13px; border: 1px solid currentColor; border-radius: 4px; padding: 2px; }
+.mo .mo-device[data-platform="android"] .mo-battery { width: 9px; height: 14px; border: 1.5px solid currentColor; border-radius: 1px; padding: 1px; margin-inline: 2px; }
+.mo .mo-device[data-platform="android"] .mo-battery::after { width: 4px; height: 2px; top: -3px; left: 1px; }
+.mo .mo-device[data-platform="android"] .mo-battery > span { height: 84%; width: 100%; margin-top: 1px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-gesture-nav { min-height: 34px; padding: 0; position: relative; overflow: visible; }
+.mo .mo-device[data-platform="ios"] .mo-home-indicator-button { position: absolute; bottom: 0; height: 44px; width: 170px; display: flex; justify-content: center; align-items: flex-end; padding: 0 0 8px; border: 0; background: transparent; }
+.mo .mo-device[data-platform="ios"] .mo-home-indicator-button > span { width: 134px; height: 5px; border-radius: 3px; }
+.mo .mo-device[data-platform="android"] .mo-system-nav { height: 48px; grid-template-columns: repeat(3, 1fr); padding: 0 32px; }
+.mo .mo-device[data-platform="android"] .mo-system-nav > button { height: 48px; min-height: 48px; border: 0; background: transparent; }
+.mo-workspace-footer { padding-inline: 24px; font-size: 11px; }
+.if-preview-frame[data-preview-open="true"]:has(.mo) .if-preview-content { overflow-y: auto; }
+.if-preview-frame[data-preview-open="true"]:has(.mo) .if-specimen { height: auto; min-height: 0; }
+@container (max-width: 760px) {
+  .mo-stage { display: flex; justify-content: flex-start; gap: 0; padding: 24px 0; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; }
+  .mo-device { display: flex; flex: 0 0 100%; padding-inline: 20px; height: auto; align-self: flex-start; scroll-snap-align: start; }
+  .mo-device-label { width: 100%; max-width: 430px; margin-inline: auto; }
+  .mo-swipe-hint { display: block; }
+  .mo-workspace-footer { display: flex; justify-content: center; }
+  .mo-workspace-footer > span:first-child { display: none; }
+}
+@media (forced-colors: active) {
+  .mo-hardware { background: CanvasText; border-color: CanvasText; box-shadow: none; }
+  .mo .mo-device .mo-camera-cutout { background: CanvasText; }
+  .mo-side-key { background: CanvasText; border-color: CanvasText; }
+}
