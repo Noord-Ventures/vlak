@@ -13,6 +13,9 @@ export function SiteFooter() {
         <nav className="site-footer-nav" aria-label="Footer">
           <Link href="/">{WORD}</Link>
           <Link href="/about/">About</Link>
+          <Link href="/components/">Components</Link>
+          <Link href="/interfaces/">Interfaces</Link>
+          <Link href="/use-cases/">Use cases</Link>
           <Link href="/docs/">Docs</Link>
           <a href={person.repo}>GitHub</a>
           <a href={DOOR}>vlak.dev</a>

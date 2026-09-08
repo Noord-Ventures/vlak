@@ -2,6 +2,9 @@ packages:
   - "packages/*"
   - "apps/*"
 
+allowBuilds:
+  esbuild: true
+
 # Keep transitive tooling outside the workspace supply-chain quarantine window.
 overrides:
   baseline-browser-mapping: 2.11.20

@@ -3,16 +3,18 @@ const productionHosts = new Set(["vlak.dev", "www.vlak.dev"]);
 
 export const publicSitePaths = [
   "/", "/about", "/components", "/docs", "/docs/accessibility", "/docs/agents",
-  "/docs/frameworks", "/docs/layers", "/docs/stylex", "/docs/theming", "/docs/tokens",
+  "/docs/choosing-vlak", "/docs/frameworks", "/docs/layers", "/docs/stylex", "/docs/theming", "/docs/tokens",
   "/inspiration", "/interfaces", "/interfaces/agents", "/interfaces/drive",
   "/interfaces/evening", "/interfaces/frontier", "/interfaces/graphics", "/interfaces/line",
   "/interfaces/night", "/interfaces/orbit", "/interfaces/platforms", "/interfaces/press",
   "/interfaces/render", "/interfaces/room", "/interfaces/wall", "/swag",
   "/interfaces/microbiology", "/interfaces/genome", "/interfaces/protein", "/interfaces/robotics",
   "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
+  "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
+  "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",
 ];
 
-type EventName = "docs_click" | "get_started_click" | "github_click" | "install_copy" | "network_click";
+type EventName = "acquisition" | "docs_click" | "get_started_click" | "github_click" | "install_copy" | "network_click";
 type EventData = Record<string, string>;
 type AnalyticsEvent = { type: "pageview" | "event"; url: string; payload?: { name: string; data?: EventData } };
 type AnalyticsQueue = (command: string, value: unknown) => void;
@@ -52,6 +54,13 @@ export function redactUrl(value: string, paths: Set<string>): string | null {
 
 function safeEventData(name: string | undefined, data: EventData = {}, paths: Set<string>): EventData | null {
   const result: EventData = { source: "vlak" };
+  if (name === "acquisition") {
+    const channels = new Set(["direct", "twitter", "linkedin", "threads", "github", "npm", "producthunt", "search", "referral"]);
+    const channel = data.channel;
+    const path = normalizePath(data.landing || "");
+    if (!channel || !channels.has(channel) || !paths.has(path)) return null;
+    return { ...result, channel, landing: path };
+  }
   if (name === "network_click") {
     if (data.destination !== "noord" && data.destination !== "renatovaldes") return null;
     return { ...result, destination: data.destination };
@@ -95,6 +104,30 @@ export function trackSiteEvent(name: EventName, data: EventData = {}): void {
   if (safe) window.va?.("event", { name, data: safe });
 }
 
+export function acquisitionChannel(location: Pick<Location, "href">, referrer: string): string {
+  const source = new URL(location.href).searchParams.get("utm_source")?.toLowerCase().replace(/[^a-z]/g, "") ?? "";
+  const named: Record<string, string> = {
+    x: "twitter", twitter: "twitter", linkedin: "linkedin", threads: "threads",
+    github: "github", npm: "npm", producthunt: "producthunt",
+  };
+  if (named[source]) return named[source];
+  if (!referrer) return "direct";
+  try {
+    const host = new URL(referrer).hostname.replace(/^www\./, "");
+    if (host === "t.co" || host === "x.com" || host.endsWith("twitter.com")) return "twitter";
+    if (host.endsWith("linkedin.com")) return "linkedin";
+    if (host.endsWith("threads.net")) return "threads";
+    if (host === "github.com") return "github";
+    if (host === "npmjs.com") return "npm";
+    if (host.endsWith("producthunt.com")) return "producthunt";
+    if (/^(?:www\.)?(?:google\.|bing\.com$|duckduckgo\.com$)/.test(host)) return "search";
+    if (productionHosts.has(host)) return "direct";
+  } catch {
+    return "direct";
+  }
+  return "referral";
+}
+
 export function initializeSiteAnalytics(publicPaths: string[]): void {
   if (typeof window === "undefined" || !isProductionLocation(window.location) || window.__vlakSiteAnalytics) return;
   const paths = new Set(publicPaths.map(normalizePath));
@@ -111,6 +144,16 @@ export function initializeSiteAnalytics(publicPaths: string[]): void {
   // Suppress automatic URL/referrer HTTP headers on this script request.
   script.referrerPolicy = "no-referrer";
   document.head.appendChild(script);
+
+  try {
+    if (sessionStorage.getItem("vlak-acquisition") !== "sent") {
+      const landing = normalizePath(window.location.pathname);
+      trackSiteEvent("acquisition", { channel: acquisitionChannel(window.location, document.referrer), landing });
+      sessionStorage.setItem("vlak-acquisition", "sent");
+    }
+  } catch {
+    // Analytics stays optional when storage is unavailable.
+  }
 
   document.addEventListener("click", (event) => {
     if (event.button !== 0 || !(event.target instanceof Element)) return;

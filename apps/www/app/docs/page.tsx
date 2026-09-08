@@ -133,6 +133,12 @@ export default function DocsPage() {
       <h2 className="section-label">Next</h2>
       <ul className="docs-list">
         <li>
+          <a className="rs-link" href="/docs/choosing-vlak">
+            Choosing Vlak
+          </a>
+          : when the system fits, and when Radix, shadcn, or another library is the better choice.
+        </li>
+        <li>
           <a className="rs-link" href="/docs/frameworks">
             Frameworks
           </a>
@@ -171,6 +177,12 @@ export default function DocsPage() {
             Components
           </a>
           : every component, with props, keyboard, and markup.
+        </li>
+        <li>
+          <a className="rs-link" href="/use-cases/">
+            Use cases
+          </a>
+          : components and interface studies grouped by the work they support.
         </li>
       </ul>
     </DocsShell>

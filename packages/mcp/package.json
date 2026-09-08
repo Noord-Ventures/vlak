@@ -9,6 +9,9 @@
     "directory": "packages/mcp"
   },
   "homepage": "https://vlak.dev",
+  "bugs": {
+    "url": "https://github.com/Noord-Ventures/vlak/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -43,6 +46,9 @@
     "design-system",
     "agents",
     "components"
+    ,"coding-agents"
+    ,"react-component-library"
+    ,"accessible-components"
   ],
   "author": "Renato Valdés Olmos"
 }

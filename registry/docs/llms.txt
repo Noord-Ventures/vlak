@@ -9,6 +9,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Design brief](https://vlak.dev/design.md): Vlak's design principles, layout, typography, controls, and implementation constraints
 - [Interfaces](https://vlak.dev/interfaces.md): working interface studies with source, component links, and interaction briefs
 - [Guide](https://vlak.dev/docs/guide.md): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents
+- [Agent guide](https://vlak.dev/docs/agents.md): machine-readable surfaces, CLI commands, and MCP setup
 - [Component index](https://vlak.dev/docs/index.md): the catalogue by category
 - [Health guide](https://vlak.dev/docs/health.md): health, wellness, and care components with data and action contracts
 - [Civic guide](https://vlak.dev/docs/civic.md): Components for public services, identity records, tax summaries, benefits, and applications.

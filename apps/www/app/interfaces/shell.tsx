@@ -7,6 +7,9 @@ import { interfaces } from "./interfaces.stylex";
 import { InterfacesNav } from "./nav";
 import { StartBuilding } from "./start-building";
 import { InterfacePreviewProvider, InterfacePreview, PreviewButton } from "./preview";
+import { componentForLabel } from "@/lib/catalog-relationships";
+import { StructuredData, breadcrumbData } from "@/components/structured-data";
+import { HOST } from "../specimen";
 
 const sourceRoot = "https://github.com/Noord-Ventures/vlak/tree/main/apps/www/app/interfaces";
 
@@ -24,14 +27,30 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
     <div {...sx("if-index", interfaces.index)}>
       <InterfacesNav />
       <main id="main" {...sx("site-content-wide", chrome.contentWide)}>
+        <StructuredData value={[
+          breadcrumbData([
+            { name: "Vlak", url: `${HOST}/` },
+            { name: "Interfaces", url: `${HOST}/interfaces/` },
+            { name: proto.title, url: `${HOST}/interfaces/${slug}/` },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            headline: `${proto.title} interface study`,
+            description: proto.law,
+            url: `${HOST}/interfaces/${slug}/`,
+            isPartOf: { "@id": `${HOST}/#website` },
+            about: proto.components,
+          },
+        ]} />
         <section className="if-study" aria-labelledby={`${slug}-name`}>
           <InterfacePreviewProvider slug={slug} title={proto.title}>
-          <header className="if-study-bar">
-            <h1 id={`${slug}-name`}>{proto.title}</h1>
-            <div className="if-study-actions"><PreviewButton /><a className="rs-btn-primary if-build-link" href="#build-with-vlak">Build with Vlak <span aria-hidden="true">↓</span></a></div>
-          </header>
-          <InterfacePreview><div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, workbench && interfaces.workbenchSpecimen)}>{children}</div></InterfacePreview>
-          <div className="if-study-caption"><p>{proto.use}</p><a href={source}>View source <span aria-hidden="true">↗</span></a></div>
+            <header className="if-study-bar">
+              <h1 id={`${slug}-name`}>{proto.title}</h1>
+              <div className="if-study-actions"><PreviewButton /><a className="rs-btn-primary if-build-link" href="#build-with-vlak">Build with Vlak <span aria-hidden="true">↓</span></a></div>
+            </header>
+            <InterfacePreview><div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, workbench && interfaces.workbenchSpecimen)}>{children}</div></InterfacePreview>
+            <div className="if-study-caption"><p>{proto.use}</p><a href={source}>View source <span aria-hidden="true">↗</span></a></div>
           </InterfacePreviewProvider>
         </section>
         <div className="if-detail-content">
@@ -45,9 +64,9 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
               <h2>Components used</h2>
               <ul className="if-component-list">
                 {proto.components.map((name) => (
-                  <li key={name}><Link href={`/components/${name.toLowerCase().replaceAll(" ", "-").replace("icon", "icons")}/`}>
-                    {name}
-                  </Link></li>
+                  <li key={name}>{componentForLabel(name) ? (
+                    <Link href={`/components/${componentForLabel(name)!.name}/`}>{name}</Link>
+                  ) : name}</li>
                 ))}
               </ul>
               {slug === "drive" && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa" target="_blank" rel="noreferrer">2022 Land Rover Range Rover Evoque</a> by <a href="https://sketchfab.com/tonielpro520" target="_blank" rel="noreferrer">tonielpro520</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Original geometry retained, with simplified source contours and monochrome materials.</p>}

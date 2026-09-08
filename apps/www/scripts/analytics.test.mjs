@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { beforeSend, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
+import { acquisitionChannel, beforeSend, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
 
 const paths = new Set([...publicSitePaths, "/components/button"]);
 
@@ -39,4 +39,16 @@ test("install-copy classification returns an enum without passing source content
   assert.equal(installMethod("npx shadcn add https://vlak.dev/r/button.json"), "shadcn");
   assert.equal(installMethod("<input value='private'/>"), null);
   assert.equal(installMethod("npm install private-package"), null);
+});
+
+test("acquisition keeps only a fixed channel and public landing path", () => {
+  assert.equal(acquisitionChannel({ href: "https://vlak.dev/components/button/?utm_source=linkedin&utm_campaign=private" }, ""), "linkedin");
+  assert.equal(acquisitionChannel({ href: "https://vlak.dev/" }, "https://t.co/secret"), "twitter");
+  assert.equal(acquisitionChannel({ href: "https://vlak.dev/" }, "https://google.com/search?q=private"), "search");
+  assert.equal(acquisitionChannel({ href: "https://vlak.dev/" }, "https://example.com/a/private/path"), "referral");
+  assert.deepEqual(
+    beforeSend({ type: "event", url: "https://vlak.dev/components/button/?private=yes", payload: { name: "acquisition", data: { channel: "linkedin", landing: "/components/button", campaign: "private" } } }, paths),
+    { type: "event", url: "https://vlak.dev/components/button", payload: { name: "acquisition", data: { source: "vlak", channel: "linkedin", landing: "/components/button" } } },
+  );
+  assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "acquisition", data: { channel: "private", landing: "/" } } }, paths), null);
 });

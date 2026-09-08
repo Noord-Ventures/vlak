@@ -321,6 +321,47 @@ When composing an interface: pick components by name or alias from index.md, rea
 `;
 }
 
+function agentsPage() {
+  return `# Vlak for coding agents
+
+Vlak publishes the same component, token, prop, keyboard, accessibility, and installation data as Markdown, JSON, CLI output, and MCP resources. All surfaces are generated from the component registry.
+
+## Start here
+
+- [Short index](${HOST}/llms.txt)
+- [Complete documentation](${HOST}/llms-full.txt)
+- [Component catalogue](${HOST}/docs/index.md)
+- [Design brief](${HOST}/design.md)
+- [Interface studies](${HOST}/interfaces.md)
+- [Registry index](${HOST}/r/index.json)
+- [Props JSON](${HOST}/docs/props.json)
+
+## Component records
+
+Read one component at \`${HOST}/docs/<name>.md\`. Each record includes install paths, React examples, props, keyboard behavior, accessibility notes, markup, classes, and registry dependencies. The matching human-readable page is \`${HOST}/components/<name>/\` and the shadcn registry item is \`${HOST}/r/<name>.json\`.
+
+## CLI
+
+${fence("sh", `npx ${CLI} list --json
+npx ${CLI} search <term> --json
+npx ${CLI} docs <name>
+npx ${CLI} tokens --json`)}
+
+## MCP
+
+${fence("json", `{
+  "mcpServers": {
+    "vlak": {
+      "command": "npx",
+      "args": ["-y", "${MCP}"]
+    }
+  }
+}`)}
+
+The server exposes component search and records, tokens, install commands, and the guide from an offline snapshot.
+`;
+}
+
 function healthPage() {
   const parts = [
     "# Health, wellness, and care",
@@ -371,6 +412,7 @@ function llmsIndex() {
     `- [Design brief](${HOST}/design.md): Vlak's design principles, layout, typography, controls, and implementation constraints`,
     `- [Interfaces](${HOST}/interfaces.md): working interface studies with source, component links, and interaction briefs`,
     `- [Guide](${docUrl("guide")}): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents`,
+    `- [Agent guide](${docUrl("agents")}): machine-readable surfaces, CLI commands, and MCP setup`,
     `- [Component index](${docUrl("index")}): the catalogue by category`,
     `- [Health guide](${docUrl("health")}): health, wellness, and care components with data and action contracts`,
     ...domainCollections.map(collection => `- [${collection.title} guide](${docUrl(collection.name)}): ${collection.description}`),
@@ -403,6 +445,7 @@ const domains = domainCollections.map(collection => {
 write("index.md", indexPage());
 write("tokens.md", tokens);
 write("guide.md", guide);
+write("agents.md", agentsPage());
 write("health.md", health);
 write("llms.txt", llmsIndex());
 write(

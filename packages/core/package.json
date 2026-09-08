@@ -9,6 +9,9 @@
     "directory": "packages/core"
   },
   "homepage": "https://vlak.dev",
+  "bugs": {
+    "url": "https://github.com/Noord-Ventures/vlak/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -76,6 +79,11 @@
     "stylex",
     "shadcn",
     "registry"
+    ,"ui-library"
+    ,"typescript"
+    ,"accessible-components"
+    ,"design-tokens"
+    ,"react-component-library"
   ],
   "author": "Renato Valdés Olmos"
 }

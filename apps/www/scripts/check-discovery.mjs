@@ -51,8 +51,9 @@ for (const file of readdirSync(out, { recursive: true, encoding: "utf8" })) {
     }
   }
   assert.equal([...html.matchAll(/<h1(?:\s|>)/gi)].length, 1, `${path}: one main heading`);
-  const structured = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].map(([, json]) => JSON.parse(json));
-  assert(structured.some(item => item["@type"] === "WebSite" && item.url === `${origin}/` && item.name === "Vlak"), `${path}: truthful site identity`);
+const structured = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].map(([, json]) => JSON.parse(json));
+  const structuredItems = structured.flat();
+  assert(structuredItems.some(item => item["@type"] === "WebSite" && item.url === `${origin}/` && item.name === "Vlak"), `${path}: truthful site identity`);
   urls.add(expected);
   checked++;
 }
@@ -84,4 +85,5 @@ for (const [, url] of llms.matchAll(/\]\((https:\/\/vlak\.dev[^\s)]*)\)/g)) {
   const { pathname } = new URL(url);
   assert(existsSync(join(out, pathname)) || existsSync(join(out, pathname, "index.html")), `Broken agent-index link: ${url}`);
 }
+for (const path of ["docs/agents.md", "docs/button.md", "docs/props.json"]) assert(existsSync(join(out, path)), `Missing machine-readable surface: ${path}`);
 console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, ${previews} direct preview links, site identity and agent links.`);

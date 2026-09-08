@@ -9,6 +9,9 @@
     "directory": "packages/react"
   },
   "homepage": "https://vlak.dev",
+  "bugs": {
+    "url": "https://github.com/Noord-Ventures/vlak/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
@@ -82,6 +85,14 @@
     "accessible",
     "monochrome",
     "shadcn"
+    ,"ui-library"
+    ,"typescript"
+    ,"a11y"
+    ,"accessible-components"
+    ,"react-component-library"
+    ,"dashboard"
+    ,"data-table"
+    ,"agent-ui"
   ],
   "author": "Renato Valdés Olmos"
 }

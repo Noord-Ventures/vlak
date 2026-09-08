@@ -9,6 +9,7 @@ import { CrumbBar } from "@/components/crumb-bar";
 import { SiteChrome } from "@/components/site-chrome";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteAnalytics } from "@/components/site-analytics";
+import { StructuredData } from "@/components/structured-data";
 import { catalogComponents, domainCollections } from "@noorddev/vlak";
 import { interfaces } from "./interfaces/catalog";
 import { publicSitePaths } from "@/lib/site-analytics";
@@ -34,15 +35,29 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "@id": `${HOST}/#website`,
-          url: `${HOST}/`,
-          name: WORD,
-          description: LAW,
-          inLanguage: "en",
-        }).replace(/</g, "\\u003c") }} />
+        <StructuredData value={[
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${HOST}/#website`,
+            url: `${HOST}/`,
+            name: WORD,
+            description: LAW,
+            inLanguage: "en",
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "SoftwareSourceCode",
+            "@id": `${HOST}/#source`,
+            name: WORD,
+            description: LAW,
+            url: `${HOST}/`,
+            codeRepository: "https://github.com/Noord-Ventures/vlak",
+            license: "https://opensource.org/license/mit",
+            programmingLanguage: ["TypeScript", "JavaScript", "CSS"],
+            runtimePlatform: "React",
+          },
+        ]} />
         <style dangerouslySetInnerHTML={{ __html: crumbPin }} />
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
         <a href="#main" className="skip-link">

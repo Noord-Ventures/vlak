@@ -9,6 +9,9 @@ import { DocsNav } from "@/components/docs-nav";
 import { InAction } from "@/components/examples/scene";
 import { Preview } from "@/components/preview";
 import { reactUsage } from "@/lib/react-usage";
+import { componentForLabel, relatedComponents } from "@/lib/catalog-relationships";
+import { StructuredData, breadcrumbData } from "@/components/structured-data";
+import { interfaces } from "@/app/interfaces/catalog";
 import { sx } from "@/lib/sx";
 import { COMMAND, HOST, INSTALL } from "../../specimen";
 
@@ -112,6 +115,8 @@ export default async function ComponentPage({
   const keyboard = component.keyboard ?? [];
   const a11y = component.a11y ?? [];
   const deps = component.registryDependencies ?? [];
+  const usedIn = interfaces.filter(study => study.components.some(label => componentForLabel(label)?.name === component.name));
+  const related = relatedComponents(component.name);
 
   const packageInstall = `${INSTALL}\n\n// once, next to your app's root\nimport "@noorddev/vlak-react/css";\n\nimport { ${names.join(", ")} } from "@noorddev/vlak-react";`;
   const cliInstall = `${COMMAND.replace("init", `add ${component.name}`)}`;
@@ -122,6 +127,22 @@ export default async function ComponentPage({
     <div className="site-layout">
       <DocsNav />
       <main id="main" {...sx("site-content", component.name === "icons" ? chrome.iconContent : chrome.content)}>
+        <StructuredData value={[
+          breadcrumbData([
+            { name: "Vlak", url: `${HOST}/` },
+            { name: "Components", url: `${HOST}/components/` },
+            { name: component.title, url: `${HOST}/components/${component.name}/` },
+          ]),
+          {
+            "@context": "https://schema.org",
+            "@type": "TechArticle",
+            headline: `${component.title} React component`,
+            description: component.description,
+            url: `${HOST}/components/${component.name}/`,
+            isPartOf: { "@id": `${HOST}/#website` },
+            about: ["React", "accessibility", component.category],
+          },
+        ]} />
         <header {...sx("cover", chrome.cover)}>
           <h1 className="rs-t-display component-head">{component.title}</h1>
           <p className="rs-t-sub component-desc">{component.description}</p>
@@ -270,6 +291,31 @@ export default async function ComponentPage({
             </div>
           </>
         )}
+
+        <h2 className="section-label">Use elsewhere</h2>
+        <div className="class-list">
+          <a href={`/docs/${component.name}.md`} className="rs-chip">Markdown</a>
+          <a href={`/r/${component.name}.json`} className="rs-chip">Registry item</a>
+          <a href={`https://github.com/Noord-Ventures/vlak/tree/main/packages/react/src/${component.react ?? `components/${component.name}.tsx`}`} className="rs-chip">Source</a>
+        </div>
+
+        {usedIn.length > 0 ? (
+          <>
+            <h2 className="section-label">Used in interfaces</h2>
+            <div className="class-list">
+              {usedIn.map(study => <a key={study.slug} href={`/interfaces/${study.slug}/`} className="rs-chip">{study.title}</a>)}
+            </div>
+          </>
+        ) : null}
+
+        {related.length > 0 ? (
+          <>
+            <h2 className="section-label">Related components</h2>
+            <div className="class-list">
+              {related.map(item => <a key={item.name} href={`/components/${item.name}/`} className="rs-chip">{item.title}</a>)}
+            </div>
+          </>
+        ) : null}
       </main>
     </div>
   );

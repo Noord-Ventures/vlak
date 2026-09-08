@@ -3,6 +3,7 @@ import { join } from "node:path";
 import type { MetadataRoute } from "next";
 import { catalogComponents, domainCollections } from "@noorddev/vlak";
 import { HOST } from "./specimen";
+import { useCases } from "./use-cases/catalog";
 
 export const dynamic = "force-static";
 
@@ -19,6 +20,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       for (const component of catalogComponents) paths.add(`/components/${component.name}/`);
     } else if (path === "docs/[collection]") {
       for (const collection of domainCollections) paths.add(`/docs/${collection.name}/`);
+    } else if (path === "use-cases/[slug]") {
+      for (const useCase of useCases) paths.add(`/use-cases/${useCase.slug}/`);
     } else {
       if (path.includes("[") || path.includes("(")) throw new Error(`Unmapped sitemap route: ${path}`);
       paths.add(path ? `/${path}/` : "/");
