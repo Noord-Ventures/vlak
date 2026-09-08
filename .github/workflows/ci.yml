@@ -79,6 +79,8 @@ jobs:
         run: pnpm --filter www build
       - name: Canonical pages, sharing metadata, sitemap and agent links
         run: node apps/www/scripts/check-discovery.mjs
+      - name: Agent plugin, MCP and model-readable docs
+        run: pnpm check:agents
       - name: Mobile navigation and interactive workspaces
         run: |
           python3 -m http.server 3016 --directory apps/www/out > /tmp/vlak-interface-server.log 2>&1 &

@@ -93,4 +93,5 @@ Generated from the same sources, served by the site and shipped in the packages:
 - `https://vlak.dev/r/index.json` and `r/<name>.json`: the shadcn-compatible registry; `meta.vlak` carries example, usage, keyboard, a11y, aliases, classes, snippet.
 - `npx @noorddev/vlak-cli list --json | search <term> --json | docs <name> | tokens --json`: the same data offline.
 - `@noorddev/vlak-mcp`: MCP tools `list_components`, `get_component`, `search_components`, `get_tokens`, `get_install`, `get_guide`; resources `vlak://docs/guide`, `vlak://docs/<name>`, `vlak://tokens`.
+- `plugins/vlak`: a portable agent plugin with the MCP server and a provider-neutral `use-vlak` skill. The root `.claude-plugin/marketplace.json` makes it installable in Claude Code and compatible clients.
 - In code: `import { vlakComponents, vlakTokens } from "@noorddev/vlak"` and `@noorddev/vlak/props`.

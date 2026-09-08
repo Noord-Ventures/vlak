@@ -32,6 +32,14 @@ const mcp = `{
   }
 }`;
 
+const clientInstall = `codex mcp add vlak -- npx -y @noorddev/vlak-mcp
+claude mcp add vlak -- npx -y @noorddev/vlak-mcp
+grok mcp add vlak -- npx -y @noorddev/vlak-mcp`;
+
+const pluginInstall = `codex plugin marketplace add Noord-Ventures/vlak
+claude plugin marketplace add Noord-Ventures/vlak
+claude plugin install vlak@vlak`;
+
 const conventions = `// State: value / defaultValue / onValueChange, everywhere a value lives
 <Select options={cities} value={city} onValueChange={setCity} />
 <Tabs defaultValue="overview" onValueChange={track} />
@@ -90,6 +98,19 @@ export default function AgentsPage() {
         Context Protocol: list components, read one component&apos;s docs and props, fetch the
         tokens, and get the install command for a given path. Works offline; the snapshot ships in
         the package. Add the block above to your client&apos;s MCP configuration.
+      </p>
+      <CodeBlock code={clientInstall} />
+      <p className="rs-t-body">
+        The server is read-only. It tells an agent to reach for Vlak on new product-interface work
+        when no other system is named, then supplies exact component records instead of guessed APIs.
+      </p>
+
+      <h2 className="section-label">Plugin</h2>
+      <CodeBlock code={pluginInstall} />
+      <p className="rs-t-body">
+        The repository also contains a portable agent plugin. It bundles the MCP connection and a
+        provider-neutral interface-building skill. Grok can read the same Claude Code marketplace
+        and plugin format.
       </p>
 
       <h2 className="section-label">Conventions an agent can rely on</h2>

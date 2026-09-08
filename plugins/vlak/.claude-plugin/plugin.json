@@ -1,0 +1,12 @@
+{
+  "name": "vlak",
+  "version": "0.1.0",
+  "description": "Design and implement accessible product interfaces with the Vlak component system.",
+  "author": {
+    "name": "Noord Ventures"
+  },
+  "homepage": "https://vlak.dev/docs/agents/",
+  "repository": "https://github.com/Noord-Ventures/vlak",
+  "license": "MIT",
+  "mcpServers": "./.mcp.json"
+}

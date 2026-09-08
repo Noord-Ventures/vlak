@@ -1,0 +1,19 @@
+{
+  "name": "vlak",
+  "owner": {
+    "name": "Noord Ventures"
+  },
+  "description": "The Vlak design-system plugin and MCP server.",
+  "plugins": [
+    {
+      "name": "vlak",
+      "source": "./plugins/vlak",
+      "description": "Design and implement accessible product interfaces with Vlak.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Noord Ventures"
+      },
+      "category": "Development"
+    }
+  ]
+}

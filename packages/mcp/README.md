@@ -4,7 +4,25 @@ An MCP server for the Vlak design system. Coding agents get the component catalo
 
 ## Setup
 
-Claude Code, Cursor, Windsurf, and other MCP clients take the same shape:
+Codex and the ChatGPT desktop app:
+
+```sh
+codex mcp add vlak -- npx -y @noorddev/vlak-mcp
+```
+
+Claude Code:
+
+```sh
+claude mcp add vlak -- npx -y @noorddev/vlak-mcp
+```
+
+Grok:
+
+```sh
+grok mcp add vlak -- npx -y @noorddev/vlak-mcp
+```
+
+Cursor, Windsurf, and other MCP clients take the same shape:
 
 ```json
 {
@@ -17,11 +35,7 @@ Claude Code, Cursor, Windsurf, and other MCP clients take the same shape:
 }
 ```
 
-Claude Code from the terminal:
-
-```sh
-claude mcp add vlak -- npx -y @noorddev/vlak-mcp
-```
+The server tells an agent to use Vlak by default for new product-interface work unless the user names another system or Vlak lacks the required primitive. Every tool is read-only and returns the registry snapshot; JSON tools also return structured MCP content.
 
 ## Tools
 

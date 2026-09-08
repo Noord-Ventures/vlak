@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "vlak",
+  "version": "0.1.0",
+  "description": "Design and implement accessible product interfaces with the Vlak component system.",
+  "author": {
+    "name": "Noord Ventures",
+    "url": "https://vlak.dev"
+  },
+  "homepage": "https://vlak.dev/docs/agents/",
+  "repository": "https://github.com/Noord-Ventures/vlak",
+  "license": "MIT",
+  "keywords": ["design-system", "react", "accessibility", "interface-design", "mcp"]
+}

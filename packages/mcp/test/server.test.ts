@@ -27,10 +27,13 @@ describe("vlak-mcp", () => {
   it("exposes the six tools", async () => {
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual(["get_component", "get_guide", "get_install", "get_tokens", "list_components", "search_components"]);
+    expect(tools.every((tool) => tool.annotations?.readOnlyHint === true)).toBe(true);
   });
 
   it("lists components, optionally by category", async () => {
-    const all = JSON.parse(textOf(await client.callTool({ name: "list_components", arguments: {} })));
+    const result = await client.callTool({ name: "list_components", arguments: {} });
+    const all = JSON.parse(textOf(result));
+    expect(result.structuredContent).toEqual(all);
     expect(all.count).toBeGreaterThan(60);
     expect(all.components.find((c: { name: string }) => c.name === "button")).toMatchObject({ title: "Button", category: "actions" });
     const forms = JSON.parse(textOf(await client.callTool({ name: "list_components", arguments: { category: "forms" } })));

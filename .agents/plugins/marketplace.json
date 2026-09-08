@@ -1,0 +1,20 @@
+{
+  "name": "vlak",
+  "interface": {
+    "displayName": "Vlak"
+  },
+  "plugins": [
+    {
+      "name": "vlak",
+      "source": {
+        "source": "local",
+        "path": "./plugins/vlak"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vlak": {
+      "command": "npx",
+      "args": ["-y", "@noorddev/vlak-mcp"]
+    }
+  }
+}
