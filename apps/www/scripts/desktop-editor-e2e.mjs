@@ -15,7 +15,10 @@ export async function checkDesktopEditor({ page, base, fail }) {
       if (await desktop.getAttribute("data-compact") === "true") {
         await desktop.locator(".dos-mobile-tasks").click();
         await desktop.getByRole("dialog").locator(".dos-running-app").filter({ hasText: name }).click();
-      } else await desktop.getByRole("button", { name: `Switch to ${name}`, exact: true }).click();
+      } else {
+        await desktop.locator('.dos-mac-menu-trigger[data-menu="window"]').click();
+        await desktop.getByRole("menu", { name: "Window", exact: true }).getByRole("menuitemcheckbox", { name, exact: true }).click();
+      }
     };
     const editor = desktop.locator('.dos-window[data-app="editor"][data-front="true"]');
     await editor.getByRole("textbox", { name: "Save file path" }).fill(copyPath);
