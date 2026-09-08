@@ -33,5 +33,16 @@
     "@arethetypeswrong/cli": "^0.18",
     "@biomejs/biome": "^2.5.12",
     "publint": "^0.3"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ],
+    "overrides": {
+      "baseline-browser-mapping": "2.11.20",
+      "electron-to-chromium": "1.5.420",
+      "jose": "6.2.10",
+      "postcss": "8.5.27"
+    }
   }
 }
