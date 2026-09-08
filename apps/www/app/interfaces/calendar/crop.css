@@ -1,0 +1,18 @@
+.cal-crop { display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; overflow: hidden; color: var(--text); background: var(--bg); font-size: 11px; line-height: 1.35; }
+.cal-crop > header { display: flex; align-items: center; flex: none; gap: 10px; min-height: 48px; padding: 10px 20px; border-bottom: 1px solid var(--divider); }
+.cal-crop > header strong { flex: 1; font-size: 13px; font-weight: 500; white-space: nowrap; }
+.cal-crop > header > span { color: var(--text-secondary); }
+.cal-crop-weekdays { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); flex: none; padding-inline: 12px; color: var(--text-secondary); }
+.cal-crop-weekdays > span { padding: 9px 0 5px; text-align: center; }
+.cal-crop-month { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-template-rows: repeat(5, minmax(26px, 1fr)); flex: 1; min-height: 130px; margin: 0 12px 10px; }
+.cal-crop-month > div { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-top: 1px solid var(--divider-subtle); font-variant-numeric: tabular-nums; }
+.cal-crop-month > div[data-outside="true"] { color: var(--text-secondary); }
+.cal-crop-month > div[data-selected="true"] { color: var(--bg); background: var(--text); }
+.cal-crop-month i { width: 3px; height: 3px; background: currentColor; border-radius: 50%; }
+.cal-crop-agenda { flex: none; border-top: 1px solid var(--divider); }
+.cal-crop-agenda > span { display: block; padding: 8px 20px 3px; color: var(--text-secondary); }
+.cal-crop-agenda > div { display: flex; align-items: baseline; gap: 10px; padding: 6px 20px; }
+.cal-crop-agenda > div:last-child { padding-bottom: 12px; }
+.cal-crop-agenda time { color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.cal-crop-agenda strong { flex: 1; font-weight: 500; }
+.cal-crop-agenda > div > span { color: var(--text-secondary); font-size: 10px; }

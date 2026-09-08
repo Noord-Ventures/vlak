@@ -11,3 +11,5 @@
   min-height: 0;
 }
 .if-preview-frame[data-preview-open="true"] .dos { height: 100%; }
+
+.if-preview-frame[data-preview-open="true"] .cal-board { height: 100%; min-height: 0; }

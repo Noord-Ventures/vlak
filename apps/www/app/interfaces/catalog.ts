@@ -371,6 +371,27 @@ const microscopyStudy = {
   ],
 } as const;
 
+const calendarStudy = {
+  slug: "calendar",
+  title: "Calendar",
+  voice: "Plan events and keep the week in view.",
+  law: "A local calendar with month, week, day and agenda views, recurring events and iCalendar files.",
+  story: "Move between the month, a timed week, a single day and an agenda. Create or edit events, organize calendars, and repeat a schedule. Search finds events across the calendar, while import and export let you move supported iCalendar records between tools. Desktop events can be dragged to a new time; a focused day agenda keeps the phone layout readable.",
+  what: "Calendar",
+  type: "Month, week, day, agenda and event editor",
+  module: "Grid system",
+  ink: "Paper and ink date grids, hairline time divisions and full-surface event selection.",
+  use: "Choose a date → create or edit an event → organize the schedule → export",
+  field: "Calendar navigation beside a date grid or agenda, with a focused event editor.",
+  note: "Events and calendar settings stay in this browser. Import and export use .ics files; no account, invitations or calendar sync service is connected.",
+  components: ["Button", "Checkbox", "Dialog", "Icon", "Input", "Native select", "Textarea"],
+  modifications: [
+    "Button and Icon navigate dates, switch views and open events. Checkbox controls calendar visibility, while Input searches the actual event records.",
+    "Input, Native select and Textarea edit event dates, times, calendars, recurrence, location and notes. Dialog keeps event editing and recurring-event decisions within the working calendar.",
+    "The custom month grid, timed week and day views, and agenda share the same local records. Desktop dragging changes an event’s schedule; validated browser storage and iCalendar files preserve actual event data.",
+  ],
+} as const;
+
 const desktopStudy = {
   slug: "desktop-os",
   title: "Desktop OS",
@@ -393,8 +414,8 @@ const desktopStudy = {
 } as const;
 
 const specialistStudies = [...scienceStudies, ...engineeringStudies, ...careStudies, ...musicStudies] as const;
-export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy, desktopStudy] as const;
-export const orderedInterfaces = [...specialistStudies, microscopyStudy, desktopStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
+export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy, calendarStudy, desktopStudy] as const;
+export const orderedInterfaces = [...specialistStudies, microscopyStudy, calendarStudy, desktopStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
 
 export type InterfaceSlug = (typeof interfaces)[number]["slug"];
 
@@ -406,6 +427,7 @@ export function interfaceBySlug(slug: string) {
 
 /** Each compact workspace changes its flow, not just its column widths. */
 export const mobilePatterns: Record<InterfaceSlug, string> = {
+  calendar: "On mobile, a focused day agenda replaces the wide time grid. Date navigation, calendar filters, search and event creation remain reachable. The event editor uses the available screen width, preserving the selected day and saved records when returning to the agenda or opening fullscreen preview.",
   "desktop-os": "On mobile, the selected application fills the workspace. Apps and Tasks become separate drawers, keeping file operations and app switching within reach. Window positions, unsaved drafts and independent platform files survive changes between compact and desktop layouts.",
   microscopy: "On mobile, Positions, Sequence, Stack and Review are focused screens. Opening a position replaces the list with its editor; Back preserves the unsaved draft, while Apply and Discard remain explicit. The planned stack and import/export controls stay available without shrinking the desktop workspace.",
   ...scienceMobilePatterns,

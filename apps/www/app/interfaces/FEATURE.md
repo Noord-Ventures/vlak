@@ -1,6 +1,6 @@
 # Interfaces
 
-The catalogue contains 24 working interface studies. Their definitions live in `app/interfaces/catalog.ts`; each study has its own route and source folder. Interfaces is a first-class site destination alongside Components, Docs and About. The component expansion adds 52 specialist controls, taking the public component catalogue from 114 to 166.
+The catalogue contains 28 working interface studies. Their definitions live in `app/interfaces/catalog.ts`; each study has its own route and source folder. Interfaces is a first-class site destination alongside Components, Docs and About. The component expansion adds 52 specialist controls, taking the public component catalogue from 114 to 166.
 
 ## Catalogue and shared shell
 
@@ -37,6 +37,7 @@ State transitions are restrained. Focus and a user-triggered change can move del
 | Patient dashboard | `/interfaces/patient` | Overview → readings or care → visit preparation | Inspect sample readings, update a local care record, and preserve an unsaved visit note or appointment preference across Back until explicitly saved. |
 | Music session | `/interfaces/music` | Clip → pattern → mix or export | Four synthesized tracks use the Web Audio clock. Clip, tempo, mix and tone controls affect sound; export renders a stereo wave file. |
 | AI chat | `/interfaces/line` | Notebook → conversation → response details | Independent conversations and drafts, local response templates, saved replies and Markdown export. |
+| Calendar | `/interfaces/calendar` | Date or agenda → event → repeat or reschedule → export | Month, week, day and agenda views share editable local events and calendars. Search, recurring schedules, desktop dragging and iCalendar import/export use the actual records; no account or sync service is connected. |
 | Dashboard | `/interfaces/press` | Production → job → review | Supplied dates and records drive the metrics and filters. Save review notes without changing invoice payment state. |
 | Social feed | `/interfaces/wall` | Feed → comments → profile | Publish text, filter contributors, like, reply and follow locally. People and post records are fictional. |
 | Fleet management | `/interfaces/night` | Vehicles → map → trip | Filter sample vehicles on Mapbox's monochrome Dogpatch map, inspect provider street routes and save local trip notes. |
@@ -64,6 +65,7 @@ Use the specimen's width, not only the browser width. At 640px and below, deskto
 - Patient visit preparation preserves unsaved note and preference drafts when returning to the overview; its saved record changes only on explicit Save.
 - Team chat restores the originating screen, thread draft and focus after cancelled channel creation. Food ordering does not add history when its active Bag action is tapped again.
 - Agent management uses Tasks, Active and Review; detail and creation replace the list with their own Back and primary action.
+- Calendar uses a focused day agenda and a full-width event editor on compact screens. Date navigation, calendar visibility, search and creation remain reachable; returning from an event preserves the selected day. The same live board fills fullscreen preview.
 - Wallpaper generation separates Preview from Direction, retains the selected result and exposes the other generated choices.
 - The 3D workspace separates Viewport from Inspector. Viewport tools remain reachable without covering the model.
 - EV keeps Range & battery, Cabin and Media readings available. Details slide in above those controls on phones, with a clear return to the scene. Desktop details occupy one third of the workspace.
@@ -79,6 +81,8 @@ Desktop specimens adapt between 612 and 816px tall; phone frames follow the stab
 ## Media and service boundaries
 
 Fleet management needs `NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN`, documented in `apps/www/.env.example`. Its fallback is a labeled schematic, and Mapbox attribution remains visible. Vehicle positions and operational readings are samples even when geographic tiles and routes come from Mapbox.
+
+Calendar stores events and calendar preferences in this browser. Its recurrence model expands supported schedules locally, and .ics import/export exchanges actual event records. There is no account connection, invitation delivery or background synchronization. The catalog supplies its alphabetically sorted navigation entry, agent-readable description, canonical study page and `/i/calendar/` preview address.
 
 Food ordering uses verified restaurant references for Joe's Kitchen, Neder, La Dune and Jacky's. Restaurant and dish photographs are generated illustrations. Prices and service details distinguish sourced snapshots from samples; delivery and checkout remain illustrative.
 
@@ -104,7 +108,8 @@ The newer main-branch media-control alignment changes are merged; the final prod
 
 For the fresh export, set `SITE_URL` and optionally `PLAYWRIGHT_EXECUTABLE_PATH`, then use the relevant runners:
 
-- `scripts/e2e-interface-refresh.mjs`: all 24 studies at 320, 390, 1024 and 1440px, with layout and accessibility in both themes and focused app flows in light mode at each width. Room/Bag return paths also run at the two phone widths. `INTERFACES` selects a bounded subset.
+- `scripts/e2e-interface-refresh.mjs`: catalog studies at 320, 390, 1024 and 1440px, with layout and accessibility in both themes and focused app flows in light mode at each width. Room/Bag return paths also run at the two phone widths. `INTERFACES` selects a bounded subset.
+- `scripts/calendar-model.test.mjs`: calendar records, recurrence and iCalendar interchange. CI runs these unit checks and includes Calendar in the affected interface refresh and catalog-driven preview checks.
 - `scripts/e2e-specialist-interfaces.mjs`: the eight specialist application layouts in both themes, with local persistence, exact data, downloads and synthesized-audio workflows in light mode at each width.
 - `scripts/e2e-render-controls.mjs` and `scripts/e2e-vehicle.mjs`: actual geometry, line treatments, mesh, camera fit, turntable, failure/retry and context cleanup.
 - `scripts/e2e-interface-chrome.mjs`, `scripts/e2e-interfaces.mjs` and `scripts/e2e-mobile-interfaces.mjs`: shared navigation, gallery behavior, flush dividers, target sizes and established responsive journeys.

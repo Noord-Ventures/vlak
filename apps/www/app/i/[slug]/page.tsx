@@ -8,6 +8,7 @@ import { HOST } from "../../specimen";
 
 // The short address renders the same page modules, so apps and credits stay in sync.
 const pages = {
+  "calendar": () => import("../../interfaces/calendar/page"),
   "line": () => import("../../interfaces/line/page"),
   "press": () => import("../../interfaces/press/page"),
   "wall": () => import("../../interfaces/wall/page"),

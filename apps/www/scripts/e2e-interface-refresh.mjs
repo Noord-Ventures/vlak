@@ -9,7 +9,7 @@ import { checkWallpaper } from "./wallpaper-rebuild-e2e.mjs";
 const require = createRequire(import.meta.url);
 const axe = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const base = process.env.SITE_URL || "http://localhost:3016";
-const slugs = (process.env.INTERFACES || "render,drive,orbit,graphics,line,room,wall,evening,press,night,platforms,mobile-os,documentation,music-player,video-player,patient,identity,music,agents,microbiology,genome,protein,robotics,circuitry,frontier,microscopy,desktop-os").split(",");
+const slugs = (process.env.INTERFACES || "render,drive,orbit,graphics,line,room,wall,evening,press,night,platforms,mobile-os,documentation,music-player,video-player,patient,identity,music,agents,microbiology,genome,protein,robotics,circuitry,frontier,microscopy,desktop-os,calendar").split(",");
 const failures = [];
 const fail = message => { failures.push(message); console.error(message); };
 const browser = await chromium.launch({ ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}), args: ["--enable-unsafe-swiftshader"] });
@@ -59,6 +59,7 @@ try {
         [["frontier"], "./athena-e2e.mjs", "checkAthena"],
         [["microscopy"], "./microscopy-interface-e2e.mjs", "checkMicroscopyInterface"],
         [["documentation"], "./documentation-e2e.mjs", "checkDocumentation"],
+        [["calendar"], "./calendar-e2e.mjs", "checkCalendar"],
         [["desktop-os"], "./desktop-os-e2e.mjs", "checkDesktopOS"],
         [["desktop-os"], "./desktop-utilities-e2e.mjs", "checkDesktopUtilities"],
         [["desktop-os"], "./desktop-editor-e2e.mjs", "checkDesktopEditor"],
