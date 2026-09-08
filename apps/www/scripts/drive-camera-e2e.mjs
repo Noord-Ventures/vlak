@@ -27,7 +27,14 @@ export async function checkDriveCameraTransition({ page, root, scene }) {
       };
     };
     const record = () => {
-      recording.frames.push(recording.capture());
+      const frame = recording.capture();
+      recording.frames.push(frame);
+      if (recording.interruptButton && frame.mode === "energy" && frame.settled === "false" && frame.opacity < .9 && frame.opacity > .25) {
+        frame.interrupted = true;
+        const button = recording.interruptButton;
+        recording.interruptButton = null;
+        button.click();
+      }
       recording.frame = requestAnimationFrame(record);
     };
     record();
@@ -57,10 +64,12 @@ export async function checkDriveCameraTransition({ page, root, scene }) {
     }
   };
 
+  let phase = "enable animated camera";
   try {
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await page.waitForFunction(() => document.querySelector('.ev-scene-motion')?.disabled === false);
     await settled("vehicle");
+    phase = "Vehicle to Journey";
     await begin();
     await choose("Journey");
     await settled("journey");
@@ -73,22 +82,24 @@ export async function checkDriveCameraTransition({ page, root, scene }) {
       assert(journey[index].span >= journey[index - 1].span, "Journey zooms out continuously");
     }
 
+    phase = "interrupt Energy orbit";
     await begin();
-    await choose("Energy");
-    await page.waitForFunction(() => {
-      const data = document.querySelector(".ev-scene")?.dataset;
-      return data?.mode === "energy" && data.settled === "false" && Number(data.vehicleOpacity) < .9 && Number(data.vehicleOpacity) > .25;
+    // Arm the real control before the transition. On a slow renderer, waiting
+    // until the automation's scroll/action round trip returns misses this frame.
+    await root.locator(".ev-modes").getByRole("button", { name: "Vehicle", exact: true }).evaluate(button => {
+      button.closest(".ev").querySelector(".ev-scene").__cameraRecording.interruptButton = button;
     });
-    await choose("Vehicle");
+    await choose("Energy");
     await settled("vehicle");
     const reversed = await end();
     continuous(reversed, "Interrupted Energy orbit");
-    assert(reversed.some(frame => frame.mode === "energy" && frame.opacity > 0 && frame.opacity < 1), "Energy starts revealing the assembly before interruption");
+    assert(reversed.some(frame => frame.interrupted && frame.mode === "energy" && frame.settled === "false" && frame.opacity > .25 && frame.opacity < .9), "The actual Vehicle control interrupts a rendered frame while Energy reveals the assembly");
     const side = reversed.at(-1);
     assert.equal(side.camera[0], 0, "Returning from an interrupted orbit finishes at a true side view");
     assert.equal(side.camera[1], 1.03, "The side schematic finishes level");
     assert.equal(side.fov, 12);
 
+    phase = "reduced-motion composition";
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.waitForFunction(() => document.querySelector('.ev-scene-motion')?.disabled);
     await begin();
@@ -100,6 +111,8 @@ export async function checkDriveCameraTransition({ page, root, scene }) {
     assert(energy.length > 0 && energy.every(frame => frame.settled === "true" && frame.opacity === 0), "Reduced motion changes composition without intermediate animation");
     await choose("Vehicle");
     await settled("vehicle");
+  } catch (error) {
+    throw new Error(`Camera ${phase}: ${error instanceof Error ? error.stack || error.message : String(error)}`);
   } finally {
     await end();
     await page.emulateMedia({ reducedMotion: reduced ? "reduce" : "no-preference" });

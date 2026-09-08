@@ -4,6 +4,7 @@ import { checkDriveLoading } from "./drive-loading-e2e.mjs";
 
 /** Exercise the EV workspace through visible, keyboard-operable Vlak controls. */
 export async function checkDriveStyle({ page, base, fail }) {
+  let phase = "initial layout and source readiness";
   try {
     await page.goto(`${base}/interfaces/drive/`, { waitUntil: "networkidle" });
     if (page.viewportSize()?.width === 1024) await page.addStyleTag({ content: ".if-specimen { width: 620px; max-width: 100%; }" });
@@ -82,6 +83,7 @@ export async function checkDriveStyle({ page, base, fail }) {
     const sourceResources = await page.evaluate(() => performance.getEntriesByType('resource').map(resource => new URL(resource.name).pathname));
     assert(sourceResources.includes('/interfaces/concepts/evoque-monochrome.glb'), 'Vehicle proportions use the original licensed Evoque surface geometry');
     assert(sourceResources.includes('/interfaces/concepts/evoque-feature-lines.json'), 'Sparse contours use the prepared source feature paths');
+    phase = "door and light controls";
     const lock = root.getByRole("button", { name: "Door lock", exact: true });
     await activate(lock); assert.equal(await lock.getAttribute("aria-pressed"), "false");
     assert.match(await root.locator(".ev-profile figcaption").textContent(), /Doors unlocked/);
@@ -112,7 +114,9 @@ export async function checkDriveStyle({ page, base, fail }) {
     }
     assert(Number(await scene.getAttribute('data-contour-width')) >= 1, 'Main contours use a stable CSS-pixel width');
     assert.equal(await scene.getAttribute("data-camera-style"), "side", "Vehicle uses the side-profile camera");
+    phase = "camera transitions";
     if (page.viewportSize()?.width === 1440 && originalTheme === "light") await checkDriveCameraTransition({ page, root, scene });
+    phase = "Journey motion and route controls";
     const profileScale = await scene.evaluate(element => element.clientHeight / Number(element.dataset.span));
     await mode("Journey");
     assert(await scene.evaluate(element => element.clientHeight / Number(element.dataset.span)) < profileScale * .5, "Journey must zoom substantially farther out");
@@ -143,6 +147,7 @@ export async function checkDriveStyle({ page, base, fail }) {
     assert.equal(await root.getByRole('button', { name: '3D motion disabled for reduced motion', exact: true }).isDisabled(), true);
     if (!reduced) await page.emulateMedia({ reducedMotion: 'no-preference' });
     await fit();
+    phase = "Energy and charging controls";
     await mode("Energy");
     assert.equal(await scene.getAttribute('data-modules'), '12');
     assert(Number(await scene.getAttribute('data-vehicle-opacity')) < .003, 'Energy composition must focus only on the battery assembly');
@@ -159,6 +164,7 @@ export async function checkDriveStyle({ page, base, fail }) {
     assert.equal(await root.getByRole("button", { name: "Charge limit 100 percent. Change to 90 percent", exact: true }).isVisible(), true);
     await activate(root.getByRole("button", { name: "Cancel charging schedule", exact: true }));
     assert.equal(await root.getByRole("button", { name: "Schedule charging", exact: true }).isVisible(), true);
+    phase = "climate and media controls";
     await panel("Climate");
     const temperature = root.getByRole("spinbutton", { name: "Cabin", exact: true });
     await activate(root.getByRole("button", { name: "Raise temperature", exact: true }));
@@ -185,8 +191,9 @@ export async function checkDriveStyle({ page, base, fail }) {
     await activate(root.getByRole("button", { name: "Play", exact: true }));
     assert.equal(await root.getAttribute("data-playing"), "true");
     await fit();
+    phase = "source loading and recovery";
     if (page.viewportSize()?.width === 1440 && originalTheme === "light") await checkDriveLoading({ page, base });
   } catch (error) {
-    fail(`EV workspace: ${error instanceof Error ? error.message : String(error)}`);
+    fail(`EV workspace (${phase}): ${error instanceof Error ? error.stack || error.message : String(error)}`);
   }
 }
