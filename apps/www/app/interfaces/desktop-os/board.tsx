@@ -3,12 +3,14 @@
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from "react";
 import { Button, Icon, Tab, TabList, TabPanel, Tabs, type IconName } from "@noorddev/vlak-react";
 import { DesktopApp } from "./apps";
+import { MacMenus } from "./mac-menus";
 import { initialFileSystem, validateFileSystem, welcomePath } from "./fs";
 import { appNames, defaultPreferences, platforms, type AppId, type AppWindow, type DesktopPreferences, type FileSystem, type Platform } from "./types";
 import "./scene.css";
 
 const applications: AppId[] = ["files", "editor", "terminal", "browser", "calculator", "paint", "calendar", "settings", "monitor", "mines"];
 const appIcons: Record<AppId, IconName> = { files: "folder", editor: "edit", terminal: "terminal", browser: "globe", calculator: "grid", paint: "image", calendar: "calendar", settings: "settings", monitor: "activity", mines: "grid" };
+const macFavorites: AppId[] = ["files", "browser", "editor", "terminal", "paint", "calendar"];
 type Rect = { x: number; y: number; width: number; height: number };
 type WindowState = AppWindow & Rect & { z: number; workspace: number; maximized: boolean; shaded: boolean };
 type Menu = "apps" | "tasks" | "file" | "window" | null;
@@ -234,7 +236,7 @@ function Desktop({ platform, active }: { platform: Platform; active: boolean }) 
       const rect = kind === "tile" ? { x: (index % columns) * bounds.width / columns, y: Math.floor(index / columns) * bounds.height / rows, width: bounds.width / columns, height: bounds.height / rows } : constrain({ x: 24 + index * 28, y: 18 + index * 28, width: 460, height: 370 }, bounds);
       return { ...win, ...rect, maximized: false, shaded: false };
     }));
-    dismissMenu();
+    dismissMenu(Boolean(menu));
   };
   const drag = useRef<{ id: number; mode: "move" | "resize"; startX: number; startY: number; rect: Rect } | null>(null);
   const startPointer = (event: PointerEvent<HTMLButtonElement>, win: WindowState, mode: "move" | "resize") => {
@@ -273,14 +275,25 @@ function Desktop({ platform, active }: { platform: Platform; active: boolean }) 
   const trigger = (label: string, target: Exclude<Menu, null>, icon?: IconName, className = "") => <Button variant="ghost" size="sm" className={`dos-chrome-button ${target === "apps" ? "dos-apps-trigger" : ""} ${className}`} aria-haspopup="dialog" aria-expanded={menu === target} aria-controls={menu === target ? menuId : undefined} onClick={event => openMenu(target, event.currentTarget)}>{icon && <Icon name={icon} size={16} />}<span>{label}</span></Button>;
   const workspaceButtons = <div className="dos-workspaces" role="group" aria-label="Workspaces">{[0, 1, 2, 3].map(value => <Button key={value} variant="ghost" size="sm" className="dos-workspace-button" aria-label={`Workspace ${value + 1}`} aria-pressed={workspace === value} onClick={() => switchWorkspace(value)}>{value + 1}</Button>)}</div>;
   const tasks = <div className="dos-task-list" role="group" aria-label="Running applications">{runningWindows.map(win => <Button variant="ghost" size="sm" key={win.id} className="dos-task" aria-label={`${win.minimized ? "Restore" : "Switch to"} ${win.title}`} aria-pressed={front?.id === win.id} onClick={() => focusWindow(win.id, true)}><Icon name={appIcons[win.app]} size={16} /><span>{win.title}</span>{win.minimized && <span className="dos-minimized-mark" aria-hidden="true">·</span>}</Button>)}</div>;
+  const dockApps = [...macFavorites, ...applications.filter(app => !macFavorites.includes(app) && windows.some(win => win.app === app))];
+  const macDock = platform === "mac" && <div className="dos-mac-dockbar"><div className="dos-mac-dock" role="group" aria-label="Dock">
+    {dockApps.map(app => {
+      const appWindows = windows.filter(win => win.app === app);
+      const latest = appWindows.reduce<WindowState | undefined>((current, win) => !current || win.z > current.z ? win : current, undefined);
+      const action = latest ? latest.minimized ? "Restore" : "Switch to" : "Open";
+      return <Button key={app} variant="ghost" className="dos-mac-dock-app" data-app={app} data-running={appWindows.length > 0} aria-label={`${action} ${names[app]}`} aria-pressed={front?.app === app} onClick={() => latest ? focusWindow(latest.id, true) : openApp(app)}><Icon name={appIcons[app]} size={24} /><span className="dos-mac-dock-label" aria-hidden="true">{names[app]}</span><span className="dos-mac-dock-dot" aria-hidden="true" /></Button>;
+    })}
+    <span className="dos-mac-dock-divider" aria-hidden="true" />
+    <Button variant="ghost" className="dos-mac-dock-app dos-apps-trigger" aria-label="Applications" aria-haspopup="dialog" aria-expanded={menu === "apps"} aria-controls={menu === "apps" ? menuId : undefined} onClick={event => openMenu("apps", event.currentTarget)}><Icon name="grid" size={24} /><span className="dos-mac-dock-label" aria-hidden="true">Applications</span></Button>
+    <Button variant="ghost" className="dos-mac-dock-app" aria-label="Open Trash" onClick={() => openApp("files", "/Trash")}><Icon name="trash" size={24} /><span className="dos-mac-dock-label" aria-hidden="true">Trash</span></Button>
+  </div></div>;
   const statusClock = <Button variant="ghost" size="sm" className="dos-chrome-button dos-clock" aria-label={`Open calendar, ${clock}`} onClick={() => openApp("calendar")}><time>{clock}</time></Button>;
 
   return <div ref={desktop} className={`dos dos-${platform}`} data-platform={platform} data-compact={compact} data-wallpaper={preferences.wallpaper}>
     <p id={instructionsId} className="dos-sr-only">Drag a window by its title. With the title focused, arrow keys move the window and Shift plus arrow keys resize it.</p>
     <div className="dos-desktop-content" inert={menu !== null}>
       {(platform === "mac" || platform === "linux") && <div className="dos-menubar">
-        {trigger(platform === "mac" ? "Mac OS" : "Activities", "apps", platform === "mac" ? "grid" : undefined)}
-        {platform === "mac" ? <><span className="dos-active-app">{front ? names[front.app] : "Finder"}</span>{trigger("File", "file")}{trigger("Window", "window")}</> : <span className="dos-active-app">{front ? names[front.app] : "Desktop"}</span>}
+        {platform === "mac" ? <MacMenus active={active && menu === null} front={front} windows={windows} appName={front ? names[front.app] : "Finder"} onOpenApp={openApp} onApplications={opener => openMenu("apps", opener)} onFocusWindow={id => focusWindow(id, true)} onCloseWindow={closeWindow} onMinimizeWindow={minimizeWindow} onZoomWindow={id => { const win = windows.find(item => item.id === id); if (win) zoomWindow(win); }} onShadeWindow={id => { const win = windows.find(item => item.id === id); if (win) updateWindow(id, { shaded: !win.shaded }); }} onArrange={arrange} /> : <>{trigger("Activities", "apps")}<span className="dos-active-app">{front ? names[front.app] : "Desktop"}</span></>}
         <span className="dos-spacer" />{statusClock}
         {platform === "linux" && <Button variant="ghost" size="sm" className="dos-icon-button" aria-label="Open settings" onClick={() => openApp("settings")}><Icon name="settings" /></Button>}
       </div>}
@@ -309,6 +322,7 @@ function Desktop({ platform, active }: { platform: Platform; active: boolean }) 
         })}
         {platform === "beos" && <div className="dos-deskbar">{trigger("BeOS", "apps", "grid")}{trigger(`${windows.length} apps`, "tasks", "layers")}{statusClock}</div>}
       </div>
+      {macDock}
       <div className="dos-taskbar">
         {platform === "windows" ? trigger("Start", "apps", "grid") : trigger(platform === "beos" ? "Deskbar" : "Apps", "apps", "grid", "dos-mobile-launch")}
         <div className="dos-desktop-tasks">{tasks}</div>

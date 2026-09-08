@@ -62,6 +62,7 @@ try {
         [["desktop-os"], "./desktop-os-e2e.mjs", "checkDesktopOS"],
         [["desktop-os"], "./desktop-utilities-e2e.mjs", "checkDesktopUtilities"],
         [["desktop-os"], "./desktop-editor-e2e.mjs", "checkDesktopEditor"],
+        [["desktop-os"], "./desktop-mac-chrome-e2e.mjs", "checkDesktopMacChrome"],
         [["video-player"], "./video-player-e2e.mjs", "checkVideoPlayer"],
         [["music-player"], "./music-player-e2e.mjs", "checkMusicPlayer"],
         [["music-player"], "./music-player-sound-e2e.mjs", "checkMusicPlayerSound"],
