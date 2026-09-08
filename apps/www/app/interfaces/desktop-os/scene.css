@@ -57,7 +57,7 @@
 .dos-mac .dos-window-title span { padding: 2px 6px; background: var(--bg); }
 .dos-mac .dos-window-title > svg { display: none; }
 .dos-mac .dos-menubar > .dos-apps-trigger { font-weight: 600; }
-.dos-mac .dos-shortcut { align-items: flex-start; padding-inline: 12px; text-align: left; }
+.dos-mac .dos-shortcut { align-items: center; }
 .dos-mac .dos-taskbar { display: none; }
 .dos-mac-dockbar { position: relative; z-index: 2; display: flex; justify-content: center; flex: none; padding: 8px 12px 10px; background: var(--table-alt); }
 .dos-mac-dock { display: flex; align-items: center; gap: 2px; max-width: 100%; padding: 4px; border: 1px solid var(--divider); border-radius: 4px; background: var(--bg); }
@@ -120,7 +120,7 @@
 .dos-crop-bar { gap: 14px; padding: 0 12px; font-size: 9px; }
 .dos-crop-bar time { margin-left: auto; }
 .dos-crop-stage { position: relative; flex: 1; background: var(--table-alt); }
-.dos-crop-icons { position: absolute; top: 16px; left: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.dos-crop-icons { position: absolute; top: 16px; left: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dos-crop-dock { position: absolute; bottom: 8px; left: 50%; z-index: 1; display: flex; gap: 12px; padding: 8px 12px; border: 1px solid var(--divider); border-radius: 4px; background: var(--bg); transform: translateX(-50%); }
 .dos-crop-window { position: absolute; top: 14px; left: 66px; width: 56%; height: 144px; border: 1px solid var(--divider); background: var(--bg); }
 .dos-crop-title { display: flex; align-items: center; justify-content: space-between; height: 24px; padding: 0 8px; border-bottom: 1px solid var(--divider); background: repeating-linear-gradient(0deg, transparent 0, transparent 3px, var(--divider-subtle) 3px, var(--divider-subtle) 4px); }

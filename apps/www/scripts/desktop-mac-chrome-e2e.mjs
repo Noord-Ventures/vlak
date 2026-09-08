@@ -6,6 +6,28 @@ const focusReturns = async (page, locator) => {
   await page.waitForFunction(target => document.activeElement === target, element);
   await element.dispose();
 };
+const checkShortcutPlacement = async (desktop, mode) => {
+  const placement = await desktop.locator(".dos-stage").evaluate(stage => {
+    const group = stage.querySelector(".dos-desktop-icons");
+    return {
+      leftOffset: group.getBoundingClientRect().left - stage.getBoundingClientRect().left,
+      icons: [...group.querySelectorAll(".dos-shortcut")].map(element => {
+        const icon = element.querySelector("svg").getBoundingClientRect();
+        const label = element.querySelector("span").getBoundingClientRect();
+        const button = element.getBoundingClientRect();
+        return { iconCenter: icon.left + icon.width / 2, textCenter: label.left + label.width / 2, tileCenter: button.left + button.width / 2, textAlign: getComputedStyle(element).textAlign, width: button.width, height: button.height };
+      }),
+    };
+  });
+  near(placement.leftOffset, 8, `${mode}: shortcut group stays at the desktop's left edge`);
+  assert.ok(placement.icons.length >= 4, "Mac keeps working desktop shortcuts");
+  for (const icon of placement.icons) {
+    near(icon.iconCenter, icon.tileCenter, `${mode}: shortcut icon is centered within its tile`);
+    near(icon.textCenter, icon.tileCenter, `${mode}: shortcut caption is centered within its tile`);
+    assert.equal(icon.textAlign, "center");
+    assert.ok(icon.width >= 44 && icon.height >= 44, "Shortcut retains a full touch target");
+  }
+};
 
 export async function checkDesktopMacChrome({ page, base, fail }) {
   try {
@@ -41,19 +63,7 @@ export async function checkDesktopMacChrome({ page, base, fail }) {
       await desktop.getByRole("dialog").getByRole("button", { name: "Terminal", exact: true }).click();
     } else {
       await dock.waitFor({ state: "visible" });
-      const icons = await desktop.locator(".dos-shortcut").evaluateAll(elements => elements.map(element => {
-        const icon = element.querySelector("svg").getBoundingClientRect();
-        const label = element.querySelector("span").getBoundingClientRect();
-        const button = element.getBoundingClientRect();
-        return { iconLeft: icon.left, textLeft: label.left, textAlign: getComputedStyle(element).textAlign, width: button.width, height: button.height };
-      }));
-      assert.ok(icons.length >= 4, "Mac keeps working desktop shortcuts");
-      for (const icon of icons) {
-        near(icon.iconLeft, icon.textLeft, "Shortcut icon and label share a left origin");
-        near(icon.iconLeft, icons[0].iconLeft, "Desktop shortcuts share a left edge");
-        assert.equal(icon.textAlign, "left");
-        assert.ok(icon.width >= 44 && icon.height >= 44, "Shortcut retains a full touch target");
-      }
+      await checkShortcutPlacement(desktop, "Embedded view");
       assert.equal(await desktop.locator(".dos-taskbar").isVisible(), false, "Desktop Mac uses the dock below its workspace");
       await terminalDock.click();
       assert.equal(await terminalDock.getAttribute("data-running"), "true", "Dock marks a newly launched app as running");
@@ -134,6 +144,7 @@ export async function checkDesktopMacChrome({ page, base, fail }) {
     await page.locator('.if-preview-frame[data-preview-open="true"]').waitFor();
     assert.equal(await terminalInput.inputValue(), "echo Preview keeps this command");
     const previewCompact = await desktop.getAttribute("data-compact") === "true";
+    if (!previewCompact) await checkShortcutPlacement(desktop, "Fullscreen preview");
     const previewMenuTrigger = previewCompact ? systemTrigger : fileTrigger;
     const previewMenu = desktop.getByRole("menu", { name: previewCompact ? "Mac OS" : "File", exact: true });
     await previewMenuTrigger.click();
@@ -159,6 +170,6 @@ export async function checkDesktopMacChrome({ page, base, fail }) {
     }
     await page.getByRole("tab", { name: "Mac OS", exact: true }).click();
     assert.equal(await terminalInput.inputValue(), "echo Preview keeps this command", "OS tab changes retain Mac application state");
-    console.log(`${page.viewportSize().width}px Mac chrome: left-aligned shortcuts, dock or compact tasks, launch/restore, traditional menu keyboard and dismissal, app state and preview preservation`);
+    console.log(`${page.viewportSize().width}px Mac chrome: shortcuts at the desktop's left edge with centered icons and captions, dock or compact tasks, launch/restore, traditional menu keyboard and dismissal, app state and preview preservation`);
   } catch (error) { fail(`Mac desktop chrome: ${error.message}`); }
 }
