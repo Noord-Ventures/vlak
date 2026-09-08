@@ -219,6 +219,12 @@ for (const component of vlakComponents) {
     if (!componentFiles.includes(file)) componentFiles.push(file);
   }
 }
+/* Standalone component files keep their source provenance. The aggregate
+   bundles already have a generated banner, so omit only those repeated headers. */
+const readBundleCss = (file) => read(`css/${file}`).replace(
+  /^\/\* ── [^\r\n]*: generated from packages\/react\/src\/[^\r\n]* ── \*\/\r?\n/,
+  "",
+);
 /* Cascade layers: every Vlak rule sits in a named layer, so unlayered
    consumer CSS wins without specificity games. @font-face stays outside. */
 const layered = [
@@ -255,7 +261,7 @@ const vlakCss =
   read("css/fonts.css") +
   `\n@layer ${layered.map(([name]) => name).join(", ")};\n\n` +
   layered
-    .map(([name, files]) => `@layer ${name} {\n${files.map((f) => read(`css/${f}`)).join("\n")}\n}\n`)
+    .map(([name, files]) => `@layer ${name} {\n${files.map(readBundleCss).join("\n")}\n}\n`)
     .join("\n");
 write("css/vlak.css", vlakCss);
 
@@ -267,7 +273,7 @@ write(
   `/* Vlak component classes only (layer vlak.components). Load after tokens, base, and type:
    @noorddev/vlak/css carries all of it; @noorddev/vlak-react/css carries the React side. Generated. */
 @layer vlak.components {
-${componentFiles.map((f) => read(`css/${f}`)).join("\n")}
+${componentFiles.map(readBundleCss).join("\n")}
 }
 `,
 );

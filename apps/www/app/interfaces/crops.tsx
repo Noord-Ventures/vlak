@@ -4,6 +4,7 @@ import { sx } from "@/lib/sx";
 import { type InterfaceSlug, interfaceBySlug } from "./catalog";
 import { interfaces } from "./interfaces.stylex";
 import { DocumentationCrop } from "./documentation/crop";
+import { CalendarCrop } from "./calendar/crop";
 import { DesktopOSCrop } from "./desktop-os/crop";
 import { VideoPlayerCrop } from "./video-player/crop";
 import { MusicPlayerCrop } from "./music-player/crop";
@@ -85,6 +86,7 @@ function FrontierCrop() {
 }
 
 const CROPS: Record<InterfaceSlug, () => ReactNode> = {
+  calendar: CalendarCrop,
   line: ChatCrop,
   press: DashboardCrop,
   wall: SocialCrop,
