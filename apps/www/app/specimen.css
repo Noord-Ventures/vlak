@@ -110,7 +110,7 @@ html:has(.specimen-page) .site-footer {
 .specimen-cell-command {
   grid-area: cmd;
   container-type: inline-size;
-  justify-content: center;
+  justify-content: space-between;
   gap: 20px;
   min-height: 408px;
 }
@@ -120,6 +120,11 @@ html:has(.specimen-page) .site-footer {
   font-weight: 500;
   letter-spacing: -.01em;
   color: var(--text-secondary);
+}
+.specimen-command-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 .specimen-command-row {
   display: flex;

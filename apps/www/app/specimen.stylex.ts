@@ -58,7 +58,7 @@ export const specimen = stylex.create({
   },
   cellCommand: {
     minHeight: 408,
-    justifyContent: "center",
+    justifyContent: "space-between",
     gap: 20,
   },
 });

@@ -32,15 +32,17 @@ export default function Home() {
 
         <section {...sx("specimen-cell specimen-cell-command", specimen.cell, specimen.cellCommand)}>
           <p className="specimen-command-kicker">Install</p>
-          <div className="specimen-command-row">
-            <p className="specimen-command">{INSTALL}</p>
-            <CopyControl text={INSTALL} />
+          <div className="specimen-command-copy">
+            <div className="specimen-command-row">
+              <p className="specimen-command">{INSTALL}</p>
+              <CopyControl text={INSTALL} />
+            </div>
+            <p className="specimen-command-meta">
+              <a href="/docs">Getting started</a>
+              <span aria-hidden="true"> · </span>
+              MIT
+            </p>
           </div>
-          <p className="specimen-command-meta">
-            <a href="/docs">Getting started</a>
-            <span aria-hidden="true"> · </span>
-            MIT
-          </p>
         </section>
 
         <SpecimenPrinciples />
