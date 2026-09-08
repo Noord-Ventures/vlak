@@ -86,22 +86,22 @@ body {
 
 /* ── Fixed corner chrome ── */
 .logo-wrap {
-  position: fixed; top: 24px; left: 20px; z-index: 200;
+  position: fixed; top: 14px; left: calc(var(--pad) - 12px); z-index: 200;
   display: flex; align-items: center; justify-content: center; gap: 12px;
-  height: 24px;
+  height: 44px;
 }
-/* The Vlak glyph, bare: ink on the page, no tile (house spec: 20px). */
+/* The 20px glyph starts on the page grid; its 44px target reaches into the gutter. */
 .site-logo {
   display: flex; align-items: center; justify-content: center;
-  width: 20px; height: 20px;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px;
   color: var(--text);
   filter: drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg));
   transition: var(--transition), opacity var(--duration-snap) var(--ease);
 }
 .site-logo:hover { opacity: .6; }
 .site-logo:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* Exact 20px box: its left edge sits on the first 20px grid line. */
-.site-logo-mark { width: 20px; height: 20px; }
+/* The path fills this box, so the SVG edge is also the painted alignment edge. */
+.site-logo-mark { display: block; width: 20px; height: 20px; flex-shrink: 0; }
 .mobile-site-name { display: none; }
 
 .corner-nav {
@@ -172,12 +172,13 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 .corner-nav a:hover, .corner-nav a[aria-current="page"] { color: var(--text); }
 
 .settings {
-  position: fixed; top: 24px; right: 20px; z-index: 200;
+  /* 14px target inset + 2px SVG bearing puts the ink on the page gutter. */
+  position: fixed; top: 14px; right: calc(var(--pad) - 16px); z-index: 200;
   filter: drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg));
 }
 .theme-toggle {
   position: static;
-  width: 24px; height: 24px; padding: 0; overflow: hidden;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0; overflow: hidden;
   display: flex; align-items: center; justify-content: center;
   background: none; border: none; border-radius: 0;
   color: var(--text-secondary); cursor: pointer; outline: none;
@@ -198,7 +199,7 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   position: absolute;
   top: calc(100% + 8px);
   inset-inline-start: auto;
-  inset-inline-end: 0;
+  inset-inline-end: 16px;
   z-index: var(--z-float);
   width: 232px;
   /* A settings panel, not a list: it never scrolls. The rs-menu leaf caps lists at 240px. */
@@ -280,7 +281,7 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 @media (max-width: 640px) {
   .logo-wrap {
     top: calc(8px + env(safe-area-inset-top, 0px));
-    left: calc(8px + env(safe-area-inset-left, 0px));
+    left: calc(var(--pad) - 12px + env(safe-area-inset-left, 0px));
     height: 44px;
     min-height: 44px;
   }
@@ -796,70 +797,70 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 .code-copy svg { display: block; }
 .code-copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-/* Phone contents picker. Hidden on the desktop rail. */
+/* Phone contents: an opaque full-width row and a viewport-height list. */
 .toc-mobile { display: none; }
 .toc-mobile-trigger {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  width: 100%; min-height: 44px; padding: 0;
-  background: none; border: none; border-radius: 0; box-shadow: none;
+  width: 100%; min-height: 44px; flex-shrink: 0;
+  padding: 10px max(var(--pad), env(safe-area-inset-right, 0px)) 10px max(var(--pad), env(safe-area-inset-left, 0px));
+  background: var(--bg); border: none; border-bottom: 1px solid var(--divider-subtle); border-radius: 0; box-shadow: none;
   color: var(--text); cursor: pointer; font: inherit;
   font-size: 1rem; font-weight: 600; letter-spacing: -.01em; text-align: left;
 }
 .toc-mobile-mark { display: flex; align-items: center; color: var(--text-secondary); }
 .toc-mobile-trigger:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
-.toc-mobile-dismiss {
-  position: fixed; inset: 0; z-index: 149;
-  background: none; border: none; padding: 0;
-}
 .toc-mobile-sheet {
-  position: absolute; left: 0; right: 0; top: 100%; z-index: 150;
-  max-height: min(70vh, 520px); overflow-y: auto;
-  background: var(--bg); border-bottom: 1px solid var(--divider);
-  border-radius: 0; box-shadow: none;
+  min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior-y: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg); border: 0; border-radius: 0; box-shadow: none;
 }
 .toc-mobile-item {
   display: flex; align-items: center;
-  min-height: 44px; padding: 10px 0;
+  min-height: 44px;
+  padding: 10px max(var(--pad), env(safe-area-inset-right, 0px)) 10px max(var(--pad), env(safe-area-inset-left, 0px));
   font-size: 1rem; font-weight: 500; letter-spacing: -.01em;
   color: var(--text-secondary); text-decoration: none;
   border-bottom: 1px solid var(--divider-subtle);
   transition: color var(--duration-snap) var(--ease), opacity var(--duration-snap) var(--ease);
 }
-.toc-mobile-item:last-child { border-bottom: none; }
 .toc-mobile-item:hover,
 .toc-mobile-item[aria-current="page"],
 .toc-mobile-item[aria-current="true"] { color: var(--text); }
 .toc-mobile-item[aria-current="page"],
 .toc-mobile-item[aria-current="true"] { font-weight: 600; }
+.toc-mobile-group { border-bottom: 1px solid var(--divider-subtle); }
 .toc-mobile-row { display: flex; align-items: stretch; gap: 0; }
-.toc-mobile-row .toc-mobile-item { flex: 1; min-width: 0; }
+.toc-mobile-row .toc-mobile-item { flex: 1; min-width: 0; border-bottom: 0; }
 .toc-mobile-more {
-  flex-shrink: 0; width: 44px; min-width: 44px; min-height: 44px;
+  flex-shrink: 0; width: calc(44px + max(var(--pad), env(safe-area-inset-right, 0px))); min-width: 44px; min-height: 44px;
   display: flex; align-items: center; justify-content: center;
+  padding: 0 max(var(--pad), env(safe-area-inset-right, 0px)) 0 0;
   background: none; border: none; border-radius: 0;
   color: var(--text-secondary); cursor: pointer; font: inherit; font-size: 1.125rem;
 }
-.toc-mobile-sub { padding-left: 16px; }
+.toc-mobile-sub { padding-left: calc(max(var(--pad), env(safe-area-inset-left, 0px)) + 16px); }
+.toc-mobile-sub:last-child { border-bottom: 0; }
+.toc-mobile-item:focus-visible,
+.toc-mobile-more:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
 @media (max-width: 899px) {
   .toc-mobile {
-    display: block;
-    position: sticky;
-    top: calc(72px + env(safe-area-inset-top, 0px));
-    z-index: 150;
-    background: transparent;
-    border-bottom: 1px solid transparent;
-    transition: background-color var(--duration-snap) var(--ease), border-color var(--duration-snap) var(--ease);
+    --toc-chrome-height: calc(72px + env(safe-area-inset-top, 0px));
+    display: block; position: sticky; top: var(--toc-chrome-height); z-index: 150;
+    width: 100vw; margin-inline: calc(-1 * var(--pad)); background: var(--bg);
   }
-  .toc-mobile[data-scrolled="true"] { background: var(--bg); border-bottom-color: var(--divider-subtle); }
-  .toc-mobile-inset {
-    margin-top: calc(72px + env(safe-area-inset-top, 0px));
-    top: calc(72px + env(safe-area-inset-top, 0px));
+  .toc-mobile[data-open="true"] { visibility: hidden; }
+  .toc-mobile-inset { margin-top: var(--toc-chrome-height); margin-inline: 0; }
+  .toc-mobile-open {
+    position: fixed; inset: var(--toc-chrome-height) 0 0; margin: 0;
+    display: flex; flex-direction: column;
+    height: calc(100dvh - var(--toc-chrome-height));
   }
+  html:has(body > .toc-mobile-open) { overflow: hidden; overscroll-behavior: none; }
+  body:has(> .toc-mobile-open) { overflow: clip; overscroll-behavior: none; }
+  body:has(.toc-mobile) { --mobile-chrome-background: var(--bg); --mobile-chrome-divider: var(--divider); --mobile-chrome-transition: none; }
 }
 @media (max-width: 640px) {
-  .toc-mobile,
-  .toc-mobile-inset { top: calc(56px + env(safe-area-inset-top, 0px)); }
-  .toc-mobile-inset { margin-top: calc(56px + env(safe-area-inset-top, 0px)); }
+  .toc-mobile { --toc-chrome-height: calc(60px + env(safe-area-inset-top, 0px)); }
 }
 .class-list { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 28px; }
 .section-label { font-size: 0.8125rem; font-weight: 600; letter-spacing: -.01em; margin: 36px 0 0; }

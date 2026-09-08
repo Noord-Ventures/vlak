@@ -48,6 +48,7 @@
 .am-task strong { display: block; font-size: 13px; line-height: 1.35; font-weight: 500; overflow-wrap: anywhere; }
 .am-task-meta, .am-task-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; font-size: 11px; line-height: 1.35; }
 .am-task-meta, .am-task-percent { color: var(--text-secondary); }
+.am-task:not([aria-current="true"]):hover .am-task-meta, .am-task:not([aria-current="true"]):hover .am-task-percent { color: inherit; }
 .am-task[aria-current="true"] .am-task-meta, .am-task[aria-current="true"] .am-task-percent { color: inherit; }
 .am-task-number, .am-task-percent { font-variant-numeric: tabular-nums; }
 .am-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; line-height: 1.35; white-space: nowrap; }

@@ -1,0 +1,6 @@
+import { Icon } from "@noorddev/vlak-react";
+import "./scene.css";
+
+export function DesktopOSCrop() {
+  return <div className="if-crop-scene dos-crop" aria-hidden="true"><div className="dos-crop-tabs"><span>Mac OS</span><span>Windows</span><span>Linux</span><span>BeOS</span></div><div className="dos-crop-bar"><Icon name="grid" size={12} /><strong>Finder</strong><span>File</span><span>Window</span><time>09:41</time></div><div className="dos-crop-stage"><div className="dos-crop-icons"><Icon name="folder" size={24} /><span>Documents</span></div><div className="dos-crop-window"><div className="dos-crop-title"><Icon name="close" size={12} /><span>Documents</span><Icon name="expand" size={12} /></div><div className="dos-crop-files"><span><Icon name="file" size={24} />Welcome.txt</span><span><Icon name="file" size={24} />Notes.txt</span><span><Icon name="folder" size={24} />Calendar</span></div></div><div className="dos-crop-window dos-crop-editor"><div className="dos-crop-title"><Icon name="close" size={12} /><span>Welcome.txt</span><Icon name="expand" size={12} /></div><p>A place to work</p><p>Open a folder, make a note, or try a command in Terminal.</p></div></div></div>;
+}

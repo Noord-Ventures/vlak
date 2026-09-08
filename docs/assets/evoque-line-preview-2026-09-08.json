@@ -1,0 +1,32 @@
+{
+  "created": "2026-09-08T00:12:00.159Z",
+  "method": "Unretouched Chromium screenshots of the actual Three.js EV scene in its side view, reduced motion.",
+  "source": "https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa",
+  "creator": "tonielpro520",
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "adaptations": "The original licensed Evoque geometry retains its proportions and silhouette. Selected original body boundaries, creases and wheel ridges are simplified offline. Paper-colored surfaces and sparse outlines omit fine trim, badges, grille mesh and interior detail. Attribution is retained under Components used.",
+  "rendering": {
+    "featureContours": "LineSegments2 / LineMaterial",
+    "lineWidthCssPixels": 1.2,
+    "paperSurfacePolygonOffset": true
+  },
+  "captureCommand": "SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-vehicle-previews.mjs",
+  "captures": {
+    "light": {
+      "filename": "evoque-line-side-light-v4.png",
+      "sha256": "b60485eafdd5dea2f428e880790f3ee95ed448dd9d4be5388a7014bf9da96bbe",
+      "width": 998,
+      "height": 408,
+      "camera": "0.000,1.030,11.988",
+      "paper": "f5f3ed"
+    },
+    "dark": {
+      "filename": "evoque-line-side-dark-v4.png",
+      "sha256": "527caa862cb3e6639c5608733b2ad45932a5c2927b91eacf8f93beb1c658a77a",
+      "width": 998,
+      "height": 408,
+      "camera": "0.000,1.030,11.988",
+      "paper": "161412"
+    }
+  }
+}

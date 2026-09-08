@@ -1,0 +1,62 @@
+.dos-app {
+  --control-h: 44px;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  color: var(--text);
+  background: var(--bg);
+  font-size: 14px;
+  line-height: 1.45;
+  container-type: inline-size;
+}
+.dos-app > * { flex-shrink: 0; }
+.dos-app button { min-width: 44px; min-height: 44px; flex-shrink: 0; }
+.dos-app input, .dos-app textarea { min-width: 0; max-width: 100%; font-family: inherit; font-size: 16px; }
+.dos-app p, .dos-app h2 { margin: 0; }
+.dos-app-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.dos-app-toolbar > input { flex: 1 1 140px; width: 0; }
+.dos-path { flex: 1; min-width: 0; overflow-wrap: anywhere; color: var(--gray); }
+.dos-app-actions { border-top: 1px solid var(--divider); padding-top: 12px; }
+.dos-app-status { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; margin-top: auto; color: var(--gray); font-size: 12px; overflow-wrap: anywhere; }
+.dos-app-muted { color: var(--gray); }
+.dos-file-list { display: flex; flex-direction: column; min-height: 80px; }
+.dos-app .dos-file-row { display: flex; justify-content: start; gap: 12px; width: 100%; border-radius: 0; text-align: left; padding: 8px; border-bottom: 1px solid var(--divider); }
+.dos-file-row > span { flex: 1; min-width: 0; overflow-wrap: anywhere; white-space: normal; }
+.dos-file-row > small { margin-left: auto; color: var(--gray); font-size: 12px; font-weight: 400; }
+.dos-app .dos-file-row[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.dos-file-row[aria-pressed="true"] > small { color: inherit; }
+.dos-inline-form { display: grid; gap: 12px; border-block: 1px solid var(--divider); padding-block: 16px; }
+.dos-editor { height: 100%; }
+.dos-editor > .rs-textarea-field { display: flex; flex: 1; min-height: 200px; }
+.dos-app .dos-editor-text { min-height: 200px; height: 100%; resize: vertical; padding: 16px; border-radius: 0; }
+.dos-terminal { height: 100%; }
+.dos-terminal-output { flex: 1; min-height: 140px; max-height: 420px; overflow: auto; overscroll-behavior: contain; }
+.dos-terminal-output pre { margin: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; font: 13px/1.5 var(--font-mono, monospace); }
+.dos-terminal-prompt { display: flex; gap: 8px; min-width: 0; margin-top: auto; }
+.dos-terminal-prompt > input { flex: 1; width: 0; }
+.dos-browser-bookmarks { display: flex; flex-wrap: wrap; gap: 0 8px; border-bottom: 1px solid var(--divider); padding-bottom: 8px; }
+.dos-browser-document { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding-block: 12px; }
+.dos-browser-document h2 { font-size: 32px; line-height: 1.1; letter-spacing: -.035em; font-weight: 500; }
+.dos-browser-document pre { font: 13px/1.6 var(--font-mono, monospace); white-space: pre-wrap; overflow-wrap: anywhere; }
+.dos-browser-document p { max-width: 60ch; }
+.dos-app .dos-browser-guide { justify-content: space-between; width: 100%; padding-inline: 0; border-bottom: 1px solid var(--divider); border-radius: 0; }
+.dos-calculator { max-width: 440px; margin-inline: auto; }
+.dos-calculator-result { display: block; text-align: right; font-size: 30px; line-height: 1.25; min-height: 40px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.dos-calculator-keys { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); border: 1px solid var(--divider); }
+.dos-app .dos-calculator-keys button { min-height: 52px; border-radius: 0; border: 0; box-shadow: inset -1px -1px var(--divider); }
+.dos-calculator-history { display: grid; gap: 8px; text-align: right; color: var(--gray); font-size: 12px; overflow-wrap: anywhere; }
+@container (max-width: 360px) {
+  .dos-file-row > small { display: none; }
+  .dos-browser > .dos-app-toolbar > input { flex-basis: calc(100% - 64px); }
+  .dos-app-actions { gap: 4px; }
+}
+@media (max-width: 680px) {
+  .dos-app { padding: 12px; }
+  .dos-browser-document h2 { font-size: 28px; }
+}

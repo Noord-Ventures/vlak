@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 import { arrangeDriveCar } from "./drive-car";
 
-/** Original battery illustration paired with the abstract Evoque line model. */
+/** Original battery illustration paired with the licensed Evoque's paper surfaces. */
 export function createDriveModel() {
   const root = new THREE.Group();
   const battery = new THREE.Group();
@@ -15,7 +15,7 @@ export function createDriveModel() {
   const alloy = new THREE.MeshBasicMaterial({ color: 0xfaf9f6, toneMapped: false });
   const cell = new THREE.MeshBasicMaterial({ color: 0xfaf9f6, toneMapped: false });
   const edge = new THREE.LineBasicMaterial({ color: 0x303030, transparent: true, opacity: .84 });
-  const vehicleEdge = new LineMaterial({ color: 0x3a3a3a, linewidth: 1.05, worldUnits: false, transparent: true, opacity: .88, depthWrite: false });
+  const vehicleEdge = new LineMaterial({ color: 0x3a3a3a, linewidth: 1.2, worldUnits: false, transparent: true, opacity: .88, depthWrite: false });
   const detail = new THREE.LineBasicMaterial({ color: 0x5f5f5f, transparent: true, opacity: .7 });
   const lamp = new THREE.MeshBasicMaterial({ color: 0x6c6c6c });
   const trim = new THREE.MeshBasicMaterial({ color: 0xfaf9f6, toneMapped: false });
@@ -23,7 +23,8 @@ export function createDriveModel() {
   const silhouette = new THREE.MeshBasicMaterial({ color: 0x505050, side: THREE.BackSide, toneMapped: false });
   const materials = { paint, glass, rubber, alloy, cell, edge, detail, lamp, trim, chargeFill, silhouette, vehicleEdge };
   for (const surface of [paint, glass, rubber, alloy, trim, lamp]) { surface.polygonOffset = true; surface.polygonOffsetFactor = 1; surface.polygonOffsetUnits = 1; }
-  const { body, runningGear, wheels } = arrangeDriveCar(materials);
+  const { body, runningGear, wheels, ready: vehicleReady, cancel: cancelVehicle } = arrangeDriveCar(materials);
+  let cancelled = false;
   const line = (parent: THREE.Object3D, points: number[][], material = edge, closed = false) => {
     const geometry = new THREE.BufferGeometry().setFromPoints(points.map(point => new THREE.Vector3(point[0], point[1], point[2])));
     const object = closed ? new THREE.LineLoop(geometry, material) : new THREE.Line(geometry, material);
@@ -56,12 +57,12 @@ export function createDriveModel() {
   for(let i=0;i<8;i++){const dot=mesh(current,new THREE.SphereGeometry(.026,8,6),lamp,false);dot.position.set(-1.16+i*.31,.80,-.66);}
   root.add(body,runningGear,battery,cover);
   const vehicleMaterials = new Map<THREE.Material, THREE.Material>();
-  for (const group of [body, runningGear]) group.traverse(object => {
+  const ready = vehicleReady.then(() => { if (cancelled) return; for (const group of [body, runningGear]) group.traverse(object => {
     const drawable = object as THREE.Mesh;
     if (!drawable.material || Array.isArray(drawable.material)) return;
     const source = drawable.material;
     if (!vehicleMaterials.has(source)) vehicleMaterials.set(source, source.clone());
     drawable.material = vehicleMaterials.get(source)!;
-  });
-  return {root,body,runningGear,battery,cover,wheels,connectors,current,moduleFills,vehicleMaterials,materials,gradient};
+  }); });
+  return {root,body,runningGear,battery,cover,wheels,connectors,current,moduleFills,vehicleMaterials,materials,gradient,ready,cancel() { cancelled = true; cancelVehicle(); }};
 }

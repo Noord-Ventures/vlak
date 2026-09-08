@@ -12,7 +12,7 @@ The site gutter overlay appears on `/interfaces` as it does on Components. It is
 
 Detail pages keep the Vlak logo, corner navigation, breadcrumb and Interfaces rail. A compact title and Build with Vlak link sit directly above the specimen. Below it are the interaction summary, source, plain-language description and links to the components actually used. Custom visual adaptations are documented honestly. The Build section supplies a package install, stylesheet import, installation guide, source link and copyable study brief. Copy reports actual clipboard success or exposes selectable text. `/design.md` is copied from the root guide during site preparation. Gallery and next-study links finish the page, with the next arrow in the gutter.
 
-On narrow pages, a secondary contents picker sits below the main navigation. It is transparent at the top and backed by paper after scroll. Its chevron and the two-line main menu mark share the Vlak icon geometry. Desktop documentation menus allow pointer travel from trigger into the panel; focus, outside-click and Escape paths remain usable.
+Below 900px, the section contents picker opens a full-screen menu beneath the global navigation. Both header rows use opaque paper. The list scrolls independently with edge-to-edge dividers and gutter-aligned labels. Escape restores the trigger, route changes and desktop resizing close the menu, and background content is inert while the visible global chrome stays usable. Opening the site menu or appearance closes section contents. Its chevron and the two-line main menu mark share the Vlak icon geometry. Desktop documentation menus allow pointer travel from trigger into the panel; focus, outside-click and Escape paths remain usable.
 
 ## Visual and interaction contract
 

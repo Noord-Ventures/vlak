@@ -56,7 +56,7 @@ jobs:
   site:
     name: Docs site build and end-to-end
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -74,20 +74,22 @@ jobs:
       - name: Every catalogue entry has an isolated example
         run: node apps/www/scripts/check-examples.mjs
       - name: Site state and planning integrity
-        run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs
+        run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs apps/www/scripts/desktop-os.test.mjs
       - name: Build the site
         run: pnpm --filter www build
       - name: Canonical pages, sharing metadata, sitemap and agent links
         run: node apps/www/scripts/check-discovery.mjs
-      - name: axe, keyboard, and phone checks over the export
-        run: pnpm --filter www e2e
-      - name: EV, documentation and music video interactions
+      - name: Mobile navigation and interactive workspaces
         run: |
           python3 -m http.server 3016 --directory apps/www/out > /tmp/vlak-interface-server.log 2>&1 &
           INTERFACE_SERVER_PID=$!
           trap 'kill "$INTERFACE_SERVER_PID"' EXIT
           curl --retry 10 --retry-connrefused --retry-delay 1 -fsS http://localhost:3016/interfaces/ > /dev/null
-          INTERFACES=drive,documentation,video-player SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
+          SITE_URL=http://localhost:3016 node apps/www/scripts/mobile-navigation-e2e.mjs
+          INTERFACES=drive,documentation,video-player,desktop-os SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
+          SITE_URL=http://localhost:3016 node apps/www/scripts/interface-preview-e2e.mjs
+      - name: axe, keyboard, and phone checks over the export
+        run: pnpm --filter www e2e
       - uses: actions/upload-artifact@v4
         if: always()
         with:

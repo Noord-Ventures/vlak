@@ -150,25 +150,25 @@ export const interfaces = stylex.create({
     containerType: "inline-size",
     marginTop: 0,
     height: {
-      default: 612,
-      [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
+      default: "var(--interface-preview-height, 612px)",
+      [phone]: "var(--interface-preview-height, clamp(480px, calc(100svh - 148px), 720px))",
     },
     minHeight: {
-      default: null,
-      [phone]: 480,
+      default: "var(--interface-preview-min-height, 0px)",
+      [phone]: "var(--interface-preview-min-height, 480px)",
     },
     backgroundColor: "var(--bg)",
-    borderWidth: 1,
+    borderWidth: "var(--interface-preview-border-width, 1px)",
     borderStyle: "solid",
     borderColor: "var(--divider)",
     borderRadius: 0,
     boxShadow: "none",
-    overflow: "hidden",
+    overflow: "var(--interface-preview-overflow, hidden)",
   },
   workbenchSpecimen: {
     height: {
-      default: "clamp(612px, calc(100svh - 180px), 816px)",
-      [phone]: "clamp(480px, calc(100svh - 148px), 720px)",
+      default: "var(--interface-preview-height, clamp(612px, calc(100svh - 180px), 816px))",
+      [phone]: "var(--interface-preview-height, clamp(480px, calc(100svh - 148px), 720px))",
     },
   },
   matter: {
