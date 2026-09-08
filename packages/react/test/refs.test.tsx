@@ -263,6 +263,7 @@ const cases: Record<string, Case> = {
   Command: { props: { groups: [] }, tag: "div" },
   CommandDialog: { props: { ...dialog, groups: [] }, tag: "dialog" },
   Calendar: { tag: "div" },
+  CalendarPopover: { tag: "input" },
   DatePicker: { tag: "div" },
   Table: { tag: "table" },
   TableHead: { tag: "thead", wrap: inTable },

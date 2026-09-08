@@ -23,13 +23,14 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 
 /* [label, path or directory + filter, gzipped budget in bytes] */
 const budgets = [
-  // The 167-component catalog includes the stage-position editor alongside the
-  // industrial, geospatial, robotics, electronics and microbiology workbenches.
-  // Aggregate caps are unchanged; each new leaf also has its own bound.
-  // Keep atomic CSS and existing control caps; bound every new leaf separately.
+  // The 168-component catalog adds a native calendar popover with editable civil
+  // dates, clock validation and top-layer focus handling. Allow 5 KiB aggregate JS
+  // and 256 bytes of atomic CSS for this leaf, with its own 5.25 KiB JS bound.
+  // The core CSS, CLI and all existing control caps stay unchanged.
   ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 29 * 1024],
-  ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024],
-  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 205 * 1024],
+  ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024 + 256],
+  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 210 * 1024],
+  ["@noorddev/vlak-react components/calendar-popover.js", "packages/react/dist/components/calendar-popover.js", 5 * 1024 + 256],
   ["@noorddev/vlak-react components/button.js", "packages/react/dist/components/button.js", 4 * 1024],
   ["@noorddev/vlak-react components/number-field.js", "packages/react/dist/components/number-field.js", 3 * 1024],
   ["@noorddev/vlak-react components/playback-controls.js", "packages/react/dist/components/playback-controls.js", 2 * 1024],

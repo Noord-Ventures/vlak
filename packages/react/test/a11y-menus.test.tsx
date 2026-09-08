@@ -483,6 +483,22 @@ describe("Menubar", () => {
 });
 
 describe("Calendar", () => {
+  it("preserves a four-digit early year through month paging and date selection", async () => {
+    const user = userEvent.setup();
+    const changed = vi.fn();
+    const early = new Date(0);
+    early.setHours(0, 0, 0, 0);
+    early.setFullYear(42, 0, 31);
+    render(<Calendar defaultValue={early} min={early} onValueChange={changed} />);
+    const grid = screen.getByRole("grid", { name: "January 42" });
+    const selected = within(grid).getByRole("gridcell", { selected: true });
+    expect(selected.textContent).toBe("31");
+    selected.focus();
+    await user.keyboard("{PageDown}{Enter}");
+    expect(changed).toHaveBeenCalledTimes(1);
+    const result = changed.mock.calls[0]![0] as Date;
+    expect([result.getFullYear(), result.getMonth(), result.getDate()]).toEqual([42, 1, 28]);
+  });
   it("is a grid of rows and gridcells with one roving tab stop", () => {
     render(<Calendar defaultValue={new Date(2026, 8, 3)} />);
     const grid = screen.getByRole("grid", { name: "September 2026" });

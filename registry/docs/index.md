@@ -1,6 +1,6 @@
 # Vlak components
 
-167 components in 18 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+168 components in 18 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -46,6 +46,7 @@
 - [One-time code](input-otp.md): Collects a one-time code in one cell per character. Supports auto-advance, backspace, and paste.
 - [Combobox](combobox.md): Filters and selects an option from a listbox through one text field.
 - [Calendar](calendar.md): Selects a date from a month grid. Selected day fills with ink; today has a 1px outline.
+- [Calendar popover](calendar-popover.md): Types or picks a date and optional local time. A 1px field opens a calendar in the native top layer.
 - [Date picker](date-picker.md): Selects a date from a calendar overlay opened by a 1px trigger.
 - [Form](form.md): Collects related inputs as stacked fields with one primary action at the end.
 

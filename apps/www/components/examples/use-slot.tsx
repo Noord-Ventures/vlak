@@ -15,6 +15,7 @@ import { Use as Breadcrumbs } from "./breadcrumbs/use";
 import { Use as Button } from "./button/use";
 import { Use as ButtonGroup } from "./button-group/use";
 import { Use as Calendar } from "./calendar/use";
+import { Use as CalendarPopover } from "./calendar-popover/use";
 import { Use as Callout } from "./callout/use";
 import { Use as Card } from "./card/use";
 import { Use as Carousel } from "./carousel/use";
@@ -92,6 +93,7 @@ const uses: Record<string, ComponentType> = {
   button: Button,
   "button-group": ButtonGroup,
   calendar: Calendar,
+  "calendar-popover": CalendarPopover,
   callout: Callout,
   card: Card,
   carousel: Carousel,

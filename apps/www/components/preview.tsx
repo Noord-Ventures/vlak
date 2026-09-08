@@ -43,6 +43,7 @@ import {
   SidebarNav,
   Spinner,
   Calendar,
+  CalendarPopover,
   Carousel,
   Collapsible,
   Combobox,
@@ -681,6 +682,7 @@ export const demos: Record<string, () => React.ReactNode> = {
   ),
   command: CommandDemo,
   calendar: CalendarDemo,
+  "calendar-popover": () => <CalendarPopover label="Deadline" defaultValue="2026-07-24" />,
   "date-picker": DatePickerDemo,
   "data-table": () => (
     <div style={{ width: 300 }}>

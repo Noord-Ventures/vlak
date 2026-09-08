@@ -8066,6 +8066,105 @@
         }
       ]
     },
+    "calendar-popover": {
+      "exports": [
+        {
+          "name": "CalendarPopover",
+          "kind": "component",
+          "description": "Editable civil dates with native form validation and a top-layer calendar.",
+          "extends": "InputHTMLAttributes<HTMLInputElement>",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "type",
+              "type": "\"date\" | \"datetime-local\"",
+              "required": false,
+              "default": "\"date\""
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false,
+              "description": "Local canonical value. Typed partial drafts are emitted too."
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "min",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "max",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "weekStart",
+              "type": "0 | 1",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "locale",
+              "type": "string",
+              "required": false,
+              "default": "\"en\""
+            },
+            {
+              "name": "triggerLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Open calendar\""
+            },
+            {
+              "name": "dialogLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Label rendered above the field at 12px."
+            },
+            {
+              "name": "ok",
+              "type": "boolean",
+              "required": false,
+              "description": "Marks the field as validated: ink border and ink feedback text."
+            },
+            {
+              "name": "feedback",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Quiet feedback line under the field."
+            },
+            {
+              "name": "hint",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Hint under the field; it describes the control."
+            },
+            {
+              "name": "error",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Error under the field; it describes the control and marks it invalid."
+            }
+          ]
+        }
+      ]
+    },
     "date-picker": {
       "exports": [
         {
