@@ -115,13 +115,13 @@ Forwards `ref` to the `HTMLInputElement`.
 - An editable input keeps its native label, hint, error, required, disabled and readOnly behavior. The ref resolves to this input.
 - Typing emits partial drafts as well as complete values. Invalid dates and values outside min or max fail native form validation; local date and time fields display a space and emit a T between date and time.
 - The named calendar trigger opens a non-modal dialog using the native Popover API, above surrounding overflow and dialogs.
-- Calendar supplies a roving day grid, full-date names, selected and today states, and 44px day controls.
+- The compact panel keeps square 44px day targets independently of the input width. The calendar shows only the four to six weeks needed for its month.
 - The local date and time panel has separately labelled hour and minute inputs. Done confirms the draft; Escape and outside dismissal cancel it.
 - A named hidden input submits the canonical string. Controlled with value and onValueChange, or uncontrolled with defaultValue.
 
 ## Classes
 
-`rs-calendar-popover`, `rs-calendar-popover-label`, `rs-calendar-popover-control`, `rs-calendar-popover-input`, `rs-calendar-popover-trigger`, `rs-calendar-popover-panel`, `rs-calendar-popover-grid`, `rs-calendar-popover-time`, `rs-calendar-popover-actions`, `rs-calendar-popover-feedback`, `rs-calendar-popover-error`
+`rs-calendar-popover`, `rs-calendar-popover-label`, `rs-calendar-popover-control`, `rs-calendar-popover-input`, `rs-calendar-popover-trigger`, `rs-calendar-popover-panel`, `rs-calendar-popover-grid`, `rs-calendar-popover-time`, `rs-calendar-popover-actions`, `rs-calendar-popover-action`, `rs-calendar-popover-done`, `rs-calendar-popover-feedback`, `rs-calendar-popover-error`
 
 ## Dependencies
 

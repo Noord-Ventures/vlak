@@ -16,6 +16,8 @@ export interface CalendarProps
   defaultMonth?: Date;
   /** 0 = Sunday, 1 = Monday. */
   weekStart?: 0 | 1;
+  /** Keep six week rows. False shows only the four to six rows this month needs. */
+  fixedWeeks?: boolean;
   /** Move focus to the roving day on mount (a date picker opening). */
   autoFocus?: boolean;
   min?: Date;
@@ -62,70 +64,47 @@ const styles = stylex.create({
   },
   head: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
-    minHeight: {
-      default: "1.625rem",
-      [mq.phone]: vlak.hit,
-    },
-    marginBottom: "0.5rem",
+    minHeight: vlak.hit,
+    marginBottom: "0.25rem",
   },
   title: {
-    fontSize: {
-      default: "0.8125rem",
-      [mq.phone]: vlak.controlFs,
-    },
-    fontWeight: 600,
+    fontSize: "0.875rem",
+    fontWeight: 500,
     letterSpacing: "-0.01em",
-    lineHeight: "26px",
+    lineHeight: 20 / 14,
     color: vlak.ink,
   },
   nav: {
     display: "flex",
-    gap: {
-      default: "0.3125rem",
-      [mq.phone]: "0.5rem",
-    },
+    gap: 0,
     flexShrink: 0,
+    marginInlineStart: "auto",
   },
   page: {
     boxSizing: "border-box",
-    width: {
-      default: vlak.hit,
-      [mq.phone]: vlak.hit,
-    },
-    height: {
-      default: vlak.hit,
-      [mq.phone]: vlak.hit,
-    },
-    minWidth: {
-      default: null,
-      [mq.phone]: vlak.hit,
-    },
-    minHeight: {
-      default: null,
-      [mq.phone]: vlak.hit,
-    },
-    borderRadius: {
-      default: vlak.radiusSm,
-      [mq.phone]: vlak.radiusSm,
-    },
+    width: vlak.hit,
+    height: vlak.hit,
+    minWidth: vlak.hit,
+    minHeight: vlak.hit,
+    borderRadius: vlak.radiusSm,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: {
-      default: "0.8125rem",
-      [mq.phone]: vlak.controlFs,
-    },
+    fontSize: "0.8125rem",
     color: vlak.gray,
-    borderWidth: vlak.hairline,
-    borderStyle: "solid",
-    borderColor: vlak.divider,
+    borderWidth: 0,
+    borderStyle: "none",
     padding: 0,
-    backgroundColor: "transparent",
+    backgroundColor: {
+      default: "transparent",
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonFace" } },
+    },
     fontFamily: "inherit",
     cursor: "pointer",
-    transform: "translateY(1px)",
+    opacity: { default: 1, ":disabled": 0.4 },
     outlineWidth: {
       default: null,
       ":focus-visible": 2,
@@ -136,11 +115,11 @@ const styles = stylex.create({
     },
     outlineColor: {
       default: null,
-      ":focus-visible": vlak.ink,
+      ":focus-visible": { default: vlak.ink, [mq.forcedColors]: "CanvasText" },
     },
     outlineOffset: {
       default: null,
-      ":focus-visible": 2,
+      ":focus-visible": -2,
     },
   },
   icon: {
@@ -155,13 +134,11 @@ const styles = stylex.create({
     gridTemplateColumns: "repeat(7, minmax(44px, 1fr))",
   },
   dow: {
-    fontSize: {
-      default: "0.6875rem",
-      [mq.phone]: "0.8125rem",
-    },
+    fontSize: "0.75rem",
     fontWeight: 500,
     color: vlak.gray,
     textAlign: "center",
+    lineHeight: 20 / 12,
     paddingTop: "0.25rem",
     paddingBottom: "0.25rem",
     paddingInline: 0,
@@ -175,7 +152,7 @@ const styles = stylex.create({
     boxSizing: "border-box",
     width: "100%",
     height: vlak.hit,
-    minWidth: vlak.hit,
+    minWidth: "44px",
     minHeight: vlak.hit,
     display: "flex",
     alignItems: "center",
@@ -203,11 +180,11 @@ const styles = stylex.create({
     },
     outlineColor: {
       default: null,
-      ":focus-visible": vlak.ink,
+      ":focus-visible": { default: vlak.ink, [mq.forcedColors]: "CanvasText" },
     },
     outlineOffset: {
       default: null,
-      ":focus-visible": 2,
+      ":focus-visible": -2,
     },
   },
   /* Gray at full opacity stays above 4.5:1 on paper and on the dark ground. */
@@ -231,6 +208,12 @@ const styles = stylex.create({
     color: { default: vlak.paper, [mq.forcedColors]: "HighlightText" },
     fontWeight: 600,
     forcedColorAdjust: "none",
+    boxShadow: "none",
+    outlineColor: {
+      default: null,
+      ":focus-visible": { default: vlak.paper, [mq.forcedColors]: "HighlightText" },
+    },
+    outlineOffset: { default: null, ":focus-visible": -4 },
   },
 });
 
@@ -246,6 +229,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   onSelect,
   defaultMonth,
   weekStart = 1,
+  fixedWeeks = true,
   autoFocus,
   min,
   max,
@@ -309,12 +293,14 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   const first = civilDate(month.getFullYear(), month.getMonth(), 1);
   const lead = (first.getDay() - weekStart + 7) % 7;
   const start = civilDate(month.getFullYear(), month.getMonth(), 1 - lead);
-  const weeks = Array.from({ length: 6 }, (_, w) =>
+  const monthDays = civilDate(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const rowCount = fixedWeeks ? 6 : Math.ceil((lead + monthDays) / 7);
+  const weeks = Array.from({ length: rowCount }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)),
   );
   const title = month.toLocaleDateString(locale, { month: "long", year: "numeric" });
   const weekdayDates = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 7 + weekStart + i));
-  const dows = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "short" }));
+  const dows = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "narrow" }));
   const dowsLong = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "long" }));
 
   const shift = (delta: number) => {
@@ -401,17 +387,17 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
         </span>
         <span className={nav.className} style={nav.style}>
           <button type="button" className={page.className} style={page.style} disabled={disabled || (!!min && startOfMonth(month) <= startOfMonth(min))} aria-label="Previous month" onClick={() => shift(-1)}>
-            <Icon name="chevron-left" size={12} className={icon.className} style={icon.style} />
+            <Icon name="chevron-left" size={16} className={icon.className} style={icon.style} />
           </button>
           <button type="button" className={page.className} style={page.style} disabled={disabled || (!!max && startOfMonth(month) >= startOfMonth(max))} aria-label="Next month" onClick={() => shift(1)}>
-            <Icon name="chevron-right" size={12} className={icon.className} style={icon.style} />
+            <Icon name="chevron-right" size={16} className={icon.className} style={icon.style} />
           </button>
         </span>
       </div>
       <div className={grid.className} style={grid.style} role="grid" aria-labelledby={titleId} onKeyDown={onGridKeyDown}>
         <div className={row.className} style={row.style} role="row">
           {dows.map((d, i) => (
-            <span key={d} className={dow.className} style={dow.style} role="columnheader" aria-label={dowsLong[i]}>
+            <span key={dowsLong[i]} className={dow.className} style={dow.style} role="columnheader" aria-label={dowsLong[i]}>
               {d}
             </span>
           ))}

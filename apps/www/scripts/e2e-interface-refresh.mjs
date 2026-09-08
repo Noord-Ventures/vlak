@@ -60,6 +60,7 @@ try {
         [["microscopy"], "./microscopy-interface-e2e.mjs", "checkMicroscopyInterface"],
         [["documentation"], "./documentation-e2e.mjs", "checkDocumentation"],
         [["calendar"], "./calendar-e2e.mjs", "checkCalendar"],
+        [["calendar"], "./calendar-popover-e2e.mjs", "checkCalendarPopover"],
         [["desktop-os"], "./desktop-os-e2e.mjs", "checkDesktopOS"],
         [["desktop-os"], "./desktop-utilities-e2e.mjs", "checkDesktopUtilities"],
         [["desktop-os"], "./desktop-editor-e2e.mjs", "checkDesktopEditor"],

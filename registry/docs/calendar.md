@@ -77,6 +77,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | `onSelect` | `(date: Date) => void` |  | Deprecated. Use `onValueChange`. |
 | `defaultMonth` | `Date` |  |  |
 | `weekStart` | `0 \| 1` | `1` | 0 = Sunday, 1 = Monday. |
+| `fixedWeeks` | `boolean` | `true` | Keep six week rows. False shows only the four to six rows this month needs. |
 | `autoFocus` | `boolean` |  | Move focus to the roving day on mount (a date picker opening). |
 | `min` | `Date` |  |  |
 | `max` | `Date` |  |  |
@@ -103,6 +104,7 @@ Forwards `ref` to the `HTMLDivElement`.
 - Previous and next month buttons are labelled. Controlled with value and onValueChange, or uncontrolled with defaultValue.
 - Days and month controls are 44px targets. min, max and isDateDisabled prevent selection; unavailable days expose aria-disabled while remaining discoverable with arrows.
 - locale formats the month, weekdays and full-date labels; weekStart sets Sunday or Monday independently. disabled removes the day grid from the tab order.
+- fixedWeeks keeps six date rows by default. Set it to false for only the four to six weeks occupied by the current month.
 
 ## Classes
 

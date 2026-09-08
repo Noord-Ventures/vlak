@@ -34,18 +34,20 @@ const styles = stylex.create({
     outlineWidth: { default: 0, ":focus-within": 2 }, outlineStyle: { default: "none", ":focus-within": "solid" }, outlineColor: { default: vlak.ink, [mq.forcedColors]: "Highlight" }, outlineOffset: 2,
   },
   input: { minWidth: 0, width: "100%", flex: "1 1 0", height: vlak.hit, minHeight: vlak.hit, fontVariantNumeric: "tabular-nums", outlineOffset: -2 },
-  trigger: { flexShrink: 0, width: vlak.hit, height: vlak.hit, minWidth: vlak.hit, minHeight: vlak.hit, padding: 0, borderRadius: vlak.radiusSm },
+  trigger: { flexShrink: 0, width: vlak.hit, height: vlak.hit, minWidth: vlak.hit, minHeight: vlak.hit, padding: 0, borderWidth: 0, borderRadius: vlak.radiusSm },
   panel: {
     boxSizing: "border-box", position: "fixed", inset: "auto", margin: 0,
-    width: "calc(19.25rem + 10px)", maxWidth: "calc(100vw - 2px)", padding: "4px",
+    width: "calc(19.25rem + 26px)", maxWidth: "calc(100vw - 2px)", padding: "clamp(4px, calc((100vw - 312px) / 2), 12px)",
     borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.divider, borderRadius: vlak.radius,
     backgroundColor: vlak.paper, color: vlak.ink, overflow: "auto", overscrollBehavior: "contain",
     boxShadow: { default: "0 8px 24px rgba(0,0,0,0.08)", [mq.forcedColors]: "none" },
     "::backdrop": { backgroundColor: "transparent" },
   },
   grid: { width: "100%" },
-  time: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", padding: "0.5rem 0.25rem", borderTopWidth: vlak.hairline, borderTopStyle: "solid", borderTopColor: vlak.divider },
-  actions: { display: "flex", gap: "0.25rem", justifyContent: "flex-end", flexWrap: "nowrap", paddingTop: "0.25rem" },
+  time: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.5rem", paddingBlock: "0.75rem", paddingInline: "clamp(4px, calc((100vw - 312px) / 2), 12px)", marginInline: "calc(-1 * clamp(4px, calc((100vw - 312px) / 2), 12px))", borderTopWidth: vlak.hairline, borderTopStyle: "solid", borderTopColor: vlak.divider },
+  actions: { display: "flex", alignItems: "center", gap: "0.25rem", flexWrap: "wrap", marginTop: "0.5rem", marginInline: "calc(-1 * clamp(4px, calc((100vw - 312px) / 2), 12px))", paddingTop: "0.25rem", paddingInline: "clamp(4px, calc((100vw - 312px) / 2), 12px)", borderTopWidth: vlak.hairline, borderTopStyle: "solid", borderTopColor: vlak.divider },
+  action: { width: "auto", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: "0.5rem", marginInlineEnd: { default: null, ":first-child": "auto" }, borderWidth: 0, backgroundColor: "transparent", fontWeight: 500, outlineOffset: -2 },
+  done: { width: "auto", minWidth: vlak.hit, paddingInline: "0.875rem" },
   feedback: { margin: 0, fontSize: { default: "0.75rem", [mq.phone]: "0.875rem" }, color: vlak.gray, lineHeight: 1.45 },
   error: { color: vlak.ink },
 });
@@ -87,7 +89,7 @@ export const CalendarPopover = React.forwardRef<HTMLInputElement, CalendarPopove
   const context = React.useRef<HTMLDialogElement | null>(null);
   const minValue = min && valid(min, type) ? min : undefined, maxValue = max && valid(max, type) ? max : undefined;
   const minDay = parseDate(minValue?.slice(0, 10) ?? "0001-01-01"), maxDay = parseDate(maxValue?.slice(0, 10) ?? "9999-12-31");
-  const placement = useOverlayPosition(open, panelRef, controlRef, undefined, "bottom", { popover: "auto", edge: 1 });
+  const placement = useOverlayPosition(open, panelRef, controlRef, undefined, "bottom", { popover: "auto", edge: 1, matchAnchorWidth: false });
 
   const issue = (next: string) => {
     if (!next) return required ? "Enter a date." : "";
@@ -180,6 +182,8 @@ export const CalendarPopover = React.forwardRef<HTMLInputElement, CalendarPopove
   const grid = rs(["rs-calendar-popover-grid"], styles.grid);
   const time = rs(["rs-calendar-popover-time"], styles.time);
   const actions = rs(["rs-calendar-popover-actions"], styles.actions);
+  const action = rs(["rs-calendar-popover-action"], styles.action);
+  const done = rs(["rs-calendar-popover-done"], styles.done);
   const quiet = rs(["rs-calendar-popover-feedback"], styles.feedback);
   const err = rs(["rs-calendar-popover-error"], styles.feedback, styles.error);
   const shownError = error ?? (showError ? message : "");
@@ -208,16 +212,16 @@ export const CalendarPopover = React.forwardRef<HTMLInputElement, CalendarPopove
         else if (event.key === "Enter" && event.target instanceof HTMLInputElement) { event.preventDefault(); if (draftIssue) setPanelError(draftIssue); else choose(draftValue); }
       }}>
       {open && <>
-        <Calendar className={grid.className} style={grid.style} value={parseDate(draft.day)} defaultMonth={parseDate(draft.day)} min={minDay} max={maxDay} weekStart={weekStart} locale={locale} autoFocus={placement.visibility === "visible"} onValueChange={selectDay} />
+        <Calendar fixedWeeks={false} className={grid.className} style={grid.style} value={parseDate(draft.day)} defaultMonth={parseDate(draft.day)} min={minDay} max={maxDay} weekStart={weekStart} locale={locale} autoFocus={placement.visibility === "visible"} onValueChange={selectDay} />
         {type === "datetime-local" && <div className={time.className} style={time.style}>
           <Input label="Hours" type="number" inputMode="numeric" min={0} max={23} step={1} value={draft.hours} onChange={event => { setDraft(state => ({ ...state, hours: event.target.value })); setPanelError(""); }} />
           <Input label="Minutes" type="number" inputMode="numeric" min={0} max={59} step={1} value={draft.minutes} onChange={event => { setDraft(state => ({ ...state, minutes: event.target.value })); setPanelError(""); }} />
         </div>}
         {panelError && <p role="alert" className={err.className} style={err.style}>{panelError}</p>}
         <div className={actions.className} style={actions.style}>
-          <Button type="button" variant="ghost" disabled={todayDisabled} onClick={() => selectDay(new Date())}>Today</Button>
-          {!required && <Button type="button" variant="ghost" onClick={() => { change(""); setShowError(false); close(true); }}>Clear</Button>}
-          <Button type="button" onClick={() => { if (type === "date") close(true); else if (draftIssue) setPanelError(draftIssue); else choose(draftValue); }}>Done</Button>
+          <Button type="button" variant="ghost" className={action.className} style={action.style} disabled={todayDisabled} onClick={() => selectDay(new Date())}>Today</Button>
+          {!required && <Button type="button" variant="ghost" className={action.className} style={action.style} onClick={() => { change(""); setShowError(false); close(true); }}>Clear</Button>}
+          {type === "datetime-local" && <Button type="button" className={done.className} style={done.style} onClick={() => { if (draftIssue) setPanelError(draftIssue); else choose(draftValue); }}>Done</Button>}
         </div>
       </>}
     </div>
