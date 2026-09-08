@@ -19,7 +19,7 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: {
       default: vlak.divider,
-      ":hover": vlak.accent,
+      ":hover": { default: null, [mq.hover]: vlak.accent },
       ":active": vlak.accent,
     },
     transition: {
@@ -50,7 +50,7 @@ const styles = stylex.create({
     borderBottomStyle: "none",
     backgroundImage: {
       default: "linear-gradient(var(--divider), var(--divider))",
-      ":hover": "linear-gradient(var(--accent), var(--accent))",
+      ":hover": { default: null, [mq.hover]: "linear-gradient(var(--accent), var(--accent))" },
       ":active": "linear-gradient(var(--accent), var(--accent))",
     },
     backgroundSize: "calc(100% - 1px) 1px",

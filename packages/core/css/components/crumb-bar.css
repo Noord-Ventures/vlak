@@ -25,10 +25,10 @@
 .rs-crumbs-link.rs-crumb-link{min-width:var(--hit);transition:var(--transition);color:var(--text-secondary);font-weight:400;text-decoration:none;text-underline-offset:3px;background-color:transparent;display:inline-flex;align-items:center;min-height:var(--hit)}
 .rs-crumbs-link.rs-crumb-link:link{color:var(--text-secondary)}
 .rs-crumbs-link.rs-crumb-link:visited{color:var(--text-secondary)}
-.rs-crumbs-link.rs-crumb-link:hover{color:var(--text);text-decoration:underline}
 .rs-crumbs-link.rs-crumb-link:active{color:var(--text)}
 .rs-crumbs-link.rs-crumb-link:focus-visible{color:var(--text);outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.rs-crumbs-link.rs-crumb-link{transition:none}}
+@media (hover: hover) and (pointer: fine){.rs-crumbs-link.rs-crumb-link:hover{color:var(--text);text-decoration:underline}}
 @media (max-width: 640px){.rs-crumbs-link.rs-crumb-link{display:inline-flex;align-items:center;min-height:var(--hit)}}
 .rs-crumbs-sep.rs-crumb-sep{color:var(--text-secondary)}
 .rs-crumbs-here.rs-crumb-here{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis}

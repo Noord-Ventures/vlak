@@ -34,40 +34,44 @@ export function ReferenceTile({ study, caption, index, selected, onSelect, showI
         id={`study-select-${index}`}
         className="inspiration-thumbnail reference-tile"
         data-work-id={study.id}
-        style={{ height: "100%", width: "100%", minWidth: 0, padding: "20px", flexDirection: "column", alignItems: "stretch", justifyContent: "flex-start", gap: "16px", textAlign: "left", borderWidth: 0, borderRadius: 0, outlineOffset: "-2px" }}
+        style={{ display: "grid", gridArea: "1 / 1 / 3 / 2", gridTemplateRows: "subgrid", height: "100%", width: "100%", minWidth: 0, padding: 0, alignItems: "stretch", justifyContent: "stretch", gap: 0, textAlign: "left", borderWidth: 0, borderRadius: 0, outlineOffset: "-2px" }}
         aria-label={`${index + 1}. ${study.title}, ${artist}`}
         aria-describedby={detailsId}
         pressed={selected}
         onPressedChange={() => onSelect(index)}
       >
-        <span className="inspiration-thumbnail-meta">
-          <CardLabel style={metaType}>{String(index + 1).padStart(2, "0")}</CardLabel>
-          <CardLabel style={metaType}>{study.kind}</CardLabel>
+        <span className="reference-tile-content">
+          <span className="inspiration-thumbnail-meta">
+            <CardLabel style={metaType}>{String(index + 1).padStart(2, "0")}</CardLabel>
+            <CardLabel style={metaType}>{study.kind}</CardLabel>
+          </span>
+          {showImage && <span className="inspiration-thumbnail-image">
+            <img src={study.poster ?? study.image} alt="" loading="lazy" onError={(event) => {
+              if (event.currentTarget.getAttribute("src") !== study.image) event.currentTarget.src = study.image;
+            }} />
+          </span>}
+          <span className="reference-tile-identity">
+            <CardLabel className="reference-tile-artist" style={artistType}>{artist}</CardLabel>
+            {caption && <CardLabel className="reference-tile-dates" style={metaType}>{caption.years} · {caption.place}</CardLabel>}
+            <CardLabel className="reference-tile-work" style={workType}>{work}</CardLabel>
+          </span>
+          <span className="reference-tile-details" id={detailsId}>
+            <span className="reference-tile-description reference-tile-copy" style={bodyType}>{study.description}</span>
+            {note && <span className="reference-tile-caption-note reference-tile-copy" style={bodyType}>{note}</span>}
+          </span>
+          <span className="reference-tile-materials">
+            <CardLabel className="reference-tile-kind" style={metaType}>{study.model ? "Spatial study" : "From the archive"}</CardLabel>
+            <span className="reference-tile-material reference-tile-copy" style={bodyType}>{study.material}</span>
+          </span>
+          <span className="reference-tile-context">
+            <CardLabel style={{ ...metaType, fontWeight: 600 }}>About this work</CardLabel>
+            <span className="reference-tile-relation reference-tile-copy" style={bodyType}>{study.relation}</span>
+          </span>
         </span>
-        {showImage && <span className="inspiration-thumbnail-image">
-          <img src={study.poster ?? study.image} alt="" loading="lazy" onError={(event) => {
-            if (event.currentTarget.getAttribute("src") !== study.image) event.currentTarget.src = study.image;
-          }} />
-        </span>}
-        <span className="reference-tile-identity">
-          <CardLabel className="reference-tile-artist" style={artistType}>{artist}</CardLabel>
-          {caption && <CardLabel className="reference-tile-dates" style={metaType}>{caption.years} · {caption.place}</CardLabel>}
-          <CardLabel className="reference-tile-work" style={workType}>{work}</CardLabel>
-        </span>
-        <span className="reference-tile-details" id={detailsId}>
-          <span className="reference-tile-description reference-tile-copy" style={bodyType}>{study.description}</span>
-          {note && <span className="reference-tile-caption-note reference-tile-copy" style={bodyType}>{note}</span>}
-        </span>
-        <span className="reference-tile-materials">
-          <CardLabel className="reference-tile-kind" style={metaType}>{study.model ? "Spatial study" : "From the archive"}</CardLabel>
-          <span className="reference-tile-material reference-tile-copy" style={bodyType}>{study.material}</span>
-        </span>
-        <span className="reference-tile-context">
-          <CardLabel style={{ ...metaType, fontWeight: 600 }}>About this work</CardLabel>
-          <span className="reference-tile-relation reference-tile-copy" style={bodyType}>{study.relation}</span>
-        </span>
+        {/* The sibling anchor shares this row without nesting an interactive link in the toggle. */}
+        <span aria-hidden="true" />
       </Toggle>
-      <Link className="reference-tile-source" href={study.source} target="_blank" rel="noreferrer">
+      <Link className="reference-tile-source" style={{ borderBottomWidth: 0, color: selected ? "var(--reference-source-ink, var(--bg))" : "var(--reference-source-ink, var(--text))", outlineColor: "currentColor" }} href={study.source} target="_blank" rel="noreferrer">
         <span>{study.sourceLabel}</span><Icon name="external" />
       </Link>
     </div>

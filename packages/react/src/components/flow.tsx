@@ -34,7 +34,7 @@ const styles = stylex.create({
     borderStyle: "dashed",
     borderColor: {
       default: vlak.divider,
-      ":hover": vlak.accent,
+      ":hover": { default: null, [mq.hover]: vlak.accent },
     },
     borderRadius: vlak.radiusSm,
     paddingTop: "0.875rem",
@@ -136,7 +136,7 @@ const styles = stylex.create({
     borderStyle: "dashed",
     borderColor: {
       default: vlak.divider,
-      ":hover": vlak.accent,
+      ":hover": { default: null, [mq.hover]: vlak.accent },
     },
     borderRadius: vlak.radiusSm,
     paddingTop: "0.75rem",
@@ -148,7 +148,7 @@ const styles = stylex.create({
     letterSpacing: "-0.01em",
     color: {
       default: vlak.gray,
-      ":hover": "var(--text)",
+      ":hover": { default: null, [mq.hover]: "var(--text)" },
     },
     backgroundColor: "transparent",
     width: 184,

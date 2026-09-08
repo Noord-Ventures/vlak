@@ -44,14 +44,14 @@ const styles = stylex.create({
     letterSpacing: "-0.01em",
     backgroundColor: {
       default: "transparent",
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonFace" } },
       [mq.forcedColors]: "ButtonFace",
     },
     borderWidth: vlak.hairline,
     borderStyle: "solid",
     borderColor: {
       default: vlak.controlBorder,
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonText" } },
       [mq.forcedColors]: "ButtonText",
     },
     borderRadius: {
@@ -60,7 +60,7 @@ const styles = stylex.create({
     },
     color: {
       default: vlak.gray,
-      ":hover": vlak.ink,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.ink, [mq.forcedColors]: "ButtonText" } },
       [mq.forcedColors]: "ButtonText",
     },
     cursor: "pointer",
@@ -89,14 +89,17 @@ const styles = stylex.create({
   pressed: {
     backgroundColor: {
       default: vlak.ink,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.ink, [mq.forcedColors]: "Highlight" } },
       [mq.forcedColors]: "Highlight",
     },
     borderColor: {
       default: vlak.ink,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.ink, [mq.forcedColors]: "Highlight" } },
       [mq.forcedColors]: "Highlight",
     },
     color: {
       default: vlak.paper,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.paper, [mq.forcedColors]: "HighlightText" } },
       [mq.forcedColors]: "HighlightText",
     },
     forcedColorAdjust: "none",

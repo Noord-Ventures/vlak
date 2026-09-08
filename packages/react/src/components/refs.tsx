@@ -21,7 +21,7 @@ const styles = stylex.create({
   citeA: {
     color: {
       default: vlak.gray,
-      ":hover": vlak.accent,
+      ":hover": { default: null, [mq.hover]: vlak.accent },
     },
     textDecoration: "none",
     transition: {
@@ -79,14 +79,14 @@ const styles = stylex.create({
     fontSize: "0.6875rem",
     color: {
       default: vlak.gray,
-      ":hover": "var(--text)",
+      ":hover": { default: null, [mq.hover]: "var(--text)" },
     },
     textDecoration: "none",
     borderBottomWidth: vlak.hairline,
     borderBottomStyle: "solid",
     borderBottomColor: {
       default: vlak.divider,
-      ":hover": vlak.accent,
+      ":hover": { default: null, [mq.hover]: vlak.accent },
     },
     transition: {
       default: vlak.transition,

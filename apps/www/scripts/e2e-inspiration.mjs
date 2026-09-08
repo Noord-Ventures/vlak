@@ -106,6 +106,13 @@ try {
       assert.equal(await source.innerText(), studies[i].sourceLabel);
       assert.equal(await source.getAttribute("href"), studies[i].source);
       assert.equal(await tile.locator("a").count(), 0, "a source link must not be inside a selection button");
+      const sourceLayout = await source.evaluate((element) => {
+        const source = element.getBoundingClientRect();
+        const tile = element.parentElement.querySelector(".reference-tile");
+        const surface = tile.getBoundingClientRect();
+        return { inside: source.left >= surface.left + 19 && source.right <= surface.right - 19 && source.top >= surface.top && source.bottom <= surface.bottom - 11, border: getComputedStyle(element).borderBottomWidth, foreground: getComputedStyle(element).color === getComputedStyle(tile).color };
+      });
+      assert.deepEqual(sourceLayout, { inside: true, border: "0px", foreground: true }, "the source shares its selected card surface and foreground, without a separate underlined footer");
       if (["bruynzeel-kitchen", "gertrud-kurz", "schiphol-signage", "vught-memorial", "sdap-nvv"].includes(studies[i].id)) {
         await desktop.locator(".inspiration-canvas canvas").screenshot({ path: `${screenshots}/${studies[i].id}.png` });
       }

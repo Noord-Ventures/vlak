@@ -14,7 +14,9 @@
 .cx button { cursor: pointer; }
 .cx button:disabled { cursor: default; opacity: .45; }
 .cx button:focus-visible, .cx a:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
-.cx button:hover:not(:disabled):not(.on) { filter: brightness(1.14); }
+@media (hover: hover) and (pointer: fine) {
+  .cx button:hover:not(:disabled):not(.on):where(:not([aria-pressed="true"]):not([aria-selected="true"]):not([aria-current]:not([aria-current="false"]))) { filter: brightness(1.14); }
+}
 .cx > header { min-width: 0; min-height: 48px; display: flex; align-items: center; gap: 16px; padding: 8px 16px; border-bottom: 1px solid var(--divider); }
 .cx > header > b { flex-shrink: 0; font-size: 13px; font-weight: 600; }
 .cx > header > span { min-width: 0; flex: 1; color: var(--text-secondary); font-size: 11px; }

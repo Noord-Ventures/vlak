@@ -178,11 +178,7 @@ const styles = stylex.create({
     color: vlak.ink,
     backgroundColor: {
       default: "transparent",
-      ":hover": vlak.controlFill,
-      [mq.touch]: {
-        ":hover": "transparent",
-        ":active": vlak.controlFill,
-      },
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonFace" } },
     },
     borderWidth: 0,
     borderStyle: "none",
@@ -221,11 +217,13 @@ const styles = stylex.create({
     },
     backgroundColor: {
       default: vlak.ink,
-      ":hover": vlak.ink,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.ink, [mq.forcedColors]: "Highlight" } },
+      [mq.forcedColors]: "Highlight",
     },
     borderRadius: vlak.radiusSm,
-    color: vlak.paper,
+    color: { default: vlak.paper, [mq.forcedColors]: "HighlightText" },
     fontWeight: 600,
+    forcedColorAdjust: "none",
   },
 });
 

@@ -50,8 +50,8 @@ const styles = stylex.create({
     opacity: {
       default: 0,
       [stylex.when.ancestor(":hover")]: {
-        default: 1,
-        [mq.touch]: 0,
+        default: null,
+        [mq.hover]: 1,
       },
       [stylex.when.ancestor(":focus-within")]: 1,
       [stylex.when.ancestor(":active")]: {
@@ -62,8 +62,8 @@ const styles = stylex.create({
     visibility: {
       default: "hidden",
       [stylex.when.ancestor(":hover")]: {
-        default: "visible",
-        [mq.touch]: "hidden",
+        default: null,
+        [mq.hover]: "visible",
       },
       [stylex.when.ancestor(":focus-within")]: "visible",
       [stylex.when.ancestor(":active")]: {

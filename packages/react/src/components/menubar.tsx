@@ -56,7 +56,7 @@ const styles = stylex.create({
     fontSize: vlak.controlFs,
     lineHeight: 1.25,
     color: vlak.ink,
-    backgroundColor: { default: "transparent", ":hover": vlak.controlFill },
+    backgroundColor: { default: "transparent", ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonFace" } } },
     overflowWrap: "anywhere",
     cursor: "pointer",
     outlineWidth: { default: null, ":focus-visible": 2 },
@@ -65,7 +65,7 @@ const styles = stylex.create({
     outlineOffset: -2,
   },
   open: {
-    backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: "Highlight" },
+    backgroundColor: { default: vlak.controlFill, ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "Highlight" } }, [mq.forcedColors]: "Highlight" },
     color: { default: vlak.ink, [mq.forcedColors]: "HighlightText" },
   },
   panel: {

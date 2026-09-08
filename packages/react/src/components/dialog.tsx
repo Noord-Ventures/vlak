@@ -138,7 +138,7 @@ export const dialogStyles = stylex.create({
     borderRadius: vlak.radiusSm,
     backgroundColor: {
       default: "transparent",
-      ":hover": vlak.controlFill,
+      ":hover": { default: null, [mq.hover]: vlak.controlFill },
     },
     color: vlak.ink,
     cursor: "pointer",

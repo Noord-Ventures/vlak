@@ -55,11 +55,11 @@ const styles = stylex.create({
     /* Hover and disabled are opacity on paper; in forced colors they become system colors instead. */
     opacity: {
       default: 1,
-      ":hover": 0.85,
+      ":hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current])": { default: null, [mq.hover]: 0.85 },
       ":disabled": 0.4,
       [mq.forcedColors]: {
         default: 1,
-        ":hover": 1,
+        ":hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current])": { default: null, [mq.hover]: 1 },
         ":disabled": 1,
       },
     },
@@ -109,7 +109,7 @@ const styles = stylex.create({
     fontWeight: 500,
     backgroundColor: {
       default: "transparent",
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current])": { default: null, [mq.hover]: vlak.controlFill },
       ":disabled": "transparent",
       [mq.forcedColors]: "ButtonFace",
     },
@@ -122,11 +122,11 @@ const styles = stylex.create({
     },
     borderColor: {
       default: vlak.divider,
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current])": { default: null, [mq.hover]: vlak.controlFill },
       ":disabled": vlak.divider,
       [mq.forcedColors]: {
         default: "ButtonText",
-        ":hover": "Highlight",
+        ":hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current])": { default: null, [mq.hover]: "Highlight" },
         ":disabled": "GrayText",
       },
     },
@@ -183,7 +183,7 @@ const styles = stylex.create({
     },
     backgroundColor: {
       default: vlak.paper,
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current])": { default: null, [mq.hover]: vlak.controlFill },
       ":disabled": vlak.paper,
       [mq.forcedColors]: "ButtonFace",
     },

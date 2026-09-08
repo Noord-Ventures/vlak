@@ -49,7 +49,9 @@
 .tr-results h3 { font-size: 20px; font-weight: 400; letter-spacing: -.025em; line-height: 1.2; }
 .tr-results > header > span { color: var(--text-secondary); font-size: 11px; }
 .tr-trip { width: 100%; display: flex; align-items: center; min-height: 96px; gap: 18px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; padding: 20px 28px; background: transparent; color: var(--text); text-align: start; cursor: pointer; }
-.tr-trip:hover { background: var(--control-fill); }
+@media (hover: hover) and (pointer: fine) {
+  .tr-trip:hover { background: var(--control-fill); }
+}
 .tr-trip:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
 .tr-trip-index { font-size: 10px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
 .tr-trip-main { min-width: 0; flex: 1; display: grid; gap: 10px; }

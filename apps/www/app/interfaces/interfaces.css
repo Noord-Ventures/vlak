@@ -220,8 +220,10 @@ body:has(.if-index) {
   overflow: hidden;
   transition: border-color var(--duration-snap) var(--ease), background-color var(--duration-snap) var(--ease);
 }
-.if-tile:hover,
 .if-tile:focus-visible { border-color: var(--text); background: color-mix(in srgb, var(--text) 2%, transparent); }
+@media (hover: hover) and (pointer: fine) {
+  .if-tile:hover { border-color: var(--text); background: color-mix(in srgb, var(--text) 2%, transparent); }
+}
 .if-tile:focus-visible { outline: 1px solid var(--text); outline-offset: 2px; }
 
 .if-crop {
@@ -233,7 +235,9 @@ body:has(.if-index) {
   background: transparent;
   transition: filter var(--duration-snap) var(--ease);
 }
-.if-tile:hover .if-crop { filter: contrast(1.035); }
+@media (hover: hover) and (pointer: fine) {
+  .if-tile:hover .if-crop { filter: contrast(1.035); }
+}
 .if-crop-scene { color: var(--text); }
 .if-mark { display: block; flex-shrink: 0; color: currentColor; }
 
@@ -282,7 +286,9 @@ body:has(.if-index) {
 }
 .if-tile-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
 .if-tile-head > span { color: var(--text-tertiary); font-size: .6875rem; font-variant-numeric: tabular-nums; transition: color var(--duration-snap) var(--ease); }
-.if-tile:hover .if-tile-head > span { color: var(--text); }
+@media (hover: hover) and (pointer: fine) {
+  .if-tile:hover .if-tile-head > span { color: var(--text); }
+}
 .if-tile-matter h2 {
   margin: 0 0 2px;
   font-size: 0.9375rem;

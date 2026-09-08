@@ -21,7 +21,9 @@
 .am .rs-btn-primary, .am .rs-btn-ghost { flex: none; width: auto; min-width: 44px; min-height: 44px; height: 44px; padding: 0 12px; font-size: 12px; line-height: 1.2; border-radius: var(--radius-sm); }
 .am .rs-btn-primary { background: var(--text); color: var(--bg); }
 .am .rs-btn-ghost { color: var(--text); border-color: var(--control-border); }
-.am .rs-btn-ghost:hover { background: var(--control-fill); }
+@media (hover: hover) and (pointer: fine) {
+  .am .rs-btn-ghost:hover:where(:not([aria-pressed="true"]):not([aria-selected="true"])) { background: var(--control-fill); }
+}
 .am .rs-icon { flex: none; display: block; }
 .am-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--divider); }
 .am-workspace { display: flex; align-items: center; gap: 12px; min-width: 0; }
@@ -42,13 +44,17 @@
 .am .am-filter .rs-toggle { flex: 1; min-width: 44px; min-height: 44px; padding: 0 8px; font-size: 12px; line-height: 1.2; white-space: nowrap; }
 .am-queue-list, .am-detail-scroll, .am-compose { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--divider) transparent; }
 .am-task { display: grid; gap: 7px; width: 100%; min-width: 0; min-height: 100px; padding: 13px 16px; border: 0; border-bottom: 1px solid var(--divider); border-radius: 0; background: transparent; color: var(--text); text-align: left; cursor: pointer; transition: background-color 200ms ease, color 200ms ease; }
-.am-task:hover { background: var(--control-fill); }
+@media (hover: hover) and (pointer: fine) {
+  .am-task:hover { background: var(--control-fill); }
+}
 .am-task[aria-current="true"] { background: var(--text); color: var(--bg); }
 .am-task:focus-visible { outline: 2px solid currentColor; outline-offset: -4px; }
 .am-task strong { display: block; font-size: 13px; line-height: 1.35; font-weight: 500; overflow-wrap: anywhere; }
 .am-task-meta, .am-task-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; font-size: 11px; line-height: 1.35; }
 .am-task-meta, .am-task-percent { color: var(--text-secondary); }
-.am-task:not([aria-current="true"]):hover .am-task-meta, .am-task:not([aria-current="true"]):hover .am-task-percent { color: inherit; }
+@media (hover: hover) and (pointer: fine) {
+  .am-task:not([aria-current="true"]):hover .am-task-meta, .am-task:not([aria-current="true"]):hover .am-task-percent { color: inherit; }
+}
 .am-task[aria-current="true"] .am-task-meta, .am-task[aria-current="true"] .am-task-percent { color: inherit; }
 .am-task-number, .am-task-percent { font-variant-numeric: tabular-nums; }
 .am-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; line-height: 1.35; white-space: nowrap; }

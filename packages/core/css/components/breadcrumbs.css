@@ -8,10 +8,10 @@
 .rs-crumbs-link{min-width:var(--hit);transition:var(--transition);color:var(--text-secondary);font-weight:400;text-decoration:none;text-underline-offset:3px;background-color:transparent;display:inline-flex;align-items:center;min-height:var(--hit)}
 .rs-crumbs-link:link{color:var(--text-secondary)}
 .rs-crumbs-link:visited{color:var(--text-secondary)}
-.rs-crumbs-link:hover{color:var(--text);text-decoration:underline}
 .rs-crumbs-link:active{color:var(--text)}
 .rs-crumbs-link:focus-visible{color:var(--text);outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.rs-crumbs-link{transition:none}}
+@media (hover: hover) and (pointer: fine){.rs-crumbs-link:hover{color:var(--text);text-decoration:underline}}
 @media (max-width: 640px){.rs-crumbs-link{display:inline-flex;align-items:center;min-height:var(--hit)}}
 .rs-crumbs-sep{color:var(--text-secondary)}
 .rs-crumbs-here{color:var(--text);font-weight:500}

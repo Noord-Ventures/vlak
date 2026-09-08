@@ -3,8 +3,11 @@
 @media (max-width: 640px){.rs-menubar{width:100%;border-radius:var(--radius-sm)}}
 .rs-menubar-wrap{position:relative;display:flex;flex:0 1 auto;min-width:0;max-width:100%}
 .rs-menubar-trigger{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);max-width:100%;padding:0.5rem 0.75rem;border-width:0;border-radius:var(--radius-sm);font-family:inherit;font-size:var(--control-fs);line-height:1.25;color:var(--text);background-color:transparent;overflow-wrap:anywhere;cursor:pointer;outline-color:var(--text);outline-offset:-2px}
-.rs-menubar-trigger:hover{background-color:var(--control-fill)}
 .rs-menubar-trigger:focus-visible{outline-width:2px;outline-style:solid}
+@media (hover: hover) and (pointer: fine){.rs-menubar-trigger:hover:not(:disabled):not([aria-disabled='true']){background-color:var(--control-fill)}}
+@media (hover: hover) and (pointer: fine) and (forced-colors: active){.rs-menubar-trigger:hover:not(:disabled):not([aria-disabled='true']){background-color:ButtonFace}}
 .rs-menubar-trigger-open{background-color:var(--control-fill);color:var(--text)}
+@media (hover: hover) and (pointer: fine){.rs-menubar-trigger-open:hover:not(:disabled):not([aria-disabled='true']){background-color:var(--control-fill)}}
+@media (hover: hover) and (pointer: fine) and (forced-colors: active){.rs-menubar-trigger-open:hover:not(:disabled):not([aria-disabled='true']){background-color:Highlight}}
 @media (forced-colors: active){.rs-menubar-trigger-open{background-color:Highlight;color:HighlightText}}
 .rs-menubar-panel{min-width:10rem;width:max-content;max-width:calc(100vw - 16px)}

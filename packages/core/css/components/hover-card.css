@@ -1,10 +1,10 @@
 /* ── hover-card: generated from packages/react/src/components/hover-card.tsx ── */
 .rs-hover-card{position:relative;display:inline-block}
 .rs-hover-card-panel{position:absolute;top:calc(100% + 8px);inset-inline-start:0;z-index:var(--z-float);width:16.25rem;background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.06);padding:0.875rem;font-size:0.8125rem;line-height:1.45;letter-spacing:-0.01em;color:var(--text-secondary);opacity:0;visibility:hidden;transition:var(--transition)}
-.rs-hover-card:hover .rs-hover-card-panel{opacity:1;visibility:visible}
 .rs-hover-card:focus-within .rs-hover-card-panel{opacity:1;visibility:visible}
 .rs-hover-card-panel::before{content:"";position:absolute;bottom:100%;inset-inline-start:0;inset-inline-end:0;height:0.5rem}
 @media (max-width: 640px){.rs-hover-card-panel{width:min(280px, calc(100vw - 32px));border-radius:var(--radius);box-shadow:none;font-size:0.9375rem}}
-@media (hover: none){.rs-hover-card:hover .rs-hover-card-panel{opacity:0;visibility:hidden}.rs-hover-card:active .rs-hover-card-panel{opacity:1;visibility:visible}}
+@media (hover: hover) and (pointer: fine){.rs-hover-card:hover .rs-hover-card-panel{opacity:1;visibility:visible}}
+@media (hover: none){.rs-hover-card:active .rs-hover-card-panel{opacity:1;visibility:visible}}
 @media (prefers-reduced-motion: reduce){.rs-hover-card-panel{transition:none}}
 .rs-hover-card-open{opacity:1;visibility:visible}

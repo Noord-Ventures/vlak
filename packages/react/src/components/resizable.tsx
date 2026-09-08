@@ -121,8 +121,11 @@ const styles = stylex.create({
     },
     ":hover::after": {
       backgroundColor: {
-        default: vlak.ink,
-        [mq.forcedColors]: "Highlight",
+        default: null,
+        [mq.hover]: {
+          default: vlak.ink,
+          [mq.forcedColors]: "Highlight",
+        },
       },
     },
     ":focus-visible::after": {

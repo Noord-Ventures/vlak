@@ -595,19 +595,24 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   flex-direction: column;
   transition: border-color var(--duration-snap) var(--ease), background-color var(--duration-snap) var(--ease);
 }
-.gallery-item:hover,
 .gallery-item:focus-within {
   border-color: var(--text);
   background-color: color-mix(in srgb, var(--text) 5%, var(--bg));
 }
-.gallery-item:hover .gallery-demo,
-.gallery-item:hover .gallery-meta,
 .gallery-item:focus-within .gallery-demo,
 .gallery-item:focus-within .gallery-meta {
   background-color: color-mix(in srgb, var(--text) 5%, var(--bg));
 }
-.gallery-item:hover .gallery-item-link,
 .gallery-item:focus-within .gallery-item-link { text-decoration: underline; text-underline-offset: 3px; }
+@media (hover: hover) and (pointer: fine) {
+  .gallery-item:hover {
+    border-color: var(--text);
+    background-color: color-mix(in srgb, var(--text) 5%, var(--bg));
+  }
+  .gallery-item:hover .gallery-demo,
+  .gallery-item:hover .gallery-meta { background-color: color-mix(in srgb, var(--text) 5%, var(--bg)); }
+  .gallery-item:hover .gallery-item-link { text-decoration: underline; text-underline-offset: 3px; }
+}
 .gallery-item-link { color: inherit; text-decoration: none; }
 .gallery-item-link::after { content: ""; position: absolute; inset: 0; }
 .gallery-item-link:focus-visible::after { outline: 1px solid var(--text); outline-offset: -3px; }

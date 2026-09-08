@@ -1,9 +1,9 @@
 /* ── tooltip: generated from packages/react/src/components/tooltip.tsx ── */
 .rs-tip{position:relative;display:inline-flex}
 .rs-tip-bubble{position:absolute;bottom:calc(100% + 8px);inset-inline-start:50%;transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:min(280px, calc(100vw - 16px));background-color:var(--text);color:var(--bg);font-size:0.71875rem;font-weight:500;letter-spacing:-0.01em;line-height:1.3;padding-block:0.3125rem;padding-inline:0.5625rem;border-radius:var(--radius-sm);z-index:var(--z-float);opacity:0;visibility:hidden;pointer-events:none;transition:var(--transition)}
-.rs-tip:hover .rs-tip-bubble{opacity:1;visibility:visible;pointer-events:auto}
 .rs-tip:focus-within .rs-tip-bubble{opacity:1;visibility:visible;pointer-events:auto}
 .rs-tip-bubble::before{content:"";position:absolute;top:100%;inset-inline-start:0;inset-inline-end:0;height:0.5rem}
 @media (max-width: 640px){.rs-tip-bubble{font-size:0.8125rem;padding-block:0.5rem;padding-inline:0.75rem;border-radius:var(--radius-sm)}}
-@media (hover: none){.rs-tip:hover .rs-tip-bubble{opacity:0;visibility:hidden}.rs-tip:active .rs-tip-bubble{opacity:1;visibility:visible}}
+@media (hover: hover) and (pointer: fine){.rs-tip:hover .rs-tip-bubble{opacity:1;visibility:visible;pointer-events:auto}}
+@media (hover: none){.rs-tip:active .rs-tip-bubble{opacity:1;visibility:visible}}
 @media (prefers-reduced-motion: reduce){.rs-tip-bubble{transition:none}}

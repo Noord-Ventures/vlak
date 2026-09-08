@@ -15,7 +15,10 @@
 .dos-taskbar { border-top: 1px solid var(--divider); }
 .dos .dos-chrome-button { flex: none; width: auto; min-width: 44px; min-height: 44px; padding: 0 12px; gap: 8px; border: 0; border-radius: 0; white-space: nowrap; }
 .dos .dos-icon-button { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; min-width: 44px; min-height: 44px; padding: 0; border: 0; border-radius: 0; }
-.dos .dos-chrome-button:hover, .dos .dos-icon-button:hover, .dos .dos-chrome-button[aria-expanded="true"] { background: var(--table-alt); }
+.dos .dos-chrome-button[aria-expanded="true"] { background: var(--table-alt); }
+@media (hover: hover) and (pointer: fine) {
+  .dos .dos-chrome-button:hover, .dos .dos-icon-button:hover { background: var(--table-alt); }
+}
 .dos-active-app { overflow: hidden; padding: 0 12px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
 .dos-spacer { flex: 1; }
 .dos-clock { font-variant-numeric: tabular-nums; }
@@ -25,7 +28,9 @@
 .dos-desktop-icons { position: absolute; inset: 12px auto auto 8px; display: flex; flex-direction: column; gap: 4px; width: 88px; }
 .dos .dos-shortcut { display: flex; flex-direction: column; justify-content: center; gap: 9px; min-width: 0; min-height: 82px; padding: 10px 4px; border: 0; background: transparent; font-size: 12px; text-align: center; white-space: normal; }
 .dos-shortcut span { overflow-wrap: anywhere; }
-.dos .dos-shortcut:hover { background: var(--bg); }
+@media (hover: hover) and (pointer: fine) {
+  .dos .dos-shortcut:hover { background: var(--bg); }
+}
 .dos-window { position: absolute; display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--divider); background: var(--bg); box-shadow: 2px 2px 0 var(--divider-subtle); overflow: hidden; }
 .dos-window[data-front="true"] { border-color: var(--text); }
 .dos-titlebar { display: flex; align-items: center; flex: none; height: 44px; min-width: 0; border-bottom: 1px solid var(--divider); background: var(--table-alt); }
@@ -63,18 +68,25 @@
 .dos-mac-dockbar { position: relative; z-index: 2; display: flex; justify-content: center; flex: none; padding: 8px 12px 10px; background: var(--table-alt); }
 .dos-mac-dock { display: flex; align-items: center; gap: 2px; max-width: 100%; padding: 4px; border: 1px solid var(--divider); border-radius: 4px; background: var(--bg); }
 .dos .dos-mac-dock-app { position: relative; display: flex; align-items: center; justify-content: center; flex: 0 1 48px; width: 48px; min-width: 44px; height: 56px; padding: 0 0 6px; border: 0; border-radius: 4px; background: transparent; }
-.dos .dos-mac-dock-app:hover { background: var(--table-alt); }
+@media (hover: hover) and (pointer: fine) {
+  .dos .dos-mac-dock-app:hover { background: var(--table-alt); }
+}
 .dos .dos-mac-dock-app[aria-pressed="true"] { color: var(--bg); background: var(--text); }
 .dos .dos-mac-dock-app[aria-pressed="true"]:focus-visible { outline-color: var(--bg); }
 .dos-mac-dock-dot { position: absolute; bottom: 5px; left: calc(50% - 2px); width: 4px; height: 4px; border-radius: 50%; background: currentColor; visibility: hidden; }
 .dos-mac-dock-app[data-running="true"] .dos-mac-dock-dot { visibility: visible; }
 .dos-mac-dock-label { position: absolute; bottom: calc(100% + 12px); left: 50%; z-index: 1; padding: 6px 10px; border: 1px solid var(--divider); border-radius: 4px; color: var(--text); background: var(--bg); font-size: 12px; line-height: 1.4; white-space: nowrap; pointer-events: none; opacity: 0; transform: translate(-50%, 3px); transition: opacity 160ms ease, transform 160ms ease; }
-.dos-mac-dock-app:hover .dos-mac-dock-label, .dos-mac-dock-app:focus-visible .dos-mac-dock-label { opacity: 1; transform: translate(-50%, 0); }
+.dos-mac-dock-app:focus-visible .dos-mac-dock-label { opacity: 1; transform: translate(-50%, 0); }
+@media (hover: hover) and (pointer: fine) {
+  .dos-mac-dock-app:hover .dos-mac-dock-label { opacity: 1; transform: translate(-50%, 0); }
+}
 .dos-mac-dock-divider { align-self: stretch; flex: none; width: 1px; margin: 6px; background: var(--divider); }
 .dos-windows .dos-taskbar > .dos-apps-trigger { border-right: 1px solid var(--divider); font-weight: 600; }
 .dos-windows .dos-window[data-front="true"] .dos-titlebar { color: var(--bg); background: var(--text); }
 .dos-windows .dos-window[data-front="true"] .dos-titlebar button { color: inherit; }
-.dos-windows .dos-window[data-front="true"] .dos-titlebar button:hover { background: color-mix(in srgb, var(--bg) 15%, var(--text)); }
+@media (hover: hover) and (pointer: fine) {
+  .dos-windows .dos-window[data-front="true"] .dos-titlebar button:hover { background: color-mix(in srgb, var(--bg) 15%, var(--text)); }
+}
 .dos-linux .dos-desktop-icons { display: none; }
 .dos-dock { position: absolute; top: 50%; left: 8px; display: flex; flex-direction: column; transform: translateY(-50%); border: 1px solid var(--divider); background: var(--bg); }
 .dos-dock .dos-chrome-button { flex-direction: column; padding: 8px 4px; font-size: 10px; }
@@ -86,7 +98,9 @@
 .dos-beos .dos-titlebar { width: max-content; max-width: 100%; border: 1px solid var(--divider); border-bottom: 0; background: var(--table-alt); }
 .dos-beos .dos-window[data-front="true"] .dos-titlebar { border-color: var(--text); color: var(--bg); background: var(--text); }
 .dos-beos .dos-window[data-front="true"] .dos-titlebar button { color: inherit; }
-.dos-beos .dos-window[data-front="true"] .dos-titlebar button:hover { background: color-mix(in srgb, var(--bg) 15%, var(--text)); }
+@media (hover: hover) and (pointer: fine) {
+  .dos-beos .dos-window[data-front="true"] .dos-titlebar button:hover { background: color-mix(in srgb, var(--bg) 15%, var(--text)); }
+}
 .dos-windows .dos-window[data-front="true"] .dos-titlebar button:focus-visible, .dos-beos .dos-window[data-front="true"] .dos-titlebar button:focus-visible, .dos .dos-task[aria-pressed="true"]:focus-visible, .dos .dos-workspace-button[aria-pressed="true"]:focus-visible { outline-color: var(--bg); }
 .dos-beos .dos-window-body { border: 1px solid var(--divider); background: var(--bg); }
 .dos-beos .dos-window[data-front="true"] .dos-window-body { border-color: var(--text); }

@@ -50,7 +50,7 @@ const styles = stylex.create({
       default: vlak.gray,
       ":link": vlak.gray,
       ":visited": vlak.gray,
-      ":hover": vlak.ink,
+      ":hover": { default: null, [mq.hover]: vlak.ink },
       '[aria-current="page"]': vlak.ink,
     },
     textDecoration: "none",

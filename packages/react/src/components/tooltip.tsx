@@ -49,8 +49,8 @@ const styles = stylex.create({
     opacity: {
       default: 0,
       [stylex.when.ancestor(":hover")]: {
-        default: 1,
-        [mq.touch]: 0,
+        default: null,
+        [mq.hover]: 1,
       },
       [stylex.when.ancestor(":focus-within")]: 1,
       [stylex.when.ancestor(":active")]: {
@@ -61,8 +61,8 @@ const styles = stylex.create({
     visibility: {
       default: "hidden",
       [stylex.when.ancestor(":hover")]: {
-        default: "visible",
-        [mq.touch]: "hidden",
+        default: null,
+        [mq.hover]: "visible",
       },
       [stylex.when.ancestor(":focus-within")]: "visible",
       [stylex.when.ancestor(":active")]: {
@@ -73,7 +73,7 @@ const styles = stylex.create({
     // The tip itself can be hovered (WCAG 1.4.13); ::before bridges the 8px gap.
     pointerEvents: {
       default: "none",
-      [stylex.when.ancestor(":hover")]: "auto",
+      [stylex.when.ancestor(":hover")]: { default: null, [mq.hover]: "auto" },
       [stylex.when.ancestor(":focus-within")]: "auto",
     },
     // The delay is the leave grace: the pointer can cross onto the tip.

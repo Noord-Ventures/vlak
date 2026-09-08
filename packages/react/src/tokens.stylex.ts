@@ -62,6 +62,8 @@ export const mq = stylex.defineConsts({
   wide: "@media (min-width: 1440px)",
   reduce: "@media (prefers-reduced-motion: reduce)",
   touch: "@media (hover: none)",
+  /** Visual hover feedback is only for a pointer that can actually hover. */
+  hover: "@media (hover: hover) and (pointer: fine)",
   forcedColors: "@media (forced-colors: active)",
 });
 

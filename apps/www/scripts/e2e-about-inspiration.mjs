@@ -52,6 +52,12 @@ try {
     assert.equal(await source.innerText(), study.sourceLabel);
     assert.equal(await source.getAttribute("href"), study.source);
     assert.equal(await tile.locator("a").count(), 0, "source links must not be nested in the selection button");
+    const sourceLayout = await source.evaluate((element) => {
+      const source = element.getBoundingClientRect();
+      const surface = element.parentElement.querySelector(".reference-tile").getBoundingClientRect();
+      return { inside: source.left >= surface.left + 19 && source.right <= surface.right - 19 && source.top >= surface.top && source.bottom <= surface.bottom - 11, border: getComputedStyle(element).borderBottomWidth };
+    });
+    assert.deepEqual(sourceLayout, { inside: true, border: "0px" }, "the source belongs inside the complete selectable card, without a separate underlined footer");
   }
   assert.equal(await page.locator("#study-select-0 .reference-tile-artist").innerText(), "Paul Schuitema");
   assert.equal(await page.locator("#study-select-0 .reference-tile-dates").innerText(), "1897–1973 · Rotterdam");
@@ -174,6 +180,12 @@ try {
       return style.display === "none" || style.visibility === "hidden" || style.textOverflow === "ellipsis" || (element.clientHeight > 0 && element.scrollHeight > element.clientHeight + 1 && style.overflowY === "hidden");
     }).map((element) => element.textContent));
     assert.deepEqual(clippedMetadata, [], `tile metadata remains visible without truncation at ${width}px`);
+    const detachedSources = await page.locator(".reference-tile-source").evaluateAll((elements) => elements.filter((element) => {
+      const source = element.getBoundingClientRect();
+      const surface = element.parentElement.querySelector(".reference-tile").getBoundingClientRect();
+      return source.left < surface.left + 19 || source.right > surface.right - 19 || source.bottom > surface.bottom - 11;
+    }).map((element) => element.textContent));
+    assert.deepEqual(detachedSources, [], `source links remain within their card surface at ${width}px`);
     if (width === 390) {
       await page.evaluate(() => { document.documentElement.dataset.theme = "light"; });
       await page.waitForTimeout(700);

@@ -213,6 +213,6 @@ describe("generated vlak.css", () => {
 
   it("respects reduced motion and touch", () => {
     expect(vlakCss).toContain("@media(prefers-reduced-motion:reduce)");
-    expect(vlakCss).toContain("@media(hover:none)");
+    expect(vlakCss).toMatch(/@media\s*\(hover:\s*none\)/);
   });
 });

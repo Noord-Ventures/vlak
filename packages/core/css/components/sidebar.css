@@ -8,10 +8,10 @@
 .rs-sidebar-item:last-child{padding-bottom:2rem}
 .rs-sidebar-item:link{color:var(--text-secondary)}
 .rs-sidebar-item:visited{color:var(--text-secondary)}
-.rs-sidebar-item:hover{color:var(--text)}
 .rs-sidebar-item[aria-current="page"]{color:var(--text)}
 @media (prefers-reduced-motion: reduce){.rs-sidebar-item{transition:none}}
 @media (max-width: 640px){.rs-sidebar-item{display:flex;align-items:center;min-height:var(--hit);padding-top:0.75rem;padding-bottom:0.75rem;font-size:var(--control-fs)}}
+@media (hover: hover) and (pointer: fine){.rs-sidebar-item:hover{color:var(--text)}}
 .rs-sidebar-label{padding-top:1rem;padding-inline-end:1.25rem;padding-bottom:0.25rem;padding-inline-start:1.25rem;font-size:0.75rem;font-weight:600;letter-spacing:-0.01em;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-sidebar-label{padding-bottom:0.5rem;font-size:var(--control-label)}}
 .rs-sidebar-foot{box-sizing:border-box;padding-top:0.75rem;padding-inline-end:1.25rem;padding-bottom:0.75rem;padding-inline-start:1.25rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);font-size:0.75rem;font-weight:500;letter-spacing:-0.01em;color:var(--text-secondary)}

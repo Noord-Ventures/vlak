@@ -31,7 +31,10 @@
 .ev .ev-reading + .ev-reading { border-inline-start: 1px solid var(--divider); }
 .ev .ev-reading::before { position: absolute; inset: -1px 0 auto; height: 2px; background: var(--text); content: ""; opacity: 0; transition: opacity 180ms; }
 .ev .ev-reading[aria-expanded="true"]::before { opacity: 1; }
-.ev .ev-reading:hover, .ev .ev-reading[aria-expanded="true"] { background: var(--table-alt); }
+.ev .ev-reading[aria-expanded="true"] { background: var(--table-alt); }
+@media (hover: hover) and (pointer: fine) {
+  .ev .ev-reading:hover { background: var(--table-alt); }
+}
 .ev .ev-reading:focus-visible { outline-offset: -4px; }
 .ev-readings .rs-metric { gap: 8px; }
 .ev-readings .rs-metric-label, .ev-reading-label { font-size: 11px; color: var(--text-secondary); }

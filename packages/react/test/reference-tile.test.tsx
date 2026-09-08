@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { readFileSync } from "node:fs";
 import * as React from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { axe } from "vitest-axe";
@@ -105,5 +106,19 @@ describe("Reference carousel tiles", () => {
     expect(document.activeElement).toBe(document.getElementById("study-select-1"));
     await userEvent.tab({ shift: true });
     expect(document.activeElement).toBe(source);
+  });
+
+  it("keeps the source foreground overrideable by forced-colors with a matching focus outline", () => {
+    const { rerender } = render(<ReferenceTile study={study} index={0} selected={false} onSelect={() => {}} />);
+    const source = screen.getByRole("link", { name: study.sourceLabel });
+    expect(source.style.color).toBe("var(--reference-source-ink, var(--text))");
+    expect(source.style.outlineColor.toLowerCase()).toBe("currentcolor");
+    rerender(<ReferenceTile study={study} index={0} selected onSelect={() => {}} />);
+    expect(source.style.color).toBe("var(--reference-source-ink, var(--bg))");
+    expect(source.previousElementSibling?.getAttribute("aria-pressed")).toBe("true");
+    const cssPath = "../../../apps/www/app/inspiration/reference-tile.css";
+    const css = readFileSync(new URL(cssPath, import.meta.url), "utf8");
+    expect(css).toMatch(/@media\s*\(forced-colors:\s*active\)[\s\S]*\.reference-tile-source\s*\{\s*--reference-source-ink:\s*LinkText;/);
+    expect(css).toMatch(/\.reference-tile\[aria-pressed="true"\]\s*\+\s*\.reference-tile-source\s*\{\s*--reference-source-ink:\s*HighlightText;\s*forced-color-adjust:\s*none;/);
   });
 });

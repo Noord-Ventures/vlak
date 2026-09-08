@@ -6,7 +6,9 @@
 .mp-player .rs-btn-primary,.mp-player .rs-btn-ghost { flex:none; width:auto; min-width:44px; min-height:44px; height:44px; padding:0 12px; border-radius:var(--radius-sm); font-size:12px; line-height:1.25; }
 .mp-player .rs-btn-primary { background:var(--text); color:var(--bg); }
 .mp-player .rs-btn-ghost { color:var(--text); border-color:var(--control-border); }
-.mp-player .rs-btn-ghost:hover { background:var(--control-fill); }
+@media (hover: hover) and (pointer: fine) {
+  .mp-player .rs-btn-ghost:hover:where(:not([aria-pressed="true"]):not([aria-selected="true"])) { background:var(--control-fill); }
+}
 .mp-player .rs-icon { flex:none; display:block; }
 .mp-player button:focus-visible,.mp-player a:focus-visible { outline:2px solid currentColor; outline-offset:-3px; }
 .mp-header { display:flex; align-items:center; gap:12px; height:64px; min-height:64px; padding:10px 20px; border-bottom:1px solid var(--divider); }
@@ -162,8 +164,10 @@
 .mp-crop-controls { display:flex; align-items:center; gap:8px; margin-top:20px; }
 .mp-crop-controls > span { display:grid; place-items:center; width:44px; height:44px; border:1px solid var(--control-border); border-radius:var(--radius-sm); }
 .mp-crop-controls > span:nth-child(2) { background:var(--text); color:var(--bg); }
-.mp-player .mp-track:hover,.mp-player .mp-favorite:hover,.mp-player .mp-queue-track:hover,.mp-player .mp-queue-actions .mp-icon:hover { background:transparent; }
-.mp-track-list > li:not([data-selected=true]):hover,.mp-queue li:not([data-selected=true]):hover { background:var(--control-fill); }
+@media (hover: hover) and (pointer: fine) {
+  .mp-player .mp-track:hover,.mp-player .mp-favorite:hover,.mp-player .mp-queue-track:hover,.mp-player .mp-queue-actions .mp-icon:hover { background:transparent; }
+  .mp-track-list > li:not([data-selected=true]):hover,.mp-queue li:not([data-selected=true]):hover { background:var(--control-fill); }
+}
 .mp-player .mp-mobile-nav [aria-pressed=true],.mp-player .mp-queue-options [aria-pressed=true] { background:var(--text); color:var(--bg); }
 .mp-now-tools { display:flex; align-items:center; gap:4px; }
 .mp-player .mp-now-tools > .mp-icon { border-color:transparent; }

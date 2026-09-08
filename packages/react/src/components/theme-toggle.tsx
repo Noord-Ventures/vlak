@@ -42,7 +42,7 @@ const styles = stylex.create({
     cursor: "pointer",
     color: {
       default: vlak.gray,
-      ":hover": vlak.ink,
+      ":hover": { default: null, [mq.hover]: vlak.ink },
     },
     outlineWidth: {
       default: 0,

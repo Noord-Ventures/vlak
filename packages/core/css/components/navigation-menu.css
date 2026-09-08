@@ -4,7 +4,7 @@
 .rs-nav-link{min-width:var(--hit);display:inline-flex;align-items:center;min-height:var(--hit);font-size:0.875rem;font-weight:500;letter-spacing:-0.01em;color:var(--text-secondary);text-decoration:none;transition:var(--transition)}
 .rs-nav-link:link{color:var(--text-secondary)}
 .rs-nav-link:visited{color:var(--text-secondary)}
-.rs-nav-link:hover{color:var(--text)}
 .rs-nav-link[aria-current="page"]{color:var(--text)}
 @media (max-width: 640px){.rs-nav-link{display:inline-flex;align-items:center;min-height:var(--hit);padding-inline:0.75rem;font-size:var(--control-fs)}}
+@media (hover: hover) and (pointer: fine){.rs-nav-link:hover{color:var(--text)}}
 @media (prefers-reduced-motion: reduce){.rs-nav-link{transition:none}}

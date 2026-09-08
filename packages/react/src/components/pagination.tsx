@@ -70,7 +70,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: {
       default: vlak.controlBorder,
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonText" } },
       [mq.forcedColors]: {
         default: "ButtonText",
         ":disabled": "GrayText",
@@ -79,7 +79,7 @@ const styles = stylex.create({
     padding: 0,
     backgroundColor: {
       default: "transparent",
-      ":hover": vlak.controlFill,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.controlFill, [mq.forcedColors]: "ButtonFace" } },
       [mq.forcedColors]: "ButtonFace",
     },
     fontFamily: "inherit",
@@ -115,6 +115,7 @@ const styles = stylex.create({
   on: {
     backgroundColor: {
       default: vlak.ink,
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: vlak.ink, [mq.forcedColors]: "Highlight" } },
       [mq.forcedColors]: "Highlight",
     },
     color: {
@@ -124,12 +125,14 @@ const styles = stylex.create({
     fontWeight: 600,
     borderColor: {
       default: "transparent",
+      ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: { default: "transparent", [mq.forcedColors]: "Highlight" } },
       [mq.forcedColors]: "Highlight",
     },
     forcedColorAdjust: "none",
   },
   gap: {
-    borderColor: "transparent",
+    borderColor: { default: "transparent", ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: "transparent" } },
+    backgroundColor: { default: "transparent", ":hover:not(:disabled):not([aria-disabled='true'])": { default: null, [mq.hover]: "transparent" } },
     cursor: "default",
   },
   icon: {
