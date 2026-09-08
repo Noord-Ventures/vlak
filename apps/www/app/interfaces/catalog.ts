@@ -384,10 +384,10 @@ const calendarStudy = {
   use: "Choose a date → create or edit an event → organize the schedule → export",
   field: "Calendar navigation beside a date grid or agenda, with a focused event editor.",
   note: "Events and calendar settings stay in this browser. Import and export use .ics files; no account, invitations or calendar sync service is connected.",
-  components: ["Button", "Checkbox", "Dialog", "Icon", "Input", "Native select", "Textarea"],
+  components: ["Button", "Calendar popover", "Checkbox", "Dialog", "Icon", "Input", "Native select", "Textarea"],
   modifications: [
     "Button and Icon navigate dates, switch views and open events. Checkbox controls calendar visibility, while Input searches the actual event records.",
-    "Input, Native select and Textarea edit event dates, times, calendars, recurrence, location and notes. Dialog keeps event editing and recurring-event decisions within the working calendar.",
+    "Calendar popover edits dates and times with a keyboard-accessible month grid. Input, Native select and Textarea edit calendars, recurrence, location and notes. Dialog keeps event editing and recurring-event decisions within the working calendar.",
     "The custom month grid, timed week and day views, and agenda share the same local records. Desktop dragging changes an event’s schedule; validated browser storage and iCalendar files preserve actual event data.",
   ],
 } as const;

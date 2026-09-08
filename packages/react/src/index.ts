@@ -138,6 +138,7 @@ export { Split, type SplitProps } from "./components/resizable";
 export { Combobox, type ComboboxProps } from "./components/combobox";
 export { Command, CommandDialog, type CommandProps, type CommandDialogProps, type CommandItem, type CommandGroup } from "./components/command";
 export { Calendar, type CalendarProps } from "./components/calendar";
+export { CalendarPopover, type CalendarPopoverProps } from "./components/calendar-popover";
 export { DatePicker, type DatePickerProps } from "./components/date-picker";
 export {
   Table,

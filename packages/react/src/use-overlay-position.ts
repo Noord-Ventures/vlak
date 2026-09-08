@@ -9,6 +9,7 @@ export function useOverlayPosition(
   anchor: React.RefObject<HTMLElement | null>,
   point?: { x: number; y: number } | null,
   placement: "bottom" | "inline-end" = "bottom",
+  options?: { popover?: "auto" | "manual"; edge?: number },
 ) {
   const [position, setPosition] = React.useState<React.CSSProperties>({ visibility: "hidden" });
   React.useLayoutEffect(() => {
@@ -16,23 +17,24 @@ export function useOverlayPosition(
     if (!open || !element) return;
     const native = typeof element.showPopover === "function";
     if (native) {
-      element.setAttribute("popover", "manual");
+      element.setAttribute("popover", options?.popover ?? "manual");
       if (!element.matches(":popover-open")) element.showPopover();
     }
     const place = () => {
       const viewport = window.visualViewport;
-      const leftEdge = (viewport?.offsetLeft ?? 0) + 8;
-      const topEdge = (viewport?.offsetTop ?? 0) + 8;
+      const edge = Math.max(0, options?.edge ?? 8);
+      const leftEdge = (viewport?.offsetLeft ?? 0) + edge;
+      const topEdge = (viewport?.offsetTop ?? 0) + edge;
       const viewportWidth = viewport?.width ?? window.innerWidth;
       const viewportHeight = viewport?.height ?? window.innerHeight;
-      const rightEdge = leftEdge + viewportWidth - 16;
-      const bottomEdge = topEdge + viewportHeight - 16;
+      const rightEdge = leftEdge + viewportWidth - edge * 2;
+      const bottomEdge = topEdge + viewportHeight - edge * 2;
       const target = anchor.current?.getBoundingClientRect();
       const paint = getComputedStyle(element);
       const borderX = (Number.parseFloat(paint.borderLeftWidth) || 0) + (Number.parseFloat(paint.borderRightWidth) || 0);
       const borderY = (Number.parseFloat(paint.borderTopWidth) || 0) + (Number.parseFloat(paint.borderBottomWidth) || 0);
-      const width = Math.min(Math.max(element.scrollWidth + borderX, target?.width ?? 0), viewportWidth - 16);
-      const height = Math.min(element.scrollHeight + borderY, viewportHeight - 16);
+      const width = Math.min(Math.max(element.scrollWidth + borderX, target?.width ?? 0), viewportWidth - edge * 2);
+      const height = Math.min(element.scrollHeight + borderY, viewportHeight - edge * 2);
       let left = point?.x ?? target?.left ?? leftEdge;
       let top = point?.y ?? (target ? target.bottom + 6 : topEdge);
       if (placement === "inline-end" && target) {
@@ -43,14 +45,14 @@ export function useOverlayPosition(
         top = target.top;
       }
       if (top + height > bottomEdge) {
-        top = placement === "inline-end" ? bottomEdge - height : point ? point.y - height : target ? target.top - height - 6 : bottomEdge - height;
+        top = placement === "inline-end" ? bottomEdge - height : point?.y !== undefined ? point.y - height : target ? target.top - height - 6 : bottomEdge - height;
       }
       left = Math.max(leftEdge, Math.min(left, rightEdge - width));
       top = Math.max(topEdge, Math.min(top, bottomEdge - height));
       const next: React.CSSProperties = {
         position: "fixed", inset: "auto", left, top, margin: 0,
-        minWidth: Math.min(target?.width ?? 0, viewportWidth - 16),
-        maxWidth: viewportWidth - 16, maxHeight: viewportHeight - 16,
+        minWidth: Math.min(target?.width ?? 0, viewportWidth - edge * 2),
+        maxWidth: viewportWidth - edge * 2, maxHeight: viewportHeight - edge * 2,
         width, overflow: "auto", visibility: "visible",
       };
       setPosition((previous) => JSON.stringify(previous) === JSON.stringify(next) ? previous : next);
@@ -70,6 +72,6 @@ export function useOverlayPosition(
       window.visualViewport?.removeEventListener("resize", place);
       window.visualViewport?.removeEventListener("scroll", place);
     };
-  }, [open, panel, anchor, point?.x, point?.y, placement]);
+  }, [open, panel, anchor, point?.x, point?.y, placement, options?.popover, options?.edge]);
   return position;
 }

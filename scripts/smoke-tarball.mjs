@@ -18,8 +18,9 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 167;
+const expectedCatalogueSize = 168;
 const additions = [
+  ["calendar-popover", "CalendarPopover"],
   ["joint-panel", "JointPanel"],
   ["robot-pose", "RobotPose"],
   ["robot-mission-queue", "RobotMissionQueue"],
@@ -63,6 +64,7 @@ const additions = [
 const renderAdditions = `
 const additions = ${JSON.stringify(additions)};
 const fixtureProps = {
+  CalendarPopover: { label: "Deadline", defaultValue: "2026-07-24", name: "deadline" },
   JointPanel: {"label": "Robot joints", "joints": []},
   RobotPose: {"label": "Recorded pose", "poses": []},
   RobotMissionQueue: {"label": "Inspection mission", "steps": []},

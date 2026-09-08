@@ -1,6 +1,6 @@
 # Vlak
 
-> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 167 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
+> A minimal design system built from paper, ink, gray, hairlines, and a 204px module. 168 React components as precompiled StyleX with one stylesheet, the same components as rs-* CSS, and a shadcn-compatible registry. Version 0.4.0.
 
 Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-react/css"`, vendor the source with `npx @noorddev/vlak-cli add <name>`, or use `npx shadcn add https://vlak.dev/r/<name>.json`. Every component page below has install paths, a React example, a props table generated from the types, keyboard interactions, and accessibility notes.
 
@@ -67,6 +67,7 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [One-time code](https://vlak.dev/docs/input-otp.md): Collects a one-time code in one cell per character. Supports auto-advance, backspace, and paste.
 - [Combobox](https://vlak.dev/docs/combobox.md): Filters and selects an option from a listbox through one text field.
 - [Calendar](https://vlak.dev/docs/calendar.md): Selects a date from a month grid. Selected day fills with ink; today has a 1px outline.
+- [Calendar popover](https://vlak.dev/docs/calendar-popover.md): Types or picks a date and optional local time. A 1px field opens a calendar in the native top layer.
 - [Date picker](https://vlak.dev/docs/date-picker.md): Selects a date from a calendar overlay opened by a 1px trigger.
 - [Form](https://vlak.dev/docs/form.md): Collects related inputs as stacked fields with one primary action at the end.
 

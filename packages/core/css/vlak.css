@@ -1970,6 +1970,24 @@ body{
 @media (hover: hover) and (pointer: fine) and (forced-colors: active){.rs-cal-day-selected:hover:not(:disabled):not([aria-disabled='true']){background-color:Highlight}}
 @media (forced-colors: active){.rs-cal-day-selected{background-color:Highlight;color:HighlightText}}
 
+.rs-calendar-popover{width:100%;min-width:0;display:flex;flex-direction:column;gap:0.5rem}
+.rs-calendar-popover-label{font-size:0.75rem;font-weight:600;color:var(--text-secondary);line-height:16px}
+@media (max-width: 640px){.rs-calendar-popover-label{font-size:var(--control-label)}}
+.rs-calendar-popover-control{display:flex;align-items:stretch;min-width:0;min-height:var(--hit);box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);outline-width:0;outline-style:none;outline-color:var(--text);outline-offset:2px}
+.rs-calendar-popover-control:focus-within{outline-width:2px;outline-style:solid}
+@media (forced-colors: active){.rs-calendar-popover-control{outline-color:Highlight}}
+.rs-calendar-popover-input{min-width:0;width:100%;flex:1 1 0;height:var(--hit);min-height:var(--hit);font-variant-numeric:tabular-nums;outline-offset:-2px}
+.rs-calendar-popover-trigger{flex-shrink:0;width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);padding:0;border-radius:var(--radius-sm)}
+.rs-calendar-popover-panel{box-sizing:border-box;position:fixed;inset:auto;margin:0;width:calc(19.25rem + 10px);max-width:calc(100vw - 2px);padding:4px;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius);background-color:var(--bg);color:var(--text);overflow:auto;overscroll-behavior:contain;box-shadow:0 8px 24px rgba(0,0,0,0.08)}
+.rs-calendar-popover-panel::backdrop{background-color:transparent}
+@media (forced-colors: active){.rs-calendar-popover-panel{box-shadow:none}}
+.rs-calendar-popover-grid{width:100%}
+.rs-calendar-popover-time{display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;padding:0.5rem 0.25rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
+.rs-calendar-popover-actions{display:flex;gap:0.25rem;justify-content:flex-end;flex-wrap:nowrap;padding-top:0.25rem}
+.rs-calendar-popover-feedback,.rs-calendar-popover-error{margin:0;font-size:0.75rem;color:var(--text-secondary);line-height:1.45}
+@media (max-width: 640px){.rs-calendar-popover-feedback,.rs-calendar-popover-error{font-size:0.875rem}}
+.rs-calendar-popover-error{color:var(--text)}
+
 .rs-menu.rs-date-picker-cal-menu{inset-inline-end:auto;padding:0.75rem;background-color:var(--bg)}
 
 .rs-datatable-scroll{width:100%;overflow-x:auto}

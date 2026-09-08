@@ -35,14 +35,21 @@ function sameDay(a: Date | undefined, b: Date): boolean {
 }
 const sameMonth = (a: Date | undefined, b: Date) =>
   !!a && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
-const startOfMonth = (d: Date) => new Date(d.getFullYear(), d.getMonth(), 1);
+/** Numeric Date constructors reinterpret years 0–99 as 1900–1999. */
+function civilDate(year: number, month: number, day: number): Date {
+  const date = new Date(0);
+  date.setHours(0, 0, 0, 0);
+  date.setFullYear(year, month, day);
+  return date;
+}
+const startOfMonth = (d: Date) => civilDate(d.getFullYear(), d.getMonth(), 1);
 const dayKey = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const addDays = (d: Date, n: number) => civilDate(d.getFullYear(), d.getMonth(), d.getDate() + n);
 /** Same day-of-month `n` months on, clamped to the target month's length. */
 function addMonths(d: Date, n: number): Date {
-  const first = new Date(d.getFullYear(), d.getMonth() + n, 1);
-  const last = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
-  return new Date(first.getFullYear(), first.getMonth(), Math.min(d.getDate(), last));
+  const first = civilDate(d.getFullYear(), d.getMonth() + n, 1);
+  const last = civilDate(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  return civilDate(first.getFullYear(), first.getMonth(), Math.min(d.getDate(), last));
 }
 const longDate = (d: Date, locale = "en") =>
   d.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -256,7 +263,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   const [inner, setInner] = React.useState(defaultValue);
   const selectedDate = isControlled ? value : inner;
   const today = new Date();
-  const dateOnly = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const dateOnly = (d: Date) => civilDate(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
   const unavailable = (d: Date) => disabled || (!!min && dateOnly(d) < dateOnly(min)) || (!!max && dateOnly(d) > dateOnly(max)) || !!isDateDisabled?.(d);
 
   const [month, setMonth] = React.useState(() => startOfMonth(selectedDate ?? defaultMonth ?? today));
@@ -299,9 +306,9 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
     if (autoFocus) cellRefs.current.get(dayKey(rovingOnMount.current))?.focus();
   }, [autoFocus]);
 
-  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const first = civilDate(month.getFullYear(), month.getMonth(), 1);
   const lead = (first.getDay() - weekStart + 7) % 7;
-  const start = new Date(month.getFullYear(), month.getMonth(), 1 - lead);
+  const start = civilDate(month.getFullYear(), month.getMonth(), 1 - lead);
   const weeks = Array.from({ length: 6 }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => addDays(start, w * 7 + d)),
   );

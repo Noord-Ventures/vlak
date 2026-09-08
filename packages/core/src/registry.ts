@@ -2152,6 +2152,54 @@ const [date, setDate] = useState<Date>();
     aliases: ["Calendar", "Date grid", "Month view", "Day picker"],
   },
   {
+    name: "calendar-popover",
+    title: "Calendar popover",
+    description: "Types or picks a date and optional local time. A 1px field opens a calendar in the native top layer.",
+    category: "forms",
+    classes: ["rs-calendar-popover", "rs-calendar-popover-label", "rs-calendar-popover-control", "rs-calendar-popover-input", "rs-calendar-popover-trigger", "rs-calendar-popover-panel", "rs-calendar-popover-grid", "rs-calendar-popover-time", "rs-calendar-popover-actions", "rs-calendar-popover-feedback", "rs-calendar-popover-error"],
+    css: ["components/calendar-popover.css"],
+    react: "components/calendar-popover.tsx",
+    registryDependencies: ["calendar", "input", "button", "icons"],
+    snippet: `<div class="rs-calendar-popover"><label class="rs-calendar-popover-label" for="deadline">Deadline</label><div class="rs-calendar-popover-control"><input id="deadline" class="rs-input rs-input-grouped rs-calendar-popover-input" type="text" value="2026-07-24" /><button class="rs-btn-ghost rs-calendar-popover-trigger" type="button" aria-label="Open calendar" aria-haspopup="dialog" aria-expanded="false"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3 3.5h10v10H3zM3 6.5h10M5.5 1.5v4M10.5 1.5v4" /></svg></button></div><input type="hidden" name="deadline" value="2026-07-24" /></div>`,
+    example: `import { useState } from "react";
+import { CalendarPopover } from "@noorddev/vlak-react";
+
+const [date, setDate] = useState("2026-07-24");
+const [review, setReview] = useState("2026-07-23T10:30");
+
+<CalendarPopover label="Print date" name="printDate" value={date} onValueChange={setDate} required />
+<CalendarPopover
+  label="Proof review"
+  name="review"
+  type="datetime-local"
+  value={review}
+  onValueChange={setReview}
+  hint="Local date and time, without a time zone."
+/>`,
+    usage: {
+      use: ["Form dates that can be typed or chosen from a month grid.", "type=\"datetime-local\" for a date with hour and minute controls; the value has no time zone.", "String values such as 2026-07-24 or 2026-07-24T10:30; min and max use the same format."],
+      avoid: ["A permanently visible month grid; use Calendar.", "Date ranges; use DateRangePicker.", "An absolute timestamp shared across time zones; resolve the local value and its time zone in the application."],
+    },
+    keyboard: [
+      { keys: "Tab", does: "Moves through the date field, calendar trigger, and open panel controls; leaving closes the panel" },
+      { keys: "Enter, Space on the trigger", does: "Opens the calendar" },
+      { keys: "Arrow down in the field or on the trigger", does: "Opens the calendar and focuses the selected day" },
+      { keys: "Arrow keys, Home, End", does: "Moves between calendar days or to the ends of the week" },
+      { keys: "Page up, Page down", does: "Moves by month; hold Shift to move by year" },
+      { keys: "Enter, Space on a day", does: "Selects the date; local date and time fields wait for Done" },
+      { keys: "Escape", does: "Closes the panel and discards unconfirmed date and time changes" },
+    ],
+    a11y: [
+      "An editable input keeps its native label, hint, error, required, disabled and readOnly behavior. The ref resolves to this input.",
+      "Typing emits partial drafts as well as complete values. Invalid dates and values outside min or max fail native form validation; local date and time fields display a space and emit a T between date and time.",
+      "The named calendar trigger opens a non-modal dialog using the native Popover API, above surrounding overflow and dialogs.",
+      "Calendar supplies a roving day grid, full-date names, selected and today states, and 44px day controls.",
+      "The local date and time panel has separately labelled hour and minute inputs. Done confirms the draft; Escape and outside dismissal cancel it.",
+      "A named hidden input submits the canonical string. Controlled with value and onValueChange, or uncontrolled with defaultValue.",
+    ],
+    aliases: ["Calendar popover", "CalendarPopover", "Date input", "Date field", "Date time picker", "Local date and time", "shadcn date picker"],
+  },
+  {
     name: "date-picker",
     title: "Date picker",
     description: "Selects a date from a calendar overlay opened by a 1px trigger.",

@@ -23,6 +23,7 @@ const patterns: Record<string, string> = {
   button: "Button, native <button>",
   "button-group": "Group of native buttons",
   calendar: "Grid with a roving cell",
+  "calendar-popover": "Editable date field with a popover dialog and calendar grid",
   carousel: "Carousel, scroll snap with named groups",
   checkbox: "Checkbox, native input",
   collapsible: "Disclosure, native <details>",
