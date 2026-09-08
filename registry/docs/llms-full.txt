@@ -18141,7 +18141,7 @@ Forwards `ref` to the `HTMLInputElement`.
 
 ## Classes
 
-`rs-calendar-popover`, `rs-calendar-popover-label`, `rs-calendar-popover-control`, `rs-calendar-popover-input`, `rs-calendar-popover-trigger`, `rs-calendar-popover-panel`, `rs-calendar-popover-grid`, `rs-calendar-popover-time`, `rs-calendar-popover-actions`, `rs-calendar-popover-spacer`, `rs-calendar-popover-action`, `rs-calendar-popover-done`, `rs-calendar-popover-feedback`, `rs-calendar-popover-error`
+`rs-calendar-popover`, `rs-calendar-popover-label`, `rs-calendar-popover-control`, `rs-calendar-popover-input`, `rs-calendar-popover-trigger`, `rs-calendar-popover-panel`, `rs-calendar-popover-grid`, `rs-calendar-popover-time`, `rs-calendar-popover-actions`, `rs-calendar-popover-action`, `rs-calendar-popover-done`, `rs-calendar-popover-feedback`, `rs-calendar-popover-error`
 
 ## Dependencies
 

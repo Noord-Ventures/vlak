@@ -64,6 +64,7 @@ const styles = stylex.create({
   },
   head: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
     minHeight: vlak.hit,
@@ -73,13 +74,14 @@ const styles = stylex.create({
     fontSize: "0.875rem",
     fontWeight: 500,
     letterSpacing: "-0.01em",
-    lineHeight: "20px",
+    lineHeight: 20 / 14,
     color: vlak.ink,
   },
   nav: {
     display: "flex",
     gap: 0,
     flexShrink: 0,
+    marginInlineStart: "auto",
   },
   page: {
     boxSizing: "border-box",
@@ -136,7 +138,7 @@ const styles = stylex.create({
     fontWeight: 500,
     color: vlak.gray,
     textAlign: "center",
-    lineHeight: "20px",
+    lineHeight: 20 / 12,
     paddingTop: "0.25rem",
     paddingBottom: "0.25rem",
     paddingInline: 0,
@@ -150,7 +152,7 @@ const styles = stylex.create({
     boxSizing: "border-box",
     width: "100%",
     height: vlak.hit,
-    minWidth: vlak.hit,
+    minWidth: "44px",
     minHeight: vlak.hit,
     display: "flex",
     alignItems: "center",
@@ -298,7 +300,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
   );
   const title = month.toLocaleDateString(locale, { month: "long", year: "numeric" });
   const weekdayDates = Array.from({ length: 7 }, (_, i) => new Date(2024, 0, 7 + weekStart + i));
-  const dows = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "short" }));
+  const dows = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "narrow" }));
   const dowsLong = weekdayDates.map((d) => d.toLocaleDateString(locale, { weekday: "long" }));
 
   const shift = (delta: number) => {
@@ -395,7 +397,7 @@ export const Calendar = React.forwardRef<HTMLDivElement, CalendarProps>(function
       <div className={grid.className} style={grid.style} role="grid" aria-labelledby={titleId} onKeyDown={onGridKeyDown}>
         <div className={row.className} style={row.style} role="row">
           {dows.map((d, i) => (
-            <span key={d} className={dow.className} style={dow.style} role="columnheader" aria-label={dowsLong[i]}>
+            <span key={dowsLong[i]} className={dow.className} style={dow.style} role="columnheader" aria-label={dowsLong[i]}>
               {d}
             </span>
           ))}

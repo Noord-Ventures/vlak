@@ -536,7 +536,9 @@ describe("Calendar", () => {
     render(<Calendar defaultValue={new Date(2026, 8, 3)} />);
     const grid = screen.getByRole("grid", { name: "September 2026" });
     expect(within(grid).getAllByRole("row")).toHaveLength(7);
-    expect(within(grid).getAllByRole("columnheader")).toHaveLength(7);
+    const headers = within(grid).getAllByRole("columnheader");
+    expect(headers.map(header => header.textContent)).toEqual(["M", "T", "W", "T", "F", "S", "S"]);
+    expect(headers.map(header => header.getAttribute("aria-label"))).toEqual(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]);
     const cells = within(grid).getAllByRole("gridcell");
     expect(cells).toHaveLength(42);
     const tabbable = cells.filter((c) => c.getAttribute("tabindex") === "0");

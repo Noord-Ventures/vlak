@@ -2157,7 +2157,7 @@ const [date, setDate] = useState<Date>();
     title: "Calendar popover",
     description: "Types or picks a date and optional local time. A 1px field opens a calendar in the native top layer.",
     category: "forms",
-    classes: ["rs-calendar-popover", "rs-calendar-popover-label", "rs-calendar-popover-control", "rs-calendar-popover-input", "rs-calendar-popover-trigger", "rs-calendar-popover-panel", "rs-calendar-popover-grid", "rs-calendar-popover-time", "rs-calendar-popover-actions", "rs-calendar-popover-spacer", "rs-calendar-popover-action", "rs-calendar-popover-done", "rs-calendar-popover-feedback", "rs-calendar-popover-error"],
+    classes: ["rs-calendar-popover", "rs-calendar-popover-label", "rs-calendar-popover-control", "rs-calendar-popover-input", "rs-calendar-popover-trigger", "rs-calendar-popover-panel", "rs-calendar-popover-grid", "rs-calendar-popover-time", "rs-calendar-popover-actions", "rs-calendar-popover-action", "rs-calendar-popover-done", "rs-calendar-popover-feedback", "rs-calendar-popover-error"],
     css: ["components/calendar-popover.css"],
     react: "components/calendar-popover.tsx",
     registryDependencies: ["calendar", "input", "button", "icons"],
