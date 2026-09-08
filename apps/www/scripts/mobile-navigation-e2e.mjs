@@ -9,7 +9,6 @@ const axe = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const base = process.env.SITE_URL || "http://localhost:3016";
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
-  args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
 });
 const near = (actual, expected, message) => assert(Math.abs(actual - expected) < 1, `${message}: ${actual} ≠ ${expected}`);
 const settle = page => page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
@@ -168,9 +167,20 @@ try {
     await open();
     await page.setViewportSize({ width: 1024, height: 844 });
     await closed();
+    const overflow = await page.evaluate(() => ({
+      html: getComputedStyle(document.documentElement).overflowY,
+      body: getComputedStyle(document.body).overflowY,
+    }));
+    for (const [element, value] of Object.entries(overflow)) {
+      assert(!["hidden", "clip"].includes(value), `Desktop resize releases ${element} vertical scroll lock`);
+    }
+    // Programmatic scrolling can bypass overflow:hidden, and auto inherits the
+    // site's smooth scrolling. Verify native wheel input produces actual movement.
+    assert(await page.evaluate(() => !!document.elementFromPoint(innerWidth / 2, innerHeight / 2)?.closest("main")), "Wheel targets the page content");
+    await page.mouse.move(512, 422);
     const beforeScroll = await page.evaluate(() => window.scrollY);
-    await page.evaluate(() => window.scrollBy(0, 100));
-    await settle(page);
+    await page.mouse.wheel(0, 100);
+    await page.waitForFunction(previous => window.scrollY > previous, beforeScroll, { timeout: 5000 });
     assert(await page.evaluate(() => window.scrollY) > beforeScroll, "Desktop resize releases scroll lock");
     await page.setViewportSize({ width, height: 844 });
     assert.equal(await trigger.getAttribute("aria-expanded"), "false");
