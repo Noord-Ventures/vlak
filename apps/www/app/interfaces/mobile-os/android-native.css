@@ -1,7 +1,8 @@
 /* Android 15 / Material 3. Values are logical dp, rendered at 1 CSS px per dp.
    Hardware scales the complete display; component geometry does not reflow.
-   See android-reference.md for the pinned component and SystemUI sources. */
-.mo-device[data-platform="android"] .mo-phone {
+   See android-reference.md for the pinned component and SystemUI sources.
+   The .mo scope also wins legacy scene rules when standalone routes reorder CSS. */
+.mo .mo-device[data-platform="android"] .mo-phone {
   --mo-android-surface: var(--bg);
   --mo-android-container: color-mix(in srgb, var(--text) 7%, var(--bg));
   --mo-android-container-high: color-mix(in srgb, var(--text) 11%, var(--bg));
@@ -12,12 +13,12 @@
   letter-spacing: 0;
 }
 
-.mo-device[data-platform="android"] .mo-phone :is(button, input, textarea, select) {
+.mo .mo-device[data-platform="android"] .mo-phone :is(button, input, textarea, select) {
   font-family: inherit;
   letter-spacing: inherit;
 }
 
-.mo-device[data-platform="android"] .mo-phone :is(.rs-btn-primary, .rs-btn-ghost) {
+.mo .mo-device[data-platform="android"] .mo-phone :is(.rs-btn-primary, .rs-btn-ghost) {
   min-width: 48px;
   min-height: 48px;
   padding: 12px 24px;
@@ -29,12 +30,12 @@
   box-shadow: none;
 }
 
-.mo-device[data-platform="android"] .mo-phone :is(button, input, textarea):focus-visible {
+.mo .mo-device[data-platform="android"] .mo-phone :is(button, input, textarea):focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 3px;
 }
 
-.mo-device[data-platform="android"] .mo-phone .rs-icon {
+.mo .mo-device[data-platform="android"] .mo-phone .rs-icon {
   flex-shrink: 0;
   width: 24px;
   height: 24px;
@@ -42,12 +43,12 @@
 }
 
 /* Launcher3 Large Phone profile: 56dp icons and 104dp app-drawer cells. */
-.mo-device[data-platform="android"] .mo-phone[data-app="home"]:not([data-overlay]),
-.mo-device[data-platform="android"] .mo-home {
+.mo .mo-device[data-platform="android"] .mo-phone[data-app="home"]:not([data-overlay]),
+.mo .mo-device[data-platform="android"] .mo-home {
   background: var(--mo-android-surface);
 }
 
-.mo-device[data-platform="android"] .mo-home {
+.mo .mo-device[data-platform="android"] .mo-home {
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -55,11 +56,11 @@
   overflow-y: auto;
 }
 
-.mo-device[data-platform="android"] .mo-home > * {
+.mo .mo-device[data-platform="android"] .mo-home > * {
   margin: 0;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-at-a-glance {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-at-a-glance {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -74,24 +75,24 @@
   font-weight: 400;
 }
 
-.mo-device[data-platform="android"] .mo-at-a-glance > span:first-child {
+.mo .mo-device[data-platform="android"] .mo-at-a-glance > span:first-child {
   font-size: 20px;
   line-height: 28px;
   letter-spacing: 0;
 }
 
-.mo-device[data-platform="android"] .mo-at-a-glance > span:last-child {
+.mo .mo-device[data-platform="android"] .mo-at-a-glance > span:last-child {
   gap: 8px;
   font-size: 16px;
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-at-a-glance .rs-icon {
+.mo .mo-device[data-platform="android"] .mo-at-a-glance .rs-icon {
   width: 20px;
   height: 20px;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-android-clock-widget {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-clock-widget {
   width: 192px;
   height: 192px;
   min-height: 192px;
@@ -102,7 +103,7 @@
   color: var(--text);
 }
 
-.mo-device[data-platform="android"] .mo-android-clock-widget > span {
+.mo .mo-device[data-platform="android"] .mo-android-clock-widget > span {
   font-size: 76px;
   line-height: 76px;
   font-weight: 400;
@@ -110,13 +111,13 @@
   letter-spacing: -3px;
 }
 
-.mo-device[data-platform="android"] .mo-home-apps {
+.mo .mo-device[data-platform="android"] .mo-home-apps {
   margin-top: auto;
   padding-top: 24px;
   gap: 16px 0;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-app-icon {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-app-icon {
   gap: 8px;
   min-height: 88px;
   padding: 0;
@@ -125,8 +126,8 @@
   background: transparent;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-app-icon > [data-app-icon],
-.mo-device[data-platform="android"] .mo-phone .mo-dock button > [data-app-icon]:first-child {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-app-icon > [data-app-icon],
+.mo .mo-device[data-platform="android"] .mo-phone .mo-dock button > [data-app-icon]:first-child {
   --mo-android-glyph-cutout: var(--mo-android-container-high);
   display: grid;
   place-items: center;
@@ -139,20 +140,20 @@
   background: var(--mo-android-container-high);
 }
 
-.mo-device[data-platform="android"] .mo-phone [data-app-icon] > :is(.rs-icon, .mo-android-app-glyph) {
+.mo .mo-device[data-platform="android"] .mo-phone [data-app-icon] > :is(.rs-icon, .mo-android-app-glyph) {
   width: 28px;
   height: 28px;
   flex-shrink: 0;
 }
 
-.mo-device[data-platform="android"] .mo-app-icon strong {
+.mo .mo-device[data-platform="android"] .mo-app-icon strong {
   font-size: 14px;
   font-weight: 400;
   line-height: 20px;
   letter-spacing: 0;
 }
 
-.mo-device[data-platform="android"] .mo-app-icon [data-app-icon] > i {
+.mo .mo-device[data-platform="android"] .mo-app-icon [data-app-icon] > i {
   top: 0;
   right: 0;
   width: 10px;
@@ -166,7 +167,7 @@
   font-size: 0;
 }
 
-.mo-device[data-platform="android"] .mo-dock {
+.mo .mo-device[data-platform="android"] .mo-dock {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
@@ -178,7 +179,7 @@
   background: transparent;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-dock > button {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-dock > button {
   min-height: 56px;
   padding: 0;
   border: 0;
@@ -186,7 +187,7 @@
   background: transparent;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-android-search {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-search {
   flex-shrink: 0;
   width: calc(100% - 40px);
   min-height: 56px;
@@ -202,12 +203,12 @@
   font-weight: 400;
 }
 
-.mo-device[data-platform="android"] .mo-home > .mo-android-search {
+.mo .mo-device[data-platform="android"] .mo-home > .mo-android-search {
   width: 100%;
   margin: 20px 0 0;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-all-apps-button {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-all-apps-button {
   min-height: 48px;
   margin-top: 0;
   padding: 0 16px;
@@ -215,11 +216,11 @@
   font-size: 12px;
 }
 
-.mo-device[data-platform="android"] .mo-phone[data-overlay="library"] .mo-scroll {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="library"] .mo-scroll {
   padding: 12px 20px 24px;
 }
 
-.mo-device[data-platform="android"] .mo-phone[data-overlay="library"] .mo-app-search {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="library"] .mo-app-search {
   height: 56px;
   min-height: 56px;
   padding-inline: 20px;
@@ -228,14 +229,14 @@
   background: var(--mo-android-container-high);
 }
 
-.mo-device[data-platform="android"] .mo-all-apps {
+.mo .mo-device[data-platform="android"] .mo-all-apps {
   grid-template-columns: repeat(5, minmax(0, 1fr));
   grid-auto-rows: 104px;
   gap: 0;
   margin-top: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-all-apps .mo-app-icon strong {
+.mo .mo-device[data-platform="android"] .mo-all-apps .mo-app-icon strong {
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -243,7 +244,7 @@
 }
 
 /* M3 small top app bar and type scale. */
-.mo-device[data-platform="android"] .mo-app-header {
+.mo .mo-device[data-platform="android"] .mo-app-header {
   min-height: 64px;
   height: 64px;
   gap: 16px;
@@ -252,7 +253,7 @@
   background: var(--mo-android-surface);
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-app-header > button {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-app-header > button {
   width: 48px;
   height: 48px;
   padding: 12px;
@@ -260,42 +261,42 @@
   border-radius: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-app-header h2 {
+.mo .mo-device[data-platform="android"] .mo-app-header h2 {
   font-size: calc(22px * var(--mo-text-scale));
   line-height: 28px;
   font-weight: 400;
   letter-spacing: 0;
 }
 
-.mo-device[data-platform="android"] .mo-scroll:not(.mo-home) {
+.mo .mo-device[data-platform="android"] .mo-scroll:not(.mo-home) {
   padding: 16px;
   font-size: calc(16px * var(--mo-text-scale));
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] :where(.mo-scroll:not(.mo-home)) > * + * {
+.mo .mo-device[data-platform="android"] :where(.mo-scroll:not(.mo-home)) > * + * {
   margin-top: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-scroll > :is(.mo-list-row, .mo-contact-row, .mo-data-row, .mo-event) {
+.mo .mo-device[data-platform="android"] .mo-scroll > :is(.mo-list-row, .mo-contact-row, .mo-data-row, .mo-event) {
   margin-top: 0;
 }
 
-.mo-device[data-platform="android"] .mo-caption,
-.mo-device[data-platform="android"] .mo-eyebrow {
+.mo .mo-device[data-platform="android"] .mo-caption,
+.mo .mo-device[data-platform="android"] .mo-eyebrow {
   font-size: calc(12px * var(--mo-text-scale));
   line-height: 16px;
   letter-spacing: .4px;
 }
 
-.mo-device[data-platform="android"] .mo-section-intro h3 {
+.mo .mo-device[data-platform="android"] .mo-section-intro h3 {
   font-size: calc(24px * var(--mo-text-scale));
   line-height: 32px;
   font-weight: 400;
   letter-spacing: 0;
 }
 
-.mo-device[data-platform="android"] .mo-section-intro p {
+.mo .mo-device[data-platform="android"] .mo-section-intro p {
   margin-top: 4px;
   font-size: 14px;
   line-height: 20px;
@@ -303,11 +304,11 @@
 }
 
 /* Outlined fields retain native input semantics and the 56dp M3 container. */
-.mo-device[data-platform="android"] .mo-field {
+.mo .mo-device[data-platform="android"] .mo-field {
   position: relative;
 }
 
-.mo-device[data-platform="android"] .mo-phone :is(.rs-input, .rs-dropdown) {
+.mo .mo-device[data-platform="android"] .mo-phone :is(.rs-input, .rs-dropdown) {
   width: 100%;
   min-width: 0;
   min-height: 56px;
@@ -322,7 +323,7 @@
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-phone .rs-textarea {
+.mo .mo-device[data-platform="android"] .mo-phone .rs-textarea {
   padding: 16px;
   border: 1px solid var(--mo-android-outline);
   border-radius: 4px;
@@ -331,14 +332,14 @@
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-field > span {
+.mo .mo-device[data-platform="android"] .mo-field > span {
   margin-bottom: 8px;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: .4px;
 }
 
-.mo-device[data-platform="android"] .mo-field:has(> :is(.rs-input, .rs-textarea, .rs-select)) > span {
+.mo .mo-device[data-platform="android"] .mo-field:has(> :is(.rs-input, .rs-textarea, .rs-select)) > span {
   position: absolute;
   z-index: 1;
   top: -8px;
@@ -353,11 +354,11 @@
   pointer-events: none;
 }
 
-.mo-device[data-platform="android"] .mo-field:focus-within > span {
+.mo .mo-device[data-platform="android"] .mo-field:focus-within > span {
   color: var(--text);
 }
 
-.mo-device[data-platform="android"] .rs-select-list {
+.mo .mo-device[data-platform="android"] .rs-select-list {
   padding-block: 8px;
   border: 0;
   border-radius: 4px;
@@ -365,20 +366,20 @@
   box-shadow: none;
 }
 
-.mo-device[data-platform="android"] .rs-select-list .rs-menu-item {
+.mo .mo-device[data-platform="android"] .rs-select-list .rs-menu-item {
   min-height: 48px;
   padding: 12px 16px;
   font-size: 16px;
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-form {
+.mo .mo-device[data-platform="android"] .mo-form {
   gap: 28px;
   padding-top: 8px;
 }
 
 /* 40dp visible segments in a 48dp interactive row. */
-.mo-device[data-platform="android"] .rs-toggle-group {
+.mo .mo-device[data-platform="android"] .rs-toggle-group {
   min-height: 48px;
   padding-block: 0;
   border: 0;
@@ -387,7 +388,7 @@
   background: transparent;
 }
 
-.mo-device[data-platform="android"] .rs-toggle {
+.mo .mo-device[data-platform="android"] .rs-toggle {
   position: relative;
   isolation: isolate;
   display: flex;
@@ -405,7 +406,7 @@
   letter-spacing: .1px;
 }
 
-.mo-device[data-platform="android"] .rs-toggle::after {
+.mo .mo-device[data-platform="android"] .rs-toggle::after {
   content: "";
   position: absolute;
   z-index: -1;
@@ -415,16 +416,16 @@
   pointer-events: none;
 }
 
-.mo-device[data-platform="android"] .rs-toggle:first-child { border-radius: 20px 0 0 20px; }
-.mo-device[data-platform="android"] .rs-toggle:last-child { border-radius: 0 20px 20px 0; }
-.mo-device[data-platform="android"] .rs-toggle + .rs-toggle { margin-inline-start: -1px; border-inline-start: 0; }
-.mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"] {
+.mo .mo-device[data-platform="android"] .rs-toggle:first-child { border-radius: 20px 0 0 20px; }
+.mo .mo-device[data-platform="android"] .rs-toggle:last-child { border-radius: 0 20px 20px 0; }
+.mo .mo-device[data-platform="android"] .rs-toggle + .rs-toggle { margin-inline-start: -1px; border-inline-start: 0; }
+.mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"] {
   z-index: 1;
   background: transparent;
   color: var(--text);
 }
-.mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::after { background: var(--mo-android-container-high); }
-.mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::before {
+.mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::after { background: var(--mo-android-container-high); }
+.mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::before {
   content: "";
   width: 12px;
   height: 7px;
@@ -436,7 +437,7 @@
 }
 
 /* A switch has a 52 × 32 track, 16dp off thumb and 24dp on thumb. */
-.mo-device[data-platform="android"] .mo-native-switch {
+.mo .mo-device[data-platform="android"] .mo-native-switch {
   position: relative;
   display: inline-grid;
   place-items: center;
@@ -446,7 +447,7 @@
   vertical-align: middle;
 }
 
-.mo-device[data-platform="android"] .mo-native-switch > input {
+.mo .mo-device[data-platform="android"] .mo-native-switch > input {
   position: absolute;
   z-index: 1;
   inset: 0;
@@ -457,7 +458,7 @@
   cursor: pointer;
 }
 
-.mo-device[data-platform="android"] .mo-native-switch-track {
+.mo .mo-device[data-platform="android"] .mo-native-switch-track {
   position: relative;
   display: block;
   width: 52px;
@@ -469,7 +470,7 @@
   transition: background-color 200ms ease, border-color 200ms ease;
 }
 
-.mo-device[data-platform="android"] .mo-native-switch-thumb {
+.mo .mo-device[data-platform="android"] .mo-native-switch-thumb {
   position: absolute;
   top: 6px;
   left: 6px;
@@ -482,12 +483,12 @@
   transition: left 200ms ease, top 200ms ease, width 200ms ease, height 200ms ease, background-color 200ms ease;
 }
 
-.mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track {
+.mo .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track {
   border-color: var(--text);
   background: var(--text);
 }
 
-.mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track > .mo-native-switch-thumb {
+.mo .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track > .mo-native-switch-thumb {
   top: 2px;
   left: 22px;
   width: 24px;
@@ -496,27 +497,27 @@
   transform: none;
 }
 
-.mo-device[data-platform="android"] .mo-native-switch > input:focus-visible + .mo-native-switch-track {
+.mo .mo-device[data-platform="android"] .mo-native-switch > input:focus-visible + .mo-native-switch-track {
   outline: 2px solid var(--text);
   outline-offset: 4px;
 }
 
-.mo-device[data-platform="android"] .mo-native-switch > input:disabled { cursor: default; }
-.mo-device[data-platform="android"] .mo-native-switch > input:disabled + .mo-native-switch-track { opacity: .38; }
+.mo .mo-device[data-platform="android"] .mo-native-switch > input:disabled { cursor: default; }
+.mo .mo-device[data-platform="android"] .mo-native-switch > input:disabled + .mo-native-switch-track { opacity: .38; }
 
-.mo-device[data-platform="android"] .mo-native-range {
+.mo .mo-device[data-platform="android"] .mo-native-range {
   height: 48px;
   margin: 0;
   box-shadow: none;
 }
 
-.mo-device[data-platform="android"] .mo-native-range::-webkit-slider-runnable-track {
+.mo .mo-device[data-platform="android"] .mo-native-range::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
   background: linear-gradient(to right, var(--text) var(--mo-range-fill), var(--mo-android-container-high) var(--mo-range-fill));
 }
 
-.mo-device[data-platform="android"] .mo-native-range::-webkit-slider-thumb {
+.mo .mo-device[data-platform="android"] .mo-native-range::-webkit-slider-thumb {
   width: 20px;
   height: 20px;
   margin-top: -8px;
@@ -526,14 +527,14 @@
   box-shadow: none;
 }
 
-.mo-device[data-platform="android"] .mo-native-range::-moz-range-track {
+.mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-track {
   height: 4px;
   border-radius: 2px;
   background: var(--mo-android-container-high);
 }
 
-.mo-device[data-platform="android"] .mo-native-range::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--text); }
-.mo-device[data-platform="android"] .mo-native-range::-moz-range-thumb {
+.mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--text); }
+.mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border: 0;
@@ -543,7 +544,7 @@
 }
 
 /* Material lists use 56dp one-line and 72dp two-line rows. */
-.mo-device[data-platform="android"] .mo-phone .mo-list-row {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-list-row {
   min-height: 72px;
   gap: 16px;
   padding: 12px 16px;
@@ -551,22 +552,22 @@
   border-radius: 0;
 }
 
-.mo-device[data-platform="android"] .mo-list-row strong {
+.mo .mo-device[data-platform="android"] .mo-list-row strong {
   font-size: calc(16px * var(--mo-text-scale));
   line-height: 24px;
   letter-spacing: .15px;
   font-weight: 400;
 }
 
-.mo-device[data-platform="android"] .mo-list-row > span > span {
+.mo .mo-device[data-platform="android"] .mo-list-row > span > span {
   margin-top: 0;
   font-size: calc(14px * var(--mo-text-scale));
   line-height: 20px;
   letter-spacing: .25px;
 }
 
-.mo-device[data-platform="android"] .mo-list-row > .rs-icon:last-child { width: 24px; }
-.mo-device[data-platform="android"] .mo-initials {
+.mo .mo-device[data-platform="android"] .mo-list-row > .rs-icon:last-child { width: 24px; }
+.mo .mo-device[data-platform="android"] .mo-initials {
   width: 40px;
   height: 40px;
   border: 0;
@@ -575,9 +576,9 @@
   font-weight: 500;
 }
 
-.mo-device[data-platform="android"] .mo-contact-row { border: 0; }
-.mo-device[data-platform="android"] .mo-contact-row > button:last-child { padding: 12px; }
-.mo-device[data-platform="android"] .mo-data-row {
+.mo .mo-device[data-platform="android"] .mo-contact-row { border: 0; }
+.mo .mo-device[data-platform="android"] .mo-contact-row > button:last-child { padding: 12px; }
+.mo .mo-device[data-platform="android"] .mo-data-row {
   min-height: 56px;
   padding-block: 16px;
   border: 0;
@@ -585,13 +586,13 @@
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-settings-section {
+.mo .mo-device[data-platform="android"] .mo-settings-section {
   gap: 0;
   padding-block: 16px;
   border-top: 1px solid var(--divider);
 }
 
-.mo-device[data-platform="android"] .mo-settings-section > h3 {
+.mo .mo-device[data-platform="android"] .mo-settings-section > h3 {
   padding-block: 8px;
   font-size: 14px;
   font-weight: 500;
@@ -599,7 +600,7 @@
   letter-spacing: .1px;
 }
 
-.mo-device[data-platform="android"] .mo-setting-switch {
+.mo .mo-device[data-platform="android"] .mo-setting-switch {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -610,12 +611,12 @@
   line-height: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-settings-profile { min-height: 88px; gap: 16px; }
-.mo-device[data-platform="android"] .mo-settings-profile h3 { font-size: 22px; line-height: 28px; letter-spacing: 0; }
-.mo-device[data-platform="android"] .mo-settings-profile p { font-size: 14px; line-height: 20px; margin-top: 4px; }
-.mo-device[data-platform="android"] .mo-settings-profile .mo-initials { width: 56px; height: 56px; font-size: 22px; }
+.mo .mo-device[data-platform="android"] .mo-settings-profile { min-height: 88px; gap: 16px; }
+.mo .mo-device[data-platform="android"] .mo-settings-profile h3 { font-size: 22px; line-height: 28px; letter-spacing: 0; }
+.mo .mo-device[data-platform="android"] .mo-settings-profile p { font-size: 14px; line-height: 20px; margin-top: 4px; }
+.mo .mo-device[data-platform="android"] .mo-settings-profile .mo-initials { width: 56px; height: 56px; font-size: 22px; }
 
-.mo-device[data-platform="android"] .mo-phone .mo-android-settings-search {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-settings-search {
   min-height: 56px;
   padding-inline: 24px;
   border: 0;
@@ -623,11 +624,11 @@
   background: var(--mo-android-container-high);
 }
 
-.mo-device[data-platform="android"] .mo-android-settings-list {
+.mo .mo-device[data-platform="android"] .mo-android-settings-list {
   margin: 16px -16px 0;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-android-setting-row {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-setting-row {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -642,15 +643,15 @@
   text-align: start;
 }
 
-.mo-device[data-platform="android"] .mo-android-setting-row > span { display: block; min-width: 0; }
-.mo-device[data-platform="android"] .mo-android-setting-row strong {
+.mo .mo-device[data-platform="android"] .mo-android-setting-row > span { display: block; min-width: 0; }
+.mo .mo-device[data-platform="android"] .mo-android-setting-row strong {
   display: block;
   font-size: calc(20px * var(--mo-text-scale));
   line-height: 28px;
   letter-spacing: 0;
   font-weight: 400;
 }
-.mo-device[data-platform="android"] .mo-android-setting-row small {
+.mo .mo-device[data-platform="android"] .mo-android-setting-row small {
   display: block;
   margin-top: 2px;
   font-size: calc(14px * var(--mo-text-scale));
@@ -660,21 +661,21 @@
 }
 
 /* Flat M3 action containers, FAB and navigation bar. */
-.mo-device[data-platform="android"] .mo-app-actions {
+.mo .mo-device[data-platform="android"] .mo-app-actions {
   min-height: 72px;
   padding: 12px 16px;
   border: 0;
   gap: 8px;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-app-actions > button { font-size: 14px; }
-.mo-device[data-platform="android"] .mo-screen[data-fab="true"] > .mo-app-actions {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-app-actions > button { font-size: 14px; }
+.mo .mo-device[data-platform="android"] .mo-screen[data-fab="true"] > .mo-app-actions {
   min-height: 56px;
   bottom: 16px;
   padding: 0;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-screen[data-fab="true"] > .mo-app-actions > button {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-screen[data-fab="true"] > .mo-app-actions > button {
   min-width: 56px;
   min-height: 56px;
   gap: 12px;
@@ -686,14 +687,14 @@
   box-shadow: none;
 }
 
-.mo-device[data-platform="android"] .mo-clock-tabs {
+.mo .mo-device[data-platform="android"] .mo-clock-tabs {
   min-height: 80px;
   padding: 12px 8px 16px;
   border: 0;
   background: var(--mo-android-container);
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-clock-tabs > button {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-clock-tabs > button {
   position: relative;
   gap: 4px;
   min-height: 52px;
@@ -706,7 +707,7 @@
   line-height: 16px;
 }
 
-.mo-device[data-platform="android"] .mo-clock-tabs > button > .rs-icon {
+.mo .mo-device[data-platform="android"] .mo-clock-tabs > button > .rs-icon {
   box-sizing: content-box;
   width: 24px;
   height: 24px;
@@ -714,40 +715,40 @@
   border-radius: 16px;
 }
 
-.mo-device[data-platform="android"] .mo-clock-tabs > button[aria-pressed="true"] { color: var(--text); }
-.mo-device[data-platform="android"] .mo-clock-tabs > button[aria-pressed="true"] > .rs-icon { background: var(--mo-android-container-high); color: var(--text); }
-.mo-device[data-platform="android"] .mo-clock-face { padding-block: 40px; font-size: 72px; line-height: 80px; letter-spacing: -1px; }
-.mo-device[data-platform="android"] .mo-message { border-radius: 20px 20px 20px 4px; padding: 12px 16px; }
-.mo-device[data-platform="android"] .mo-message-mine { border-radius: 20px 20px 4px 20px; }
-.mo-device[data-platform="android"] .mo-message p { font-size: 16px; line-height: 24px; }
-.mo-device[data-platform="android"] :is(.mo-message-compose, .mo-address) { grid-template-columns: minmax(0, 1fr) 48px; align-items: center; }
-.mo-device[data-platform="android"] .mo-phone :is(.mo-message-compose, .mo-address) button { width: 48px; height: 48px; padding: 12px; border-radius: 24px; }
-.mo-device[data-platform="android"] .mo-phone .mo-message-compose .rs-input { border: 0; border-radius: 28px; background: var(--mo-android-container-high); }
-.mo-device[data-platform="android"] .mo-phone .mo-keypad button { min-height: 72px; border: 0; border-radius: 36px; background: var(--mo-android-container); font-size: 32px; font-weight: 400; }
-.mo-device[data-platform="android"] .mo-phone .mo-calculator button { min-height: 72px; border: 0; border-radius: 36px; background: var(--mo-android-container); font-size: 28px; font-weight: 400; }
-.mo-device[data-platform="android"] .mo-phone .mo-calculator .rs-btn-primary { background: var(--text); color: var(--bg); }
-.mo-device[data-platform="android"] .mo-calculator-display { min-height: 148px; padding: 24px 8px; font-size: 56px; line-height: 72px; letter-spacing: 0; }
+.mo .mo-device[data-platform="android"] .mo-clock-tabs > button[aria-pressed="true"] { color: var(--text); }
+.mo .mo-device[data-platform="android"] .mo-clock-tabs > button[aria-pressed="true"] > .rs-icon { background: var(--mo-android-container-high); color: var(--text); }
+.mo .mo-device[data-platform="android"] .mo-clock-face { padding-block: 40px; font-size: 72px; line-height: 80px; letter-spacing: -1px; }
+.mo .mo-device[data-platform="android"] .mo-message { border-radius: 20px 20px 20px 4px; padding: 12px 16px; }
+.mo .mo-device[data-platform="android"] .mo-message-mine { border-radius: 20px 20px 4px 20px; }
+.mo .mo-device[data-platform="android"] .mo-message p { font-size: 16px; line-height: 24px; }
+.mo .mo-device[data-platform="android"] :is(.mo-message-compose, .mo-address) { grid-template-columns: minmax(0, 1fr) 48px; align-items: center; }
+.mo .mo-device[data-platform="android"] .mo-phone :is(.mo-message-compose, .mo-address) button { width: 48px; height: 48px; padding: 12px; border-radius: 24px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-message-compose .rs-input { border: 0; border-radius: 28px; background: var(--mo-android-container-high); }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-keypad button { min-height: 72px; border: 0; border-radius: 36px; background: var(--mo-android-container); font-size: 32px; font-weight: 400; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-calculator button { min-height: 72px; border: 0; border-radius: 36px; background: var(--mo-android-container); font-size: 28px; font-weight: 400; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-calculator .rs-btn-primary { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="android"] .mo-calculator-display { min-height: 148px; padding: 24px 8px; font-size: 56px; line-height: 72px; letter-spacing: 0; }
 
 /* Android 15 SystemUI: 80dp tiles, 8dp gaps, 20dp icons and 16dp start inset. */
-.mo-device[data-platform="android"] .mo-phone:is([data-overlay="quick"], [data-overlay="notifications"]) {
+.mo .mo-device[data-platform="android"] .mo-phone:is([data-overlay="quick"], [data-overlay="notifications"]) {
   background: var(--mo-android-container);
 }
 
-.mo-device[data-platform="android"] .mo-phone:is([data-overlay="quick"], [data-overlay="notifications"]) .mo-scroll {
+.mo .mo-device[data-platform="android"] .mo-phone:is([data-overlay="quick"], [data-overlay="notifications"]) .mo-scroll {
   padding: 16px;
   background: transparent;
 }
 
-.mo-device[data-platform="android"] .mo-shade-clock {
+.mo .mo-device[data-platform="android"] .mo-shade-clock {
   align-items: center;
   min-height: 56px;
   margin: 0 0 16px;
 }
 
-.mo-device[data-platform="android"] .mo-shade-clock strong { font-size: 40px; line-height: 48px; letter-spacing: 0; font-weight: 400; }
-.mo-device[data-platform="android"] .mo-shade-clock span { font-size: 14px; line-height: 20px; }
-.mo-device[data-platform="android"] .mo-quick-grid { gap: 8px; }
-.mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button {
+.mo .mo-device[data-platform="android"] .mo-shade-clock strong { font-size: 40px; line-height: 48px; letter-spacing: 0; font-weight: 400; }
+.mo .mo-device[data-platform="android"] .mo-shade-clock span { font-size: 14px; line-height: 20px; }
+.mo .mo-device[data-platform="android"] .mo-quick-grid { gap: 8px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button {
   grid-template-columns: 20px minmax(0, 1fr);
   grid-template-rows: 20px 20px;
   align-content: center;
@@ -762,17 +763,17 @@
   color: var(--text);
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
-.mo-device[data-platform="android"] .mo-quick-grid > button > .rs-icon { width: 20px; height: 20px; }
-.mo-device[data-platform="android"] .mo-quick-grid strong { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
-.mo-device[data-platform="android"] .mo-quick-grid span { font-size: 12px; line-height: 16px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="android"] .mo-quick-grid > button > .rs-icon { width: 20px; height: 20px; }
+.mo .mo-device[data-platform="android"] .mo-quick-grid strong { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
+.mo .mo-device[data-platform="android"] .mo-quick-grid span { font-size: 12px; line-height: 16px; }
 
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-scroll > :is(.mo-field, .mo-android-brightness) {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-scroll > :is(.mo-field, .mo-android-brightness) {
   margin-top: 8px;
   margin-bottom: 16px;
 }
 
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-scroll > .mo-field > span {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-scroll > .mo-field > span {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -780,35 +781,35 @@
   clip-path: inset(50%);
 }
 
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-webkit-slider-runnable-track {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-webkit-slider-runnable-track {
   height: 48px;
   border-radius: 24px;
 }
 
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-webkit-slider-thumb {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-webkit-slider-thumb {
   width: 4px;
   height: 24px;
   margin-top: 12px;
   border-radius: 2px;
   background: var(--bg);
 }
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-track {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-track {
   height: 48px;
   border-radius: 24px;
 }
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-progress {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-progress {
   height: 48px;
   border-radius: 24px;
 }
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-thumb {
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-thumb {
   width: 4px;
   height: 24px;
   border-radius: 2px;
   background: var(--bg);
 }
-.mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-quick-grid { margin-top: 16px; }
+.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-quick-grid { margin-top: 16px; }
 
-.mo-device[data-platform="android"] .mo-now-playing {
+.mo .mo-device[data-platform="android"] .mo-now-playing {
   min-height: 112px;
   margin: 16px 0 0;
   padding: 20px;
@@ -818,20 +819,20 @@
   gap: 16px;
 }
 
-.mo-device[data-platform="android"] .mo-now-playing strong { font-size: 16px; line-height: 24px; }
-.mo-device[data-platform="android"] .mo-now-playing > span > span { margin-top: 0; font-size: 14px; line-height: 20px; }
-.mo-device[data-platform="android"] .mo-phone .mo-now-playing > button { width: 48px; height: 48px; padding: 12px; border: 0; border-radius: 24px; background: var(--mo-android-container-high); }
-.mo-device[data-platform="android"] .mo-shade-actions { min-height: 60px; font-size: 12px; line-height: 16px; }
-.mo-device[data-platform="android"] .mo-phone .mo-shade-actions > button { width: 48px; height: 48px; padding: 12px; border: 0; border-radius: 24px; }
+.mo .mo-device[data-platform="android"] .mo-now-playing strong { font-size: 16px; line-height: 24px; }
+.mo .mo-device[data-platform="android"] .mo-now-playing > span > span { margin-top: 0; font-size: 14px; line-height: 20px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-now-playing > button { width: 48px; height: 48px; padding: 12px; border: 0; border-radius: 24px; background: var(--mo-android-container-high); }
+.mo .mo-device[data-platform="android"] .mo-shade-actions { min-height: 60px; font-size: 12px; line-height: 16px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-shade-actions > button { width: 48px; height: 48px; padding: 12px; border: 0; border-radius: 24px; }
 
-.mo-device[data-platform="android"] .mo-shade-compact {
+.mo .mo-device[data-platform="android"] .mo-shade-compact {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   position: relative;
   padding-bottom: 48px;
 }
 
-.mo-device[data-platform="android"] .mo-phone .mo-shade-compact > button {
+.mo .mo-device[data-platform="android"] .mo-phone .mo-shade-compact > button {
   flex-direction: row;
   justify-content: flex-start;
   gap: 10px;
@@ -842,8 +843,8 @@
   line-height: 20px;
 }
 
-.mo-device[data-platform="android"] .mo-shade-compact > button > .rs-icon { width: 20px; height: 20px; }
-.mo-device[data-platform="android"] .mo-phone .mo-shade-compact > button[aria-label="Expand Quick Settings"] {
+.mo .mo-device[data-platform="android"] .mo-shade-compact > button > .rs-icon { width: 20px; height: 20px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-shade-compact > button[aria-label="Expand Quick Settings"] {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -856,10 +857,10 @@
   background: transparent;
 }
 
-.mo-device[data-platform="android"] .mo-notification-heading { min-height: 48px; margin-top: 16px; }
-.mo-device[data-platform="android"] .mo-notification-heading h3 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
-.mo-device[data-platform="android"] .mo-phone .mo-notification-heading > button { width: 48px; padding: 12px; }
-.mo-device[data-platform="android"] .mo-notification {
+.mo .mo-device[data-platform="android"] .mo-notification-heading { min-height: 48px; margin-top: 16px; }
+.mo .mo-device[data-platform="android"] .mo-notification-heading h3 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-notification-heading > button { width: 48px; padding: 12px; }
+.mo .mo-device[data-platform="android"] .mo-notification {
   grid-template-columns: 20px minmax(0, 1fr) 48px;
   gap: 12px;
   min-height: 96px;
@@ -871,33 +872,33 @@
   background: var(--mo-android-surface);
 }
 
-.mo-device[data-platform="android"] .mo-notification > .rs-icon { width: 20px; height: 20px; margin-top: 2px; }
-.mo-device[data-platform="android"] .mo-notification h3 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
-.mo-device[data-platform="android"] .mo-notification p { margin-top: 4px; font-size: 14px; line-height: 20px; letter-spacing: .25px; }
-.mo-device[data-platform="android"] .mo-phone .mo-notification button { width: 48px; padding: 12px; margin-top: -8px; }
-.mo-device[data-platform="android"] .mo-notification button > .rs-icon { width: 20px; height: 20px; }
+.mo .mo-device[data-platform="android"] .mo-notification > .rs-icon { width: 20px; height: 20px; margin-top: 2px; }
+.mo .mo-device[data-platform="android"] .mo-notification h3 { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
+.mo .mo-device[data-platform="android"] .mo-notification p { margin-top: 4px; font-size: 14px; line-height: 20px; letter-spacing: .25px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-notification button { width: 48px; padding: 12px; margin-top: -8px; }
+.mo .mo-device[data-platform="android"] .mo-notification button > .rs-icon { width: 20px; height: 20px; }
 
-.mo-device[data-platform="android"] .mo-recents { padding-top: 40px; gap: 24px; }
-.mo-device[data-platform="android"] .mo-phone .mo-recent-preview { min-height: 460px; border: 0; border-radius: 28px; background: var(--mo-android-container); }
-.mo-device[data-platform="android"] .mo-recent-task header { min-height: 56px; }
-.mo-device[data-platform="android"] .mo-recent-task header > strong { font-size: 16px; line-height: 24px; font-weight: 400; }
-.mo-device[data-platform="android"] .mo-recent-task .mo-mini-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--mo-android-container-high); }
+.mo .mo-device[data-platform="android"] .mo-recents { padding-top: 40px; gap: 24px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-recent-preview { min-height: 460px; border: 0; border-radius: 28px; background: var(--mo-android-container); }
+.mo .mo-device[data-platform="android"] .mo-recent-task header { min-height: 56px; }
+.mo .mo-device[data-platform="android"] .mo-recent-task header > strong { font-size: 16px; line-height: 24px; font-weight: 400; }
+.mo .mo-device[data-platform="android"] .mo-recent-task .mo-mini-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--mo-android-container-high); }
 
 @media (prefers-reduced-motion: reduce) {
-  .mo-device[data-platform="android"] :is(.mo-native-switch-track, .mo-native-switch-thumb) { transition: none; }
+  .mo .mo-device[data-platform="android"] :is(.mo-native-switch-track, .mo-native-switch-thumb) { transition: none; }
 }
 
 @media (forced-colors: active) {
-  .mo-device[data-platform="android"] .mo-phone {
+  .mo .mo-device[data-platform="android"] .mo-phone {
     --mo-android-surface: Canvas;
     --mo-android-container: Canvas;
     --mo-android-container-high: Canvas;
     --mo-android-outline: CanvasText;
   }
-  .mo-device[data-platform="android"] :is([data-app-icon], .mo-notification, .mo-quick-grid > button, .mo-android-search) { outline: 1px solid CanvasText; }
-  .mo-device[data-platform="android"] .mo-native-switch-track { forced-color-adjust: none; border-color: CanvasText; background: Canvas; }
-  .mo-device[data-platform="android"] .mo-native-switch-thumb { background: CanvasText; }
-  .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track { background: Highlight; border-color: Highlight; }
-  .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track > .mo-native-switch-thumb { background: HighlightText; }
-  .mo-device[data-platform="android"] .mo-native-range { appearance: auto; }
+  .mo .mo-device[data-platform="android"] :is([data-app-icon], .mo-notification, .mo-quick-grid > button, .mo-android-search) { outline: 1px solid CanvasText; }
+  .mo .mo-device[data-platform="android"] .mo-native-switch-track { forced-color-adjust: none; border-color: CanvasText; background: Canvas; }
+  .mo .mo-device[data-platform="android"] .mo-native-switch-thumb { background: CanvasText; }
+  .mo .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track { background: Highlight; border-color: Highlight; }
+  .mo .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track > .mo-native-switch-thumb { background: HighlightText; }
+  .mo .mo-device[data-platform="android"] .mo-native-range { appearance: auto; }
 }

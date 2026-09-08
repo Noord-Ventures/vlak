@@ -287,6 +287,19 @@ export async function checkMobileOS({ page, base, fail }) {
       assert.equal(await device.locator(".mo-recent-task").count(), 6);
       await home(); await fit();
     }
+    stage = "standalone preview cascade";
+    await page.goto(`${base}/i/mobile-os/`, { waitUntil: "networkidle" });
+    const standalone = await page.locator(".mo").evaluate(element => {
+      const android = element.querySelector('.mo-device[data-platform="android"]');
+      return {
+        phoneDimensions: [...element.querySelectorAll(".mo-phone")].map(phone => [phone.offsetWidth, phone.offsetHeight]),
+        clockRadius: getComputedStyle(android.querySelector(".mo-android-clock-widget")).borderRadius,
+        wallpaper: getComputedStyle(android.querySelector(".mo-home")).backgroundImage,
+      };
+    });
+    assert.deepEqual(standalone.phoneDimensions, [[393, 852], [412, 915]]);
+    assert.equal(standalone.clockRadius, "48px", "Standalone CSS order preserves native component shapes");
+    assert.equal(standalone.wallpaper, "none", "Standalone route does not restore the legacy gradient");
   } catch (error) { fail(`Mobile OS (${stage}): ${error instanceof Error ? error.message : String(error)}`); }
 }
 
