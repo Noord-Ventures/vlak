@@ -11,3 +11,11 @@ position/normal pairs, and applied monochrome materials. All 204,453 triangles i
 the downloaded GLB are retained. The interactive EV example separates wheel
 assemblies for rotation. Its battery geometry and energy values are illustrative
 local examples, not specifications for the creator's vehicle model.
+
+evoque-feature-lines.json is derived from the same licensed geometry. Vlak welded
+source material boundaries, selected glazing, lamp and body-panel contours and
+front-facing wheel creases, and simplified their samples for sparse linework.
+Some feature paths are projected onto nearby original exterior faces with a small
+depth clearance; the source GLB surfaces and proportions are unchanged. Regenerate
+with apps/www/scripts/prepare-evoque-features.mjs; --check verifies the committed
+asset against its pinned source SHA-256 and deterministic preparation.

@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { checkDriveCameraTransition } from "./drive-camera-e2e.mjs";
+import { checkDriveLoading } from "./drive-loading-e2e.mjs";
 
 /** Exercise the EV workspace through visible, keyboard-operable Vlak controls. */
 export async function checkDriveStyle({ page, base, fail }) {
@@ -76,8 +77,11 @@ export async function checkDriveStyle({ page, base, fail }) {
     await waitForScene(() => document.querySelector('.ev-scene')?.dataset.rendered === 'true');
     assert.equal(await scene.locator('canvas[data-engine="three"]').count(), 1);
     const triangles = Number(await scene.getAttribute('data-triangles'));
-    assert(triangles > 5000 && triangles < 60000, 'Curved line model stays within the simplified geometry budget');
-    assert.equal(await page.evaluate(() => performance.getEntriesByType('resource').some(resource => new URL(resource.name).pathname.endsWith('/evoque-monochrome.glb'))), false, 'The schematic renders without downloading the detailed Evoque GLB');
+    assert(triangles >= 204453 && triangles < 350000, 'The complete Evoque source and sparse contour hull stay within the measured rendering budget');
+    assert(Number(await scene.getAttribute('data-draw-calls')) < 150, 'Source surfaces and feature lines remain batched');
+    const sourceResources = await page.evaluate(() => performance.getEntriesByType('resource').map(resource => new URL(resource.name).pathname));
+    assert(sourceResources.includes('/interfaces/concepts/evoque-monochrome.glb'), 'Vehicle proportions use the original licensed Evoque surface geometry');
+    assert(sourceResources.includes('/interfaces/concepts/evoque-feature-lines.json'), 'Sparse contours use the prepared source feature paths');
     const lock = root.getByRole("button", { name: "Door lock", exact: true });
     await activate(lock); assert.equal(await lock.getAttribute("aria-pressed"), "false");
     assert.match(await root.locator(".ev-profile figcaption").textContent(), /Doors unlocked/);
@@ -181,6 +185,7 @@ export async function checkDriveStyle({ page, base, fail }) {
     await activate(root.getByRole("button", { name: "Play", exact: true }));
     assert.equal(await root.getAttribute("data-playing"), "true");
     await fit();
+    if (page.viewportSize()?.width === 1440 && originalTheme === "light") await checkDriveLoading({ page, base });
   } catch (error) {
     fail(`EV workspace: ${error instanceof Error ? error.message : String(error)}`);
   }

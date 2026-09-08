@@ -198,7 +198,7 @@ const originalInterfaces = [
     ink: "Paper and ink surfaces, monochrome vehicle linework and clear status records.",
     use: "Choose a vehicle view → adjust the cabin → control media",
     field: "Vehicle and journey views beside focused climate, charging and media panels.",
-    note: "Three.js renders an abstract line model measured from the licensed Evoque geometry. The electric system, battery assembly, vehicle settings and journey are fictional simulations, independent of the source vehicle's engineering. The player shows Fortress Down by Loathe; playback controls are simulated and do not stream audio.",
+    note: "Three.js renders the licensed Evoque geometry with paper-colored surfaces and a simplified selection of source contours. The electric system, battery assembly, vehicle settings and journey are fictional simulations, independent of the source vehicle's engineering. The player shows Fortress Down by Loathe; playback controls are simulated and do not stream audio.",
     components: ["Button", "Card", "Icon", "Progress", "Toggle group", "Metric", "Number field", "Playback controls", "Media scrubber", "Connection status"],
     modifications: [
       "Flush working panels separate the vehicle visualization from local controls. Metrics present range and battery records; a focused inspector keeps cabin, charging and media actions readable.",
@@ -370,9 +370,30 @@ const microscopyStudy = {
   ],
 } as const;
 
+const desktopStudy = {
+  slug: "desktop-os",
+  title: "Desktop OS",
+  voice: "Familiar places to work, in a shared visual language.",
+  law: "Four working desktops with independent files, windows and everyday applications.",
+  story: "Mac OS, Windows, Linux and BeOS each bring their own way of working. Open and arrange windows, move between apps, write a document or draw something. The file manager, editor and terminal share the same files, and each desktop keeps its own workspace when you return.",
+  what: "Desktop OS",
+  type: "Window manager, file system, applications and desktop preferences",
+  module: "Grid system",
+  ink: "Paper, ink, hairline window frames and Inter across four distinct desktop conventions.",
+  use: "Choose a desktop → open an app → save your work → return to it",
+  field: "A working desktop with platform-specific menus, window controls and app switching.",
+  note: "These browser workspaces adapt classic Mac OS, Windows XP, GNOME and BeOS conventions. Files and preferences stay in this browser, separately for each desktop. Terminal commands act on those files; external websites open in a browser tab. No native operating system is running.",
+  components: ["Button", "Icon", "Input", "Slider", "Tabs", "Textarea", "Toggle group"],
+  modifications: [
+    "Tabs preserve independent desktops. Window controls support focus, movement, resizing, minimizing and maximizing, with platform-specific menus and application switching.",
+    "Input, Textarea and Button connect the file manager, editor and command line to a persistent local file system. Drawings and text can be exported; the calculator, calendar and Mines game work locally.",
+    "Desktop preferences adjust the workspace, while the process view lists its actual open windows. Classic Mac, Windows XP and BeOS behaviors adapt the creator’s existing browser prototypes using Vlak components and original interface artwork.",
+  ],
+} as const;
+
 const specialistStudies = [...scienceStudies, ...engineeringStudies, ...careStudies, ...musicStudies] as const;
-export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy] as const;
-export const orderedInterfaces = [...specialistStudies, microscopyStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
+export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy, desktopStudy] as const;
+export const orderedInterfaces = [...specialistStudies, microscopyStudy, desktopStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
 
 export type InterfaceSlug = (typeof interfaces)[number]["slug"];
 
@@ -384,6 +405,7 @@ export function interfaceBySlug(slug: string) {
 
 /** Each compact workspace changes its flow, not just its column widths. */
 export const mobilePatterns: Record<InterfaceSlug, string> = {
+  "desktop-os": "On mobile, the selected application fills the workspace. Apps and Tasks become separate drawers, keeping file operations and app switching within reach. Window positions, unsaved drafts and independent platform files survive changes between compact and desktop layouts.",
   microscopy: "On mobile, Positions, Sequence, Stack and Review are focused screens. Opening a position replaces the list with its editor; Back preserves the unsaved draft, while Apply and Discard remain explicit. The planned stack and import/export controls stay available without shrinking the desktop workspace.",
   ...scienceMobilePatterns,
   ...engineeringMobilePatterns,

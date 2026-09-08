@@ -1,28 +1,28 @@
 {
-  "created": "2026-09-07T23:18:13.885Z",
+  "created": "2026-09-08T00:12:00.159Z",
   "method": "Unretouched Chromium screenshots of the actual Three.js EV scene in its side view, reduced motion.",
   "source": "https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa",
   "creator": "tonielpro520",
   "license": "https://creativecommons.org/licenses/by/4.0/",
-  "adaptations": "An original simplified shell follows the licensed Evoque's measured wheelbase, roof, glazing and shoulder contours. Curated lamp, vent, handle and wheel outlines retain its identity; fine trim, badges and grille mesh are omitted. The source mesh is not downloaded at runtime. Attribution is retained under Components used.",
+  "adaptations": "The original licensed Evoque geometry retains its proportions and silhouette. Selected original body boundaries, creases and wheel ridges are simplified offline. Paper-colored surfaces and sparse outlines omit fine trim, badges, grille mesh and interior detail. Attribution is retained under Components used.",
   "rendering": {
     "featureContours": "LineSegments2 / LineMaterial",
-    "lineWidthCssPixels": 1.05,
+    "lineWidthCssPixels": 1.2,
     "paperSurfacePolygonOffset": true
   },
   "captureCommand": "SITE_URL=<fresh source or site URL> PLAYWRIGHT_EXECUTABLE_PATH=<Chromium> node apps/www/scripts/capture-vehicle-previews.mjs",
   "captures": {
     "light": {
-      "filename": "evoque-line-side-light-v3.png",
-      "sha256": "25a48473b3da7d84e6256cfa4a131f43d6d6e49741234b8d587a65fa1ef87f35",
+      "filename": "evoque-line-side-light-v4.png",
+      "sha256": "b60485eafdd5dea2f428e880790f3ee95ed448dd9d4be5388a7014bf9da96bbe",
       "width": 998,
       "height": 408,
       "camera": "0.000,1.030,11.988",
       "paper": "f5f3ed"
     },
     "dark": {
-      "filename": "evoque-line-side-dark-v3.png",
-      "sha256": "8d2d300d73ad60bb5da429956bc9b482bbed10bdc5f3b375be044cda2ba28fbe",
+      "filename": "evoque-line-side-dark-v4.png",
+      "sha256": "527caa862cb3e6639c5608733b2ad45932a5c2927b91eacf8f93beb1c658a77a",
       "width": 998,
       "height": 408,
       "camera": "0.000,1.030,11.988",

@@ -29,6 +29,7 @@ const marks = {
   documentation: "file-text",
   "music-player": "music",
   "video-player": "video",
+  "desktop-os": "monitor",
 } as const;
 
 /** Product marks use the current Vlak icon family. */

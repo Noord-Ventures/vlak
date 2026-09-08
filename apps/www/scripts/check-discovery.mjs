@@ -57,6 +57,19 @@ for (const file of readdirSync(out, { recursive: true, encoding: "utf8" })) {
   checked++;
 }
 
+// Share-only previews keep the study canonical and stay out of the search index.
+let previews = 0;
+for (const entry of readdirSync(join(out, "interfaces"), { withFileTypes: true })) {
+  if (!entry.isDirectory() || !existsSync(join(out, "interfaces", entry.name, "index.html"))) continue;
+  const file = `i/${entry.name}/index.html`;
+  assert(existsSync(join(out, file)), `${entry.name}: missing direct preview link`);
+  const html = read(file), head = html.match(/<head>([\s\S]*?)<\/head>/i)?.[1] ?? "";
+  assert(tags(head, "meta").some(item => item.name === "robots" && /noindex/.test(item.content)), `${file}: preview excludes duplicate indexing`);
+  assert.deepEqual(tags(head, "link").filter(item => item.rel === "canonical").map(item => item.href), [`${origin}/interfaces/${entry.name}/`], `${file}: canonical study`);
+  assert.deepEqual(tags(head, "meta").filter(item => item.property === "og:url").map(item => item.content), [`${origin}/i/${entry.name}/`], `${file}: direct sharing URL`);
+  assert.match(html, /data-preview-open="true"/, `${file}: preview is present on first paint`);
+  previews++;
+}
 for (const path of images) assert(existsSync(join(out, path)), `Missing social image: ${path}`);
 const sitemap = [...read("sitemap.xml").matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
 assert.equal(new Set(sitemap).size, sitemap.length, "Sitemap URLs are unique");
@@ -71,4 +84,4 @@ for (const [, url] of llms.matchAll(/\]\((https:\/\/vlak\.dev[^\s)]*)\)/g)) {
   const { pathname } = new URL(url);
   assert(existsSync(join(out, pathname)) || existsSync(join(out, pathname, "index.html")), `Broken agent-index link: ${url}`);
 }
-console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, site identity and agent links.`);
+console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, ${previews} direct preview links, site identity and agent links.`);

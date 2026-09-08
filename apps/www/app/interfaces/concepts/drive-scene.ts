@@ -43,7 +43,7 @@ export function createDriveScene(host: HTMLDivElement, initial: DriveSceneState,
   });
   const groundMaterial = new THREE.LineBasicMaterial({color:0xb4b4b4,transparent:true,opacity:.6});
   const groundLine = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-3.1,0,1.18),new THREE.Vector3(3.1,0,1.18)]),groundMaterial);scene.add(groundLine);
-  let state=initial,disposed=false,frame=0,last=0,visible=true,tabVisible=!document.hidden,width=1,height=1,distance=0,wheelAngle=0,flowDistance=0;
+  let state=initial,disposed=false,modelReady=false,contextLost=false,frame=0,last=0,visible=true,tabVisible=!document.hidden,width=1,height=1,distance=0,wheelAngle=0,flowDistance=0;
   let bodyLift=0,batteryLift=0,coverLift=0,vehicleOpacity=1,span=2.52,lightPower=0,fov=12,worldOpacity=0;
   const eye=new THREE.Vector3(0,0,1),target=new THREE.Vector3(0,1.03,0);
   const desiredEye=new THREE.Vector3(),desiredTarget=new THREE.Vector3();
@@ -67,7 +67,7 @@ export function createDriveScene(host: HTMLDivElement, initial: DriveSceneState,
     request();
   };
   const render=(now:number)=>{
-    frame=0;if(disposed||!visible||!tabVisible||!width||!height)return;
+    frame=0;if(disposed||contextLost||!modelReady||!visible||!tabVisible||!width||!height)return;
     const dt=Math.min((now-(last||now))/1000,.05);last=now;
     const snap=state.reducedMotion||state.paused;
     const rate=snap?1:1-Math.exp(-dt*6);
@@ -93,7 +93,7 @@ export function createDriveScene(host: HTMLDivElement, initial: DriveSceneState,
     for(const [source,material]of model.vehicleMaterials){
       const original=source as THREE.MeshBasicMaterial,copy=material as THREE.MeshBasicMaterial;
       if(original.color&&copy.color)copy.color.copy(original.color);
-      const transparent=source.transparent||vehicleOpacity<.999;if(material.transparent!==transparent){material.transparent=transparent;material.needsUpdate=true;}material.opacity=vehicleOpacity*(source.transparent?source.opacity:1);material.depthWrite=vehicleOpacity>.99;
+      const transparent=source.transparent||vehicleOpacity<.999;if(material.transparent!==transparent){material.transparent=transparent;material.needsUpdate=true;}material.opacity=vehicleOpacity*(source.transparent?source.opacity:1);material.depthWrite=source.depthWrite&&vehicleOpacity>.99;
     }
     model.body.visible=model.runningGear.visible=vehicleOpacity>.003;
     model.body.position.y=bodyLift;model.battery.position.y=batteryLift;model.cover.position.y=coverLift;
@@ -132,7 +132,7 @@ export function createDriveScene(host: HTMLDivElement, initial: DriveSceneState,
     host.dataset.settled=String(!transitioning);
     if(transitioning||moving||flowing)request();
   };
-  function request(){if(!disposed&&!frame&&visible&&tabVisible&&width&&height)frame=requestAnimationFrame(render);}
+  function request(){if(!disposed&&!contextLost&&!frame&&visible&&tabVisible&&width&&height)frame=requestAnimationFrame(render);}
   const resize=()=>{const rect=host.getBoundingClientRect();width=Math.round(rect.width);height=Math.round(rect.height);if(width&&height){renderer.setSize(width,height,false);last=0;request();}else if(frame){cancelAnimationFrame(frame);frame=0;}};
   const observer=new ResizeObserver(resize);observer.observe(host);
   const intersection=new IntersectionObserver(entries=>{visible=entries.some(entry=>entry.isIntersecting);if(visible){last=0;request();}else if(frame){cancelAnimationFrame(frame);frame=0;}});intersection.observe(host);
@@ -140,10 +140,13 @@ export function createDriveScene(host: HTMLDivElement, initial: DriveSceneState,
   document.addEventListener("visibilitychange",visibility);
   const themeObserver=new MutationObserver(palette);themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:["data-theme","style","class"]});
   const theme=matchMedia("(prefers-color-scheme: dark)");theme.addEventListener("change",palette);
-  const lost=(event:Event)=>{event.preventDefault();visible=false;if(frame)cancelAnimationFrame(frame);frame=0;failed();};renderer.domElement.addEventListener("webglcontextlost",lost);
+  const lost=(event:Event)=>{event.preventDefault();contextLost=true;model.cancel();visible=false;if(frame)cancelAnimationFrame(frame);frame=0;failed();};renderer.domElement.addEventListener("webglcontextlost",lost);
   resize();palette();
+  const ready=model.ready.then(()=>{if(disposed)return;if(contextLost)throw new Error("The 3D context was lost while loading");modelReady=true;palette();});
+  void ready.catch(()=>{if(!disposed)failed();});
   return {
+    ready,
     update(next:DriveSceneState){state=next;last=0;palette();},
-    dispose(){disposed=true;if(frame)cancelAnimationFrame(frame);observer.disconnect();intersection.disconnect();themeObserver.disconnect();theme.removeEventListener("change",palette);document.removeEventListener("visibilitychange",visibility);renderer.domElement.removeEventListener("webglcontextlost",lost);const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();scene.traverse(object=>{const drawable=object as THREE.Mesh;if(drawable.geometry)geometries.add(drawable.geometry);if(drawable.material)for(const item of Array.isArray(drawable.material)?drawable.material:[drawable.material])materials.add(item);});for(const geometry of geometries)geometry.dispose();for(const material of [...materials,...Object.values(model.materials)])material.dispose();model.gradient.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();},
+    dispose(){disposed=true;model.cancel();if(frame)cancelAnimationFrame(frame);observer.disconnect();intersection.disconnect();themeObserver.disconnect();theme.removeEventListener("change",palette);document.removeEventListener("visibilitychange",visibility);renderer.domElement.removeEventListener("webglcontextlost",lost);const geometries=new Set<THREE.BufferGeometry>(),materials=new Set<THREE.Material>();scene.traverse(object=>{const drawable=object as THREE.Mesh;if(drawable.geometry)geometries.add(drawable.geometry);if(drawable.material)for(const item of Array.isArray(drawable.material)?drawable.material:[drawable.material])materials.add(item);});for(const geometry of geometries)geometry.dispose();for(const material of [...materials,...Object.values(model.materials)])material.dispose();model.gradient.dispose();renderer.dispose();renderer.forceContextLoss();renderer.domElement.remove();},
   };
 }

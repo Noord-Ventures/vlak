@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (file !== "page.tsx" && !file.endsWith("/page.tsx")) continue;
     const path = file === "page.tsx" ? "" : file.slice(0, -"/page.tsx".length);
     // This retired route deliberately returns notFound and is disallowed in robots.txt.
-    if (path === "swag") continue;
+    if (path === "swag" || path === "i/[slug]") continue;
     if (path === "components/[name]") {
       for (const component of catalogComponents) paths.add(`/components/${component.name}/`);
     } else if (path === "docs/[collection]") {

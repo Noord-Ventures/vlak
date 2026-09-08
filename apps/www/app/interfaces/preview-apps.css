@@ -1,0 +1,13 @@
+/* Desktop tabs keep their state mounted while the live preview gains height. */
+.if-preview-frame[data-preview-open="true"] .dos-board {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.if-preview-frame[data-preview-open="true"] .dos-platform-tabs { flex: none; }
+.if-preview-frame[data-preview-open="true"] .dos-platform-panel:not([hidden]) {
+  flex: 1;
+  min-height: 0;
+}
+.if-preview-frame[data-preview-open="true"] .dos { height: 100%; }

@@ -1,0 +1,76 @@
+/* Utility applications use the same paper, ink and 44px controls as the desktop. */
+.dos-paint, .dos-calendar, .dos-preferences, .dos-monitor, .dos-mines { min-width: 0; container-type: inline-size; }
+.dos-utility-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-width: 0; }
+.dos-utility-toolbar > .rs-input { flex: 1 1 160px; min-width: 0; }
+.dos-utility-toolbar > button, .dos-calendar-day, .dos-wallpaper-options > button, .dos-task-row > button { width: auto; min-width: 44px; min-height: 44px; flex-shrink: 0; }
+.dos-utility-toolbar [aria-pressed="true"], .dos-wallpaper-options [aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.dos-utility-range { display: flex; align-items: center; gap: 8px; min-height: 44px; min-width: 0; font-size: .8125rem; }
+.dos-utility-range input { min-width: 56px; width: 96px; min-height: 44px; accent-color: var(--text); cursor: pointer; }
+.dos-utility-range output { min-width: 24px; font-variant-numeric: tabular-nums; }
+.dos-utility-range input:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.dos-utility-help { font-size: .75rem; line-height: 1.45; margin: 8px 0; }
+.dos-paint-sheet { position: relative; width: 100%; min-width: 0; background: #fafafa; border: 1px solid var(--control-border); margin-block: 8px; }
+.dos-paint-sheet canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; touch-action: none; cursor: crosshair; }
+.dos-paint-sheet canvas:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.dos-paint-cursor { position: absolute; width: 12px; height: 12px; transform: translate(-50%, -50%); border: 1px solid #202020; outline: 1px solid #fafafa; border-radius: 50%; pointer-events: none; }
+.dos-calendar-heading h2 { flex: 1; min-width: 0; margin: 0; font-size: 1rem; line-height: 1.3; text-align: center; }
+.dos-calendar-layout { display: flex; flex-direction: column; gap: 20px; min-width: 0; padding-block: 8px; }
+.dos-calendar-weekdays, .dos-calendar-month { display: grid; grid-template-columns: repeat(7, minmax(44px, 1fr)); }
+.dos-calendar-weekdays { text-align: center; padding-block: 8px; color: var(--text-secondary); font-size: .75rem; }
+.dos-calendar-day { position: relative; display: flex; justify-content: center; align-items: center; min-width: 44px; min-height: 44px; border-radius: 0; }
+.dos-calendar-day[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.dos-calendar-day[aria-current="date"] .dos-calendar-number { text-decoration: underline; text-underline-offset: 4px; font-weight: 700; }
+.dos-calendar-dot { position: absolute; bottom: 5px; width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+.dos-calendar-agenda-label, .dos-calendar-note-preview { display: none; }
+.dos-calendar-note { display: flex; flex-direction: column; align-items: stretch; gap: 10px; min-width: 0; padding-top: 16px; border-top: 1px solid var(--divider); }
+.dos-calendar-note h3 { margin: 0; font-size: .875rem; line-height: 1.45; }
+.dos-calendar-note textarea { width: 100%; min-width: 0; min-height: 140px; resize: vertical; }
+.dos-calendar-note > button { align-self: flex-start; min-height: 44px; }
+.dos-settings-section { padding-block: 12px 20px; }
+.dos-settings-section + .dos-settings-section { border-top: 1px solid var(--divider); }
+.dos-settings-section h2 { margin: 0 0 8px; font-size: 1rem; }
+.dos-settings-section > p { margin-block: 8px; }
+.dos-wallpaper-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.dos-wallpaper-options > button { display: flex; flex-direction: column; gap: 8px; padding: 12px 8px; min-width: 0; border: 1px solid var(--control-border); }
+.dos-wallpaper-sample { display: block; width: 100%; height: 52px; border: 1px solid currentColor; background: var(--bg); color: var(--text-secondary); }
+.dos-wallpaper-sample[data-wallpaper="grid"] { background-image: linear-gradient(to right, var(--divider) 1px, transparent 1px), linear-gradient(to bottom, var(--divider) 1px, transparent 1px); background-size: 12px 12px; }
+.dos-wallpaper-sample[data-wallpaper="stripes"] { background-image: repeating-linear-gradient(135deg, transparent 0, transparent 9px, var(--divider) 9px, var(--divider) 10px); }
+.dos-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; }
+.dos-volume { margin-block: 8px; }
+.dos-volume input { flex: 1; width: auto; }
+.dos-volume output { min-width: 40px; text-align: right; }
+.dos-monitor-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--divider); border: 1px solid var(--divider); margin-bottom: 12px; }
+.dos-monitor-stats > div { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 14px; background: var(--bg); }
+.dos-monitor-stats span { font-size: .75rem; color: var(--text-secondary); }
+.dos-monitor-stats strong { font-size: 1.25rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.dos-monitor-list { min-width: 0; }
+.dos-task-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; padding-block: 8px; border-bottom: 1px solid var(--divider); }
+.dos-task-row > div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dos-task-row strong { font-size: .875rem; font-weight: 500; overflow-wrap: anywhere; }
+.dos-task-row span { font-size: .75rem; color: var(--text-secondary); }
+.dos-mines { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.dos-mines .dos-utility-toolbar > strong { flex: 1; font-size: .875rem; font-variant-numeric: tabular-nums; }
+.dos-mine-board { display: grid; grid-template-columns: repeat(5, minmax(44px, 1fr)); width: min(100%, 300px); align-self: center; border: 1px solid var(--control-border); }
+.dos-mine-board .dos-mine-cell { width: 100%; min-width: 44px; height: 52px; min-height: 44px; padding: 0; border: 0; border-right: 1px solid var(--divider); border-bottom: 1px solid var(--divider); border-radius: 0; color: var(--text); background: var(--table-alt); font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.dos-mine-board .dos-mine-cell:nth-child(5n) { border-right: 0; }
+.dos-mine-board .dos-mine-cell:nth-child(n + 21) { border-bottom: 0; }
+.dos-mine-board .dos-mine-cell[data-state="open"] { background: var(--bg); }
+.dos-mine-board .dos-mine-cell[data-state="mine"], .dos-mine-board .dos-mine-cell[data-state="flag"] { background: var(--text); color: var(--bg); }
+.dos-mine-board .dos-mine-cell:focus-visible { outline: 2px solid var(--text); outline-offset: -3px; }
+@container (max-width: 399px) {
+  .dos-calendar-heading h2 { flex-basis: calc(100% - 112px); }
+  .dos-calendar-heading > button:last-child { margin-left: auto; }
+  .dos-calendar-weekdays, .dos-calendar-blank { display: none; }
+  .dos-calendar-month { display: flex; flex-direction: column; max-height: 228px; overflow-y: auto; border-block: 1px solid var(--divider); }
+  .dos-calendar-month .dos-calendar-day { justify-content: flex-start; gap: 12px; width: 100%; text-align: left; border-bottom: 1px solid var(--divider); padding: 8px 10px; }
+  .dos-calendar-number { min-width: 20px; font-variant-numeric: tabular-nums; }
+  .dos-calendar-agenda-label { display: block; min-width: 32px; }
+  .dos-calendar-note-preview { display: block; flex: 1; min-width: 0; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: .75rem; }
+  .dos-calendar-dot { position: static; flex-shrink: 0; }
+  .dos-utility-toolbar > .rs-input { flex-basis: 100%; }
+}
+@media (forced-colors: active) {
+  .dos-mine-board .dos-mine-cell, .dos-wallpaper-sample { border-color: ButtonText; }
+  .dos-mine-board .dos-mine-cell[data-state="flag"], .dos-calendar-day[aria-pressed="true"], .dos-wallpaper-options [aria-pressed="true"] { background: Highlight; color: HighlightText; }
+  .dos-paint-sheet { forced-color-adjust: none; }
+}
