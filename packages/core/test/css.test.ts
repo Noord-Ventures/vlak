@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
+import { transformSync } from "esbuild";
 import { vlakTokens } from "../src/tokens";
 import { vlakComponents } from "../src/registry";
 
@@ -69,6 +70,21 @@ beforeAll(() => {
 });
 
 describe("generated vlak.css", () => {
+  it("bundles the same component rules and order while leaving provenance in standalone files", () => {
+    const files = [...new Set(vlakComponents.flatMap(component => component.css))];
+    const sources = files.map(file => readFileSync(join(pkgDir, "css", file), "utf8"));
+    const bundle = readFileSync(join(pkgDir, "css/components.css"), "utf8");
+    // Parse both forms with the existing build dependency. Only comments and
+    // formatting are discarded; selectors, declarations, layers and order remain.
+    const paint = (css: string) => transformSync(css, { loader: "css", legalComments: "none", minifyWhitespace: true }).code;
+    expect(paint(bundle)).toBe(paint(`@layer vlak.components {\n${sources.join("\n")}\n}\n`));
+    expect(vlakCss).toContain(bundle.slice(bundle.indexOf("@layer vlak.components")));
+    expect(sources.every(source => source.startsWith("/* ── ") && source.split("\n")[0]!.includes("generated from packages/react/src/"))).toBe(true);
+    expect(bundle).not.toContain("generated from packages/react/src/");
+    expect(vlakCss).not.toContain("generated from packages/react/src/");
+    expect(vlakCss).toContain("Typeface: Inter (SIL OFL 1.1)");
+  });
+
   it("keeps the switch rail slim without shrinking its hit area", () => {
     const css = readFileSync(join(pkgDir, "css/components/switch.css"), "utf8");
     const hit = css.match(/\.rs-switch\{([^}]+)\}/)?.[1];

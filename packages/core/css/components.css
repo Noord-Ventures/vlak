@@ -1,14 +1,12 @@
 /* Vlak component classes only (layer vlak.components). Load after tokens, base, and type:
    @noorddev/vlak/css carries all of it; @noorddev/vlak-react/css carries the React side. Generated. */
 @layer vlak.components {
-/* ── description-list: generated from packages/react/src/components/description-list.tsx ── */
 .rs-description-list{margin:0;width:100%;min-width:0;color:var(--text)}
 .rs-description-list-row{display:grid;grid-template-columns:minmax(8rem, 1fr) minmax(0, 2fr);gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 @media (max-width: 640px){.rs-description-list-row{grid-template-columns:minmax(0, 1fr)}}
 .rs-description-list-label{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45}
 .rs-description-list-value{margin:0;min-width:0;overflow-wrap:anywhere;line-height:1.45;font-variant-numeric:tabular-nums}
 
-/* ── metric: generated from packages/react/src/components/metric.tsx ── */
 .rs-metric{display:grid;align-content:start;gap:1rem;min-width:0;color:var(--text)}
 .rs-metric-label{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin:0}
 .rs-metric-reading{display:flex;align-items:baseline;gap:0.5rem;min-height:4rem;min-width:0;font-variant-numeric:tabular-nums;line-height:1}
@@ -16,7 +14,6 @@
 .rs-metric-unit{font-size:1.125rem;color:var(--text-secondary)}
 .rs-metric-detail{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45}
 
-/* ── activity-timeline: generated from packages/react/src/components/activity-timeline.tsx ── */
 .rs-activity-timeline{list-style-type:none;margin:0;padding:0;color:var(--text);width:100%}
 .rs-activity-timeline-event{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 3fr);gap:0.5rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 @media (max-width: 640px){.rs-activity-timeline-event{grid-template-columns:minmax(0, 1fr)}}
@@ -25,7 +22,6 @@
 .rs-activity-timeline-body{margin-block:0.5rem;line-height:1.45;max-width:66ch;overflow-wrap:anywhere}
 .rs-activity-timeline-summary{min-height:var(--hit);display:list-item;align-content:center;cursor:pointer;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}
 
-/* ── code-block: generated from packages/react/src/components/code-block.tsx ── */
 .rs-code-block{margin:0;width:100%;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);color:var(--text);background-color:var(--bg)}
 .rs-code-block-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;padding:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 .rs-code-block-pre{margin:0;overflow-x:auto;padding:1rem;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;tab-size:2;outline-color:var(--text);outline-offset:-2px}
@@ -34,7 +30,6 @@
 .rs-code-block-number{display:inline-block;user-select:none;color:var(--text-secondary);min-width:3ch;margin-inline-end:2ch;text-align:end}
 .rs-code-block-status{font-size:0.875rem;color:var(--text-secondary)}
 
-/* ── json-viewer: generated from packages/react/src/components/json-viewer.tsx ── */
 .rs-json-viewer{display:grid;gap:1rem;width:100%;min-width:0;color:var(--text)}
 .rs-json-viewer-tools{display:flex;flex-wrap:wrap;gap:0.5rem}
 .rs-json-viewer-body{padding:1rem;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45}
@@ -43,7 +38,6 @@
 .rs-json-viewer-value{min-height:2rem;align-content:center;margin:0}
 .rs-json-viewer-note{color:var(--text-secondary);font-family:inherit}
 
-/* ── diff-viewer: generated from packages/react/src/components/diff-viewer.tsx ── */
 .rs-diff-viewer{width:100%;min-width:0;color:var(--text)}
 .rs-diff-viewer-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:1rem}
 .rs-diff-viewer-tools{display:flex;flex-wrap:wrap;gap:0.5rem}
@@ -53,13 +47,11 @@
 .rs-diff-viewer-change{background-color:var(--control-fill);font-weight:500}
 .rs-diff-viewer-number{color:var(--text-secondary);width:3ch;padding-inline:0.5rem;vertical-align:top;font-variant-numeric:tabular-nums;text-align:end}
 
-/* ── error-summary: generated from packages/react/src/components/error-summary.tsx ── */
 .rs-error-summary{box-sizing:border-box;min-width:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);padding:1rem;background-color:var(--bg);color:var(--text);outline-color:var(--text);outline-offset:2px}
 .rs-error-summary-title{font-size:0.875rem;font-weight:600;margin:0 0 0.25rem;line-height:1.45}
 .rs-error-summary-list{margin:0;padding:0;list-style:none}
 .rs-error-summary-link{display:inline-flex;align-items:center;min-height:var(--hit);min-width:var(--hit);max-width:100%;font-size:0.875rem;font-weight:400;color:var(--text);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:0.2em;line-height:1.45;overflow-wrap:anywhere;border-radius:var(--radius-sm);outline-color:var(--text);outline-offset:2px}
 
-/* ── notification-center: generated from packages/react/src/components/notification-center.tsx ── */
 .rs-notification-center{color:var(--text);width:100%;min-width:0}
 .rs-notification-center-header{display:flex;flex-wrap:wrap;gap:0.75rem;align-items:center;justify-content:space-between}
 .rs-notification-center-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45}
@@ -69,7 +61,6 @@
 .rs-notification-center-detail{margin-block:0.5rem;color:var(--text);line-height:1.45}
 .rs-notification-center-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}
 
-/* ── task-progress: generated from packages/react/src/components/task-progress.tsx ── */
 .rs-task-progress{display:grid;gap:1rem;color:var(--text);min-width:0;width:100%}
 .rs-task-progress-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45}
 .rs-task-progress-bar{width:100%;height:0.5rem;accent-color:var(--text)}
@@ -78,12 +69,10 @@
 .rs-task-progress-phase{padding-block:0.5rem}
 .rs-task-progress-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 
-/* ── connection-status: generated from packages/react/src/components/connection-status.tsx ── */
 .rs-connection-status{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;color:var(--text);min-width:0}
 .rs-connection-status-label{display:inline-flex;align-items:center;gap:0.5rem;line-height:1.45}
 .rs-connection-status-detail{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin:0}
 
-/* ── tree-view: generated from packages/react/src/components/tree-view.tsx ── */
 .rs-tree-view{list-style-type:none;margin:0;padding:0;color:var(--text);min-width:0;width:100%;box-sizing:border-box;font-size:0.875rem;line-height:1.45}
 .rs-tree-view-group{list-style-type:none;margin:0;padding-inline-start:1rem;min-width:0;box-sizing:border-box}
 .rs-tree-view-item{display:flex;align-items:center;gap:0.25rem;min-height:var(--hit);min-width:var(--hit);width:100%;padding-inline:0.25rem;box-sizing:border-box;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:-2px}
@@ -94,28 +83,23 @@
 .rs-tree-view-spacer{width:var(--hit);flex-shrink:0}
 .rs-tree-view-disclosure{display:inline-flex;align-items:center;justify-content:center;width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);flex-shrink:0;box-sizing:border-box;border-width:0;border-radius:var(--radius-sm);background-color:transparent;color:var(--text);cursor:pointer;padding:0}
 
-/* ── toolbar: generated from packages/react/src/components/toolbar.tsx ── */
 .rs-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text)}
 .rs-toolbar-vertical{flex-direction:column;align-items:stretch}
 .rs-toolbar-pressed{font-weight:600}
 
-/* ── bottom-navigation: generated from packages/react/src/components/bottom-navigation.tsx ── */
 .rs-bottom-navigation{background-color:var(--bg);color:var(--text);border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-bottom:env(safe-area-inset-bottom, 0px)}
 .rs-bottom-navigation-list{list-style-type:none;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0, 1fr);gap:0.25rem;padding:0.5rem;margin:0}
 .rs-bottom-navigation-link{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.25rem;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;padding:0.5rem;color:var(--text-secondary);text-decoration:none;font-size:0.875rem;border-radius:var(--radius-sm);text-align:center;overflow-wrap:anywhere;outline-color:var(--text);outline-offset:2px}
 .rs-bottom-navigation-current{color:var(--text);font-weight:600;background-color:var(--control-fill)}
 
-/* ── overflow-list: generated from packages/react/src/components/overflow-list.tsx ── */
 .rs-overflow-list{position:relative;display:flex;align-items:center;gap:0.5rem;width:100%;min-width:0;color:var(--text)}
 .rs-overflow-list-measure{position:absolute;visibility:hidden;pointer-events:none;display:flex;gap:0.5rem;width:max-content;inset-block-start:0;inset-inline-start:0}
 .rs-overflow-list-sample{display:inline-flex;align-items:center;justify-content:center;min-width:var(--hit);min-height:var(--hit);box-sizing:border-box;border-width:1px;border-style:solid;padding-inline:1.375rem;font-family:inherit;font-size:var(--control-fs);letter-spacing:-0.01em;white-space:nowrap}
 .rs-overflow-list-more{flex-shrink:0;min-width:0}
 
-/* ── filter-bar: generated from packages/react/src/components/filter-bar.tsx ── */
 .rs-filter-bar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text);min-width:0}
 .rs-filter-bar-count{font-size:0.875rem;color:var(--text-secondary);font-variant-numeric:tabular-nums;line-height:1.45}
 
-/* ── query-builder: generated from packages/react/src/components/query-builder.tsx ── */
 .rs-query-builder{display:grid;gap:1rem;width:100%;min-width:0;color:var(--text)}
 .rs-query-builder-group{border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;margin:0;min-width:0;display:grid;gap:0.75rem}
 .rs-query-builder-legend{font-weight:600;font-size:0.875rem;padding-inline:0.25rem}
@@ -123,20 +107,17 @@
 .rs-query-builder-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 .rs-query-builder-summary{margin:0;max-width:66ch;overflow-wrap:anywhere;font-size:0.875rem;line-height:1.45;color:var(--text-secondary)}
 
-/* ── sortable-list: generated from packages/react/src/components/sortable-list.tsx ── */
 .rs-sortable-list{list-style-type:none;margin:0;padding:0;width:100%;color:var(--text)}
 .rs-sortable-list-item{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:0.75rem;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 .rs-sortable-list-content{flex:1 1 10rem;min-width:0;overflow-wrap:anywhere;line-height:1.45}
 .rs-sortable-list-actions{display:flex;gap:0.25rem}
 .rs-sortable-list-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
-/* ── virtual-list: generated from packages/react/src/components/virtual-list.tsx ── */
 .rs-virtual-list{overflow-y:auto;overscroll-behavior:contain;border-width:1px;border-style:solid;border-color:var(--divider);min-width:0;color:var(--text);position:relative}
 .rs-virtual-list-canvas{position:relative;min-width:0}
 .rs-virtual-list-item{position:absolute;inset-inline:0;inset-block-start:0;box-sizing:border-box;display:flex;align-items:center;padding-inline:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);outline-color:var(--text);outline-offset:-2px;overflow:hidden}
 .rs-virtual-list-empty{padding:1rem;color:var(--text-secondary);line-height:1.45}
 
-/* ── master-detail: generated from packages/react/src/components/master-detail.tsx ── */
 .rs-master-detail{display:grid;grid-template-columns:minmax(12rem, 1fr) minmax(0, 2fr);gap:1.25rem;min-width:0;color:var(--text)}
 @media (max-width: 640px){.rs-master-detail{grid-template-columns:minmax(0, 1fr)}}
 .rs-master-detail-list{display:flex;flex-direction:column;gap:0.25rem;min-width:0}
@@ -149,7 +130,6 @@
 .rs-master-detail-back{display:none;margin-bottom:1rem}
 @media (max-width: 640px){.rs-master-detail-back{display:block}}
 
-/* ── property-grid: generated from packages/react/src/components/property-grid.tsx ── */
 .rs-property-grid{color:var(--text);width:100%;min-width:0}
 .rs-property-grid-row{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 2fr);align-items:center;gap:0.75rem;padding-block:0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 @media (max-width: 640px){.rs-property-grid-row{grid-template-columns:minmax(0, 1fr)}}
@@ -157,7 +137,6 @@
 .rs-property-grid-control{display:flex;gap:0.5rem;align-items:center;min-width:0}
 .rs-property-grid-note{color:var(--text-secondary);font-size:0.875rem;line-height:1.45;margin-block:0.5rem 0}
 
-/* ── number-field: generated from packages/react/src/components/number-field.tsx ── */
 .rs-number-field{display:grid;gap:0.5rem;min-width:0}
 .rs-number-field-label{color:var(--text-secondary);font-size:var(--control-label)}
 .rs-number-field-row{display:flex;align-items:center;gap:0.5rem;min-width:0}
@@ -167,7 +146,6 @@
 .rs-number-field-controls-stacked{flex-direction:column}
 .rs-number-field-action{width:var(--hit);min-width:var(--hit);min-height:var(--hit);padding-inline:0;flex:0 0 auto}
 
-/* ── range-slider: generated from packages/react/src/components/range-slider.tsx ── */
 .rs-range-slider{display:grid;gap:0.5rem;min-width:0;border-width:0;margin:0;padding:0;color:var(--text)}
 .rs-range-slider-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.5rem;padding:0}
 .rs-range-slider-row{display:grid;grid-template-columns:minmax(3rem, auto) minmax(0, 1fr) minmax(3rem, auto);gap:0.75rem;align-items:center}
@@ -175,7 +153,6 @@
 .rs-range-slider-input{width:100%;min-width:var(--hit);height:var(--hit);margin:0;accent-color:var(--text);cursor:pointer;outline-color:var(--text);outline-offset:2px}
 .rs-range-slider-output{font-size:var(--control-fs);font-variant-numeric:tabular-nums;text-align:end}
 
-/* ── multi-select: generated from packages/react/src/components/multi-select.tsx ── */
 .rs-multi-select{display:grid;gap:0.5rem;min-width:0;border-width:0;margin:0;padding:0}
 .rs-multi-select-legend{padding:0;margin-bottom:0.5rem;font-size:var(--control-label);color:var(--text-secondary)}
 .rs-multi-select-trigger{display:flex;justify-content:space-between;align-items:center;gap:0.75rem;box-sizing:border-box;min-height:var(--hit);padding:0.625rem 0.75rem;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:var(--control-fs);cursor:pointer;list-style:none;outline-color:var(--text);outline-offset:2px}
@@ -189,7 +166,6 @@
 .rs-multi-select-empty{margin:0;padding-block:0.75rem;color:var(--text-secondary);font-size:var(--control-fs)}
 .rs-multi-select-clear{justify-self:start;width:auto}
 
-/* ── tag-input: generated from packages/react/src/components/tag-input.tsx ── */
 .rs-tag-input{display:grid;gap:0.5rem;min-width:0}
 .rs-tag-input-label{font-size:var(--control-label);color:var(--text-secondary)}
 .rs-tag-input-list{display:flex;flex-wrap:wrap;gap:0.5rem;padding:0;margin:0;list-style:none}
@@ -206,17 +182,14 @@
 .rs-tag-input-add{width:auto;flex-shrink:0}
 .rs-tag-input-feedback{color:var(--text-secondary);font-size:var(--control-label);margin:0;line-height:1.45}
 
-/* ── date-range-picker: generated from packages/react/src/components/date-range-picker.tsx ── */
 .rs-date-range-picker{min-width:0;border-width:0;margin:0;padding:0}
 .rs-date-range-picker-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.75rem;padding:0}
 .rs-date-range-picker-fields{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:0.75rem;min-width:0}
 @media (max-width: 480px){.rs-date-range-picker-fields{grid-template-columns:minmax(0, 1fr)}}
 .rs-date-range-picker-input{min-width:0;max-width:100%;box-sizing:border-box;color-scheme:inherit}
 
-/* ── time-field: generated from packages/react/src/components/time-field.tsx ── */
 .rs-time-field{min-width:0;font-variant-numeric:tabular-nums;color-scheme:inherit}
 
-/* ── file-upload: generated from packages/react/src/components/file-upload.tsx ── */
 .rs-file-upload{display:grid;gap:0.75rem;min-width:0}
 .rs-file-upload-drop{position:relative;display:grid;align-content:center;justify-items:center;gap:0.5rem;min-height:8.25rem;padding:1.25rem;box-sizing:border-box;border-width:1px;border-style:dashed;border-color:var(--control-border);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);outline-color:var(--text);outline-offset:2px}
 .rs-file-upload-drop:focus-within{outline-width:2px;outline-style:solid}
@@ -233,7 +206,6 @@
 .rs-file-upload-action{width:auto}
 .rs-file-upload-status{margin:0;font-size:var(--control-label);color:var(--text-secondary)}
 
-/* ── transfer-list: generated from packages/react/src/components/transfer-list.tsx ── */
 .rs-transfer-list{border-width:0;padding:0;margin:0;min-width:0}
 .rs-transfer-list-legend{font-size:var(--control-label);color:var(--text-secondary);margin-bottom:0.75rem;padding:0}
 .rs-transfer-list-columns{display:grid;grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr);gap:0.75rem;align-items:center}
@@ -247,7 +219,6 @@
 .rs-transfer-list-empty{margin:0;color:var(--text-secondary);font-size:var(--control-fs)}
 .rs-transfer-list-status{margin:0.75rem 0 0;color:var(--text-secondary);font-size:var(--control-label)}
 
-/* ── inline-edit: generated from packages/react/src/components/inline-edit.tsx ── */
 .rs-inline-edit{display:grid;gap:0.5rem;min-width:0}
 .rs-inline-edit-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;min-width:0}
 .rs-inline-edit-label{font-size:var(--control-label);color:var(--text-secondary)}
@@ -256,7 +227,6 @@
 .rs-inline-edit-action{width:auto}
 .rs-inline-edit-error{margin:0;color:var(--text);font-size:var(--control-label)}
 
-/* ── rating: generated from packages/react/src/components/rating.tsx ── */
 .rs-rating{display:grid;gap:0.5rem;min-width:0;border-width:0;padding:0;margin:0}
 .rs-rating-legend{padding:0;margin-bottom:0.5rem;color:var(--text-secondary);font-size:var(--control-label)}
 .rs-rating-choices{display:flex;flex-wrap:wrap;gap:0.5rem}
@@ -267,11 +237,9 @@
 .rs-rating-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);opacity:0;margin:0;cursor:inherit}
 .rs-rating-clear{width:auto;justify-self:start}
 
-/* ── playback-controls: generated from packages/react/src/components/playback-controls.tsx ── */
 .rs-playback-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;color:var(--text)}
 .rs-playback-action{width:var(--hit);min-width:var(--hit);height:var(--hit);padding:0;flex-shrink:0}
 
-/* ── media-scrubber: generated from packages/react/src/components/media-scrubber.tsx ── */
 .rs-media-scrubber{display:flex;flex-direction:column;min-width:0;width:100%;color:var(--text)}
 .rs-media-scrubber-times{display:flex;justify-content:space-between;gap:1rem;color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45}
 .rs-media-scrubber-track{position:relative;display:flex;flex-direction:column}
@@ -281,7 +249,6 @@
 .rs-media-scrubber-preview{position:absolute;bottom:100%;inset-inline-start:0;max-width:12rem;padding:0.5rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);pointer-events:none;z-index:1}
 .rs-media-scrubber-chapters{margin-top:0.75rem}
 
-/* ── media-player: generated from packages/react/src/components/media-player.tsx ── */
 .rs-media-player{width:100%;min-width:0;color:var(--text);display:flex;flex-direction:column;gap:1rem}
 .rs-media-player-media{display:block;width:100%;max-height:32rem;background-color:var(--control-fill)}
 .rs-media-player-title{margin:0;font-size:1rem;font-weight:600;line-height:1.45;overflow-wrap:anywhere}
@@ -294,7 +261,6 @@
 .rs-media-player-summary{min-height:var(--hit);cursor:pointer;display:flex;align-items:center;font-weight:500}
 .rs-media-player-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 
-/* ── waveform: generated from packages/react/src/components/waveform.tsx ── */
 .rs-waveform{min-width:0;width:100%;color:var(--text);display:flex;flex-direction:column;gap:0.5rem}
 .rs-waveform-stage{position:relative;min-height:var(--hit);height:4rem;border-radius:var(--radius-sm)}
 .rs-waveform-stage:focus-within{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
@@ -306,7 +272,6 @@
 .rs-waveform-region-controls{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:1rem}
 .rs-waveform-label{font-size:0.75rem;color:var(--text-secondary);line-height:1.45}
 
-/* ── image-viewer: generated from packages/react/src/components/image-viewer.tsx ── */
 .rs-image-viewer{display:flex;flex-direction:column;gap:1rem;width:100%;min-width:0;color:var(--text)}
 .rs-image-viewer-canvas{overflow:auto;height:22rem;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--divider)}
 .rs-image-viewer-canvas:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
@@ -318,12 +283,10 @@
 .rs-image-viewer-caption{margin:0;color:var(--text-secondary);font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere}
 .rs-image-viewer-modal{width:min(64rem, calc(100vw - 2rem));max-width:calc(100vw - 2rem)}
 
-/* ── canvas-controls: generated from packages/react/src/components/canvas-controls.tsx ── */
 .rs-canvas-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;color:var(--text)}
 .rs-canvas-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem}
 .rs-canvas-zoom{min-width:3.75rem;text-align:center;font-size:0.8125rem;font-variant-numeric:tabular-nums}
 
-/* ── message-composer: generated from packages/react/src/components/message-composer.tsx ── */
 .rs-message-composer{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}
 .rs-message-composer-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem}
 .rs-message-composer-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.875rem}
@@ -332,7 +295,6 @@
 .rs-message-composer-hint{margin:0;font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}
 .rs-message-composer-input{display:none}
 
-/* ── file-browser: generated from packages/react/src/components/file-browser.tsx ── */
 .rs-file-browser{display:flex;flex-direction:column;width:100%;min-width:0;gap:1rem;color:var(--text)}
 .rs-file-browser-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem}
 .rs-file-browser-breadcrumbs{min-width:0;max-width:100%}
@@ -368,7 +330,6 @@
 .rs-file-browser-meta{color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;flex-shrink:1}
 .rs-file-browser-empty{margin:0;padding-block:1rem;color:var(--text-secondary);line-height:1.45}
 
-/* ── kanban-board: generated from packages/react/src/components/kanban-board.tsx ── */
 .rs-kanban-board{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}
 .rs-kanban-columns{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(min(100%, 17rem), 1fr);gap:1rem;width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow-x:auto;overscroll-behavior-x:contain;padding:0.25rem;scroll-padding-inline:0.25rem;scroll-snap-type:x proximity;outline-color:var(--text);outline-offset:-2px}
 .rs-kanban-column{display:flex;flex-direction:column;align-self:start;gap:0.75rem;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);padding:0.5rem;scroll-snap-align:start}
@@ -385,7 +346,6 @@
 .rs-kanban-status{margin:0;padding-inline:0.75rem;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}
 .rs-kanban-help{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
-/* ── scheduler: generated from packages/react/src/components/scheduler.tsx ── */
 .rs-scheduler{display:flex;flex-direction:column;gap:1rem;width:100%;min-width:0;color:var(--text)}
 .rs-scheduler-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem}
 .rs-scheduler-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.75rem}
@@ -410,7 +370,6 @@
 .rs-scheduler-empty{margin:0;padding-block:0.75rem;color:var(--text-secondary);font-size:0.8125rem;line-height:1.45}
 .rs-scheduler-form{display:flex;flex-direction:column;gap:1rem}
 
-/* ── health-metric: generated from packages/react/src/components/health-metric.tsx ── */
 .rs-health-metric{display:grid;gap:0.5rem;min-width:0;color:var(--text);padding-block:1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);line-height:1.45;overflow-wrap:anywhere}
 .rs-health-metric-label{margin:0;font-size:0.875rem;font-weight:500}
 .rs-health-metric-reading{margin:0;display:flex;align-items:baseline;flex-wrap:wrap;gap:0.5rem;font-variant-numeric:tabular-nums}
@@ -420,7 +379,6 @@
 .rs-health-metric-meta{margin:0;font-size:0.75rem;color:var(--text-secondary);display:flex;flex-wrap:wrap;gap:0.25rem 0.75rem}
 .rs-health-metric-description{margin:0;font-size:0.875rem;max-width:66ch}
 
-/* ── reference-range: generated from packages/react/src/components/reference-range.tsx ── */
 .rs-reference-range{display:grid;gap:0.5rem;width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-reference-range-head{margin:0;display:flex;align-items:baseline;flex-wrap:wrap;justify-content:space-between;gap:0.25rem 1rem;font-size:0.875rem}
 .rs-reference-range-label{font-weight:500}
@@ -436,7 +394,6 @@
 .rs-reference-range-bound-value{text-align:end;margin-inline-start:auto}
 .rs-reference-range-description{margin:0;font-size:0.75rem;color:var(--text-secondary)}
 
-/* ── lab-results: generated from packages/react/src/components/lab-results.tsx ── */
 .rs-lab-results{list-style-type:none;margin:0;padding:0;width:100%;min-width:0;color:var(--text);line-height:1.45}
 .rs-lab-results-item{display:grid;gap:0.75rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);overflow-wrap:anywhere}
 .rs-lab-results-head{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.25rem 1rem}
@@ -449,7 +406,6 @@
 .rs-lab-results-note{margin:0;font-size:0.875rem;max-width:66ch}
 .rs-lab-results-time{font-size:0.75rem;color:var(--text-secondary)}
 
-/* ── symptom-diary: generated from packages/react/src/components/symptom-diary.tsx ── */
 .rs-symptom-diary{list-style-type:none;margin:0;padding:0;min-width:0;color:var(--text);line-height:1.45}
 .rs-symptom-diary-item{display:grid;grid-template-columns:minmax(7rem, 1fr) minmax(0, 3fr);gap:0.5rem 1rem;padding-block:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);overflow-wrap:anywhere}
 @media (max-width: 640px){.rs-symptom-diary-item{grid-template-columns:minmax(0, 1fr)}}
@@ -463,7 +419,6 @@
 .rs-symptom-diary-summary:focus-visible{outline:2px solid var(--text)}
 .rs-symptom-diary-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 
-/* ── check-in: generated from packages/react/src/components/check-in.tsx ── */
 .rs-check-in{display:grid;gap:0.75rem;min-width:0;border-width:0;padding:0;margin:0;color:var(--text)}
 .rs-check-in-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-check-in-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}
@@ -477,7 +432,6 @@
 .rs-check-in-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);opacity:0;margin:0;cursor:inherit}
 .rs-check-in-clear{justify-self:start;min-width:var(--hit);min-height:var(--hit);width:auto;max-width:100%}
 
-/* ── habit-tracker: generated from packages/react/src/components/habit-tracker.tsx ── */
 .rs-habit-tracker{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
 .rs-habit-tracker-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-habit-tracker-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}
@@ -493,7 +447,6 @@
 .rs-habit-tracker-static{cursor:default}
 .rs-habit-tracker-mark{font-size:1.25rem;line-height:1.2}
 
-/* ── sleep-timeline: generated from packages/react/src/components/sleep-timeline.tsx ── */
 .rs-sleep-timeline{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text)}
 .rs-sleep-timeline-caption{display:grid;gap:0.375rem}
 .rs-sleep-timeline-label{font-size:var(--control-fs);font-weight:600;line-height:1.45}
@@ -513,7 +466,6 @@
 .rs-sleep-timeline-interval{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:0.25rem 1rem;padding-block:0.625rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:var(--control-fs);line-height:1.45}
 .rs-sleep-timeline-period{color:var(--text-secondary);font-variant-numeric:tabular-nums}
 
-/* ── activity-goal: generated from packages/react/src/components/activity-goal.tsx ── */
 .rs-activity-goal{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
 .rs-activity-goal-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-activity-goal-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;max-width:66ch}
@@ -522,7 +474,6 @@
 .rs-activity-goal-progress{display:block;width:100%;height:0.75rem;accent-color:var(--text);border-radius:0}
 @media (forced-colors: active){.rs-activity-goal-progress{accent-color:Highlight}}
 
-/* ── activity-rings: generated from packages/react/src/components/activity-rings.tsx ── */
 @keyframes rs-anim-ring-build{from{stroke-dashoffset:100;opacity:0}to{opacity:1}}
 @keyframes rs-anim-encouragement-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
 .rs-activity-rings{margin:0;width:100%;min-width:0;color:var(--text);line-height:1.45}
@@ -552,7 +503,6 @@
 .rs-activity-rings-description{margin:1rem 0 0;font-size:0.875rem;color:var(--text-secondary);max-width:66ch}
 .rs-activity-rings-progress{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border-width:0}
 
-/* ── patient-banner: generated from packages/react/src/components/patient-banner.tsx ── */
 .rs-patient-banner{width:100%;min-width:0;box-sizing:border-box;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);padding:1.25rem;display:flex;flex-direction:column;gap:1rem;overflow-wrap:anywhere}
 .rs-patient-banner-name{margin:0;font-size:1.375rem;font-weight:600;line-height:1.25;letter-spacing:-0.035em}
 .rs-patient-banner-identifiers{margin:0;display:flex;flex-wrap:wrap;gap:0.75rem 2rem}
@@ -563,7 +513,6 @@
 @media (max-width: 640px){.rs-patient-banner-context{grid-template-columns:minmax(0, 1fr)}}
 .rs-patient-banner-missing{margin:0;font-size:0.875rem;color:var(--text-secondary);line-height:1.45}
 
-/* ── medication-schedule: generated from packages/react/src/components/medication-schedule.tsx ── */
 .rs-medication-schedule{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-medication-schedule-header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;padding-bottom:1rem;font-size:0.875rem}
 .rs-medication-schedule-zone{color:var(--text-secondary);font-variant-numeric:tabular-nums}
@@ -579,7 +528,6 @@
 .rs-medication-schedule-action{min-width:var(--hit);min-height:var(--hit);height:auto;padding-block:0.625rem;white-space:normal;line-height:1.3}
 .rs-medication-schedule-empty{margin:0;padding-block:1.25rem;color:var(--text-secondary);font-size:0.875rem}
 
-/* ── appointment-card: generated from packages/react/src/components/appointment-card.tsx ── */
 .rs-appointment-card{box-sizing:border-box;width:100%;min-width:0;padding:1.25rem;color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);display:flex;flex-direction:column;gap:1.25rem;overflow-wrap:anywhere;line-height:1.45}
 .rs-appointment-card-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.75rem}
 .rs-appointment-card-title{margin:0;font-size:1.125rem;font-weight:600;line-height:1.3;letter-spacing:-0.025em}
@@ -594,7 +542,6 @@
 .rs-appointment-card-value{margin:0;margin-top:0.25rem;font-size:0.875rem}
 .rs-appointment-card-actions{display:flex;flex-wrap:wrap;gap:0.5rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem}
 
-/* ── care-plan: generated from packages/react/src/components/care-plan.tsx ── */
 .rs-care-plan{width:100%;min-width:0;color:var(--text);overflow-wrap:anywhere;line-height:1.45}
 .rs-care-plan-description{margin:0;margin-bottom:1rem;max-width:66ch;font-size:0.875rem;color:var(--text-secondary)}
 .rs-care-plan-list{margin:0;padding:0;list-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
@@ -610,7 +557,6 @@
 .rs-care-plan-pending{font-size:0.875rem;color:var(--text-secondary)}
 .rs-care-plan-empty{margin:0;padding-block:1.25rem;color:var(--text-secondary);font-size:0.875rem}
 
-/* ── identity-document: generated from packages/react/src/components/identity-document.tsx ── */
 .rs-identity-document{width:100%;min-width:0;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--divider);padding:1.25rem;display:grid;gap:1.25rem;color:var(--text);background-color:var(--bg);overflow-wrap:anywhere;line-height:1.45}
 .rs-identity-document-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.75rem}
 .rs-identity-document-title{margin:0;font-weight:600;font-size:0.875rem}
@@ -624,7 +570,6 @@
 .rs-identity-document-detail{margin:0;color:var(--text-secondary);max-width:66ch;font-size:0.875rem}
 .rs-identity-document-actions{border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem;display:flex;flex-wrap:wrap;gap:0.5rem}
 
-/* ── tax-summary: generated from packages/react/src/components/tax-summary.tsx ── */
 .rs-tax-summary{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-tax-summary-header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem;margin-bottom:1rem;font-size:0.875rem}
 .rs-tax-summary-status{font-weight:600}
@@ -641,7 +586,6 @@
 .rs-tax-summary-note{margin:0;color:var(--text-secondary);max-width:66ch}
 .rs-tax-summary-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}
 
-/* ── benefit-program: generated from packages/react/src/components/benefit-program.tsx ── */
 .rs-benefit-program{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere;display:grid;gap:1.25rem}
 .rs-benefit-program-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.75rem}
 .rs-benefit-program-name{margin:0;font-size:1.25rem;font-weight:600;line-height:1.3;letter-spacing:-0.025em}
@@ -657,7 +601,6 @@
 .rs-benefit-program-criterion-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem;font-size:0.875rem}
 .rs-benefit-program-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 
-/* ── application-status: generated from packages/react/src/components/application-status.tsx ── */
 .rs-application-status{width:100%;min-width:0;display:grid;gap:1.25rem;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-application-status-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem}
 .rs-application-status-title{margin:0;font-size:1.125rem;font-weight:600;line-height:1.3}
@@ -677,7 +620,6 @@
 .rs-application-status-next-label{margin:0;font-size:0.75rem;color:var(--text-secondary)}
 .rs-application-status-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 
-/* ── evidence-checklist: generated from packages/react/src/components/evidence-checklist.tsx ── */
 .rs-evidence-checklist{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-evidence-checklist-heading{margin:0;font-size:1.125rem;font-weight:600;line-height:1.3}
 .rs-evidence-checklist-summary{margin:0;margin-top:0.5rem;color:var(--text-secondary);font-size:0.875rem;max-width:66ch}
@@ -693,7 +635,6 @@
 .rs-evidence-checklist-action{min-width:var(--hit);min-height:var(--hit);height:auto;white-space:normal;line-height:1.3;padding-block:0.625rem}
 .rs-evidence-checklist-empty{margin:0;padding-block:1rem;font-size:0.875rem;color:var(--text-secondary)}
 
-/* ── measurement-value: generated from packages/react/src/components/measurement-value.tsx ── */
 .rs-measurement-value{display:grid;gap:0.5rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-measurement-value-label{margin:0;font-size:0.875rem;font-weight:500}
 .rs-measurement-value-reading{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0.375rem;font-variant-numeric:tabular-nums}
@@ -702,7 +643,6 @@
 .rs-measurement-value-unit{font-size:0.875rem;color:var(--text-secondary)}
 .rs-measurement-value-context{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
 
-/* ── quantity-field: generated from packages/react/src/components/quantity-field.tsx ── */
 .rs-quantity-field{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-quantity-field-legend{padding:0;margin-bottom:0.5rem;font-weight:500;font-size:0.875rem}
 .rs-quantity-field-row{display:grid;grid-template-columns:minmax(0, 2fr) minmax(0, 1fr);gap:0.75rem}
@@ -710,7 +650,6 @@
 .rs-quantity-field-control{width:100%;min-width:0;font-variant-numeric:tabular-nums}
 .rs-quantity-field-description{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
 
-/* ── well-plate: generated from packages/react/src/components/well-plate.tsx ── */
 .rs-well-plate{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text);line-height:1.45}
 .rs-well-plate-label{margin:0;font-size:0.875rem;font-weight:600}
 .rs-well-plate-description{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
@@ -728,7 +667,6 @@
 .rs-well-plate-static{cursor:default}
 .rs-well-plate-coordinate{font-weight:600;font-variant-numeric:tabular-nums}
 
-/* ── experiment-run: generated from packages/react/src/components/experiment-run.tsx ── */
 .rs-experiment-run{display:grid;gap:1rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-experiment-run-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem}
 .rs-experiment-run-title{margin:0;font-size:1rem;font-weight:600}
@@ -742,7 +680,6 @@
 .rs-experiment-run-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem}
 .rs-experiment-run-action{flex-shrink:0}
 
-/* ── spectrum-plot: generated from packages/react/src/components/spectrum-plot.tsx ── */
 .rs-spectrum-plot{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-spectrum-plot-label{font-size:0.875rem;font-weight:600}
 .rs-spectrum-plot-description{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
@@ -765,7 +702,6 @@
 .rs-spectrum-plot-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding-block:0.5rem;font-size:0.75rem}
 .rs-spectrum-plot-button{flex-shrink:0}
 
-/* ── audio-meter: generated from packages/react/src/components/audio-meter.tsx ── */
 .rs-audio-meter{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
 .rs-audio-meter-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-audio-meter-channel{display:grid;gap:0.375rem}
@@ -777,7 +713,6 @@
 @media (forced-colors: active){.rs-audio-meter-bar::-webkit-meter-optimum-value{background-color:CanvasText}.rs-audio-meter-bar::-moz-meter-bar{background-color:CanvasText}}
 .rs-audio-meter-note{color:var(--text-secondary);margin:0;font-size:var(--control-label);line-height:1.45}
 
-/* ── channel-strip: generated from packages/react/src/components/channel-strip.tsx ── */
 .rs-channel-strip{display:grid;gap:0.75rem;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);padding:1rem;margin:0;color:var(--text)}
 .rs-channel-strip-label{padding-inline:0.25rem;font-size:var(--control-fs);line-height:1.45;font-weight:600}
 .rs-channel-strip-field{display:grid;gap:0.25rem;font-size:var(--control-label);line-height:1.45}
@@ -789,7 +724,6 @@
 .rs-channel-strip-pressed{background-color:var(--text);color:var(--bg)}
 @media (forced-colors: active){.rs-channel-strip-pressed{background-color:Highlight;color:HighlightText}}
 
-/* ── parameter-knob: generated from packages/react/src/components/parameter-knob.tsx ── */
 .rs-parameter-knob{display:inline-grid;justify-items:center;gap:0.5rem;min-width:5rem;color:var(--text)}
 .rs-parameter-knob-label{font-size:var(--control-fs);line-height:1.45;font-weight:500}
 .rs-parameter-knob-control{position:relative;width:4rem;height:4rem;border-radius:50%;border-width:1px;border-style:solid;border-color:var(--control-border);box-sizing:border-box;background-color:var(--bg);outline-color:var(--text);outline-offset:3px}
@@ -800,13 +734,11 @@
 .rs-parameter-knob-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);margin:0;opacity:0;cursor:ew-resize}
 .rs-parameter-knob-value{font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;font-variant-numeric:tabular-nums}
 
-/* ── timecode-field: generated from packages/react/src/components/timecode-field.tsx ── */
 .rs-timecode-field{display:grid;gap:0.375rem;min-width:0;color:var(--text)}
 .rs-timecode-field-label{font-size:var(--control-fs);font-weight:500;line-height:1.45}
 .rs-timecode-field-input{width:100%;min-width:0;font-variant-numeric:tabular-nums}
 .rs-timecode-field-hint{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
 
-/* ── clip-timeline: generated from packages/react/src/components/clip-timeline.tsx ── */
 .rs-clip-timeline{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text)}
 .rs-clip-timeline-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-clip-timeline-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
@@ -824,7 +756,6 @@
 .rs-clip-timeline-button{text-align:start;min-width:var(--hit);min-height:var(--hit);padding:0.625rem 0.75rem;width:100%;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:var(--control-fs);font-family:inherit;line-height:1.45;cursor:pointer;outline-color:var(--text);outline-offset:2px}
 .rs-clip-timeline-button:focus-visible{outline-width:2px;outline-style:solid}
 
-/* ── render-queue: generated from packages/react/src/components/render-queue.tsx ── */
 .rs-render-queue{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
 .rs-render-queue-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-render-queue-list{list-style-type:none;margin:0;padding:0;display:grid}
@@ -834,7 +765,6 @@
 .rs-render-queue-progress{display:block;width:100%;height:0.5rem;accent-color:var(--text)}
 .rs-render-queue-action{align-self:start}
 
-/* ── layer-stack: generated from packages/react/src/components/layer-stack.tsx ── */
 .rs-layer-stack{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
 .rs-layer-stack-label{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-layer-stack-list{display:grid;gap:0.5rem;list-style-type:none;margin:0;padding:0}
@@ -847,7 +777,6 @@
 @media (forced-colors: active){.rs-layer-stack-selected{background-color:Highlight;color:HighlightText}}
 .rs-layer-stack-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
 
-/* ── color-inspector: generated from packages/react/src/components/color-inspector.tsx ── */
 .rs-color-inspector{display:grid;gap:0.75rem;min-width:0;border-width:0;margin:0;padding:0;color:var(--text)}
 .rs-color-inspector-label{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);line-height:1.45;font-weight:600}
 .rs-color-inspector-preview{position:relative;min-height:4rem;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--bg);background-image:repeating-conic-gradient(var(--divider) 0% 25%, transparent 0% 50%);background-size:1rem 1rem}
@@ -857,7 +786,6 @@
 .rs-color-inspector-input{width:100%;min-width:0;font-variant-numeric:tabular-nums}
 .rs-color-inspector-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
 
-/* ── spacing-control: generated from packages/react/src/components/spacing-control.tsx ── */
 .rs-spacing-control{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
 .rs-spacing-control-label{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-spacing-control-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(5rem, 1fr));gap:0.5rem}
@@ -868,7 +796,6 @@
 @media (forced-colors: active){.rs-spacing-control-linked{background-color:Highlight;color:HighlightText}}
 .rs-spacing-control-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}
 
-/* ── coordinate-reference-field: generated from packages/react/src/components/coordinate-reference-field.tsx ── */
 .rs-coordinate-reference-field{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-coordinate-reference-field-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
 .rs-coordinate-reference-field-axes{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.75rem}
@@ -876,7 +803,6 @@
 .rs-coordinate-reference-field-control{min-width:0;width:100%;min-height:var(--hit)}
 .rs-coordinate-reference-field-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}
 
-/* ── datum-transform-picker: generated from packages/react/src/components/datum-transform-picker.tsx ── */
 .rs-datum-transform-picker{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-datum-transform-picker-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
 .rs-datum-transform-picker-context{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 10rem), 1fr));gap:0.75rem;margin:0}
@@ -891,7 +817,6 @@
 .rs-datum-transform-picker-title{margin:0;font-weight:600;font-size:var(--control-fs);overflow-wrap:anywhere}
 .rs-datum-transform-picker-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
 
-/* ── raster-band-mixer: generated from packages/react/src/components/raster-band-mixer.tsx ── */
 .rs-raster-band-mixer{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-raster-band-mixer-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
 .rs-raster-band-mixer-fields{display:grid;grid-template-columns:repeat(auto-fit, minmax(min(100%, 9rem), 1fr));gap:0.75rem;min-width:0}
@@ -902,7 +827,6 @@
 .rs-raster-band-mixer-control{min-width:0;width:100%;min-height:var(--hit)}
 .rs-raster-band-mixer-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);max-width:66ch;overflow-wrap:anywhere}
 
-/* ── stage-position-list: generated from packages/react/src/components/stage-position-list.tsx ── */
 .rs-stage-position-list{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-stage-position-list-legend{padding:0;margin-bottom:0.75rem;font-weight:600;font-size:0.875rem}
 .rs-stage-position-list-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
@@ -921,7 +845,6 @@
 .rs-stage-position-list-action{min-width:var(--hit);min-height:var(--hit);width:auto}
 .rs-stage-position-list-status{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 
-/* ── stack-navigator: generated from packages/react/src/components/stack-navigator.tsx ── */
 .rs-stack-navigator{display:grid;gap:1rem;min-width:0;padding:0;margin:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-stack-navigator-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}
 .rs-stack-navigator-axis{display:grid;gap:0.5rem;min-width:0}
@@ -930,7 +853,6 @@
 .rs-stack-navigator-step{min-width:var(--hit);min-height:var(--hit);width:var(--hit);padding-inline:0}
 .rs-stack-navigator-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
 
-/* ── acquisition-sequencer: generated from packages/react/src/components/acquisition-sequencer.tsx ── */
 .rs-acquisition-sequencer{display:grid;gap:0.75rem;min-width:0;border-width:0;padding:0;margin:0;color:var(--text);line-height:1.45}
 .rs-acquisition-sequencer-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}
 .rs-acquisition-sequencer-list{font-size:0.875rem;list-style-type:decimal;padding-inline-start:1.5rem;margin:0}
@@ -946,7 +868,6 @@
 .rs-acquisition-sequencer-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}
 .rs-acquisition-sequencer-action{min-width:var(--hit);min-height:var(--hit);width:auto}
 
-/* ── sequence-alignment: generated from packages/react/src/components/sequence-alignment.tsx ── */
 .rs-sequence-alignment{display:grid;gap:0.75rem;min-width:0;max-width:100%;color:var(--text);line-height:1.45}
 .rs-sequence-alignment-title{margin:0;font-size:0.875rem;font-weight:600}
 .rs-sequence-alignment-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
@@ -963,7 +884,6 @@
 .rs-sequence-alignment-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 .rs-sequence-alignment-action{min-width:var(--hit);min-height:var(--hit);width:auto}
 
-/* ── coverage-inspector: generated from packages/react/src/components/coverage-inspector.tsx ── */
 .rs-coverage-inspector{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45}
 .rs-coverage-inspector-title{font-size:0.875rem;font-weight:600}
 .rs-coverage-inspector-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
@@ -983,7 +903,6 @@
 .rs-coverage-inspector-table{border-collapse:collapse;width:100%;font-size:0.75rem;font-variant-numeric:tabular-nums}
 .rs-coverage-inspector-cell{padding:0.5rem;text-align:start;font-weight:400;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 
-/* ── genomic-region-field: generated from packages/react/src/components/genomic-region-field.tsx ── */
 .rs-genomic-region-field{display:grid;gap:0.75rem;min-width:0;border-width:0;padding:0;margin:0;color:var(--text);line-height:1.45}
 .rs-genomic-region-field-legend{padding:0;margin-bottom:0.75rem;font-size:0.875rem;font-weight:600}
 .rs-genomic-region-field-fields{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:0.75rem}
@@ -992,7 +911,6 @@
 .rs-genomic-region-field-control{width:100%;min-width:0;font-variant-numeric:tabular-nums}
 .rs-genomic-region-field-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
 
-/* ── patchbay: generated from packages/react/src/components/patchbay.tsx ── */
 .rs-patchbay{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
 .rs-patchbay-legend{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-patchbay-viewport{min-width:0;max-width:100%;overflow:auto;border-width:1px;border-style:solid;border-color:var(--divider)}
@@ -1008,7 +926,6 @@
 .rs-patchbay-input{position:absolute;inset:-1px;width:calc(100% + 2px);height:calc(100% + 2px);margin:0;opacity:0;cursor:inherit}
 .rs-patchbay-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;max-width:66ch}
 
-/* ── kerning-pair-editor: generated from packages/react/src/components/kerning-pair-editor.tsx ── */
 .rs-kerning-pair-editor{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
 .rs-kerning-pair-editor-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-kerning-pair-editor-toolbar{display:flex;flex-wrap:wrap;align-items:end;gap:0.5rem}
@@ -1022,7 +939,6 @@
 .rs-kerning-pair-editor-glyph{flex-shrink:0}
 .rs-kerning-pair-editor-note{margin:0;font-size:var(--control-label);line-height:1.45;color:var(--text-secondary)}
 
-/* ── assembly-variant-matrix: generated from packages/react/src/components/assembly-variant-matrix.tsx ── */
 .rs-assembly-variant-matrix{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text)}
 .rs-assembly-variant-matrix-legend{margin-bottom:0.75rem;padding:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}
 .rs-assembly-variant-matrix-viewport{min-width:0;max-width:100%;overflow:auto;border-width:1px;border-style:solid;border-color:var(--divider)}
@@ -1039,7 +955,6 @@
 .rs-assembly-variant-matrix-select{min-width:0;width:100%}
 .rs-assembly-variant-matrix-note{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
 
-/* ── alarm-panel: generated from packages/react/src/components/alarm-panel.tsx ── */
 .rs-alarm-panel{width:100%;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-alarm-panel-heading{margin:0;font-size:1rem;font-weight:600}
 .rs-alarm-panel-copy{margin:0.5rem 0 0;font-size:0.75rem;color:var(--text-secondary)}
@@ -1055,7 +970,6 @@
 .rs-alarm-panel-value{margin:0}
 .rs-alarm-panel-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 
-/* ── work-offset-panel: generated from packages/react/src/components/work-offset-panel.tsx ── */
 .rs-work-offset-panel{width:100%;min-width:0;margin:0;padding:0;border-width:0;display:grid;gap:0.75rem;color:var(--text);line-height:1.45}
 .rs-work-offset-panel-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}
 .rs-work-offset-panel-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere}
@@ -1070,7 +984,6 @@
 .rs-work-offset-panel-offset{min-width:7rem;width:35%}
 .rs-work-offset-panel-button{justify-self:start}
 
-/* ── joint-panel: generated from packages/react/src/components/joint-panel.tsx ── */
 .rs-joint-panel{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-joint-panel-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}
 .rs-joint-panel-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
@@ -1083,7 +996,6 @@
 .rs-joint-panel-input{min-width:var(--hit);width:100%;font-variant-numeric:tabular-nums}
 .rs-joint-panel-button{justify-self:start}
 
-/* ── robot-pose: generated from packages/react/src/components/robot-pose.tsx ── */
 .rs-robot-pose{display:grid;gap:1rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-robot-pose-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}
 .rs-robot-pose-field{display:grid;gap:0.375rem;min-width:0;font-size:0.75rem}
@@ -1096,7 +1008,6 @@
 .rs-robot-pose-text{margin:0;overflow-wrap:anywhere}
 .rs-robot-pose-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);overflow-wrap:anywhere;max-width:66ch}
 
-/* ── robot-mission-queue: generated from packages/react/src/components/robot-mission-queue.tsx ── */
 .rs-robot-mission-queue{display:grid;gap:0.75rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-robot-mission-queue-legend{padding:0;margin-bottom:0.75rem;font-size:1rem;font-weight:600}
 .rs-robot-mission-queue-list{padding-inline-start:1.5rem;margin:0}
@@ -1108,7 +1019,6 @@
 .rs-robot-mission-queue-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem}
 .rs-robot-mission-queue-button{min-height:var(--hit)}
 
-/* ── pad-inspector: generated from packages/react/src/components/pad-inspector.tsx ── */
 .rs-pad-inspector{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-pad-inspector-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
 .rs-pad-inspector-label{display:grid;gap:0.375rem;min-width:0;font-size:var(--control-label)}
@@ -1121,7 +1031,6 @@
 .rs-pad-inspector-cell{text-align:start;vertical-align:top;padding-block:0.625rem;padding-inline-end:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);font-weight:400;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .rs-pad-inspector-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);overflow-wrap:anywhere;max-width:66ch}
 
-/* ── design-rule-results: generated from packages/react/src/components/design-rule-results.tsx ── */
 .rs-design-rule-results{display:grid;gap:0.875rem;min-width:0;margin:0;padding:0;border-width:0;color:var(--text);line-height:1.45}
 .rs-design-rule-results-legend{padding:0;margin-bottom:0.75rem;font-size:var(--control-fs);font-weight:600}
 .rs-design-rule-results-filters{display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:0.75rem}
@@ -1140,7 +1049,6 @@
 .rs-design-rule-results-action{min-height:var(--hit);max-width:100%}
 .rs-design-rule-results-note{margin:0;color:var(--text-secondary);font-size:var(--control-label);overflow-wrap:anywhere;max-width:66ch}
 
-/* ── colony-plate: generated from packages/react/src/components/colony-plate.tsx ── */
 .rs-colony-plate{display:grid;gap:0.75rem;min-width:0;margin:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-colony-plate-title{font-size:0.875rem;font-weight:600}
 .rs-colony-plate-copy{margin:0;font-size:0.75rem;color:var(--text-secondary);max-width:66ch}
@@ -1163,7 +1071,6 @@
 .rs-colony-plate-details{margin:0;font-size:0.75rem;max-width:66ch}
 .rs-colony-plate-clear{min-width:var(--hit);min-height:var(--hit);width:auto;justify-self:start}
 
-/* ── culture-log: generated from packages/react/src/components/culture-log.tsx ── */
 .rs-culture-log{display:grid;gap:1rem;min-width:0;color:var(--text);line-height:1.45;overflow-wrap:anywhere}
 .rs-culture-log-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0.5rem 1rem}
 .rs-culture-log-title{margin:0;font-size:0.875rem;font-weight:600}
@@ -1181,7 +1088,6 @@
 .rs-culture-log-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
 .rs-culture-log-action{min-width:var(--hit);min-height:var(--hit);width:auto}
 
-/* ── button: generated from packages/react/src/components/button.tsx ── */
 .rs-btn-ghost,.rs-btn-primary{box-sizing:border-box;min-width:var(--hit);font-family:inherit;letter-spacing:-0.01em;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;height:var(--control-h);font-size:var(--control-fs);padding-inline:1.375rem;border-width:1px;border-style:solid;border-radius:var(--radius-sm);transition:var(--transition);opacity:1}
 .rs-btn-ghost:disabled,.rs-btn-primary:disabled{cursor:not-allowed;opacity:0.4}
 .rs-btn-ghost:focus-visible,.rs-btn-primary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
@@ -1209,11 +1115,9 @@
 @media (hover: hover) and (pointer: fine){.rs-btn-grouped-ghost:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){background-color:var(--control-fill)}}
 @media (forced-colors: active){.rs-btn-grouped-ghost{background-color:ButtonFace}}
 
-/* ── button-group: generated from packages/react/src/components/button-group.tsx ── */
 .rs-btn-group{box-sizing:border-box;display:inline-flex;align-items:stretch;min-height:calc(var(--hit) + 2 * 1px);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--divider);gap:1px;overflow:hidden}
 @media (max-width: 640px){.rs-btn-group{display:flex;width:100%;border-radius:var(--radius-sm)}}
 
-/* ── link: generated from packages/react/src/components/link.tsx ── */
 .rs-link{font-size:0.875rem;color:var(--accent);text-decoration:none;font-weight:500;letter-spacing:-0.01em;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);transition:var(--transition)}
 .rs-link:active{border-bottom-color:var(--accent)}
 .rs-link:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--accent);outline-offset:2px}
@@ -1224,7 +1128,6 @@
 @media (hover: hover) and (pointer: fine){.rs-link-underline:hover{background-image:linear-gradient(var(--accent), var(--accent))}}
 @media (prefers-reduced-motion: reduce){.rs-link-underline{transition:none}}
 
-/* ── input: generated from packages/react/src/components/input.tsx ── */
 .rs-field.rs-input-field{width:100%;display:flex;flex-direction:column;gap:0.5rem}
 .rs-field-label.rs-input-label{font-size:0.75rem;font-weight:600;color:var(--text-secondary);letter-spacing:-0.01em;line-height:16px}
 @media (max-width: 640px){.rs-field-label.rs-input-label{font-size:var(--control-label)}}
@@ -1244,11 +1147,9 @@
 .rs-feedback-ok{color:var(--text)}
 .rs-feedback-error{color:var(--text)}
 
-/* ── label: generated from packages/react/src/components/label.tsx ── */
 .rs-label{font-size:0.75rem;font-weight:600;color:var(--text-secondary);letter-spacing:-0.01em;line-height:16px}
 @media (max-width: 640px){.rs-label{font-size:var(--control-label)}}
 
-/* ── field: generated from packages/react/src/components/field.tsx ── */
 .rs-field{width:100%;display:flex;flex-direction:column;gap:0.5rem}
 @media (max-width: 640px){.rs-field{gap:0.5rem}}
 .rs-field-label{font-size:0.75rem;font-weight:600;color:var(--text-secondary);letter-spacing:-0.01em;line-height:16px}
@@ -1258,7 +1159,6 @@
 .rs-field-error{margin:0;font-size:0.75rem;font-weight:500;color:var(--text);letter-spacing:-0.01em;line-height:16px}
 @media (max-width: 640px){.rs-field-error{font-size:0.875rem}}
 
-/* ── input-group: generated from packages/react/src/components/input-group.tsx ── */
 .rs-input-group{display:flex;align-items:stretch;box-sizing:border-box;width:100%;height:var(--control-h);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);overflow:hidden;outline-width:0;outline-style:none;outline-color:var(--text);outline-offset:2px}
 .rs-input-group:focus-within{border-color:var(--accent);outline-width:2px;outline-style:solid}
 @media (max-width: 640px){.rs-input-group{border-radius:var(--radius-sm)}}
@@ -1266,7 +1166,6 @@
 @media (max-width: 640px){.rs-input-addon{padding-inline:0.875rem;font-size:var(--control-fs);min-height:var(--hit)}}
 .rs-input-group-end .rs-input-addon{border-inline-start-width:1px;border-inline-end-width:0}
 
-/* ── native-select: generated from packages/react/src/components/native-select.tsx ── */
 .rs-native-select-control{position:relative;width:100%}
 .rs-native-select-icon{position:absolute;inset-inline-end:0.75rem;top:50%;margin-top:-0.5rem;color:var(--text);pointer-events:none}
 .rs-field.rs-native-select-field{width:100%;display:flex;flex-direction:column;gap:0.5rem}
@@ -1278,7 +1177,6 @@
 @media (max-width: 640px){.rs-native-select{min-height:var(--hit);font-size:1rem;border-radius:var(--radius-sm);padding-inline-start:0.875rem;padding-inline-end:2.25rem}}
 .rs-native-select-invalid{border-color:var(--text)}
 
-/* ── inline-form: generated from packages/react/src/components/inline-form.tsx ── */
 @keyframes rs-anim-fade-in{from{opacity:0}to{opacity:1}}
 .rs-inline-field{box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);padding-block:0.25rem;padding-inline-start:0.75rem;padding-inline-end:0.375rem;transition:border-color var(--duration-snap) var(--ease)}
 .rs-inline-field:focus-within{border-color:var(--accent)}
@@ -1293,7 +1191,6 @@
 .rs-subscribed{display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;font-weight:600;letter-spacing:-0.01em;color:var(--text);animation-name:rs-anim-fade-in;animation-duration:var(--duration-confirm);animation-timing-function:var(--ease)}
 .rs-inline-error{flex-basis:100%;margin:0;padding:0.5rem;font-size:var(--control-fs);color:var(--text)}
 
-/* ── radio: generated from packages/react/src/components/radio.tsx ── */
 .rs-radio{display:flex;align-items:center;gap:0.5625rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;min-height:var(--hit);min-width:var(--hit)}
 @media (max-width: 640px){.rs-radio{gap:0.75rem;font-size:1.0625rem;min-height:var(--hit)}}
 .rs-radio-dot{width:1rem;height:1rem;border-radius:50%;border-width:1.5px;border-style:solid;border-color:var(--control-border);position:relative;flex-shrink:0;box-sizing:border-box}
@@ -1305,7 +1202,6 @@
 @media (max-width: 640px){.rs-radio-fill{inset:0.3125rem}}
 @media (forced-colors: active){.rs-radio-fill{background-color:Highlight}}
 
-/* ── checkbox: generated from packages/react/src/components/checkbox.tsx ── */
 .rs-choice{display:flex;align-items:center;gap:0.5625rem;font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;min-height:var(--hit);min-width:var(--hit)}
 @media (max-width: 640px){.rs-choice{gap:0.75rem;font-size:1.0625rem;min-height:var(--hit)}}
 .rs-check{width:1rem;height:1rem;border-radius:3px;border-width:1.5px;border-style:solid;border-color:var(--control-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:var(--bg);box-sizing:border-box}
@@ -1314,7 +1210,6 @@
 .rs-check-on{background-color:var(--text);border-color:var(--text);color:var(--bg);forced-color-adjust:none}
 @media (forced-colors: active){.rs-check-on{background-color:Highlight;border-color:Highlight;color:HighlightText}}
 
-/* ── switch: generated from packages/react/src/components/switch.tsx ── */
 .rs-switch{display:inline-flex;box-sizing:border-box;width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);border-radius:var(--radius-sm);border-width:0;position:relative;flex-shrink:0;padding:0;background-color:transparent;cursor:pointer}
 .rs-switch::before{content:"";box-sizing:border-box;position:absolute;top:0.625rem;inset-inline-start:0;width:2.75rem;height:1.5rem;border-radius:0.75rem;border-width:1.5px;border-style:solid;border-color:var(--control-border);background-color:transparent;transition:background-color var(--duration) var(--ease), border-color var(--duration) var(--ease)}
 .rs-switch:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
@@ -1329,7 +1224,6 @@
 .rs-switch-thumb-on{background-color:var(--bg);inset-inline-start:1.46875rem}
 @media (forced-colors: active){.rs-switch-thumb-on{background-color:HighlightText}}
 
-/* ── slider: generated from packages/react/src/components/slider.tsx ── */
 .rs-slider{position:relative;height:2px;background-color:var(--divider);border-radius:1px;margin-block:1.3125rem;margin-inline:0}
 @media (max-width: 640px){.rs-slider{height:0.25rem;border-radius:1px;margin-block:1.25rem}}
 .rs-slider-fill{position:absolute;inset-inline-start:0;top:0;bottom:0;background-color:var(--text);border-radius:1px;pointer-events:none}
@@ -1340,12 +1234,10 @@
 .rs-slider-range{position:absolute;inset-inline-start:0;inset-inline-end:0;top:-1.3125rem;bottom:-1.3125rem;width:100%;height:auto;opacity:0;cursor:pointer;margin:0}
 @media (max-width: 640px){.rs-slider-range{top:-1.25rem;bottom:-1.25rem}}
 
-/* ── progress: generated from packages/react/src/components/progress.tsx ── */
 .rs-progress-head{display:flex;justify-content:space-between;font-size:0.75rem;font-weight:500;color:var(--text-secondary);letter-spacing:-0.01em;margin-bottom:0.4375rem}
 .rs-progress{height:0.25rem;background-color:var(--divider-subtle);border-radius:2px;overflow:hidden}
 .rs-progress-fill{display:block;height:100%;background-color:var(--text);border-radius:2px}
 
-/* ── tabs: generated from packages/react/src/components/tabs.tsx ── */
 .rs-tabs{display:flex;align-items:baseline;gap:1.375rem;max-width:22.5rem;border-width:0;border-style:none;border-bottom-width:0;border-bottom-style:none;border-bottom-color:transparent;box-shadow:none;background-color:transparent}
 @media (max-width: 640px){.rs-tabs{align-items:stretch;gap:0;width:100%;max-width:none;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}}
 .rs-tabs-vertical{flex-direction:column;align-items:stretch;gap:0;border-bottom-width:0;border-bottom-style:none}
@@ -1356,7 +1248,6 @@
 .rs-tab-active{color:var(--text);font-weight:600;border-width:0;border-style:none;box-shadow:inset 0 -1px 0;border-bottom-width:0;border-bottom-style:none;border-bottom-color:transparent}
 @media (forced-colors: active){.rs-tab-active{color:Highlight;border-bottom-width:2px;border-bottom-style:solid;border-bottom-color:Highlight}}
 
-/* ── breadcrumbs: generated from packages/react/src/components/breadcrumbs.tsx ── */
 .rs-crumbs{font-size:0.8125rem;color:var(--text);letter-spacing:-0.01em}
 @media (max-width: 640px){.rs-crumbs{font-size:var(--control-fs)}}
 .rs-crumbs-list{list-style:none;margin:0;padding:0;display:flex;align-items:baseline;gap:0.5rem}
@@ -1375,7 +1266,6 @@
 .rs-crumbs-here{color:var(--text);font-weight:500}
 @media (max-width: 640px){.rs-crumbs-here{display:inline-flex;align-items:center;min-height:var(--hit)}}
 
-/* ── crumb-bar: generated from packages/react/src/components/crumb-bar.tsx ── */
 .rs-crumb-bar{position:fixed;top:0;inset-inline-start:0;inset-inline-end:0;z-index:var(--z-sticky);display:flex;align-items:center;height:4.5rem;font-size:0.8125rem;font-weight:500;letter-spacing:-0.01em;line-height:1.3;background-color:transparent;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:transparent;transition:var(--transition)}
 @media (max-width: 640px){.rs-crumb-bar{height:4rem;font-size:0.75rem}}
 .rs-crumb-bar-scrolled{background-color:var(--bg);border-bottom-color:var(--divider)}
@@ -1411,7 +1301,6 @@
 .rs-crumbs-here.rs-crumb-here{color:var(--text);font-weight:500;overflow:hidden;text-overflow:ellipsis}
 @media (max-width: 640px){.rs-crumbs-here.rs-crumb-here{display:inline-flex;align-items:center;min-height:var(--hit)}}
 
-/* ── pagination: generated from packages/react/src/components/pagination.tsx ── */
 .rs-pages{display:flex;align-items:center;gap:0.3125rem}
 @media (max-width: 640px){.rs-pages{gap:0.5rem;flex-wrap:wrap}}
 .rs-page{transition:var(--transition);box-sizing:border-box;width:var(--hit);height:var(--hit);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.8125rem;color:var(--text-secondary);border-width:1px;border-style:solid;border-color:var(--control-border);padding:0;background-color:transparent;font-family:inherit;cursor:pointer;opacity:1}
@@ -1430,14 +1319,12 @@
 @media (hover: hover) and (pointer: fine){.rs-page-gap:hover:not(:disabled):not([aria-disabled='true']){border-color:transparent;background-color:transparent}}
 .rs-pages-icon{display:block;color:inherit}
 
-/* ── select: generated from packages/react/src/components/select.tsx ── */
 .rs-select{position:relative;display:inline-block;min-width:var(--rs-select-min-width, 11.25rem);background-color:var(--bg)}
 .rs-select-fluid{display:block;width:100%;min-width:0;--rs-select-min-width:0px}
 .rs-select-native{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border-width:0}
 .rs-select-feedback{margin:0.5rem 0 0;font-size:0.75rem;color:var(--text-secondary);line-height:1.45}
 .rs-menu.rs-select-list{max-height:17.5rem;overflow-y:auto}
 
-/* ── dialog: generated from packages/react/src/components/dialog.tsx ── */
 .rs-dialog{box-sizing:border-box;max-width:20rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);padding:1.25rem;background-color:var(--bg);color:var(--text);box-shadow:none}
 .rs-dialog::backdrop{background-color:rgba(0,0,0,0.25);background-color:color-mix(in srgb, var(--bg) 55%, transparent)}
 @media (max-width: 640px){.rs-dialog{max-width:calc(100vw - 32px);width:calc(100vw - 32px);padding:24px 20px}}
@@ -1453,28 +1340,23 @@
 @media (max-width: 640px){.rs-dialog-close,.rs-drawer-close,.rs-sheet-close{width:var(--hit);height:var(--hit);margin-top:-0.75rem;margin-inline-end:-0.75rem}}
 @media (hover: hover) and (pointer: fine){.rs-dialog-close:hover,.rs-drawer-close:hover,.rs-sheet-close:hover{background-color:var(--control-fill)}}
 
-/* ── badge: generated from packages/react/src/components/badge.tsx ── */
 .rs-badge,.rs-badge-solid,.rs-badge-muted{font-size:0.6875rem;font-weight:600;letter-spacing:0.02em;line-height:1.4;border-radius:var(--radius-sm)}
 .rs-badge{color:var(--accent);border-width:1px;border-style:solid;border-color:var(--accent);padding-block:0.1875rem;padding-inline:0.625rem}
 .rs-badge-solid{color:var(--bg);background-color:var(--text);padding-block:0.25rem;padding-inline:0.6875rem}
 .rs-badge-muted{color:var(--text);background-color:var(--divider-subtle);padding-block:0.25rem;padding-inline:0.6875rem}
 
-/* ── chip: generated from packages/react/src/components/chip.tsx ── */
 .rs-chip{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.6875rem;font-weight:500;color:var(--text-secondary);border-width:1px;border-style:solid;border-color:color-mix(in srgb, currentColor 35%, transparent);padding-block:0.1875rem;padding-inline:0.4375rem;line-height:1;border-radius:var(--radius-sm)}
 @media (max-width: 640px){.rs-chip{font-size:0.8125rem;padding-block:0.75rem;padding-inline:0.875rem;border-radius:var(--radius-sm);display:inline-flex;align-items:center;min-height:var(--hit)}}
 
-/* ── card: generated from packages/react/src/components/card.tsx ── */
 .rs-card{border-width:0;border-style:none;border-radius:0;padding:0;max-width:22.5rem;background-color:transparent;box-shadow:none}
 .rs-card-in{box-sizing:border-box;border-width:0;border-radius:0;min-height:0;padding:0;background-color:transparent}
 .rs-card-label{font-size:0.75rem;font-weight:600;color:var(--text);letter-spacing:-0.01em;display:block;margin-bottom:0.375rem}
 .rs-card-title{font-size:1.0625rem;font-weight:600;color:var(--text);letter-spacing:-0.02em;margin-top:0;margin-bottom:0.5rem}
 .rs-card-body{font-size:0.875rem;color:var(--text-secondary);font-weight:500;letter-spacing:-0.01em;line-height:1.45;margin:0}
 
-/* ── concentric-radius: generated from packages/react/src/components/concentric-radius.tsx ── */
 .rs-nest{box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--rs-out, var(--radius-sm));padding:var(--rs-gap, var(--pad));background-color:var(--bg)}
 .rs-nest-in{box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--rs-in);min-height:4.5rem;background-color:var(--bg);display:flex;align-items:flex-end}
 
-/* ── stepper: generated from packages/react/src/components/stepper.tsx ── */
 .rs-steps{display:flex;align-items:flex-start;width:100%;max-width:100%;gap:0}
 .rs-step{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:0.1875rem;flex-grow:1;flex-shrink:1;flex-basis:0;min-width:0}
 @media (max-width: 640px){.rs-step{gap:0.375rem}}
@@ -1489,7 +1371,6 @@
 .rs-step-line{position:absolute;top:0.71875rem;inset-inline-start:1.5rem;inset-inline-end:0;height:1px;background-color:var(--divider);margin:0;min-width:0;z-index:0}
 @media (max-width: 640px){.rs-step-line{top:calc(var(--hit) / 2);inset-inline-start:var(--hit)}}
 
-/* ── table: generated from packages/react/src/components/table.tsx ── */
 .rs-table{width:calc(100% + 40px);border-collapse:collapse;margin-top:1rem;margin-bottom:1.5rem;margin-inline-start:-1.25rem;margin-inline-end:0;font-size:0.875rem}
 @media (max-width: 640px){.rs-table{width:calc(100% + 2 * var(--pad));margin-inline-start:calc(-1 * var(--pad));margin-inline-end:calc(-1 * var(--pad));font-size:1rem}}
 .rs-table-th{text-align:start;font-weight:600;color:var(--text);letter-spacing:-0.01em;padding-top:0.625rem;padding-bottom:0.625rem;padding-inline-start:0.75rem;padding-inline-end:1rem;border-bottom-width:2px;border-bottom-style:solid;border-bottom-color:var(--divider);font-size:0.8125rem}
@@ -1505,7 +1386,6 @@
 .rs-total-row{font-weight:500;color:var(--text);border-top-width:2px;border-top-style:solid;border-top-color:var(--divider);border-bottom-width:2px;border-bottom-style:solid;border-bottom-color:var(--divider);background-color:transparent}
 .rs-table-total-cell{font-weight:500;color:var(--text);border-top-width:2px;border-bottom-width:2px}
 
-/* ── icons: generated from packages/react/src/components/icon.tsx ── */
 .rs-icon{display:block;flex-shrink:0;overflow:visible;color:inherit}
 .rs-icons{display:flex;gap:1.125rem;align-items:center;color:var(--text)}
 .rs-icon-catalog{width:100%;display:flex;flex-direction:column;gap:1.75rem;text-align:start;align-self:stretch}
@@ -1519,7 +1399,6 @@
 .rs-icon-kin{display:flex;align-items:center;gap:0.5rem;min-height:1.5rem}
 .rs-icon-label{margin:0;font-size:0.6875rem;line-height:1.3;color:var(--text-secondary);text-transform:none}
 
-/* ── accordion: generated from packages/react/src/components/accordion.tsx ── */
 .rs-acc{border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
 .rs-acc-item{border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
 .rs-acc-summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:0.75rem;padding-block:0.875rem;padding-inline:0;min-height:1.5rem;font-size:0.90625rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
@@ -1532,7 +1411,6 @@
 .rs-acc-body{padding-top:0;padding-inline-end:0;padding-bottom:1rem;padding-inline-start:0;font-size:0.84375rem;line-height:1.45;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-acc-body{padding-bottom:1.25rem;font-size:1rem}}
 
-/* ── alert: generated from packages/react/src/components/alert.tsx ── */
 .rs-alert{display:flex;gap:0.625rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius);padding-block:0.75rem;padding-inline:0.875rem;align-items:flex-start}
 .rs-alert-solid{background-color:var(--text);border-color:var(--text)}
 .rs-alert-icon{flex-shrink:0;margin-top:1px;color:var(--text)}
@@ -1542,10 +1420,8 @@
 .rs-alert-body{font-size:0.8125rem;line-height:1.45;letter-spacing:-0.01em;color:var(--text-secondary);margin-top:2px;margin-bottom:0;margin-inline:0}
 .rs-alert-body-solid{color:var(--bg)}
 
-/* ── alert-dialog: generated from packages/react/src/components/alert-dialog.tsx ── */
 .rs-alert-dialog{border-radius:var(--radius-sm);box-shadow:none}
 
-/* ── avatar: generated from packages/react/src/components/avatar.tsx ── */
 .rs-avatar{width:2rem;height:2rem;border-radius:50%;background-color:var(--divider-subtle);color:var(--text);display:inline-flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;letter-spacing:-0.01em;overflow:hidden;flex-shrink:0;user-select:none}
 .rs-avatar-sm{width:1.5rem;height:1.5rem;font-size:0.625rem}
 .rs-avatar-lg{width:3rem;height:3rem;font-size:1rem}
@@ -1554,7 +1430,6 @@
 .rs-avatar-in-row{border-width:2px;border-style:solid;border-color:var(--bg);margin-inline-start:-0.5rem}
 .rs-avatar-in-row:first-child{margin-inline-start:0}
 
-/* ── item: generated from packages/react/src/components/item.tsx ── */
 .rs-item{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:3rem;padding-block:0.625rem;padding-inline:0;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider);border-radius:0}
 .rs-item:last-child{border-bottom-width:0}
 @media (max-width: 640px){.rs-item{min-height:var(--hit);padding-block:0.875rem}}
@@ -1565,7 +1440,6 @@
 .rs-item-meta{font-size:0.75rem;font-weight:500;letter-spacing:-0.01em;color:var(--text-secondary);flex-shrink:0}
 @media (max-width: 640px){.rs-item-meta{font-size:0.875rem}}
 
-/* ── textarea: generated from packages/react/src/components/textarea.tsx ── */
 .rs-field.rs-textarea-field{width:100%;display:flex;flex-direction:column;gap:0.5rem}
 .rs-field-label.rs-textarea-label{font-size:0.75rem;font-weight:600;color:var(--text-secondary);letter-spacing:-0.01em;line-height:16px}
 @media (max-width: 640px){.rs-field-label.rs-textarea-label{font-size:var(--control-label)}}
@@ -1578,29 +1452,24 @@
 .rs-feedback.rs-textarea-feedback{display:flex;align-items:center;gap:0.5rem;font-size:0.75rem;font-weight:500;color:var(--text-secondary);letter-spacing:-0.01em;line-height:16px;margin:0;min-height:1rem}
 @media (max-width: 640px){.rs-feedback.rs-textarea-feedback{font-size:0.875rem}}
 
-/* ── separator: generated from packages/react/src/components/separator.tsx ── */
 .rs-sep{border-width:0;border-style:none;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);margin-block:1.25rem;margin-inline:0}
 .rs-sep-v{display:inline-block;width:1px;align-self:stretch;background-color:var(--divider);margin-block:0;margin-inline:0.75rem}
 
-/* ── skeleton: generated from packages/react/src/components/skeleton.tsx ── */
 @keyframes rs-anim-rs-skel{0%{opacity:1}50%{opacity:0.55}100%{opacity:1}}
 .rs-skeleton{display:block;background-color:var(--divider-subtle);border-radius:var(--radius-sm);animation-name:rs-anim-rs-skel;animation-duration:1.6s;animation-timing-function:ease-in-out;animation-iteration-count:infinite}
 @media (prefers-reduced-motion: reduce){.rs-skeleton{animation-name:none}}
 
-/* ── empty: generated from packages/react/src/components/empty.tsx ── */
 .rs-empty{display:flex;flex-direction:column;justify-content:center;gap:0.5rem;min-height:204px;padding:1.25rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:0}
 .rs-empty-title{margin:0;font-size:0.9375rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
 .rs-empty-body{margin:0;font-size:0.84375rem;line-height:1.45;letter-spacing:-0.01em;color:var(--text-secondary)}
 .rs-empty-action{margin-top:0.5rem;width:fit-content}
 @media (max-width: 640px){.rs-empty-action{width:100%}}
 
-/* ── spinner: generated from packages/react/src/components/spinner.tsx ── */
 @keyframes rs-anim-spin{to{transform:rotate(360deg)}}
 .rs-spinner{display:inline-flex;width:1rem;height:1rem;color:var(--text);vertical-align:middle}
 .rs-spinner-ring{display:block;width:1rem;height:1rem;animation-name:rs-anim-spin;animation-duration:0.7s;animation-timing-function:linear;animation-iteration-count:infinite}
 @media (prefers-reduced-motion: reduce){.rs-spinner-ring{animation-name:none}}
 
-/* ── tooltip: generated from packages/react/src/components/tooltip.tsx ── */
 .rs-tip{position:relative;display:inline-flex}
 .rs-tip-bubble{position:absolute;bottom:calc(100% + 8px);inset-inline-start:50%;transform:translateX(-50%);box-sizing:border-box;width:max-content;max-width:min(280px, calc(100vw - 16px));background-color:var(--text);color:var(--bg);font-size:0.71875rem;font-weight:500;letter-spacing:-0.01em;line-height:1.3;padding-block:0.3125rem;padding-inline:0.5625rem;border-radius:var(--radius-sm);z-index:var(--z-float);opacity:0;visibility:hidden;pointer-events:none;transition:var(--transition)}
 .rs-tip:focus-within .rs-tip-bubble{opacity:1;visibility:visible;pointer-events:auto}
@@ -1610,7 +1479,6 @@
 @media (hover: none){.rs-tip:active .rs-tip-bubble{opacity:1;visibility:visible}}
 @media (prefers-reduced-motion: reduce){.rs-tip-bubble{transition:none}}
 
-/* ── toast: generated from packages/react/src/components/toast.tsx ── */
 @keyframes rs-anim-toast-in{from{opacity:0}to{opacity:1}}
 .rs-toasts{position:fixed;bottom:1.25rem;inset-inline-end:1.25rem;z-index:var(--z-toast);display:flex;flex-direction:column;align-items:flex-end;gap:0.5rem}
 @media (max-width: 640px){.rs-toasts{bottom:max(0.5rem, env(safe-area-inset-bottom));inset-inline-end:0.5rem;inset-inline-start:0.5rem;align-items:stretch;gap:0.5rem}}
@@ -1627,7 +1495,6 @@
 @media (max-width: 640px){.rs-toast-close{margin-top:-0.625rem;margin-inline-end:-0.75rem;width:var(--hit);height:var(--hit)}}
 @media (hover: hover) and (pointer: fine){.rs-toast-close:hover{background-color:var(--control-fill)}}
 
-/* ── dropdown-menu: generated from packages/react/src/components/dropdown-menu.tsx ── */
 .rs-select{position:relative;display:inline-block;min-width:var(--rs-select-min-width, 11.25rem)}
 @media (max-width: 640px){.rs-select{display:block;min-width:0;width:100%}}
 .rs-dropdown{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding-block:0.5625rem;padding-inline:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);font-size:0.875rem;color:var(--text);letter-spacing:-0.01em;cursor:pointer;font-family:inherit;background-color:transparent;width:100%;min-height:var(--hit)}
@@ -1651,7 +1518,6 @@
 .rs-menu-item-disabled{color:var(--text-secondary);cursor:default}
 .rs-menu-sep{border-width:0;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);margin-block:0.25rem;margin-inline:0.5rem}
 
-/* ── toggle: generated from packages/react/src/components/toggle.tsx ── */
 .rs-toggle{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:0.375rem;height:var(--hit);min-width:var(--hit);padding-block:0;padding-inline:1.25rem;font-size:0.8125rem;font-weight:500;letter-spacing:-0.01em;background-color:transparent;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);color:var(--text-secondary);cursor:pointer;font-family:inherit;transition:var(--transition)}
 .rs-toggle:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (max-width: 640px){.rs-toggle{height:var(--hit);min-height:var(--hit);min-width:var(--hit);padding-inline:1.25rem;font-size:var(--control-fs);border-radius:var(--radius-sm)}}
@@ -1672,14 +1538,12 @@
 @media (max-width: 640px){.rs-toggle-grouped{flex-grow:1}}
 .rs-toggle-grouped-on{position:relative;z-index:1}
 
-/* ── popover: generated from packages/react/src/components/popover.tsx ── */
 .rs-popover{box-sizing:border-box;position:fixed;inset:auto;margin:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius);background-color:var(--bg);color:var(--text);box-shadow:0 8px 24px rgba(0,0,0,0.06);padding:0.875rem;width:15rem;font-size:0.8125rem;line-height:1.45;letter-spacing:-0.01em}
 @media (max-width: 640px){.rs-popover{border-radius:var(--radius);box-shadow:none;padding:1rem;width:min(320px, calc(100vw - 32px));font-size:1rem}}
 .rs-popover-title{display:block;font-size:0.8125rem;font-weight:600;letter-spacing:-0.01em;color:var(--text);margin-bottom:0.25rem}
 @media (max-width: 640px){.rs-popover-title{font-size:1rem}}
 .rs-popover-body{color:var(--text-secondary);margin:0}
 
-/* ── sheet: generated from packages/react/src/components/sheet.tsx ── */
 .rs-sheet{box-sizing:border-box;position:fixed;top:0;inset-inline-end:0;bottom:0;inset-inline-start:auto;margin:0;height:100dvh;max-height:none;width:22.5rem;max-width:85vw;border-width:0;border-style:solid;border-inline-start-width:1px;border-color:var(--divider);border-start-start-radius:var(--radius-sm);border-start-end-radius:0;border-end-end-radius:0;border-end-start-radius:var(--radius-sm);padding-block:1.5rem;padding-inline:1.25rem;background-color:var(--bg);color:var(--text);box-shadow:none}
 .rs-sheet::backdrop{background-color:rgba(0,0,0,0.25);background-color:color-mix(in srgb, var(--bg) 55%, transparent)}
 @media (max-width: 640px){.rs-sheet{width:100%;max-width:100%}}
@@ -1689,7 +1553,6 @@
 .rs-sheet-body{font-size:0.84375rem;line-height:1.45;letter-spacing:-0.01em;color:var(--text-secondary);margin:0}
 @media (max-width: 640px){.rs-sheet-body{font-size:1rem}}
 
-/* ── drawer: generated from packages/react/src/components/drawer.tsx ── */
 .rs-drawer{box-sizing:border-box;position:fixed;top:auto;inset-inline-end:0;bottom:0;inset-inline-start:0;margin:0;width:100%;max-width:none;height:auto;max-height:85dvh;border-width:0;border-style:solid;border-top-width:1px;border-color:var(--divider);border-start-start-radius:var(--radius-sm);border-start-end-radius:var(--radius-sm);border-end-end-radius:0;border-end-start-radius:0;padding-block:1.5rem;padding-inline:1.25rem;background-color:var(--bg);color:var(--text);box-shadow:none}
 .rs-drawer::backdrop{background-color:rgba(0,0,0,0.25);background-color:color-mix(in srgb, var(--bg) 55%, transparent)}
 .rs-drawer-title{display:block;font-size:0.9375rem;font-weight:600;letter-spacing:-0.01em;color:var(--text);margin-top:0;margin-inline-end:0;margin-bottom:0.375rem;margin-inline-start:0}
@@ -1697,12 +1560,10 @@
 .rs-drawer-body{font-size:0.84375rem;line-height:1.45;letter-spacing:-0.01em;color:var(--text-secondary);margin:0}
 @media (max-width: 640px){.rs-drawer-body{font-size:1rem}}
 
-/* ── scroll-area: generated from packages/react/src/components/scroll-area.tsx ── */
 .rs-scroll{overflow-y:auto;scrollbar-width:none;mask-image:linear-gradient(to bottom, transparent 0, #000 20px, #000 calc(100% - 20px), transparent 100%);padding-block:0.75rem;padding-inline:0;color:var(--text)}
 .rs-scroll::-webkit-scrollbar{display:none}
 .rs-scroll:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 
-/* ── chart: generated from packages/react/src/components/charts/frame.tsx ── */
 .rs-chart{position:relative;width:100%;border-radius:0;box-shadow:none}
 .rs-chart-field{isolation:isolate;background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:0;box-shadow:none;padding:1rem}
 .rs-chart-canvas{position:relative;width:100%;min-width:0}
@@ -1756,7 +1617,6 @@
 .rs-spark{display:inline-block;vertical-align:middle}
 .rs-chart-svg{display:block;overflow:visible}
 
-/* ── collapsible: generated from packages/react/src/components/collapsible.tsx ── */
 .rs-disclosure-summary{list-style:none;cursor:pointer;display:inline-flex;align-items:center;gap:0.4375rem;min-height:var(--hit);min-width:var(--hit);font-size:0.84375rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
 .rs-disclosure-summary::-webkit-details-marker{display:none}
 .rs-disclosure-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
@@ -1768,7 +1628,6 @@
 @media (max-width: 640px){.rs-disclosure-body{padding-top:0.75rem;font-size:1rem}}
 .rs-disclosure{display:block}
 
-/* ── hover-card: generated from packages/react/src/components/hover-card.tsx ── */
 .rs-hover-card{position:relative;display:inline-block}
 .rs-hover-card-panel{position:absolute;top:calc(100% + 8px);inset-inline-start:0;z-index:var(--z-float);width:16.25rem;background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,0.06);padding:0.875rem;font-size:0.8125rem;line-height:1.45;letter-spacing:-0.01em;color:var(--text-secondary);opacity:0;visibility:hidden;transition:var(--transition)}
 .rs-hover-card:focus-within .rs-hover-card-panel{opacity:1;visibility:visible}
@@ -1779,11 +1638,9 @@
 @media (prefers-reduced-motion: reduce){.rs-hover-card-panel{transition:none}}
 .rs-hover-card-open{opacity:1;visibility:visible}
 
-/* ── kbd: generated from packages/react/src/components/kbd.tsx ── */
 .rs-kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.6875rem;font-weight:500;color:var(--text-secondary);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);border-bottom-width:2px;border-radius:var(--radius-sm);padding-block:2px;padding-inline:0.375rem;line-height:1.2}
 .rs-kbd-pair{display:inline-flex;align-items:center;gap:0.25rem}
 
-/* ── input-otp: generated from packages/react/src/components/input-otp.tsx ── */
 .rs-otp{display:flex;gap:0.5rem}
 @media (max-width: 640px){.rs-otp{width:100%}}
 .rs-otp-cell{box-sizing:border-box;width:var(--hit);min-width:var(--hit);height:3rem;text-align:center;font-size:1.125rem;font-weight:600;font-variant-numeric:tabular-nums;appearance:none;-webkit-appearance:none;color:var(--text);caret-color:var(--text);background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);outline-width:0;outline-style:none;outline-color:var(--text);outline-offset:2px;font-family:inherit;padding:0}
@@ -1793,11 +1650,9 @@
 @media (max-width: 640px){.rs-otp-cell{width:auto;flex-grow:1;min-width:var(--hit);height:var(--hit);min-height:var(--hit);border-radius:var(--radius-sm)}}
 .rs-otp-cell-invalid{border-color:var(--text)}
 
-/* ── context-menu: generated from packages/react/src/components/context-menu.tsx ── */
 .rs-context-menu-trigger:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 .rs-menu.rs-context-menu-pin{position:fixed;z-index:var(--z-float);background-color:var(--bg)}
 
-/* ── menubar: generated from packages/react/src/components/menubar.tsx ── */
 .rs-menubar{box-sizing:border-box;display:inline-flex;flex-wrap:wrap;align-items:center;gap:2px;min-width:0;max-width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);padding:2px}
 @media (max-width: 640px){.rs-menubar{width:100%;border-radius:var(--radius-sm)}}
 .rs-menubar-wrap{position:relative;display:flex;flex:0 1 auto;min-width:0;max-width:100%}
@@ -1811,7 +1666,6 @@
 @media (forced-colors: active){.rs-menubar-trigger-open{background-color:Highlight;color:HighlightText}}
 .rs-menubar-panel{min-width:10rem;width:max-content;max-width:calc(100vw - 16px)}
 
-/* ── navigation-menu: generated from packages/react/src/components/navigation-menu.tsx ── */
 .rs-nav{display:flex;align-items:center;gap:1.375rem}
 @media (max-width: 640px){.rs-nav{gap:0;flex-wrap:wrap}}
 .rs-nav-link{min-width:var(--hit);display:inline-flex;align-items:center;min-height:var(--hit);font-size:0.875rem;font-weight:500;letter-spacing:-0.01em;color:var(--text-secondary);text-decoration:none;transition:var(--transition)}
@@ -1822,7 +1676,6 @@
 @media (hover: hover) and (pointer: fine){.rs-nav-link:hover{color:var(--text)}}
 @media (prefers-reduced-motion: reduce){.rs-nav-link{transition:none}}
 
-/* ── sidebar: generated from packages/react/src/components/sidebar.tsx ── */
 .rs-sidebar{box-sizing:border-box;width:204px;min-height:204px;display:flex;flex-direction:column;border-width:1px;border-style:solid;border-color:var(--divider);background-color:var(--bg);border-radius:0}
 @media (max-width: 640px){.rs-sidebar{width:100%}}
 .rs-sidebar-head{box-sizing:border-box;padding-block:1rem;padding-inline:1.25rem;font-size:0.8125rem;font-weight:600;letter-spacing:-0.01em;color:var(--text);border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
@@ -1841,7 +1694,6 @@
 .rs-sidebar-foot{box-sizing:border-box;padding-top:0.75rem;padding-inline-end:1.25rem;padding-bottom:0.75rem;padding-inline-start:1.25rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);font-size:0.75rem;font-weight:500;letter-spacing:-0.01em;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-sidebar-foot{font-size:0.875rem;min-height:var(--hit);display:flex;align-items:center}}
 
-/* ── carousel: generated from packages/react/src/components/carousel.tsx ── */
 .rs-carousel{position:relative;width:100%;max-width:100%}
 .rs-carousel-track{display:flex;gap:var(--gutter);overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;mask-image:linear-gradient(to right, transparent 0, black 28px, black calc(100% - 36px), transparent 100%);padding-top:2px;padding-bottom:2px;padding-inline:0}
 .rs-carousel-track::-webkit-scrollbar{display:none}
@@ -1857,7 +1709,6 @@
 .rs-carousel-slide{flex-shrink:0;scroll-snap-align:start;border-radius:var(--radius-sm)}
 @media (max-width: 640px){.rs-carousel-slide{border-radius:var(--radius-sm)}}
 
-/* ── resizable: generated from packages/react/src/components/resizable.tsx ── */
 .rs-split{display:flex;flex-direction:row;width:100%}
 @media (max-width: 640px){.rs-split{flex-direction:column}}
 .rs-split-pane{min-width:0;overflow:hidden}
@@ -1871,13 +1722,11 @@
 @media (hover: hover) and (pointer: fine){.rs-split-handle:hover::after{background-color:var(--text)}}
 @media (hover: hover) and (pointer: fine) and (forced-colors: active){.rs-split-handle:hover::after{background-color:Highlight}}
 
-/* ── combobox: generated from packages/react/src/components/combobox.tsx ── */
 .rs-combobox{position:relative;display:inline-block;min-width:12.5rem}
 @media (max-width: 640px){.rs-combobox{display:block;min-width:0;width:100%}}
 .rs-combobox-empty{padding:10px 12px;font-size:0.8125rem;letter-spacing:-0.01em;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-combobox-empty{padding:0.875rem;font-size:0.9375rem}}
 
-/* ── command: generated from packages/react/src/components/command.tsx ── */
 .rs-command{display:flex;flex-direction:column;min-width:0}
 .rs-command-dialog{width:480px;max-width:90vw;padding:0;overflow:hidden}
 @media (max-width: 640px){.rs-command-dialog{width:100%;max-width:100%}}
@@ -1895,7 +1744,6 @@
 .rs-command-empty{padding:1.25rem;text-align:center;font-size:0.8125rem;color:var(--text-secondary)}
 @media (max-width: 640px){.rs-command-empty{padding:1.5rem;font-size:0.9375rem}}
 
-/* ── calendar: generated from packages/react/src/components/calendar.tsx ── */
 .rs-cal{width:19.25rem;max-width:100%;overflow-x:auto}
 .rs-cal-head{display:flex;justify-content:space-between;align-items:center;min-height:1.625rem;margin-bottom:0.5rem}
 @media (max-width: 640px){.rs-cal-head{min-height:var(--hit)}}
@@ -1925,10 +1773,8 @@
 @media (hover: hover) and (pointer: fine) and (forced-colors: active){.rs-cal-day-selected:hover:not(:disabled):not([aria-disabled='true']){background-color:Highlight}}
 @media (forced-colors: active){.rs-cal-day-selected{background-color:Highlight;color:HighlightText}}
 
-/* ── date-picker: generated from packages/react/src/components/date-picker.tsx ── */
 .rs-menu.rs-date-picker-cal-menu{inset-inline-end:auto;padding:0.75rem;background-color:var(--bg)}
 
-/* ── data-table: generated from packages/react/src/components/data-table.tsx ── */
 .rs-datatable-scroll{width:100%;overflow-x:auto}
 .rs-table.rs-datatable-table{width:100%;border-collapse:collapse;margin-top:1rem;margin-bottom:1.5rem;margin-inline-start:0;margin-inline-end:0;font-size:0.875rem}
 @media (max-width: 640px){.rs-table.rs-datatable-table{width:100%;margin-inline-start:0;margin-inline-end:0;font-size:1rem}}
@@ -1948,14 +1794,11 @@
 .rs-datatable-sort-icon-on{color:var(--text)}
 .rs-datatable-empty{padding-top:1.5rem;padding-bottom:1.5rem;padding-inline:1.25rem;text-align:center;font-size:0.8125rem;letter-spacing:-0.01em;color:var(--text-secondary)}
 
-/* ── aspect-ratio: generated from packages/react/src/components/aspect-ratio.tsx ── */
 .rs-ratio{position:relative;display:grid;width:100%;overflow:hidden;border-radius:var(--radius)}
 
-/* ── form: generated from packages/react/src/components/form.tsx ── */
 .rs-form{display:flex;flex-direction:column;gap:1rem;max-width:388px;margin:0;color:var(--text)}
 @media (max-width: 640px){.rs-form{gap:1.25rem;max-width:none;width:100%}}
 
-/* ── workflow: generated from packages/react/src/components/flow.tsx ── */
 .rs-flow{display:grid;grid-template-columns:1fr;gap:var(--gutter)}
 @media (min-width: 560px){.rs-flow{grid-template-columns:repeat(2, 184px);width:fit-content}}
 @media (min-width: 940px){.rs-flow{grid-template-columns:repeat(3, 184px)}}
@@ -1976,7 +1819,6 @@
 @media (prefers-reduced-motion: reduce){.rs-flow-add{transition:none}}
 .rs-flow-plus{display:inline-flex;align-items:center;justify-content:center;width:1.125rem;height:1.125rem;border-width:1px;border-style:solid;border-color:currentColor;border-radius:50%;font-size:0.8125rem;line-height:1}
 
-/* ── assistant: generated from packages/react/src/components/assistant.tsx ── */
 .rs-ai{display:flex;flex-direction:column;gap:1rem;max-width:35rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius);padding:1.25rem}
 .rs-ai-head{display:flex;justify-content:space-between;align-items:center}
 .rs-ai-title{font-size:0.8125rem;font-weight:600;letter-spacing:-0.01em;color:var(--text)}
@@ -1993,7 +1835,6 @@
 .rs-ai-input{margin-top:2px;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);padding-top:0.625rem;padding-bottom:0.625rem;padding-inline-start:0.75rem;padding-inline-end:0.75rem;font-size:0.78125rem;color:var(--text-secondary);display:flex;justify-content:space-between;align-items:center}
 .rs-ai-send{color:var(--text);font-weight:600}
 
-/* ── theme-toggle: generated from packages/react/src/components/theme-toggle.tsx ── */
 .rs-theme-toggle{transition:var(--transition);position:fixed;top:1.5rem;inset-inline-end:1.25rem;z-index:var(--z-sticky);width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);padding:0.625rem;display:flex;align-items:center;justify-content:center;overflow:hidden;background-color:transparent;border-width:0;border-style:none;border-radius:var(--radius-sm);cursor:pointer;color:var(--text-secondary);outline-width:0;outline-style:none;outline-color:transparent;outline-offset:0;filter:drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg))}
 .rs-theme-toggle:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (prefers-reduced-motion: reduce){.rs-theme-toggle{transition:none}}
@@ -2002,11 +1843,9 @@
 .rs-theme-toggle-inline{position:relative;top:auto;inset-inline-end:auto;z-index:1;filter:none}
 .rs-theme-sun,.rs-theme-moon{width:1.5rem;height:1.5rem;display:block;flex-shrink:0}
 
-/* ── callout: generated from packages/react/src/components/callout.tsx ── */
 .rs-callout{background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:0;box-shadow:none;padding-block:1rem;padding-inline:1.25rem}
 @media (max-width: 640px){.rs-callout{padding-block:0.875rem;padding-inline:1rem}}
 
-/* ── references: generated from packages/react/src/components/refs.tsx ── */
 .rs-cite{font-size:0.65625rem;font-weight:600;letter-spacing:0;line-height:0;vertical-align:super;white-space:nowrap}
 .rs-cite-cite-a{color:var(--text-secondary);text-decoration:none;transition:var(--transition)}
 @media (hover: hover) and (pointer: fine){.rs-cite-cite-a:hover{color:var(--accent)}}
