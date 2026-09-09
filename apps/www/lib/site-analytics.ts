@@ -12,6 +12,7 @@ export const publicSitePaths = [
   "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
   "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
   "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",
+  "/use-cases/enterprise-software", "/use-cases/consumer-software",
 ];
 
 type EventName = "acquisition" | "docs_click" | "get_started_click" | "github_click" | "install_copy" | "network_click";

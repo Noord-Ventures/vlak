@@ -1,5 +1,31 @@
 export const useCases = [
   {
+    slug: "enterprise-software",
+    title: "Enterprise software",
+    searchTitle: "React components for enterprise software · Vlak",
+    summary: "Connect team conversations, records, schedules, and approvals in a shared working environment.",
+    interfaceSlugs: ["room", "press", "night", "calendar", "agents"],
+    componentNames: ["data-table", "filter-bar", "form", "field", "activity-timeline", "calendar-popover", "dialog"],
+    principles: [
+      "Keep the selected workspace, record, and permission scope visible while people move between tasks.",
+      "Pair changes with clear validation, confirmation, and an activity history. Preserve filters and drafts when opening a record.",
+      "On narrow screens, move from lists to focused records while keeping the next action within reach.",
+    ],
+  },
+  {
+    slug: "consumer-software",
+    title: "Consumer software",
+    searchTitle: "React components for consumer apps · Vlak",
+    summary: "Build everyday experiences for discovery, ordering, listening, watching, and staying connected.",
+    interfaceSlugs: ["evening", "music-player", "video-player", "wall", "platforms"],
+    componentNames: ["card", "input", "tabs", "number-field", "playback-controls", "media-scrubber", "toast"],
+    principles: [
+      "Keep discovery, selection, and the next action close together. Show the details people need before they commit.",
+      "Preserve progress, selections, and playback when moving between views. Make it easy to go back and change a choice.",
+      "Build for one-handed use with readable content, reachable controls, and clear feedback for each action.",
+    ],
+  },
+  {
     slug: "agent-interfaces",
     title: "Agent interfaces",
     searchTitle: "React components for AI agent interfaces · Vlak",
