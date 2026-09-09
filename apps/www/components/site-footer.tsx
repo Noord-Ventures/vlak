@@ -17,6 +17,8 @@ export function SiteFooter() {
           <Link href="/interfaces/">Interfaces</Link>
           <Link href="/use-cases/">Use cases</Link>
           <Link href="/docs/">Docs</Link>
+          <Link href="/privacy/">Privacy</Link>
+          <Link href="/terms/">Terms</Link>
           <a href={person.repo}>GitHub</a>
           <a href={DOOR}>vlak.dev</a>
         </nav>

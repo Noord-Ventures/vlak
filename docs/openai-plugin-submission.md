@@ -16,13 +16,13 @@ Use this sheet for Vlak's initial public OpenAI Plugins Directory submission. Th
 | Plugin name | Vlak |
 | Short description | Build accessible product interfaces with Vlak |
 | Long description | Search Vlak's component catalogue, inspect exact React props and accessibility guidance, and get verified install instructions for package, CLI, shadcn registry, or CSS-only use. Vlak is read-only and does not modify projects or external services. |
-| Developer | Noord Ventures, if this is the verified publisher identity |
+| Developer | Noord.dev |
 | Category | Developer tools |
 | Website | `https://vlak.dev` |
 | Support | `https://github.com/Noord-Ventures/vlak/issues` |
 | Logo source | `apps/www/app/icon.svg` |
-| Privacy | Required public URL, publisher review needed |
-| Terms | Required public URL, publisher review needed |
+| Privacy | `https://vlak.dev/privacy/` |
+| Terms | `https://vlak.dev/terms/` |
 
 ## MCP
 

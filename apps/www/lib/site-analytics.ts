@@ -4,7 +4,7 @@ const productionHosts = new Set(["vlak.dev", "www.vlak.dev"]);
 export const publicSitePaths = [
   "/", "/about", "/components", "/docs", "/docs/accessibility", "/docs/agents",
   "/docs/choosing-vlak", "/docs/frameworks", "/docs/layers", "/docs/stylex", "/docs/theming", "/docs/tokens",
-  "/inspiration", "/interfaces", "/interfaces/agents", "/interfaces/drive",
+  "/inspiration", "/privacy", "/terms", "/interfaces", "/interfaces/agents", "/interfaces/drive",
   "/interfaces/evening", "/interfaces/frontier", "/interfaces/graphics", "/interfaces/line",
   "/interfaces/night", "/interfaces/orbit", "/interfaces/platforms", "/interfaces/press",
   "/interfaces/render", "/interfaces/room", "/interfaces/wall", "/swag",
