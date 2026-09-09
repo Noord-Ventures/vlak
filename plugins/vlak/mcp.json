@@ -2,9 +2,8 @@
   "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
   "mcpServers": {
     "vlak": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@noorddev/vlak-mcp"]
+      "type": "streamable-http",
+      "url": "https://vlak.dev/mcp"
     }
   }
 }

@@ -20,8 +20,8 @@ const agents = read("registry/docs/agents.md");
 
 assert(plugin.$schema === "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json", "Portable plugin schema is missing");
 assert(portableMcp.$schema === "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json", "Portable MCP schema is missing");
-assert(portableMcp.mcpServers.vlak.type === "stdio", "Portable MCP transport must be explicit");
-assert(portableMcp.mcpServers.vlak.command === "npx", "Portable MCP must launch through npx");
+assert(portableMcp.mcpServers.vlak.type === "streamable-http", "Portable MCP transport must be Streamable HTTP");
+assert(portableMcp.mcpServers.vlak.url === "https://vlak.dev/mcp", "Portable MCP must use the stable Vlak endpoint");
 assert(claudePlugin.mcpServers === "./.mcp.json", "Claude plugin must use its compatible MCP config");
 assert(claudeMcp.mcpServers.vlak.args.includes("@noorddev/vlak-mcp"), "Claude MCP config must launch Vlak");
 assert(marketplace.plugins.some((entry) => entry.name === "vlak" && entry.source === "./plugins/vlak"), "Marketplace must expose the Vlak plugin");

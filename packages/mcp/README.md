@@ -2,6 +2,8 @@
 
 An MCP server for the Vlak design system. Coding agents get the component catalogue, per-component docs with generated props tables, install commands, the design tokens, and the guide, all from a local snapshot. No network.
 
+Hosted Streamable HTTP endpoint: `https://vlak.dev/mcp`.
+
 ## Setup
 
 Codex and the ChatGPT desktop app:

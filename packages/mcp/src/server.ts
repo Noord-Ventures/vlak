@@ -11,7 +11,16 @@ import { type RegistryItem, components, docsFor, findComponent, loadBundle, load
 const HOST = "https://vlak.dev";
 const REACT = "@noorddev/vlak-react";
 const CLI = "@noorddev/vlak-cli";
-const READ_ONLY = { readOnlyHint: true, idempotentHint: true, openWorldHint: false } as const;
+const READ_ONLY = { readOnlyHint: true, destructiveHint: false, idempotentHint: true, openWorldHint: false } as const;
+
+const componentSummaryShape = {
+  name: z.string(),
+  title: z.string(),
+  description: z.string(),
+  category: z.string(),
+  aliases: z.array(z.string()),
+  cssOnly: z.boolean(),
+};
 
 const text = (value: string) => ({ content: [{ type: "text" as const, text: value }] });
 const json = (value: Record<string, unknown>) => ({
@@ -106,6 +115,7 @@ export function createServer(): McpServer {
       title: "List Vlak components",
       description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, health, civic, science, creative, engineering, geospatial, robotics, electronics, microbiology.",
       inputSchema: { category: z.string().optional().describe("Only this category") },
+      outputSchema: { version: z.string(), count: z.number(), components: z.array(z.object(componentSummaryShape)) },
       annotations: READ_ONLY,
     },
     ({ category }) => {
@@ -121,6 +131,21 @@ export function createServer(): McpServer {
       title: "Get a Vlak component",
       description: "The markdown docs page for a component (install paths, example, props tables, keyboard, accessibility), plus its props as JSON, the CSS-only snippet, the React example, its classes, and aliases. Pass the kebab-case name from list_components or search_components.",
       inputSchema: { name: z.string().describe("Component name, e.g. \"button\" or \"dropdown-menu\"") },
+      outputSchema: {
+        ...componentSummaryShape,
+        docs: z.string().nullable(),
+        import: z.string().nullable(),
+        example: z.string().nullable(),
+        snippet: z.string().nullable(),
+        classes: z.array(z.string()),
+        usage: z.object({ use: z.array(z.string()), avoid: z.array(z.string()) }).nullable(),
+        keyboard: z.array(z.object({ keys: z.string(), does: z.string() })),
+        a11y: z.array(z.string()),
+        registryDependencies: z.array(z.string()),
+        props: z.array(z.object({}).loose()),
+        page: z.string(),
+        registryItem: z.string(),
+      },
       annotations: READ_ONLY,
     },
     ({ name }) => {
@@ -155,6 +180,10 @@ export function createServer(): McpServer {
       title: "Search Vlak components",
       description: "Find components by name, title, description, alias (shadcn/ui, Radix, and common names such as Sonner, Drawer, Combobox), or rs-* class. Returns matches ranked by field.",
       inputSchema: { term: z.string().describe("Search term, e.g. \"menu\", \"snackbar\", \"rs-input\"") },
+      outputSchema: {
+        term: z.string(),
+        hits: z.array(z.object({ ...componentSummaryShape, matched: z.array(z.string()) })),
+      },
       annotations: READ_ONLY,
     },
     ({ term }) => json({ term, hits: searchComponents(term) }),
@@ -176,6 +205,14 @@ export function createServer(): McpServer {
       title: "Get install commands",
       description: "The three ways to install one component (npm package plus import line, Vlak CLI, shadcn CLI) and the CSS-only markup, with its registry dependencies.",
       inputSchema: { name: z.string().describe("Component name") },
+      outputSchema: {
+        name: z.string(),
+        package: z.object({ install: z.string(), css: z.string(), import: z.string().nullable() }),
+        cli: z.string(),
+        shadcn: z.string(),
+        cssOnly: z.object({ stylesheet: z.string(), markup: z.string() }),
+        registryDependencies: z.array(z.string()),
+      },
       annotations: READ_ONLY,
     },
     ({ name }) => {

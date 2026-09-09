@@ -9,7 +9,7 @@ packages/core     @noorddev/vlak        tokens (src/tokens.ts), the registry (sr
                                           (src/schema.ts), generated CSS (css/), tokens JSON, props JSON, docs
 packages/react    @noorddev/vlak-react  the components: StyleX leaves in src/components/*.tsx, precompiled at build
 packages/cli      @noorddev/vlak-cli    init, add, list, search, docs, tokens; bundles the registry snapshot
-packages/mcp      @noorddev/vlak-mcp    MCP server over the same snapshot (stdio)
+packages/mcp      @noorddev/vlak-mcp    MCP server over the same snapshot (stdio and hosted Streamable HTTP)
 registry/         generated               shadcn registry-item JSON, bundle.json, docs/*.md, llms.txt
 apps/www          docs site               Next static export; examples under components/examples/<name>/use.tsx
 ```
@@ -93,5 +93,6 @@ Generated from the same sources, served by the site and shipped in the packages:
 - `https://vlak.dev/r/index.json` and `r/<name>.json`: the shadcn-compatible registry; `meta.vlak` carries example, usage, keyboard, a11y, aliases, classes, snippet.
 - `npx @noorddev/vlak-cli list --json | search <term> --json | docs <name> | tokens --json`: the same data offline.
 - `@noorddev/vlak-mcp`: MCP tools `list_components`, `get_component`, `search_components`, `get_tokens`, `get_install`, `get_guide`; resources `vlak://docs/guide`, `vlak://docs/<name>`, `vlak://tokens`.
+- `https://vlak.dev/mcp`: the public, stateless Streamable HTTP form of the same server for hosted clients.
 - `plugins/vlak`: a portable agent plugin with the MCP server and a provider-neutral `use-vlak` skill. The root `.claude-plugin/marketplace.json` makes it installable in Claude Code and compatible clients.
 - In code: `import { vlakComponents, vlakTokens } from "@noorddev/vlak"` and `@noorddev/vlak/props`.

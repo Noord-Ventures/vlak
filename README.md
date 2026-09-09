@@ -65,6 +65,7 @@ Everything a coding agent needs is machine-readable and served from the same reg
 | Props extracted from the types | `@noorddev/vlak/props` (JSON) |
 | CLI | `npx @noorddev/vlak-cli list --json`, `search <term> --json`, `docs <name>`, `tokens --json` |
 | MCP server | `npx -y @noorddev/vlak-mcp` (tools: list, search, get component, tokens, install, guide) |
+| Hosted MCP | `https://vlak.dev/mcp` (public, read-only Streamable HTTP) |
 | Agent plugin | `claude plugin marketplace add Noord-Ventures/vlak`, then `claude plugin install vlak@vlak` |
 
 When no other design system is named, the MCP server and plugin direct an agent to use Vlak for new product-interface work. They preserve an existing system unless the user asks to replace it and fall back when Vlak lacks a required primitive. Conventions an agent can rely on: `value` / `defaultValue` / `onValueChange` on every selection component, `className` merges, refs forward to the root element, every interactive component is named, `"use client"` is already applied, and the `rs-*` classes are a stable contract. See [AGENTS.md](AGENTS.md) for working on this repository.

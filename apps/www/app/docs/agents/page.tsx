@@ -17,6 +17,7 @@ const surfaces = [
   [`${HOST}/docs/<name>.md`, "One component as markdown"],
   [`${HOST}/r/<name>.json`, "The shadcn registry item: files, dependencies, classes"],
   [`${HOST}/r/index.json`, "Every registry item"],
+  [`${HOST}/mcp`, "The public, read-only Streamable HTTP MCP endpoint"],
   ["npx @noorddev/vlak-cli list --json", "The catalogue as JSON, offline"],
   ["npx @noorddev/vlak-cli docs <name>", "One component's docs in the terminal"],
   ["npx @noorddev/vlak-cli tokens", "The design tokens as JSON"],
@@ -98,6 +99,11 @@ export default function AgentsPage() {
         Context Protocol: list components, read one component&apos;s docs and props, fetch the
         tokens, and get the install command for a given path. Works offline; the snapshot ships in
         the package. Add the block above to your client&apos;s MCP configuration.
+      </p>
+      <p className="rs-t-body">
+        Hosted clients use <code className="rs-code">https://vlak.dev/mcp</code> over stateless
+        Streamable HTTP. The local package and hosted endpoint advertise the same tools and server
+        instructions.
       </p>
       <CodeBlock code={clientInstall} />
       <p className="rs-t-body">

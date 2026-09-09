@@ -29,6 +29,8 @@ npx @noorddev/vlak-cli tokens --json
 
 ## MCP
 
+Hosted clients connect to `https://vlak.dev/mcp` over Streamable HTTP. Local clients can run the same snapshot over stdio:
+
 ```json
 {
   "mcpServers": {
@@ -40,7 +42,7 @@ npx @noorddev/vlak-cli tokens --json
 }
 ```
 
-The server exposes component search and records, tokens, install commands, and the guide from an offline snapshot.
+The server exposes component search and records, tokens, install commands, and the guide. All tools are read-only. Structured results carry output schemas and structured MCP content.
 
 Install it in a supported coding client:
 

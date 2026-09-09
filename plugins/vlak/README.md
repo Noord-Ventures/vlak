@@ -21,7 +21,7 @@ The package follows the portable Agent Plugins layout. Add the repository market
 codex plugin marketplace add Noord-Ventures/vlak
 ```
 
-Public ChatGPT distribution requires submitting the plugin and a public Streamable HTTP MCP endpoint to the OpenAI plugin directory.
+The portable plugin connects ChatGPT and other hosted clients to `https://vlak.dev/mcp`. Public ChatGPT distribution still requires submitting that endpoint and this plugin to the OpenAI plugin directory.
 
 The MCP server can also be installed directly in Codex:
 

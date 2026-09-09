@@ -81,6 +81,12 @@ function locate(candidates: string[], what: string): string {
 let bundle: Bundle | undefined;
 let props: PropsJson | undefined;
 
+/** Supply bundled data in environments where runtime filesystem assets are unavailable. */
+export function primeData(nextBundle: Bundle, nextProps: PropsJson): void {
+  bundle = nextBundle;
+  props = nextProps;
+}
+
 export function loadBundle(): Bundle {
   bundle ??= JSON.parse(readFileSync(locate(["registry/bundle.json", "../../../registry/bundle.json"], "registry bundle"), "utf8")) as Bundle;
   return bundle;

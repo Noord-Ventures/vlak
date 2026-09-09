@@ -10,5 +10,23 @@
   "homepage": "https://vlak.dev/docs/agents/",
   "repository": "https://github.com/Noord-Ventures/vlak",
   "license": "MIT",
-  "keywords": ["design-system", "react", "accessibility", "interface-design", "mcp"]
+  "keywords": ["design-system", "react", "accessibility", "interface-design", "mcp"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Vlak",
+        "shortDescription": "Build product interfaces with Vlak",
+        "longDescription": "Search Vlak's component catalogue, read exact props and accessibility guidance, and install the right React, CSS, CLI, or registry implementation.",
+        "developerName": "Noord Ventures",
+        "capabilities": ["Read"],
+        "websiteURL": "https://vlak.dev",
+        "defaultPrompt": [
+          "Build this product interface with Vlak.",
+          "Find the right Vlak components for this screen.",
+          "Convert this interface to Vlak without inventing props."
+        ],
+        "brandColor": "#111111"
+      }
+    }
+  }
 }

@@ -1,8 +1,19 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "pnpm install",
+  "installCommand": "npx -y pnpm@11.19.0 install --frozen-lockfile",
   "buildCommand": "pnpm --filter www build",
   "outputDirectory": "apps/www/out",
+  "functions": {
+    "api/mcp.ts": {
+      "maxDuration": 30
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/mcp",
+      "destination": "/api/mcp"
+    }
+  ],
   "redirects": [
     {
       "source": "/interfaces/ai-tool",
