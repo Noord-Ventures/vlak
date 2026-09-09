@@ -8,7 +8,7 @@ Core components use React and StyleX. They work with any provider and do not req
 
 ## Runnable reference app
 
-The [assistant reference app](https://github.com/Noord-Ventures/vlak/tree/codex/ai-elements/apps/assistant) is a complete Next.js application using AI SDK 7, the OpenAI Responses provider, and the published Vlak components. The static documentation examples remain usable without credentials.
+The [assistant reference app](https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant) is a complete Next.js application using AI SDK 7, the OpenAI Responses provider, and the published Vlak components. The static documentation examples remain usable without credentials.
 
 From this repository:
 

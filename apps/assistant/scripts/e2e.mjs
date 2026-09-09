@@ -123,7 +123,14 @@ try {
         const regenerated = await stored();
         ensure(regenerated.versions.length > edited.versions.length, "regeneration does not preserve its previous version");
         ensure(regenerated.messages.some(message => message.role === "assistant" && text(message).includes("The brief is the source")), "regenerated answer is incomplete");
-        await page.getByRole("combobox", { name: "Earlier versions", exact: true }).selectOption(initialVersion);
+        const versionIndex = regenerated.versions.findIndex(item => item.id === initialVersion);
+        ensure(versionIndex >= 0, "the original saved version is missing after regeneration");
+        const versions = page.getByRole("combobox", { name: "Earlier versions", exact: true });
+        await versions.focus(); await versions.press("Home");
+        for (let index = 0; index < versionIndex; index += 1) await versions.press("ArrowDown");
+        const option = page.getByRole("option", { name: new RegExp(`^Version ${versionIndex + 1} ·`) });
+        ensure(await versions.getAttribute("aria-activedescendant") === await option.getAttribute("id"), "version keyboard navigation does not reach the intended saved version");
+        await versions.press("Enter");
         await page.getByRole("button", { name: "Restore version", exact: true }).click(); await settled();
         ensure(JSON.stringify((await stored()).messages) === JSON.stringify(original.messages), "restoring the saved version does not recover the original messages");
         await page.reload({ waitUntil: "networkidle" }); await settled();

@@ -4,8 +4,8 @@ import * as React from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, isToolUIPart, } from "ai";
 import {
-  Attachment, Attachments, Button, Chat, Confirmation, ContextUsage,
-  MessageComposer, Reasoning, Response, ResponseActions, Suggestion,
+  Attachment, Attachments, Button, Chat, Confirmation, ContextUsage, Icon,
+  MessageComposer, Reasoning, Response, ResponseActions, Select, Suggestion,
   Suggestions, Textarea, ToolCall, Widget, WidgetEmbed, getToolCallPresentation,
 } from "@noorddev/vlak-react";
 import type { ReferenceConversation as ConversationData, ReferenceMessage as UIMessage, StoredUpload as UploadedFile } from "../lib/types";
@@ -13,7 +13,11 @@ import { ResponseMarkdown } from "@noorddev/vlak-react/components/response-markd
 import { AiAvatar } from "../../www/components/ai-avatar";
 
 type Summary = { id: string; title: string; updatedAt: string };
-type Configuration = { mode: "live" | "fixture"; model?: string; configured?: boolean };
+type Configuration = {
+  mode: "live" | "fixture"; model?: string; configured?: boolean;
+  storage?: "private-blob" | "local";
+  uploadLimits?: { maxFileBytes: number; maxTotalBytes: number; maxFiles: number };
+};
 type OptimisticRequest = { text: string; files?: UploadedFile[]; messageId?: string; id?: string };
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
@@ -188,6 +192,10 @@ function ConversationView({ initial, configuration, onBusy, onUpdated }: {
 
   async function send(message: { text: string; files: File[] }) {
     if (actionLocked.current || stopLocked.current) throw new Error("Wait for the current request to finish.");
+    const maxTotalBytes = configuration.uploadLimits?.maxTotalBytes ?? 12 * 1024 * 1024;
+    if (message.files.reduce((total, file) => total + file.size, 0) > maxTotalBytes) {
+      throw new Error(`Keep attachments under ${maxTotalBytes / (1024 * 1024)} MB in total.`);
+    }
     actionLocked.current = true; setWaiting(true); setFailure("");
     failedDraft.current = message;
     const controller = new AbortController(); uploadController.current = controller;
@@ -265,10 +273,10 @@ function ConversationView({ initial, configuration, onBusy, onUpdated }: {
       actions={<Button variant="subtle" disabled={!chat.messages.length || busy} onClick={() => exportConversation(conversation, chat.messages)}>Export</Button>}
       historyHeight="clamp(16rem, calc(100dvh - 340px), 44rem)"
       composer={<MessageComposer ref={composer} compact maxRows={6} maxLength={8000} sendOnEnter value={draft} onValueChange={setDraft} files={files} onFilesChange={setFiles}
-        allowAttachments accept=".txt,.md,.csv,.json,.pdf,image/png,image/jpeg,image/webp,image/gif" maxFiles={4} maxFileSize={5 * 1024 * 1024}
+        allowAttachments accept=".txt,.md,.csv,.json,.pdf,image/png,image/jpeg,image/webp,image/gif" maxFiles={configuration.uploadLimits?.maxFiles ?? 4} maxFileSize={configuration.uploadLimits?.maxFileBytes ?? 5 * 1024 * 1024}
         disabled={configuration.configured === false || (pendingApproval && !busy)} generating={busy} onStop={() => void stopResponse()} onSend={send}
         placeholder={pendingApproval ? "Approve or reject the proposed action first" : "Ask about your project…"} />}
-      footer="Conversations and files are saved in this browser’s private session on this server.">
+      footer={<span>Conversations and files are saved in this browser’s private session.{files.length > 0 && configuration.uploadLimits && ` Files: ${configuration.uploadLimits.maxFileBytes / (1024 * 1024)} MB each, ${configuration.uploadLimits.maxTotalBytes / (1024 * 1024)} MB total.`}</span>}>
       {!chat.messages.length && <div className="assistant-welcome">
         <AiAvatar state="idle" size={24} />
         <h2>What are we working on?</h2>
@@ -297,10 +305,11 @@ function ConversationView({ initial, configuration, onBusy, onUpdated }: {
       <Button variant="ghost" disabled={busy} onClick={() => void retryResponse()}>Retry response</Button>
     </div>}
     {conversation.versions && conversation.versions.length > 0 && <div className="assistant-versions">
-      <label htmlFor="saved-version">Earlier versions</label>
-      <select id="saved-version" value={version} disabled={busy} onChange={event => setVersion(event.target.value)}>
-        <option value="">Choose a saved version</option>{conversation.versions.map((item, index) => <option key={item.id} value={item.id}>Version {index + 1} · {new Date(item.createdAt).toLocaleString()}</option>)}
-      </select><Button variant="ghost" disabled={busy || !version} onClick={() => void restore()}>Restore version</Button>
+      <span id="saved-version-label">Earlier versions</span>
+      <Select className="assistant-version-select" fullWidth aria-labelledby="saved-version-label" value={version} disabled={busy} onValueChange={setVersion}
+        placeholder="Choose a saved version"
+        options={conversation.versions.map((item, index) => ({ value: item.id, label: `Version ${index + 1} · ${new Date(item.createdAt).toLocaleString()}` }))} />
+      <Button variant="ghost" disabled={busy || !version} onClick={() => void restore()}>Restore version</Button>
     </div>}
     {conversation.tasks.length > 0 && <Widget title="Saved tasks" provider="This conversation" footer="Created only after your approval. Restoring a conversation does not undo completed tasks.">
       <ul className="assistant-task-list">{conversation.tasks.map(task => <li key={task.id}><strong>{task.title}</strong><p className="assistant-note">{task.status}</p></li>)}</ul>
@@ -318,8 +327,10 @@ function MessageView({ message, latest, streaming, stopped, busy, onApprove, onE
   const metadata = message.metadata;
   const outcome = metadata && "outcome" in metadata ? metadata.outcome as "complete" | "stopped" | "error" : undefined;
   return <Response from={user ? "user" : "assistant"} status={streaming ? "streaming" : stopped ? "stopped" : outcome ?? "complete"}
+    className={user ? "assistant-user-response" : undefined} statusLabel={user ? "" : undefined}
+    renderLayout={user ? ({ content, actions, status }) => <>{content}{actions}<span className="assistant-visually-hidden">{status}</span></> : undefined}
     avatar={!user && <AiAvatar size={20} static={!latest} state={reading ? "speaking" : streaming ? "thinking" : "idle"} />}
-    actions={user ? <Button variant="subtle" disabled={busy} onClick={onEdit}>Edit request</Button> : <ResponseActions text={text} onReadingChange={setReading}>
+    actions={user ? <Button variant="subtle" size="icon" aria-label="Edit request" title="Edit request" disabled={busy} onClick={onEdit}><Icon name="edit" size={16} /></Button> : <ResponseActions text={text} onReadingChange={setReading}>
       <Button variant="subtle" disabled={busy} onClick={onRegenerate}>Regenerate</Button>
     </ResponseActions>}>
     <div className="assistant-message-content">

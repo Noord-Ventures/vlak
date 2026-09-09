@@ -81,7 +81,7 @@ This local ownership model is not production authentication. Before hosting a mu
 
 ## Avatar
 
-The chat uses the shared monochrome Orbkit avatar from `apps/www/components/ai-avatar`, including its MIT attribution. Only the latest assistant message allocates the renderer; older messages use its static mosaic. Vlak's official Persona component also offers three native visual variants and a custom-renderer API.
+The chat uses Vlak's original monochrome SVG dot orb from `apps/www/components/ai-avatar`. Only the latest assistant message animates; older messages use its static image. It needs no WebGL or external avatar runtime. Vlak's official Persona component also offers three native visual variants and a custom-renderer API.
 
 ## Deterministic verification
 

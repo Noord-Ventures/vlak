@@ -44,7 +44,7 @@ export default function AiPage() {
 
       <section className="ai-overview-reading" aria-labelledby="reference-app">
         <h2 id="reference-app" className="section-label">Connect a live model</h2>
-        <p className="rs-t-body">The <a className="rs-link" href="https://github.com/Noord-Ventures/vlak/tree/codex/ai-elements/apps/assistant">assistant reference app</a> connects these components to the AI SDK and OpenAI. It includes saved conversations, attachments, editing, regeneration, tool approvals, and React and iframe widgets.</p>
+        <p className="rs-t-body">The <a className="rs-link" href="https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant">assistant reference app</a> connects these components to the AI SDK and OpenAI. It includes saved conversations, attachments, editing, regeneration, tool approvals, and React and iframe widgets.</p>
         <p className="rs-t-body">Run it locally with your server credentials. The <a className="rs-link" href="/docs/ai.md#runnable-reference-app">integration guide</a> explains the setup and the boundary between reusable UI and application code.</p>
       </section>
 

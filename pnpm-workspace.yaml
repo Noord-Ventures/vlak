@@ -11,3 +11,6 @@ overrides:
   electron-to-chromium: 1.5.420
   jose: 6.2.10
   postcss: 8.5.27
+  # The JSX parser supports React 19 but pins optional React 18 global JSX types.
+  "react-jsx-parser>@types/react": 19.2.18
+  "react-jsx-parser>@types/react-dom": 19.2.7
