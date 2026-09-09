@@ -28,6 +28,7 @@ describe("vlak-mcp", () => {
     const { tools } = await client.listTools();
     expect(tools.map((t) => t.name).sort()).toEqual(["get_component", "get_guide", "get_install", "get_tokens", "list_components", "search_components"]);
     expect(tools.every((tool) => tool.annotations?.readOnlyHint === true)).toBe(true);
+    expect(tools.every((tool) => tool.outputSchema)).toBe(true);
   });
 
   it("lists components, optionally by category", async () => {
@@ -73,8 +74,12 @@ describe("vlak-mcp", () => {
     expect(install.shadcn).toBe("npx shadcn add https://vlak.dev/r/dialog.json");
     expect(install.package.import).toContain("DialogTitle");
     expect(install.registryDependencies).toContain("button");
-    expect(textOf(await client.callTool({ name: "get_guide", arguments: {} }))).toContain("# Vlak guide");
-    expect(textOf(await client.callTool({ name: "get_tokens", arguments: {} }))).toContain("--bg");
+    const guide = await client.callTool({ name: "get_guide", arguments: {} });
+    const tokens = await client.callTool({ name: "get_tokens", arguments: {} });
+    expect(textOf(guide)).toContain("# Vlak guide");
+    expect(guide.structuredContent).toMatchObject({ page: "guide", markdown: expect.stringContaining("# Vlak guide") });
+    expect(textOf(tokens)).toContain("--bg");
+    expect(tokens.structuredContent).toMatchObject({ page: "tokens", markdown: expect.stringContaining("--bg") });
   });
 
   it("serves resources for the guide, tokens, and every component", async () => {

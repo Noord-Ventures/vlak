@@ -194,9 +194,16 @@ export function createServer(): McpServer {
     {
       title: "Get Vlak tokens",
       description: "The design tokens page: every CSS custom property with its light and dark value and StyleX alias, plus the raw token groups (type scale, grid, radius, motion, breakpoints, control sizes).",
+      outputSchema: {
+        page: z.literal("tokens"),
+        markdown: z.string(),
+      },
       annotations: READ_ONLY,
     },
-    () => text(docsFor("tokens") ?? "Tokens page not bundled."),
+    () => {
+      const markdown = docsFor("tokens") ?? "Tokens page not bundled.";
+      return { ...text(markdown), structuredContent: { page: "tokens", markdown } };
+    },
   );
 
   server.registerTool(
@@ -227,9 +234,16 @@ export function createServer(): McpServer {
     {
       title: "Get the Vlak guide",
       description: "Install paths, theming (data-theme, color-scheme), cascade layers and overriding, StyleX usage, the rs-* CSS path, the CLI, the registry, and the conventions every component follows (controlled/uncontrolled props, className merging, forwarded refs, naming). Read this first.",
+      outputSchema: {
+        page: z.literal("guide"),
+        markdown: z.string(),
+      },
       annotations: READ_ONLY,
     },
-    () => text(docsFor("guide") ?? "Guide not bundled."),
+    () => {
+      const markdown = docsFor("guide") ?? "Guide not bundled.";
+      return { ...text(markdown), structuredContent: { page: "guide", markdown } };
+    },
   );
 
   server.registerResource(
