@@ -874,7 +874,7 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 .component-head { margin: 8px 0 4px; }
 .component-desc { max-width: 592px; }
 
-/* ── Footer: mark | stacked links | about. 204 with gutters, not a boxed field. ── */
+/* Footer frame follows the page grid; grouped navigation lives in site-footer.stylex.ts. */
 .site-footer {
   position: relative;
   z-index: 1;
@@ -892,39 +892,9 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
   letter-spacing: -.01em;
   color: var(--text-secondary);
 }
-.site-footer-inner {
-  display: grid;
-  grid-template-columns: 184px 184px minmax(0, 1fr);
-  column-gap: var(--gutter);
-  row-gap: 24px;
-  align-items: start;
-  width: calc(max(round(down, 100vw - 2 * var(--pad) + var(--gutter), 204px), 204px) + var(--gutter));
-  max-width: 100%;
-}
-.site-footer-brand {
-  display: flex;
-  width: 20px;
-  height: 20px;
-  color: var(--text);
-}
-.site-footer-nav {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-}
-.site-footer-about {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 388px;
-}
 .site-footer-about p { margin: 0; line-height: 1.45; }
 .site-footer a { color: inherit; text-decoration: none; }
 .site-footer a:hover { color: var(--text); }
-@media (max-width: 640px) {
-  .site-footer-inner { grid-template-columns: minmax(0, 1fr); }
-}
 
 /* Grid hide: module overlay and boxed cages only. Component hairlines stay. */
 /* The cages are StyleX conditional rules (:not(#\#) specificity), so this

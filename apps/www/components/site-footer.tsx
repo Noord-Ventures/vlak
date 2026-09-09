@@ -1,28 +1,64 @@
 import Link from "next/link";
 import { person } from "@/app/about/facts";
-import { DOOR, WORD } from "@/app/specimen";
+import { DOOR } from "@/app/specimen";
+import { useCases } from "@/app/use-cases/catalog";
+import { sx } from "@/lib/sx";
 import { VlakMark } from "./vlak-mark";
+import { footer } from "./site-footer.stylex";
+
+const groups = [
+  {
+    id: "vlak",
+    title: "Vlak",
+    links: [
+      { href: "/", title: "Home" },
+      { href: "/about/", title: "About" },
+      { href: "/privacy/", title: "Privacy" },
+      { href: "/terms/", title: "Terms" },
+      { href: DOOR, title: "vlak.dev" },
+    ],
+  },
+  {
+    id: "resources",
+    title: "Resources",
+    links: [
+      { href: "/components/", title: "Components" },
+      { href: "/interfaces/", title: "Interfaces" },
+      { href: "/use-cases/", title: "Use cases" },
+      { href: "/docs/", title: "Docs" },
+      { href: person.repo, title: "GitHub" },
+    ],
+  },
+  {
+    id: "use-cases",
+    title: "Use cases",
+    links: [...useCases].sort((a, b) => a.title.localeCompare(b.title, "en")).map(useCase => ({
+      href: `/use-cases/${useCase.slug}/`,
+      title: useCase.title,
+    })),
+  },
+];
 
 export function SiteFooter() {
   return (
     <footer className="site-footer">
-      <div className="site-footer-inner">
-        <div className="site-footer-brand" aria-hidden="true">
+      <div {...sx("site-footer-inner", footer.inner)}>
+        <div {...sx("site-footer-brand", footer.brand)} aria-hidden="true">
           <VlakMark />
         </div>
-        <nav className="site-footer-nav" aria-label="Footer">
-          <Link href="/">{WORD}</Link>
-          <Link href="/about/">About</Link>
-          <Link href="/components/">Components</Link>
-          <Link href="/interfaces/">Interfaces</Link>
-          <Link href="/use-cases/">Use cases</Link>
-          <Link href="/docs/">Docs</Link>
-          <Link href="/privacy/">Privacy</Link>
-          <Link href="/terms/">Terms</Link>
-          <a href={person.repo}>GitHub</a>
-          <a href={DOOR}>vlak.dev</a>
-        </nav>
-        <div className="site-footer-about">
+        {groups.map(group => (
+          <nav key={group.id} aria-labelledby={`footer-${group.id}`} {...sx("site-footer-nav", footer.group, group.id === "use-cases" && footer.categories)}>
+            <h2 id={`footer-${group.id}`} {...sx("site-footer-heading", footer.heading)}>{group.title}</h2>
+            <ul {...sx("site-footer-links", footer.links, group.id === "use-cases" && footer.categoryLinks)}>
+              {group.links.map(link => (
+                <li key={link.href} {...sx("", footer.item)}>
+                  <Link href={link.href} {...sx("site-footer-link", footer.link)}>{link.title}</Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+        <div {...sx("site-footer-about", footer.about)}>
           <p>
             Vlak was designed and built at <a href="https://noord.dev">Noord</a> in Alkmaar by <a href="https://renatovaldes.com">Renn</a>.
           </p>
