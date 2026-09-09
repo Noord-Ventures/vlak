@@ -332,23 +332,31 @@ export const mediaAdditions: VlakComponent[] = [
   {
     "name": "message-composer",
     "title": "Message composer",
-    "description": "Composes text and optional attachments with submission shortcuts and retained drafts on failure.",
+    "description": "Composes a compact growing draft with validated file previews, paste and drop, screenshot capture, and retained drafts on failure.",
     "category": "patterns",
     "registryDependencies": [
       "textarea",
       "button",
-      "icons"
+      "icons",
+      "attachments"
     ],
     "snippet": "<form class=\"rs-message-composer\" aria-label=\"Message\"><label>Message<textarea class=\"rs-textarea\" placeholder=\"Write a message…\"></textarea></label><div class=\"rs-message-composer-actions\"><button class=\"rs-btn-primary\" type=\"submit\">Send</button></div></form>",
-    "example": "import { MessageComposer } from \"@noorddev/vlak-react\";\n\n<MessageComposer onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept=\"image/*,.pdf\" />",
+    "example": "import { MessageComposer } from \"@noorddev/vlak-react\";\n\n<MessageComposer compact maxRows={6} sendOnEnter onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept=\"image/*,.pdf\" maxFiles={4} maxFileSize={10 * 1024 * 1024} allowScreenshot />",
     "usage": {
       "use": [
         "Chat, comments, or a support reply.",
         "Async submission that must preserve a draft when it fails.",
-        "Application-owned response generation with a Stop response action."
+        "Application-owned response generation with a Stop response action.",
+        "Use compact for a single-line draft with inline icon actions. The field grows with wrapping and newlines, then scrolls at maxRows, which defaults to six lines.",
+        "The compact field shrinks when text is removed or a successful send clears it, and remeasures when its available width changes.",
+        "Use files, defaultFiles, and onFilesChange to lift attachment selection alongside controlled text.",
+        "Picker, paste, and drop share accept, maxFiles, maxFileSize, and multiple validation. onAttachmentError receives rejected files and reasons.",
+        "Use tools for model selectors or application controls, and renderAttachments for custom preview composition.",
+        "Enable globalDrop on one composer per page when file drops outside the field should attach there. allowScreenshot adds explicit browser screen selection when supported."
       ],
       "avoid": [
-        "An arbitrary multi-field form or uploading files without a message."
+        "An arbitrary multi-field form or uploading files without a message.",
+        "Assuming browser file checks replace the application upload policy or that attachment selection uploads files automatically."
       ]
     },
     "keyboard": [
@@ -366,30 +374,43 @@ export const mediaAdditions: VlakComponent[] = [
       }
     ],
     "a11y": [
-      "The textarea has a visible label and shortcut description.",
+      "The textarea has a visible label by default. Compact mode uses the same accessible name and a visually hidden shortcut description.",
       "Sending prevents duplicate submission; results are announced.",
       "Only a successful send clears the draft and attachments; failures retain both.",
-      "generating replaces Send with Stop response but keeps the next draft editable. onStop requests application cancellation; it does not cancel network activity itself."
+      "generating replaces Send with Stop response but keeps the next draft editable. onStop requests application cancellation; it does not cancel network activity itself.",
+      "Compact icon actions retain readable names, titles, and 44px targets. Failed sends remain visible beneath the field; other status updates are available to assistive technology.",
+      "Rejected attachments remain visible in an alert. File previews have named remove controls and preserve object addresses until removal.",
+      "Screenshot capture starts only from its button, uses the browser chooser, and stops display tracks after capture, cancellation, or unmount.",
+      "If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match."
     ],
     "aliases": [
       "MessageComposer",
       "Chat input",
-      "Comment composer"
+      "Comment composer",
+      "AI Elements PromptInput"
     ],
     "classes": [
       "rs-message-composer",
+      "rs-message-composer-compact",
+      "rs-message-composer-row",
+      "rs-message-composer-area",
       "rs-message-composer-actions",
       "rs-message-composer-action",
+      "rs-message-composer-icon-action",
       "rs-message-composer-files",
       "rs-message-composer-file",
       "rs-message-composer-hint",
-      "rs-message-composer-input"
+      "rs-message-composer-input",
+      "rs-message-composer-sr-only",
+      "rs-message-composer-tools",
+      "rs-message-composer-drag"
     ],
     "css": [
       "components/message-composer.css"
     ],
     "react": "components/message-composer.tsx"
   },
+
   {
     "name": "file-browser",
     "title": "File browser",

@@ -2,14 +2,23 @@
 
 import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
-import { vlak } from "../tokens.stylex";
+import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 import { useMergedRefs } from "../merge-refs";
 import { Textarea } from "./textarea";
 import { Button } from "./button";
 import { Icon } from "./icon";
+import { Attachment, Attachments, useFileAttachments, type AttachmentData } from "./attachments";
+import { selectFiles, type FileSelectionRejection } from "../file-selection";
+import { captureScreenshot } from "../capture-screenshot";
 
 export interface ComposedMessage { text: string; files: File[] }
+export type MessageAttachmentRejection = FileSelectionRejection;
+export interface MessageComposerAttachmentActions {
+  remove: (id: string) => void;
+  openFileDialog: () => void;
+  disabled: boolean;
+}
 export interface MessageComposerProps extends Omit<React.FormHTMLAttributes<HTMLFormElement>, "defaultValue" | "onSubmit"> {
   value?: string;
   defaultValue?: string;
@@ -20,6 +29,21 @@ export interface MessageComposerProps extends Omit<React.FormHTMLAttributes<HTML
   disabled?: boolean;
   allowAttachments?: boolean;
   accept?: string;
+  /** Controlled file selection, independent of the text draft. */
+  files?: File[];
+  defaultFiles?: File[];
+  onFilesChange?: (files: File[]) => void;
+  multiple?: boolean;
+  maxFiles?: number;
+  maxFileSize?: number;
+  onAttachmentError?: (rejections: MessageAttachmentRejection[]) => void;
+  /** Also accept file drops outside this composer. Enable on one composer per page. */
+  globalDrop?: boolean;
+  /** Shows a user-activated browser screen capture action when available. */
+  allowScreenshot?: boolean;
+  /** Application-owned model selectors, capability controls, or other tools. */
+  tools?: React.ReactNode;
+  renderAttachments?: (attachments: AttachmentData[], actions: MessageComposerAttachmentActions) => React.ReactNode;
   maxLength?: number;
   /** Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter. */
   sendOnEnter?: boolean;
@@ -27,53 +51,184 @@ export interface MessageComposerProps extends Omit<React.FormHTMLAttributes<HTML
   generating?: boolean;
   /** Requests that the application stop generation; does not itself cancel a network request. */
   onStop?: () => void;
+  /** A single-line draft with an inline icon action; grows as the message wraps. */
+  compact?: boolean;
+  /** Maximum visible draft lines in compact mode, clamped to 1–20. */
+  maxRows?: number;
 }
 const styles = stylex.create({
   root: { display: "flex", flexDirection: "column", width: "100%", minWidth: 0, gap: "0.75rem", color: vlak.ink },
+  compact: { gap: "0.5rem" },
+  row: { display: "flex", alignItems: "flex-end", gap: "0.25rem", padding: "0.25rem", minWidth: 0, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: vlak.controlBorder, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper },
+  area: {
+    boxSizing: "border-box", flex: "1 1 0%", width: "100%", minWidth: 0, minHeight: vlak.hit,
+    fontFamily: "inherit", fontSize: "1rem", lineHeight: 1.375, color: vlak.ink,
+    backgroundColor: "transparent", borderWidth: 0, borderRadius: vlak.radiusSm,
+    paddingBlock: "0.6875rem", paddingInline: "0.5rem", resize: "none", overflowY: "hidden",
+    outlineWidth: { default: 0, ":focus-visible": 2 },
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineColor: vlak.ink, outlineOffset: -2,
+  },
   actions: { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "0.75rem" },
   action: { width: "auto", minWidth: vlak.hit, minHeight: vlak.hit, paddingInline: "0.875rem" },
-  files: { display: "flex", flexWrap: "wrap", gap: "0.5rem", listStyleType: "none", padding: 0, margin: 0 },
-  file: { display: "flex", alignItems: "center", gap: "0.5rem", maxWidth: "100%", overflowWrap: "anywhere", fontSize: "0.8125rem" },
+  iconAction: { flex: "0 0 auto", flexBasis: vlak.hit, width: { default: vlak.hit, [mq.phone]: vlak.hit }, maxWidth: vlak.hit, height: vlak.hit, minHeight: vlak.hit, paddingInline: { default: 0, [mq.phone]: 0 }, alignSelf: "flex-end" },
+  files: { minWidth: 0 },
+  file: { minWidth: 0 },
+  tools: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.5rem", minWidth: 0 },
+  drag: { outlineWidth: 2, outlineStyle: "dashed", outlineColor: vlak.ink, outlineOffset: 4 },
   hint: { margin: 0, fontSize: "0.75rem", lineHeight: 1.45, color: vlak.gray },
   input: { display: "none" },
+  srOnly: { position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clipPath: "inset(50%)", whiteSpace: "nowrap", borderWidth: 0 },
 });
 
 /** A message draft with attachments, IME-safe shortcuts, and retained text after send failures. */
-export const MessageComposer = React.forwardRef<HTMLTextAreaElement, MessageComposerProps>(function MessageComposer({ value, defaultValue = "", onValueChange, onSend, label = "Message", placeholder = "Write a message…", disabled = false, allowAttachments = false, accept, maxLength, sendOnEnter = false, generating = false, onStop, className, style, ...props }, ref) {
+export const MessageComposer = React.forwardRef<HTMLTextAreaElement, MessageComposerProps>(function MessageComposer({ value, defaultValue = "", onValueChange, onSend, label = "Message", placeholder = "Write a message…", disabled = false, allowAttachments = false, accept, files: controlledFiles, defaultFiles = [], onFilesChange, multiple = true, maxFiles, maxFileSize, onAttachmentError, globalDrop = false, allowScreenshot = false, tools, renderAttachments, children, maxLength, sendOnEnter = false, generating = false, onStop, compact = false, maxRows = 6, className, style, ...props }, ref) {
   const [inner, setInner] = React.useState(defaultValue);
   const current = value ?? inner;
-  const [files, setFiles] = React.useState<File[]>([]);
+  const [innerFiles, setInnerFiles] = React.useState<File[]>(defaultFiles);
+  const files = controlledFiles ?? innerFiles;
+  const setFiles = (next: File[]) => { if (controlledFiles === undefined) setInnerFiles(next); onFilesChange?.(next); };
+  const previews = useFileAttachments(files);
+  const [rejections, setRejections] = React.useState<MessageAttachmentRejection[]>([]);
+  const [dragging, setDragging] = React.useState(false);
+  const [capturing, setCapturing] = React.useState(false);
+  const [captureAvailable, setCaptureAvailable] = React.useState(false);
+  const capturedStream = React.useRef<MediaStream | null>(null);
+  const captureAbort = React.useRef<AbortController | null>(null);
+  const mounted = React.useRef(true);
+  const sendVersion = React.useRef(0);
   const [pending, setPending] = React.useState(false);
   const sending = React.useRef(false);
   const [status, setStatus] = React.useState("");
+  const [failed, setFailed] = React.useState(false);
   const areaRef = React.useRef<HTMLTextAreaElement>(null);
   const mergedRef = useMergedRefs(areaRef, ref);
   const fileRef = React.useRef<HTMLInputElement>(null);
   const helpId = React.useId();
   const blocked = disabled || pending;
+  const currentDraft = React.useRef({ text: current, files });
+  currentDraft.current = { text: current, files };
+  React.useEffect(() => {
+    mounted.current = true;
+    setCaptureAvailable(typeof navigator.mediaDevices?.getDisplayMedia === "function");
+    return () => { mounted.current = false; sendVersion.current++; captureAbort.current?.abort(); for (const track of capturedStream.current?.getTracks() ?? []) track.stop(); };
+  }, []);
+  const addFiles = (incoming: File[]) => {
+    if (blocked || !allowAttachments) return false;
+    const { accepted, added, rejected } = selectFiles(incoming, { files, accept, multiple, maxFiles, maxSize: maxFileSize });
+    setRejections(rejected);
+    if (rejected.length) onAttachmentError?.(rejected);
+    if (added.length) setFiles(accepted);
+    return added.length > 0;
+  };
+  const attachmentState = React.useRef({ addFiles, blocked, allowAttachments });
+  attachmentState.current = { addFiles, blocked, allowAttachments };
+  React.useEffect(() => {
+    if (!globalDrop || !allowAttachments) return;
+    const over = (event: DragEvent) => { if (!attachmentState.current.blocked && event.dataTransfer?.types.includes("Files")) event.preventDefault(); };
+    const drop = (event: DragEvent) => {
+      if (event.defaultPrevented || attachmentState.current.blocked || !event.dataTransfer?.files.length) return;
+      event.preventDefault(); attachmentState.current.addFiles(Array.from(event.dataTransfer.files));
+    };
+    document.addEventListener("dragover", over); document.addEventListener("drop", drop);
+    return () => { document.removeEventListener("dragover", over); document.removeEventListener("drop", drop); };
+  }, [globalDrop, allowAttachments]);
+  const takeScreenshot = async () => {
+    if (blocked || capturing || !captureAvailable) return;
+    const controller = new AbortController();
+    captureAbort.current = controller;
+    setCapturing(true); setFailed(false); setStatus("Choose a screen or window to attach.");
+    try {
+      const file = await captureScreenshot((stream) => { capturedStream.current = stream; if (!mounted.current) for (const track of stream.getTracks()) track.stop(); }, controller.signal);
+      if (mounted.current) setStatus(attachmentState.current.addFiles([file]) ? "Screenshot attached." : "");
+    } catch { if (mounted.current) { setFailed(true); setStatus("Screen capture was cancelled or could not be attached."); } }
+    finally { capturedStream.current = null; if (mounted.current) setCapturing(false); }
+  };
+  const rows = Number.isFinite(maxRows) ? Math.min(20, Math.max(1, Math.floor(maxRows))) : 6;
+  const resize = React.useCallback(() => {
+    const area = areaRef.current;
+    if (!compact || !area) return;
+    const computed = window.getComputedStyle(area);
+    const number = (property: string) => Number.parseFloat(property) || 0;
+    const lineHeight = number(computed.lineHeight) || number(computed.fontSize) * 1.375 || 22;
+    const padding = number(computed.paddingTop) + number(computed.paddingBottom);
+    const border = number(computed.borderTopWidth) + number(computed.borderBottomWidth);
+    const minimum = number(computed.minHeight) || 44;
+    const maximum = Math.max(minimum, rows * lineHeight + padding + border);
+    // Release the previous height before measuring so shorter and cleared drafts shrink.
+    area.style.height = "auto";
+    const content = area.scrollHeight + border;
+    area.style.height = `${Math.max(minimum, Math.min(content, maximum))}px`;
+    area.style.maxHeight = `${maximum}px`;
+    area.style.overflowY = content > maximum ? "auto" : "hidden";
+  }, [compact, rows]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Draft changes alter the textarea's measured scroll height.
+  React.useEffect(() => { resize(); }, [resize, current]);
+  React.useEffect(() => {
+    const area = areaRef.current;
+    if (!compact || !area || typeof ResizeObserver === "undefined") return;
+    let width = area.clientWidth;
+    const observer = new ResizeObserver(() => {
+      const nextWidth = area.clientWidth;
+      // Height changes are our own work; only remeasure when wrapping width changes.
+      if (nextWidth === width) return;
+      width = nextWidth;
+      resize();
+    });
+    observer.observe(area);
+    return () => observer.disconnect();
+  }, [compact, resize]);
   const change = (next: string) => { if (value === undefined) setInner(next); onValueChange?.(next); };
   const submit = async () => {
-    if (blocked || generating || sending.current || (!current.trim() && files.length === 0)) return;
-    sending.current = true; setPending(true); setStatus("Sending…");
-    try { await onSend({ text: current.trim(), files: [...files] }); change(""); setFiles([]); setStatus("Message sent."); }
-    catch { setStatus("The message could not be sent. Your draft is still here."); }
-    finally { sending.current = false; setPending(false); areaRef.current?.focus(); }
+    if (blocked || capturing || generating || sending.current || (!current.trim() && files.length === 0)) return;
+    const snapshot = { text: current, files: [...files] };
+    const request = ++sendVersion.current;
+    sending.current = true; setPending(true); setFailed(false); setStatus("Sending…");
+    try {
+      await onSend({ text: snapshot.text.trim(), files: snapshot.files });
+      if (!mounted.current || request !== sendVersion.current) return;
+      if (currentDraft.current.text === snapshot.text) change("");
+      setFiles(currentDraft.current.files.filter((file) => !snapshot.files.includes(file)));
+      setRejections([]); setStatus("Message sent.");
+    } catch { if (mounted.current && request === sendVersion.current) { setFailed(true); setStatus("The message could not be sent. Your draft is still here."); } }
+    finally { if (mounted.current && request === sendVersion.current) { sending.current = false; setPending(false); areaRef.current?.focus(); } }
   };
-  const root = rs(["rs-message-composer", className], styles.root);
+  const root = rs(["rs-message-composer", compact && "rs-message-composer-compact", dragging && "rs-message-composer-drag", className], styles.root, compact && styles.compact, dragging && styles.drag);
+  const row = rs(["rs-message-composer-row"], styles.row);
+  const area = rs(["rs-message-composer-area"], styles.area);
   const actions = rs(["rs-message-composer-actions"], styles.actions);
-  const action = rs(["rs-message-composer-action"], styles.action);
+  const action = rs(["rs-message-composer-action", compact && "rs-message-composer-icon-action"], styles.action, compact && styles.iconAction);
   const fileList = rs(["rs-message-composer-files"], styles.files);
+  const toolRow = rs(["rs-message-composer-tools"], styles.tools);
   const file = rs(["rs-message-composer-file"], styles.file);
-  const hint = rs(["rs-message-composer-hint"], styles.hint);
+  const hint = rs(["rs-message-composer-hint", compact && "rs-message-composer-sr-only"], styles.hint, compact && styles.srOnly);
+  const feedback = rs(["rs-message-composer-hint", compact && !failed && "rs-message-composer-sr-only"], styles.hint, compact && !failed && styles.srOnly);
   const input = rs(["rs-message-composer-input"], styles.input);
-  return <form aria-label={label} aria-busy={pending || generating} {...props} className={root.className} style={{ ...root.style, ...style }} onSubmit={event => { event.preventDefault(); void submit(); }}>
-    <Textarea ref={mergedRef} label={label} value={current} onChange={event => change(event.target.value)} placeholder={placeholder} disabled={blocked} maxLength={maxLength} aria-describedby={helpId} onKeyDown={event => { if (event.nativeEvent.isComposing || event.key !== "Enter") return; if ((sendOnEnter && !event.shiftKey) || event.metaKey || event.ctrlKey) { event.preventDefault(); void submit(); } }} />
-    {files.length > 0 && <ul {...fileList} aria-label="Attachments">{files.map((attachment, index) => <li {...file} key={`${attachment.name}-${index}`}><Icon name="attachment" />{attachment.name}<Button {...action} variant="ghost" aria-label={`Remove ${attachment.name}`} disabled={blocked} onClick={() => setFiles(files.filter((_, at) => at !== index))}><Icon name="close" size={12} /></Button></li>)}</ul>}
-    <div {...actions}>
-      {allowAttachments ? <><input {...input} ref={fileRef} type="file" multiple accept={accept} tabIndex={-1} aria-label="Attach files" disabled={blocked} onChange={event => { setFiles([...files, ...Array.from(event.target.files ?? [])]); event.target.value = ""; }} /><Button {...action} variant="ghost" disabled={blocked} onClick={() => fileRef.current?.click()}><Icon name="attachment" />Attach</Button></> : <span />}
-      {generating ? <Button {...action} type="button" disabled={disabled || !onStop} onClick={onStop}><Icon name="stop" />Stop response</Button> : <Button {...action} type="submit" disabled={blocked || (!current.trim() && files.length === 0)}><Icon name="send" />{pending ? "Sending…" : "Send"}</Button>}
-    </div>
+  const rejection = rs(["rs-message-composer-hint"], styles.hint);
+  const draftProps = {
+    ref: mergedRef, value: current, onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => change(event.target.value),
+    placeholder, disabled: blocked, maxLength, "aria-describedby": helpId,
+    onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => { if (event.nativeEvent.isComposing || event.key !== "Enter") return; if ((sendOnEnter && !event.shiftKey) || event.metaKey || event.ctrlKey) { event.preventDefault(); void submit(); } },
+  };
+  const attachments = allowAttachments && <><input {...input} ref={fileRef} type="file" multiple={multiple} accept={accept} tabIndex={-1} aria-label="Attach files" disabled={blocked} onChange={event => { addFiles(Array.from(event.target.files ?? [])); event.target.value = ""; }} /><Button {...action} variant="subtle" aria-label={compact ? "Attach files" : undefined} title={compact ? "Attach files" : undefined} disabled={blocked} onClick={() => fileRef.current?.click()}><Icon name="attachment" />{!compact && "Attach"}</Button></>;
+  const removeAttachment = (id: string) => { const index = previews.findIndex((item) => item.id === id); if (index >= 0 && !blocked) setFiles(files.filter((_, at) => at !== index)); };
+  const captureAction = allowAttachments && allowScreenshot && <Button {...action} variant="subtle" aria-label="Attach screenshot" title={captureAvailable ? "Attach screenshot" : "Screen capture is unavailable in this browser"} disabled={blocked || capturing || !captureAvailable} onClick={() => void takeScreenshot()}><Icon name="camera" />{!compact && (capturing ? "Capturing…" : "Screenshot")}</Button>;
+  const sendLabel = pending ? "Sending…" : "Send";
+  const sendAction = generating
+    ? <Button {...action} type="button" aria-label={compact ? "Stop response" : undefined} title={compact ? "Stop response" : undefined} disabled={disabled || !onStop} onClick={onStop}><Icon name="stop" />{!compact && "Stop response"}</Button>
+    : <Button {...action} type="submit" aria-label={compact ? sendLabel : undefined} title={compact ? sendLabel : undefined} disabled={blocked || capturing || (!current.trim() && files.length === 0)}><Icon name="send" />{!compact && sendLabel}</Button>;
+  return <form aria-label={label} aria-busy={pending || generating} {...props} className={root.className} style={{ ...root.style, ...style }} onSubmit={event => { event.preventDefault(); void submit(); }}
+    onDragOver={event => { props.onDragOver?.(event); if (!event.defaultPrevented && allowAttachments && !blocked && event.dataTransfer.types.includes("Files")) { event.preventDefault(); setDragging(true); } }}
+    onDragLeave={event => { props.onDragLeave?.(event); if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDragging(false); }}
+    onDrop={event => { props.onDrop?.(event); setDragging(false); if (!event.defaultPrevented && allowAttachments && !blocked && event.dataTransfer.files.length) { event.preventDefault(); addFiles(Array.from(event.dataTransfer.files)); } }}
+    onPaste={event => { props.onPaste?.(event); if (!event.defaultPrevented && allowAttachments && !blocked && event.clipboardData.files.length) { if (!event.clipboardData.getData("text/plain")) event.preventDefault(); addFiles(Array.from(event.clipboardData.files)); } }}>
+    {compact ? <div {...row}><textarea {...area} {...draftProps} rows={1} aria-label={label} />{attachments}{sendAction}</div> : <Textarea {...draftProps} label={label} />}
+    {files.length > 0 && <div {...fileList}>{renderAttachments ? renderAttachments(previews, { remove: removeAttachment, openFileDialog: () => fileRef.current?.click(), disabled: blocked }) : <Attachments>{previews.map((data) => <Attachment {...file} key={data.id} data={data} disabled={blocked} onRemove={() => removeAttachment(data.id)} />)}</Attachments>}</div>}
+    {!compact && <div {...actions}><div {...toolRow}>{attachments}{captureAction}</div>{sendAction}</div>}
+    {(tools || (compact && captureAction)) && <div {...toolRow}>{compact && captureAction}{tools}</div>}
+    {children}
+    {rejections.length > 0 && <div role="alert">{rejections.map(({ file, reason }, index) => <p {...rejection} key={`${file.name}-${index}`}>{file.name}: {reason}</p>)}</div>}
     <p {...hint} id={helpId}>{sendOnEnter ? "Enter to send. Shift+Enter for a new line." : "Cmd or Ctrl+Enter to send."}</p>
-    <p {...hint} role="status">{status}</p>
+    <p {...feedback} role="status">{status}</p>
   </form>;
 });

@@ -1,0 +1,10 @@
+/* ── thought-steps: generated from packages/react/src/components/thought-steps.tsx ── */
+.rs-thought-steps{max-width:none}
+.rs-thought-steps-list{display:grid;gap:1.5rem;padding:0;margin:0;list-style-type:none}
+.rs-thought-steps-step{display:grid;grid-template-columns:1.25rem minmax(0, 1fr);gap:0.75rem;font-size:0.875rem;line-height:1.45}
+.rs-thought-steps-title{color:var(--text-secondary);font-weight:500}
+.rs-thought-steps-active{color:var(--text);font-weight:600}
+.rs-thought-steps-detail{display:grid;gap:0.75rem;min-width:0}
+.rs-thought-steps-sources{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-thought-steps-figure{margin:0;display:grid;gap:0.5rem;min-width:0}
+.rs-thought-steps-caption{color:var(--text-secondary);font-size:0.8125rem}

@@ -1,0 +1,15 @@
+/* ── response: generated from packages/react/src/components/response.tsx ── */
+.rs-response{box-sizing:border-box;display:flex;flex-direction:column;gap:0.875rem;min-width:0;width:100%;max-width:66ch;align-self:flex-start;margin-inline-start:0;margin-inline-end:auto;padding-block:1.25rem;padding-inline:0;color:var(--text);font-size:0.9375rem;line-height:1.45;overflow-wrap:anywhere}
+.rs-response-user{width:fit-content;max-width:min(85%, 66ch);align-self:flex-end;margin-inline-start:auto;margin-inline-end:0;background-color:var(--table-alt);border-radius:var(--radius-sm);padding-block:1rem;padding-inline:1rem}
+.rs-response-header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
+.rs-response-author{font-weight:600;font-size:0.84375rem}
+.rs-response-status{color:var(--text-secondary);font-size:0.8125rem}
+.rs-response-content{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.rs-response-error{margin:0;color:var(--text);font-size:0.875rem}
+.rs-response-actions{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem}
+.rs-response-copy{box-sizing:border-box;min-height:var(--hit);min-width:var(--hit);padding-block:0.5rem;padding-inline:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:transparent;color:var(--text);font-family:inherit;font-size:0.8125rem;font-weight:500;line-height:1.45;cursor:pointer}
+.rs-response-copy:disabled{cursor:wait}
+.rs-response-copy:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+@media (forced-colors: active){.rs-response-copy{border-color:ButtonText;background-color:ButtonFace;color:ButtonText}}
+@media (hover: hover) and (pointer: fine){.rs-response-copy:hover:not(:disabled){background-color:var(--control-fill)}}
+.rs-response-copy-status{color:var(--text-secondary);font-size:0.8125rem}

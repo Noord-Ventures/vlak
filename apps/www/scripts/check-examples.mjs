@@ -81,7 +81,9 @@ function checkPreview(file) {
 }
 checkPreview(join(root, "apps/www/components/preview.tsx"));
 const additions = readFileSync(join(examples, "additions.tsx"), "utf8");
-const additionNames = [...additions.matchAll(/^\s+(?:"([a-z0-9-]+)"|([a-z][a-z0-9]*)):\s*[A-Z]/gm)].map(m => m[1] ?? m[2]);
+// A lazy optional renderer is still a Use mapping and must own a raw counterpart.
+// Match the map key independently of its value, including dynamic(() => import(...)).
+const additionNames = [...additions.matchAll(/^\s+(?:"([a-z0-9-]+)"|([a-z][a-z0-9]*)):\s*\S/gm)].map(m => m[1] ?? m[2]);
 const rawSources = [...previewFiles].map(file => readFileSync(file, "utf8")).join("\n");
 for (const name of additionNames) {
   if (!new RegExp(`^\\s+(?:"${name}"|${name}):`, "m").test(rawSources)) {

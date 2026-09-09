@@ -18,6 +18,7 @@ import { dirname, join, normalize, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { vlakTokens } from "../src/tokens.ts";
 import { vlakComponents } from "../src/registry.ts";
+import { workflowStylesheet } from "../../react/scripts/workflow-styles.mjs";
 
 const PUBLIC_HOST = vlakTokens.meta.url;
 const REGISTRY_URL = process.env.VLAK_REGISTRY_URL ?? `${PUBLIC_HOST}/r`;
@@ -238,6 +239,12 @@ for (const component of vlakComponents) {
       target: `styles/vlak/${base}`,
     });
   }
+  for (const stylesheet of component.styles ?? []) {
+    if (!stylesheet.startsWith("@noorddev/vlak-react/")) continue;
+    const source = stylesheet.slice("@noorddev/vlak-react/".length);
+    if (!source.endsWith(".css") || source.includes("..")) continue;
+    files.push({ path: `vlak/styles/${source}`, content: source === "workflow.css" ? workflowStylesheet() : readReact(source), type: "registry:file", target: `styles/vlak/${source}` });
+  }
 
   const registryDependencies = [...deps];
   items.push({
@@ -253,9 +260,14 @@ for (const component of vlakComponents) {
     ],
     ...(component.react
       ? {
-          dependencies: ["@stylexjs/stylex"],
+          dependencies: ["@stylexjs/stylex", ...(component.dependencies ?? [])],
           devDependencies: ["@stylexjs/babel-plugin"],
-          docs: "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+          docs: [
+            "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+            ...(component.styles ?? []).map(style => style.startsWith("@noorddev/vlak-react/")
+              ? `Import the copied styles/vlak/${style.slice("@noorddev/vlak-react/".length)} stylesheet in your application.`
+              : `Required stylesheet: import "${style}";`),
+          ].join("\n"),
         }
       : {}),
     files,
@@ -266,6 +278,9 @@ for (const component of vlakComponents) {
         snippet: component.snippet,
         cssOnly: !component.react,
         registryDependencies,
+        ...(component.reactImport ? { reactImport: component.reactImport } : {}),
+        ...(component.dependencies ? { dependencies: component.dependencies } : {}),
+        ...(component.styles ? { styles: component.styles } : {}),
         ...(component.hidden ? { hidden: true } : {}),
         ...(component.aliases ? { aliases: component.aliases } : {}),
         ...(component.example ? { example: component.example } : {}),

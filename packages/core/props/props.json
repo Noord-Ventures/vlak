@@ -1,6 +1,2771 @@
 {
   "version": "0.4.0",
   "components": {
+    "context-usage": {
+      "exports": [
+        {
+          "name": "ContextUsage",
+          "kind": "component",
+          "description": "Context occupancy and caller-supplied token usage/pricing. No model catalog or prices are fetched.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "usedTokens",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "maxTokens",
+              "type": "number",
+              "required": true
+            },
+            {
+              "name": "usage",
+              "type": "TokenUsage",
+              "required": false
+            },
+            {
+              "name": "pricing",
+              "type": "TokenPricing",
+              "required": false
+            },
+            {
+              "name": "model",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Context usage\""
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "model-selector": {
+      "exports": [
+        {
+          "name": "ModelSelector",
+          "kind": "component",
+          "description": "Search and select models from an application-supplied catalog, without provider lookups.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "models",
+              "type": "readonly ModelOption[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(modelId: string) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Model\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "sources": {
+      "exports": [
+        {
+          "name": "sourceHref",
+          "kind": "function",
+          "description": "External web addresses and document-relative references; executable URL schemes are omitted.",
+          "props": []
+        },
+        {
+          "name": "Sources",
+          "kind": "component",
+          "description": "A counted native disclosure of application-supplied source links and optional quotes.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "sources",
+              "type": "readonly CitationSource[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Sources\""
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "inline-citation": {
+      "exports": [
+        {
+          "name": "InlineCitation",
+          "kind": "component",
+          "description": "A keyboard-reachable source preview with count, quotes and navigation through multiple citations.",
+          "extends": "HTMLAttributes<HTMLSpanElement>",
+          "ref": "HTMLSpanElement",
+          "props": [
+            {
+              "name": "sources",
+              "type": "readonly CitationSource[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "index",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultIndex",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "onIndexChange",
+              "type": "(index: number) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "open-in-chat": {
+      "exports": [
+        {
+          "name": "OpenInChat",
+          "kind": "component",
+          "description": "Explicit provider links for a supplied prompt. Nothing leaves the page until a link is activated.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "prompt",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "providers",
+              "type": "readonly OpenInChatProvider[]",
+              "required": false,
+              "default": "[\"chatgpt\", \"claude\", \"cursor\", \"scira\", \"t3\", \"v0\"]"
+            },
+            {
+              "name": "githubUrl",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Open in chat\""
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        },
+        {
+          "name": "openInChatHref",
+          "kind": "function",
+          "description": "Builds provider handoff links without contacting providers or submitting a conversation.",
+          "props": []
+        }
+      ]
+    },
+    "terminal": {
+      "exports": [
+        {
+          "name": "Terminal",
+          "kind": "component",
+          "description": "Streaming console output with incremental ANSI attributes; not a shell or terminal emulator.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"onCopy\" | \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "output",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Terminal\""
+            },
+            {
+              "name": "streaming",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "autoScroll",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "ansiColors",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Explicitly opt into original ANSI colors. The default retains text attributes in monochrome."
+            },
+            {
+              "name": "onClear",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "onCopy",
+              "type": "(output: string) => void | Promise<void>",
+              "required": false
+            },
+            {
+              "name": "maxHeight",
+              "type": "Property.MaxHeight<string | number>",
+              "required": false,
+              "default": "\"24rem\""
+            },
+            {
+              "name": "maxCharacters",
+              "type": "number",
+              "required": false,
+              "default": "100000",
+              "description": "Maximum visible source characters. Copy retains the complete original output."
+            }
+          ]
+        }
+      ]
+    },
+    "stack-trace": {
+      "exports": [
+        {
+          "name": "parseStackTrace",
+          "kind": "function",
+          "description": "Parses V8/Node and Firefox/Safari locations; unknown frame text remains readable.",
+          "props": []
+        },
+        {
+          "name": "StackTrace",
+          "kind": "component",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"onCopy\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "trace",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onFilePathClick",
+              "type": "(filePath: string, line?: number, column?: number) => void",
+              "required": false
+            },
+            {
+              "name": "onCopy",
+              "type": "(trace: string) => void | Promise<void>",
+              "required": false
+            },
+            {
+              "name": "maxFrames",
+              "type": "number",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "sandbox": {
+      "exports": [
+        {
+          "name": "Sandbox",
+          "kind": "component",
+          "description": "A code/output disclosure. Execution and process isolation remain application-owned.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "code",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "language",
+              "type": "string",
+              "required": false,
+              "default": "\"Text\""
+            },
+            {
+              "name": "output",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "codeContent",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "tab",
+              "type": "\"output\" | \"code\"",
+              "required": false
+            },
+            {
+              "name": "defaultTab",
+              "type": "\"output\" | \"code\"",
+              "required": false,
+              "default": "\"code\""
+            },
+            {
+              "name": "onTabChange",
+              "type": "(tab: \"code\" | \"output\") => void",
+              "required": false
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Name of the application-owned tool operation."
+            },
+            {
+              "name": "state",
+              "type": "ToolCallState",
+              "required": false
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false,
+              "description": "More precise supplied progress, for example approval or input preparation."
+            },
+            {
+              "name": "error",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "web-preview": {
+      "exports": [
+        {
+          "name": "isPreviewUrl",
+          "kind": "function",
+          "props": []
+        },
+        {
+          "name": "WebPreview",
+          "kind": "component",
+          "description": "URL navigation and a sandboxed iframe with host-supplied console messages.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": false,
+              "default": "\"Web preview\""
+            },
+            {
+              "name": "url",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultUrl",
+              "type": "string",
+              "required": false,
+              "default": "\"about:blank\""
+            },
+            {
+              "name": "onUrlChange",
+              "type": "(url: string) => void",
+              "required": false
+            },
+            {
+              "name": "onBack",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "onForward",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "canGoBack",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "canGoForward",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onReload",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "logs",
+              "type": "WebPreviewLog[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "maxLogEntries",
+              "type": "number",
+              "required": false,
+              "default": "200"
+            },
+            {
+              "name": "frameProps",
+              "type": "Omit<IframeHTMLAttributes<HTMLIFrameElement>, \"title\" | \"children\" | \"src\" | \"srcDoc\">",
+              "required": false,
+              "description": "iframe permissions remain application-controlled; scripts and forms are allowed without same-origin access by default."
+            }
+          ]
+        }
+      ]
+    },
+    "jsx-preview": {
+      "exports": [
+        {
+          "name": "JSXPreview",
+          "kind": "component",
+          "description": "Optional Acorn-validated JSX data renderer. This is not a general JavaScript sandbox.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"children\" | \"onError\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "jsx",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "streaming",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "components",
+              "type": "Record<string, ElementType<any, keyof JSX.IntrinsicElements>>",
+              "required": false,
+              "default": "{}",
+              "description": "Trusted, display-only application components. Do not expose components that execute operations during render."
+            },
+            {
+              "name": "bindings",
+              "type": "Record<string, unknown>",
+              "required": false,
+              "description": "Plain data only. Calls, functions, accessors and prototype access are rejected."
+            },
+            {
+              "name": "onError",
+              "type": "(error: Error) => void",
+              "required": false
+            },
+            {
+              "name": "fallback",
+              "type": "ReactNode | ((error: Error) => ReactNode)",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "attachments": {
+      "exports": [
+        {
+          "name": "Attachment",
+          "kind": "component",
+          "description": "File metadata and native media previews, with explicit application actions.",
+          "extends": "HTMLAttributes<HTMLLIElement>",
+          "ref": "HTMLLIElement",
+          "props": [
+            {
+              "name": "data",
+              "type": "AttachmentData",
+              "required": true
+            },
+            {
+              "name": "variant",
+              "type": "AttachmentVariant",
+              "required": false,
+              "description": "Overrides the layout inherited from Attachments."
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onRemove",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "onRetry",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "preview",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Trusted application content replaces the automatic media preview."
+            }
+          ]
+        },
+        {
+          "name": "Attachments",
+          "kind": "component",
+          "description": "A responsive list of application-owned files and media.",
+          "extends": "HTMLAttributes<HTMLUListElement>",
+          "ref": "HTMLUListElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Attachments\""
+            },
+            {
+              "name": "variant",
+              "type": "AttachmentVariant",
+              "required": false,
+              "default": "\"grid\""
+            }
+          ]
+        },
+        {
+          "name": "useFileAttachments",
+          "kind": "hook",
+          "description": "Creates local preview URLs and revokes them when files leave the list or the owner unmounts.",
+          "props": []
+        }
+      ]
+    },
+    "shimmer": {
+      "exports": [
+        {
+          "name": "Shimmer",
+          "kind": "component",
+          "description": "Animated text for supplied progress. Screen readers receive the text once, without token announcements.",
+          "extends": "HTMLAttributes<HTMLSpanElement>",
+          "ref": "HTMLSpanElement",
+          "props": [
+            {
+              "name": "children",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "active",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "required": false,
+              "default": "2"
+            },
+            {
+              "name": "spread",
+              "type": "number",
+              "required": false,
+              "default": "15"
+            }
+          ]
+        }
+      ]
+    },
+    "plan": {
+      "exports": [
+        {
+          "name": "Plan",
+          "kind": "component",
+          "description": "A proposed plan with supplied steps and actions. Execution remains application-owned.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "streaming",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"inline\" | \"panel\"",
+              "required": false,
+              "description": "An inline disclosure for message activity, or a framed panel."
+            },
+            {
+              "name": "durationMs",
+              "type": "number",
+              "required": false,
+              "description": "Optional elapsed time supplied by the application, in milliseconds."
+            },
+            {
+              "name": "measureDuration",
+              "type": "boolean",
+              "required": false,
+              "description": "Measure this component's streaming interval. Off by default."
+            },
+            {
+              "name": "autoExpand",
+              "type": "boolean",
+              "required": false,
+              "description": "Open when a new streaming interval begins. Manual disclosure remains the default."
+            },
+            {
+              "name": "autoCollapseDelay",
+              "type": "number | false",
+              "required": false,
+              "description": "Close once after completion unless the reader manually changed the disclosure."
+            }
+          ]
+        }
+      ]
+    },
+    "task": {
+      "exports": [
+        {
+          "name": "Task",
+          "kind": "component",
+          "description": "A default-open task disclosure with supplied rows and file references.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReasoningStatus",
+              "required": false,
+              "description": "Describes application-supplied progress, without generating a thinking trace."
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"inline\" | \"panel\"",
+              "required": false,
+              "description": "An inline disclosure for message activity, or a framed panel."
+            },
+            {
+              "name": "durationMs",
+              "type": "number",
+              "required": false,
+              "description": "Optional elapsed time supplied by the application, in milliseconds."
+            },
+            {
+              "name": "measureDuration",
+              "type": "boolean",
+              "required": false,
+              "description": "Measure this component's streaming interval. Off by default."
+            },
+            {
+              "name": "autoExpand",
+              "type": "boolean",
+              "required": false,
+              "description": "Open when a new streaming interval begins. Manual disclosure remains the default."
+            },
+            {
+              "name": "autoCollapseDelay",
+              "type": "number | false",
+              "required": false,
+              "description": "Close once after completion unless the reader manually changed the disclosure."
+            },
+            {
+              "name": "items",
+              "type": "readonly TaskItem[]",
+              "required": false,
+              "default": "[]"
+            }
+          ]
+        }
+      ]
+    },
+    "thought-steps": {
+      "exports": [
+        {
+          "name": "ThoughtSteps",
+          "kind": "component",
+          "description": "Application-supplied work summaries, with per-step state and supporting evidence.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ReasoningStatus",
+              "required": false,
+              "description": "Describes application-supplied progress, without generating a thinking trace."
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"inline\" | \"panel\"",
+              "required": false,
+              "description": "An inline disclosure for message activity, or a framed panel."
+            },
+            {
+              "name": "durationMs",
+              "type": "number",
+              "required": false,
+              "description": "Optional elapsed time supplied by the application, in milliseconds."
+            },
+            {
+              "name": "measureDuration",
+              "type": "boolean",
+              "required": false,
+              "description": "Measure this component's streaming interval. Off by default."
+            },
+            {
+              "name": "autoExpand",
+              "type": "boolean",
+              "required": false,
+              "description": "Open when a new streaming interval begins. Manual disclosure remains the default."
+            },
+            {
+              "name": "autoCollapseDelay",
+              "type": "number | false",
+              "required": false,
+              "description": "Close once after completion unless the reader manually changed the disclosure."
+            },
+            {
+              "name": "steps",
+              "type": "readonly ThoughtStep[]",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "checkpoint": {
+      "exports": [
+        {
+          "name": "Checkpoint",
+          "kind": "component",
+          "description": "A restore marker. The application owns saved history and the async restore operation.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"onError\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "onRestore",
+              "type": "() => void | Promise<void>",
+              "required": false
+            },
+            {
+              "name": "restoreLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Restore checkpoint\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "onError",
+              "type": "(error: unknown) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "suggestions": {
+      "exports": [
+        {
+          "name": "Suggestion",
+          "kind": "component",
+          "extends": "ButtonHTMLAttributes<HTMLButtonElement>",
+          "ref": "HTMLButtonElement",
+          "props": [
+            {
+              "name": "variant",
+              "type": "\"primary\" | \"ghost\" | \"subtle\"",
+              "required": false,
+              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+            },
+            {
+              "name": "size",
+              "type": "\"default\" | \"sm\" | \"icon\"",
+              "required": false,
+              "description": "Icon buttons stay square at every breakpoint. Supply an accessible name."
+            },
+            {
+              "name": "grouped",
+              "type": "boolean",
+              "required": false,
+              "description": "Flush into a ButtonGroup: no own stroke, one ink seam."
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "onSelect",
+              "type": "(value: string) => void",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "Suggestions",
+          "kind": "component",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "wrap",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "work-queue": {
+      "exports": [
+        {
+          "name": "WorkQueue",
+          "kind": "component",
+          "description": "Supplied prompt and todo sections. Checking a row requests a change; the application owns scheduling.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "sections",
+              "type": "readonly WorkQueueSection[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Work queue\""
+            },
+            {
+              "name": "onItemCheckedChange",
+              "type": "(sectionId: string, itemId: string, checked: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "emptyMessage",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Nothing queued.\""
+            }
+          ]
+        }
+      ]
+    },
+    "generated-image": {
+      "exports": [
+        {
+          "name": "GeneratedImage",
+          "kind": "component",
+          "description": "Displays supplied image bytes; image generation remains application-owned.",
+          "extends": "Omit<ImgHTMLAttributes<HTMLImageElement>, \"src\" | \"alt\">",
+          "ref": "HTMLImageElement",
+          "props": [
+            {
+              "name": "image",
+              "type": "GeneratedImageData",
+              "required": true
+            },
+            {
+              "name": "alt",
+              "type": "string",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "conversation-export": {
+      "exports": [
+        {
+          "name": "ConversationDownload",
+          "kind": "component",
+          "description": "Downloads a Markdown snapshot using supplied message data, without reading rendered DOM.",
+          "extends": "ButtonHTMLAttributes<HTMLButtonElement>",
+          "ref": "HTMLButtonElement",
+          "props": [
+            {
+              "name": "variant",
+              "type": "\"primary\" | \"ghost\" | \"subtle\"",
+              "required": false,
+              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+            },
+            {
+              "name": "size",
+              "type": "\"default\" | \"sm\" | \"icon\"",
+              "required": false,
+              "description": "Icon buttons stay square at every breakpoint. Supply an accessible name."
+            },
+            {
+              "name": "grouped",
+              "type": "boolean",
+              "required": false,
+              "description": "Flush into a ButtonGroup: no own stroke, one ink seam."
+            },
+            {
+              "name": "serializePart",
+              "type": "(part: ConversationExportPart, message: ConversationExportMessage) => string",
+              "required": false
+            },
+            {
+              "name": "messages",
+              "type": "readonly ConversationExportMessage[]",
+              "required": true
+            },
+            {
+              "name": "filename",
+              "type": "string",
+              "required": false,
+              "default": "\"conversation.md\""
+            },
+            {
+              "name": "onError",
+              "type": "(error: unknown) => void",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "serializeConversation",
+          "kind": "function",
+          "description": "Serializes explicit text, file and tool parts; unsupported application objects are never stringified as messages.",
+          "props": []
+        }
+      ]
+    },
+    "response-editor": {
+      "exports": [
+        {
+          "name": "ResponseEditor",
+          "kind": "component",
+          "description": "Multiline message editing with async save, cancellation, and failed-draft retention.",
+          "extends": "Omit<FormHTMLAttributes<HTMLFormElement>, \"onSubmit\" | \"onError\">",
+          "ref": "HTMLFormElement",
+          "props": [
+            {
+              "name": "text",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "onSave",
+              "type": "(text: string) => void | Promise<void>",
+              "required": true
+            },
+            {
+              "name": "onCancel",
+              "type": "() => void",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Edit message\""
+            },
+            {
+              "name": "saveLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Save message\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "onError",
+              "type": "(error: unknown) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "workflow-canvas": {
+      "exports": [
+        {
+          "name": "WorkflowCanvas",
+          "kind": "component",
+          "description": "Optional React Flow adapter. Supply a bounded height and controlled changes or defaultNodes/defaultEdges.",
+          "props": []
+        },
+        {
+          "name": "WorkflowConnection",
+          "kind": "component",
+          "description": "Pointer-following connection preview while creating an edge.",
+          "props": []
+        },
+        {
+          "name": "WorkflowControls",
+          "kind": "component",
+          "description": "Binds Vlak's canvas controls to the graph viewport and interaction lock.",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Workflow controls\""
+            }
+          ]
+        },
+        {
+          "name": "WorkflowEdge",
+          "kind": "component",
+          "description": "Bezier edge with engine-managed hit testing and optional temporary or animated state.",
+          "props": []
+        },
+        {
+          "name": "WorkflowNode",
+          "kind": "component",
+          "description": "A graph node surface. Render inside React Flow so its handles use the graph's geometry.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"title\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "source",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "target",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "sourcePosition",
+              "type": "Position",
+              "required": false,
+              "default": "Position.Right"
+            },
+            {
+              "name": "targetPosition",
+              "type": "Position",
+              "required": false,
+              "default": "Position.Left"
+            },
+            {
+              "name": "selected",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "connectable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            }
+          ]
+        },
+        {
+          "name": "WorkflowPanel",
+          "kind": "component",
+          "description": "Overlay anchored to one of React Flow's six viewport positions.",
+          "props": []
+        },
+        {
+          "name": "WorkflowToolbar",
+          "kind": "component",
+          "description": "Node-anchored toolbar with Vlak's arrow-key action navigation.",
+          "props": [
+            {
+              "name": "actions",
+              "type": "ToolbarAction[]",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "response-markdown": {
+      "exports": [
+        {
+          "name": "ResponseMarkdown",
+          "kind": "component",
+          "description": "Optional streaming Markdown, math, code, and diagrams with Vlak paint and safe default URLs.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"children\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "children",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "streaming",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "True while the application is receiving this response."
+            },
+            {
+              "name": "math",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "diagrams",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "lineNumbers",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "imageOrigins",
+              "type": "readonly string[]",
+              "required": false,
+              "default": "noImages",
+              "description": "Only images from these exact origins load. The default renders image descriptions."
+            },
+            {
+              "name": "baseUrl",
+              "type": "string",
+              "required": false,
+              "description": "Origin used to resolve relative image addresses."
+            },
+            {
+              "name": "components",
+              "type": "Components",
+              "required": false,
+              "description": "Trusted application components override Vlak's Markdown elements."
+            }
+          ]
+        }
+      ]
+    },
+    "highlighted-code": {
+      "exports": [
+        {
+          "name": "HighlightedCode",
+          "kind": "component",
+          "description": "Optional Shiki renderer with lazy grammars, monochrome tokens, and exact-source copy.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "code",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "language",
+              "type": "string",
+              "required": false,
+              "default": "\"text\""
+            },
+            {
+              "name": "streaming",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Keep an unfinished source block readable without repeatedly highlighting it."
+            },
+            {
+              "name": "lineNumbers",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "maxHeight",
+              "type": "number",
+              "required": false,
+              "default": "400",
+              "description": "Maximum scrollable source height in pixels."
+            },
+            {
+              "name": "copyable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "downloadable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "filename",
+              "type": "string",
+              "required": false,
+              "default": "\"code.txt\""
+            },
+            {
+              "name": "onCopyCode",
+              "type": "(code: string) => void | Promise<void>",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "response-branch": {
+      "exports": [
+        {
+          "name": "ResponseBranch",
+          "kind": "component",
+          "description": "Navigates application-owned response alternatives without changing conversation history.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"children\" | \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "branches",
+              "type": "readonly ResponseBranchItem[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Response alternatives\""
+            }
+          ]
+        }
+      ]
+    },
+    "audio-player": {
+      "exports": [
+        {
+          "name": "AudioPlayer",
+          "kind": "component",
+          "description": "Native audio for URLs or generated speech, with replaceable controls and explicit media ownership.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLAudioElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "src",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "data",
+              "type": "GeneratedSpeechAudio",
+              "required": false
+            },
+            {
+              "name": "transcript",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "preload",
+              "type": "\"none\" | \"metadata\" | \"auto\"",
+              "required": false,
+              "default": "\"metadata\""
+            },
+            {
+              "name": "onTimeChange",
+              "type": "(seconds: number) => void",
+              "required": false
+            },
+            {
+              "name": "onPlayingChange",
+              "type": "(playing: boolean) => void",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "AudioPlayerControls",
+          "kind": "component",
+          "description": "Default transport, bounded skip seeking and volume; replace or compose with useAudioPlayer.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "seekOffset",
+              "type": "number",
+              "required": false,
+              "default": "10"
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        },
+        {
+          "name": "useAudioPlayer",
+          "kind": "hook",
+          "description": "Access the native media controller from controls nested inside AudioPlayer.",
+          "props": []
+        }
+      ]
+    },
+    "mic-selector": {
+      "exports": [
+        {
+          "name": "MicSelector",
+          "kind": "component",
+          "description": "Searchable microphone choice. The application owns capture and the selected device's use.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(deviceId: string) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Microphone\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        },
+        {
+          "name": "useAudioDevices",
+          "kind": "hook",
+          "description": "Enumerates inputs without opening a microphone; requestAccess is an explicit user action.",
+          "props": []
+        }
+      ]
+    },
+    "speech-input": {
+      "exports": [
+        {
+          "name": "SpeechInput",
+          "kind": "component",
+          "description": "User-activated speech capture with an application-owned transcription fallback.",
+          "extends": "ButtonHTMLAttributes<HTMLButtonElement>",
+          "ref": "HTMLButtonElement",
+          "props": [
+            {
+              "name": "variant",
+              "type": "\"primary\" | \"ghost\" | \"subtle\"",
+              "required": false,
+              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+            },
+            {
+              "name": "size",
+              "type": "\"default\" | \"sm\" | \"icon\"",
+              "required": false,
+              "description": "Icon buttons stay square at every breakpoint. Supply an accessible name."
+            },
+            {
+              "name": "grouped",
+              "type": "boolean",
+              "required": false,
+              "description": "Flush into a ButtonGroup: no own stroke, one ink seam."
+            },
+            {
+              "name": "onTranscript",
+              "type": "(text: string) => void",
+              "required": true
+            },
+            {
+              "name": "onInterimTranscript",
+              "type": "(text: string) => void",
+              "required": false
+            },
+            {
+              "name": "onAudioRecorded",
+              "type": "(audio: Blob, context: { signal: AbortSignal; }) => Promise<string>",
+              "required": false
+            },
+            {
+              "name": "onStatusChange",
+              "type": "(status: SpeechInputStatus) => void",
+              "required": false
+            },
+            {
+              "name": "onError",
+              "type": "(error: Error) => void",
+              "required": false
+            },
+            {
+              "name": "mode",
+              "type": "\"auto\" | \"recognition\" | \"recording\"",
+              "required": false,
+              "default": "\"auto\""
+            },
+            {
+              "name": "deviceId",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "lang",
+              "type": "string",
+              "required": false,
+              "default": "\"en-US\""
+            },
+            {
+              "name": "maxDuration",
+              "type": "number",
+              "required": false,
+              "default": "120",
+              "description": "Stops and processes a recording after this many seconds. Defaults to 120."
+            }
+          ]
+        }
+      ]
+    },
+    "voice-selector": {
+      "exports": [
+        {
+          "name": "VoiceSelector",
+          "kind": "component",
+          "description": "Supplied voice metadata and optional real audio samples; provider catalogs remain application-owned.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "voices",
+              "type": "readonly VoiceOption[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(voiceId: string) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Voice\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "transcription": {
+      "exports": [
+        {
+          "name": "Transcription",
+          "kind": "component",
+          "description": "Supplied timed text. Playback remains application-owned; only activation requests a seek.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "segments",
+              "type": "readonly TranscriptionSegment[]",
+              "required": true
+            },
+            {
+              "name": "currentTime",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "onSeek",
+              "type": "(seconds: number) => void",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Transcript\""
+            },
+            {
+              "name": "autoScroll",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Follow active text until the reader scrolls. Off by default."
+            },
+            {
+              "name": "maxHeight",
+              "type": "string | number",
+              "required": false,
+              "default": "\"24rem\""
+            }
+          ]
+        }
+      ]
+    },
+    "persona": {
+      "exports": [
+        {
+          "name": "Persona",
+          "kind": "component",
+          "description": "Five conversational states with a native monochrome visual and a custom rendering slot.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "state",
+              "type": "PersonaState",
+              "required": false,
+              "default": "\"idle\""
+            },
+            {
+              "name": "size",
+              "type": "number",
+              "required": false,
+              "default": "48"
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "description": "A custom decorative visual. The application owns its rendering lifecycle."
+            }
+          ]
+        }
+      ]
+    },
+    "agent": {
+      "exports": [
+        {
+          "name": "Agent",
+          "kind": "component",
+          "description": "Inspect agent configuration without instantiating tools or executing instructions.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "name",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "model",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "instructions",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "tools",
+              "type": "AgentToolDefinition[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "outputSchema",
+              "type": "unknown",
+              "required": false
+            },
+            {
+              "name": "renderSchema",
+              "type": "(schema: unknown, context: \"input\" | \"output\") => ReactNode",
+              "required": false,
+              "description": "Optional rich/schema renderer. The default safely displays objects or escaped source text."
+            }
+          ]
+        }
+      ]
+    },
+    "artifact": {
+      "exports": [
+        {
+          "name": "Artifact",
+          "kind": "component",
+          "description": "Generated content with header actions, a close request and an optional scroll region.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "onClose",
+              "type": "() => void",
+              "required": false,
+              "description": "Requests closing; the application owns visibility and focus restoration."
+            },
+            {
+              "name": "closeLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Close artifact\""
+            },
+            {
+              "name": "maxHeight",
+              "type": "Property.MaxHeight<string | number>",
+              "required": false,
+              "description": "Optional height cap for long generated content."
+            }
+          ]
+        }
+      ]
+    },
+    "commit": {
+      "exports": [
+        {
+          "name": "Commit",
+          "kind": "component",
+          "description": "Supplied commit metadata and changed files with exact hash copy and optional file navigation.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"onCopy\" | \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "hash",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "message",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "author",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "avatar",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "timestamp",
+              "type": "string | Date",
+              "required": false,
+              "description": "ISO date or Date; a supplied timeLabel can use the application's locale or relative clock."
+            },
+            {
+              "name": "timeLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "files",
+              "type": "CommitFile[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onFileSelect",
+              "type": "(file: CommitFile) => void",
+              "required": false
+            },
+            {
+              "name": "onCopy",
+              "type": "(hash: string) => void | Promise<void>",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "environment-variables": {
+      "exports": [
+        {
+          "name": "EnvironmentVariables",
+          "kind": "component",
+          "description": "Masked values with deliberate reveal and exact-value/export copy actions.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"onCopy\" | \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "variables",
+              "type": "EnvironmentVariable[]",
+              "required": true
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Environment variables\""
+            },
+            {
+              "name": "showValues",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultShowValues",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onShowValuesChange",
+              "type": "(show: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onCopy",
+              "type": "(value: string) => void | Promise<void>",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "formatEnvironmentExports",
+          "kind": "function",
+          "description": "POSIX shell-safe assignments. Invalid names are rejected rather than emitted as executable shell text.",
+          "props": []
+        }
+      ]
+    },
+    "package-info": {
+      "exports": [
+        {
+          "name": "PackageInfo",
+          "kind": "component",
+          "description": "Supplied package changes and dependencies; never resolves or installs packages.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "name",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "currentVersion",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "newVersion",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "changeType",
+              "type": "PackageChangeType",
+              "required": false
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "dependencies",
+              "type": "PackageDependency[]",
+              "required": false
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "schema-display": {
+      "exports": [
+        {
+          "name": "SchemaDisplay",
+          "kind": "component",
+          "description": "Endpoint documentation with bounded, expandable object and array schemas.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "method",
+              "type": "\"GET\" | \"POST\" | \"PUT\" | \"PATCH\" | \"DELETE\" | \"HEAD\" | \"OPTIONS\"",
+              "required": true
+            },
+            {
+              "name": "path",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "parameters",
+              "type": "SchemaParameter[]",
+              "required": false
+            },
+            {
+              "name": "requestBody",
+              "type": "SchemaProperty[]",
+              "required": false
+            },
+            {
+              "name": "responseBody",
+              "type": "SchemaProperty[]",
+              "required": false
+            },
+            {
+              "name": "maxDepth",
+              "type": "number",
+              "required": false,
+              "default": "6",
+              "description": "Bounds recursive schema rendering. Defaults to 6 levels and 200 properties."
+            },
+            {
+              "name": "maxNodes",
+              "type": "number",
+              "required": false,
+              "default": "200"
+            }
+          ]
+        }
+      ]
+    },
+    "snippet": {
+      "exports": [
+        {
+          "name": "Snippet",
+          "kind": "component",
+          "description": "A compact, selectable command or code line; the decorative prefix is not copied.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"onCopy\" | \"prefix\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "code",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "prefix",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Code snippet\""
+            },
+            {
+              "name": "copyLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "copyable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "onCopy",
+              "type": "(value: string) => void | Promise<void>",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "SnippetCopy",
+          "kind": "component",
+          "description": "Exact-value clipboard action shared by compact developer views.",
+          "extends": "Omit<HTMLAttributes<HTMLSpanElement>, \"onCopy\">",
+          "ref": "HTMLSpanElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Copy snippet\""
+            },
+            {
+              "name": "onCopy",
+              "type": "(value: string) => void | Promise<void>",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "test-results": {
+      "exports": [
+        {
+          "name": "TestResults",
+          "kind": "component",
+          "description": "Test hierarchy and derived totals, with runner-owned status and retry results.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "suites",
+              "type": "TestResultSuite[]",
+              "required": true
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Test results\""
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "required": false,
+              "description": "Total elapsed time in milliseconds, when measured by the runner."
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "onRetry",
+              "type": "(test: TestResultItem, suite: TestResultSuite) => void | Promise<void>",
+              "required": false,
+              "description": "Requests a retry; only new supplied test data changes the displayed result."
+            }
+          ]
+        }
+      ]
+    },
+    "chat": {
+      "exports": [
+        {
+          "name": "Chat",
+          "kind": "component",
+          "description": "A chat frame with a named history and a composer that stays outside its scroll area.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Visible name of this chat and its region."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Context or status below the title."
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Application-owned controls in the header."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Messages rendered inside the conversation history."
+            },
+            {
+              "name": "composer",
+              "type": "ReactNode",
+              "required": true,
+              "description": "An application-owned message composer, outside the scrolling history."
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Supporting text below the composer."
+            },
+            {
+              "name": "conversationLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Conversation\"",
+              "description": "Accessible name of the scrollable message history."
+            },
+            {
+              "name": "historyHeight",
+              "type": "Property.Height<string | number>",
+              "required": false,
+              "default": "\"28rem\"",
+              "description": "Height reserved for the message history, including its jump control."
+            },
+            {
+              "name": "autoScroll",
+              "type": "boolean",
+              "required": false,
+              "default": "true",
+              "description": "Follow new content while the reader is at the end."
+            }
+          ]
+        }
+      ]
+    },
+    "conversation": {
+      "exports": [
+        {
+          "name": "Conversation",
+          "kind": "component",
+          "description": "A message history that follows new content without taking the reader away from earlier messages.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"Conversation\"",
+              "description": "Accessible name of the scrollable message history."
+            },
+            {
+              "name": "maxHeight",
+              "type": "Property.MaxHeight<string | number>",
+              "required": false,
+              "default": "\"28rem\"",
+              "description": "Maximum height of the message history, before it scrolls."
+            },
+            {
+              "name": "autoScroll",
+              "type": "boolean",
+              "required": false,
+              "default": "true",
+              "description": "Follow new content while the reader is at the end."
+            },
+            {
+              "name": "latestLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Jump to latest\""
+            }
+          ]
+        }
+      ]
+    },
+    "widget": {
+      "exports": [
+        {
+          "name": "Widget",
+          "kind": "component",
+          "description": "A shared surface for application and third-party React content, with explicit data states.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Visible name of this widget and its region."
+            },
+            {
+              "name": "provider",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Name or linked attribution for the application or integration supplying the content."
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Optional decorative provider or content mark."
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "WidgetStatus",
+              "required": false,
+              "default": "\"ready\"",
+              "description": "Application-supplied data state. The widget never fetches data itself."
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "emptyMessage",
+              "type": "string",
+              "required": false,
+              "default": "\"No results to show.\""
+            },
+            {
+              "name": "errorMessage",
+              "type": "string",
+              "required": false,
+              "default": "\"This widget could not be loaded.\""
+            },
+            {
+              "name": "onRetry",
+              "type": "() => void | Promise<void>",
+              "required": false
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Application-owned controls, rendered after the content."
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Supporting source, update time, or context below the actions."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "WidgetEmbed",
+          "kind": "component",
+          "description": "An explicitly sized provider iframe for a Widget. Permissions and provider messaging remain application-owned.",
+          "extends": "IframeHTMLAttributes<HTMLIFrameElement>",
+          "ref": "HTMLIFrameElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "string",
+              "required": true,
+              "description": "Descriptive name of the embedded interface, announced to assistive technology."
+            },
+            {
+              "name": "src",
+              "type": "string",
+              "required": true,
+              "description": "Address supplied by the application or its connected provider."
+            }
+          ]
+        }
+      ]
+    },
+    "response-actions": {
+      "exports": [
+        {
+          "name": "ResponseActions",
+          "kind": "component",
+          "description": "Compact message actions. Speech and sharing run only after a button activation.",
+          "extends": "HTMLAttributes<HTMLDivElement>",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "text",
+              "type": "string",
+              "required": true,
+              "description": "Plain text used for copying, narration, and the default share action."
+            },
+            {
+              "name": "feedback",
+              "type": "ResponseFeedback",
+              "required": false
+            },
+            {
+              "name": "defaultFeedback",
+              "type": "ResponseFeedback",
+              "required": false,
+              "default": "null"
+            },
+            {
+              "name": "onFeedback",
+              "type": "(value: ResponseFeedback) => void | Promise<void>",
+              "required": false,
+              "description": "A rejected promise preserves the previous selection and allows retry."
+            },
+            {
+              "name": "onShare",
+              "type": "() => void | Promise<void>",
+              "required": false,
+              "description": "Overrides native sharing. Without it, unsupported browsers copy the text."
+            },
+            {
+              "name": "onReadingChange",
+              "type": "(reading: boolean) => void",
+              "required": false,
+              "description": "Reports this response's narration state for an avatar or other presentation."
+            }
+          ]
+        }
+      ]
+    },
+    "tool-call": {
+      "exports": [
+        {
+          "name": "getToolCallPresentation",
+          "kind": "function",
+          "description": "Maps supplied tool lifecycle without inferring that ready arguments have started execution.",
+          "props": []
+        },
+        {
+          "name": "ToolCall",
+          "kind": "component",
+          "description": "Displays supplied tool activity. The application owns execution and its state.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Name of the application-owned tool operation."
+            },
+            {
+              "name": "state",
+              "type": "ToolCallState",
+              "required": false,
+              "default": "\"queued\""
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false,
+              "description": "More precise supplied progress, for example approval or input preparation."
+            },
+            {
+              "name": "input",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Strings and numbers are rendered as plain preformatted text. Format objects before passing them."
+            },
+            {
+              "name": "output",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "error",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "confirmation": {
+      "exports": [
+        {
+          "name": "Confirmation",
+          "kind": "component",
+          "description": "Records a decision about an application-owned action without executing a tool.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true,
+              "description": "Names the proposed action and the confirmation region."
+            },
+            {
+              "name": "status",
+              "type": "ConfirmationStatus",
+              "required": false
+            },
+            {
+              "name": "defaultStatus",
+              "type": "ConfirmationStatus",
+              "required": false,
+              "default": "\"pending\""
+            },
+            {
+              "name": "onStatusChange",
+              "type": "(status: Decision) => void",
+              "required": false
+            },
+            {
+              "name": "onConfirm",
+              "type": "() => void | Promise<void>",
+              "required": true,
+              "description": "Records approval. A rejection keeps the proposal pending and allows retry."
+            },
+            {
+              "name": "onReject",
+              "type": "() => void | Promise<void>",
+              "required": false
+            },
+            {
+              "name": "confirmLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Confirm\""
+            },
+            {
+              "name": "rejectLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Reject\""
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "response": {
+      "exports": [
+        {
+          "name": "Response",
+          "kind": "component",
+          "description": "One message with application-rendered content and a separate status announcement.",
+          "extends": "HTMLAttributes<HTMLElement>",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "from",
+              "type": "\"user\" | \"assistant\"",
+              "required": false,
+              "default": "\"assistant\"",
+              "description": "The speaker's identity, separate from the native ARIA role."
+            },
+            {
+              "name": "author",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "status",
+              "type": "ResponseStatus",
+              "required": false,
+              "default": "\"complete\""
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false,
+              "description": "A short status phrase. Keep token-by-token updates in children."
+            },
+            {
+              "name": "errorMessage",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "copyText",
+              "type": "string",
+              "required": false,
+              "description": "Explicit text to copy. Omit to hide the copy action."
+            },
+            {
+              "name": "copyLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Copy response\""
+            },
+            {
+              "name": "copiedLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Copied\""
+            },
+            {
+              "name": "copyErrorLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Could not copy. Try again.\""
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Application-owned actions, such as retry or feedback buttons."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Rendered content. Supply your own markdown renderer here when needed."
+            }
+          ]
+        }
+      ]
+    },
+    "reasoning": {
+      "exports": [
+        {
+          "name": "Reasoning",
+          "kind": "component",
+          "description": "A native disclosure for a work summary supplied by the application.",
+          "extends": "Omit<DetailsHTMLAttributes<HTMLDetailsElement>, \"title\">",
+          "ref": "HTMLDetailsElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false,
+              "default": "\"Work summary\""
+            },
+            {
+              "name": "status",
+              "type": "ReasoningStatus",
+              "required": false,
+              "default": "\"complete\"",
+              "description": "Describes application-supplied progress, without generating a thinking trace."
+            },
+            {
+              "name": "statusLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"inline\" | \"panel\"",
+              "required": false,
+              "default": "\"panel\"",
+              "description": "An inline disclosure for message activity, or a framed panel."
+            },
+            {
+              "name": "durationMs",
+              "type": "number",
+              "required": false,
+              "description": "Optional elapsed time supplied by the application, in milliseconds."
+            },
+            {
+              "name": "measureDuration",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Measure this component's streaming interval. Off by default."
+            },
+            {
+              "name": "autoExpand",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Open when a new streaming interval begins. Manual disclosure remains the default."
+            },
+            {
+              "name": "autoCollapseDelay",
+              "type": "number | false",
+              "required": false,
+              "default": "false",
+              "description": "Close once after completion unless the reader manually changed the disclosure."
+            }
+          ]
+        }
+      ]
+    },
     "description-list": {
       "exports": [
         {
@@ -487,6 +3252,12 @@
               "name": "onExpandedChange",
               "type": "(ids: string[]) => void",
               "required": false
+            },
+            {
+              "name": "renderLabel",
+              "type": "(node: TreeNode, state: { selected: boolean; expanded: boolean; }) => ReactNode",
+              "required": false,
+              "description": "Custom non-interactive row content. The node's plain label still names the tree item."
             }
           ]
         }
@@ -1990,6 +4761,69 @@
               "required": false
             },
             {
+              "name": "files",
+              "type": "File[]",
+              "required": false,
+              "description": "Controlled file selection, independent of the text draft."
+            },
+            {
+              "name": "defaultFiles",
+              "type": "File[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "onFilesChange",
+              "type": "(files: File[]) => void",
+              "required": false
+            },
+            {
+              "name": "multiple",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "maxFiles",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "maxFileSize",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "onAttachmentError",
+              "type": "(rejections: MessageAttachmentRejection[]) => void",
+              "required": false
+            },
+            {
+              "name": "globalDrop",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Also accept file drops outside this composer. Enable on one composer per page."
+            },
+            {
+              "name": "allowScreenshot",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Shows a user-activated browser screen capture action when available."
+            },
+            {
+              "name": "tools",
+              "type": "ReactNode",
+              "required": false,
+              "description": "Application-owned model selectors, capability controls, or other tools."
+            },
+            {
+              "name": "renderAttachments",
+              "type": "(attachments: AttachmentData[], actions: MessageComposerAttachmentActions) => ReactNode",
+              "required": false
+            },
+            {
               "name": "maxLength",
               "type": "number",
               "required": false
@@ -2013,6 +4847,20 @@
               "type": "() => void",
               "required": false,
               "description": "Requests that the application stop generation; does not itself cancel a network request."
+            },
+            {
+              "name": "compact",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "A single-line draft with an inline icon action; grows as the message wraps."
+            },
+            {
+              "name": "maxRows",
+              "type": "number",
+              "required": false,
+              "default": "6",
+              "description": "Maximum visible draft lines in compact mode, clamped to 1–20."
             }
           ]
         }
@@ -5219,16 +8067,17 @@
           "props": [
             {
               "name": "variant",
-              "type": "\"primary\" | \"ghost\"",
+              "type": "\"primary\" | \"ghost\" | \"subtle\"",
               "required": false,
               "default": "\"primary\"",
-              "description": "Solid ink primary or hairline ghost. One primary per view."
+              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
             },
             {
               "name": "size",
-              "type": "\"default\" | \"sm\"",
+              "type": "\"default\" | \"sm\" | \"icon\"",
               "required": false,
-              "default": "\"default\""
+              "default": "\"default\"",
+              "description": "Icon buttons stay square at every breakpoint. Supply an accessible name."
             },
             {
               "name": "grouped",
@@ -5975,7 +8824,7 @@
           "props": [
             {
               "name": "as",
-              "type": "\"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\" | \"div\"",
+              "type": "\"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\"",
               "required": false,
               "default": "\"h2\"",
               "description": "Heading level. The dialog is named by this element either way."
@@ -6373,7 +9222,7 @@
           "props": [
             {
               "name": "as",
-              "type": "\"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\" | \"div\"",
+              "type": "\"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\"",
               "required": false,
               "default": "\"h2\"",
               "description": "Heading level. The dialog is named by this element either way."
@@ -6660,6 +9509,13 @@
               "name": "onPressedChange",
               "type": "(pressed: boolean) => void",
               "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"subtle\" | \"default\"",
+              "required": false,
+              "default": "\"default\"",
+              "description": "Subtle uses a quiet hover and a soft selected fill."
             }
           ]
         },
@@ -6689,6 +9545,13 @@
               "name": "onValueChange",
               "type": "(value: string) => void",
               "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"subtle\" | \"default\"",
+              "required": false,
+              "default": "\"default\"",
+              "description": "Subtle groups use a soft rail and individually rounded selected items."
             }
           ]
         }
@@ -6722,6 +9585,13 @@
               "name": "onValueChange",
               "type": "(value: string) => void",
               "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"subtle\" | \"default\"",
+              "required": false,
+              "default": "\"default\"",
+              "description": "Subtle groups use a soft rail and individually rounded selected items."
             }
           ]
         }
@@ -6826,7 +9696,7 @@
           "props": [
             {
               "name": "as",
-              "type": "\"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\" | \"div\"",
+              "type": "\"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\"",
               "required": false,
               "default": "\"h2\""
             }
@@ -6888,7 +9758,7 @@
           "props": [
             {
               "name": "as",
-              "type": "\"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\" | \"div\"",
+              "type": "\"div\" | \"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"span\"",
               "required": false,
               "default": "\"h2\""
             }

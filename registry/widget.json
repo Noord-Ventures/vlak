@@ -1,0 +1,112 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "widget",
+  "type": "registry:component",
+  "title": "Widget",
+  "description": "A surface with a subtle 1px outline and 4px corners for React content and provider iframes, with attribution, data states, actions, and supporting context.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/widget.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport type WidgetStatus = \"ready\" | \"loading\" | \"empty\" | \"error\";\nexport interface WidgetProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  /** Visible name of this widget and its region. */\n  title: React.ReactNode;\n  /** Name or linked attribution for the application or integration supplying the content. */\n  provider?: React.ReactNode;\n  /** Optional decorative provider or content mark. */\n  icon?: React.ReactNode;\n  description?: React.ReactNode;\n  /** Application-supplied data state. The widget never fetches data itself. */\n  status?: WidgetStatus;\n  statusLabel?: string;\n  emptyMessage?: string;\n  errorMessage?: string;\n  onRetry?: () => void | Promise<void>;\n  /** Application-owned controls, rendered after the content. */\n  actions?: React.ReactNode;\n  /** Supporting source, update time, or context below the actions. */\n  footer?: React.ReactNode;\n  children?: React.ReactNode;\n}\n\nexport interface WidgetEmbedProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {\n  /** Descriptive name of the embedded interface, announced to assistive technology. */\n  title: string;\n  /** Address supplied by the application or its connected provider. */\n  src: string;\n}\n\nconst styles = stylex.create({\n  root: { boxSizing: \"border-box\", minWidth: 0, width: \"100%\", maxWidth: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, overflowWrap: \"anywhere\" },\n  header: { display: \"flex\", alignItems: \"flex-start\", gap: \"0.75rem\", padding: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  icon: { display: \"flex\", alignItems: \"center\", justifyContent: \"center\", width: \"1.25rem\", height: \"1.25rem\", flexShrink: 0 },\n  heading: { display: \"grid\", gap: \"0.25rem\", flex: \"1 1 auto\", minWidth: 0 },\n  title: { fontSize: \"0.875rem\", lineHeight: 1.45, fontWeight: 600 },\n  provider: { fontSize: \"0.75rem\", lineHeight: 1.45, color: vlak.gray },\n  label: { fontSize: \"0.75rem\", lineHeight: 1.45, color: vlak.gray, marginInlineStart: \"auto\" },\n  content: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, padding: \"1rem\", fontSize: \"0.875rem\", lineHeight: 1.45 },\n  description: { margin: 0, color: vlak.gray },\n  state: { display: \"grid\", justifyItems: \"start\", gap: \"0.75rem\", minWidth: 0 },\n  message: { margin: 0 },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", minWidth: 0, paddingBlock: \"0 1rem\", paddingInline: \"1rem\" },\n  footer: { margin: 0, padding: \"0.75rem 1rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, fontSize: \"0.75rem\", lineHeight: 1.45, color: vlak.gray },\n  embed: { boxSizing: \"border-box\", display: \"block\", width: \"100%\", maxWidth: \"100%\", minWidth: 0, borderWidth: 0 },\n});\n\n/** An explicitly sized provider iframe for a Widget. Permissions and provider messaging remain application-owned. */\nexport const WidgetEmbed = React.forwardRef<HTMLIFrameElement, WidgetEmbedProps>(function WidgetEmbed({\n  title, src, height = 320, sandbox = \"allow-scripts allow-forms\", referrerPolicy = \"no-referrer\", loading = \"lazy\", className, style, ...props\n}, ref) {\n  const embed = rs([\"rs-widget-embed\", className], styles.embed);\n  return <iframe {...props} ref={ref} title={title} src={src} height={height} sandbox={sandbox} referrerPolicy={referrerPolicy} loading={loading} className={embed.className} style={{ ...embed.style, ...style }} />;\n});\n\n/** A shared surface for application and third-party React content, with explicit data states. */\nexport const Widget = React.forwardRef<HTMLElement, WidgetProps>(function Widget({\n  title, provider, icon, description, status = \"ready\", statusLabel, emptyMessage = \"No results to show.\", errorMessage = \"This widget could not be loaded.\",\n  onRetry, actions, footer, children, className, style, \"aria-label\": label, \"aria-labelledby\": labelledBy, ...props\n}, ref) {\n  const titleId = React.useId();\n  const [retrying, setRetrying] = React.useState(false);\n  const [retryError, setRetryError] = React.useState(\"\");\n  const pending = React.useRef(false);\n  const request = React.useRef(0);\n  // biome-ignore lint/correctness/useExhaustiveDependencies: A changed data state invalidates previous retry results.\n  React.useEffect(() => {\n    request.current += 1;\n    pending.current = false;\n    setRetrying(false);\n    setRetryError(\"\");\n    return () => { request.current += 1; };\n  }, [status]);\n  const retry = async () => {\n    if (!onRetry || pending.current) return;\n    pending.current = true;\n    const id = ++request.current;\n    setRetrying(true);\n    setRetryError(\"\");\n    try { await onRetry(); }\n    catch { if (request.current === id) setRetryError(\"Retry failed. Try again.\"); }\n    finally { if (request.current === id) { pending.current = false; setRetrying(false); } }\n  };\n  const root = rs([\"rs-widget\", className], styles.root);\n  const header = rs([\"rs-widget-header\"], styles.header);\n  const iconStyle = rs([\"rs-widget-icon\"], styles.icon);\n  const heading = rs([\"rs-widget-heading\"], styles.heading);\n  const titleStyle = rs([\"rs-widget-title\"], styles.title);\n  const providerStyle = rs([\"rs-widget-provider\"], styles.provider);\n  const labelStyle = rs([\"rs-widget-label\"], styles.label);\n  const content = rs([\"rs-widget-content\"], styles.content);\n  const descriptionStyle = rs([\"rs-widget-description\"], styles.description);\n  const state = rs([\"rs-widget-state\"], styles.state);\n  const message = rs([\"rs-widget-message\"], styles.message);\n  const actionsStyle = rs([\"rs-widget-actions\"], styles.actions);\n  const footerStyle = rs([\"rs-widget-footer\"], styles.footer);\n\n  return <section {...props} ref={ref} aria-label={label} aria-labelledby={labelledBy ?? (label == null ? titleId : undefined)} data-status={status} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}>\n      {icon != null && <span {...iconStyle} aria-hidden=\"true\">{icon}</span>}\n      <div {...heading}>\n        <span {...titleStyle} id={titleId}>{title}</span>\n        {provider != null && <div {...providerStyle}>{provider}</div>}\n      </div>\n      {statusLabel && <span {...labelStyle}>{statusLabel}</span>}\n    </header>\n    <div {...content}>\n      {description != null && <div {...descriptionStyle}>{description}</div>}\n      {status === \"ready\" ? children : <div {...state}>\n        <p {...message} role={status === \"error\" ? \"alert\" : \"status\"}>{retrying ? \"Retrying…\" : retryError || (status === \"loading\" ? \"Loading…\" : status === \"empty\" ? emptyMessage : errorMessage)}</p>\n        {status === \"error\" && onRetry && <Button type=\"button\" variant=\"ghost\" disabled={retrying} onClick={() => { void retry(); }}>{retrying ? \"Retrying…\" : \"Try again\"}</Button>}\n      </div>}\n    </div>\n    {status === \"ready\" && actions != null && <div {...actionsStyle}>{actions}</div>}\n    {footer != null && <div {...footerStyle}>{footer}</div>}\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/widget.tsx"
+    },
+    {
+      "path": "vlak/styles/widget.css",
+      "content": "/* ── widget: generated from packages/react/src/components/widget.tsx ── */\n.rs-widget{box-sizing:border-box;min-width:0;width:100%;max-width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);overflow-wrap:anywhere}\n@media (forced-colors: active){.rs-widget{border-color:CanvasText}}\n.rs-widget-header{display:flex;align-items:flex-start;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-widget-icon{display:flex;align-items:center;justify-content:center;width:1.25rem;height:1.25rem;flex-shrink:0}\n.rs-widget-heading{display:grid;gap:0.25rem;flex:1 1 auto;min-width:0}\n.rs-widget-title{font-size:0.875rem;line-height:1.45;font-weight:600}\n.rs-widget-provider{font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}\n.rs-widget-label{font-size:0.75rem;line-height:1.45;color:var(--text-secondary);margin-inline-start:auto}\n.rs-widget-content{display:grid;gap:0.75rem;min-width:0;padding:1rem;font-size:0.875rem;line-height:1.45}\n.rs-widget-description{margin:0;color:var(--text-secondary)}\n.rs-widget-state{display:grid;justify-items:start;gap:0.75rem;min-width:0}\n.rs-widget-message{margin:0}\n.rs-widget-actions{display:flex;flex-wrap:wrap;gap:0.5rem;min-width:0;padding-block:0 1rem;padding-inline:1rem}\n.rs-widget-footer{margin:0;padding:0.75rem 1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}\n.rs-widget-embed{box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;border-width:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/widget.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-widget",
+        "rs-widget-header",
+        "rs-widget-icon",
+        "rs-widget-heading",
+        "rs-widget-title",
+        "rs-widget-provider",
+        "rs-widget-label",
+        "rs-widget-content",
+        "rs-widget-description",
+        "rs-widget-state",
+        "rs-widget-message",
+        "rs-widget-actions",
+        "rs-widget-footer",
+        "rs-widget-embed"
+      ],
+      "snippet": "<section class=\"rs-widget\" aria-labelledby=\"widget-title\" data-status=\"ready\"><header class=\"rs-widget-header\"><div class=\"rs-widget-heading\"><span class=\"rs-widget-title\" id=\"widget-title\">Recent files</span><div class=\"rs-widget-provider\">Connected drive</div></div></header><div class=\"rs-widget-content\"><p class=\"rs-widget-message\">Project brief · Updated today</p></div><div class=\"rs-widget-footer\">Supplied by the connected application</div></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI widget",
+        "Tool result card",
+        "Connected service widget",
+        "Integration widget",
+        "Generative UI",
+        "WidgetEmbed",
+        "Embedded widget",
+        "iframe"
+      ],
+      "example": "import { Button, Widget, WidgetEmbed, type WidgetStatus } from \"@noorddev/vlak-react\";\n\nexport function ConnectedWidgets({ status, onRetry, onOpenFiles, embedUrl }: {\n  status: WidgetStatus;\n  onRetry: () => void | Promise<void>;\n  onOpenFiles: () => void;\n  embedUrl: string;\n}) {\n  return <>\n    <Widget title=\"Recent files\" provider=\"Connected drive\" status={status} onRetry={onRetry}\n      emptyMessage=\"No files match this request.\" errorMessage=\"The drive could not be reached.\"\n      actions={<Button variant=\"subtle\" onClick={onOpenFiles}>Open files</Button>} footer=\"Updated just now\">\n      <p>Project brief · Ready for review</p>\n    </Widget>\n    <Widget title=\"Project board\" provider=\"Connected board\">\n      <WidgetEmbed title=\"Project board from the connected provider\" src={embedUrl} height={360} />\n    </Widget>\n  </>;\n}",
+      "usage": {
+        "use": [
+          "Present application data and third-party results with the same title, provider, content, action, and footer slots.",
+          "Map your integration's result to ready, loading, empty, or error. Supply rendered React content in children for the ready state.",
+          "Use WidgetEmbed in children for a provider iframe. Supply its embed address, a descriptive title, and an explicit height; the default height is 320px.",
+          "WidgetEmbed fills the available width and defaults to lazy loading, no-referrer, and a sandbox allowing scripts and forms. Set sandbox and allow for the provider's application-approved permissions.",
+          "Show the source in provider and an update time or other context in footer.",
+          "Use subtle Button actions and subtle ToggleGroup controls for supporting actions and visible view choices within a widget.",
+          "Use onRetry for an application-owned reload. Update status when data arrives; the widget does not fetch data or infer success.",
+          "CSS-only markup supplies the frame; data transitions and retry handling require React or application code."
+        ],
+        "avoid": [
+          "Treating this surface as a connector, authentication flow, or tool execution engine.",
+          "Passing untrusted markup or model-selected component names directly into rendered content.",
+          "Assuming the parent stylesheet can style a cross-origin iframe's interior. Provider theming, messaging, and automatic height coordination belong to the application integration.",
+          "Hiding consequential actions inside a widget without the application's normal confirmation step."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through provider links, ready content, supplied actions, and the error state's retry button"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused retry button or supplied native button"
+        },
+        {
+          "keys": "Tab inside an embed",
+          "does": "Follows the provider document's native focus order; its keyboard interactions are supplied by that document"
+        }
+      ],
+      "a11y": [
+        "The section is named by its visible title unless an accessible name override is supplied.",
+        "Empty and loading messages use a status region; failures use an alert. Progress remains outside a busy region so it can be announced promptly.",
+        "A rejected retry remains readable and permits another attempt. Pending retries prevent duplicate activation, and changed data states invalidate stale retry results.",
+        "The decorative icon is hidden from assistive technology. Provider content and supplied actions remain in the normal reading and tab order.",
+        "WidgetEmbed requires a title that identifies the embedded document. The provider supplies the document's accessible content and keyboard behavior.",
+        "Native section attributes, className, style, and the section ref are forwarded. WidgetEmbed forwards native iframe attributes, permission overrides, and the iframe ref. The application supplies accessible content and controls for each integration."
+      ]
+    }
+  }
+}

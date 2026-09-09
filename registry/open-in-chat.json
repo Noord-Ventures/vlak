@@ -1,0 +1,93 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "open-in-chat",
+  "type": "registry:component",
+  "title": "Open in chat",
+  "description": "Explicit provider links that encode a supplied prompt for ChatGPT, Claude, Cursor, Scira, T3 Chat and v0.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/sources.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/open-in-chat.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Collapsible } from \"./collapsible\";\nimport { sourceHref } from \"./sources\";\n\nexport type OpenInChatProvider = \"chatgpt\" | \"claude\" | \"cursor\" | \"scira\" | \"t3\" | \"v0\" | \"github\";\nexport interface OpenInChatProps extends Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, \"title\"> {\n  prompt: string;\n  providers?: readonly OpenInChatProvider[];\n  githubUrl?: string;\n  label?: string;\n  defaultOpen?: boolean;\n}\nconst names: Record<OpenInChatProvider, string> = { chatgpt: \"ChatGPT\", claude: \"Claude\", cursor: \"Cursor\", scira: \"Scira\", t3: \"T3 Chat\", v0: \"v0\", github: \"GitHub\" };\n\n/** Builds provider handoff links without contacting providers or submitting a conversation. */\nexport function openInChatHref(provider: OpenInChatProvider, prompt: string, githubUrl?: string): string | undefined {\n  switch (provider) {\n    case \"chatgpt\": return `https://chatgpt.com/?${new URLSearchParams({ hints: \"search\", prompt })}`;\n    case \"claude\": return `https://claude.ai/new?${new URLSearchParams({ q: prompt })}`;\n    case \"cursor\": return `https://cursor.com/link/prompt?${new URLSearchParams({ text: prompt })}`;\n    case \"scira\": return `https://scira.ai/?${new URLSearchParams({ q: prompt })}`;\n    case \"t3\": return `https://t3.chat/new?${new URLSearchParams({ q: prompt })}`;\n    case \"v0\": return `https://v0.app/?${new URLSearchParams({ q: prompt })}`;\n    case \"github\": return githubUrl ? sourceHref(githubUrl) : undefined;\n  }\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, color: vlak.ink },\n  list: { margin: 0, padding: 0, listStyleType: \"none\", display: \"grid\", gap: 0 },\n  link: { display: \"flex\", alignItems: \"center\", justifyContent: \"space-between\", gap: \"1rem\", minWidth: vlak.hit, minHeight: vlak.hit, color: { default: vlak.gray, \":hover\": { default: null, [mq.hover]: vlak.ink } }, fontSize: vlak.controlFs, lineHeight: 1.45, textDecoration: \"none\", paddingInline: \"0.5rem\", borderRadius: vlak.radiusSm, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -2 } },\n  note: { margin: \"0.5rem 0 0\", fontSize: vlak.controlLabel, lineHeight: 1.45, color: vlak.gray },\n});\n\n/** Explicit provider links for a supplied prompt. Nothing leaves the page until a link is activated. */\nexport const OpenInChat = React.forwardRef<HTMLDetailsElement, OpenInChatProps>(function OpenInChat({ prompt, providers = [\"chatgpt\", \"claude\", \"cursor\", \"scira\", \"t3\", \"v0\"], githubUrl, label = \"Open in chat\", defaultOpen = false, className, style, ...props }, ref) {\n  const root = rs([\"rs-open-in-chat\", className], styles.root);\n  const list = rs([\"rs-open-in-chat-list\"], styles.list);\n  const link = rs([\"rs-open-in-chat-link\"], styles.link);\n  const note = rs([\"rs-open-in-chat-note\"], styles.note);\n  const links = Array.from(new Set(providers)).flatMap(provider => { const href = openInChatHref(provider, prompt, githubUrl); return href ? [{ provider, href }] : []; });\n  return <Collapsible {...props} ref={ref} title={label} defaultOpen={defaultOpen} className={root.className} style={{ ...root.style, ...style }}>\n    <ul {...list}>{links.map(({ provider, href }) => <li key={provider}><a {...link} href={href} target=\"_blank\" rel=\"noopener noreferrer\" aria-label={`Open in ${names[provider]} (new tab)`}><span>{names[provider]}</span><span aria-hidden=\"true\">↗</span></a></li>)}</ul>\n    <p {...note}>{links.length ? \"Choose a provider to open the supplied prompt in a new tab.\" : \"No provider links available.\"}</p>\n  </Collapsible>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/open-in-chat.tsx"
+    },
+    {
+      "path": "vlak/styles/open-in-chat.css",
+      "content": "/* ── open-in-chat: generated from packages/react/src/components/open-in-chat.tsx ── */\n.rs-open-in-chat{min-width:0;color:var(--text)}\n.rs-open-in-chat-list{margin:0;padding:0;list-style-type:none;display:grid;gap:0}\n.rs-open-in-chat-link{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-width:var(--hit);min-height:var(--hit);color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;text-decoration:none;padding-inline:0.5rem;border-radius:var(--radius-sm)}\n.rs-open-in-chat-link:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}\n@media (hover: hover) and (pointer: fine){.rs-open-in-chat-link:hover{color:var(--text)}}\n.rs-open-in-chat-note{margin:0.5rem 0 0;font-size:var(--control-label);line-height:1.45;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/open-in-chat.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-open-in-chat",
+        "rs-open-in-chat-list",
+        "rs-open-in-chat-link",
+        "rs-open-in-chat-note"
+      ],
+      "snippet": "<details class=\"rs-open-in-chat rs-disclosure\"><summary class=\"rs-disclosure-summary\">Open in chat</summary><ul class=\"rs-open-in-chat-list\"><li><a class=\"rs-open-in-chat-link\" href=\"https://claude.ai/new?q=Review+the+brief\" target=\"_blank\" rel=\"noopener noreferrer\">Claude</a></li></ul></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "collapsible",
+        "sources",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Open in Chat",
+        "OpenIn",
+        "ChatGPT handoff",
+        "Claude handoff",
+        "Provider prompt links"
+      ],
+      "example": "import { OpenInChat } from \"@noorddev/vlak-react\";\n\n<OpenInChat prompt=\"Review the brief and suggest the next step.\" providers={[\"chatgpt\", \"claude\", \"cursor\"]} />",
+      "usage": {
+        "use": [
+          "Offer an explicit handoff of supplied text to another application.",
+          "Choose providers from chatgpt, claude, cursor, scira, t3, v0 and github. GitHub requires a separate githubUrl; it does not treat the prompt as a URL.",
+          "Prompt query parameters use the browser's query encoder. Native links preserve browser open-in-new-tab behavior.",
+          "No prompt is sent when the component renders or opens; the selected provider is contacted only after link activation.",
+          "Provider handoff addresses are based on the pinned AI Elements reference and may evolve. The provider controls what happens after navigation."
+        ],
+        "avoid": [
+          "Claiming that opening a provider link has submitted or generated a response.",
+          "Including conversation content in prompt that the application does not intend to hand off."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches the native disclosure and its provider links"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Opens or closes provider choices"
+        },
+        {
+          "keys": "Enter on a link",
+          "does": "Opens that provider in a new tab"
+        }
+      ],
+      "a11y": [
+        "The disclosure and every provider link have readable names. New-tab behavior is included in link labels.",
+        "Links have 44px minimum height, visible focus and rel=noopener noreferrer.",
+        "Native details attributes and the details ref pass through; CSS-only markup retains native disclosure and links."
+      ]
+    }
+  }
+}

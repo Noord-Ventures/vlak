@@ -1,0 +1,97 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "transcription",
+  "type": "registry:component",
+  "title": "Transcription",
+  "description": "Displays timestamped speech segments, highlights playback time, and optionally seeks a player through accessible phrase controls.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/media-scrubber.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/transcription.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { formatMediaTime } from \"./media-scrubber\";\n\nexport interface TranscriptionSegment { id: string; text: string; startSecond: number; endSecond: number; speaker?: string }\nexport interface TranscriptionProps extends React.HTMLAttributes<HTMLDivElement> {\n  segments: readonly TranscriptionSegment[];\n  currentTime?: number;\n  onSeek?: (seconds: number) => void;\n  label?: string;\n  /** Follow active text until the reader scrolls. Off by default. */\n  autoScroll?: boolean;\n  maxHeight?: number | string;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0, color: vlak.ink },\n  viewport: { overflowY: \"auto\", minWidth: 0, overscrollBehavior: \"contain\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n  list: { margin: 0, padding: 0, listStyleType: \"none\" },\n  segment: { display: \"grid\", gridTemplateColumns: \"4.5rem minmax(0, 1fr)\", alignItems: \"start\", gap: \"0.75rem\", width: \"100%\", minHeight: vlak.hit, boxSizing: \"border-box\", padding: \"0.75rem\", borderWidth: 0, borderRadius: 0, backgroundColor: \"transparent\", color: vlak.gray, fontSize: vlak.controlFs, lineHeight: 1.45, fontFamily: \"inherit\", textAlign: \"start\", overflowWrap: \"anywhere\" },\n  interactive: { cursor: \"pointer\", color: { default: vlak.gray, \":hover\": { default: null, [mq.hover]: vlak.ink } }, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -2 } },\n  active: { backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: \"Highlight\" }, color: { default: vlak.ink, [mq.forcedColors]: \"HighlightText\" }, fontWeight: 500 },\n  time: { fontSize: vlak.controlLabel, fontVariantNumeric: \"tabular-nums\", paddingTop: \"0.125rem\" },\n  speaker: { display: \"block\", fontSize: vlak.controlLabel, marginBottom: \"0.25rem\" },\n  empty: { margin: 0, padding: \"0.75rem\", fontSize: vlak.controlFs, color: vlak.gray },\n});\n\n/** Supplied timed text. Playback remains application-owned; only activation requests a seek. */\nexport const Transcription = React.forwardRef<HTMLDivElement, TranscriptionProps>(function Transcription({ segments, currentTime = 0, onSeek, label = \"Transcript\", autoScroll = false, maxHeight = \"24rem\", className, style, ...props }, ref) {\n  const viewport = React.useRef<HTMLDivElement>(null);\n  const activeRef = React.useRef<HTMLLIElement>(null);\n  const [following, setFollowing] = React.useState(autoScroll);\n  const rendered = segments.filter(segment => segment.text.trim() && Number.isFinite(segment.startSecond) && Number.isFinite(segment.endSecond) && segment.startSecond >= 0 && segment.endSecond >= segment.startSecond);\n  const active = rendered.find(segment => currentTime >= segment.startSecond && currentTime < segment.endSecond)?.id;\n  const reveal = React.useCallback(() => {\n    const parent = viewport.current; const item = activeRef.current;\n    if (!parent || !item) return;\n    const parentBox = parent.getBoundingClientRect(); const itemBox = item.getBoundingClientRect();\n    if (itemBox.top < parentBox.top) parent.scrollTop += itemBox.top - parentBox.top;\n    else if (itemBox.bottom > parentBox.bottom) parent.scrollTop += itemBox.bottom - parentBox.bottom;\n  }, []);\n  React.useEffect(() => setFollowing(autoScroll), [autoScroll]);\n  React.useEffect(() => { if (autoScroll && following && active) reveal(); }, [active, autoScroll, following, reveal]);\n  const root = rs([\"rs-transcription\", className], styles.root);\n  const frame = rs([\"rs-transcription-viewport\"], styles.viewport);\n  const list = rs([\"rs-transcription-list\"], styles.list);\n  const time = rs([\"rs-transcription-time\"], styles.time);\n  const speaker = rs([\"rs-transcription-speaker\"], styles.speaker);\n  const empty = rs([\"rs-transcription-empty\"], styles.empty);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...frame} ref={viewport} role=\"group\" aria-label={label} tabIndex={0} style={{ ...frame.style, maxHeight }} onWheel={() => setFollowing(false)} onTouchMove={() => setFollowing(false)} onPointerDown={() => setFollowing(false)} onKeyDown={event => { if ([\"ArrowUp\", \"ArrowDown\", \"PageUp\", \"PageDown\", \"Home\", \"End\"].includes(event.key)) setFollowing(false); }}>\n      {rendered.length ? <ol {...list}>{rendered.map(segment => {\n        const selected = segment.id === active;\n        const item = rs([\"rs-transcription-segment\", Boolean(onSeek) && \"rs-transcription-interactive\", selected && \"rs-transcription-active\"], styles.segment, Boolean(onSeek) && styles.interactive, selected && styles.active);\n        const content = <><span {...time}>{formatMediaTime(segment.startSecond)}</span><span>{segment.speaker && <span {...speaker}>{segment.speaker}</span>}{segment.text}</span></>;\n        return <li key={segment.id} ref={selected ? activeRef : undefined}>{onSeek ? <button {...item} type=\"button\" aria-current={selected ? \"true\" : undefined} aria-label={`Seek to ${formatMediaTime(segment.startSecond)}${segment.speaker ? `, ${segment.speaker}` : \"\"}: ${segment.text}`} onClick={() => onSeek(segment.startSecond)}>{content}</button> : <div {...item} aria-current={selected ? \"true\" : undefined}>{content}</div>}</li>;\n      })}</ol> : <p {...empty}>No transcript available.</p>}\n    </div>\n    {autoScroll && !following && <Button variant=\"subtle\" size=\"sm\" onClick={() => { setFollowing(true); reveal(); }}>Follow transcript</Button>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/transcription.tsx"
+    },
+    {
+      "path": "vlak/styles/transcription.css",
+      "content": "/* ── transcription: generated from packages/react/src/components/transcription.tsx ── */\n.rs-transcription{display:grid;gap:0.5rem;min-width:0;color:var(--text)}\n.rs-transcription-viewport{overflow-y:auto;min-width:0;overscroll-behavior:contain;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm)}\n.rs-transcription-viewport:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n@media (forced-colors: active){.rs-transcription-viewport{border-color:CanvasText}}\n.rs-transcription-list{margin:0;padding:0;list-style-type:none}\n.rs-transcription-segment{display:grid;grid-template-columns:4.5rem minmax(0, 1fr);align-items:start;gap:0.75rem;width:100%;min-height:var(--hit);box-sizing:border-box;padding:0.75rem;border-width:0;border-radius:0;background-color:transparent;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;font-family:inherit;text-align:start;overflow-wrap:anywhere}\n.rs-transcription-interactive{cursor:pointer;color:var(--text-secondary)}\n.rs-transcription-interactive:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}\n@media (hover: hover) and (pointer: fine){.rs-transcription-interactive:hover{color:var(--text)}}\n.rs-transcription-active{background-color:var(--control-fill);color:var(--text);font-weight:500}\n@media (forced-colors: active){.rs-transcription-active{background-color:Highlight;color:HighlightText}}\n.rs-transcription-time{font-size:var(--control-label);font-variant-numeric:tabular-nums;padding-top:0.125rem}\n.rs-transcription-speaker{display:block;font-size:var(--control-label);margin-bottom:0.25rem}\n.rs-transcription-empty{margin:0;padding:0.75rem;font-size:var(--control-fs);color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/transcription.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-transcription",
+        "rs-transcription-viewport",
+        "rs-transcription-list",
+        "rs-transcription-segment",
+        "rs-transcription-interactive",
+        "rs-transcription-active",
+        "rs-transcription-time",
+        "rs-transcription-speaker",
+        "rs-transcription-empty"
+      ],
+      "snippet": "<div class=\"rs-transcription\"><div class=\"rs-transcription-viewport\" role=\"group\" aria-label=\"Transcript\" tabindex=\"0\"><ol class=\"rs-transcription-list\"><li><div class=\"rs-transcription-segment rs-transcription-active\" aria-current=\"true\"><span class=\"rs-transcription-time\">0:00</span><span>The brief is ready for review.</span></div></li></ol></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "media-scrubber",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Transcription",
+        "Timed transcript",
+        "Speech segments",
+        "Transcript seek"
+      ],
+      "example": "\"use client\";\nimport { useRef, useState } from \"react\";\nimport { Transcription } from \"@noorddev/vlak-react\";\n\nexport function TimedTranscript({ src }: { src: string }) {\n  const audioRef = useRef<HTMLAudioElement>(null);\n  const [time, setTime] = useState(0);\n  return <>\n    <audio ref={audioRef} src={src} controls aria-label=\"Spoken brief\" onTimeUpdate={event => setTime(event.currentTarget.currentTime)} />\n    <Transcription currentTime={time} onSeek={seconds => {\n      if (audioRef.current) audioRef.current.currentTime = seconds;\n    }} segments={[\n      { id: \"opening\", startSecond: 0, endSecond: 4, speaker: \"Mina\", text: \"The brief is ready for review.\" },\n      { id: \"next\", startSecond: 4, endSecond: 8, text: \"Each decision has an owner and a next step.\" },\n    ]} />\n  </>;\n}",
+      "usage": {
+        "use": [
+          "Supply stable segment ids, text and finite non-negative timestamps in seconds.",
+          "currentTime controls highlighting. Only activating a segment invokes onSeek; playback updates never trigger seek feedback loops.",
+          "Without onSeek the transcript is noninteractive text. Empty or invalid segments are omitted.",
+          "autoScroll is off by default. When enabled it follows active text until the reader scrolls or interacts, then offers Follow transcript.",
+          "CSS-only markup displays supplied text and states; synchronization requires application code."
+        ],
+        "avoid": [
+          "Treating supplied text as a live transcription service.",
+          "Forcing the viewport back to the active phrase after the reader scrolls away."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches the transcript region and optional phrase seek controls"
+        },
+        {
+          "keys": "Arrow keys, Page Up, Page Down, Home, End",
+          "does": "Scrolls the focused region and pauses automatic following"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Seeks to the focused phrase or resumes following"
+        }
+      ],
+      "a11y": [
+        "A named region contains an ordered list, timestamps and optional speaker labels.",
+        "Active text exposes aria-current and a full selected fill. Seek buttons have 44px minimum height and visible focus.",
+        "Following moves only this transcript's scroll position; it never steals focus or announces each playback tick."
+      ]
+    }
+  }
+}

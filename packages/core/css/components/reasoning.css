@@ -1,0 +1,17 @@
+/* ── reasoning: generated from packages/react/src/components/reasoning.tsx ── */
+.rs-reasoning{box-sizing:border-box;min-width:0;width:100%;max-width:66ch;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text)}
+@media (forced-colors: active){.rs-reasoning{border-color:ButtonText}}
+.rs-reasoning-inline{border-width:0;background-color:transparent}
+.rs-reasoning-summary{box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;gap:0.625rem;min-width:var(--hit);min-height:var(--hit);padding-block:0.75rem;padding-inline:1rem;border-radius:inherit;list-style:none;cursor:pointer;font-size:0.84375rem;line-height:1.45;background-color:transparent;color:var(--text)}
+.rs-reasoning-summary::-webkit-details-marker{display:none}
+.rs-reasoning-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+@media (hover: hover) and (pointer: fine){.rs-reasoning-summary:hover{background-color:var(--control-fill)}}
+@media (forced-colors: active){.rs-reasoning-summary{background-color:ButtonFace;color:ButtonText}}
+.rs-reasoning-indicator{display:block;flex-shrink:0;width:1rem;height:1rem}
+.rs-reasoning-summary-inline{padding-block:0.5rem;padding-inline:0.75rem;color:var(--text-secondary);background-color:transparent}
+@media (hover: hover) and (pointer: fine){.rs-reasoning-summary-inline:hover{color:var(--text);background-color:transparent}}
+@media (forced-colors: active){.rs-reasoning-summary-inline{color:ButtonText;background-color:transparent}}
+.rs-reasoning-title{flex-grow:1;font-weight:600}
+.rs-reasoning-title-inline{font-weight:400}
+.rs-reasoning-status{color:var(--text-secondary);font-size:0.8125rem}
+.rs-reasoning-content{padding-block:0.25rem 1rem;padding-inline:1rem;font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere;color:var(--text-secondary)}

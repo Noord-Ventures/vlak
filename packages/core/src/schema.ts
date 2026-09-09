@@ -14,6 +14,7 @@ export const vlakCategories = [
   "icons",
   "charts",
   "patterns",
+  "ai",
   "health",
   "civic",
   "science",
@@ -40,6 +41,12 @@ export interface VlakComponent {
   css: string[];
   /** React source file, relative to packages/react/src/. Absent for CSS-only entries. */
   react?: string;
+  /** Optional renderer entry point. Omitted for components available from the root React package. */
+  reactImport?: string;
+  /** Additional npm packages required by this optional renderer or adapter. */
+  dependencies?: string[];
+  /** Additional stylesheets required by an optional rendering engine. */
+  styles?: string[];
   /** Other registry components this one's snippet or styles rely on. */
   registryDependencies?: string[];
   /** Minimal HTML snippet in the house style. */

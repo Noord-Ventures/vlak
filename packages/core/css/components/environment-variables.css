@@ -1,0 +1,15 @@
+/* ── environment-variables: generated from packages/react/src/components/environment-variables.tsx ── */
+.rs-environment-variables{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}
+@media (forced-colors: active){.rs-environment-variables{border-color:CanvasText}}
+.rs-environment-variables-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0.5rem 1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-environment-variables-title{flex:1 1 auto;font-size:0.875rem;line-height:1.45;font-weight:600}
+.rs-environment-variables-list{margin:0;padding:0 1rem}
+.rs-environment-variables-row{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr) auto;align-items:center;gap:0.5rem;padding-block:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+@media (max-width: 640px){.rs-environment-variables-row{grid-template-columns:minmax(0, 1fr) auto}}
+.rs-environment-variables-name{margin:0;min-width:0;overflow-wrap:anywhere;font-size:0.875rem;line-height:1.45}
+.rs-environment-variables-value{margin:0;min-width:0;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;grid-column:auto}
+@media (max-width: 640px){.rs-environment-variables-value{grid-column:1 / 2}}
+.rs-environment-variables-controls{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0.25rem;margin:0;grid-column:auto;grid-row:auto}
+@media (max-width: 640px){.rs-environment-variables-controls{grid-column:2 / 3;grid-row:1 / 3}}
+.rs-environment-variables-note{display:block;margin:0;color:var(--text-secondary);font-size:0.75rem;line-height:1.45}
+.rs-environment-variables-footer{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0.5rem 1rem}

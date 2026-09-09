@@ -22,6 +22,12 @@ function trailFor(pathname: string): Crumb[] {
     trail.push({ label: "Docs", href: "/docs" });
     if (parts[1] === "tokens") trail.push({ label: "Tokens" });
     else trail.push({ label: "Getting started" });
+  } else if (parts[0] === "ai") {
+    trail.push({ label: "AI", href: "/ai" });
+    if (parts[1]) {
+      const component = vlakComponents.find((c) => c.name === parts[1] && c.category === "ai");
+      trail.push({ label: parts[1] === "widgets" ? "Widget patterns" : component?.title ?? parts[1] });
+    }
   } else if (parts[0] === "about") {
     trail.push({ label: "About" });
   } else if (parts[0] === "components") {

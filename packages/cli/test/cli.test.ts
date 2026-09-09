@@ -251,6 +251,8 @@ describe("docs", () => {
     expect(docsFor("guide")).toContain("# Vlak guide");
     expect(docsFor("index")).toContain("# Vlak components");
     expect(docsFor("tokens")).toContain("--bg");
+    expect(docsFor("ai")).toContain("Show tools and decisions separately");
+    expect(search("AI Elements").map(hit => hit.name)).toContain("response");
   });
 
   it("has a page for every listed component and none for unknown names", () => {
@@ -306,4 +308,19 @@ describe("list", () => {
     }
     expect(JSON.parse(JSON.stringify(entries))).toEqual(entries);
   });
+});
+
+it("installs optional graph source and layered engine CSS with explicit npm dependencies", async () => {
+  init(cwd);
+  const result = await add(cwd, ["workflow-canvas"]);
+  const canvas = result.outcomes.find(outcome => outcome.item.name === "workflow-canvas");
+  expect(canvas?.item.dependencies).toContain("@xyflow/react");
+  expect(canvas?.item.meta?.vlak?.reactImport).toBe("@noorddev/vlak-react/components/workflow-canvas");
+  expect(canvas?.item.files.some(file => file.content.includes("@layer vlak.engine {"))).toBe(true);
+  expect(existsSync(join(cwd, "components/vlak/workflow-canvas.tsx"))).toBe(true);
+  const stylesheet = readFileSync(join(cwd, "styles/vlak/workflow.css"), "utf8");
+  expect(stylesheet).toContain("@layer vlak.engine {");
+  expect(stylesheet).toContain(".react-flow__edge-path");
+  expect(stylesheet).toContain("MIT License");
+  expect(stylesheet).not.toContain("@import");
 });

@@ -1,0 +1,10 @@
+/* ── agent: generated from packages/react/src/components/agent.tsx ── */
+.rs-agent{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+@media (forced-colors: active){.rs-agent{border-color:CanvasText}}
+.rs-agent-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-agent-title{font-weight:600;overflow-wrap:anywhere}
+.rs-agent-content{display:grid;gap:1rem;padding:1rem;min-width:0}
+.rs-agent-section{display:grid;gap:0.5rem;min-width:0}
+.rs-agent-label{font-size:0.75rem;color:var(--text-secondary);font-weight:600}
+.rs-agent-instructions{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}
+.rs-agent-description{color:var(--text-secondary);margin:0 0 0.75rem;overflow-wrap:anywhere}

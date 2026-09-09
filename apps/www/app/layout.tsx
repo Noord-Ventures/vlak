@@ -69,7 +69,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <SiteFooter />
         <SiteAnalytics publicPaths={[
           ...publicSitePaths,
-          ...catalogComponents.map(({ name }) => `/components/${name}`),
+          ...catalogComponents.map(({ name, category }) => `/${category === "ai" ? "ai" : "components"}/${name}`),
           ...domainCollections.map(({ name }) => `/docs/${name}`),
           ...interfaces.map(({ slug }) => `/interfaces/${slug}`),
         ]} />

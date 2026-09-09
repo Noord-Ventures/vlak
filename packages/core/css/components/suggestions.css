@@ -1,0 +1,4 @@
+/* ── suggestions: generated from packages/react/src/components/suggestions.tsx ── */
+.rs-suggestions{display:flex;gap:0.5rem;overflow-x:auto;padding-block:0.25rem;min-width:0;max-width:100%}
+.rs-suggestions-wrap{flex-wrap:wrap}
+.rs-suggestions-item{flex-shrink:0;width:auto;white-space:nowrap}

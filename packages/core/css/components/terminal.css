@@ -1,0 +1,23 @@
+/* ── terminal: generated from packages/react/src/components/terminal.tsx ── */
+@keyframes rs-anim-blink{from{opacity:1}to{opacity:0.35}}
+.rs-terminal{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+@media (forced-colors: active){.rs-terminal{border-color:CanvasText}}
+.rs-terminal-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-terminal-title{font-weight:600;flex:1 1 auto}
+.rs-terminal-status{color:var(--text-secondary);font-size:0.75rem;margin:0}
+.rs-terminal-content{padding:1rem;overflow:auto;outline-color:var(--text);outline-offset:-2px}
+.rs-terminal-pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace}
+.rs-terminal-run{color:inherit;--terminal-foreground:inherit;--terminal-background:transparent}
+.rs-terminal-bold{font-weight:700}
+.rs-terminal-dim{color:var(--text-secondary)}
+.rs-terminal-italic{font-style:italic}
+.rs-terminal-underline{text-decoration-line:underline}
+.rs-terminal-strike{text-decoration-line:line-through}
+.rs-terminal-underline-strike{text-decoration-line:underline line-through}
+.rs-terminal-inverse{color:var(--bg);background-color:var(--text)}
+@media (forced-colors: active){.rs-terminal-inverse{color:HighlightText;background-color:Highlight}}
+.rs-terminal-colors{color:var(--terminal-foreground, inherit);background-color:var(--terminal-background, transparent)}
+@media (forced-colors: active){.rs-terminal-colors{color:CanvasText;background-color:Canvas}}
+.rs-terminal-cursor{display:inline-block;width:0.5rem;height:1em;background-color:var(--text);vertical-align:text-bottom;margin-inline-start:0.25rem;animation-name:rs-anim-blink;animation-duration:800ms;animation-direction:alternate;animation-iteration-count:infinite}
+@media (prefers-reduced-motion: reduce){.rs-terminal-cursor{animation-name:none}}
+.rs-terminal-footer{padding:0 1rem 0.75rem;color:var(--text-secondary);font-size:0.75rem}

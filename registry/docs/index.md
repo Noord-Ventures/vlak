@@ -1,6 +1,6 @@
 # Vlak components
 
-168 components in 18 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+215 components in 19 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -8,12 +8,12 @@
 - [Overflow list](overflow-list.md): Keeps priority actions visible and moves excess actions into a menu.
 - [Playback controls](playback-controls.md): Groups named play, pause, previous, next, and stop controls with 44px targets.
 - [Canvas controls](canvas-controls.md): Adjusts bounded zoom and exposes fit and reset actions for a canvas.
-- [Button](button.md): Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.
-- [Button group](button-group.md): Keeps related actions together as joined ghost buttons with 1px dividers.
+- [Button](button.md): Triggers an action with solid primary, 1px ghost, or borderless subtle styling. Every target is at least 44px; icon size is a 44px square.
+- [Button group](button-group.md): Keeps related actions together as joined buttons with 1px dividers and one outer frame.
 - [Text link](link.md): Navigates to a page or resource. Hairline underline; in-copy variant is inset 1px.
 - [Dropdown menu](dropdown-menu.md): Presents a compact list of actions. Menu roles and arrow-key navigation are built in.
-- [Toggle](toggle.md): Turns one persistent option on or off. Pressed fills with ink and exposes aria-pressed.
-- [Toggle group](toggle-group.md): Selects one option from joined toggles. The active option fills with ink.
+- [Toggle](toggle.md): Turns one persistent option on or off with aria-pressed. Default uses an ink fill when pressed; subtle uses a soft fill and stronger text.
+- [Toggle group](toggle-group.md): Selects one visible option. Default joins toggles with an ink active state; subtle uses a gray rail, 3px gaps, and a soft active fill.
 - [Context menu](context-menu.md): Opens actions at the pointer or with Shift+F10. Escape and outside click close the menu.
 - [Menubar](menubar.md): Groups application menus in a compact 1px frame. Text-only triggers keep 44px targets and wrap to fit.
 - [Command](command.md): Finds and runs commands in a native dialog. Filter by typing; navigate with arrows and Enter.
@@ -136,13 +136,63 @@
 - [Property grid](property-grid.md): Aligns editable labels, values, units, and hints in an inspector.
 - [Media player](media-player.md): Connects native audio or video to playback, seeking, captions, speed, volume, and full screen.
 - [Image viewer](image-viewer.md): Inspects an image collection with zoom, navigation, and a native dialog lightbox.
-- [Message composer](message-composer.md): Composes text and optional attachments with submission shortcuts and retained drafts on failure.
+- [Message composer](message-composer.md): Composes a compact growing draft with validated file previews, paste and drop, screenshot capture, and retained drafts on failure.
 - [File browser](file-browser.md): Explores a supplied file hierarchy through folders, breadcrumbs, search, and list or grid views.
 - [Kanban board](kanban-board.md): Moves and reorders cards across named columns with drag and keyboard alternatives.
 - [Scheduler](scheduler.md): Plans events in agenda, week, or month views with date navigation and accessible rescheduling.
 - [Inline form](inline-form.md): Pairs one field with an embedded submit action. The button appears after validation.
 - [Workflow card](workflow.md): Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 - [Assistant panel](assistant.md): Frames an assistant exchange with a user message, reply, suggestion, and input row.
+
+## AI
+
+- [Context usage](context-usage.md): A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates.
+- [Model selector](model-selector.md): Searches a supplied model catalog by name, provider and capabilities, with metadata and controlled selection.
+- [Sources](sources.md): A counted native disclosure of application-supplied references, descriptions and supporting quotes.
+- [Inline citation](inline-citation.md): A quiet inline source trigger opening a counted, keyboard-navigable preview with links, descriptions and quotes.
+- [Open in chat](open-in-chat.md): Explicit provider links that encode a supplied prompt for ChatGPT, Claude, Cursor, Scira, T3 Chat and v0.
+- [Terminal](terminal.md): Renders streamed console output with incremental ANSI attributes and optional original colors.
+- [Stack trace](stack-trace.md): Parses JavaScript error frames into function names, file locations and internal-frame labels.
+- [Sandbox](sandbox.md): Combines a tool-status disclosure with keyboard-accessible code and output tabs.
+- [Web preview](web-preview.md): Provides URL navigation, a sandboxed iframe and a collapsible console of supplied log messages.
+- [Jsx preview](jsx-preview.md): Renders registered components and plain data expressions from streamed JSX through an optional parser.
+- [Attachments](attachments.md): A responsive file list with image, audio, and video previews, file metadata, removal, and application-owned upload states.
+- [Shimmer](shimmer.md): A monochrome moving highlight over progress text, with reduced-motion and forced-color fallbacks.
+- [Plan](plan.md): A collapsible proposed plan with streaming title treatment, actions, and supporting context.
+- [Task](task.md): A default-open task disclosure with supplied item states and file references.
+- [Thought steps](thought-steps.md): A collapsible sequence of work summaries, with step states, source badges, images, and captions.
+- [Checkpoint](checkpoint.md): A conversation marker with an async restore action, retry feedback, and stable cancellation.
+- [Suggestions](suggestions.md): A wrapping or horizontally scrollable collection of prompt buttons with subtle outlines and 4px corners.
+- [Work queue](work-queue.md): Collapsible prompt and todo sections with completion counts, attachments, and item actions.
+- [Generated image](generated-image.md): Displays a supplied generated-image result with alt text and responsive 4px corners.
+- [Conversation export](conversation-export.md): Downloads a Markdown snapshot from explicit message text, attachments, and structured tool results.
+- [Response editor](response-editor.md): A multiline message editor that preserves failed drafts and ignores cancelled saves.
+- [Workflow canvas](workflow-canvas.md): An interactive graph with draggable nodes, connections, viewport controls, anchored panels, and node actions.
+- [Response markdown](response-markdown.md): Renders streaming markdown, tables, code, math, and diagrams with Vlak typography and safe default links.
+- [Highlighted code](highlighted-code.md): Monochrome syntax highlighting with lazy grammars, exact-source copy and download, and a scrollable code region.
+- [Response branch](response-branch.md): Navigates saved response alternatives with stable identity, previous and next controls, and a readable position.
+- [Audio player](audio-player.md): Native audio playback for remote files and generated speech, with composable controls, bounded skip seeking, volume, and recoverable errors.
+- [Mic selector](mic-selector.md): Searches available microphone inputs with explicit permission activation, device-change updates, and recoverable selection states.
+- [Speech input](speech-input.md): Starts and stops native speech capture, with final text, optional interim results, and application transcription of recorded audio.
+- [Voice selector](voice-selector.md): Searches application-supplied voice names and metadata, with controlled selection and optional audio preview playback.
+- [Transcription](transcription.md): Displays timestamped speech segments, highlights playback time, and optionally seeks a player through accessible phrase controls.
+- [Persona](persona.md): A monochrome assistant visual with idle, listening, thinking, speaking, and asleep states, plus a custom visual slot.
+- [Agent](agent.md): Inspects an agent’s model, instructions, tool definitions and output schema in a 4px surface.
+- [Artifact](artifact.md): Frames generated content with header actions, an optional scroll region and a close request.
+- [Commit](commit.md): Shows a commit message, full-hash copy, author and time, with expandable changed files.
+- [Environment variables](environment-variables.md): Masks environment values by default, with deliberate reveal, value copy and quoted shell exports.
+- [Package info](package-info.md): Compares current and proposed package versions with change type and expandable dependencies.
+- [Schema display](schema-display.md): Displays an endpoint’s method, path, parameters and nested request and response schemas.
+- [Snippet](snippet.md): Presents a compact selectable command with a decorative prefix and exact-value copy action.
+- [Test results](test-results.md): Displays suites, derived pass/fail/skip totals, elapsed time and failure details with optional retries.
+- [Chat](chat.md): A subtle 1px outline with 4px corners, a named header, scrollable conversation, and a composer anchored below the history.
+- [Conversation](conversation.md): Keeps a scrollable message history at the latest response until the reader scrolls back.
+- [Widget](widget.md): A surface with a subtle 1px outline and 4px corners for React content and provider iframes, with attribution, data states, actions, and supporting context.
+- [Response actions](response-actions.md): Four subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
+- [Tool call](tool-call.md): Shows tool input, output, and execution state in a native disclosure with a subtle 1px outline, 4px corners, and a 44px summary.
+- [Confirmation](confirmation.md): Collects approval or rejection in a surface with a subtle 1px outline and 4px corners, with async recording, error recovery, and 44px actions.
+- [Response](response.md): Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, status, and an action slot.
+- [Reasoning](reasoning.md): A native disclosure for supplied work summaries, with a chevron and 44px control. Panels use a subtle 1px outline and 4px corners.
 
 ## Health
 

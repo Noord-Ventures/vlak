@@ -1,0 +1,107 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "terminal",
+  "type": "registry:component",
+  "title": "Terminal",
+  "description": "Renders streamed console output with incremental ANSI attributes and optional original colors.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/snippet.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/terminal.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { SnippetCopy } from \"./snippet\";\nimport { appendTerminalOutput, createTerminalParser, type TerminalParserState } from \"./terminal-parser\";\n\nexport interface TerminalProps extends Omit<React.HTMLAttributes<HTMLElement>, \"onCopy\" | \"title\"> {\n  output: string;\n  title?: React.ReactNode;\n  streaming?: boolean;\n  autoScroll?: boolean;\n  /** Explicitly opt into original ANSI colors. The default retains text attributes in monochrome. */\n  ansiColors?: boolean;\n  onClear?: () => void;\n  onCopy?: (output: string) => void | Promise<void>;\n  maxHeight?: React.CSSProperties[\"maxHeight\"];\n  /** Maximum visible source characters. Copy retains the complete original output. */\n  maxCharacters?: number;\n}\nconst blink = stylex.keyframes({ from: { opacity: 1 }, to: { opacity: 0.35 } });\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", padding: \"0.5rem 0.75rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  title: { fontWeight: 600, flex: \"1 1 auto\" },\n  status: { color: vlak.gray, fontSize: \"0.75rem\", margin: 0 },\n  content: { padding: \"1rem\", overflow: \"auto\", outlineColor: vlak.ink, outlineOffset: -2 },\n  pre: { margin: 0, whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\" },\n  run: { color: \"inherit\", \"--terminal-foreground\": \"inherit\", \"--terminal-background\": \"transparent\" },\n  bold: { fontWeight: 700 },\n  dim: { color: vlak.gray },\n  italic: { fontStyle: \"italic\" },\n  underline: { textDecorationLine: \"underline\" },\n  strike: { textDecorationLine: \"line-through\" },\n  underlineStrike: { textDecorationLine: \"underline line-through\" },\n  inverse: { color: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" }, backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" } },\n  colors: { color: { default: \"var(--terminal-foreground, inherit)\", [mq.forcedColors]: \"CanvasText\" }, backgroundColor: { default: \"var(--terminal-background, transparent)\", [mq.forcedColors]: \"Canvas\" } },\n  cursor: { display: \"inline-block\", width: \"0.5rem\", height: \"1em\", backgroundColor: vlak.ink, verticalAlign: \"text-bottom\", marginInlineStart: \"0.25rem\", animationName: { default: blink, [mq.reduce]: \"none\" }, animationDuration: \"800ms\", animationDirection: \"alternate\", animationIterationCount: \"infinite\" },\n  footer: { padding: \"0 1rem 0.75rem\", color: vlak.gray, fontSize: \"0.75rem\" },\n});\n\n/** Streaming console output with incremental ANSI attributes; not a shell or terminal emulator. */\nexport const Terminal = React.forwardRef<HTMLElement, TerminalProps>(function Terminal({ output, title = \"Terminal\", streaming = false, autoScroll = true, ansiColors = false, onClear, onCopy, maxHeight = \"24rem\", maxCharacters = 100000, className, style, children, ...props }, ref) {\n  const cache = React.useRef<{ source: string; parsed: TerminalParserState }>({ source: \"\", parsed: createTerminalParser() });\n  const contentRef = React.useRef<HTMLDivElement>(null);\n  const following = React.useRef(true);\n  const [atEnd, setAtEnd] = React.useState(true);\n  const budget = Number.isFinite(maxCharacters) ? Math.min(2000000, Math.max(100, Math.floor(maxCharacters))) : 100000;\n  const source = output.slice(-budget);\n  const parsed = React.useMemo(() => {\n    const previous = cache.current;\n    const append = source.startsWith(previous.source);\n    const next = appendTerminalOutput(append ? previous.parsed : createTerminalParser(), append ? source.slice(previous.source.length) : source);\n    cache.current = { source, parsed: next };\n    return next;\n  }, [source]);\n  // biome-ignore lint/correctness/useExhaustiveDependencies: New output requests follow-scroll only while the reader is at the end.\n  React.useEffect(() => { if (autoScroll && following.current && contentRef.current) contentRef.current.scrollTop = contentRef.current.scrollHeight; }, [output, autoScroll]);\n  const root = rs([\"rs-terminal\", className], styles.root);\n  const header = rs([\"rs-terminal-header\"], styles.header);\n  const titleStyle = rs([\"rs-terminal-title\"], styles.title);\n  const status = rs([\"rs-terminal-status\"], styles.status);\n  const content = rs([\"rs-terminal-content\"], styles.content);\n  const pre = rs([\"rs-terminal-pre\"], styles.pre);\n  const cursor = rs([\"rs-terminal-cursor\"], styles.cursor);\n  const footer = rs([\"rs-terminal-footer\"], styles.footer);\n  return <section aria-label={typeof title === \"string\" ? title : \"Terminal output\"} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}><span {...titleStyle}>{title}</span><span {...status} role=\"status\">{streaming ? \"Streaming\" : \"Output complete\"}</span><SnippetCopy value={output} label=\"Copy terminal output\" onCopy={onCopy} />{onClear && <Button type=\"button\" variant=\"subtle\" onClick={onClear}>Clear</Button>}{!atEnd && autoScroll && <Button type=\"button\" variant=\"subtle\" onClick={() => { following.current = true; setAtEnd(true); if (contentRef.current) contentRef.current.scrollTop = contentRef.current.scrollHeight; }}>Latest output</Button>}</header>\n    <div ref={contentRef} className={content.className} style={{ ...content.style, maxHeight }} tabIndex={0} role=\"group\" aria-label=\"Terminal output\" onScroll={event => { const node = event.currentTarget; following.current = node.scrollHeight - node.scrollTop - node.clientHeight < 24; setAtEnd(following.current); }}><pre {...pre}>{parsed.runs.map((run, index) => {\n      const sx = rs([\"rs-terminal-run\", run.bold && \"rs-terminal-bold\", run.dim && \"rs-terminal-dim\", run.italic && \"rs-terminal-italic\", run.underline && \"rs-terminal-underline\", run.strike && \"rs-terminal-strike\", run.underline && run.strike && \"rs-terminal-underline-strike\", run.inverse && \"rs-terminal-inverse\", ansiColors && \"rs-terminal-colors\"], styles.run, run.bold && styles.bold, run.dim && styles.dim, run.italic && styles.italic, run.underline && styles.underline, run.strike && styles.strike, run.underline && run.strike && styles.underlineStrike, run.inverse && styles.inverse, ansiColors && styles.colors);\n      const dynamic = ansiColors ? { \"--terminal-foreground\": run.inverse ? run.background ?? \"var(--bg)\" : run.foreground, \"--terminal-background\": run.inverse ? run.foreground ?? \"var(--text)\" : run.background } as React.CSSProperties : undefined;\n      return <span key={index} className={sx.className} style={{ ...sx.style, ...dynamic }}>{run.text}</span>;\n    })}{streaming && <span {...cursor} aria-hidden=\"true\" />}</pre></div>{output.length > budget && <div {...footer}>Earlier output omitted. Copy includes the complete source.</div>}{children}\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/terminal.tsx"
+    },
+    {
+      "path": "vlak/terminal-parser.ts",
+      "content": "export interface TerminalAttributes { bold?: boolean; dim?: boolean; italic?: boolean; underline?: boolean; strike?: boolean; inverse?: boolean; foreground?: string; background?: string }\nexport interface TerminalRun extends TerminalAttributes { text: string }\nexport interface TerminalParserState { mode: \"text\" | \"escape\" | \"csi\" | \"osc\" | \"osc-escape\"; parameters: string; attributes: TerminalAttributes; runs: TerminalRun[] }\n\nexport function createTerminalParser(): TerminalParserState { return { mode: \"text\", parameters: \"\", attributes: {}, runs: [] }; }\n\nfunction ansiColor(index: number | undefined): string | undefined {\n  if (index === undefined || !Number.isInteger(index) || index < 0 || index > 255) return undefined;\n  const basic = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0], [0, 0, 128], [128, 0, 128], [0, 128, 128], [192, 192, 192], [128, 128, 128], [255, 0, 0], [0, 255, 0], [255, 255, 0], [0, 0, 255], [255, 0, 255], [0, 255, 255], [255, 255, 255]];\n  if (index < 16) return `rgb(${basic[index]!.join(\", \")})`;\n  if (index >= 232) { const gray = 8 + (index - 232) * 10; return `rgb(${gray}, ${gray}, ${gray})`; }\n  const cube = index - 16;\n  const channel = (n: number) => n === 0 ? 0 : 55 + n * 40;\n  return `rgb(${channel(Math.floor(cube / 36))}, ${channel(Math.floor(cube / 6) % 6)}, ${channel(cube % 6)})`;\n}\nfunction applySgr(state: TerminalParserState) {\n  const values = (state.parameters || \"0\").replace(/(38|48):2::/g, \"$1;2;\").replaceAll(\":\", \";\").split(\";\").map(value => Number(value || \"0\"));\n  for (let index = 0; index < values.length; index++) {\n    const value = values[index]!;\n    const attrs = state.attributes;\n    if (value === 0) state.attributes = {};\n    else if (value === 1) attrs.bold = true;\n    else if (value === 2) attrs.dim = true;\n    else if (value === 3) attrs.italic = true;\n    else if (value === 4 || value === 21) attrs.underline = true;\n    else if (value === 7) attrs.inverse = true;\n    else if (value === 9) attrs.strike = true;\n    else if (value === 22) { delete attrs.bold; delete attrs.dim; }\n    else if (value === 23) delete attrs.italic;\n    else if (value === 24) delete attrs.underline;\n    else if (value === 27) delete attrs.inverse;\n    else if (value === 29) delete attrs.strike;\n    else if (value === 39) delete attrs.foreground;\n    else if (value === 49) delete attrs.background;\n    else if (value >= 30 && value <= 37) attrs.foreground = ansiColor(value - 30);\n    else if (value >= 90 && value <= 97) attrs.foreground = ansiColor(value - 90 + 8);\n    else if (value >= 40 && value <= 47) attrs.background = ansiColor(value - 40);\n    else if (value >= 100 && value <= 107) attrs.background = ansiColor(value - 100 + 8);\n    else if (value === 38 || value === 48) {\n      const key = value === 38 ? \"foreground\" : \"background\";\n      if (values[index + 1] === 5) { attrs[key] = ansiColor(values[index + 2]); index += 2; }\n      else if (values[index + 1] === 2) {\n        const rgb = values.slice(index + 2, index + 5);\n        if (rgb.length === 3 && rgb.every(channel => Number.isInteger(channel) && channel >= 0 && channel <= 255)) attrs[key] = `rgb(${rgb.join(\", \")})`;\n        index += 4;\n      }\n    }\n  }\n}\n\n/** Incremental SGR output parser. OSC (including clipboard and hyperlink commands) is discarded. */\nexport function appendTerminalOutput(previous: TerminalParserState, text: string): TerminalParserState {\n  const state: TerminalParserState = { ...previous, attributes: { ...previous.attributes }, runs: [...previous.runs] };\n  let buffered = \"\";\n  const flush = () => {\n    if (!buffered) return;\n    const last = state.runs.at(-1);\n    const { text: _previousText, ...lastAttributes } = last ?? { text: \"\" };\n    if (last && JSON.stringify(lastAttributes) === JSON.stringify(state.attributes)) state.runs[state.runs.length - 1] = { ...last, text: last.text + buffered };\n    else state.runs.push({ ...state.attributes, text: buffered });\n    buffered = \"\";\n  };\n  for (const character of text) {\n    if (state.mode === \"osc\") { if (character === \"\\u0007\") state.mode = \"text\"; else if (character === \"\\u001b\") state.mode = \"osc-escape\"; continue; }\n    if (state.mode === \"osc-escape\") { state.mode = character === \"\\\\\" ? \"text\" : character === \"\\u001b\" ? \"osc-escape\" : \"osc\"; continue; }\n    if (state.mode === \"escape\") { state.mode = character === \"[\" ? \"csi\" : character === \"]\" ? \"osc\" : \"text\"; state.parameters = \"\"; continue; }\n    if (state.mode === \"csi\") {\n      if (character >= \"@\" && character <= \"~\") { if (character === \"m\") applySgr(state); state.parameters = \"\"; state.mode = \"text\"; }\n      else if (state.parameters.length < 128) state.parameters += character;\n      continue;\n    }\n    if (character === \"\\u001b\") { flush(); state.mode = \"escape\"; }\n    else if (character === \"\\n\" || character === \"\\t\" || character >= \" \" && character !== \"\\u007f\") buffered += character;\n  }\n  flush();\n  return state;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/terminal-parser.ts"
+    },
+    {
+      "path": "vlak/styles/terminal.css",
+      "content": "/* ── terminal: generated from packages/react/src/components/terminal.tsx ── */\n@keyframes rs-anim-blink{from{opacity:1}to{opacity:0.35}}\n.rs-terminal{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-terminal{border-color:CanvasText}}\n.rs-terminal-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-terminal-title{font-weight:600;flex:1 1 auto}\n.rs-terminal-status{color:var(--text-secondary);font-size:0.75rem;margin:0}\n.rs-terminal-content{padding:1rem;overflow:auto;outline-color:var(--text);outline-offset:-2px}\n.rs-terminal-pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace}\n.rs-terminal-run{color:inherit;--terminal-foreground:inherit;--terminal-background:transparent}\n.rs-terminal-bold{font-weight:700}\n.rs-terminal-dim{color:var(--text-secondary)}\n.rs-terminal-italic{font-style:italic}\n.rs-terminal-underline{text-decoration-line:underline}\n.rs-terminal-strike{text-decoration-line:line-through}\n.rs-terminal-underline-strike{text-decoration-line:underline line-through}\n.rs-terminal-inverse{color:var(--bg);background-color:var(--text)}\n@media (forced-colors: active){.rs-terminal-inverse{color:HighlightText;background-color:Highlight}}\n.rs-terminal-colors{color:var(--terminal-foreground, inherit);background-color:var(--terminal-background, transparent)}\n@media (forced-colors: active){.rs-terminal-colors{color:CanvasText;background-color:Canvas}}\n.rs-terminal-cursor{display:inline-block;width:0.5rem;height:1em;background-color:var(--text);vertical-align:text-bottom;margin-inline-start:0.25rem;animation-name:rs-anim-blink;animation-duration:800ms;animation-direction:alternate;animation-iteration-count:infinite}\n@media (prefers-reduced-motion: reduce){.rs-terminal-cursor{animation-name:none}}\n.rs-terminal-footer{padding:0 1rem 0.75rem;color:var(--text-secondary);font-size:0.75rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/terminal.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-terminal",
+        "rs-terminal-header",
+        "rs-terminal-title",
+        "rs-terminal-status",
+        "rs-terminal-content",
+        "rs-terminal-pre",
+        "rs-terminal-cursor",
+        "rs-terminal-footer",
+        "rs-terminal-run",
+        "rs-terminal-bold",
+        "rs-terminal-dim",
+        "rs-terminal-italic",
+        "rs-terminal-underline",
+        "rs-terminal-strike",
+        "rs-terminal-underline-strike",
+        "rs-terminal-inverse",
+        "rs-terminal-colors"
+      ],
+      "snippet": "<section class=\"rs-terminal\" aria-label=\"Terminal\"><header class=\"rs-terminal-header\"><span class=\"rs-terminal-title\">Terminal</span><span class=\"rs-terminal-status\" role=\"status\">Output complete</span></header><div class=\"rs-terminal-content\" tabindex=\"0\" role=\"group\" aria-label=\"Terminal output\"><pre class=\"rs-terminal-pre\"><span class=\"rs-terminal-run rs-terminal-bold\">2 tests passed</span></pre></div></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "snippet",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Terminal",
+        "ANSI output",
+        "Console output"
+      ],
+      "example": "import { Terminal } from \"@noorddev/vlak-react\";\n\n<Terminal output={\"\\u001b[1m2 tests passed\\u001b[0m\\n\"} streaming={false} />",
+      "usage": {
+        "use": [
+          "Pass the growing output string to retain partial terminal escape sequences across updates.",
+          "The monochrome default preserves bold, italic, underline, strike and inverse states. Set ansiColors to display supplied 16-color, 256-color and truecolor values.",
+          "Provide onClear to request clearing application state. Copy preserves the complete original output, including escape sequences.",
+          "maxCharacters bounds visible source; maxHeight creates a named keyboard-scrollable region."
+        ],
+        "avoid": [
+          "Treating this output viewer as a shell, process runner or cursor-addressable terminal emulator.",
+          "Assuming output text can execute OSC clipboard commands or turn itself into active links. Such sequences are discarded.",
+          "Forcing follow-scroll while a reader is inspecting earlier output."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches copy, optional clear, jump-to-latest and the output region."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space activates the focused button. Scroll keys move the focused output region."
+        }
+      ],
+      "a11y": [
+        "Only the short streaming status is live; token output remains ordinary readable text.",
+        "Reader scroll position is preserved until they return to the end or activate Latest output.",
+        "The cursor is decorative and stops animating with reduced motion.",
+        "Original terminal colors are explicit opt-in and revert to system colors in forced-colors mode. Text remains escaped React content."
+      ]
+    }
+  }
+}

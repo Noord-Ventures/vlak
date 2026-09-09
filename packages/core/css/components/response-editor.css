@@ -1,0 +1,4 @@
+/* ── response-editor: generated from packages/react/src/components/response-editor.tsx ── */
+.rs-response-editor{display:grid;gap:0.75rem;min-width:0}
+.rs-response-editor-actions{display:flex;gap:0.5rem;flex-wrap:wrap}
+.rs-response-editor-error{margin:0;color:var(--text);font-size:0.8125rem}

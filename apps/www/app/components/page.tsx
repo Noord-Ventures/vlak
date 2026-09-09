@@ -77,6 +77,7 @@ export default function ComponentsPage() {
                 </p>
               )}
               {collection && <p className="rs-t-body">{collection.description} <Link href={`/docs/${category}`} className="rs-link">Read the collection guide</Link></p>}
+              {category === "ai" && <p className="rs-t-body">Conversations, responses, tool activity, and approvals. <Link href="/ai/" className="rs-link">Explore AI components</Link></p>}
               <div {...sx("gallery", chrome.gallery)}>
                 {items.map((c) => (
                   <div key={c.name} {...sx("gallery-item", chrome.galleryItem)}>
@@ -85,7 +86,7 @@ export default function ComponentsPage() {
                     </div>
                     <div {...sx("gallery-meta", chrome.galleryMeta)}>
                       <h3>
-                        <Link href={`/components/${c.name}`} className="gallery-item-link">
+                        <Link href={`/${c.category === "ai" ? "ai" : "components"}/${c.name}`} className="gallery-item-link">
                           {c.title}
                         </Link>
                       </h3>

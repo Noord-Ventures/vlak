@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "reasoning",
+  "type": "registry:component",
+  "title": "Reasoning",
+  "description": "A native disclosure for supplied work summaries, with a chevron and 44px control. Panels use a subtle 1px outline and 4px corners.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/reasoning.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport type ReasoningStatus = \"streaming\" | \"complete\";\n\nexport interface ReasoningProps extends Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, \"title\"> {\n  title?: React.ReactNode;\n  /** Describes application-supplied progress, without generating a thinking trace. */\n  status?: ReasoningStatus;\n  statusLabel?: string;\n  defaultOpen?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  /** An inline disclosure for message activity, or a framed panel. */\n  variant?: \"panel\" | \"inline\";\n  /** Optional elapsed time supplied by the application, in milliseconds. */\n  durationMs?: number;\n  /** Measure this component's streaming interval. Off by default. */\n  measureDuration?: boolean;\n  /** Open when a new streaming interval begins. Manual disclosure remains the default. */\n  autoExpand?: boolean;\n  /** Close once after completion unless the reader manually changed the disclosure. */\n  autoCollapseDelay?: number | false;\n}\n\nconst styles = stylex.create({\n  root: {\n    boxSizing: \"border-box\",\n    minWidth: 0,\n    width: \"100%\",\n    maxWidth: \"66ch\",\n    borderWidth: vlak.hairline,\n    borderStyle: \"solid\",\n    borderColor: { default: vlak.divider, [mq.forcedColors]: \"ButtonText\" },\n    borderRadius: vlak.radiusSm,\n    backgroundColor: vlak.paper,\n    color: vlak.ink,\n  },\n  inline: { borderWidth: 0, backgroundColor: \"transparent\" },\n  summary: {\n    boxSizing: \"border-box\",\n    display: \"flex\",\n    alignItems: \"center\",\n    flexWrap: \"wrap\",\n    gap: \"0.625rem\",\n    minWidth: vlak.hit,\n    minHeight: vlak.hit,\n    paddingBlock: \"0.75rem\",\n    paddingInline: \"1rem\",\n    borderRadius: \"inherit\",\n    listStyle: \"none\",\n    cursor: \"pointer\",\n    fontSize: \"0.84375rem\",\n    lineHeight: 1.45,\n    \"::-webkit-details-marker\": { display: \"none\" },\n    backgroundColor: {\n      default: \"transparent\",\n      \":hover\": { default: null, [mq.hover]: vlak.controlFill },\n      [mq.forcedColors]: \"ButtonFace\",\n    },\n    color: { default: vlak.ink, [mq.forcedColors]: \"ButtonText\" },\n    outlineWidth: { default: null, \":focus-visible\": 2 },\n    outlineStyle: { default: null, \":focus-visible\": \"solid\" },\n    outlineColor: { default: null, \":focus-visible\": vlak.ink },\n    outlineOffset: { default: null, \":focus-visible\": -2 },\n  },\n  indicator: {\n    display: \"block\",\n    flexShrink: 0,\n    width: \"1rem\",\n    height: \"1rem\",\n  },\n  summaryInline: {\n    paddingBlock: \"0.5rem\",\n    paddingInline: \"0.75rem\",\n    color: { default: vlak.gray, \":hover\": { default: null, [mq.hover]: vlak.ink }, [mq.forcedColors]: \"ButtonText\" },\n    backgroundColor: { default: \"transparent\", \":hover\": { default: null, [mq.hover]: \"transparent\" }, [mq.forcedColors]: \"transparent\" },\n  },\n  title: {\n    flexGrow: 1,\n    fontWeight: 600,\n  },\n  titleInline: { fontWeight: 400 },\n  status: {\n    color: vlak.gray,\n    fontSize: \"0.8125rem\",\n  },\n  content: {\n    paddingBlock: \"0.25rem 1rem\",\n    paddingInline: \"1rem\",\n    fontSize: \"0.875rem\",\n    lineHeight: 1.45,\n    overflowWrap: \"anywhere\",\n    color: vlak.gray,\n  },\n});\n\n/** A native disclosure for a work summary supplied by the application. */\nexport const Reasoning = React.forwardRef<HTMLDetailsElement, ReasoningProps>(function Reasoning(\n  {\n    title = \"Work summary\",\n    status = \"complete\",\n    statusLabel,\n    open,\n    defaultOpen = false,\n    onOpenChange,\n    variant = \"panel\",\n    durationMs,\n    measureDuration = false,\n    autoExpand = false,\n    autoCollapseDelay = false,\n    onToggle,\n    children,\n    className,\n    style,\n    ...props\n  },\n  ref,\n) {\n  const [innerOpen, setInnerOpen] = React.useState(defaultOpen);\n  const [elapsed, setElapsed] = React.useState(0);\n  const manuallyChanged = React.useRef(false);\n  const changeOpen = React.useRef((next: boolean) => { if (open === undefined) setInnerOpen(next); onOpenChange?.(next); });\n  changeOpen.current = (next: boolean) => { if (open === undefined) setInnerOpen(next); onOpenChange?.(next); };\n  const previousStatus = React.useRef<ReasoningStatus | undefined>(undefined);\n  const began = React.useRef<number | null>(null);\n  React.useEffect(() => {\n    const nextInterval = status === \"streaming\" && previousStatus.current !== \"streaming\";\n    const completed = status === \"complete\" && previousStatus.current === \"streaming\";\n    previousStatus.current = status;\n    if (nextInterval) {\n      manuallyChanged.current = false;\n      began.current = Date.now();\n      setElapsed(0);\n      if (autoExpand) changeOpen.current(true);\n    }\n    if (completed && began.current !== null) setElapsed(Math.max(0, Date.now() - began.current));\n    if (completed && autoCollapseDelay !== false && !manuallyChanged.current) {\n      const timer = setTimeout(() => { if (!manuallyChanged.current) changeOpen.current(false); }, Math.max(0, Number.isFinite(autoCollapseDelay) ? autoCollapseDelay : 0));\n      return () => clearTimeout(timer);\n    }\n  }, [status, autoExpand, autoCollapseDelay]);\n  React.useEffect(() => {\n    if (!measureDuration || status !== \"streaming\") return;\n    const timer = setInterval(() => { if (began.current !== null) setElapsed(Math.max(0, Date.now() - began.current)); }, 1000);\n    return () => clearInterval(timer);\n  }, [status, measureDuration]);\n  const duration = durationMs ?? (measureDuration ? elapsed : undefined);\n  const isOpen = open ?? innerOpen;\n  const inline = variant === \"inline\";\n  const root = rs([\"rs-reasoning\", inline && \"rs-reasoning-inline\", className], styles.root, inline && styles.inline);\n  const summary = rs([\"rs-reasoning-summary\", inline && \"rs-reasoning-summary-inline\"], styles.summary, inline && styles.summaryInline);\n  const indicator = rs([\"rs-reasoning-indicator\"], styles.indicator);\n  const titleStyle = rs([\"rs-reasoning-title\", inline && \"rs-reasoning-title-inline\"], styles.title, inline && styles.titleInline);\n  const statusStyle = rs([\"rs-reasoning-status\"], styles.status);\n  const content = rs([\"rs-reasoning-content\"], styles.content);\n\n  return (\n    <details\n      ref={ref}\n      {...props}\n      open={isOpen}\n      data-status={status}\n      className={root.className}\n      style={{ ...root.style, ...style }}\n      onToggle={(event) => {\n        const nextOpen = event.currentTarget.open;\n        if (nextOpen !== isOpen) {\n          manuallyChanged.current = true;\n          if (open === undefined) setInnerOpen(nextOpen);\n          else event.currentTarget.open = open;\n          onOpenChange?.(nextOpen);\n        }\n        onToggle?.(event);\n      }}\n    >\n      <summary\n        {...summary}\n        onClick={(event) => {\n          manuallyChanged.current = true;\n          if (open !== undefined) { event.preventDefault(); onOpenChange?.(!open); }\n        }}\n      >\n        <svg {...indicator} viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" strokeLinecap=\"round\" strokeLinejoin=\"round\" aria-hidden=\"true\" focusable=\"false\"><path d={isOpen ? \"m6 9 6 6 6-6\" : \"m9 6 6 6-6 6\"} /></svg>\n        <span {...titleStyle}>{title}</span>\n        <span {...statusStyle} role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">\n          {statusLabel ?? (status === \"streaming\" ? \"In progress\" : \"Complete\")}\n          {duration !== undefined && Number.isFinite(duration) && <span aria-hidden={status === \"streaming\" || undefined}>{` · ${Math.round(Math.max(0, duration) / 1000)}s`}</span>}\n        </span>\n      </summary>\n      <div {...content}>{children}</div>\n    </details>\n  );\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/reasoning.tsx"
+    },
+    {
+      "path": "vlak/styles/reasoning.css",
+      "content": "/* ── reasoning: generated from packages/react/src/components/reasoning.tsx ── */\n.rs-reasoning{box-sizing:border-box;min-width:0;width:100%;max-width:66ch;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text)}\n@media (forced-colors: active){.rs-reasoning{border-color:ButtonText}}\n.rs-reasoning-inline{border-width:0;background-color:transparent}\n.rs-reasoning-summary{box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;gap:0.625rem;min-width:var(--hit);min-height:var(--hit);padding-block:0.75rem;padding-inline:1rem;border-radius:inherit;list-style:none;cursor:pointer;font-size:0.84375rem;line-height:1.45;background-color:transparent;color:var(--text)}\n.rs-reasoning-summary::-webkit-details-marker{display:none}\n.rs-reasoning-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}\n@media (hover: hover) and (pointer: fine){.rs-reasoning-summary:hover{background-color:var(--control-fill)}}\n@media (forced-colors: active){.rs-reasoning-summary{background-color:ButtonFace;color:ButtonText}}\n.rs-reasoning-indicator{display:block;flex-shrink:0;width:1rem;height:1rem}\n.rs-reasoning-summary-inline{padding-block:0.5rem;padding-inline:0.75rem;color:var(--text-secondary);background-color:transparent}\n@media (hover: hover) and (pointer: fine){.rs-reasoning-summary-inline:hover{color:var(--text);background-color:transparent}}\n@media (forced-colors: active){.rs-reasoning-summary-inline{color:ButtonText;background-color:transparent}}\n.rs-reasoning-title{flex-grow:1;font-weight:600}\n.rs-reasoning-title-inline{font-weight:400}\n.rs-reasoning-status{color:var(--text-secondary);font-size:0.8125rem}\n.rs-reasoning-content{padding-block:0.25rem 1rem;padding-inline:1rem;font-size:0.875rem;line-height:1.45;overflow-wrap:anywhere;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/reasoning.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-reasoning",
+        "rs-reasoning-inline",
+        "rs-reasoning-summary",
+        "rs-reasoning-summary-inline",
+        "rs-reasoning-indicator",
+        "rs-reasoning-title",
+        "rs-reasoning-title-inline",
+        "rs-reasoning-status",
+        "rs-reasoning-content"
+      ],
+      "snippet": "<details class=\"rs-reasoning\"><summary class=\"rs-reasoning-summary\"><svg class=\"rs-reasoning-indicator\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" aria-hidden=\"true\"><path d=\"m9 6 6 6-6 6\" /></svg><span class=\"rs-reasoning-title\">Work summary</span><span class=\"rs-reasoning-status\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">Complete</span></summary><div class=\"rs-reasoning-content\"><p>Compared the renewal clause with the notice period.</p></div></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Reasoning",
+        "Work summary",
+        "AI progress disclosure",
+        "Task summary"
+      ],
+      "example": "import { Reasoning } from \"@noorddev/vlak-react\";\n\n<Reasoning variant=\"inline\" title=\"Reviewed the brief\" status=\"complete\">\n  <p>Compared the supplied brief with the previous revision.</p>\n</Reasoning>",
+      "usage": {
+        "use": [
+          "Optional task progress, tool activity summaries, or explanatory text supplied by your application.",
+          "Use variant=inline for activity within a message. Its padded summary changes text color on hover; the default panel uses a subtle 1px outline and 4px corners.",
+          "Use open and onOpenChange for controlled disclosure, or defaultOpen for an initial preference.",
+          "Keep title to non-interactive content so the native summary remains one clear disclosure control."
+        ],
+        "avoid": [
+          "Inventing private model thinking or inferring hidden chain-of-thought from a response. Supply a supported public summary or task progress instead.",
+          "Treating status as a timer or automatically closing the disclosure when work completes. The reader owns their open state.",
+          "Streaming long text into statusLabel. Put the evolving summary in children."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the native summary, then any interactive content in the expanded details."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Toggles the focused summary. In controlled mode, requests the next open value through onOpenChange."
+        }
+      ],
+      "a11y": [
+        "Native details and summary expose disclosure state and keyboard behavior without a custom widget.",
+        "The decorative chevron points right when closed and down when open; it is hidden from assistive technology.",
+        "The summary target is at least 44px with a visible focus outline and system colors in forced-colors mode.",
+        "Only the short status phrase is a polite, atomic live region; body updates are available in the normal reading order.",
+        "Status changes never close or open the disclosure. Controlled open values remain authoritative even when a change request is not accepted.",
+        "Native details attributes, onToggle, className, style, and the details ref are forwarded. The application supplies the summary and status; no model reasoning is generated or inferred."
+      ]
+    }
+  }
+}

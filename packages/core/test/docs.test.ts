@@ -10,7 +10,7 @@ describe("generated docs", () => {
   // registry/docs is committed and CI checks it is in sync; tests only read.
   it("has a page for every catalog component, an index, tokens, a guide, and llms.txt", () => {
     for (const c of catalogComponents) expect(existsSync(join(docsDir, `${c.name}.md`)), `docs/${c.name}.md`).toBe(true);
-    for (const f of ["index.md", "tokens.md", "guide.md", "llms.txt", "llms-full.txt"]) expect(existsSync(join(docsDir, f)), f).toBe(true);
+    for (const f of ["index.md", "tokens.md", "guide.md", "ai.md", "ai-parity.md", "llms.txt", "llms-full.txt"]) expect(existsSync(join(docsDir, f)), f).toBe(true);
   });
 
   it("links every component from llms.txt and index.md", () => {
@@ -30,6 +30,17 @@ describe("generated docs", () => {
       expect(page).toContain("npm install @noorddev/vlak-react");
       expect(page).toContain("## Example");
       expect(page).toContain("## Accessibility");
+    }
+  });
+
+  it("shows optional stylesheet instructions to stock shadcn users", () => {
+    for (const component of catalogComponents.filter(entry => entry.styles?.length)) {
+      const item = JSON.parse(readFileSync(join(repoRoot, "registry", `${component.name}.json`), "utf8"));
+      for (const stylesheet of component.styles!) {
+        const target = stylesheet.replace("@noorddev/vlak-react/", "styles/vlak/");
+        expect(item.docs, `${component.name}: installer stylesheet instructions`).toContain(target);
+        if (stylesheet.startsWith("@noorddev/vlak-react/")) expect(item.files.some((file: { target: string }) => file.target === target)).toBe(true);
+      }
     }
   });
 });

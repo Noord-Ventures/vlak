@@ -42,7 +42,7 @@ function groupLinks(category: VlakCategory) {
     .map((c) => ({
       key: c.name,
       title: c.title,
-      href: `/components/${c.name}`,
+      href: c.category === "ai" ? `/ai/${c.name}` : `/components/${c.name}`,
     }));
 }
 
@@ -177,7 +177,7 @@ export function DocsNav() {
           <div key={category} className="toc-mobile-group">
             <div className="toc-mobile-row">
               <Link
-                href={`/components#${category}`}
+                href={category === "ai" ? "/ai" : `/components#${category}`}
                 className="toc-mobile-item"
                 aria-current={selected === category ? "true" : undefined}
               >
@@ -242,7 +242,7 @@ export function DocsNav() {
           {groups.map((category) => (
             <Link
               key={category}
-              href={`/components#${category}`}
+              href={category === "ai" ? "/ai" : `/components#${category}`}
               {...sx("toc-item", navStyles.item)}
               aria-current={selected === category ? "true" : undefined}
               data-category={category}

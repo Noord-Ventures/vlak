@@ -1,0 +1,98 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "test-results",
+  "type": "registry:component",
+  "title": "Test results",
+  "description": "Displays suites, derived pass/fail/skip totals, elapsed time and failure details with optional retries.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/badge.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/code-block.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/test-results.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Badge } from \"./badge\";\nimport { Button } from \"./button\";\nimport { CodeBlock } from \"./code-block\";\nimport { Collapsible } from \"./collapsible\";\n\nexport type TestResultStatus = \"passed\" | \"failed\" | \"skipped\" | \"running\" | \"pending\";\nexport interface TestResultItem { id: string; name: string; status: TestResultStatus; duration?: number; error?: string; stack?: string }\nexport interface TestResultSuite { id: string; name: string; tests: TestResultItem[]; duration?: number }\nexport interface TestResultsProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  suites: TestResultSuite[];\n  title?: React.ReactNode;\n  /** Total elapsed time in milliseconds, when measured by the runner. */\n  duration?: number;\n  defaultOpen?: boolean;\n  /** Requests a retry; only new supplied test data changes the displayed result. */\n  onRetry?: (test: TestResultItem, suite: TestResultSuite) => void | Promise<void>;\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  header: { display: \"grid\", gap: \"0.75rem\", padding: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  title: { fontWeight: 600 },\n  summary: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", alignItems: \"center\", fontVariantNumeric: \"tabular-nums\" },\n  progress: { width: \"100%\", height: \"0.5rem\", accentColor: vlak.ink },\n  content: { padding: \"0.5rem 1rem 1rem\", display: \"grid\", gap: \"0.75rem\", minWidth: 0 },\n  list: { listStyle: \"none\", margin: 0, padding: 0 },\n  test: { paddingBlock: \"0.75rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, color: vlak.ink, minWidth: 0 },\n  line: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", alignItems: \"center\", minWidth: 0 },\n  name: { minWidth: 0, overflowWrap: \"anywhere\", flex: \"1 1 auto\" },\n  note: { color: vlak.gray, fontSize: \"0.75rem\", margin: 0 },\n  error: { margin: \"0.5rem 0\", whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\" },\n});\nfunction durationLabel(milliseconds: number): string { const ms = Number.isFinite(milliseconds) ? Math.max(0, milliseconds) : 0; return ms < 1000 ? `${Math.round(ms)} ms` : `${(ms / 1000).toFixed(2)} s`; }\n\nfunction TestRow({ test, suite, onRetry }: { test: TestResultItem; suite: TestResultSuite; onRetry?: TestResultsProps[\"onRetry\"] }) {\n  const [pending, setPending] = React.useState(false);\n  const [error, setError] = React.useState(\"\");\n  const locked = React.useRef(false);\n  const request = React.useRef(0);\n  // biome-ignore lint/correctness/useExhaustiveDependencies: A new result invalidates the previous retry callback.\n  React.useEffect(() => { request.current++; locked.current = false; setPending(false); setError(\"\"); return () => { request.current++; }; }, [test.status, test.error, test.stack]);\n  const retry = async () => {\n    if (!onRetry || locked.current) return;\n    locked.current = true;\n    const id = ++request.current;\n    setPending(true); setError(\"\");\n    try { await onRetry(test, suite); }\n    catch { if (id === request.current) setError(\"Retry failed. Try again.\"); }\n    finally { if (id === request.current) { locked.current = false; setPending(false); } }\n  };\n  const row = rs([\"rs-test-results-test\"], styles.test);\n  const line = rs([\"rs-test-results-line\"], styles.line);\n  const name = rs([\"rs-test-results-name\"], styles.name);\n  const note = rs([\"rs-test-results-note\"], styles.note);\n  const errorStyle = rs([\"rs-test-results-error\"], styles.error);\n  return <li {...row}><div {...line}><Badge variant={test.status === \"passed\" ? \"solid\" : \"muted\"}>{test.status}</Badge><span {...name}>{test.name}</span>{test.duration != null && <span {...note}>{durationLabel(test.duration)}</span>}{test.status === \"failed\" && onRetry && <Button type=\"button\" variant=\"subtle\" disabled={pending} aria-label={`Retry ${test.name}`} onClick={() => { void retry(); }}>{pending ? \"Retrying…\" : \"Retry\"}</Button>}</div>\n    {(test.error || test.stack) && <Collapsible title={`Failure details for ${test.name}`} defaultOpen={test.status === \"failed\"}>{test.error && <p {...errorStyle}>{test.error}</p>}{test.stack && <CodeBlock code={test.stack} language=\"Stack trace\" />}</Collapsible>}\n    <span {...note} role=\"status\">{error || (pending ? \"Retry requested…\" : \"\")}</span>\n  </li>;\n}\n\n/** Test hierarchy and derived totals, with runner-owned status and retry results. */\nexport const TestResults = React.forwardRef<HTMLElement, TestResultsProps>(function TestResults({ suites, title = \"Test results\", duration, defaultOpen = true, onRetry, children, className, style, \"aria-label\": label, \"aria-labelledby\": labelledBy, ...props }, ref) {\n  const titleId = React.useId();\n  const tests = suites.flatMap(suite => suite.tests);\n  const counts = { passed: 0, failed: 0, skipped: 0, running: 0, pending: 0 };\n  for (const test of tests) counts[test.status]++;\n  const completed = counts.passed + counts.failed + counts.skipped;\n  const root = rs([\"rs-test-results\", className], styles.root);\n  const header = rs([\"rs-test-results-header\"], styles.header);\n  const titleStyle = rs([\"rs-test-results-title\"], styles.title);\n  const summary = rs([\"rs-test-results-summary\"], styles.summary);\n  const progress = rs([\"rs-test-results-progress\"], styles.progress);\n  const content = rs([\"rs-test-results-content\"], styles.content);\n  const list = rs([\"rs-test-results-list\"], styles.list);\n  const note = rs([\"rs-test-results-note\"], styles.note);\n  return <section {...props} ref={ref} aria-label={label} aria-labelledby={labelledBy ?? (label == null ? titleId : undefined)} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}><span {...titleStyle} id={titleId}>{title}</span><div {...summary} role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">{Object.entries(counts).map(([status, count]) => count > 0 && <Badge key={status} variant={status === \"passed\" ? \"solid\" : \"muted\"}>{count} {status}</Badge>)}<span {...note}>{completed} of {tests.length} complete</span>{duration != null && <span {...note}>{durationLabel(duration)}</span>}</div><progress {...progress} value={completed} max={Math.max(1, tests.length)} aria-label=\"Tests completed\" /></header>\n    <div {...content}>{suites.map(suite => <Collapsible key={suite.id} title={<>{suite.name} · {suite.tests.length} tests{suite.duration != null && ` · ${durationLabel(suite.duration)}`}</>} defaultOpen={defaultOpen}><ul {...list}>{suite.tests.map(test => <TestRow key={test.id} test={test} suite={suite} onRetry={onRetry} />)}</ul>{suite.tests.length === 0 && <p {...note}>No tests in this suite.</p>}</Collapsible>)}{suites.length === 0 && <p {...note}>No test results yet.</p>}{children}</div>\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/test-results.tsx"
+    },
+    {
+      "path": "vlak/styles/test-results.css",
+      "content": "/* ── test-results: generated from packages/react/src/components/test-results.tsx ── */\n.rs-test-results{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-test-results{border-color:CanvasText}}\n.rs-test-results-header{display:grid;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-test-results-title{font-weight:600}\n.rs-test-results-summary{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;font-variant-numeric:tabular-nums}\n.rs-test-results-progress{width:100%;height:0.5rem;accent-color:var(--text)}\n.rs-test-results-content{padding:0.5rem 1rem 1rem;display:grid;gap:0.75rem;min-width:0}\n.rs-test-results-list{list-style:none;margin:0;padding:0}\n.rs-test-results-test{padding-block:0.75rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);color:var(--text);min-width:0}\n.rs-test-results-line{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;min-width:0}\n.rs-test-results-name{min-width:0;overflow-wrap:anywhere;flex:1 1 auto}\n.rs-test-results-note{color:var(--text-secondary);font-size:0.75rem;margin:0}\n.rs-test-results-error{margin:0.5rem 0;white-space:pre-wrap;overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/test-results.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-test-results-test",
+        "rs-test-results-line",
+        "rs-test-results-name",
+        "rs-test-results-note",
+        "rs-test-results-error",
+        "rs-test-results",
+        "rs-test-results-header",
+        "rs-test-results-title",
+        "rs-test-results-summary",
+        "rs-test-results-progress",
+        "rs-test-results-content",
+        "rs-test-results-list"
+      ],
+      "snippet": "<section class=\"rs-test-results\" aria-labelledby=\"tests-title\"><header class=\"rs-test-results-header\"><span class=\"rs-test-results-title\" id=\"tests-title\">Test results</span><div class=\"rs-test-results-summary\" role=\"status\"><span class=\"rs-badge-solid\">1 passed</span><span class=\"rs-badge-muted\">1 failed</span><span class=\"rs-test-results-note\">2 of 2 complete</span></div><progress class=\"rs-test-results-progress\" value=\"2\" max=\"2\" aria-label=\"Tests completed\"></progress></header><div class=\"rs-test-results-content\"><p class=\"rs-test-results-note\">Open a suite to inspect its results.</p></div></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "badge",
+        "button",
+        "collapsible",
+        "code-block",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Test Results",
+        "Test runner output",
+        "Suite results"
+      ],
+      "example": "import { TestResults } from \"@noorddev/vlak-react\";\n\n<TestResults suites={[{ id: \"composer\", name: \"Composer\", tests: [{ id: \"send\", name: \"Sends a prompt\", status: \"passed\", duration: 82 }, { id: \"retry\", name: \"Retains failed drafts\", status: \"failed\", error: \"Expected the original draft.\", stack: \"at retryTest (composer.test.tsx:38:3)\" }] }]} duration={428} />",
+      "usage": {
+        "use": [
+          "Render supplied test suites, durations in milliseconds and per-test failures.",
+          "Provide onRetry to request another run; new application data determines the resulting status.",
+          "Counts and completion progress derive from the displayed tests, including skipped and running states."
+        ],
+        "avoid": [
+          "Executing tests or marking them passed merely because a retry callback resolves.",
+          "Announcing full changing logs through a live region."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches suite/failure disclosures, retry actions and stack copy controls."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space toggles disclosures or requests retry for the focused failed test."
+        }
+      ],
+      "a11y": [
+        "Text labels distinguish all five states without color dependence.",
+        "A concise atomic status announces totals; failure text remains ordinary readable content.",
+        "The named native progress element avoids a zero maximum for empty results.",
+        "Retries prevent duplicate activation, retain actionable failure feedback and ignore stale completion after data changes."
+      ]
+    }
+  }
+}

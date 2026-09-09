@@ -26,6 +26,7 @@ import { createRequire } from "node:module";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
+import { workflowStylesheet } from "./workflow-styles.mjs";
 
 const require = createRequire(import.meta.url);
 const babel = require("@babel/core");
@@ -161,12 +162,14 @@ const tail = [
 const css =
   `/* @noorddev/vlak-react. Vlak base + compiled StyleX leaves. Generated. */\n` +
   read("fonts.css") +
-  `\n@layer vlak.tokens, vlak.base, vlak.type, vlak.components, vlak.touch, vlak.motion;\n\n` +
+  `\n@layer vlak.engine, vlak.tokens, vlak.base, vlak.type, vlak.components, vlak.touch, vlak.motion;\n\n` +
   base.map(([name, f]) => `@layer ${name} {\n${read(f)}\n}\n`).join("\n") +
   `@layer vlak.components {\n${compiled}\n}\n` +
   tail.map(([name, f]) => `@layer ${name} {\n${read(f)}\n}\n`).join("\n");
 writeFileSync(join(distDir, "vlak-react.css"), css);
 writeFileSync(join(distDir, "vlak-react.css.d.ts"), "export {};\n");
+writeFileSync(join(distDir, "workflow.css"), workflowStylesheet());
+writeFileSync(join(distDir, "workflow.css.d.ts"), "export {};\n");
 cpSync(join(coreCss, "fonts"), join(distDir, "fonts"), { recursive: true });
 
 /* Types. tokens.js shares the token file's declarations. */

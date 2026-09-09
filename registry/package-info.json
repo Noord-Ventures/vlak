@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "package-info",
+  "type": "registry:component",
+  "title": "Package info",
+  "description": "Compares current and proposed package versions with change type and expandable dependencies.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/badge.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/package-info.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Badge } from \"./badge\";\nimport { Collapsible } from \"./collapsible\";\n\nexport type PackageChangeType = \"major\" | \"minor\" | \"patch\" | \"added\" | \"removed\";\nexport interface PackageDependency { name: string; version: string; kind?: \"runtime\" | \"development\" | \"peer\" | \"optional\" }\nexport interface PackageInfoProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  name: string;\n  currentVersion?: string;\n  newVersion?: string;\n  changeType?: PackageChangeType;\n  description?: React.ReactNode;\n  dependencies?: PackageDependency[];\n  actions?: React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", padding: \"1rem\", minWidth: 0, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\" },\n  name: { fontWeight: 600, overflowWrap: \"anywhere\", minWidth: 0, flex: \"1 1 auto\" },\n  versions: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", overflowWrap: \"anywhere\" },\n  description: { color: vlak.gray, margin: 0 },\n  list: { paddingInlineStart: \"1.25rem\", margin: 0, display: \"grid\", gap: \"0.5rem\", color: vlak.ink, overflowWrap: \"anywhere\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n});\n\n/** Supplied package changes and dependencies; never resolves or installs packages. */\nexport const PackageInfo = React.forwardRef<HTMLElement, PackageInfoProps>(function PackageInfo({ name, currentVersion, newVersion, changeType, description, dependencies, actions, children, className, style, ...props }, ref) {\n  const root = rs([\"rs-package-info\", className], styles.root);\n  const header = rs([\"rs-package-info-header\"], styles.header);\n  const nameStyle = rs([\"rs-package-info-name\"], styles.name);\n  const versions = rs([\"rs-package-info-versions\"], styles.versions);\n  const descriptionStyle = rs([\"rs-package-info-description\"], styles.description);\n  const list = rs([\"rs-package-info-list\"], styles.list);\n  const actionStyle = rs([\"rs-package-info-actions\"], styles.actions);\n  return <article aria-label={`Package ${name}`} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}><code {...nameStyle}>{name}</code>{changeType && <Badge variant=\"muted\">{changeType}</Badge>}</header>\n    {(currentVersion || newVersion) && <div {...versions}>{currentVersion && <span>Current {currentVersion}</span>}{currentVersion && newVersion && <span aria-hidden=\"true\">→</span>}{newVersion && <strong>Proposed {newVersion}</strong>}</div>}\n    {description != null && <div {...descriptionStyle}>{description}</div>}\n    {dependencies != null && <Collapsible title={`Dependencies (${dependencies.length})`}><ul {...list}>{dependencies.map(dependency => <li key={`${dependency.kind}:${dependency.name}`}><code>{dependency.name}</code> {dependency.version}{dependency.kind && ` · ${dependency.kind}`}</li>)}</ul>{dependencies.length === 0 && <p {...descriptionStyle}>No dependencies.</p>}</Collapsible>}\n    {children}{actions != null && <div {...actionStyle}>{actions}</div>}\n  </article>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/package-info.tsx"
+    },
+    {
+      "path": "vlak/styles/package-info.css",
+      "content": "/* ── package-info: generated from packages/react/src/components/package-info.tsx ── */\n.rs-package-info{display:grid;gap:0.75rem;padding:1rem;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-package-info{border-color:CanvasText}}\n.rs-package-info-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem}\n.rs-package-info-name{font-weight:600;overflow-wrap:anywhere;min-width:0;flex:1 1 auto}\n.rs-package-info-versions{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;overflow-wrap:anywhere}\n.rs-package-info-description{color:var(--text-secondary);margin:0}\n.rs-package-info-list{padding-inline-start:1.25rem;margin:0;display:grid;gap:0.5rem;color:var(--text);overflow-wrap:anywhere}\n.rs-package-info-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/package-info.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-package-info",
+        "rs-package-info-header",
+        "rs-package-info-name",
+        "rs-package-info-versions",
+        "rs-package-info-description",
+        "rs-package-info-list",
+        "rs-package-info-actions"
+      ],
+      "snippet": "<article class=\"rs-package-info\" aria-label=\"Package @example/review-ui\"><header class=\"rs-package-info-header\"><code class=\"rs-package-info-name\">@example/review-ui</code></header><div class=\"rs-package-info-versions\"><span>Current 1.2.0</span><strong>Proposed 1.3.0</strong></div><p class=\"rs-package-info-description\">Adds draft recovery.</p></article>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "badge",
+        "collapsible",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Package Info",
+        "Dependency change",
+        "Package version"
+      ],
+      "example": "import { PackageInfo } from \"@noorddev/vlak-react\";\n\n<PackageInfo name=\"@example/review-ui\" currentVersion=\"1.2.0\" newVersion=\"1.3.0\" changeType=\"minor\" description=\"Adds draft recovery.\" dependencies={[{ name: \"react\", version: \"^19.0.0\", kind: \"peer\" }]} />",
+      "usage": {
+        "use": [
+          "Review package additions, removals or version changes before an application performs them.",
+          "Supply explicit changeType and dependency kinds; the component does not infer semantic version compatibility.",
+          "Use actions for application-owned install, compare or inspection controls."
+        ],
+        "avoid": [
+          "Assuming displayed package metadata is fetched, resolved or installed automatically."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches dependency disclosure and supplied actions."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space toggles the dependency summary."
+        }
+      ],
+      "a11y": [
+        "Current and proposed version labels remain explicit to screen readers.",
+        "Change type uses text instead of color alone.",
+        "Dependency expansion uses a native details element."
+      ]
+    }
+  }
+}

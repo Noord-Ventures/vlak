@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sandbox",
+  "type": "registry:component",
+  "title": "Sandbox",
+  "description": "Combines a tool-status disclosure with keyboard-accessible code and output tabs.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/tool-call.json",
+    "https://vlak.dev/r/code-block.json",
+    "https://vlak.dev/r/tabs.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/sandbox.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { ToolCall, type ToolCallProps } from \"./tool-call\";\nimport { CodeBlock } from \"./code-block\";\nimport { Tabs, TabList, Tab, TabPanel } from \"./tabs\";\n\nexport interface SandboxProps extends Omit<ToolCallProps, \"input\" | \"output\"> {\n  code: string;\n  language?: string;\n  output?: React.ReactNode;\n  codeContent?: React.ReactNode;\n  tab?: \"code\" | \"output\";\n  defaultTab?: \"code\" | \"output\";\n  onTabChange?: (tab: \"code\" | \"output\") => void;\n}\nconst styles = stylex.create({\n  root: { minWidth: 0 },\n  content: { minWidth: 0, display: \"grid\", gap: \"0.75rem\", color: vlak.ink },\n  output: { margin: 0, whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\", fontSize: \"0.875rem\", lineHeight: 1.45, fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\" },\n});\n\n/** A code/output disclosure. Execution and process isolation remain application-owned. */\nexport const Sandbox = React.forwardRef<HTMLDetailsElement, SandboxProps>(function Sandbox({ code, language = \"Text\", output, codeContent, tab, defaultTab = \"code\", onTabChange, defaultOpen = true, children, className, style, ...props }, ref) {\n  const root = rs([\"rs-sandbox\", className], styles.root);\n  const content = rs([\"rs-sandbox-content\"], styles.content);\n  const outputStyle = rs([\"rs-sandbox-output\"], styles.output);\n  return <ToolCall {...props} ref={ref} defaultOpen={defaultOpen} className={root.className} style={{ ...root.style, ...style }}>\n    <Tabs {...content} value={tab} defaultValue={defaultTab} onValueChange={value => onTabChange?.(value as \"code\" | \"output\")}><TabList aria-label=\"Sandbox content\"><Tab value=\"code\">Code</Tab><Tab value=\"output\">Output</Tab></TabList><TabPanel value=\"code\">{codeContent ?? <CodeBlock code={code} language={language} />}</TabPanel><TabPanel value=\"output\">{typeof output === \"string\" || typeof output === \"number\" ? <pre {...outputStyle}>{output}</pre> : output ?? <p>No output supplied.</p>}</TabPanel></Tabs>{children}\n  </ToolCall>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/sandbox.tsx"
+    },
+    {
+      "path": "vlak/styles/sandbox.css",
+      "content": "/* ── sandbox: generated from packages/react/src/components/sandbox.tsx ── */\n.rs-sandbox{min-width:0}\n.rs-sandbox-content{min-width:0;display:grid;gap:0.75rem;color:var(--text)}\n.rs-sandbox-output{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:0.875rem;line-height:1.45;font-family:ui-monospace, SFMono-Regular, Menlo, monospace}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/sandbox.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-sandbox",
+        "rs-sandbox-content",
+        "rs-sandbox-output"
+      ],
+      "snippet": "<details class=\"rs-tool-call rs-sandbox\" open><summary class=\"rs-tool-call-summary\"><span class=\"rs-tool-call-title\">Check generated module</span><span class=\"rs-tool-call-state\">Complete</span></summary><div class=\"rs-tool-call-body\"><div class=\"rs-sandbox-content\"><pre class=\"rs-sandbox-output\">2 checks passed</pre></div></div></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "tool-call",
+        "code-block",
+        "tabs",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Sandbox",
+        "Code execution result",
+        "Code and output"
+      ],
+      "example": "import { Sandbox } from \"@noorddev/vlak-react\";\n\n<Sandbox title=\"Check generated module\" state=\"complete\" code=\"export const ready = true;\" language=\"TypeScript\" output=\"2 checks passed\" />",
+      "usage": {
+        "use": [
+          "Display supplied generated code and the result of an application-owned run.",
+          "Use tab/onTabChange or defaultTab to select code or output.",
+          "Supply codeContent to compose an optional syntax renderer, and output for text or structured React results."
+        ],
+        "avoid": [
+          "Treating this display surface as a code executor or isolation boundary.",
+          "Reporting a successful run before the application supplies that state."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches the native disclosure, active tab and controls inside the selected panel."
+        },
+        {
+          "keys": "Arrow keys, Home, End, Enter, Space",
+          "does": "Arrow keys, Home and End move between code/output tabs; Enter or Space activates the focused control."
+        }
+      ],
+      "a11y": [
+        "ToolCall supplies a named 44px summary, status text and subtle 4px surface.",
+        "Tabs provide a named tablist and labelled panels; hidden panels do not stay in the tab order.",
+        "Output strings are escaped preformatted text and can be read without repeated live announcements."
+      ]
+    }
+  }
+}

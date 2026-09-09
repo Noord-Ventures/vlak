@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "snippet",
+  "type": "registry:component",
+  "title": "Snippet",
+  "description": "Presents a compact selectable command with a decorative prefix and exact-value copy action.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/snippet.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface SnippetCopyProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, \"onCopy\"> {\n  value: string;\n  label?: string;\n  onCopy?: (value: string) => void | Promise<void>;\n}\nexport interface SnippetProps extends Omit<React.HTMLAttributes<HTMLElement>, \"onCopy\" | \"prefix\"> {\n  code: string;\n  prefix?: React.ReactNode;\n  label?: string;\n  copyLabel?: string;\n  copyable?: boolean;\n  onCopy?: (value: string) => void | Promise<void>;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", margin: 0, padding: \"0.25rem 0.5rem 0.25rem 0.75rem\", minWidth: 0, maxWidth: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper },\n  prefix: { color: vlak.gray, flexShrink: 0, fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\" },\n  code: { flex: \"1 1 auto\", minWidth: 0, overflowX: \"auto\", whiteSpace: \"pre\", fontSize: \"0.875rem\", lineHeight: 1.45, fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", outlineColor: vlak.ink, outlineOffset: 2 },\n  copy: { display: \"inline-flex\", alignItems: \"center\", flexWrap: \"wrap\", gap: \"0.25rem\", flexShrink: 0 },\n  status: { fontSize: \"0.75rem\", lineHeight: 1.45, color: vlak.gray, maxWidth: \"24ch\" },\n});\n\n/** Exact-value clipboard action shared by compact developer views. */\nexport const SnippetCopy = React.forwardRef<HTMLSpanElement, SnippetCopyProps>(function SnippetCopy({ value, label = \"Copy snippet\", onCopy, className, style, ...props }, ref) {\n  const [state, setState] = React.useState<\"idle\" | \"pending\" | \"done\" | \"error\">(\"idle\");\n  const request = React.useRef(0);\n  const pending = React.useRef(false);\n  // biome-ignore lint/correctness/useExhaustiveDependencies: A changed value invalidates the pending clipboard result.\n  React.useEffect(() => { request.current++; pending.current = false; setState(\"idle\"); return () => { request.current++; }; }, [value]);\n  const copy = async () => {\n    if (pending.current) return;\n    pending.current = true;\n    const id = ++request.current;\n    setState(\"pending\");\n    try { if (onCopy) await onCopy(value); else await navigator.clipboard.writeText(value); if (id === request.current) setState(\"done\"); }\n    catch { if (id === request.current) setState(\"error\"); }\n    finally { if (id === request.current) pending.current = false; }\n  };\n  const root = rs([\"rs-snippet-copy\", className], styles.copy);\n  const status = rs([\"rs-snippet-status\"], styles.status);\n  return <span {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <Button type=\"button\" variant=\"subtle\" size=\"icon\" aria-label={label} title={label} disabled={state === \"pending\"} onClick={() => { void copy(); }}><Icon name={state === \"done\" ? \"check\" : \"copy\"} /></Button>\n    <span {...status} role=\"status\" aria-live=\"polite\">{state === \"error\" ? \"Could not copy. Try again.\" : state === \"done\" ? \"Copied\" : state === \"pending\" ? \"Copying…\" : \"\"}</span>\n  </span>;\n});\n\n/** A compact, selectable command or code line; the decorative prefix is not copied. */\nexport const Snippet = React.forwardRef<HTMLElement, SnippetProps>(function Snippet({ code, prefix, label = \"Code snippet\", copyLabel, copyable = true, onCopy, className, style, ...props }, ref) {\n  const root = rs([\"rs-snippet\", className], styles.root);\n  const prefixStyle = rs([\"rs-snippet-prefix\"], styles.prefix);\n  const codeStyle = rs([\"rs-snippet-code\"], styles.code);\n  return <figure aria-label={label} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    {prefix != null && <span {...prefixStyle} aria-hidden=\"true\">{prefix}</span>}\n    <code {...codeStyle} tabIndex={0}>{code}</code>\n    {copyable && <SnippetCopy value={code} label={copyLabel} onCopy={onCopy} />}\n  </figure>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/snippet.tsx"
+    },
+    {
+      "path": "vlak/styles/snippet.css",
+      "content": "/* ── snippet: generated from packages/react/src/components/snippet.tsx ── */\n.rs-snippet{display:flex;align-items:center;gap:0.5rem;margin:0;padding:0.25rem 0.5rem 0.25rem 0.75rem;min-width:0;max-width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}\n@media (forced-colors: active){.rs-snippet{border-color:CanvasText}}\n.rs-snippet-prefix{color:var(--text-secondary);flex-shrink:0;font-family:ui-monospace, SFMono-Regular, Menlo, monospace}\n.rs-snippet-code{flex:1 1 auto;min-width:0;overflow-x:auto;white-space:pre;font-size:0.875rem;line-height:1.45;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;outline-color:var(--text);outline-offset:2px}\n.rs-snippet-copy{display:inline-flex;align-items:center;flex-wrap:wrap;gap:0.25rem;flex-shrink:0}\n.rs-snippet-status{font-size:0.75rem;line-height:1.45;color:var(--text-secondary);max-width:24ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/snippet.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-snippet-copy",
+        "rs-snippet-status",
+        "rs-snippet",
+        "rs-snippet-prefix",
+        "rs-snippet-code"
+      ],
+      "snippet": "<figure class=\"rs-snippet\" aria-label=\"Install command\"><span class=\"rs-snippet-prefix\" aria-hidden=\"true\">$</span><code class=\"rs-snippet-code\" tabindex=\"0\">pnpm add @noorddev/vlak-react</code></figure>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Snippet",
+        "Command line",
+        "Copy command"
+      ],
+      "example": "import { Snippet } from \"@noorddev/vlak-react\";\n\n<Snippet code=\"pnpm add @noorddev/vlak-react\" prefix=\"$\" label=\"Install command\" />",
+      "usage": {
+        "use": [
+          "A short command or source reference where the copy value should preserve whitespace.",
+          "Reuse SnippetCopy for named exact-value actions in developer views.",
+          "Supply onCopy for a host clipboard adapter; omit it to use the browser clipboard."
+        ],
+        "avoid": [
+          "Claiming syntax highlighting or command execution from a selectable code line.",
+          "Including a shell prompt in code when it should only be a decorative prefix."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches the scrollable code and 44px copy button."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space requests clipboard copy from the focused button."
+        }
+      ],
+      "a11y": [
+        "The prefix is decorative and is excluded from copied source.",
+        "Copy reports success only after completion, errors remain visible, and duplicate pending requests are locked.",
+        "Changing the source invalidates stale clipboard feedback. Native attributes, className, style and refs are forwarded."
+      ]
+    }
+  }
+}

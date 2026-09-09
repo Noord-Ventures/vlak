@@ -22,6 +22,9 @@ export interface VlakMeta {
   snippet?: string;
   cssOnly?: boolean;
   registryDependencies?: string[];
+  reactImport?: string;
+  dependencies?: string[];
+  styles?: string[];
   hidden?: boolean;
   aliases?: string[];
   example?: string;

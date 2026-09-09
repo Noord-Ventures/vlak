@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "voice-selector",
+  "type": "registry:component",
+  "title": "Voice selector",
+  "description": "Searches application-supplied voice names and metadata, with controlled selection and optional audio preview playback.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/combobox.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/voice-selector.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Combobox } from \"./combobox\";\n\nexport interface VoiceOption {\n  id: string;\n  name: string;\n  provider?: string;\n  language?: string;\n  description?: string;\n  attributes?: readonly string[];\n  previewSrc?: string;\n  /** A text alternative for speech in the preview sample. */\n  previewText?: string;\n  disabled?: boolean;\n}\nexport interface VoiceSelectorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  voices: readonly VoiceOption[];\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (voiceId: string) => void;\n  label?: string;\n  disabled?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, width: \"100%\", color: vlak.ink },\n  label: { fontSize: vlak.controlFs, fontWeight: 500, lineHeight: 1.45 },\n  option: { display: \"grid\", gap: \"0.125rem\" },\n  metadata: { fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n  detail: { padding: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, display: \"grid\", gap: \"0.5rem\" },\n  message: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** Supplied voice metadata and optional real audio samples; provider catalogs remain application-owned. */\nexport const VoiceSelector = React.forwardRef<HTMLDivElement, VoiceSelectorProps>(function VoiceSelector({ voices, value, defaultValue = \"\", onValueChange, label = \"Voice\", disabled = false, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const selected = voices.find(voice => voice.id === (value ?? inner));\n  const [playing, setPlaying] = React.useState(false);\n  const [pending, setPending] = React.useState(false);\n  const [message, setMessage] = React.useState(\"\");\n  const mediaRef = React.useRef<HTMLAudioElement>(null);\n  const version = React.useRef(0);\n  const busy = React.useRef(false);\n  const id = React.useId();\n  React.useEffect(() => {\n    const media = mediaRef.current;\n    version.current++; busy.current = false; setPlaying(false); setPending(false); setMessage(\"\");\n    return () => { version.current++; busy.current = false; media?.pause(); };\n  }, [selected?.id, selected?.previewSrc, disabled]);\n  const preview = async () => {\n    const media = mediaRef.current;\n    if (!media || disabled || selected?.disabled || busy.current) return;\n    if (playing) { media.pause(); setPlaying(false); return; }\n    busy.current = true; const request = ++version.current;\n    setPending(true); setMessage(\"\");\n    try { await media.play(); if (request === version.current) setPlaying(!media.paused); }\n    catch { if (request === version.current) setMessage(\"The voice sample could not play. Try again.\"); }\n    finally { if (request === version.current) { busy.current = false; setPending(false); } }\n  };\n  const root = rs([\"rs-voice-selector\", className], styles.root);\n  const heading = rs([\"rs-voice-selector-label\"], styles.label);\n  const option = rs([\"rs-voice-selector-option\"], styles.option);\n  const metadata = rs([\"rs-voice-selector-metadata\"], styles.metadata);\n  const detail = rs([\"rs-voice-selector-detail\"], styles.detail);\n  const status = rs([\"rs-voice-selector-message\"], styles.message);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <span {...heading} id={`${id}-label`}>{label}</span>\n    <Combobox value={value ?? inner} onValueChange={next => { if (value === undefined) setInner(next); onValueChange?.(next); }} aria-labelledby={`${id}-label`} placeholder=\"Search voices…\" emptyLabel=\"No voices match\" disabled={disabled} options={voices.map(voice => ({ value: voice.id, disabled: voice.disabled, searchText: [voice.name, voice.provider, voice.language, voice.description, ...(voice.attributes ?? [])].filter(Boolean).join(\" \"), label: <span {...option}><span>{voice.name}</span><span {...metadata}>{[voice.provider, voice.language, ...(voice.attributes ?? [])].filter(Boolean).join(\" · \")}</span></span> }))} />\n    {selected && <div {...detail}><span>{selected.name}</span>{selected.description && <p {...status}>{selected.description}</p>}<span {...metadata}>{[selected.provider, selected.language, ...(selected.attributes ?? [])].filter(Boolean).join(\" · \")}</span>\n      {selected.previewSrc && <>\n      {/* biome-ignore lint/a11y/useMediaCaption: The supplied sample's speech alternative is rendered visibly through previewText. */}\n      <audio ref={mediaRef} key={`${selected.id}:${selected.previewSrc}`} src={selected.previewSrc} preload=\"none\" aria-label={`${selected.name} voice sample`} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} onEnded={() => setPlaying(false)} onError={() => { version.current++; busy.current = false; setPlaying(false); setPending(false); setMessage(\"The voice sample could not load. Try again.\"); }} />\n      {selected.previewText && <p {...status}>{selected.previewText}</p>}\n      <Button variant=\"subtle\" size=\"sm\" disabled={disabled || selected.disabled || pending} onClick={() => { void preview(); }}>{pending ? \"Loading sample…\" : playing ? \"Stop sample\" : \"Preview voice\"}</Button></>}\n    </div>}\n    <p {...status} role=\"status\">{message || (voices.length === 0 ? \"No voices supplied.\" : (value ?? inner) && !selected ? \"The selected voice is unavailable. Choose another voice.\" : \"\")}</p>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/voice-selector.tsx"
+    },
+    {
+      "path": "vlak/styles/voice-selector.css",
+      "content": "/* ── voice-selector: generated from packages/react/src/components/voice-selector.tsx ── */\n.rs-voice-selector{display:grid;gap:0.75rem;min-width:0;width:100%;color:var(--text)}\n.rs-voice-selector-label{font-size:var(--control-fs);font-weight:500;line-height:1.45}\n.rs-voice-selector-option{display:grid;gap:0.125rem}\n.rs-voice-selector-metadata{font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n.rs-voice-selector-detail{padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);display:grid;gap:0.5rem}\n@media (forced-colors: active){.rs-voice-selector-detail{border-color:CanvasText}}\n.rs-voice-selector-message{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/voice-selector.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-voice-selector",
+        "rs-voice-selector-label",
+        "rs-voice-selector-option",
+        "rs-voice-selector-metadata",
+        "rs-voice-selector-detail",
+        "rs-voice-selector-message"
+      ],
+      "snippet": "<div class=\"rs-voice-selector\"><label class=\"rs-voice-selector-label\" for=\"voice\">Voice</label><select class=\"rs-input\" id=\"voice\"><option>Mina · English</option><option>Noor · Dutch</option></select></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "combobox",
+        "input",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Voice Selector",
+        "Voice picker",
+        "Voice preview",
+        "TTS voice"
+      ],
+      "example": "\"use client\";\nimport { useState } from \"react\";\nimport { VoiceSelector } from \"@noorddev/vlak-react\";\n\nexport function VoicePicker({ sampleUrl }: { sampleUrl?: string }) {\n  const [voiceId, setVoiceId] = useState(\"mina\");\n  return <VoiceSelector value={voiceId} onValueChange={setVoiceId} voices={[\n    { id: \"mina\", name: \"Mina\", provider: \"Your provider\", language: \"English\", attributes: [\"Warm\"], previewSrc: sampleUrl, previewText: \"A short sample of this voice.\" },\n    { id: \"noor\", name: \"Noor\", provider: \"Your provider\", language: \"Dutch\" },\n  ]} />;\n}",
+      "usage": {
+        "use": [
+          "Supply provider voice records; name, provider, language, description and attributes all participate in search.",
+          "Use value/onValueChange or defaultValue for voice selection.",
+          "Supply previewSrc for a real audio sample and previewText for speech's text alternative.",
+          "Sample playback begins only after Preview voice. Selection changes or unmount stop this selector's previous sample.",
+          "CSS-only markup provides selection paint; search and sample playback need application code."
+        ],
+        "avoid": [
+          "Assuming this picker fetches a provider catalog or changes a speech engine by itself.",
+          "Inferring voice metadata instead of using the provider's supplied descriptions."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Type",
+          "does": "Filters voice names and supplied metadata"
+        },
+        {
+          "keys": "Arrow Down, Arrow Up, Enter",
+          "does": "Navigates and selects a voice"
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the voice list"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Starts or stops the selected voice sample"
+        }
+      ],
+      "a11y": [
+        "The visible label names the shared Combobox; disabled voices are skipped by keyboard navigation.",
+        "Preview errors use a status region and permit retry. Samples never autoplay.",
+        "The selected voice's metadata uses a subtle 1px frame with 4px corners. Native div attributes and ref are forwarded."
+      ]
+    }
+  }
+}

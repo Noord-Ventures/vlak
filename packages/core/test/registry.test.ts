@@ -120,12 +120,14 @@ describe("registry ↔ CSS parity", () => {
       const own = new Set(c.classes);
       for (const cls of used) {
         if (own.has(cls)) continue;
-        const provider = vlakComponents.find((o) => o.classes.includes(cls));
-        expect(provider, `${c.name}: no provider for "${cls}"`).toBeTruthy();
+        // Compositions can share a primitive's paint. Any declared provider is
+        // valid; catalog ordering must not change which dependency is required.
+        const providers = vlakComponents.filter((o) => o.classes.includes(cls));
+        expect(providers.length, `${c.name}: no provider for "${cls}"`).toBeGreaterThan(0);
         expect(
-          c.registryDependencies ?? [],
-          `${c.name}: uses .${cls} from "${provider!.name}" without declaring it as a registry dependency`,
-        ).toContain(provider!.name);
+          providers.some((provider) => c.registryDependencies?.includes(provider.name)),
+          `${c.name}: uses .${cls} without declaring one of its providers (${providers.map((p) => p.name).join(", ")}) as a registry dependency`,
+        ).toBe(true);
       }
     }
   });
@@ -160,12 +162,17 @@ describe("registry copy for agents", () => {
 
   it("examples import from the React package and name real exports", () => {
     for (const c of vlakComponents) {
-      const imports = [...c.example!.matchAll(/import \{([^}]+)\} from "@noorddev\/vlak-react"/g)];
+      const imports = [...c.example!.matchAll(/import \{([^}]+)\} from "(@noorddev\/vlak-react(?:\/components\/[a-z-]+)?)"/g)];
       expect(imports.length, `${c.name}: example imports from @noorddev/vlak-react`).toBeGreaterThan(0);
       expect(c.example, `${c.name}: example uses the site alias`).not.toContain("@/components/vlak");
       for (const m of imports) {
-        for (const name of m[1]!.split(",").map((s) => s.trim()).filter(Boolean)) {
-          expect(exported.has(name), `${c.name}: example imports "${name}", not exported from packages/react/src/index.ts`).toBe(true);
+        const entry = m[2] === "@noorddev/vlak-react" ? exported : new Set(
+          [...readFileSync(join(reactSrcDir, m[2]!.replace("@noorddev/vlak-react/", "") + ".tsx"), "utf8")
+            .matchAll(/export (?:const|function|class|interface|type) ([A-Za-z_$][\w$]*)/g)].map((match) => match[1]!),
+        );
+        if (m[2] !== "@noorddev/vlak-react") expect(m[2], `${c.name}: optional import matches its registry entry`).toBe(c.reactImport);
+        for (const name of m[1]!.split(",").map((s) => s.trim().replace(/^type\s+/, "").split(/\s+as\s+/)[0]!).filter(Boolean)) {
+          expect(entry.has(name), `${c.name}: example imports "${name}", not exported from ${m[2]}`).toBe(true);
         }
       }
     }

@@ -23,6 +23,16 @@
   ],
   "redirects": [
     {
+      "source": "/docs/ai",
+      "destination": "/ai/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/ai/",
+      "destination": "/ai/",
+      "permanent": true
+    },
+    {
       "source": "/interfaces/ai-tool",
       "destination": "/interfaces/line/",
       "permanent": true

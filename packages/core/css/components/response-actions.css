@@ -1,0 +1,8 @@
+/* ── response-actions: generated from packages/react/src/components/response-actions.tsx ── */
+.rs-response-actions-bar{display:flex;flex-wrap:wrap;align-items:center;gap:0;min-width:0;color:var(--text-secondary)}
+.rs-response-actions-selected{color:var(--text);background-color:var(--table-alt)}
+@media (forced-colors: active){.rs-response-actions-selected{color:HighlightText;background-color:Highlight}}
+.rs-response-actions-icon{display:block;width:18px;height:18px;flex-shrink:0;pointer-events:none}
+.rs-response-actions-status{color:var(--text-secondary);font-size:0.8125rem;line-height:1.45;overflow-wrap:anywhere}
+.rs-response-actions-menu{box-sizing:border-box;position:fixed;z-index:var(--z-float);width:13rem;margin:0;padding:0.25rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text)}
+@media (forced-colors: active){.rs-response-actions-menu{border-color:CanvasText}}

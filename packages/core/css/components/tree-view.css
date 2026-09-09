@@ -4,6 +4,7 @@
 .rs-tree-view-item{display:flex;align-items:center;gap:0.25rem;min-height:var(--hit);min-width:var(--hit);width:100%;padding-inline:0.25rem;box-sizing:border-box;border-radius:var(--radius-sm);cursor:pointer;outline-color:var(--text);outline-offset:-2px}
 .rs-tree-view-item:focus-visible{outline-width:2px;outline-style:solid}
 .rs-tree-view-label{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rs-tree-view-icon{display:inline-flex;align-items:center;justify-content:center;width:1rem;height:1rem;flex-shrink:0;color:var(--text-secondary)}
 .rs-tree-view-selected{background-color:var(--control-fill);font-weight:600}
 .rs-tree-view-disabled{color:var(--text-secondary);cursor:not-allowed}
 .rs-tree-view-spacer{width:var(--hit);flex-shrink:0}

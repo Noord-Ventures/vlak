@@ -1,0 +1,6 @@
+/* ── jsx-preview: generated from packages/react/src/components/jsx-preview.tsx ── */
+.rs-jsx-preview{min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);padding:1rem;font-size:0.875rem;line-height:1.45;overflow:auto;isolation:isolate;contain:layout paint}
+@media (forced-colors: active){.rs-jsx-preview{border-color:CanvasText}}
+.rs-jsx-preview-content{min-width:0;overflow-wrap:anywhere}
+.rs-jsx-preview-status{margin:0.5rem 0 0;color:var(--text-secondary);font-size:0.75rem}
+.rs-jsx-preview-error{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}

@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "work-queue",
+  "type": "registry:component",
+  "title": "Work queue",
+  "description": "Collapsible prompt and todo sections with completion counts, attachments, and item actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/reasoning.json",
+    "https://vlak.dev/r/checkbox.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/work-queue.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { vlak } from \"./tokens.stylex\";\nimport { Checkbox } from \"./checkbox\";\nimport { Reasoning } from \"./reasoning\";\n\nexport interface WorkQueueItem { id: string; content: React.ReactNode; description?: React.ReactNode; completed?: boolean; disabled?: boolean; attachments?: React.ReactNode; actions?: React.ReactNode }\nexport interface WorkQueueSection { id: string; title: string; items: readonly WorkQueueItem[]; defaultOpen?: boolean }\nexport interface WorkQueueProps extends React.HTMLAttributes<HTMLElement> { sections: readonly WorkQueueSection[]; label?: string; onItemCheckedChange?: (sectionId: string, itemId: string, checked: boolean) => void; emptyMessage?: React.ReactNode }\nconst styles = stylex.create({ root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0, color: vlak.ink }, section: { maxWidth: \"none\" }, list: { display: \"grid\", gap: \"1rem\", padding: 0, margin: 0, listStyleType: \"none\", maxHeight: \"24rem\", overflowY: \"auto\" }, item: { display: \"grid\", gap: \"0.5rem\", paddingBlock: \"0.5rem\", minWidth: 0 }, row: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.5rem\", minWidth: 0 }, content: { flex: \"1 1 12rem\", minWidth: 0 }, complete: { color: vlak.gray, textDecorationLine: \"line-through\" }, detail: { color: vlak.gray, fontSize: \"0.8125rem\", lineHeight: 1.45 }, actions: { display: \"flex\", gap: \"0.25rem\", flexWrap: \"wrap\" } });\n/** Supplied prompt and todo sections. Checking a row requests a change; the application owns scheduling. */\nexport const WorkQueue = React.forwardRef<HTMLElement, WorkQueueProps>(function WorkQueue({ sections, label = \"Work queue\", onItemCheckedChange, emptyMessage = \"Nothing queued.\", className, style, ...props }, ref) {\n  const root = rs([\"rs-work-queue\", className], styles.root);\n  return <section ref={ref} aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>{sections.length ? sections.map(section => <Reasoning key={section.id} {...rs([\"rs-work-queue-section\"], styles.section)} title={section.title} defaultOpen={section.defaultOpen ?? true} statusLabel={`${section.items.filter(item => item.completed).length}/${section.items.length}`}><ul {...rs([\"rs-work-queue-list\"], styles.list)} tabIndex={0} aria-label={`${section.title} items`}>{section.items.map(item => { const completed = !!item.completed; return <li key={item.id} {...rs([\"rs-work-queue-item\"], styles.item)}><div {...rs([\"rs-work-queue-row\"], styles.row)}><div {...rs([\"rs-work-queue-content\", completed && \"rs-work-queue-complete\"], styles.content, completed && styles.complete)}>{onItemCheckedChange ? <Checkbox checked={completed} disabled={item.disabled} onCheckedChange={checked => onItemCheckedChange(section.id, item.id, checked)} label={item.content} /> : <span>{completed && <span aria-label=\"Complete\">✓ </span>}{item.content}</span>}</div>{item.actions && <div {...rs([\"rs-work-queue-actions\"], styles.actions)}>{item.actions}</div>}</div>{item.description && <div {...rs([\"rs-work-queue-detail\"], styles.detail)}>{item.description}</div>}{item.attachments}</li>; })}</ul>{section.items.length === 0 && <p>{emptyMessage}</p>}</Reasoning>) : <p role=\"status\">{emptyMessage}</p>}</section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/work-queue.tsx"
+    },
+    {
+      "path": "vlak/styles/work-queue.css",
+      "content": "/* ── work-queue: generated from packages/react/src/components/work-queue.tsx ── */\n.rs-work-queue{display:grid;gap:0.75rem;min-width:0;color:var(--text)}\n.rs-work-queue-section{max-width:none}\n.rs-work-queue-list{display:grid;gap:1rem;padding:0;margin:0;list-style-type:none;max-height:24rem;overflow-y:auto}\n.rs-work-queue-item{display:grid;gap:0.5rem;padding-block:0.5rem;min-width:0}\n.rs-work-queue-row{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:0.5rem;min-width:0}\n.rs-work-queue-content{flex:1 1 12rem;min-width:0}\n.rs-work-queue-complete{color:var(--text-secondary);text-decoration-line:line-through}\n.rs-work-queue-detail{color:var(--text-secondary);font-size:0.8125rem;line-height:1.45}\n.rs-work-queue-actions{display:flex;gap:0.25rem;flex-wrap:wrap}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/work-queue.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-work-queue",
+        "rs-work-queue-section",
+        "rs-work-queue-list",
+        "rs-work-queue-item",
+        "rs-work-queue-row",
+        "rs-work-queue-content",
+        "rs-work-queue-complete",
+        "rs-work-queue-actions",
+        "rs-work-queue-detail"
+      ],
+      "snippet": "<section class=\"rs-work-queue\" aria-label=\"Work queue\"><details class=\"rs-work-queue-section\" open><summary>Next steps, 0 of 1 complete</summary><ul class=\"rs-work-queue-list\"><li class=\"rs-work-queue-item\">Review the brief</li></ul></details></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "reasoning",
+        "checkbox",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Queue",
+        "Prompt queue"
+      ],
+      "example": "\"use client\";\nimport { useState } from \"react\";\nimport { WorkQueue } from \"@noorddev/vlak-react\";\n\nexport function ReviewQueue() {\n  const [completed, setCompleted] = useState(false);\n  return <WorkQueue sections={[{ id: \"todos\", title: \"Next steps\", items: [\n    { id: \"review\", content: \"Review the brief\", completed },\n  ] }]} onItemCheckedChange={(_sectionId, _itemId, checked) => setCompleted(checked)} />;\n}",
+      "usage": {
+        "use": [
+          "Group queued prompts and todo items in sections with stable ids.",
+          "Supply onItemCheckedChange to make completion interactive; the supplied items remain authoritative.",
+          "Use attachments and actions slots for each item. The component displays counts from supplied completion state."
+        ],
+        "avoid": [
+          "Using a queue display to schedule or execute work."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

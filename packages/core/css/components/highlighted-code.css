@@ -1,0 +1,17 @@
+/* ── highlighted-code: generated from packages/react/src/components/highlighted-code.tsx ── */
+.rs-highlighted-code{margin:1rem 0;width:100%;min-width:0;overflow:hidden;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}
+.rs-highlighted-code-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;min-height:44px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-highlighted-code-language{flex:1 1 auto;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.8125rem;color:var(--text-secondary)}
+.rs-highlighted-code-actions{display:flex;align-items:center;gap:0.125rem}
+.rs-highlighted-code-action{width:44px;min-width:44px;max-width:44px;height:44px;padding:0;flex-shrink:0}
+.rs-highlighted-code-icon{width:16px;height:16px;display:block}
+.rs-highlighted-code-pre{margin:0;overflow:auto;padding:1rem;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;tab-size:2;white-space:pre;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+.rs-highlighted-code-pre:focus-visible{outline-width:2px}
+.rs-highlighted-code-line{display:block;min-height:1.45em}
+.rs-highlighted-code-number{display:inline-block;min-width:3ch;margin-inline-end:2ch;text-align:end;user-select:none;color:var(--text-secondary)}
+.rs-highlighted-code-token{color:var(--text)}
+.rs-highlighted-code-muted{color:var(--text-secondary)}
+@media (forced-colors: active){.rs-highlighted-code-muted{color:CanvasText}}
+.rs-highlighted-code-bold{font-weight:600}
+.rs-highlighted-code-italic{font-style:italic}
+.rs-highlighted-code-status{margin:0;padding:0 0.75rem 0.5rem;font-size:0.8125rem;color:var(--text-secondary)}

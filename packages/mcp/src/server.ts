@@ -43,7 +43,8 @@ function summary(item: RegistryItem) {
 export function importLine(name: string): string | undefined {
   const exports = loadProps().components[name]?.exports ?? [];
   const names = exports.map((e) => e.name).sort((a, b) => a.localeCompare(b));
-  return names.length ? `import { ${names.join(", ")} } from "${REACT}";` : undefined;
+  const entry = findComponent(name)?.meta?.vlak?.reactImport ?? REACT;
+  return names.length ? `import { ${names.join(", ")} } from "${entry}";` : undefined;
 }
 
 export function installFor(name: string) {
@@ -52,8 +53,8 @@ export function installFor(name: string) {
   return {
     name,
     package: {
-      install: `npm install ${REACT}`,
-      css: `import "${REACT}/css";`,
+      install: `npm install ${REACT}${(item.meta?.vlak?.dependencies ?? []).map(name => ` ${name}`).join("")}`,
+      css: [`import "${REACT}/css";`, ...(item.meta?.vlak?.styles ?? []).map(stylesheet => `import "${stylesheet}";`)].join("\n"),
       import: importLine(name) ?? null,
     },
     cli: `npx ${CLI} add ${name}`,
@@ -113,7 +114,7 @@ export function createServer(): McpServer {
     "list_components",
     {
       title: "List Vlak components",
-      description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, health, civic, science, creative, engineering, geospatial, robotics, electronics, microbiology.",
+      description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, ai, health, civic, science, creative, engineering, geospatial, robotics, electronics, microbiology.",
       inputSchema: { category: z.string().optional().describe("Only this category") },
       outputSchema: { version: z.string(), count: z.number(), components: z.array(z.object(componentSummaryShape)) },
       annotations: READ_ONLY,
@@ -260,7 +261,7 @@ export function createServer(): McpServer {
     (uri) => ({ contents: [{ uri: uri.href, mimeType: "text/markdown", text: docsFor("health") ?? "" }] }),
   );
 
-  for (const [name, title] of [["civic", "Civic"], ["science", "Science"], ["creative", "Creative tools"], ["engineering", "Industrial"], ["geospatial", "Geospatial"], ["robotics", "Robotics"], ["electronics", "Circuitry"], ["microbiology", "Microbiology"]] as const) {
+  for (const [name, title] of [["ai", "AI interfaces"], ["civic", "Civic"], ["science", "Science"], ["creative", "Creative tools"], ["engineering", "Industrial"], ["geospatial", "Geospatial"], ["robotics", "Robotics"], ["electronics", "Circuitry"], ["microbiology", "Microbiology"]] as const) {
     server.registerResource(
       `${name}-guide`,
       `vlak://docs/${name}`,

@@ -1,0 +1,13 @@
+/* ── stack-trace: generated from packages/react/src/components/stack-trace.tsx ── */
+.rs-stack-trace{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+@media (forced-colors: active){.rs-stack-trace{border-color:CanvasText}}
+.rs-stack-trace-header{display:flex;gap:0.75rem;align-items:flex-start;padding:0.75rem 1rem}
+.rs-stack-trace-heading{min-width:0;flex:1 1 auto;display:grid;gap:0.25rem}
+.rs-stack-trace-title{font-weight:600}
+.rs-stack-trace-message{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.rs-stack-trace-content{padding:0 1rem 1rem;min-width:0}
+.rs-stack-trace-list{list-style:none;margin:0;padding:0;display:grid;gap:0.5rem}
+.rs-stack-trace-frame{display:grid;gap:0.25rem;min-width:0;padding-block:0.25rem;color:var(--text);font-family:ui-monospace, SFMono-Regular, Menlo, monospace;overflow-wrap:anywhere}
+.rs-stack-trace-internal{color:var(--text-secondary)}
+.rs-stack-trace-location{min-width:0;width:fit-content;max-width:100%;text-align:start;justify-content:flex-start;overflow-wrap:anywhere}
+.rs-stack-trace-note{margin:0;color:var(--text-secondary);font-size:0.75rem}

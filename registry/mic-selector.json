@@ -1,0 +1,98 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mic-selector",
+  "type": "registry:component",
+  "title": "Mic selector",
+  "description": "Searches available microphone inputs with explicit permission activation, device-change updates, and recoverable selection states.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/combobox.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/mic-selector.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Combobox } from \"./combobox\";\n\nexport type AudioDeviceStatus = \"loading\" | \"ready\" | \"denied\" | \"unavailable\" | \"error\";\nexport interface AudioDevicesState {\n  devices: readonly MediaDeviceInfo[];\n  status: AudioDeviceStatus;\n  error: string | null;\n  requestAccess: () => Promise<void>;\n  refresh: () => Promise<void>;\n}\n\n/** Enumerates inputs without opening a microphone; requestAccess is an explicit user action. */\nexport function useAudioDevices(): AudioDevicesState {\n  const [devices, setDevices] = React.useState<MediaDeviceInfo[]>([]);\n  const [status, setStatus] = React.useState<AudioDeviceStatus>(\"loading\");\n  const [error, setError] = React.useState<string | null>(null);\n  const mounted = React.useRef(false);\n  const version = React.useRef(0);\n  const requesting = React.useRef(false);\n  const load = React.useCallback(async (permission: boolean) => {\n    if (!mounted.current || requesting.current) return;\n    const media = navigator.mediaDevices;\n    if (!media?.enumerateDevices || (permission && !media.getUserMedia)) {\n      setStatus(\"unavailable\"); setError(\"Microphone selection is unavailable in this browser.\"); return;\n    }\n    const request = ++version.current;\n    requesting.current = permission;\n    setStatus(\"loading\"); setError(null);\n    let stream: MediaStream | undefined;\n    try {\n      if (permission) stream = await media.getUserMedia({ audio: true });\n      if (!mounted.current || request !== version.current) return;\n      const next = (await media.enumerateDevices()).filter(device => device.kind === \"audioinput\");\n      if (mounted.current && request === version.current) { setDevices(next); setStatus(\"ready\"); }\n    } catch (reason) {\n      if (!mounted.current || request !== version.current) return;\n      const denied = typeof reason === \"object\" && reason !== null && \"name\" in reason && reason.name === \"NotAllowedError\";\n      setStatus(denied ? \"denied\" : \"error\");\n      setError(denied ? \"Microphone permission was denied. Allow access in your browser and try again.\" : \"Microphones could not be loaded. Try again.\");\n    } finally {\n      stream?.getTracks().forEach(track => { track.stop(); });\n      if (request === version.current) requesting.current = false;\n    }\n  }, []);\n  React.useEffect(() => {\n    mounted.current = true;\n    const refresh = () => { void load(false); };\n    refresh();\n    navigator.mediaDevices?.addEventListener?.(\"devicechange\", refresh);\n    return () => {\n      mounted.current = false; version.current++; requesting.current = false;\n      navigator.mediaDevices?.removeEventListener?.(\"devicechange\", refresh);\n    };\n  }, [load]);\n  return { devices, status, error, refresh: React.useCallback(() => load(false), [load]), requestAccess: React.useCallback(() => load(true), [load]) };\n}\n\nexport interface MicSelectorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (deviceId: string) => void;\n  label?: string;\n  disabled?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0, width: \"100%\", color: vlak.ink },\n  label: { fontSize: vlak.controlFs, fontWeight: 500, lineHeight: 1.45 },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  message: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** Searchable microphone choice. The application owns capture and the selected device's use. */\nexport const MicSelector = React.forwardRef<HTMLDivElement, MicSelectorProps>(function MicSelector({ value, defaultValue = \"\", onValueChange, label = \"Microphone\", disabled = false, className, style, ...props }, ref) {\n  const { devices, status, error, requestAccess, refresh } = useAudioDevices();\n  const [inner, setInner] = React.useState(defaultValue);\n  const selected = value ?? inner;\n  const id = React.useId();\n  const missing = Boolean(selected && status === \"ready\" && !devices.some(device => device.deviceId === selected));\n  const options = devices.filter(device => device.deviceId).map((device, index) => ({ value: device.deviceId, label: device.label || `Microphone ${index + 1}` }));\n  if (missing) options.unshift({ value: selected, label: \"Selected microphone unavailable\" });\n  const root = rs([\"rs-mic-selector\", className], styles.root);\n  const heading = rs([\"rs-mic-selector-label\"], styles.label);\n  const actions = rs([\"rs-mic-selector-actions\"], styles.actions);\n  const message = rs([\"rs-mic-selector-message\"], styles.message);\n  const needsPermission = !devices.length || devices.some(device => !device.label);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <span {...heading} id={`${id}-label`}>{label}</span>\n    <Combobox options={options} value={selected} onValueChange={next => { if (value === undefined) setInner(next); onValueChange?.(next); }} aria-labelledby={`${id}-label`} aria-describedby={`${id}-status`} placeholder=\"Select microphone…\" emptyLabel=\"No microphones found\" disabled={disabled || status === \"loading\" || status === \"unavailable\"} />\n    <div {...actions}>\n      {needsPermission && status !== \"unavailable\" && <Button variant=\"subtle\" size=\"sm\" disabled={disabled || status === \"loading\"} onClick={() => { void requestAccess(); }}>Allow microphone access</Button>}\n      <Button variant=\"subtle\" size=\"sm\" disabled={disabled || status === \"loading\" || status === \"unavailable\"} onClick={() => { void refresh(); }}>Refresh microphones</Button>\n    </div>\n    <p {...message} id={`${id}-status`} role=\"status\">{error ?? (status === \"loading\" ? \"Loading microphones…\" : missing ? \"The selected microphone is disconnected. Choose another input.\" : devices.length === 0 ? \"No microphones available. Allow access to discover inputs.\" : \"Selecting an input does not start recording.\")}</p>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/mic-selector.tsx"
+    },
+    {
+      "path": "vlak/styles/mic-selector.css",
+      "content": "/* ── mic-selector: generated from packages/react/src/components/mic-selector.tsx ── */\n.rs-mic-selector{display:grid;gap:0.5rem;min-width:0;width:100%;color:var(--text)}\n.rs-mic-selector-label{font-size:var(--control-fs);font-weight:500;line-height:1.45}\n.rs-mic-selector-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-mic-selector-message{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/mic-selector.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-mic-selector",
+        "rs-mic-selector-label",
+        "rs-mic-selector-actions",
+        "rs-mic-selector-message"
+      ],
+      "snippet": "<div class=\"rs-mic-selector\"><label class=\"rs-mic-selector-label\" for=\"microphone\">Microphone</label><select id=\"microphone\" class=\"rs-input\"><option>System microphone</option></select><p class=\"rs-mic-selector-message\">Selecting an input does not start recording.</p></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "combobox",
+        "input",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Mic Selector",
+        "Microphone picker",
+        "Audio input",
+        "useAudioDevices"
+      ],
+      "example": "\"use client\";\nimport { useState } from \"react\";\nimport { MicSelector } from \"@noorddev/vlak-react\";\n\nexport function MicrophonePicker() {\n  const [deviceId, setDeviceId] = useState(\"\");\n  return <MicSelector label=\"Microphone\" value={deviceId} onValueChange={setDeviceId} />;\n}",
+      "usage": {
+        "use": [
+          "Select a device before application-owned recording.",
+          "useAudioDevices enumerates without opening a microphone; requestAccess asks for permission only when activated.",
+          "Input labels may be unavailable until the user allows access. Temporary permission streams are released.",
+          "Keep value controlled to preserve a selected device across device-change events.",
+          "CSS-only markup requires application code for discovery and capture permissions."
+        ],
+        "avoid": [
+          "Assuming selection starts recording or guarantees that a disconnected device remains usable.",
+          "Requesting microphone permission automatically when rendering a page."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Type",
+          "does": "Filters the microphone list"
+        },
+        {
+          "keys": "Arrow Down, Arrow Up, Enter",
+          "does": "Navigates and chooses an available microphone"
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the selection list"
+        },
+        {
+          "keys": "Tab, Enter, Space",
+          "does": "Reaches and activates permission or refresh controls"
+        }
+      ],
+      "a11y": [
+        "A visible label names the combobox. Loading, permission errors, and disconnection are announced through a status region.",
+        "Keyboard filtering comes from the shared Combobox. Permission and refresh actions use native 44px buttons.",
+        "Native div attributes and the root ref are forwarded."
+      ]
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "commit",
+  "type": "registry:component",
+  "title": "Commit",
+  "description": "Shows a commit message, full-hash copy, author and time, with expandable changed files.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/badge.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/snippet.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/commit.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Badge } from \"./badge\";\nimport { Button } from \"./button\";\nimport { Collapsible } from \"./collapsible\";\nimport { SnippetCopy } from \"./snippet\";\n\nexport interface CommitFile { path: string; previousPath?: string; status: \"added\" | \"modified\" | \"deleted\" | \"renamed\"; additions?: number; deletions?: number }\nexport interface CommitProps extends Omit<React.HTMLAttributes<HTMLElement>, \"onCopy\" | \"title\"> {\n  hash: string;\n  message: string;\n  author?: React.ReactNode;\n  avatar?: React.ReactNode;\n  /** ISO date or Date; a supplied timeLabel can use the application's locale or relative clock. */\n  timestamp?: string | Date;\n  timeLabel?: string;\n  files?: CommitFile[];\n  defaultOpen?: boolean;\n  onFileSelect?: (file: CommitFile) => void;\n  onCopy?: (hash: string) => void | Promise<void>;\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.75rem\", padding: \"0.75rem 1rem\" },\n  heading: { display: \"grid\", gap: \"0.25rem\", minWidth: 0, flex: \"1 1 auto\", overflowWrap: \"anywhere\" },\n  message: { fontWeight: 600 },\n  metadata: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", color: vlak.gray, fontSize: \"0.75rem\" },\n  content: { padding: \"0 1rem 1rem\", minWidth: 0 },\n  list: { listStyle: \"none\", padding: 0, margin: 0, color: vlak.ink },\n  file: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", minWidth: 0, paddingBlock: \"0.5rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  path: { minWidth: 0, flex: \"1 1 auto\", overflowWrap: \"anywhere\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", textAlign: \"start\" },\n  count: { color: vlak.gray, fontSize: \"0.75rem\", fontVariantNumeric: \"tabular-nums\" },\n});\n\n/** Supplied commit metadata and changed files with exact hash copy and optional file navigation. */\nexport const Commit = React.forwardRef<HTMLElement, CommitProps>(function Commit({ hash, message, author, avatar, timestamp, timeLabel, files = [], defaultOpen = false, onFileSelect, onCopy, children, className, style, ...props }, ref) {\n  const parsed = timestamp == null ? undefined : new Date(timestamp);\n  const iso = parsed && Number.isFinite(parsed.getTime()) ? parsed.toISOString() : undefined;\n  const root = rs([\"rs-commit\", className], styles.root);\n  const header = rs([\"rs-commit-header\"], styles.header);\n  const heading = rs([\"rs-commit-heading\"], styles.heading);\n  const messageStyle = rs([\"rs-commit-message\"], styles.message);\n  const metadata = rs([\"rs-commit-metadata\"], styles.metadata);\n  const content = rs([\"rs-commit-content\"], styles.content);\n  const list = rs([\"rs-commit-list\"], styles.list);\n  const fileStyle = rs([\"rs-commit-file\"], styles.file);\n  const path = rs([\"rs-commit-path\"], styles.path);\n  const count = rs([\"rs-commit-count\"], styles.count);\n  return <article aria-label={`Commit ${hash.slice(0, 7)}`} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}>{avatar}<div {...heading}><span {...messageStyle}>{message}</span><div {...metadata}><code>{hash.slice(0, 7)}</code>{author}{iso && <time dateTime={iso}>{timeLabel ?? iso.replace(\"T\", \" \").slice(0, 16) + \" UTC\"}</time>}</div></div><SnippetCopy value={hash} label=\"Copy commit hash\" onCopy={onCopy} /></header>\n    <div {...content}><Collapsible title={`${files.length} changed ${files.length === 1 ? \"file\" : \"files\"}`} defaultOpen={defaultOpen}><ul {...list}>{files.map(file => <li key={file.path} {...fileStyle}>\n      <Badge variant=\"muted\">{file.status}</Badge>{onFileSelect ? <Button {...path} type=\"button\" variant=\"subtle\" onClick={() => onFileSelect(file)}>{file.path}</Button> : <code {...path}>{file.path}</code>}\n      {file.previousPath && <span {...count}>from {file.previousPath}</span>}{file.additions != null && <span {...count}>{file.additions} additions</span>}{file.deletions != null && <span {...count}>{file.deletions} deletions</span>}\n    </li>)}</ul>{files.length === 0 && <p {...count}>No file changes supplied.</p>}</Collapsible>{children}</div>\n  </article>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/commit.tsx"
+    },
+    {
+      "path": "vlak/styles/commit.css",
+      "content": "/* ── commit: generated from packages/react/src/components/commit.tsx ── */\n.rs-commit{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-commit{border-color:CanvasText}}\n.rs-commit-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;padding:0.75rem 1rem}\n.rs-commit-heading{display:grid;gap:0.25rem;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}\n.rs-commit-message{font-weight:600}\n.rs-commit-metadata{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text-secondary);font-size:0.75rem}\n.rs-commit-content{padding:0 1rem 1rem;min-width:0}\n.rs-commit-list{list-style:none;padding:0;margin:0;color:var(--text)}\n.rs-commit-file{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;min-width:0;padding-block:0.5rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-commit-path{min-width:0;flex:1 1 auto;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;text-align:start}\n.rs-commit-count{color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/commit.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-commit",
+        "rs-commit-header",
+        "rs-commit-heading",
+        "rs-commit-message",
+        "rs-commit-metadata",
+        "rs-commit-content",
+        "rs-commit-list",
+        "rs-commit-file",
+        "rs-commit-path",
+        "rs-commit-count"
+      ],
+      "snippet": "<article class=\"rs-commit\" aria-label=\"Commit a1b2c3d\"><header class=\"rs-commit-header\"><div class=\"rs-commit-heading\"><span class=\"rs-commit-message\">Retain failed drafts</span><div class=\"rs-commit-metadata\"><code>a1b2c3d</code><span>Mina</span></div></div></header><div class=\"rs-commit-content\"><details class=\"rs-disclosure\"><summary class=\"rs-disclosure-summary\">1 changed file</summary><ul class=\"rs-commit-list\"><li class=\"rs-commit-file\"><code class=\"rs-commit-path\">src/composer.tsx</code><span class=\"rs-commit-count\">18 additions</span></li></ul></details></div></article>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "badge",
+        "button",
+        "collapsible",
+        "snippet",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Commit",
+        "Git commit",
+        "Changed files"
+      ],
+      "example": "import { Commit } from \"@noorddev/vlak-react\";\n\n<Commit hash=\"a1b2c3d4e5f60718293a4b5c6d7e8f901234abcd\" message=\"Retain failed drafts\" author=\"Mina\" timestamp=\"2026-09-09T10:20:00Z\" defaultOpen files={[{ path: \"src/composer.tsx\", status: \"modified\", additions: 18, deletions: 4 }]} />",
+      "usage": {
+        "use": [
+          "Inspect a supplied commit and its changed files.",
+          "Use onFileSelect for navigation or an inline diff; the callback receives the full file record.",
+          "Supply timeLabel for application-localized or relative time. The fallback is a stable UTC timestamp."
+        ],
+        "avoid": [
+          "Running git commands or fetching file content from a display component.",
+          "Passing a shortened hash when the copy action must return the complete revision."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches copy, the file disclosure and optional file buttons."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space activates copy, disclosure or the focused file callback."
+        }
+      ],
+      "a11y": [
+        "The article includes the shortened hash in its accessible name while copy uses the complete supplied hash.",
+        "Change status and additions/deletions use text, independent of color.",
+        "Timestamp uses a machine-readable time element. Invalid dates are omitted."
+      ]
+    }
+  }
+}

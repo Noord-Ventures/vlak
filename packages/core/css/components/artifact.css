@@ -1,0 +1,10 @@
+/* ── artifact: generated from packages/react/src/components/artifact.tsx ── */
+.rs-artifact{display:flex;flex-direction:column;min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}
+@media (forced-colors: active){.rs-artifact{border-color:CanvasText}}
+.rs-artifact-header{display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem;padding:0.75rem 1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-artifact-heading{display:grid;gap:0.25rem;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+.rs-artifact-title{font-size:0.875rem;font-weight:600;line-height:1.45}
+.rs-artifact-description{font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}
+.rs-artifact-actions{display:flex;flex-wrap:wrap;align-items:center;gap:0.25rem}
+.rs-artifact-content{min-width:0;overflow:auto;padding:1rem;font-size:0.875rem;line-height:1.45;outline-color:var(--text);outline-offset:-2px}
+.rs-artifact-footer{padding:0.75rem 1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);color:var(--text-secondary);font-size:0.75rem;line-height:1.45}

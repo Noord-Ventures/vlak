@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "conversation",
+  "type": "registry:component",
+  "title": "Conversation",
+  "description": "Keeps a scrollable message history at the latest response until the reader scrolls back.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/conversation.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface ConversationProps extends React.HTMLAttributes<HTMLDivElement> {\n  /** Accessible name of the scrollable message history. */\n  label?: string;\n  /** Maximum height of the message history, before it scrolls. */\n  maxHeight?: React.CSSProperties[\"maxHeight\"];\n  /** Follow new content while the reader is at the end. */\n  autoScroll?: boolean;\n  latestLabel?: string;\n}\n\nconst styles = stylex.create({\n  root: { display: \"flex\", flexDirection: \"column\", gap: \"0.75rem\", width: \"100%\", minWidth: 0, color: vlak.ink },\n  viewport: {\n    overflowY: \"auto\", overflowX: \"hidden\", overscrollBehavior: \"contain\", minHeight: 0,\n    minWidth: 0, boxSizing: \"border-box\", padding: \"0.25rem\", scrollBehavior: \"auto\",\n    outlineWidth: { default: null, \":focus-visible\": 2 },\n    outlineStyle: { default: null, \":focus-visible\": \"solid\" },\n    outlineColor: { default: null, \":focus-visible\": vlak.ink },\n    outlineOffset: { default: null, \":focus-visible\": -2 },\n  },\n  content: { display: \"flex\", flexDirection: \"column\", gap: \"1.25rem\", minWidth: 0, overflowWrap: \"anywhere\" },\n  footer: { display: \"flex\", justifyContent: \"center\" },\n});\n\n/** A message history that follows new content without taking the reader away from earlier messages. */\nexport const Conversation = React.forwardRef<HTMLDivElement, ConversationProps>(function Conversation({\n  label = \"Conversation\", maxHeight = \"28rem\", autoScroll = true, latestLabel = \"Jump to latest\",\n  className, style, children, ...props\n}, ref) {\n  const viewportRef = React.useRef<HTMLDivElement>(null);\n  const contentRef = React.useRef<HTMLDivElement>(null);\n  const following = React.useRef(true);\n  const [atEnd, setAtEnd] = React.useState(true);\n  const viewportId = React.useId();\n  const measure = React.useCallback(() => {\n    const viewport = viewportRef.current;\n    if (!viewport) return;\n    const end = viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop <= 24;\n    following.current = end;\n    setAtEnd(end);\n  }, []);\n  const jump = React.useCallback(() => {\n    const viewport = viewportRef.current;\n    if (!viewport) return;\n    viewport.scrollTop = viewport.scrollHeight;\n    following.current = true;\n    setAtEnd(true);\n  }, []);\n  const follow = React.useCallback(() => {\n    if (autoScroll && following.current) jump();\n    else measure();\n  }, [autoScroll, jump, measure]);\n\n  // Content can grow without a new message (streaming, images, or rendered code).\n  React.useEffect(() => {\n    follow();\n    if (typeof ResizeObserver === \"undefined\") return;\n    const observer = new ResizeObserver(follow);\n    if (contentRef.current) observer.observe(contentRef.current);\n    if (viewportRef.current) observer.observe(viewportRef.current);\n    return () => observer.disconnect();\n  }, [follow]);\n  React.useEffect(() => { follow(); }, [children, follow]);\n\n  const root = rs([\"rs-conversation\", className], styles.root);\n  const viewport = rs([\"rs-conversation-viewport\"], styles.viewport);\n  const content = rs([\"rs-conversation-content\"], styles.content);\n  const footer = rs([\"rs-conversation-footer\"], styles.footer);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...viewport} ref={viewportRef} id={viewportId} role=\"log\" aria-label={label} aria-live=\"off\"\n      tabIndex={0} style={{ ...viewport.style, maxHeight }} onScroll={measure}>\n      <div {...content} ref={contentRef}>{children}</div>\n    </div>\n    {!atEnd && <div {...footer}><Button variant=\"ghost\" aria-controls={viewportId} onClick={() => {\n      jump();\n      viewportRef.current?.focus({ preventScroll: true });\n    }}>{latestLabel}</Button></div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/conversation.tsx"
+    },
+    {
+      "path": "vlak/styles/conversation.css",
+      "content": "/* ── conversation: generated from packages/react/src/components/conversation.tsx ── */\n.rs-conversation{display:flex;flex-direction:column;gap:0.75rem;width:100%;min-width:0;color:var(--text)}\n.rs-conversation-viewport{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;min-height:0;min-width:0;box-sizing:border-box;padding:0.25rem;scroll-behavior:auto}\n.rs-conversation-viewport:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}\n.rs-conversation-content{display:flex;flex-direction:column;gap:1.25rem;min-width:0;overflow-wrap:anywhere}\n.rs-conversation-footer{display:flex;justify-content:center}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/conversation.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-conversation",
+        "rs-conversation-viewport",
+        "rs-conversation-content",
+        "rs-conversation-footer"
+      ],
+      "snippet": "<div class=\"rs-conversation\"><div class=\"rs-conversation-viewport\" role=\"log\" aria-label=\"Conversation\" aria-live=\"off\" tabindex=\"0\" style=\"max-height:28rem\"><div class=\"rs-conversation-content\"><p>You: Summarize this document.</p><p>Assistant: The document has three sections.</p></div></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Conversation",
+        "Chat history",
+        "Message log",
+        "Auto scroll",
+        "Chatbot"
+      ],
+      "example": "import { Conversation, MessageComposer, Response, ResponseActions, type ComposedMessage } from \"@noorddev/vlak-react\";\n\nexport function DocumentConversation({ onSend, generating, onStop }: {\n  onSend: (message: ComposedMessage) => void | Promise<void>;\n  generating: boolean;\n  onStop: () => void;\n}) {\n  return <>\n    <Conversation label=\"Document conversation\" maxHeight=\"28rem\">\n      <Response from=\"user\">Summarize this document.</Response>\n      <Response actions={<ResponseActions text=\"The document has three sections.\" />}>\n        <p>The document has three sections.</p>\n      </Response>\n    </Conversation>\n    <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend} generating={generating} onStop={onStop} />\n  </>;\n}",
+      "usage": {
+        "use": [
+          "A message history whose contents grow during a streamed response.",
+          "Keep MessageComposer outside the scrollable history.",
+          "Set autoScroll={false} to keep scrolling entirely manual.",
+          "CSS-only markup provides native scrolling; following and the jump action require React or application code."
+        ],
+        "avoid": [
+          "Putting an entire workbench in the message log.",
+          "Using this component to fetch messages, render Markdown, or own a model connection."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the scrollable log and its interactive contents"
+        },
+        {
+          "keys": "Arrow keys, Page Up, Page Down",
+          "does": "Scrolls the focused history using native browser behavior"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates Jump to latest and returns focus to the history"
+        }
+      ],
+      "a11y": [
+        "The message log has a supplied accessible label and a keyboard entry point.",
+        "The log uses aria-live=off; use Response status announcements rather than announcing every streamed token.",
+        "New content follows only while the reader is within 24px of the end. Scrolling back preserves the reading position.",
+        "Jump to latest is a native 44px Button. Automatic scrolling is immediate and never moves focus.",
+        "The ref and native attributes reach the outer div; maxHeight sets the inner scrollable history."
+      ]
+    }
+  }
+}

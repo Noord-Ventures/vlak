@@ -54,6 +54,7 @@ import {
   Donut,
   Histogram,
   HoverCard,
+  Icon,
   IconCatalog,
   InputOTP,
   Kbd,
@@ -363,9 +364,12 @@ export const demos: Record<string, () => React.ReactNode> = {
     </div>
   ),
   button: () => (
-    <div className="preview-cluster">
+    <div className="preview-cluster" style={{ flexWrap: "wrap" }}>
       <Button>Primary action</Button>
       <Button variant="ghost">Secondary</Button>
+      <Button variant="subtle">Subtle</Button>
+      <Button variant="subtle" disabled>Disabled</Button>
+      <Button variant="subtle" size="icon" aria-label="Download"><Icon name="download" /></Button>
     </div>
   ),
   callout: () => (
@@ -460,14 +464,27 @@ export const demos: Record<string, () => React.ReactNode> = {
     </Sidebar>
   ),
   "toggle-group": () => (
-    <ToggleGroup
-      options={[
-        { value: "left", label: "Left" },
-        { value: "center", label: "Center" },
-        { value: "right", label: "Right" },
-      ]}
-      defaultValue="left"
-    />
+    <div style={{ display: "grid", gap: 12 }}>
+      <ToggleGroup
+        aria-label="Default alignment"
+        options={[
+          { value: "left", label: "Left" },
+          { value: "center", label: "Center" },
+          { value: "right", label: "Right" },
+        ]}
+        defaultValue="left"
+      />
+      <ToggleGroup
+        variant="subtle"
+        aria-label="Subtle alignment"
+        options={[
+          { value: "left", label: "Left" },
+          { value: "center", label: "Center" },
+          { value: "right", label: "Right" },
+        ]}
+        defaultValue="left"
+      />
+    </div>
   ),
   input: () => (
     <div style={{ width: 260 }}>
@@ -775,7 +792,12 @@ export const demos: Record<string, () => React.ReactNode> = {
     />
   ),
   toggle: () => (
-    <Toggle defaultPressed>Bold</Toggle>
+    <div className="preview-cluster" style={{ flexWrap: "wrap" }}>
+      <Toggle defaultPressed>Default</Toggle>
+      <Toggle variant="subtle">Subtle</Toggle>
+      <Toggle variant="subtle" defaultPressed>Pressed</Toggle>
+      <Toggle variant="subtle" disabled>Disabled</Toggle>
+    </div>
   ),
   popover: () => (
     <Popover trigger="Details">

@@ -1,0 +1,23 @@
+/* ── attachments: generated from packages/react/src/components/attachments.tsx ── */
+.rs-attachments{display:grid;gap:0.5rem;padding:0;margin:0;list-style:none;min-width:0}
+.rs-attachments-grid{grid-template-columns:repeat(auto-fit, minmax(min(100%, 16rem), 1fr))}
+.rs-attachments-inline{display:flex;flex-wrap:wrap;align-items:flex-start}
+.rs-attachments-list{grid-template-columns:minmax(0, 1fr)}
+.rs-attachment-inline{width:auto;max-width:100%;flex:0 1 auto;padding:0.25rem}
+.rs-attachment-list{width:100%;box-sizing:border-box}
+.rs-attachment-thumbnail-inline{width:32px;height:32px}
+.rs-attachment-detail-inline{display:none}
+.rs-attachment-media-inline{max-width:18rem}
+.rs-attachment{min-width:0;display:flex;flex-direction:column;gap:0.5rem;padding:0.5rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg)}
+.rs-attachment-row{display:flex;align-items:center;gap:0.5rem;min-width:0}
+.rs-attachment-thumbnail{width:48px;height:48px;object-fit:cover;border-radius:var(--radius-sm);flex-shrink:0}
+.rs-attachment-file-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);background-color:var(--table-alt);border-radius:var(--radius-sm);flex-shrink:0}
+.rs-attachment-info{display:grid;gap:0.25rem;flex:1 1 auto;min-width:0}
+.rs-attachment-name{font-size:0.8125rem;font-weight:500;color:var(--text);overflow-wrap:anywhere;margin:0}
+.rs-attachment-detail{font-size:0.75rem;line-height:1.4;color:var(--text-secondary);margin:0;overflow-wrap:anywhere}
+.rs-attachment-action{width:44px;min-width:44px;max-width:44px;height:44px;padding:0;flex-shrink:0}
+.rs-attachment-media{display:block;width:100%;min-width:0;max-height:240px;border-radius:var(--radius-sm)}
+.rs-attachment-link{color:var(--text);text-decoration:underline;text-underline-offset:0.2em;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+.rs-attachment-link:focus-visible{outline-width:2px}
+.rs-attachment-status{font-size:0.75rem;color:var(--text-secondary);margin:0}
+.rs-attachment-progress{width:100%;height:6px;accent-color:var(--text)}

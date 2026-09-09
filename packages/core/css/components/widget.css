@@ -1,0 +1,16 @@
+/* ── widget: generated from packages/react/src/components/widget.tsx ── */
+.rs-widget{box-sizing:border-box;min-width:0;width:100%;max-width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);overflow-wrap:anywhere}
+@media (forced-colors: active){.rs-widget{border-color:CanvasText}}
+.rs-widget-header{display:flex;align-items:flex-start;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-widget-icon{display:flex;align-items:center;justify-content:center;width:1.25rem;height:1.25rem;flex-shrink:0}
+.rs-widget-heading{display:grid;gap:0.25rem;flex:1 1 auto;min-width:0}
+.rs-widget-title{font-size:0.875rem;line-height:1.45;font-weight:600}
+.rs-widget-provider{font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}
+.rs-widget-label{font-size:0.75rem;line-height:1.45;color:var(--text-secondary);margin-inline-start:auto}
+.rs-widget-content{display:grid;gap:0.75rem;min-width:0;padding:1rem;font-size:0.875rem;line-height:1.45}
+.rs-widget-description{margin:0;color:var(--text-secondary)}
+.rs-widget-state{display:grid;justify-items:start;gap:0.75rem;min-width:0}
+.rs-widget-message{margin:0}
+.rs-widget-actions{display:flex;flex-wrap:wrap;gap:0.5rem;min-width:0;padding-block:0 1rem;padding-inline:1rem}
+.rs-widget-footer{margin:0;padding:0.75rem 1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}
+.rs-widget-embed{box-sizing:border-box;display:block;width:100%;max-width:100%;min-width:0;border-width:0}

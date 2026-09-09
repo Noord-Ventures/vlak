@@ -1,6 +1,51 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import type { ComponentType } from "react";
+import { Use as AiOpenInChat } from "./open-in-chat/use";
+import { Use as AiInlineCitation } from "./inline-citation/use";
+import { Use as AiSources } from "./sources/use";
+import { Use as AiModelSelector } from "./model-selector/use";
+import { Use as AiContextUsage } from "./context-usage/use";
+import { Use as AiWebPreview } from "./web-preview/use";
+import { Use as AiSandbox } from "./sandbox/use";
+import { Use as AiStackTrace } from "./stack-trace/use";
+import { Use as AiTerminal } from "./terminal/use";
+import { Use as AiAttachments } from "./attachments/use";
+import { Use as AiResponseEditor } from "./response-editor/use";
+import { Use as AiConversationExport } from "./conversation-export/use";
+import { Use as AiGeneratedImage } from "./generated-image/use";
+import { Use as AiWorkQueue } from "./work-queue/use";
+import { Use as AiSuggestions } from "./suggestions/use";
+import { Use as AiCheckpoint } from "./checkpoint/use";
+import { Use as AiThoughtSteps } from "./thought-steps/use";
+import { Use as AiTask } from "./task/use";
+import { Use as AiPlan } from "./plan/use";
+import { Use as AiShimmer } from "./shimmer/use";
+import { Use as AiResponseBranch } from "./response-branch/use";
+import { Use as AiAudioPlayer } from "./audio-player/use";
+import { Use as AiPersona } from "./persona/use";
+import { Use as AiTranscription } from "./transcription/use";
+import { Use as AiVoiceSelector } from "./voice-selector/use";
+import { Use as AiSpeechInput } from "./speech-input/use";
+import { Use as AiMicSelector } from "./mic-selector/use";
+import { Use as AiTestResults } from "./test-results/use";
+import { Use as AiSnippet } from "./snippet/use";
+import { Use as AiSchemaDisplay } from "./schema-display/use";
+import { Use as AiPackageInfo } from "./package-info/use";
+import { Use as AiEnvironmentVariables } from "./environment-variables/use";
+import { Use as AiCommit } from "./commit/use";
+import { Use as AiArtifact } from "./artifact/use";
+import { Use as AiAgent } from "./agent/use";
+import { Use as Chat } from "./chat/use";
+import { Use as Conversation } from "./conversation/use";
+import { Use as Response } from "./response/use";
+import { Use as ResponseActions } from "./response-actions/use";
+import { Use as Widget } from "./widget/use";
+import { Use as Reasoning } from "./reasoning/use";
+import { Use as ToolCall } from "./tool-call/use";
+import { Use as Confirmation } from "./confirmation/use";
 import { JointPanelUse as JointPanel } from "./joint-panel/use";
 import { RobotPoseUse as RobotPose } from "./robot-pose/use";
 import { RobotMissionQueueUse as RobotMissionQueue } from "./robot-mission-queue/use";
@@ -99,6 +144,53 @@ import { Use as PropertyGrid } from "./property-grid/use";
 
 /** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
+  "jsx-preview": dynamic(() => import("./jsx-preview/use").then(module => module.Use)),
+  "open-in-chat": AiOpenInChat,
+  "inline-citation": AiInlineCitation,
+  "sources": AiSources,
+  "model-selector": AiModelSelector,
+  "context-usage": AiContextUsage,
+  "web-preview": AiWebPreview,
+  "sandbox": AiSandbox,
+  "stack-trace": AiStackTrace,
+  "terminal": AiTerminal,
+  "highlighted-code": dynamic(() => import("./highlighted-code/use").then(module => module.Use)),
+  "response-markdown": dynamic(() => import("./response-markdown/use").then(module => module.Use)),
+  "workflow-canvas": dynamic(() => import("./workflow-canvas/use").then(module => module.Use)),
+  "attachments": AiAttachments,
+  "response-editor": AiResponseEditor,
+  "conversation-export": AiConversationExport,
+  "generated-image": AiGeneratedImage,
+  "work-queue": AiWorkQueue,
+  "suggestions": AiSuggestions,
+  "checkpoint": AiCheckpoint,
+  "thought-steps": AiThoughtSteps,
+  "task": AiTask,
+  "plan": AiPlan,
+  "shimmer": AiShimmer,
+  "response-branch": AiResponseBranch,
+  "audio-player": AiAudioPlayer,
+  "persona": AiPersona,
+  "transcription": AiTranscription,
+  "voice-selector": AiVoiceSelector,
+  "speech-input": AiSpeechInput,
+  "mic-selector": AiMicSelector,
+  "test-results": AiTestResults,
+  "snippet": AiSnippet,
+  "schema-display": AiSchemaDisplay,
+  "package-info": AiPackageInfo,
+  "environment-variables": AiEnvironmentVariables,
+  "commit": AiCommit,
+  "artifact": AiArtifact,
+  "agent": AiAgent,
+  chat: Chat,
+  conversation: Conversation,
+  response: Response,
+  "response-actions": ResponseActions,
+  widget: Widget,
+  reasoning: Reasoning,
+  "tool-call": ToolCall,
+  confirmation: Confirmation,
   "joint-panel": JointPanel,
   "robot-pose": RobotPose,
   "robot-mission-queue": RobotMissionQueue,

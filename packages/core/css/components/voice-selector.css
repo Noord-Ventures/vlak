@@ -1,0 +1,8 @@
+/* ── voice-selector: generated from packages/react/src/components/voice-selector.tsx ── */
+.rs-voice-selector{display:grid;gap:0.75rem;min-width:0;width:100%;color:var(--text)}
+.rs-voice-selector-label{font-size:var(--control-fs);font-weight:500;line-height:1.45}
+.rs-voice-selector-option{display:grid;gap:0.125rem}
+.rs-voice-selector-metadata{font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
+.rs-voice-selector-detail{padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);display:grid;gap:0.5rem}
+@media (forced-colors: active){.rs-voice-selector-detail{border-color:CanvasText}}
+.rs-voice-selector-message{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}

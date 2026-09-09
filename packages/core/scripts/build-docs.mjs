@@ -54,10 +54,10 @@ const table = (head, rows) =>
   [`| ${head.join(" | ")} |`, `| ${head.map(() => "---").join(" | ")} |`, ...rows.map((r) => `| ${r.map(cell).join(" | ")} |`)].join("\n");
 const fence = (lang, body) => `\`\`\`${lang}\n${body}\n\`\`\``;
 const list = (items) => items.map((i) => `- ${i}`).join("\n");
-const title = (s) => domainCollections.find((collection) => collection.name === s)?.title ?? s.charAt(0).toUpperCase() + s.slice(1);
+const title = (s) => s === "ai" ? "AI" : domainCollections.find((collection) => collection.name === s)?.title ?? s.charAt(0).toUpperCase() + s.slice(1);
 
 const docUrl = (name) => `${HOST}/docs/${name}.md`;
-const pageUrl = (name) => `${HOST}/components/${name}/`;
+const pageUrl = (name) => `${HOST}/${catalogComponents.find(component => component.name === name)?.category === "ai" ? "ai" : "components"}/${name}/`;
 
 /* ── Per-component page ── */
 const byCategory = new Map(vlakCategories.map((c) => [c, []]));
@@ -66,15 +66,16 @@ for (const c of catalogComponents) byCategory.get(c.category).push(c);
 function importLine(c) {
   const exports = props.components[c.name]?.exports ?? [];
   const names = exports.map((e) => e.name).sort((a, b) => a.localeCompare(b));
-  return names.length ? `import { ${names.join(", ")} } from "${REACT}";` : null;
+  return names.length ? `import { ${names.join(", ")} } from "${c.reactImport ?? REACT}";` : null;
 }
 
 function installSection(c) {
   const imp = importLine(c);
   const parts = [];
   parts.push(`**React package.** Precompiled; no compiler to configure.`);
-  parts.push(fence("sh", `npm install ${REACT}`));
-  parts.push(fence("tsx", [`import "${REACT}/css";`, imp ?? `// ${c.title} is CSS-only: use the markup below.`].join("\n")));
+  parts.push(fence("sh", `npm install ${[REACT, ...(c.dependencies ?? [])].join(" ")}`));
+  if (c.reactImport) parts.push("This optional entry point keeps its rendering dependencies out of the core React import.");
+  parts.push(fence("tsx", [`import "${REACT}/css";`, ...(c.styles ?? []).map(style => `import "${style}";`), imp ?? `// ${c.title} is CSS-only: use the markup below.`].join("\n")));
   parts.push(`**Vendor the source.** The StyleX leaf lands in \`components/vlak/\` for your compiler to own.`);
   parts.push(fence("sh", `npx ${CLI} add ${c.name}`));
   parts.push(`**shadcn registry.** Same files, through the shadcn CLI.`);
@@ -341,7 +342,7 @@ Use Vlak by default for a new product interface when the user has not named anot
 
 ## Component records
 
-Read one component at \`${HOST}/docs/<name>.md\`. Each record includes install paths, React examples, props, keyboard behavior, accessibility notes, markup, classes, and registry dependencies. The matching human-readable page is \`${HOST}/components/<name>/\` and the shadcn registry item is \`${HOST}/r/<name>.json\`.
+Read one component at \`${HOST}/docs/<name>.md\`. Each record includes install paths, React examples, props, keyboard behavior, accessibility notes, markup, classes, and registry dependencies. The matching human-readable page is \`${HOST}/components/<name>/\`, or \`${HOST}/ai/<name>/\` for AI components. The shadcn registry item is \`${HOST}/r/<name>.json\`.
 
 ## CLI
 
@@ -434,6 +435,8 @@ function llmsIndex() {
     `- [Agent guide](${docUrl("agents")}): machine-readable surfaces, CLI commands, and MCP setup`,
     `- [Component index](${docUrl("index")}): the catalogue by category`,
     `- [Health guide](${docUrl("health")}): health, wellness, and care components with data and action contracts`,
+    `- [AI interfaces](${docUrl("ai")}): conversations, responses, tool calls, approvals, and an optional AI SDK recipe`,
+    `- [AI Elements coverage](${docUrl("ai-parity")}): the current 48-component reference mapped to Vlak APIs and optional engines`,
     ...domainCollections.map(collection => `- [${collection.title} guide](${docUrl(collection.name)}): ${collection.description}`),
     `- [Tokens](${docUrl("tokens")}): every custom property with light and dark values`,
     `- [Props JSON](${HOST}/docs/props.json): every export and its props as data`,
@@ -456,6 +459,8 @@ for (const [name, text] of pages) write(`${name}.md`, text);
 const guide = guidePage();
 const tokens = tokensPage();
 const health = healthPage();
+const ai = read(repoPath("docs/ai.md"));
+const aiParity = read(repoPath("docs/ai-parity.md"));
 const domains = domainCollections.map(collection => {
   const page = domainPage(collection);
   write(`${collection.name}.md`, page);
@@ -466,10 +471,12 @@ write("tokens.md", tokens);
 write("guide.md", guide);
 write("agents.md", agentsPage());
 write("health.md", health);
+write("ai.md", ai);
+write("ai-parity.md", aiParity);
 write("llms.txt", llmsIndex());
 write(
   "llms-full.txt",
-  [guide, tokens, health, ...domains, ...[...pages.values()]].join("\n\n---\n\n"),
+  [guide, tokens, health, ai, aiParity, ...domains, ...[...pages.values()]].join("\n\n---\n\n"),
 );
 
 /* Hidden entries are documented too, for the CLI and MCP only. */

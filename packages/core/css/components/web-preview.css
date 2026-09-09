@@ -1,0 +1,12 @@
+/* ── web-preview: generated from packages/react/src/components/web-preview.tsx ── */
+.rs-web-preview{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+@media (forced-colors: active){.rs-web-preview{border-color:CanvasText}}
+.rs-web-preview-navigation{display:flex;flex-wrap:wrap;align-items:center;gap:0.25rem;padding:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-web-preview-address{min-width:8rem;flex:1 1 auto}
+.rs-web-preview-body{min-width:0;overflow:auto}
+.rs-web-preview-status{padding:0.5rem 1rem;margin:0;color:var(--text-secondary);font-size:0.75rem}
+.rs-web-preview-console{padding:0 1rem 0.75rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
+.rs-web-preview-logs{list-style:none;margin:0;padding:0;max-height:14rem;overflow:auto;outline-color:var(--text);outline-offset:2px}
+.rs-web-preview-log{display:grid;gap:0.25rem;padding-block:0.5rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);color:var(--text)}
+.rs-web-preview-level{font-size:0.75rem;font-weight:600}
+.rs-web-preview-message{white-space:pre-wrap;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;margin:0}

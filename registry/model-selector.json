@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "model-selector",
+  "type": "registry:component",
+  "title": "Model selector",
+  "description": "Searches a supplied model catalog by name, provider and capabilities, with metadata and controlled selection.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/combobox.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/model-selector.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Combobox } from \"./combobox\";\n\nexport interface ModelOption {\n  id: string; name: string; provider?: string; description?: string;\n  capabilities?: readonly string[]; contextWindow?: number; priceLabel?: string;\n  icon?: React.ReactNode; disabled?: boolean;\n}\nexport interface ModelSelectorProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\"> {\n  models: readonly ModelOption[]; value?: string; defaultValue?: string;\n  onValueChange?: (modelId: string) => void; label?: string; disabled?: boolean;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", width: \"100%\", minWidth: 0, color: vlak.ink },\n  label: { fontSize: vlak.controlFs, fontWeight: 500, lineHeight: 1.45 },\n  option: { display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", minWidth: 0 },\n  icon: { display: \"inline-flex\", alignItems: \"center\", width: \"1.25rem\", height: \"1.25rem\", flexShrink: 0 },\n  text: { display: \"grid\", gap: \"0.125rem\", minWidth: 0 },\n  metadata: { fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n  detail: { display: \"grid\", gap: \"0.5rem\", padding: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm },\n  description: { margin: 0, fontSize: vlak.controlFs, lineHeight: 1.45 },\n});\n\n/** Search and select models from an application-supplied catalog, without provider lookups. */\nexport const ModelSelector = React.forwardRef<HTMLDivElement, ModelSelectorProps>(function ModelSelector({ models, value, defaultValue = \"\", onValueChange, label = \"Model\", disabled = false, className, style, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue); const current = value ?? inner;\n  const selected = models.find(model => model.id === current); const id = React.useId();\n  const root = rs([\"rs-model-selector\", className], styles.root);\n  const heading = rs([\"rs-model-selector-label\"], styles.label);\n  const option = rs([\"rs-model-selector-option\"], styles.option);\n  const icon = rs([\"rs-model-selector-icon\"], styles.icon);\n  const text = rs([\"rs-model-selector-text\"], styles.text);\n  const metadata = rs([\"rs-model-selector-metadata\"], styles.metadata);\n  const detail = rs([\"rs-model-selector-detail\"], styles.detail);\n  const description = rs([\"rs-model-selector-description\"], styles.description);\n  return <div ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>\n    <span {...heading} id={`${id}-label`}>{label}</span>\n    <Combobox aria-labelledby={`${id}-label`} value={current} disabled={disabled} placeholder=\"Search models…\" emptyLabel=\"No models match\" onValueChange={next => { if (value === undefined) setInner(next); onValueChange?.(next); }} options={models.map(model => ({ value: model.id, disabled: model.disabled, searchText: [model.name, model.provider, model.description, ...(model.capabilities ?? [])].filter(Boolean).join(\" \"), label: <span {...option}>{model.icon && <span {...icon} aria-hidden=\"true\">{model.icon}</span>}<span {...text}><span>{model.name}</span><span {...metadata}>{[model.provider, ...(model.capabilities ?? [])].filter(Boolean).join(\" · \")}</span></span></span> }))} />\n    {selected && <div {...detail}><span {...heading}>{selected.name}</span>{selected.description && <p {...description}>{selected.description}</p>}<span {...metadata}>{[selected.provider, ...(selected.capabilities ?? []), selected.contextWindow != null && Number.isFinite(selected.contextWindow) && selected.contextWindow > 0 ? `${selected.contextWindow.toLocaleString(\"en-US\")} token context` : undefined, selected.priceLabel].filter(Boolean).join(\" · \")}</span></div>}\n    {(!models.length || (current && !selected)) && <span {...metadata} role=\"status\">{models.length ? \"The selected model is unavailable. Choose another model.\" : \"No models supplied.\"}</span>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/model-selector.tsx"
+    },
+    {
+      "path": "vlak/styles/model-selector.css",
+      "content": "/* ── model-selector: generated from packages/react/src/components/model-selector.tsx ── */\n.rs-model-selector{display:grid;gap:0.75rem;width:100%;min-width:0;color:var(--text)}\n.rs-model-selector-label{font-size:var(--control-fs);font-weight:500;line-height:1.45}\n.rs-model-selector-option{display:flex;align-items:center;gap:0.5rem;min-width:0}\n.rs-model-selector-icon{display:inline-flex;align-items:center;width:1.25rem;height:1.25rem;flex-shrink:0}\n.rs-model-selector-text{display:grid;gap:0.125rem;min-width:0}\n.rs-model-selector-metadata{font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n.rs-model-selector-detail{display:grid;gap:0.5rem;padding:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm)}\n@media (forced-colors: active){.rs-model-selector-detail{border-color:CanvasText}}\n.rs-model-selector-description{margin:0;font-size:var(--control-fs);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/model-selector.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-model-selector",
+        "rs-model-selector-label",
+        "rs-model-selector-option",
+        "rs-model-selector-icon",
+        "rs-model-selector-text",
+        "rs-model-selector-metadata",
+        "rs-model-selector-detail",
+        "rs-model-selector-description"
+      ],
+      "snippet": "<div class=\"rs-model-selector\"><label class=\"rs-model-selector-label\" for=\"model\">Model</label><select class=\"rs-input\" id=\"model\"><option>Swift · Example provider</option><option>Vision · Example provider</option></select></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "combobox",
+        "input",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Model Selector",
+        "Model picker",
+        "Provider models",
+        "LLM selector"
+      ],
+      "example": "\"use client\";\nimport { useState } from \"react\";\nimport { ModelSelector } from \"@noorddev/vlak-react\";\n\nexport function ModelPicker({ priceLabel }: { priceLabel?: string }) {\n  const [modelId, setModelId] = useState(\"swift\");\n  return <ModelSelector value={modelId} onValueChange={setModelId} models={[\n    { id: \"swift\", name: \"Swift\", provider: \"Your provider\", capabilities: [\"Text\", \"Fast\"], contextWindow: 32000 },\n    { id: \"vision\", name: \"Vision\", provider: \"Your provider\", capabilities: [\"Images\"], priceLabel },\n  ]} />;\n}",
+      "usage": {
+        "use": [
+          "Supply stable model ids and current provider metadata. Search includes names, descriptions, providers and capabilities.",
+          "Use value/onValueChange for an application-owned selection or defaultValue for local selection.",
+          "Supply icon as decorative React content, contextWindow as a token count and priceLabel as application-verified text.",
+          "Disabled models remain visible but cannot be selected. A removed controlled selection is explained rather than silently replaced.",
+          "CSS-only markup provides native selection; the React composition adds searchable metadata."
+        ],
+        "avoid": [
+          "Assuming the picker downloads models, calls a provider or updates an SDK connection.",
+          "Hardcoding provider prices into the library."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Type",
+          "does": "Filters model names and supplied metadata"
+        },
+        {
+          "keys": "Arrow Down, Arrow Up, Home, End",
+          "does": "Navigates available matches, skipping disabled models"
+        },
+        {
+          "keys": "Enter",
+          "does": "Selects the highlighted available model"
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the list and retains selection"
+        }
+      ],
+      "a11y": [
+        "A visible label names the shared Combobox. Disabled matches expose aria-disabled and are skipped during navigation.",
+        "Provider icons are decorative; model names and capability text remain readable.",
+        "The selected model detail has a subtle 1px frame and 4px corners. Native div attributes and ref pass through."
+      ]
+    }
+  }
+}

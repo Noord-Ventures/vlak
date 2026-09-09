@@ -7,6 +7,17 @@
  */
 
 import type { VlakComponent } from "./schema";
+import { aiChatControlComponents } from "./registry-ai-chat-controls.ts";
+import { aiCodeTools } from "./registry-ai-code-tools.ts";
+import { aiAttachments } from "./registry-ai-attachments.ts";
+import { aiWorkPatterns } from "./registry-ai-work-patterns.ts";
+import { aiWorkflowComponents } from "./registry-ai-workflow.ts";
+import { aiRichResponse } from "./registry-ai-rich-response.ts";
+import { aiVoiceComponents } from "./registry-ai-voice.ts";
+import { aiCode } from "./registry-ai-code.ts";
+import { aiComponents } from "./registry-ai.ts";
+import { aiActions } from "./registry-ai-actions.ts";
+import { aiResponse } from "./registry-ai-response.ts";
 import { dataAdditions } from "./registry-data-additions.ts";
 import { navigationAdditions } from "./registry-navigation-additions.ts";
 import { inputAdditions } from "./registry-input-additions.ts";
@@ -32,6 +43,17 @@ import { microbiologyComponents } from "./registry-microbiology.ts";
 export type { VlakComponent } from "./schema";
 
 export const vlakComponents: VlakComponent[] = [
+  ...aiChatControlComponents,
+  ...aiCodeTools,
+  ...aiAttachments,
+  ...aiWorkPatterns,
+  ...aiWorkflowComponents,
+  ...aiRichResponse,
+  ...aiVoiceComponents,
+  ...aiCode,
+  ...aiComponents,
+  ...aiActions,
+  ...aiResponse,
   ...dataAdditions,
   ...navigationAdditions,
   ...inputAdditions,
@@ -53,20 +75,24 @@ export const vlakComponents: VlakComponent[] = [
   {
     name: "button",
     title: "Button",
-    description: "Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.",
+    description: "Triggers an action with solid primary, 1px ghost, or borderless subtle styling. Every target is at least 44px; icon size is a 44px square.",
     category: "actions",
-    classes: ["rs-btn-primary", "rs-btn-ghost", "rs-btn-sm", "rs-btn-grouped", "rs-btn-grouped-ghost"],
+    classes: ["rs-btn-primary", "rs-btn-ghost", "rs-btn-subtle", "rs-btn-sm", "rs-btn-icon", "rs-btn-grouped", "rs-btn-grouped-ghost", "rs-btn-grouped-subtle"],
     css: ["components/button.css"],
     react: "components/button.tsx",
-    snippet: `<button class="rs-btn-primary">Primary action</button>\n<button class="rs-btn-ghost">Secondary</button>`,
-    example: `import { Button } from "@noorddev/vlak-react";
+    snippet: `<button class="rs-btn-primary">Primary action</button>\n<button class="rs-btn-ghost">Secondary</button>\n<button class="rs-btn-subtle">Details</button>\n<button class="rs-btn-subtle" disabled>Unavailable</button>\n<button class="rs-btn-subtle rs-btn-icon" aria-label="Download"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3.5 11.5V13h9v-1.5M8 3.5v7M5.5 8 8 10.5 10.5 8" /></svg></button>`,
+    example: `import { Button, Icon } from "@noorddev/vlak-react";
 
 <Button>Primary action</Button>
 <Button variant="ghost" size="sm">Secondary</Button>
-<Button disabled>Saving…</Button>`,
+<Button variant="subtle">Details</Button>
+<Button variant="subtle" disabled>Unavailable</Button>
+<Button variant="subtle" size="icon" aria-label="Download">
+  <Icon name="download" />
+</Button>`,
     usage: {
-      use: ["One primary action per view, with ghost for the secondary action.", "Submitting a form or answering a dialog."],
-      avoid: ["Navigation that changes the URL; use Link or a nav component.", "On and off state; use Toggle or Switch, which carry aria-pressed and aria-checked."],
+      use: ["One primary action per view, with ghost for the secondary action.", "Subtle for supporting actions in a toolbar or response. Its transparent surface stays unchanged while muted text turns to ink on hover.", "Inside ButtonGroup, subtle buttons use an opaque paper surface and a soft fill for application-supplied aria-pressed selection.", "Icon size for an icon-only action with a 44px square target and an accessible label.", "Submitting a form or answering a dialog."],
+      avoid: ["Navigation that changes the URL; use Link or a nav component.", "Standalone persistent settings; use Toggle or Switch. ButtonGroup can present application-owned selection with aria-pressed."],
     },
     keyboard: [
       { keys: "Tab", does: "Moves focus to the button" },
@@ -74,15 +100,15 @@ export const vlakComponents: VlakComponent[] = [
     ],
     a11y: [
       "Renders a native <button>; type defaults to \"button\", so pass type=\"submit\" inside a form.",
-      "The visible text is the name. Give icon-only buttons an aria-label.",
+      "The visible text is the name. Icon size changes the shape, not the accessible name; give icon-only buttons an aria-label and hide decorative icons.",
       "2px ink focus ring on :focus-visible. disabled uses the native attribute and 40% opacity; forced colors keep system colors.",
     ],
-    aliases: ["Button", "Primary button", "Ghost button", "Secondary button"],
+    aliases: ["Button", "Primary button", "Ghost button", "Secondary button", "Subtle button", "Icon button"],
   },
   {
     name: "button-group",
     title: "Button group",
-    description: "Keeps related actions together as joined ghost buttons with 1px dividers.",
+    description: "Keeps related actions together as joined buttons with 1px dividers and one outer frame.",
     category: "actions",
     classes: ["rs-btn-group"],
     css: ["components/button-group.css"],
@@ -97,8 +123,8 @@ export const vlakComponents: VlakComponent[] = [
   <Button variant="ghost">Right</Button>
 </ButtonGroup>`,
     usage: {
-      use: ["Two to four related actions that read as one control.", "Ghost buttons; the group owns the outer stroke and the seams."],
-      avoid: ["Exclusive selection; use ToggleGroup, which tracks the pressed option.", "Unrelated actions in one row; space them instead."],
+      use: ["Two to four related actions that read as one control.", "Ghost or subtle buttons; the group owns the outer stroke and the seams.", "For application-owned selection, give each subtle Button aria-pressed and update the selection from its onClick handler."],
+      avoid: ["Expecting the group to manage selection automatically; use ToggleGroup when it should own that behavior.", "Unrelated actions in one row; space them instead."],
     },
     keyboard: [
       { keys: "Tab", does: "Moves between the buttons" },
@@ -1254,20 +1280,24 @@ toast("Saved", { description: "Your changes are live." });`,
   {
     name: "toggle",
     title: "Toggle",
-    description: "Turns one persistent option on or off. Pressed fills with ink and exposes aria-pressed.",
+    description: "Turns one persistent option on or off with aria-pressed. Default uses an ink fill when pressed; subtle uses a soft fill and stronger text.",
     category: "actions",
-    classes: ["rs-toggle", "rs-toggle-group", "rs-toggle-grouped-on", "rs-toggle-pressed"],
+    classes: ["rs-toggle", "rs-toggle-group", "rs-toggle-grouped", "rs-toggle-grouped-on", "rs-toggle-pressed", "rs-toggle-subtle", "rs-toggle-subtle-pressed", "rs-toggle-group-subtle", "rs-toggle-grouped-subtle"],
     css: ["components/toggle.css"],
     react: "components/toggle.tsx",
-    snippet: `<button class="rs-toggle" aria-pressed="true">Bold</button>`,
+    snippet: `<button class="rs-toggle rs-toggle-pressed" aria-pressed="true">Bold</button>\n<button class="rs-toggle rs-toggle-subtle" aria-pressed="false">Italic</button>\n<button class="rs-toggle rs-toggle-pressed rs-toggle-subtle rs-toggle-subtle-pressed" aria-pressed="true">Underline</button>\n<button class="rs-toggle rs-toggle-subtle" aria-pressed="false" disabled>Strikethrough</button>`,
     example: `import { useState } from "react";
 import { Toggle } from "@noorddev/vlak-react";
 
 const [bold, setBold] = useState(false);
+const [italic, setItalic] = useState(false);
 
-<Toggle pressed={bold} onPressedChange={setBold} aria-label="Bold">B</Toggle>`,
+<Toggle pressed={bold} onPressedChange={setBold}>Bold</Toggle>
+<Toggle variant="subtle" pressed={italic} onPressedChange={setItalic}>Italic</Toggle>
+<Toggle variant="subtle" defaultPressed>Underline</Toggle>
+<Toggle variant="subtle" disabled>Strikethrough</Toggle>`,
     usage: {
-      use: ["A formatting or filter option that is on or off and stays in view.", "Several independent toggles in a row."],
+      use: ["A formatting or filter option that is on or off and stays in view.", "Default for a bordered toggle with an ink pressed state. Subtle stays transparent on hover while muted text turns to ink; pressing adds a soft fill and stronger text.", "Several independent toggles in a row."],
       avoid: ["A setting that applies immediately to the app; use Switch.", "One of several; use ToggleGroup."],
     },
     keyboard: [
@@ -1277,25 +1307,27 @@ const [bold, setBold] = useState(false);
     a11y: [
       "A native <button> with aria-pressed.",
       "Give icon-only toggles an aria-label. Controlled with pressed and onPressedChange, or uncontrolled with defaultPressed.",
+      "Both variants keep a minimum 44px target, a visible keyboard focus ring, and system colors in forced colors. Native disabled prevents activation.",
     ],
-    aliases: ["Toggle", "Toggle button", "Press button"],
+    aliases: ["Toggle", "Toggle button", "Press button", "Subtle toggle"],
   },
   {
     name: "toggle-group",
     title: "Toggle group",
-    description: "Selects one option from joined toggles. The active option fills with ink.",
+    description: "Selects one visible option. Default joins toggles with an ink active state; subtle uses a gray rail, 3px gaps, and a soft active fill.",
     category: "actions",
-    classes: ["rs-toggle-group"],
+    classes: ["rs-toggle-group", "rs-toggle-group-subtle"],
     css: ["components/toggle.css"],
     react: "components/toggle-group.tsx",
     registryDependencies: ["toggle"],
-    snippet: `<div class="rs-toggle-group"><button class="rs-toggle" aria-pressed="true">Left</button><button class="rs-toggle" aria-pressed="false">Center</button><button class="rs-toggle" aria-pressed="false">Right</button></div>`,
+    snippet: `<div class="rs-toggle-group" role="group" aria-label="Default alignment"><button class="rs-toggle rs-toggle-grouped rs-toggle-pressed rs-toggle-grouped-on" aria-pressed="true">Left</button><button class="rs-toggle rs-toggle-grouped" aria-pressed="false">Center</button><button class="rs-toggle rs-toggle-grouped" aria-pressed="false">Right</button></div>\n<div class="rs-toggle-group rs-toggle-group-subtle" role="group" aria-label="Subtle alignment"><button class="rs-toggle rs-toggle-grouped rs-toggle-pressed rs-toggle-grouped-on rs-toggle-subtle rs-toggle-subtle-pressed rs-toggle-grouped-subtle" aria-pressed="true">Left</button><button class="rs-toggle rs-toggle-grouped rs-toggle-subtle rs-toggle-grouped-subtle" aria-pressed="false">Center</button><button class="rs-toggle rs-toggle-grouped rs-toggle-subtle rs-toggle-grouped-subtle" aria-pressed="false">Right</button></div>`,
     example: `import { useState } from "react";
 import { ToggleGroup } from "@noorddev/vlak-react";
 
 const [align, setAlign] = useState("left");
 
 <ToggleGroup
+  variant="subtle"
   aria-label="Alignment"
   options={[
     { value: "left", label: "Left" },
@@ -1306,7 +1338,7 @@ const [align, setAlign] = useState("left");
   onValueChange={setAlign}
 />`,
     usage: {
-      use: ["One of two to five options that should all stay visible: alignment, view mode, period.", "Short labels of equal weight."],
+      use: ["One of two to five options that should all stay visible: alignment, view mode, period.", "Default for joined controls with hairline seams. Subtle uses a soft rail, 3px inset and gaps, 4px corners, and a soft active fill without internal strokes.", "Short labels of equal weight."],
       avoid: ["Many or long options; use Select.", "Multiple selection; use several Toggle buttons."],
     },
     keyboard: [
@@ -1316,8 +1348,9 @@ const [align, setAlign] = useState("left");
     a11y: [
       "Renders role=\"group\" of native buttons with aria-pressed; pass aria-label to name the group.",
       "Controlled with value and onValueChange, or uncontrolled with defaultValue.",
+      "Both variants retain a minimum 44px target per option and a visible keyboard focus ring. Tab visits each button; arrow keys do not change selection.",
     ],
-    aliases: ["Toggle group", "Segmented control", "Exclusive toggles"],
+    aliases: ["Toggle group", "Segmented control", "Exclusive toggles", "Subtle toggle group"],
   },
   {
     name: "popover",

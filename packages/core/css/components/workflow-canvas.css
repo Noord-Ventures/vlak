@@ -1,0 +1,23 @@
+/* ── workflow-canvas: generated from packages/react/src/components/workflow-canvas.tsx ── */
+@keyframes rs-anim-dash{to{stroke-dashoffset:-20}}
+.rs-workflow-canvas{width:100%;height:32rem;min-height:16rem;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);overflow:hidden;background-color:var(--bg);color:var(--text);--xy-background-color:var(--bg);--xy-background-pattern-color:var(--divider);--xy-edge-stroke:var(--text-secondary);--xy-edge-stroke-selected:var(--text);--xy-connectionline-stroke:var(--text-secondary);--xy-handle-background-color:var(--text);--xy-node-color:var(--text);--xy-node-border:1px solid var(--control-border);--xy-node-border-selected:1px solid var(--text);--xy-selection-background-color:color-mix(in srgb, var(--text) 10%, transparent);--xy-selection-border:1px solid var(--control-border);--xy-resize-background-color:var(--text);--xy-attribution-background-color:var(--bg);--xy-attribution-color:var(--text-secondary);--xy-minimap-background-color:var(--bg);--xy-minimap-mask-background-color:color-mix(in srgb, var(--text) 8%, transparent);--xy-minimap-mask-stroke-color:var(--text-secondary);--xy-minimap-node-background-color:var(--control-fill);--xy-minimap-node-stroke-color:var(--control-border)}
+@media (forced-colors: active){.rs-workflow-canvas{--xy-background-color:Canvas;--xy-background-pattern-color:GrayText;--xy-edge-stroke:CanvasText;--xy-edge-stroke-selected:Highlight;--xy-connectionline-stroke:CanvasText;--xy-handle-background-color:CanvasText;--xy-node-color:CanvasText;--xy-node-border:1px solid CanvasText;--xy-node-border-selected:1px solid Highlight;--xy-selection-background-color:transparent;--xy-selection-border:1px solid Highlight;--xy-resize-background-color:Highlight;--xy-attribution-background-color:Canvas;--xy-attribution-color:LinkText;--xy-minimap-background-color:Canvas;--xy-minimap-mask-background-color:transparent;--xy-minimap-mask-stroke-color:CanvasText;--xy-minimap-node-background-color:Canvas;--xy-minimap-node-stroke-color:CanvasText}}
+.rs-workflow-canvas-node{position:relative;box-sizing:border-box;width:18rem;max-width:100%;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm)}
+@media (forced-colors: active){.rs-workflow-canvas-node{border-color:CanvasText}}
+.rs-workflow-canvas-selected{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:3px}
+.rs-workflow-canvas-header{display:flex;align-items:center;justify-content:space-between;gap:0.75rem;padding:1rem}
+.rs-workflow-canvas-title{font-size:0.875rem;font-weight:600}
+.rs-workflow-canvas-description{margin-top:0.25rem;color:var(--text-secondary);font-size:0.8125rem;line-height:1.45}
+.rs-workflow-canvas-content{padding:1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);font-size:0.875rem;line-height:1.45}
+.rs-workflow-canvas-footer{padding:0.75rem 1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);font-size:0.8125rem;color:var(--text-secondary)}
+.rs-workflow-canvas-handle{width:8px;height:8px;min-width:8px;min-height:8px;border-width:0;border-radius:50%;background-color:transparent;cursor:crosshair}
+.rs-workflow-canvas-handle::before{content:"";position:absolute;inset:calc(50% - var(--hit) / 2);width:var(--hit);height:var(--hit);pointer-events:inherit}
+.rs-workflow-canvas-dot{display:block;position:absolute;inset:calc(50% - 4px);border-radius:50%;background-color:var(--text);pointer-events:none}
+.rs-workflow-canvas-edge{--xy-edge-stroke:var(--text-secondary);--xy-edge-stroke-selected:var(--text);--xy-edge-stroke-width:1.5;--xy-connectionline-stroke:var(--text-secondary);--xy-connectionline-stroke-width:1.5;fill:none}
+@media (forced-colors: active){.rs-workflow-canvas-edge{--xy-edge-stroke:CanvasText;--xy-edge-stroke-selected:Highlight;--xy-connectionline-stroke:CanvasText}}
+.rs-workflow-canvas-temporary{stroke-dasharray:5 5}
+.rs-workflow-canvas-animated{stroke-dasharray:5 5;animation-name:rs-anim-dash;animation-duration:1s;animation-timing-function:linear;animation-iteration-count:infinite}
+@media (prefers-reduced-motion: reduce){.rs-workflow-canvas-animated{animation-name:none}}
+.rs-workflow-canvas-endpoint{fill:var(--bg);stroke:var(--text);stroke-width:1.5}
+.rs-workflow-canvas-panel,.rs-workflow-canvas-panel.nokey{padding:0.25rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);max-width:calc(100% - 24px)}
+.rs-workflow-canvas-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.25rem}

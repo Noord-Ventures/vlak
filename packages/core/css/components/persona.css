@@ -1,0 +1,13 @@
+/* ── persona: generated from packages/react/src/components/persona.tsx ── */
+@keyframes rs-anim-breathe{0%, 100%{transform:scaleY(0.35)}50%{transform:scaleY(1)}}
+.rs-persona{display:inline-grid;place-items:center;flex-shrink:0;vertical-align:middle;color:var(--text);overflow:hidden;border-radius:50%;background-color:var(--control-fill)}
+@media (forced-colors: active){.rs-persona{background-color:Canvas}}
+.rs-persona-visual{display:flex;align-items:center;justify-content:center;gap:8%;width:60%;height:50%}
+.rs-persona-bar{width:12%;height:100%;background-color:currentColor;border-radius:var(--radius-sm);transform-origin:center;animation-name:rs-anim-breathe;animation-duration:1.8s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:paused}
+@media (forced-colors: active){.rs-persona-bar{background-color:CanvasText;animation-name:none}}
+@media (prefers-reduced-motion: reduce){.rs-persona-bar{animation-name:none}}
+.rs-persona-running{animation-play-state:running}
+.rs-persona-listening{animation-duration:1s}
+.rs-persona-thinking{animation-duration:1.4s}
+.rs-persona-speaking{animation-duration:0.55s}
+.rs-persona-asleep{height:16%;animation-name:none}

@@ -1,0 +1,15 @@
+/* ── tool-call: generated from packages/react/src/components/tool-call.tsx ── */
+.rs-tool-call{box-sizing:border-box;min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}
+@media (forced-colors: active){.rs-tool-call{border-color:CanvasText}}
+.rs-tool-call-summary{display:flex;align-items:center;gap:0.75rem;box-sizing:border-box;min-height:var(--hit);padding:0.75rem 1rem;border-radius:inherit;cursor:pointer;list-style:none}
+.rs-tool-call-summary::-webkit-details-marker{display:none}
+.rs-tool-call-summary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+.rs-tool-call-title{flex:1 1 auto;min-width:0;font-size:var(--control-fs);font-weight:600;overflow-wrap:anywhere}
+.rs-tool-call-state{flex-shrink:0;font-size:var(--control-label);color:var(--text-secondary)}
+.rs-tool-call-indicator{display:block;flex-shrink:0;width:1rem;height:1rem}
+.rs-tool-call-body{min-width:0;padding:1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);display:grid;gap:1rem}
+.rs-tool-call-section{display:grid;gap:0.5rem;min-width:0}
+.rs-tool-call-label{margin:0;font-size:var(--control-label);font-weight:600}
+.rs-tool-call-value{min-width:0;font-size:var(--control-fs);line-height:1.45;overflow-wrap:anywhere}
+.rs-tool-call-code{margin:0;padding:0.75rem;min-width:0;white-space:pre-wrap;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.8125rem;line-height:1.45;background-color:var(--table-alt)}
+.rs-tool-call-error{margin:0;font-size:var(--control-fs);line-height:1.45;overflow-wrap:anywhere}

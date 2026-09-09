@@ -1,0 +1,59 @@
+.site-layout.ai-section-wide {
+  width: calc(100% - var(--rail-inset));
+  max-width: 1244px;
+}
+.ai-overview-reading { max-width: 592px; }
+.ai-nav-group { margin-top: 20px; }
+.ai-nav-label { color: var(--text); font-size: 0.75rem; font-weight: 600; margin-bottom: 6px; }
+@media (min-width: 900px) {
+  .ai-section .toc-rail {
+    height: 100dvh;
+    min-height: 0;
+    padding-bottom: 24px;
+  }
+  .ai-section .toc {
+    height: auto;
+    min-height: 0;
+    max-height: 100%;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    padding-block: 4px 16px;
+    scroll-padding-block: 16px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--divider) transparent;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .ai-section .toc::-webkit-scrollbar { display: block; width: 6px; }
+  .ai-section .toc::-webkit-scrollbar-thumb { background: var(--divider); border-radius: 3px; }
+  .ai-section .toc:focus-visible { outline: 1px solid var(--text); outline-offset: 4px; }
+}
+.ai-catalog-group { margin-top: 32px; }
+.ai-overview-demo { min-width: 0; }
+
+.ai-section .ai-component-preview,
+.ai-section .ai-component-example {
+  box-sizing: border-box;
+  min-width: 0;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  margin: 12px 0 24px;
+}
+.ai-section .ai-component-preview { padding: clamp(1rem, 3vw, 2rem); }
+.ai-section .ai-component-own-frame { border: 0; padding: 0; background: transparent; }
+.ai-component-own-frame .rs-use-body { padding: 0; }
+.ai-component-example > .rs-scene { margin: 0; }
+.ai-component-list { list-style: none; padding: 0; margin: 12px calc(-1 * var(--pad)) 0; }
+.ai-component-list li { border-top: 1px solid var(--divider); }
+.ai-component-list li:last-child { border-bottom: 1px solid var(--divider); }
+.ai-component-list a { display: grid; gap: 4px; min-height: 44px; padding: 16px var(--pad); color: var(--text); text-decoration: none; }
+.ai-component-list a:hover strong { text-decoration: underline; text-underline-offset: 3px; }
+.ai-component-list a:focus-visible { outline: 2px solid var(--text); outline-offset: 4px; }
+.ai-component-list strong { font-size: 0.875rem; font-weight: 600; }
+.ai-component-list span { font-size: 0.875rem; line-height: 1.6; color: var(--text-secondary); }
+@media (forced-colors: active) {
+  .ai-section .ai-component-preview,
+  .ai-section .ai-component-example { border-color: CanvasText; }
+}

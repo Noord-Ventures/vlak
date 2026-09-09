@@ -1,0 +1,84 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "thought-steps",
+  "type": "registry:component",
+  "title": "Thought steps",
+  "description": "A collapsible sequence of work summaries, with step states, source badges, images, and captions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/reasoning.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/thought-steps.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { vlak } from \"./tokens.stylex\";\nimport { Reasoning, type ReasoningProps } from \"./reasoning\";\n\nexport interface ThoughtStep { id: string; title: React.ReactNode; state?: \"pending\" | \"active\" | \"complete\"; description?: React.ReactNode; content?: React.ReactNode; sources?: React.ReactNode; image?: React.ReactNode; caption?: React.ReactNode; icon?: React.ReactNode }\nexport interface ThoughtStepsProps extends ReasoningProps { steps: readonly ThoughtStep[] }\nconst styles = stylex.create({ root: { maxWidth: \"none\" }, list: { display: \"grid\", gap: \"1.5rem\", padding: 0, margin: 0, listStyleType: \"none\" }, step: { display: \"grid\", gridTemplateColumns: \"1.25rem minmax(0, 1fr)\", gap: \"0.75rem\", fontSize: \"0.875rem\", lineHeight: 1.45 }, title: { color: vlak.gray, fontWeight: 500 }, active: { color: vlak.ink, fontWeight: 600 }, detail: { display: \"grid\", gap: \"0.75rem\", minWidth: 0 }, sources: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" }, figure: { margin: 0, display: \"grid\", gap: \"0.5rem\", minWidth: 0 }, caption: { color: vlak.gray, fontSize: \"0.8125rem\" } });\n/** Application-supplied work summaries, with per-step state and supporting evidence. */\nexport const ThoughtSteps = React.forwardRef<HTMLDetailsElement, ThoughtStepsProps>(function ThoughtSteps({ steps, children, className, style, ...props }, ref) {\n  const root = rs([\"rs-thought-steps\", className], styles.root);\n  return <Reasoning ref={ref} title=\"Work summary\" {...props} className={root.className} style={{ ...root.style, ...style }}><ol {...rs([\"rs-thought-steps-list\"], styles.list)}>{steps.map(step => { const active = step.state === \"active\"; return <li key={step.id} {...rs([\"rs-thought-steps-step\"], styles.step)} data-state={step.state}><span role=\"img\" aria-label={step.state ?? \"Step\"}>{step.icon ?? (step.state === \"complete\" ? \"✓\" : active ? \"◉\" : \"○\")}</span><div {...rs([\"rs-thought-steps-detail\"], styles.detail)}><div {...rs([\"rs-thought-steps-title\", active && \"rs-thought-steps-active\"], styles.title, active && styles.active)}>{step.title}</div>{step.description && <div>{step.description}</div>}{step.content}{step.sources && <div {...rs([\"rs-thought-steps-sources\"], styles.sources)}>{step.sources}</div>}{step.image && <figure {...rs([\"rs-thought-steps-figure\"], styles.figure)}>{step.image}{step.caption && <figcaption {...rs([\"rs-thought-steps-caption\"], styles.caption)}>{step.caption}</figcaption>}</figure>}</div></li>; })}</ol>{children}</Reasoning>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/thought-steps.tsx"
+    },
+    {
+      "path": "vlak/styles/thought-steps.css",
+      "content": "/* ── thought-steps: generated from packages/react/src/components/thought-steps.tsx ── */\n.rs-thought-steps{max-width:none}\n.rs-thought-steps-list{display:grid;gap:1.5rem;padding:0;margin:0;list-style-type:none}\n.rs-thought-steps-step{display:grid;grid-template-columns:1.25rem minmax(0, 1fr);gap:0.75rem;font-size:0.875rem;line-height:1.45}\n.rs-thought-steps-title{color:var(--text-secondary);font-weight:500}\n.rs-thought-steps-active{color:var(--text);font-weight:600}\n.rs-thought-steps-detail{display:grid;gap:0.75rem;min-width:0}\n.rs-thought-steps-sources{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-thought-steps-figure{margin:0;display:grid;gap:0.5rem;min-width:0}\n.rs-thought-steps-caption{color:var(--text-secondary);font-size:0.8125rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/thought-steps.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-thought-steps",
+        "rs-thought-steps-list",
+        "rs-thought-steps-step",
+        "rs-thought-steps-detail",
+        "rs-thought-steps-title",
+        "rs-thought-steps-active",
+        "rs-thought-steps-sources",
+        "rs-thought-steps-figure",
+        "rs-thought-steps-caption"
+      ],
+      "snippet": "<details class=\"rs-thought-steps\"><summary>Review summary</summary><ol class=\"rs-thought-steps-list\"><li class=\"rs-thought-steps-step\">Checked the supplied source</li></ol></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "reasoning",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Chain of thought",
+        "AI Elements ChainOfThought"
+      ],
+      "example": "import { ThoughtSteps } from \"@noorddev/vlak-react\";\n\n<ThoughtSteps title=\"Review summary\" defaultOpen steps={[{ id: \"source\", title: \"Read the brief\", state: \"complete\", description: \"Checked the supplied scope and owners.\" }, { id: \"review\", title: \"Compare responsibilities\", state: \"active\" }]} />",
+      "usage": {
+        "use": [
+          "Present application-supplied work summaries and the evidence supporting each step.",
+          "Use sources, content, image, caption, and icon slots for richer evidence; images need meaningful alt text."
+        ],
+        "avoid": [
+          "Exposing private model reasoning or inventing an explanation of hidden model internals."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "generated-image",
+  "type": "registry:component",
+  "title": "Generated image",
+  "description": "Displays a supplied generated-image result with alt text and responsive 4px corners.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/generated-image.tsx",
+      "content": "import * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { vlak } from \"./tokens.stylex\";\n\nexport interface GeneratedImageData { base64: string; mediaType: string }\nexport interface GeneratedImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, \"src\" | \"alt\"> { image: GeneratedImageData; alt: string }\nconst styles = stylex.create({ root: { display: \"block\", maxWidth: \"100%\", height: \"auto\", borderRadius: vlak.radiusSm } });\n/** Displays supplied image bytes; image generation remains application-owned. */\nexport const GeneratedImage = React.forwardRef<HTMLImageElement, GeneratedImageProps>(function GeneratedImage({ image, alt, className, style, ...props }, ref) {\n  const root = rs([\"rs-generated-image\", className], styles.root);\n  const source = /^image\\/(?:png|jpeg|jpg|gif|webp|avif|svg\\+xml)$/.test(image.mediaType) ? `data:${image.mediaType};base64,${image.base64}` : undefined;\n  return <img ref={ref} loading=\"lazy\" {...props} src={source} alt={alt} className={root.className} style={{ ...root.style, ...style }} />;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/generated-image.tsx"
+    },
+    {
+      "path": "vlak/styles/generated-image.css",
+      "content": "/* ── generated-image: generated from packages/react/src/components/generated-image.tsx ── */\n.rs-generated-image{display:block;max-width:100%;height:auto;border-radius:var(--radius-sm)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/generated-image.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-generated-image"
+      ],
+      "snippet": "<img class=\"rs-generated-image\" src=\"/example.png\" alt=\"Generated project diagram\" />",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Image",
+        "Generated image result"
+      ],
+      "example": "import { GeneratedImage, type GeneratedImageData } from \"@noorddev/vlak-react\";\n\nexport function WorkflowImage({ image }: { image: GeneratedImageData }) {\n  return <GeneratedImage image={image} alt=\"Project workflow diagram\" />;\n}",
+      "usage": {
+        "use": [
+          "Adapt a provider result containing base64 image bytes and a supported image media type.",
+          "Use native width and height to reserve space. Image generation and fetching remain application-owned."
+        ],
+        "avoid": [
+          "Omitting meaningful alt text for informative results."
+        ]
+      },
+      "keyboard": [],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

@@ -58,6 +58,7 @@ export interface RegistryItem {
   name: string;
   title: string;
   description: string;
+  dependencies?: string[];
   files: RegistryFile[];
   meta?: {
     vlak?: {
@@ -65,6 +66,9 @@ export interface RegistryItem {
       snippet?: string;
       cssOnly?: boolean;
       registryDependencies?: string[];
+      reactImport?: string;
+      dependencies?: string[];
+      styles?: string[];
     };
   };
 }
@@ -242,7 +246,16 @@ async function resolveFromRegistry(
 
 function planItemFiles(item: RegistryItem, componentsDir: string): Array<{ path: string; content: string }> {
   const files: Array<{ path: string; content: string }> = [];
+  const engineStyles = new Set((item.meta?.vlak?.styles ?? [])
+    .filter(style => style.startsWith("@noorddev/vlak-react/"))
+    .map(style => `styles/vlak/${style.slice("@noorddev/vlak-react/".length)}`));
   for (const file of item.files) {
+    // Optional engines may need structural CSS in addition to init's paint.
+    // Keep its explicit registry target at the project root.
+    if (file.path.endsWith(".css") && engineStyles.has(file.target)) {
+      files.push({ path: file.target, content: file.content });
+      continue;
+    }
     if (!file.path.endsWith(".tsx") && !file.path.endsWith(".ts")) continue;
     // Registry targets are `components/vlak/<tree>`; keep the tree so nested
     // imports (charts/, shared helpers) resolve exactly as they do in the source.
@@ -254,8 +267,8 @@ function planItemFiles(item: RegistryItem, componentsDir: string): Array<{ path:
 
 /**
  * Vendor a component's React source (plus the shared cx helper) into
- * the project. CSS is not written per-component: init's vlak.css
- * already styles every component. That is the CSS-first model.
+ * the project. Init's vlak.css already supplies component paint. Optional
+ * engine stylesheets are copied when the registry explicitly includes one.
  *
  * When --registry or vlak.json.registry is set, items are loaded
  * from that registry (HTTP(S) URL or a local directory of JSON files)

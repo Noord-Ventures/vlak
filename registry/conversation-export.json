@@ -1,0 +1,76 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "conversation-export",
+  "type": "registry:component",
+  "title": "Conversation export",
+  "description": "Downloads a Markdown snapshot from explicit message text, attachments, and structured tool results.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/conversation-export.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport { Button, type ButtonProps } from \"./button\";\n\nexport type ConversationExportPart = { type: \"text\"; text: string } | { type: \"file\"; filename: string; url?: string } | { type: \"tool\"; name: string; input?: unknown; output?: unknown };\nexport interface ConversationExportMessage { role: string; content?: string; parts?: readonly ConversationExportPart[] }\nexport interface ConversationExportOptions { title?: string; serializePart?: (part: ConversationExportPart, message: ConversationExportMessage) => string | undefined }\nfunction json(value: unknown) { try { return JSON.stringify(value, null, 2) ?? \"\"; } catch { return \"[Unable to serialize this result]\"; } }\nfunction fenced(value: string) { const longest = Math.max(2, ...[...value.matchAll(/`+/g)].map(match => match[0].length)); const fence = \"`\".repeat(longest + 1); return `${fence}json\\n${value}\\n${fence}`; }\n/** Serializes explicit text, file and tool parts; unsupported application objects are never stringified as messages. */\nexport function serializeConversation(messages: readonly ConversationExportMessage[], { title, serializePart }: ConversationExportOptions = {}): string {\n  const blocks = messages.map(message => {\n    const parts = message.parts?.map(part => {\n      const custom = serializePart?.(part, message);\n      if (custom !== undefined) return custom;\n      if (part.type === \"text\") return part.text;\n      if (part.type === \"file\") return `Attachment: ${part.filename}${part.url ? `\\n${part.url}` : \"\"}`;\n      if (part.type === \"tool\") return [`Tool: ${part.name}`, part.input !== undefined ? `Input:\\n${fenced(json(part.input))}` : \"\", part.output !== undefined ? `Output:\\n${fenced(json(part.output))}` : \"\"].filter(Boolean).join(\"\\n\\n\");\n      return \"\";\n    }).filter(Boolean).join(\"\\n\\n\");\n    return `## ${message.role.replace(/[\\r\\n]+/g, \" \")}\\n\\n${parts ?? message.content ?? \"\"}`;\n  });\n  return [title ? `# ${title.replace(/[\\r\\n]+/g, \" \")}` : \"\", ...blocks].filter(Boolean).join(\"\\n\\n\") + \"\\n\";\n}\nexport interface ConversationDownloadProps extends Omit<ButtonProps, \"onClick\" | \"onError\">, ConversationExportOptions { messages: readonly ConversationExportMessage[]; filename?: string; onError?: (error: unknown) => void }\n/** Downloads a Markdown snapshot using supplied message data, without reading rendered DOM. */\nexport const ConversationDownload = React.forwardRef<HTMLButtonElement, ConversationDownloadProps>(function ConversationDownload({ messages, filename = \"conversation.md\", title, serializePart, onError, children = \"Download conversation\", ...props }, ref) {\n  const [failed, setFailed] = React.useState(false);\n  const urls = React.useRef(new Map<string, ReturnType<typeof setTimeout>>());\n  React.useEffect(() => () => { for (const [url, timer] of urls.current) { clearTimeout(timer); URL.revokeObjectURL(url); } urls.current.clear(); }, []);\n  return <><Button ref={ref} variant=\"subtle\" {...props} onClick={() => { setFailed(false); try { const blob = new Blob([serializeConversation(messages, { title, serializePart })], { type: \"text/markdown;charset=utf-8\" }); const url = URL.createObjectURL(blob); const anchor = document.createElement(\"a\"); anchor.href = url; anchor.download = filename; document.body.append(anchor); anchor.click(); anchor.remove(); urls.current.set(url, setTimeout(() => { URL.revokeObjectURL(url); urls.current.delete(url); }, 1000)); } catch (error) { setFailed(true); onError?.(error); } }}>{children}</Button>{failed && <span role=\"alert\">The conversation could not be downloaded. Try again.</span>}</>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/conversation-export.tsx"
+    },
+    {
+      "path": "vlak/styles/button.css",
+      "content": "/* ── button: generated from packages/react/src/components/button.tsx ── */\n.rs-btn-subtle,.rs-btn-ghost,.rs-btn-primary{box-sizing:border-box;min-width:var(--hit);font-family:inherit;letter-spacing:-0.01em;display:inline-flex;align-items:center;justify-content:center;gap:0.5rem;cursor:pointer;height:var(--control-h);font-size:var(--control-fs);padding-inline:1.375rem;border-width:1px;border-style:solid;border-radius:var(--radius-sm);transition:var(--transition);opacity:1}\n.rs-btn-subtle:disabled,.rs-btn-ghost:disabled,.rs-btn-primary:disabled{cursor:not-allowed;opacity:0.4}\n.rs-btn-subtle:focus-visible,.rs-btn-ghost:focus-visible,.rs-btn-primary:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n@media (max-width: 640px){.rs-btn-subtle,.rs-btn-ghost,.rs-btn-primary{height:var(--control-h);min-height:var(--hit);width:100%;padding-inline:1.25rem;border-radius:var(--radius-sm)}}\n@media (prefers-reduced-motion: reduce){.rs-btn-subtle,.rs-btn-ghost,.rs-btn-primary{transition:none}}\n@media (hover: hover) and (pointer: fine){.rs-btn-subtle:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]),.rs-btn-ghost:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]),.rs-btn-primary:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){opacity:0.85}}\n@media (forced-colors: active){.rs-btn-subtle,.rs-btn-ghost,.rs-btn-primary{opacity:1}.rs-btn-subtle:disabled,.rs-btn-ghost:disabled,.rs-btn-primary:disabled{opacity:1}}\n@media (forced-colors: active) and (hover: hover) and (pointer: fine){.rs-btn-subtle:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]),.rs-btn-ghost:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]),.rs-btn-primary:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){opacity:1}}\n.rs-btn-primary{font-weight:600;background-color:var(--text);color:var(--bg);border-color:transparent}\n@media (forced-colors: active){.rs-btn-primary{background-color:ButtonFace;color:ButtonText;border-color:ButtonText}.rs-btn-primary:disabled{color:GrayText;border-color:GrayText}}\n.rs-btn-ghost{transition:var(--transition);font-weight:500;background-color:transparent;color:var(--text);border-color:var(--divider)}\n.rs-btn-ghost:disabled{background-color:transparent;border-color:var(--divider)}\n@media (prefers-reduced-motion: reduce){.rs-btn-ghost{transition:none}}\n@media (hover: hover) and (pointer: fine){.rs-btn-ghost:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){background-color:var(--control-fill);border-color:var(--control-fill)}}\n@media (forced-colors: active){.rs-btn-ghost{background-color:ButtonFace;color:ButtonText;border-color:ButtonText}.rs-btn-ghost:disabled{color:GrayText;border-color:GrayText}}\n@media (forced-colors: active) and (hover: hover) and (pointer: fine){.rs-btn-ghost:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){border-color:Highlight}}\n.rs-btn-subtle{min-height:var(--hit);font-weight:500;border-width:0;border-color:transparent;background-color:transparent;color:var(--text-secondary);cursor:pointer;opacity:1}\n.rs-btn-subtle:disabled{cursor:not-allowed;opacity:0.4}\n.rs-btn-subtle[aria-disabled='true']{cursor:not-allowed;opacity:0.4}\n@media (forced-colors: active){.rs-btn-subtle{border-width:1px;border-color:ButtonText;background-color:ButtonFace;color:ButtonText;opacity:1}.rs-btn-subtle:disabled{border-color:GrayText;color:GrayText;opacity:1}.rs-btn-subtle[aria-disabled='true']{border-color:GrayText;color:GrayText;opacity:1}}\n@media (hover: hover) and (pointer: fine){.rs-btn-subtle:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){color:var(--text);opacity:1}}\n@media (forced-colors: active) and (hover: hover) and (pointer: fine){.rs-btn-subtle:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){opacity:1}}\n.rs-btn-sm{height:var(--hit);padding-inline:0.875rem;font-size:0.8125rem;min-width:6.5rem}\n@media (max-width: 640px){.rs-btn-sm{height:var(--control-h);min-height:var(--hit);padding-inline:1rem;font-size:var(--control-fs);min-width:0}}\n.rs-btn-icon{height:var(--hit);min-height:var(--hit);max-height:var(--hit);width:var(--hit);min-width:var(--hit);max-width:var(--hit);flex-basis:var(--hit);flex-grow:0;flex-shrink:0;padding-inline:0;padding-block:0}\n@media (max-width: 640px){.rs-btn-icon{height:var(--hit);min-height:var(--hit);width:var(--hit);min-width:var(--hit);flex-grow:0;padding-inline:0}}\n.rs-btn-grouped{height:auto;min-height:var(--hit);border-width:0;border-radius:0;margin:0;min-width:0}\n.rs-btn-grouped:focus-visible{outline-offset:-2px}\n@media (max-width: 640px){.rs-btn-grouped{flex-grow:1;min-width:0}}\n.rs-btn-grouped-ghost{transition:var(--transition);background-color:var(--bg)}\n.rs-btn-grouped-ghost:disabled{background-color:var(--bg)}\n@media (prefers-reduced-motion: reduce){.rs-btn-grouped-ghost{transition:none}}\n@media (hover: hover) and (pointer: fine){.rs-btn-grouped-ghost:hover:not(:disabled):not([aria-disabled='true']):not([aria-pressed='true']):not([aria-selected='true']):not([aria-current]){background-color:var(--control-fill)}}\n@media (forced-colors: active){.rs-btn-grouped-ghost{background-color:ButtonFace}}\n.rs-btn-grouped-subtle{background-color:var(--bg);color:var(--text-secondary);font-weight:500}\n.rs-btn-grouped-subtle[aria-pressed='true']{background-color:var(--control-fill);color:var(--text);font-weight:600}\n@media (forced-colors: active){.rs-btn-grouped-subtle{background-color:ButtonFace;color:ButtonText}.rs-btn-grouped-subtle[aria-pressed='true']{background-color:Highlight;color:HighlightText}.rs-btn-grouped-subtle:disabled{color:GrayText}.rs-btn-grouped-subtle[aria-disabled='true']{color:GrayText}}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/button.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-btn-subtle"
+      ],
+      "snippet": "<button class=\"rs-btn-subtle\" type=\"button\">Download conversation</button>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Conversation download",
+        "Markdown export"
+      ],
+      "example": "import { ConversationDownload } from \"@noorddev/vlak-react\";\n\n<ConversationDownload title=\"Project review\" messages={[{ role: \"user\", content: \"Review the brief\" }, { role: \"assistant\", parts: [{ type: \"text\", text: \"Two owners are missing.\" }] }]} />",
+      "usage": {
+        "use": [
+          "Pass explicit message data to serializeConversation or ConversationDownload. No rendered DOM is scraped.",
+          "Use serializePart for application-specific export formatting. The download owns and releases its object URLs."
+        ],
+        "avoid": [
+          "Coercing arbitrary message objects into strings or claiming persistence from a local download."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

@@ -23,13 +23,28 @@ const kb = (n) => `${(n / 1024).toFixed(1)} KB`;
 
 /* [label, path or directory + filter, gzipped budget in bytes] */
 const budgets = [
-  // The 168-component catalog adds a native calendar popover with editable civil
-  // dates, clock validation and top-layer focus handling. Allow 5 KiB aggregate JS
-  // and 256 bytes of atomic CSS for this leaf, with its own 5.25 KiB JS bound.
-  // The core CSS, CLI and all existing control caps stay unchanged.
-  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 29 * 1024],
-  ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 16 * 1024 + 256],
-  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 210 * 1024],
+  // The 215-component catalog adds 39 AI entries: native chat, code and voice
+  // controls plus four isolated optional-engine adapters. Engine code remains
+  // external and is not imported by the root entry (verified by tarball smoke).
+  // Measured: 34.7 KiB core CSS, 18.5 KiB atomic CSS, 275.8 KiB aggregate
+  // component JS, and 138.5 KiB CLI metadata. Keep existing leaf caps intact.
+  // Graph variables provide monochrome light/dark and forced-color engine paint.
+  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 35 * 1024],
+  ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 18 * 1024 + 768],
+  // Optional graph structure, including the upstream MIT license, is a separate import.
+  ["@noorddev/vlak-react dist/workflow.css", "packages/react/dist/workflow.css", 3 * 1024 + 512],
+  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 277 * 1024],
+  ...["response-branch", "context-usage", "model-selector", "inline-citation", "sources", "open-in-chat", "mic-selector", "voice-selector", "transcription", "persona", "agent", "artifact", "commit", "environment-variables", "package-info", "schema-display", "snippet", "test-results", "terminal", "stack-trace", "sandbox", "web-preview", "jsx-preview", "shimmer", "plan", "task", "thought-steps", "checkpoint", "suggestions", "work-queue", "generated-image", "conversation-export", "response-editor"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  // Native audio hydration samples metadata that can load before React attaches listeners: 3,117 bytes gz.
+  ["@noorddev/vlak-react components/audio-player.js", "packages/react/dist/components/audio-player.js", 3 * 1024 + 128],
+  ...["attachments", "speech-input", "highlighted-code", "workflow-canvas"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 4 * 1024]),
+  ["@noorddev/vlak-react components/response-markdown.js", "packages/react/dist/components/response-markdown.js", 6 * 1024],
+  ...["chat", "conversation", "response", "reasoning", "tool-call", "confirmation", "widget"].map(name =>
+    [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
+  // Response actions include clipboard feedback, browser speech, sharing, and async ratings.
+  ["@noorddev/vlak-react components/response-actions.js", "packages/react/dist/components/response-actions.js", 5 * 1024],
   ["@noorddev/vlak-react components/calendar-popover.js", "packages/react/dist/components/calendar-popover.js", 5 * 1024 + 256],
   ["@noorddev/vlak-react components/button.js", "packages/react/dist/components/button.js", 4 * 1024],
   ["@noorddev/vlak-react components/number-field.js", "packages/react/dist/components/number-field.js", 3 * 1024],
@@ -55,7 +70,7 @@ const budgets = [
   ["@noorddev/vlak-react components/stage-position-list.js", "packages/react/dist/components/stage-position-list.js", 4 * 1024],
   ...["joint-panel", "robot-pose", "robot-mission-queue", "pad-inspector", "colony-plate", "culture-log"].map(name =>
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
-  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 104 * 1024],
+  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 139 * 1024],
 ];
 
 let failed = false;

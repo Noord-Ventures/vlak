@@ -1,0 +1,108 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "attachments",
+  "type": "registry:component",
+  "title": "Attachments",
+  "description": "A responsive file list with image, audio, and video previews, file metadata, removal, and application-owned upload states.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/attachments.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface AttachmentData {\n  id: string;\n  name: string;\n  mediaType?: string;\n  size?: number;\n  url?: string;\n  status?: \"ready\" | \"uploading\" | \"error\";\n  progress?: number;\n  error?: string;\n}\nexport type AttachmentVariant = \"grid\" | \"inline\" | \"list\";\nconst AttachmentLayout = React.createContext<AttachmentVariant>(\"grid\");\n\nexport interface AttachmentsProps extends React.HTMLAttributes<HTMLUListElement> {\n  label?: string;\n  variant?: AttachmentVariant;\n}\nexport interface AttachmentProps extends React.HTMLAttributes<HTMLLIElement> {\n  data: AttachmentData;\n  /** Overrides the layout inherited from Attachments. */\n  variant?: AttachmentVariant;\n  disabled?: boolean;\n  onRemove?: () => void;\n  onRetry?: () => void;\n  /** Trusted application content replaces the automatic media preview. */\n  preview?: React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", padding: 0, margin: 0, listStyle: \"none\", minWidth: 0 },\n  grid: { gridTemplateColumns: \"repeat(auto-fit, minmax(min(100%, 16rem), 1fr))\" },\n  inline: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"flex-start\" },\n  list: { gridTemplateColumns: \"minmax(0, 1fr)\" },\n  inlineItem: { width: \"auto\", maxWidth: \"100%\", flex: \"0 1 auto\", padding: \"0.25rem\" },\n  listItem: { width: \"100%\", boxSizing: \"border-box\" },\n  inlineThumbnail: { width: 32, height: 32 },\n  inlineDetail: { display: \"none\" },\n  inlineMedia: { maxWidth: \"18rem\" },\n  item: { minWidth: 0, display: \"flex\", flexDirection: \"column\", gap: \"0.5rem\", padding: \"0.5rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper },\n  row: { display: \"flex\", alignItems: \"center\", gap: \"0.5rem\", minWidth: 0 },\n  thumbnail: { width: 48, height: 48, objectFit: \"cover\", borderRadius: vlak.radiusSm, flexShrink: 0 },\n  fileIcon: { width: 48, height: 48, display: \"flex\", alignItems: \"center\", justifyContent: \"center\", color: vlak.gray, backgroundColor: vlak.tableAlt, borderRadius: vlak.radiusSm, flexShrink: 0 },\n  info: { display: \"grid\", gap: \"0.25rem\", flex: \"1 1 auto\", minWidth: 0 },\n  name: { fontSize: \"0.8125rem\", fontWeight: 500, color: vlak.ink, overflowWrap: \"anywhere\", margin: 0 },\n  detail: { fontSize: \"0.75rem\", lineHeight: 1.4, color: vlak.gray, margin: 0, overflowWrap: \"anywhere\" },\n  action: { width: 44, minWidth: 44, maxWidth: 44, height: 44, padding: 0, flexShrink: 0 },\n  media: { display: \"block\", width: \"100%\", minWidth: 0, maxHeight: 240, borderRadius: vlak.radiusSm },\n  link: { color: vlak.ink, textDecoration: \"underline\", textUnderlineOffset: \"0.2em\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 },\n  status: { fontSize: \"0.75rem\", color: vlak.gray, margin: 0 },\n  progress: { width: \"100%\", height: 6, accentColor: vlak.ink },\n});\n\nfunction attachmentUrl(url?: string): string | undefined {\n  if (!url || Array.from(url).some((character) => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127)) return undefined;\n  try { return [\"http:\", \"https:\", \"blob:\"].includes(new URL(url, \"https://vlak.invalid\").protocol) ? url : undefined; }\n  catch { return undefined; }\n}\n\n/** A responsive list of application-owned files and media. */\nexport const Attachments = React.forwardRef<HTMLUListElement, AttachmentsProps>(function Attachments({ label = \"Attachments\", variant = \"grid\", className, style, ...props }, ref) {\n  const root = rs([\"rs-attachments\", variant === \"grid\" && \"rs-attachments-grid\", variant === \"inline\" && \"rs-attachments-inline\", variant === \"list\" && \"rs-attachments-list\", className], styles.root, variant === \"grid\" && styles.grid, variant === \"inline\" && styles.inline, variant === \"list\" && styles.list);\n  return <AttachmentLayout.Provider value={variant}><ul {...props} ref={ref} aria-label={label} className={root.className} style={{ ...root.style, ...style }} /></AttachmentLayout.Provider>;\n});\n\n/** File metadata and native media previews, with explicit application actions. */\nexport const Attachment = React.forwardRef<HTMLLIElement, AttachmentProps>(function Attachment({ data, variant, disabled = false, onRemove, onRetry, preview, className, style, ...props }, ref) {\n  const inheritedVariant = React.useContext(AttachmentLayout);\n  const layout = variant ?? inheritedVariant;\n  const isInline = layout === \"inline\";\n  const url = attachmentUrl(data.url);\n  const download = url?.slice(0, 5).toLowerCase() === \"blob:\";\n  const mediaType = data.mediaType?.toLowerCase() ?? \"\";\n  const image = mediaType.startsWith(\"image/\");\n  const audio = mediaType.startsWith(\"audio/\");\n  const video = mediaType.startsWith(\"video/\");\n  const root = rs([\"rs-attachment\", isInline && \"rs-attachment-inline\", layout === \"list\" && \"rs-attachment-list\", className], styles.item, isInline && styles.inlineItem, layout === \"list\" && styles.listItem);\n  const row = rs([\"rs-attachment-row\"], styles.row);\n  const thumbnail = rs([\"rs-attachment-thumbnail\", isInline && \"rs-attachment-thumbnail-inline\"], styles.thumbnail, isInline && styles.inlineThumbnail);\n  const fileIcon = rs([\"rs-attachment-file-icon\", isInline && \"rs-attachment-thumbnail-inline\"], styles.fileIcon, isInline && styles.inlineThumbnail);\n  const info = rs([\"rs-attachment-info\"], styles.info);\n  const name = rs([\"rs-attachment-name\"], styles.name);\n  const detail = rs([\"rs-attachment-detail\", isInline && \"rs-attachment-detail-inline\"], styles.detail, isInline && styles.inlineDetail);\n  const action = rs([\"rs-attachment-action\"], styles.action);\n  const media = rs([\"rs-attachment-media\", isInline && \"rs-attachment-media-inline\"], styles.media, isInline && styles.inlineMedia);\n  const link = rs([\"rs-attachment-link\"], styles.link);\n  const status = rs([\"rs-attachment-status\"], styles.status);\n  const progress = rs([\"rs-attachment-progress\"], styles.progress);\n  return <li {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...row}>\n      {image && url ? <img {...thumbnail} src={url} alt=\"\" loading=\"lazy\" referrerPolicy=\"no-referrer\" /> : <span {...fileIcon} aria-hidden=\"true\"><Icon name=\"attachment\" /></span>}\n      <div {...info}><p {...name}>{url ? <a {...link} href={url} download={download ? data.name || true : undefined} target={download ? undefined : \"_blank\"} rel={download ? undefined : \"noopener noreferrer\"}>{data.name}</a> : data.name}</p><p {...detail}>{[data.mediaType, data.size === undefined ? undefined : `${data.size.toLocaleString()} bytes`].filter(Boolean).join(\" · \")}</p></div>\n      {onRetry && data.status === \"error\" && <Button {...action} variant=\"subtle\" aria-label={`Retry ${data.name}`} title={`Retry ${data.name}`} disabled={disabled} onClick={onRetry}><Icon name=\"refresh\" /></Button>}\n      {onRemove && <Button {...action} variant=\"subtle\" aria-label={`Remove ${data.name}`} title={`Remove ${data.name}`} disabled={disabled} onClick={onRemove}><Icon name=\"close\" size={12} /></Button>}\n    </div>\n    {preview ?? (url && audio ? <audio {...media} controls preload=\"none\" src={url} aria-label={`Audio preview of ${data.name}`} /> : url && video ? <video {...media} controls preload=\"metadata\" src={url} aria-label={`Video preview of ${data.name}`} /> : null)}\n    {data.status === \"uploading\" && data.progress !== undefined && <progress {...progress} max={100} value={Math.min(100, Math.max(0, data.progress))} aria-label={`Uploading ${data.name}`} />}\n    {data.status && data.status !== \"ready\" && <p {...status} role={data.status === \"error\" ? \"alert\" : \"status\"}>{data.status === \"error\" ? data.error || \"This file could not be uploaded.\" : \"Uploading…\"}</p>}\n  </li>;\n});\n\n/** Creates local preview URLs and revokes them when files leave the list or the owner unmounts. */\nexport function useFileAttachments(files: readonly File[]): AttachmentData[] {\n  const prefix = React.useId();\n  const ids = React.useRef(new WeakMap<File, string>());\n  const sequence = React.useRef(0);\n  const [previews, setPreviews] = React.useState(new Map<File, string>());\n  const urls = React.useRef(new Map<File, string>());\n  React.useEffect(() => {\n    let changed = false;\n    for (const [file, url] of urls.current) if (!files.includes(file)) { URL.revokeObjectURL(url); urls.current.delete(file); changed = true; }\n    if (typeof URL.createObjectURL === \"function\") for (const file of files) if (!urls.current.has(file)) { urls.current.set(file, URL.createObjectURL(file)); changed = true; }\n    if (changed) setPreviews(new Map(urls.current));\n  }, [files]);\n  React.useEffect(() => () => { for (const url of urls.current.values()) URL.revokeObjectURL(url); urls.current.clear(); }, []);\n  return files.map((file) => {\n    if (!ids.current.has(file)) ids.current.set(file, `${prefix}-${++sequence.current}`);\n    return { id: ids.current.get(file)!, name: file.name, mediaType: file.type, size: file.size, url: previews.get(file), status: \"ready\" };\n  });\n}\n",
+      "type": "registry:component",
+      "target": "components/vlak/attachments.tsx"
+    },
+    {
+      "path": "vlak/styles/attachments.css",
+      "content": "/* ── attachments: generated from packages/react/src/components/attachments.tsx ── */\n.rs-attachments{display:grid;gap:0.5rem;padding:0;margin:0;list-style:none;min-width:0}\n.rs-attachments-grid{grid-template-columns:repeat(auto-fit, minmax(min(100%, 16rem), 1fr))}\n.rs-attachments-inline{display:flex;flex-wrap:wrap;align-items:flex-start}\n.rs-attachments-list{grid-template-columns:minmax(0, 1fr)}\n.rs-attachment-inline{width:auto;max-width:100%;flex:0 1 auto;padding:0.25rem}\n.rs-attachment-list{width:100%;box-sizing:border-box}\n.rs-attachment-thumbnail-inline{width:32px;height:32px}\n.rs-attachment-detail-inline{display:none}\n.rs-attachment-media-inline{max-width:18rem}\n.rs-attachment{min-width:0;display:flex;flex-direction:column;gap:0.5rem;padding:0.5rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg)}\n.rs-attachment-row{display:flex;align-items:center;gap:0.5rem;min-width:0}\n.rs-attachment-thumbnail{width:48px;height:48px;object-fit:cover;border-radius:var(--radius-sm);flex-shrink:0}\n.rs-attachment-file-icon{width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);background-color:var(--table-alt);border-radius:var(--radius-sm);flex-shrink:0}\n.rs-attachment-info{display:grid;gap:0.25rem;flex:1 1 auto;min-width:0}\n.rs-attachment-name{font-size:0.8125rem;font-weight:500;color:var(--text);overflow-wrap:anywhere;margin:0}\n.rs-attachment-detail{font-size:0.75rem;line-height:1.4;color:var(--text-secondary);margin:0;overflow-wrap:anywhere}\n.rs-attachment-action{width:44px;min-width:44px;max-width:44px;height:44px;padding:0;flex-shrink:0}\n.rs-attachment-media{display:block;width:100%;min-width:0;max-height:240px;border-radius:var(--radius-sm)}\n.rs-attachment-link{color:var(--text);text-decoration:underline;text-underline-offset:0.2em;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-attachment-link:focus-visible{outline-width:2px}\n.rs-attachment-status{font-size:0.75rem;color:var(--text-secondary);margin:0}\n.rs-attachment-progress{width:100%;height:6px;accent-color:var(--text)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/attachments.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-attachments",
+        "rs-attachments-grid",
+        "rs-attachments-inline",
+        "rs-attachments-list",
+        "rs-attachment-inline",
+        "rs-attachment-list",
+        "rs-attachment-thumbnail-inline",
+        "rs-attachment-detail-inline",
+        "rs-attachment-media-inline",
+        "rs-attachment",
+        "rs-attachment-row",
+        "rs-attachment-thumbnail",
+        "rs-attachment-file-icon",
+        "rs-attachment-info",
+        "rs-attachment-name",
+        "rs-attachment-detail",
+        "rs-attachment-action",
+        "rs-attachment-media",
+        "rs-attachment-link",
+        "rs-attachment-status",
+        "rs-attachment-progress"
+      ],
+      "snippet": "<ul class=\"rs-attachments\" aria-label=\"Attachments\"><li class=\"rs-attachment\"><div class=\"rs-attachment-row\"><div class=\"rs-attachment-info\"><p class=\"rs-attachment-name\">Project brief.txt</p><p class=\"rs-attachment-detail\">text/plain · 342 bytes</p></div></div></li></ul>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Attachments",
+        "File attachments",
+        "Attachment preview",
+        "Message files"
+      ],
+      "example": "\"use client\";\nimport { useState } from \"react\";\nimport { Attachment, Attachments, Button } from \"@noorddev/vlak-react\";\n\nexport function DraftFiles() {\n  const [visible, setVisible] = useState(true);\n  return visible ? <Attachments>\n    <Attachment data={{ id: \"brief\", name: \"Project brief.txt\", mediaType: \"text/plain\", size: 342 }} onRemove={() => setVisible(false)} />\n  </Attachments> : <Button variant=\"subtle\" onClick={() => setVisible(true)}>Reset file</Button>;\n}",
+      "usage": {
+        "use": [
+          "Compose Attachment items inside Attachments for files in a message, a draft, or a tool result.",
+          "Choose grid, inline, or list layout through variant. Items inherit that layout and can override it individually.",
+          "Supply stable data IDs, readable filenames, media types, and optional web or local preview addresses.",
+          "Use useFileAttachments with a browser File array to create local previews with automatic cleanup.",
+          "Set status, progress, error, and onRetry from an application upload process. Native audio and video controls let the reader start playback.",
+          "Use preview for application-specific media content, including captions and transcripts where available."
+        ],
+        "avoid": [
+          "Treating removal or retry controls as an upload service. The application owns those operations.",
+          "Passing untrusted script addresses, or revoking preview addresses created by a different owner."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches file links, native media controls, retry, and remove actions."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused file action or native media control."
+        }
+      ],
+      "a11y": [
+        "The named list preserves file grouping. Filenames identify file links and action buttons.",
+        "Images use decorative thumbnails beside their readable filenames. Audio and video use named native controls without autoplay.",
+        "Upload status and errors are announced separately from file content. Determinate progress has a file-specific accessible name.",
+        "Removal and retry have 44px targets and visible focus inherited from Button. Native list and item attributes, className, style, and refs pass through.",
+        "useFileAttachments preserves file identity and revokes owned preview addresses when files are removed or the owner unmounts."
+      ]
+    }
+  }
+}

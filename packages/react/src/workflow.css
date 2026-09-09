@@ -1,0 +1,3 @@
+/* Engine layout stays below Vlak's component paint and consumer overrides. */
+@layer vlak.engine, vlak.tokens, vlak.base, vlak.type, vlak.components, vlak.touch, vlak.motion;
+@import "@xyflow/react/dist/base.css" layer(vlak.engine);

@@ -1,10 +1,10 @@
 # Message composer
 
-Composes text and optional attachments with submission shortcuts and retained drafts on failure.
+Composes a compact growing draft with validated file previews, paste and drop, screenshot capture, and retained drafts on failure.
 
 Category: patterns  
 Name: `message-composer`  
-Also known as: MessageComposer, Chat input, Comment composer  
+Also known as: MessageComposer, Chat input, Comment composer, AI Elements PromptInput  
 Page: https://vlak.dev/components/message-composer/
 
 ## When to use
@@ -12,10 +12,17 @@ Page: https://vlak.dev/components/message-composer/
 - Chat, comments, or a support reply.
 - Async submission that must preserve a draft when it fails.
 - Application-owned response generation with a Stop response action.
+- Use compact for a single-line draft with inline icon actions. The field grows with wrapping and newlines, then scrolls at maxRows, which defaults to six lines.
+- The compact field shrinks when text is removed or a successful send clears it, and remeasures when its available width changes.
+- Use files, defaultFiles, and onFilesChange to lift attachment selection alongside controlled text.
+- Picker, paste, and drop share accept, maxFiles, maxFileSize, and multiple validation. onAttachmentError receives rejected files and reasons.
+- Use tools for model selectors or application controls, and renderAttachments for custom preview composition.
+- Enable globalDrop on one composer per page when file drops outside the field should attach there. allowScreenshot adds explicit browser screen selection when supported.
 
 ## When not to
 
 - An arbitrary multi-field form or uploading files without a message.
+- Assuming browser file checks replace the application upload policy or that attachment selection uploads files automatically.
 
 ## Install
 
@@ -53,7 +60,7 @@ npx shadcn add https://vlak.dev/r/message-composer.json
 ```tsx
 import { MessageComposer } from "@noorddev/vlak-react";
 
-<MessageComposer onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept="image/*,.pdf" />
+<MessageComposer compact maxRows={6} sendOnEnter onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept="image/*,.pdf" maxFiles={4} maxFileSize={10 * 1024 * 1024} allowScreenshot />
 ```
 
 ## Props
@@ -77,10 +84,23 @@ Forwards `ref` to the `HTMLTextAreaElement`.
 | `disabled` | `boolean` | `false` |  |
 | `allowAttachments` | `boolean` | `false` |  |
 | `accept` | `string` |  |  |
+| `files` | `File[]` |  | Controlled file selection, independent of the text draft. |
+| `defaultFiles` | `File[]` | `[]` |  |
+| `onFilesChange` | `(files: File[]) => void` |  |  |
+| `multiple` | `boolean` | `true` |  |
+| `maxFiles` | `number` |  |  |
+| `maxFileSize` | `number` |  |  |
+| `onAttachmentError` | `(rejections: MessageAttachmentRejection[]) => void` |  |  |
+| `globalDrop` | `boolean` | `false` | Also accept file drops outside this composer. Enable on one composer per page. |
+| `allowScreenshot` | `boolean` | `false` | Shows a user-activated browser screen capture action when available. |
+| `tools` | `ReactNode` |  | Application-owned model selectors, capability controls, or other tools. |
+| `renderAttachments` | `(attachments: AttachmentData[], actions: MessageComposerAttachmentActions) => ReactNode` |  |  |
 | `maxLength` | `number` |  |  |
 | `sendOnEnter` | `boolean` | `false` | Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter. |
 | `generating` | `boolean` | `false` | Application-owned response generation, separate from submission pending state. |
 | `onStop` | `() => void` |  | Requests that the application stop generation; does not itself cancel a network request. |
+| `compact` | `boolean` | `false` | A single-line draft with an inline icon action; grows as the message wraps. |
+| `maxRows` | `number` | `6` | Maximum visible draft lines in compact mode, clamped to 1–20. |
 
 ## Keyboard
 
@@ -92,17 +112,21 @@ Forwards `ref` to the `HTMLTextAreaElement`.
 
 ## Accessibility
 
-- The textarea has a visible label and shortcut description.
+- The textarea has a visible label by default. Compact mode uses the same accessible name and a visually hidden shortcut description.
 - Sending prevents duplicate submission; results are announced.
 - Only a successful send clears the draft and attachments; failures retain both.
 - generating replaces Send with Stop response but keeps the next draft editable. onStop requests application cancellation; it does not cancel network activity itself.
+- Compact icon actions retain readable names, titles, and 44px targets. Failed sends remain visible beneath the field; other status updates are available to assistive technology.
+- Rejected attachments remain visible in an alert. File previews have named remove controls and preserve object addresses until removal.
+- Screenshot capture starts only from its button, uses the browser chooser, and stops display tracks after capture, cancellation, or unmount.
+- If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match.
 
 ## Classes
 
-`rs-message-composer`, `rs-message-composer-actions`, `rs-message-composer-action`, `rs-message-composer-files`, `rs-message-composer-file`, `rs-message-composer-hint`, `rs-message-composer-input`
+`rs-message-composer`, `rs-message-composer-compact`, `rs-message-composer-row`, `rs-message-composer-area`, `rs-message-composer-actions`, `rs-message-composer-action`, `rs-message-composer-icon-action`, `rs-message-composer-files`, `rs-message-composer-file`, `rs-message-composer-hint`, `rs-message-composer-input`, `rs-message-composer-sr-only`, `rs-message-composer-tools`, `rs-message-composer-drag`
 
 ## Dependencies
 
-Registry dependencies: [textarea](textarea.md), [button](button.md), [icons](icons.md).  
+Registry dependencies: [textarea](textarea.md), [button](button.md), [icons](icons.md), [attachments](attachments.md).  
 React: `packages/react/src/components/message-composer.tsx`  
 CSS: `packages/core/css/components/message-composer.css`

@@ -1,0 +1,9 @@
+/* ── confirmation: generated from packages/react/src/components/confirmation.tsx ── */
+.rs-confirmation{box-sizing:border-box;min-width:0;padding:1rem;display:grid;gap:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}
+@media (forced-colors: active){.rs-confirmation{border-color:CanvasText}}
+.rs-confirmation-title{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45;overflow-wrap:anywhere}
+.rs-confirmation-context{min-width:0;font-size:var(--control-fs);line-height:1.45;overflow-wrap:anywhere}
+.rs-confirmation-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-confirmation-action{width:auto;min-height:var(--hit)}
+.rs-confirmation-status{margin:0;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}
+.rs-confirmation-error{margin:0;color:var(--text);font-size:var(--control-fs);line-height:1.45;overflow-wrap:anywhere}

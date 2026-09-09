@@ -3,7 +3,7 @@
   "name": "button-group",
   "type": "registry:component",
   "title": "Button group",
-  "description": "Keeps related actions together as joined ghost buttons with 1px dividers.",
+  "description": "Keeps related actions together as joined buttons with 1px dividers and one outer frame.",
   "registryDependencies": [
     "https://vlak.dev/r/vlak-base.json",
     "https://vlak.dev/r/inter.json",
@@ -52,10 +52,11 @@
       "usage": {
         "use": [
           "Two to four related actions that read as one control.",
-          "Ghost buttons; the group owns the outer stroke and the seams."
+          "Ghost or subtle buttons; the group owns the outer stroke and the seams.",
+          "For application-owned selection, give each subtle Button aria-pressed and update the selection from its onClick handler."
         ],
         "avoid": [
-          "Exclusive selection; use ToggleGroup, which tracks the pressed option.",
+          "Expecting the group to manage selection automatically; use ToggleGroup when it should own that behavior.",
           "Unrelated actions in one row; space them instead."
         ]
       },

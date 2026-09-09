@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "highlighted-code",
+  "type": "registry:component",
+  "title": "Highlighted code",
+  "description": "Monochrome syntax highlighting with lazy grammars, exact-source copy and download, and a scrollable code region.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex",
+    "shiki@^3.19.0"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/highlighted-code.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport type { Highlighter, ThemedToken, ThemeRegistration } from \"shiki\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface HighlightedCodeProps extends React.HTMLAttributes<HTMLElement> {\n  code: string;\n  language?: string;\n  /** Keep an unfinished source block readable without repeatedly highlighting it. */\n  streaming?: boolean;\n  lineNumbers?: boolean;\n  /** Maximum scrollable source height in pixels. */\n  maxHeight?: number;\n  copyable?: boolean;\n  downloadable?: boolean;\n  filename?: string;\n  onCopyCode?: (code: string) => void | Promise<void>;\n}\n\nconst theme: ThemeRegistration = {\n  name: \"vlak-monochrome\", type: \"light\",\n  colors: { \"editor.foreground\": \"#111111\", \"editor.background\": \"#ffffff\" },\n  tokenColors: [\n    { scope: [\"comment\", \"punctuation.definition.comment\"], settings: { foreground: \"#555555\", fontStyle: \"italic\" } },\n    { scope: [\"keyword\", \"storage\", \"entity.name.tag\"], settings: { foreground: \"#111111\", fontStyle: \"bold\" } },\n  ],\n};\nlet highlighter: Promise<Highlighter> | undefined;\nconst cache = new Map<string, ThemedToken[][]>();\nconst MAX_CACHE_ENTRIES = 24;\nconst MAX_SOURCE_LENGTH = 100_000;\n\nasync function highlight(code: string, language: string): Promise<ThemedToken[][] | null> {\n  if (code.length > MAX_SOURCE_LENGTH) return null;\n  const key = JSON.stringify([language, code]);\n  const found = cache.get(key);\n  if (found) { cache.delete(key); cache.set(key, found); return found; }\n  const shiki = await import(\"shiki\");\n  if (!Object.hasOwn(shiki.bundledLanguages, language)) return null;\n  if (!highlighter) highlighter = shiki.createHighlighter({ langs: [], themes: [theme] }).catch((error) => { highlighter = undefined; throw error; });\n  const renderer = await highlighter;\n  const grammar = shiki.bundledLanguages[language as keyof typeof shiki.bundledLanguages];\n  if (!renderer.getLoadedLanguages().includes(language)) await renderer.loadLanguage(grammar);\n  const tokens = renderer.codeToTokens(code, { lang: language as keyof typeof shiki.bundledLanguages, theme: \"vlak-monochrome\" }).tokens;\n  // Never allow a highlighter result to change the supplied source.\n  if (tokens.map((line) => line.map((token) => token.content).join(\"\")).join(\"\\n\") !== code.replace(/\\r\\n/g, \"\\n\")) return null;\n  cache.set(key, tokens);\n  while (cache.size > MAX_CACHE_ENTRIES) cache.delete(cache.keys().next().value!);\n  return tokens;\n}\n\nconst styles = stylex.create({\n  root: { margin: \"1rem 0\", width: \"100%\", minWidth: 0, overflow: \"hidden\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: vlak.divider, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", padding: \"0.25rem 0.75rem\", minHeight: 44, borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  language: { flex: \"1 1 auto\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", fontSize: \"0.8125rem\", color: vlak.gray },\n  actions: { display: \"flex\", alignItems: \"center\", gap: \"0.125rem\" },\n  action: { width: 44, minWidth: 44, maxWidth: 44, height: 44, padding: 0, flexShrink: 0 },\n  icon: { width: 16, height: 16, display: \"block\" },\n  pre: { margin: 0, overflow: \"auto\", padding: \"1rem\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", fontSize: \"0.875rem\", lineHeight: 1.45, tabSize: 2, whiteSpace: \"pre\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -2 },\n  line: { display: \"block\", minHeight: \"1.45em\" },\n  number: { display: \"inline-block\", minWidth: \"3ch\", marginInlineEnd: \"2ch\", textAlign: \"end\", userSelect: \"none\", color: vlak.gray },\n  token: { color: vlak.ink },\n  muted: { color: { default: vlak.gray, [mq.forcedColors]: \"CanvasText\" } },\n  bold: { fontWeight: 600 },\n  italic: { fontStyle: \"italic\" },\n  status: { margin: 0, padding: \"0 0.75rem 0.5rem\", fontSize: \"0.8125rem\", color: vlak.gray },\n});\n\n/** Optional Shiki renderer with lazy grammars, monochrome tokens, and exact-source copy. */\nexport const HighlightedCode = React.forwardRef<HTMLElement, HighlightedCodeProps>(function HighlightedCode({\n  code, language = \"text\", streaming = false, lineNumbers = false, maxHeight = 400,\n  copyable = true, downloadable = true, filename = \"code.txt\", onCopyCode, className, style, ...props\n}, ref) {\n  const normalizedLanguage = language.trim().toLowerCase() || \"text\";\n  const [highlighted, setHighlighted] = React.useState<{ code: string; language: string; tokens: ThemedToken[][] } | null>(null);\n  const [copyState, setCopyState] = React.useState<\"idle\" | \"pending\" | \"done\" | \"error\">(\"idle\");\n  const version = React.useRef(0);\n  React.useEffect(() => {\n    let cancelled = false;\n    if (!streaming) void highlight(code, normalizedLanguage).then((tokens) => {\n      if (!cancelled && tokens) setHighlighted({ code, language: normalizedLanguage, tokens });\n    }).catch(() => { /* Plain source remains available if a grammar cannot load. */ });\n    return () => { cancelled = true; };\n  }, [code, normalizedLanguage, streaming]);\n  // biome-ignore lint/correctness/useExhaustiveDependencies: A new source invalidates pending clipboard feedback.\n  React.useEffect(() => { version.current++; setCopyState(\"idle\"); return () => { version.current++; }; }, [code]);\n  const copy = async () => {\n    if (copyState === \"pending\") return;\n    const request = ++version.current;\n    setCopyState(\"pending\");\n    try {\n      if (onCopyCode) await onCopyCode(code); else await navigator.clipboard.writeText(code);\n      if (request === version.current) setCopyState(\"done\");\n    } catch { if (request === version.current) setCopyState(\"error\"); }\n  };\n  const download = () => {\n    const url = URL.createObjectURL(new Blob([code], { type: \"text/plain;charset=utf-8\" }));\n    const anchor = document.createElement(\"a\");\n    anchor.href = url; anchor.download = filename; anchor.click();\n    window.setTimeout(() => URL.revokeObjectURL(url), 0);\n  };\n  const root = rs([\"rs-highlighted-code\", className], styles.root);\n  const header = rs([\"rs-highlighted-code-header\"], styles.header);\n  const languageStyle = rs([\"rs-highlighted-code-language\"], styles.language);\n  const actions = rs([\"rs-highlighted-code-actions\"], styles.actions);\n  const action = rs([\"rs-highlighted-code-action\"], styles.action);\n  const icon = rs([\"rs-highlighted-code-icon\"], styles.icon);\n  const pre = rs([\"rs-highlighted-code-pre\"], styles.pre);\n  const lineStyle = rs([\"rs-highlighted-code-line\"], styles.line);\n  const number = rs([\"rs-highlighted-code-number\"], styles.number);\n  const status = rs([\"rs-highlighted-code-status\"], styles.status);\n  const tokens = !streaming && highlighted?.code === code && highlighted.language === normalizedLanguage ? highlighted.tokens : null;\n  const lines = tokens ?? code.split(\"\\n\").map((content) => [{ content, fontStyle: 0, color: \"#111111\" }]);\n  return <figure {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }} data-highlighted={Boolean(tokens)}>\n    <figcaption {...header}><span {...languageStyle}>{normalizedLanguage}</span><span {...actions}>\n      {copyable && <Button {...action} variant=\"subtle\" aria-label=\"Copy code\" title=\"Copy code\" disabled={copyState === \"pending\"} onClick={() => void copy()}><svg {...icon} viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" aria-hidden=\"true\"><rect x=\"8\" y=\"8\" width=\"12\" height=\"12\" rx=\"2\" /><path d=\"M16 8V4H4v12h4\" /></svg></Button>}\n      {downloadable && <Button {...action} variant=\"subtle\" aria-label=\"Download code\" title=\"Download code\" onClick={download}><svg {...icon} viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" aria-hidden=\"true\"><path d=\"M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5\" /></svg></Button>}\n    </span></figcaption>\n    <pre {...pre} style={{ ...pre.style, maxHeight: Number.isFinite(maxHeight) ? Math.max(44, maxHeight) : 400 }} tabIndex={0} role=\"group\" aria-label={`${normalizedLanguage} source`} dir=\"ltr\"><code>{lines.map((line, index) => <span {...lineStyle} key={index}>\n      {lineNumbers && <span {...number} aria-hidden=\"true\">{index + 1}</span>}\n      {line.map((token, tokenIndex) => {\n        const fontStyle = token.fontStyle ?? 0;\n        const muted = token.color?.toLowerCase() === \"#555555\";\n        const sx = rs([\"rs-highlighted-code-token\", muted && \"rs-highlighted-code-muted\", Boolean(fontStyle & 2) && \"rs-highlighted-code-bold\", Boolean(fontStyle & 1) && \"rs-highlighted-code-italic\"], styles.token, muted && styles.muted, Boolean(fontStyle & 2) && styles.bold, Boolean(fontStyle & 1) && styles.italic);\n        return <span {...sx} key={tokenIndex}>{token.content}</span>;\n      })}{index < lines.length - 1 ? \"\\n\" : \"\"}\n    </span>)}</code></pre>\n    <p {...status} role=\"status\">{copyState === \"done\" ? \"Code copied\" : copyState === \"error\" ? \"Could not copy. Select and copy the source.\" : \"\"}</p>\n  </figure>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/highlighted-code.tsx"
+    },
+    {
+      "path": "vlak/styles/highlighted-code.css",
+      "content": "/* ── highlighted-code: generated from packages/react/src/components/highlighted-code.tsx ── */\n.rs-highlighted-code{margin:1rem 0;width:100%;min-width:0;overflow:hidden;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}\n.rs-highlighted-code-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;min-height:44px;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-highlighted-code-language{flex:1 1 auto;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.8125rem;color:var(--text-secondary)}\n.rs-highlighted-code-actions{display:flex;align-items:center;gap:0.125rem}\n.rs-highlighted-code-action{width:44px;min-width:44px;max-width:44px;height:44px;padding:0;flex-shrink:0}\n.rs-highlighted-code-icon{width:16px;height:16px;display:block}\n.rs-highlighted-code-pre{margin:0;overflow:auto;padding:1rem;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;font-size:0.875rem;line-height:1.45;tab-size:2;white-space:pre;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px}\n.rs-highlighted-code-pre:focus-visible{outline-width:2px}\n.rs-highlighted-code-line{display:block;min-height:1.45em}\n.rs-highlighted-code-number{display:inline-block;min-width:3ch;margin-inline-end:2ch;text-align:end;user-select:none;color:var(--text-secondary)}\n.rs-highlighted-code-token{color:var(--text)}\n.rs-highlighted-code-muted{color:var(--text-secondary)}\n@media (forced-colors: active){.rs-highlighted-code-muted{color:CanvasText}}\n.rs-highlighted-code-bold{font-weight:600}\n.rs-highlighted-code-italic{font-style:italic}\n.rs-highlighted-code-status{margin:0;padding:0 0.75rem 0.5rem;font-size:0.8125rem;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/highlighted-code.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-highlighted-code",
+        "rs-highlighted-code-header",
+        "rs-highlighted-code-language",
+        "rs-highlighted-code-actions",
+        "rs-highlighted-code-action",
+        "rs-highlighted-code-icon",
+        "rs-highlighted-code-pre",
+        "rs-highlighted-code-line",
+        "rs-highlighted-code-number",
+        "rs-highlighted-code-status",
+        "rs-highlighted-code-token",
+        "rs-highlighted-code-muted",
+        "rs-highlighted-code-bold",
+        "rs-highlighted-code-italic"
+      ],
+      "snippet": "<figure class=\"rs-highlighted-code\"><figcaption class=\"rs-highlighted-code-header\"><span class=\"rs-highlighted-code-language\">typescript</span></figcaption><pre class=\"rs-highlighted-code-pre\" tabindex=\"0\" role=\"group\" aria-label=\"typescript source\"><code>const ready = true;</code></pre></figure>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "reactImport": "@noorddev/vlak-react/components/highlighted-code",
+      "dependencies": [
+        "shiki@^3.19.0"
+      ],
+      "aliases": [
+        "AI Elements CodeBlock",
+        "Shiki code block",
+        "Syntax highlighting"
+      ],
+      "example": "import { HighlightedCode } from \"@noorddev/vlak-react/components/highlighted-code\";\n\n<HighlightedCode code={\"const ready = true;\"} language=\"typescript\" filename=\"review.ts\" lineNumbers />",
+      "usage": {
+        "use": [
+          "Source returned by an assistant or supplied by an application that benefits from syntax structure.",
+          "Pass streaming=true for unfinished blocks. Highlighting begins when the block settles.",
+          "Set filename for code downloads. Copy and download always use the original supplied code.",
+          "Unknown languages, large source, and unavailable grammars remain readable plain text."
+        ],
+        "avoid": [
+          "Expecting this component to execute code or to fetch a source file.",
+          "Applying colored syntax themes outside the monochrome design system."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches copy, download, and the scrollable source region."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Copies or downloads the source through the focused button."
+        }
+      ],
+      "a11y": [
+        "Source is rendered as escaped React text, including highlighted tokens. Decorative line numbers do not enter the accessible text.",
+        "Copy feedback appears only after the clipboard request resolves. Failure remains visible and can be retried.",
+        "A 44px target and visible focus outline support keyboard use. The source region is named and scrollable.",
+        "Highlighting is lazy, has bounded full-source caching, and ignores stale results after content changes. Native figure attributes and its ref pass through."
+      ]
+    }
+  }
+}

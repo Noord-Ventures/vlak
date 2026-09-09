@@ -1,0 +1,6 @@
+/* ── task: generated from packages/react/src/components/task.tsx ── */
+.rs-task{max-width:none}
+.rs-task-list{display:grid;gap:0.75rem;list-style-type:none;padding:0;margin:0}
+.rs-task-item{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text-secondary);font-size:0.875rem}
+.rs-task-active{color:var(--text);font-weight:600}
+.rs-task-file{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);padding:0.25rem 0.5rem;font-size:0.75rem}

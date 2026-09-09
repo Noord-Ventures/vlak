@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "jsx-preview",
+  "type": "registry:component",
+  "title": "Jsx preview",
+  "description": "Renders registered components and plain data expressions from streamed JSX through an optional parser.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex",
+    "react-jsx-parser@^2.4.1",
+    "acorn@^8.15.0",
+    "acorn-jsx@^5.3.2"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/jsx-preview.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport JsxParser, { type TProps as ParserProps } from \"react-jsx-parser\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { completePreviewJSX, previewBindings, validatePreviewJSX } from \"./jsx-preview-parser\";\n\nexport interface JSXPreviewProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"children\" | \"onError\"> {\n  jsx: string;\n  streaming?: boolean;\n  /** Trusted, display-only application components. Do not expose components that execute operations during render. */\n  components?: Record<string, React.ElementType>;\n  /** Plain data only. Calls, functions, accessors and prototype access are rejected. */\n  bindings?: Record<string, unknown>;\n  onError?: (error: Error) => void;\n  fallback?: React.ReactNode | ((error: Error) => React.ReactNode);\n}\nconst ParserComponent = JsxParser as unknown as React.ComponentType<ParserProps>;\nconst styles = stylex.create({\n  root: { minWidth: 0, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, backgroundColor: vlak.paper, color: vlak.ink, padding: \"1rem\", fontSize: \"0.875rem\", lineHeight: 1.45, overflow: \"auto\", isolation: \"isolate\", contain: \"layout paint\" },\n  content: { minWidth: 0, overflowWrap: \"anywhere\" },\n  status: { margin: \"0.5rem 0 0\", color: vlak.gray, fontSize: \"0.75rem\" },\n  error: { margin: 0, whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\" },\n});\n\nclass PreviewBoundary extends React.Component<{ children: React.ReactNode; renderError: (error: Error) => React.ReactNode; onError: (error: Error) => void }, { error?: Error }> {\n  state: { error?: Error } = {};\n  static getDerivedStateFromError(error: Error) { return { error }; }\n  componentDidCatch(error: Error) { this.props.onError(error); }\n  render() { return this.state.error ? this.props.renderError(this.state.error) : this.props.children; }\n}\n\n/** Optional Acorn-validated JSX data renderer. This is not a general JavaScript sandbox. */\nexport const JSXPreview = React.forwardRef<HTMLDivElement, JSXPreviewProps>(function JSXPreview({ jsx, streaming = false, components = {}, bindings, onError, fallback, className, style, ...props }, ref) {\n  const [mounted, setMounted] = React.useState(false);\n  React.useEffect(() => setMounted(true), []);\n  const lastGood = React.useRef<{ source: string; bindings: Record<string, unknown> } | null>(null);\n  const reported = React.useRef<string | null>(null);\n  const errorCallback = React.useRef(onError);\n  errorCallback.current = onError;\n  const result = React.useMemo(() => {\n    try {\n      const source = streaming ? completePreviewJSX(jsx) : jsx;\n      validatePreviewJSX(source, new Set(Object.keys(components)));\n      const data = previewBindings(bindings);\n      const good = { source, bindings: data };\n      if (source.trim()) lastGood.current = good;\n      return { good, error: null };\n    } catch (error) { return { good: streaming ? lastGood.current : null, error: error instanceof Error ? error : new Error(\"Could not parse this preview.\") }; }\n  }, [jsx, streaming, components, bindings]);\n  const root = rs([\"rs-jsx-preview\", className], styles.root);\n  const content = rs([\"rs-jsx-preview-content\"], styles.content);\n  const status = rs([\"rs-jsx-preview-status\"], styles.status);\n  const errorStyle = rs([\"rs-jsx-preview-error\"], styles.error);\n  const renderError = (error: Error) => <div {...errorStyle} role=\"alert\">{typeof fallback === \"function\" ? fallback(error) : fallback ?? `Could not render preview: ${error.message}`}</div>;\n  const report = React.useCallback((error: Error) => { const key = `${jsx}:${error.message}`; if (!streaming && reported.current !== key) { reported.current = key; queueMicrotask(() => errorCallback.current?.(error)); } }, [jsx, streaming]);\n  React.useEffect(() => { if (result.error) report(result.error); else reported.current = null; }, [result.error, report]);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    {!mounted && <p {...status}>Preparing preview…</p>}\n    {mounted && result.good && <div {...content}><PreviewBoundary key={`${result.good.source}:${streaming}`} renderError={renderError} onError={report}><ParserComponent jsx={result.good.source} bindings={result.good.bindings} components={components as ParserProps[\"components\"]} renderInWrapper={false} allowUnknownElements={false} blacklistedTags={[\"script\", \"iframe\", \"object\", \"embed\", \"style\", \"link\", \"meta\", \"base\"]} blacklistedAttrs={[/^on/i, \"dangerouslySetInnerHTML\", \"srcDoc\", \"ref\"]} onError={report} renderError={({ error }) => renderError(new Error(error))} /></PreviewBoundary></div>}\n    {result.error && !streaming ? renderError(result.error) : streaming && <p {...status} role=\"status\">{result.good?.source.trim() ? \"Streaming preview…\" : \"Waiting for a complete element…\"}</p>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/jsx-preview.tsx"
+    },
+    {
+      "path": "vlak/jsx-preview-parser.ts",
+      "content": "import { Parser } from \"acorn\";\nimport jsx from \"acorn-jsx\";\n\ntype AstNode = { type: string; [key: string]: unknown };\nconst parser = Parser.extend(jsx());\nconst blockedKeys = new Set([\"__proto__\", \"prototype\", \"constructor\", \"caller\", \"callee\", \"arguments\"]);\nconst nativeTags = new Set(\"a article aside b blockquote br button caption code col colgroup dd del details div dl dt em fieldset figcaption figure footer h1 h2 h3 h4 h5 h6 header hr i input label legend li main mark nav ol optgroup option p pre progress s section select small span strong sub summary sup table tbody td textarea th thead time tr u ul\".split(\" \"));\nconst allowedNodes = new Set(\"Program ExpressionStatement JSXFragment JSXOpeningFragment JSXClosingFragment JSXElement JSXOpeningElement JSXClosingElement JSXIdentifier JSXMemberExpression JSXAttribute JSXText JSXExpressionContainer Literal Identifier MemberExpression BinaryExpression LogicalExpression ConditionalExpression ArrayExpression ObjectExpression Property UnaryExpression TemplateLiteral TemplateElement ChainExpression\".split(\" \"));\nconst voidTags = new Set([\"br\", \"hr\", \"input\", \"col\"]);\n\nfunction tagName(node: AstNode): string {\n  if (node.type === \"JSXIdentifier\") return String(node.name);\n  if (node.type === \"JSXMemberExpression\") return `${tagName(node.object as AstNode)}.${tagName(node.property as AstNode)}`;\n  throw new Error(\"Unsupported preview element name.\");\n}\n\n/** Completes simple open tags while preserving quoted attributes and expression boundaries. */\nexport function completePreviewJSX(source: string): string {\n  const stack: string[] = [];\n  let quote = \"\";\n  let expressionDepth = 0;\n  let escaped = false;\n  let end = source.length;\n  for (let index = 0; index < source.length; index++) {\n    const char = source[index]!;\n    if (quote) { if (escaped) escaped = false; else if (char === \"\\\\\") escaped = true; else if (char === quote) quote = \"\"; continue; }\n    if (expressionDepth > 0) { if ([\"'\", '\"', \"`\"].includes(char)) quote = char; else if (char === \"{\") expressionDepth++; else if (char === \"}\") expressionDepth--; continue; }\n    if (char === \"{\") { expressionDepth++; continue; }\n    if (char !== \"<\") continue;\n    let attributeQuote = \"\";\n    let braces = 0;\n    let tagEnd = index + 1;\n    for (; tagEnd < source.length; tagEnd++) {\n      const value = source[tagEnd]!;\n      if (attributeQuote) { if (value === \"\\\\\") tagEnd++; else if (value === attributeQuote) attributeQuote = \"\"; }\n      else if ([\"'\", '\"', \"`\"].includes(value)) attributeQuote = value;\n      else if (value === \"{\") braces++;\n      else if (value === \"}\") braces--;\n      else if (value === \">\" && braces === 0) break;\n    }\n    if (tagEnd >= source.length) { end = index; break; }\n    const tag = source.slice(index, tagEnd + 1);\n    const match = tag.match(/^<(\\/?)([A-Za-z][\\w.-]*|)(?:\\s|\\/?>)/);\n    if (match) {\n      const name = match[2]!;\n      if (match[1]) { if (stack.at(-1) === name) stack.pop(); }\n      else if (!tag.endsWith(\"/>\") && !voidTags.has(name)) stack.push(name);\n    }\n    index = tagEnd;\n  }\n  return source.slice(0, end) + [...stack].reverse().map(name => `</${name}>`).join(\"\");\n}\n\n/** Validate a data-expression subset before react-jsx-parser can interpret expressions. */\nexport function validatePreviewJSX(source: string, componentNames: ReadonlySet<string>): void {\n  if (source.length > 50000) throw new Error(\"Preview source exceeds 50,000 characters.\");\n  const tree = parser.parse(`<>${source}</>`, { ecmaVersion: \"latest\" }) as unknown as AstNode;\n  const queue = [tree];\n  let remaining = 3000;\n  while (queue.length) {\n    if (--remaining < 0) throw new Error(\"Preview contains too many expressions.\");\n    const node = queue.pop()!;\n    if (!allowedNodes.has(node.type)) throw new Error(`Unsupported preview expression: ${node.type}.`);\n    if (node.type === \"Identifier\" && blockedKeys.has(String(node.name))) throw new Error(\"Prototype access is not supported in previews.\");\n    if (node.type === \"MemberExpression\") {\n      const property = node.property as AstNode;\n      if (node.computed && property.type !== \"Literal\") throw new Error(\"Computed preview properties must use a literal key.\");\n      if (blockedKeys.has(String(property.type === \"Literal\" ? property.value : property.name))) throw new Error(\"Prototype access is not supported in previews.\");\n    }\n    if (node.type === \"Property\") {\n      const key = node.key as AstNode;\n      if (node.computed || node.method || node.kind !== \"init\" || blockedKeys.has(String(key.name ?? key.value))) throw new Error(\"Unsupported preview object property.\");\n    }\n    if (node.type === \"JSXOpeningElement\") {\n      const name = tagName(node.name as AstNode);\n      if (name.split(\".\").some(part => blockedKeys.has(part))) throw new Error(\"Unsupported preview component name.\");\n      if (!nativeTags.has(name) && !componentNames.has(name)) throw new Error(`The element ${name} is not registered for this preview.`);\n    }\n    if (node.type === \"JSXAttribute\") {\n      const name = String((node.name as AstNode).name);\n      if (/^on/i.test(name) || [\"dangerouslySetInnerHTML\", \"srcDoc\", \"srcdoc\", \"src\", \"srcSet\", \"srcset\", \"action\", \"formAction\", \"formaction\", \"ref\", \"is\"].includes(name)) throw new Error(`The attribute ${name} is not supported in previews.`);\n      if (name === \"href\") {\n        const value = node.value as AstNode | null;\n        const text = value?.type === \"Literal\" ? value.value : undefined;\n        if (typeof text !== \"string\" || !/^(?:https?:\\/\\/|\\/(?!\\/)|#)/i.test(text) || [...text].some(character => character.charCodeAt(0) <= 32) || text.includes(\"\\\\\")) throw new Error(\"Preview links must use a literal http, https, local or fragment address.\");\n      }\n    }\n    for (const value of Object.values(node)) {\n      if (value && typeof value === \"object\" && \"type\" in value) queue.push(value as AstNode);\n      else if (Array.isArray(value)) for (const child of value) if (child && typeof child === \"object\" && \"type\" in child) queue.push(child as AstNode);\n    }\n  }\n}\n\n/** Copy plain data without invoking getters or exposing prototype members. */\nexport function previewBindings(bindings: Record<string, unknown> = {}): Record<string, unknown> {\n  let remaining = 3000;\n  const copy = (value: unknown, depth: number, parents: Set<object>): unknown => {\n    if (--remaining < 0 || depth > 16) throw new Error(\"Preview bindings exceed the data budget.\");\n    if (typeof value === \"string\" && value.length > 100000) throw new Error(\"Preview bindings contain too much text.\");\n    if (value === null || [\"string\", \"number\", \"boolean\", \"undefined\"].includes(typeof value)) return value;\n    if (typeof value !== \"object\") throw new Error(\"Preview bindings must contain data, not functions.\");\n    if (parents.has(value)) throw new Error(\"Preview bindings cannot contain circular data.\");\n    if (!Array.isArray(value) && ![Object.prototype, null].includes(Object.getPrototypeOf(value))) throw new Error(\"Preview bindings must contain plain data objects.\");\n    if (Array.isArray(value) && value.length > 3000) throw new Error(\"Preview bindings exceed the data budget.\");\n    const next = new Set(parents).add(value);\n    const result: Record<string, unknown> | unknown[] = Array.isArray(value) ? [] : Object.create(null);\n    for (const key in value) {\n      if (!Object.hasOwn(value, key)) continue;\n      const descriptor = Object.getOwnPropertyDescriptor(value, key)!;\n      if (blockedKeys.has(key) || !Object.hasOwn(descriptor, \"value\")) throw new Error(\"Preview bindings cannot contain accessors or prototype keys.\");\n      (result as Record<string, unknown>)[key] = copy(descriptor.value, depth + 1, next);\n    }\n    return result;\n  };\n  return copy(bindings, 0, new Set()) as Record<string, unknown>;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/jsx-preview-parser.ts"
+    },
+    {
+      "path": "vlak/styles/jsx-preview.css",
+      "content": "/* ── jsx-preview: generated from packages/react/src/components/jsx-preview.tsx ── */\n.rs-jsx-preview{min-width:0;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);background-color:var(--bg);color:var(--text);padding:1rem;font-size:0.875rem;line-height:1.45;overflow:auto;isolation:isolate;contain:layout paint}\n@media (forced-colors: active){.rs-jsx-preview{border-color:CanvasText}}\n.rs-jsx-preview-content{min-width:0;overflow-wrap:anywhere}\n.rs-jsx-preview-status{margin:0.5rem 0 0;color:var(--text-secondary);font-size:0.75rem}\n.rs-jsx-preview-error{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/jsx-preview.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-jsx-preview",
+        "rs-jsx-preview-content",
+        "rs-jsx-preview-status",
+        "rs-jsx-preview-error"
+      ],
+      "snippet": "<div class=\"rs-jsx-preview\"><div class=\"rs-jsx-preview-content\"><section aria-label=\"Review summary\"><p>3 findings are ready for review.</p></section></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "reactImport": "@noorddev/vlak-react/components/jsx-preview",
+      "dependencies": [
+        "react-jsx-parser@^2.4.1",
+        "acorn@^8.15.0",
+        "acorn-jsx@^5.3.2"
+      ],
+      "aliases": [
+        "AI Elements JSX Preview",
+        "Generated React preview",
+        "JSX widgets"
+      ],
+      "example": "import { JSXPreview } from \"@noorddev/vlak-react/components/jsx-preview\";\n\n<JSXPreview jsx={'<section aria-label=\"Review summary\"><p>{count} findings are ready.</p></section>'} bindings={{ count: 3 }} />",
+      "usage": {
+        "use": [
+          "Install the optional react-jsx-parser, acorn and acorn-jsx dependencies and import the component subpath.",
+          "Register trusted display components and pass plain data bindings. Application components own their internal interactive controls.",
+          "Set streaming for simple tag completion and last-valid-content fallback while an expression is incomplete.",
+          "Use fallback/onError for invalid completed source or a registered component that throws."
+        ],
+        "avoid": [
+          "Treating this component as an arbitrary JavaScript sandbox or exposing side-effectful components that execute operations during render.",
+          "Passing functions, getters, prototype objects or secrets through bindings.",
+          "Expecting function calls, arrow functions, spreads, event attributes, active markup or dynamic link targets to be interpreted. Use application components or an isolated external preview for those cases."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab follows the normal order of controls and safe links produced by registered components."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Keyboard behavior inside a registered component belongs to that component."
+        }
+      ],
+      "a11y": [
+        "Acorn validates the data-expression subset before react-jsx-parser interprets it; no host eval is used.",
+        "Function calls, prototype access, active tags and unsafe attributes are rejected rather than executed.",
+        "Bindings have bounded depth and size and are copied without invoking accessors.",
+        "Invalid completed previews show an alert; streaming updates retain the last valid preview and use a short status message.",
+        "The parser mounts after hydration; styling remains inside a contained 4px surface."
+      ]
+    }
+  }
+}

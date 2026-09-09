@@ -6,7 +6,7 @@ import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
 import { Icon } from "./icon";
 
-export interface TreeNode { id: string; label: string; disabled?: boolean; children?: TreeNode[] }
+export interface TreeNode { id: string; label: string; disabled?: boolean; children?: TreeNode[]; /** Decorative file or folder icon. Keep label as plain text for keyboard search. */ icon?: React.ReactNode }
 export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLUListElement>, "defaultValue" | "onSelect"> {
   nodes: TreeNode[];
   label: string;
@@ -16,12 +16,15 @@ export interface TreeViewProps extends Omit<React.HTMLAttributes<HTMLUListElemen
   expanded?: string[];
   defaultExpanded?: string[];
   onExpandedChange?: (ids: string[]) => void;
+  /** Custom non-interactive row content. The node's plain label still names the tree item. */
+  renderLabel?: (node: TreeNode, state: { selected: boolean; expanded: boolean }) => React.ReactNode;
 }
 const styles = stylex.create({
   root: { listStyleType: "none", margin: 0, padding: 0, color: vlak.ink, minWidth: 0, width: "100%", boxSizing: "border-box", fontSize: "0.875rem", lineHeight: 1.45 },
   group: { listStyleType: "none", margin: 0, paddingInlineStart: "1rem", minWidth: 0, boxSizing: "border-box" },
   item: { display: "flex", alignItems: "center", gap: "0.25rem", minHeight: vlak.hit, minWidth: vlak.hit, width: "100%", paddingInline: "0.25rem", boxSizing: "border-box", borderRadius: vlak.radiusSm, cursor: "pointer", outlineColor: vlak.ink, outlineOffset: -2, ":focus-visible": { outlineWidth: 2, outlineStyle: "solid" } },
   label: { flex: "1 1 auto", minWidth: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  icon: { display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1rem", height: "1rem", flexShrink: 0, color: vlak.gray },
   selected: { backgroundColor: vlak.controlFill, fontWeight: 600 },
   disabled: { color: vlak.gray, cursor: "not-allowed" },
   spacer: { width: vlak.hit, flexShrink: 0 },
@@ -32,7 +35,7 @@ function flatten(nodes: TreeNode[], open: Set<string>, parent?: string): Array<{
 }
 
 /** Single selection and APG-style roving focus through a hierarchical collection. */
-export const TreeView = React.forwardRef<HTMLUListElement, TreeViewProps>(function TreeView({ nodes, label, value, defaultValue, onValueChange, expanded, defaultExpanded = [], onExpandedChange, className, style, onKeyDown, ...props }, ref) {
+export const TreeView = React.forwardRef<HTMLUListElement, TreeViewProps>(function TreeView({ nodes, label, value, defaultValue, onValueChange, expanded, defaultExpanded = [], onExpandedChange, renderLabel, className, style, onKeyDown, ...props }, ref) {
   const [inner, setInner] = React.useState(defaultValue);
   const [innerExpanded, setInnerExpanded] = React.useState(defaultExpanded);
   const [focused, setFocused] = React.useState<string | undefined>(defaultValue);
@@ -67,7 +70,7 @@ export const TreeView = React.forwardRef<HTMLUListElement, TreeViewProps>(functi
       else if (event.key.length === 1 && !event.metaKey && !event.ctrlKey && !event.altKey) { const now = Date.now(); typeAhead.current.text = now - typeAhead.current.time < 700 ? typeAhead.current.text + event.key.toLocaleLowerCase() : event.key.toLocaleLowerCase(); typeAhead.current.time = now; const order = [...visible.slice(at + 1), ...visible.slice(0, at + 1)]; next = order.find(item => item.node.label.toLocaleLowerCase().startsWith(typeAhead.current.text))?.node.id; }
       else return;
       event.preventDefault(); event.stopPropagation(); if (next) focus(next);
-    }}>{node.children?.length ? <button {...disclosure} type="button" tabIndex={-1} disabled={disabled} aria-label={`${open.has(node.id) ? "Collapse" : "Expand"} ${node.label}`} onClick={event => { event.stopPropagation(); focus(node.id); expand(node.id, !open.has(node.id)); }}><Icon name="chevron-right" rotate={open.has(node.id) ? 90 : undefined} /></button> : <span {...spacer} aria-hidden="true" />}<span {...text} title={node.label}>{node.label}</span></div>{node.children?.length && open.has(node.id) ? <ul {...group} role="group" id={`${treeId}-${encodeURIComponent(node.id)}`}>{renderNodes(node.children, level + 1)}</ul> : null}</li>;
+    }}>{node.children?.length ? <button {...disclosure} type="button" tabIndex={-1} disabled={disabled} aria-label={`${open.has(node.id) ? "Collapse" : "Expand"} ${node.label}`} onClick={event => { event.stopPropagation(); focus(node.id); expand(node.id, !open.has(node.id)); }}><Icon name="chevron-right" rotate={open.has(node.id) ? 90 : undefined} /></button> : <span {...spacer} aria-hidden="true" />}{node.icon && <span {...rs(["rs-tree-view-icon"], styles.icon)} aria-hidden="true">{node.icon}</span>}<span {...text} title={node.label}>{renderLabel ? renderLabel(node, { selected, expanded: open.has(node.id) }) : node.label}</span></div>{node.children?.length && open.has(node.id) ? <ul {...group} role="group" id={`${treeId}-${encodeURIComponent(node.id)}`}>{renderNodes(node.children, level + 1)}</ul> : null}</li>;
   });
   // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: The APG tree pattern explicitly uses a ul with role=tree and roving treeitems.
   return <ul ref={ref} role="tree" aria-label={label} {...props} onKeyDown={onKeyDown} className={root.className} style={{ ...root.style, ...style }}>{renderNodes(nodes, 1)}</ul>;

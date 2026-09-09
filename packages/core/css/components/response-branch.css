@@ -1,0 +1,8 @@
+/* ── response-branch: generated from packages/react/src/components/response-branch.tsx ── */
+.rs-response-branch{display:grid;gap:0.5rem;min-width:0}
+.rs-response-branch-content{min-width:0}
+.rs-response-branch-controls{display:flex;align-items:center;gap:0.25rem;min-width:0}
+.rs-response-branch-action{width:44px;min-width:44px;max-width:44px;height:44px;padding:0;flex-shrink:0}
+.rs-response-branch-icon{width:16px;height:16px;display:block}
+.rs-response-branch-position{color:var(--text-secondary);font-size:0.8125rem;font-variant-numeric:tabular-nums;min-width:4ch;text-align:center}
+.rs-response-branch-empty{color:var(--text-secondary);font-size:0.875rem;margin:0}

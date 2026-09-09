@@ -1,0 +1,102 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "audio-player",
+  "type": "registry:component",
+  "title": "Audio player",
+  "description": "Native audio playback for remote files and generated speech, with composable controls, bounded skip seeking, volume, and recoverable errors.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/button-group.json",
+    "https://vlak.dev/r/slider.json",
+    "https://vlak.dev/r/media-scrubber.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/audio-player.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Button } from \"./button\";\nimport { ButtonGroup } from \"./button-group\";\nimport { Slider } from \"./slider\";\nimport { MediaScrubber } from \"./media-scrubber\";\nimport { Icon } from \"./icons\";\n\nexport interface GeneratedSpeechAudio { base64: string; mediaType: string }\nexport interface AudioPlayerProps extends React.HTMLAttributes<HTMLDivElement> {\n  title: string;\n  src?: string;\n  data?: GeneratedSpeechAudio;\n  transcript?: React.ReactNode;\n  preload?: \"none\" | \"metadata\" | \"auto\";\n  onTimeChange?: (seconds: number) => void;\n  onPlayingChange?: (playing: boolean) => void;\n}\nexport interface AudioPlayerState {\n  playing: boolean; pending: boolean; currentTime: number; duration: number;\n  volume: number; muted: boolean; error: string;\n  play: () => Promise<void>; pause: () => void; seek: (seconds: number) => void;\n  setVolume: (volume: number) => void; toggleMute: () => void; retry: () => void;\n}\nexport interface AudioPlayerControlsProps extends React.HTMLAttributes<HTMLDivElement> { seekOffset?: number; disabled?: boolean }\nconst AudioPlayerContext = React.createContext<AudioPlayerState | null>(null);\n\n/** Access the native media controller from controls nested inside AudioPlayer. */\nexport function useAudioPlayer(): AudioPlayerState {\n  const context = React.useContext(AudioPlayerContext);\n  if (!context) throw new Error(\"useAudioPlayer must be used inside AudioPlayer.\");\n  return context;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.75rem\", width: \"100%\", minWidth: 0, padding: \"0.75rem\", boxSizing: \"border-box\", color: vlak.ink, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm },\n  heading: { margin: 0, fontSize: vlak.controlFs, lineHeight: 1.45, fontWeight: 500 },\n  controls: { display: \"grid\", gap: \"0.75rem\", minWidth: 0 },\n  row: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", gap: \"0.75rem\" },\n  volume: { flex: \"1 1 6rem\", minWidth: \"4rem\", maxWidth: \"10rem\" },\n  status: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n  transcript: { fontSize: vlak.controlFs, lineHeight: 1.45, maxWidth: \"66ch\" },\n});\n\n/** Native audio for URLs or generated speech, with replaceable controls and explicit media ownership. */\nexport const AudioPlayer = React.forwardRef<HTMLAudioElement, AudioPlayerProps>(function AudioPlayer({ title, src, data, transcript, preload = \"metadata\", onTimeChange, onPlayingChange, children, className, style, ...props }, ref) {\n  const validData = data && /^audio\\/[a-z0-9.+-]+$/i.test(data.mediaType) && /^[a-z0-9+/=\\s]+$/i.test(data.base64);\n  const source = src ?? (validData ? `data:${data.mediaType};base64,${data.base64.replace(/\\s/g, \"\")}` : \"\");\n  const mediaRef = React.useRef<HTMLAudioElement>(null);\n  const mergedRef = useMergedRefs(mediaRef, ref);\n  const [playing, setPlaying] = React.useState(false);\n  const [pending, setPending] = React.useState(false);\n  const [currentTime, setCurrentTime] = React.useState(0);\n  const [duration, setDuration] = React.useState(0);\n  const [volume, setVolumeState] = React.useState(1);\n  const [muted, setMuted] = React.useState(false);\n  const [error, setError] = React.useState(\"\");\n  const [hydrated, setHydrated] = React.useState(false);\n  const version = React.useRef(0); const busy = React.useRef(false);\n  const callbacks = React.useRef({ onTimeChange, onPlayingChange }); callbacks.current = { onTimeChange, onPlayingChange };\n  const id = React.useId();\n  React.useEffect(() => {\n    const media = mediaRef.current; version.current++; busy.current = false;\n    // Cached/data audio can finish loading before hydration installs the native event handlers.\n    // Read the element first so switching to custom controls preserves its ready metadata.\n    setHydrated(true); setPlaying(media ? !media.paused && !media.ended : false); setPending(false);\n    setCurrentTime(media && Number.isFinite(media.currentTime) ? media.currentTime : 0);\n    setDuration(media && Number.isFinite(media.duration) ? media.duration : 0);\n    setVolumeState(media?.volume ?? 1); setMuted(media?.muted ?? false);\n    setError(source ? media?.error ? \"Audio could not load. Retry the source.\" : \"\" : \"Supply an audio address or valid generated speech data.\");\n    return () => { version.current++; busy.current = false; media?.pause(); };\n  }, [source]);\n  const play = async () => {\n    const media = mediaRef.current; if (!media || !source || busy.current) return;\n    busy.current = true; const request = ++version.current; setPending(true); setError(\"\");\n    try { await media.play(); }\n    catch { if (request === version.current) setError(\"Audio could not play. Try again.\"); }\n    finally { if (request === version.current) { busy.current = false; setPending(false); } }\n  };\n  const pause = () => { version.current++; busy.current = false; setPending(false); mediaRef.current?.pause(); };\n  const seek = (seconds: number) => {\n    const media = mediaRef.current;\n    if (!media || !Number.isFinite(seconds) || !Number.isFinite(media.duration) || media.duration <= 0) return;\n    const next = Math.min(media.duration, Math.max(0, seconds)); media.currentTime = next; setCurrentTime(next); callbacks.current.onTimeChange?.(next);\n  };\n  const setVolume = (next: number) => { if (mediaRef.current && Number.isFinite(next)) { mediaRef.current.volume = Math.max(0, Math.min(1, next)); mediaRef.current.muted = false; setVolumeState(mediaRef.current.volume); setMuted(false); } };\n  const toggleMute = () => { if (mediaRef.current) { mediaRef.current.muted = !mediaRef.current.muted; setMuted(mediaRef.current.muted); } };\n  const retry = () => { setError(\"\"); mediaRef.current?.load(); };\n  const root = rs([\"rs-audio-player\", className], styles.root);\n  const heading = rs([\"rs-audio-player-heading\"], styles.heading);\n  const status = rs([\"rs-audio-player-status\"], styles.status);\n  const transcriptStyle = rs([\"rs-audio-player-transcript\"], styles.transcript);\n  const state = { playing, pending, currentTime, duration, volume, muted, error, play, pause, seek, setVolume, toggleMute, retry };\n  return <AudioPlayerContext.Provider value={state}><div {...props} role=\"region\" aria-labelledby={id} className={root.className} style={{ ...root.style, ...style }}>\n    <h3 {...heading} id={id}>{title}</h3>\n    {/* biome-ignore lint/a11y/useMediaCaption: Audio speech has a visible application-supplied transcript slot below the controls. */}\n    <audio key={source} ref={mergedRef} src={source || undefined} preload={preload} controls={!hydrated} aria-label={title}\n      onPlay={() => { setPlaying(true); callbacks.current.onPlayingChange?.(true); }} onPause={() => { setPlaying(false); callbacks.current.onPlayingChange?.(false); }} onEnded={() => { setPlaying(false); callbacks.current.onPlayingChange?.(false); }}\n      onTimeUpdate={event => { setCurrentTime(event.currentTarget.currentTime); callbacks.current.onTimeChange?.(event.currentTarget.currentTime); }}\n      onDurationChange={event => setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0)}\n      onLoadedMetadata={event => { setDuration(Number.isFinite(event.currentTarget.duration) ? event.currentTarget.duration : 0); setError(\"\"); }}\n      onVolumeChange={event => { setVolumeState(event.currentTarget.volume); setMuted(event.currentTarget.muted); }}\n      onError={() => { version.current++; busy.current = false; setPending(false); setPlaying(false); callbacks.current.onPlayingChange?.(false); setError(\"Audio could not load. Retry the source.\"); }} />\n    {hydrated && (children ?? <AudioPlayerControls disabled={!source} />)}\n    <p {...status} role=\"status\">{error}</p>\n    {error && source && <Button variant=\"subtle\" size=\"sm\" onClick={retry}>Retry audio</Button>}\n    {transcript && <div {...transcriptStyle}>{transcript}</div>}\n  </div></AudioPlayerContext.Provider>;\n});\n\n/** Default transport, bounded skip seeking and volume; replace or compose with useAudioPlayer. */\nexport const AudioPlayerControls = React.forwardRef<HTMLDivElement, AudioPlayerControlsProps>(function AudioPlayerControls({ seekOffset = 10, disabled = false, className, style, ...props }, ref) {\n  const audio = useAudioPlayer();\n  const offset = Number.isFinite(seekOffset) && seekOffset > 0 ? seekOffset : 10;\n  const root = rs([\"rs-audio-player-controls\", className], styles.controls);\n  const row = rs([\"rs-audio-player-row\"], styles.row);\n  const volume = rs([\"rs-audio-player-volume\"], styles.volume);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <MediaScrubber value={audio.currentTime} duration={audio.duration} onValueChange={audio.seek} disabled={disabled || audio.duration <= 0} />\n    <div {...row}><ButtonGroup aria-label=\"Audio playback\">\n      <Button variant=\"subtle\" size=\"icon\" aria-label={`Back ${offset} seconds`} disabled={disabled || audio.duration <= 0 || audio.currentTime <= 0} onClick={() => audio.seek(audio.currentTime - offset)}><Icon name=\"skip-back\" /></Button>\n      <Button variant=\"subtle\" size=\"icon\" aria-label={audio.playing ? \"Pause audio\" : \"Play audio\"} disabled={disabled || audio.pending} onClick={() => { if (audio.playing) audio.pause(); else void audio.play(); }}><Icon name={audio.playing ? \"pause\" : \"play\"} /></Button>\n      <Button variant=\"subtle\" size=\"icon\" aria-label={`Forward ${offset} seconds`} disabled={disabled || audio.duration <= 0 || audio.currentTime >= audio.duration} onClick={() => audio.seek(audio.currentTime + offset)}><Icon name=\"skip-forward\" /></Button>\n    </ButtonGroup>\n    <Button variant=\"subtle\" size=\"icon\" aria-label={audio.muted ? \"Unmute audio\" : \"Mute audio\"} disabled={disabled} onClick={audio.toggleMute}><Icon name={audio.muted ? \"volume-off\" : \"volume\"} /></Button>\n    <div {...volume}><Slider aria-label=\"Audio volume\" min={0} max={1} step={0.05} value={audio.muted ? 0 : audio.volume} onValueChange={audio.setVolume} disabled={disabled} /></div></div>\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/audio-player.tsx"
+    },
+    {
+      "path": "vlak/styles/audio-player.css",
+      "content": "/* ── audio-player: generated from packages/react/src/components/audio-player.tsx ── */\n.rs-audio-player{display:grid;gap:0.75rem;width:100%;min-width:0;padding:0.75rem;box-sizing:border-box;color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm)}\n@media (forced-colors: active){.rs-audio-player{border-color:CanvasText}}\n.rs-audio-player-heading{margin:0;font-size:var(--control-fs);line-height:1.45;font-weight:500}\n.rs-audio-player-controls{display:grid;gap:0.75rem;min-width:0}\n.rs-audio-player-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem}\n.rs-audio-player-volume{flex:1 1 6rem;min-width:4rem;max-width:10rem}\n.rs-audio-player-status{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n.rs-audio-player-transcript{font-size:var(--control-fs);line-height:1.45;max-width:66ch}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/audio-player.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-audio-player",
+        "rs-audio-player-heading",
+        "rs-audio-player-controls",
+        "rs-audio-player-row",
+        "rs-audio-player-volume",
+        "rs-audio-player-status",
+        "rs-audio-player-transcript"
+      ],
+      "snippet": "<div class=\"rs-audio-player\" role=\"region\" aria-label=\"Spoken brief\"><h3 class=\"rs-audio-player-heading\">Spoken brief</h3><audio controls aria-label=\"Spoken brief\" src=\"/brief.wav\"></audio><p class=\"rs-audio-player-transcript\">The brief is ready for review.</p></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "button-group",
+        "slider",
+        "media-scrubber",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Audio Player",
+        "Generated speech",
+        "AudioPlayerControls",
+        "Speech playback"
+      ],
+      "example": "import { AudioPlayer, AudioPlayerControls, type GeneratedSpeechAudio } from \"@noorddev/vlak-react\";\n\nexport function SpokenBrief({ speech, transcript }: { speech: GeneratedSpeechAudio; transcript: string }) {\n  return <AudioPlayer title=\"Spoken brief\" data={speech} transcript={transcript}>\n    <AudioPlayerControls seekOffset={5} />\n  </AudioPlayer>;\n}",
+      "usage": {
+        "use": [
+          "Supply src for a file or data with base64 and an audio mediaType for generated speech.",
+          "The default controls support play, pause, skip backward and forward, seeking, mute, and volume.",
+          "Replace children with AudioPlayerControls or application controls using useAudioPlayer inside the player.",
+          "Supply a readable transcript for spoken content. Provider generation and authorization remain application-owned.",
+          "The forwarded ref reaches the native audio element; onTimeChange can synchronize Transcription.",
+          "Source changes stop the old element and discard stale playback results. CSS-only markup uses native audio controls."
+        ],
+        "avoid": [
+          "Autoplaying generated speech without user activation.",
+          "Treating this component as a speech generation API."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through playback, seeking, and volume controls"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates playback, skip, mute, or retry"
+        },
+        {
+          "keys": "Arrow keys, Home, End",
+          "does": "Adjusts the focused native seek or volume range"
+        }
+      ],
+      "a11y": [
+        "The player is a region named by its title, and icon buttons have explicit accessible labels and 44px targets.",
+        "Playback failures use a status region and permit retry. Native events own playback state.",
+        "The subtle 1px frame uses 4px corners; focus and forced-colors controls retain distinct outlines."
+      ]
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "suggestions",
+  "type": "registry:component",
+  "title": "Suggestions",
+  "description": "A wrapping or horizontally scrollable collection of prompt buttons with subtle outlines and 4px corners.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/suggestions.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { Button, type ButtonProps } from \"./button\";\n\nexport interface SuggestionsProps extends React.HTMLAttributes<HTMLDivElement> { wrap?: boolean }\nexport interface SuggestionProps extends Omit<ButtonProps, \"onClick\" | \"onSelect\" | \"value\"> { value: string; onSelect?: (value: string) => void }\nconst styles = stylex.create({ root: { display: \"flex\", gap: \"0.5rem\", overflowX: \"auto\", paddingBlock: \"0.25rem\", minWidth: 0, maxWidth: \"100%\" }, wrap: { flexWrap: \"wrap\" }, item: { flexShrink: 0, width: \"auto\", whiteSpace: \"nowrap\" } });\nexport const Suggestions = React.forwardRef<HTMLDivElement, SuggestionsProps>(function Suggestions({ wrap = false, className, style, ...props }, ref) { const root = rs([\"rs-suggestions\", wrap && \"rs-suggestions-wrap\", className], styles.root, wrap && styles.wrap); return <div ref={ref} role=\"group\" aria-label=\"Suggested prompts\" {...props} className={root.className} style={{ ...root.style, ...style }} />; });\nexport const Suggestion = React.forwardRef<HTMLButtonElement, SuggestionProps>(function Suggestion({ value, onSelect, children, className, style, ...props }, ref) { const root = rs([\"rs-suggestions-item\", className], styles.item); return <Button ref={ref} variant=\"ghost\" {...props} className={root.className} style={{ ...root.style, ...style }} onClick={() => onSelect?.(value)}>{children ?? value}</Button>; });\n",
+      "type": "registry:component",
+      "target": "components/vlak/suggestions.tsx"
+    },
+    {
+      "path": "vlak/styles/suggestions.css",
+      "content": "/* ── suggestions: generated from packages/react/src/components/suggestions.tsx ── */\n.rs-suggestions{display:flex;gap:0.5rem;overflow-x:auto;padding-block:0.25rem;min-width:0;max-width:100%}\n.rs-suggestions-wrap{flex-wrap:wrap}\n.rs-suggestions-item{flex-shrink:0;width:auto;white-space:nowrap}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/suggestions.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-suggestions",
+        "rs-suggestions-wrap",
+        "rs-suggestions-item"
+      ],
+      "snippet": "<div class=\"rs-suggestions\" role=\"group\" aria-label=\"Suggested prompts\"><button class=\"rs-suggestions-item rs-btn-ghost\" type=\"button\">Review the brief</button></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Suggestion",
+        "Suggested prompts"
+      ],
+      "example": "\"use client\";\nimport { useState } from \"react\";\nimport { MessageComposer, Suggestions, Suggestion, type ComposedMessage } from \"@noorddev/vlak-react\";\n\nexport function SuggestedPrompts({ onSend }: { onSend: (message: ComposedMessage) => void | Promise<void> }) {\n  const [draft, setDraft] = useState(\"\");\n  return <>\n    <Suggestions wrap>\n      <Suggestion value=\"Review the launch brief\" onSelect={setDraft}>Review brief</Suggestion>\n      <Suggestion value=\"Find missing owners\" onSelect={setDraft} />\n    </Suggestions>\n    <MessageComposer compact value={draft} onValueChange={setDraft} onSend={onSend} />\n  </>;\n}",
+      "usage": {
+        "use": [
+          "Offer short suggested prompts using value and onSelect. Display text may be shorter than the submitted value.",
+          "The collection scrolls horizontally by default; wrap places buttons on multiple lines."
+        ],
+        "avoid": [
+          "Making suggestions look like completed or submitted messages."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

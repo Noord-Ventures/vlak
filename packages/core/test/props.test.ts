@@ -54,8 +54,10 @@ describe("props.json", () => {
 
   it("lists only exports that the React package exports", () => {
     for (const [name, entry] of Object.entries(props.components)) {
+      const component = vlakComponents.find(component => component.name === name)!;
+      const exportSource = component.reactImport && component.react ? readFileSync(join(pkgDir, "../react/src", component.react), "utf8") : reactIndex;
       for (const e of entry.exports) {
-        expect(new RegExp(`\\b${e.name}\\b`).test(reactIndex), `${name}.${e.name} is not exported from packages/react/src/index.ts`).toBe(true);
+        expect(new RegExp(`\\b${e.name}\\b`).test(exportSource), `${name}.${e.name} is not exported from its public entry`).toBe(true);
       }
     }
   });

@@ -1,0 +1,89 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "response-branch",
+  "type": "registry:component",
+  "title": "Response branch",
+  "description": "Navigates saved response alternatives with stable identity, previous and next controls, and a readable position.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/response-branch.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport interface ResponseBranchItem {\n  /** Stable identity for a saved response alternative. */\n  id: string;\n  content: React.ReactNode;\n  label?: string;\n}\nexport interface ResponseBranchProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"children\" | \"defaultValue\"> {\n  branches: readonly ResponseBranchItem[];\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  content: { minWidth: 0 },\n  controls: { display: \"flex\", alignItems: \"center\", gap: \"0.25rem\", minWidth: 0 },\n  action: { width: 44, minWidth: 44, maxWidth: 44, height: 44, padding: 0, flexShrink: 0 },\n  icon: { width: 16, height: 16, display: \"block\" },\n  position: { color: vlak.gray, fontSize: \"0.8125rem\", fontVariantNumeric: \"tabular-nums\", minWidth: \"4ch\", textAlign: \"center\" },\n  empty: { color: vlak.gray, fontSize: \"0.875rem\", margin: 0 },\n});\n\n/** Navigates application-owned response alternatives without changing conversation history. */\nexport const ResponseBranch = React.forwardRef<HTMLDivElement, ResponseBranchProps>(function ResponseBranch({\n  branches, value, defaultValue, onValueChange, label = \"Response alternatives\", className, style, ...props\n}, ref) {\n  const [internalValue, setInternalValue] = React.useState(() => defaultValue ?? branches[0]?.id);\n  const selectedId = value === undefined ? internalValue : value;\n  const index = Math.max(0, branches.findIndex((branch) => branch.id === selectedId));\n  const current = branches[index];\n  const contentId = React.useId();\n  const choose = (nextIndex: number) => {\n    const next = branches[nextIndex];\n    if (!next || next.id === current?.id) return;\n    if (value === undefined) setInternalValue(next.id);\n    onValueChange?.(next.id);\n  };\n  const root = rs([\"rs-response-branch\", className], styles.root);\n  const content = rs([\"rs-response-branch-content\"], styles.content);\n  const controls = rs([\"rs-response-branch-controls\"], styles.controls);\n  const action = rs([\"rs-response-branch-action\"], styles.action);\n  const icon = rs([\"rs-response-branch-icon\"], styles.icon);\n  const position = rs([\"rs-response-branch-position\"], styles.position);\n  const empty = rs([\"rs-response-branch-empty\"], styles.empty);\n  return <div {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...content} id={contentId}>{current ? <React.Fragment key={current.id}>{current.content}</React.Fragment> : <p {...empty}>No responses yet.</p>}</div>\n    {branches.length > 1 && <div {...controls} role=\"group\" aria-label={label}>\n      <Button {...action} variant=\"subtle\" disabled={index === 0} aria-label=\"Previous response\" aria-controls={contentId} title=\"Previous response\" onClick={() => choose(index - 1)}><svg {...icon} viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" aria-hidden=\"true\"><path d=\"m14 6-6 6 6 6\" /></svg></Button>\n      <span {...position} role=\"status\" aria-live=\"polite\" aria-atomic=\"true\" aria-label={current?.label ? `${current.label}, ${index + 1} of ${branches.length}` : undefined}>{index + 1} / {branches.length}</span>\n      <Button {...action} variant=\"subtle\" disabled={index === branches.length - 1} aria-label=\"Next response\" aria-controls={contentId} title=\"Next response\" onClick={() => choose(index + 1)}><svg {...icon} viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1.5\" aria-hidden=\"true\"><path d=\"m10 6 6 6-6 6\" /></svg></Button>\n    </div>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/response-branch.tsx"
+    },
+    {
+      "path": "vlak/styles/response-branch.css",
+      "content": "/* ── response-branch: generated from packages/react/src/components/response-branch.tsx ── */\n.rs-response-branch{display:grid;gap:0.5rem;min-width:0}\n.rs-response-branch-content{min-width:0}\n.rs-response-branch-controls{display:flex;align-items:center;gap:0.25rem;min-width:0}\n.rs-response-branch-action{width:44px;min-width:44px;max-width:44px;height:44px;padding:0;flex-shrink:0}\n.rs-response-branch-icon{width:16px;height:16px;display:block}\n.rs-response-branch-position{color:var(--text-secondary);font-size:0.8125rem;font-variant-numeric:tabular-nums;min-width:4ch;text-align:center}\n.rs-response-branch-empty{color:var(--text-secondary);font-size:0.875rem;margin:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/response-branch.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-response-branch",
+        "rs-response-branch-content",
+        "rs-response-branch-controls",
+        "rs-response-branch-action",
+        "rs-response-branch-icon",
+        "rs-response-branch-position",
+        "rs-response-branch-empty"
+      ],
+      "snippet": "<div class=\"rs-response-branch\"><div class=\"rs-response-branch-content\" id=\"branch-content\"><p>Give each decision an owner and a next step.</p></div><div class=\"rs-response-branch-controls\" role=\"group\" aria-label=\"Response alternatives\"><button class=\"rs-btn-subtle rs-response-branch-action\" type=\"button\" disabled aria-label=\"Previous response\" aria-controls=\"branch-content\">‹</button><span class=\"rs-response-branch-position\" role=\"status\" aria-live=\"polite\">1 / 2</span><button class=\"rs-btn-subtle rs-response-branch-action\" type=\"button\" aria-label=\"Next response\" aria-controls=\"branch-content\">›</button></div></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements MessageBranch",
+        "Response alternatives",
+        "Message versions",
+        "Response pagination"
+      ],
+      "example": "import { Response, ResponseBranch } from \"@noorddev/vlak-react\";\n\n<ResponseBranch branches={[\n  { id: \"first\", content: <Response>Give each decision an owner.</Response> },\n  { id: \"second\", content: <Response>Start with a clear review flow.</Response> },\n]} />",
+      "usage": {
+        "use": [
+          "Compare existing assistant responses or application-supplied alternatives without losing their identity.",
+          "Use value and onValueChange for application-owned selection, or defaultValue for an initial preference.",
+          "Keep branch IDs stable when responses are reordered or new alternatives arrive.",
+          "Compose retry and editing actions in branch content. The application owns generation, persistence, and conversation history."
+        ],
+        "avoid": [
+          "Assuming changing a branch calls a model, deletes a response, or rewrites subsequent messages.",
+          "Using array position as a persistent branch identity."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches available previous and next buttons and interactive content in the selected response."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Requests the adjacent response through the focused native button."
+        }
+      ],
+      "a11y": [
+        "The named control group exposes descriptive 44px buttons. Boundary controls are disabled.",
+        "A short polite status announces the selected position, while message content stays outside the live region.",
+        "Only the selected response is rendered. Controlled values stay authoritative until the application accepts a request.",
+        "Empty and single-branch states omit navigation. Native root attributes, className, style, and the div ref pass through."
+      ]
+    }
+  }
+}

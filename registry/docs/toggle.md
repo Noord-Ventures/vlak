@@ -1,15 +1,16 @@
 # Toggle
 
-Turns one persistent option on or off. Pressed fills with ink and exposes aria-pressed.
+Turns one persistent option on or off with aria-pressed. Default uses an ink fill when pressed; subtle uses a soft fill and stronger text.
 
 Category: actions  
 Name: `toggle`  
-Also known as: Toggle, Toggle button, Press button  
+Also known as: Toggle, Toggle button, Press button, Subtle toggle  
 Page: https://vlak.dev/components/toggle/
 
 ## When to use
 
 - A formatting or filter option that is on or off and stays in view.
+- Default for a bordered toggle with an ink pressed state. Subtle stays transparent on hover while muted text turns to ink; pressing adds a soft fill and stronger text.
 - Several independent toggles in a row.
 
 ## When not to
@@ -45,7 +46,10 @@ npx shadcn add https://vlak.dev/r/toggle.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<button class="rs-toggle" aria-pressed="true">Bold</button>
+<button class="rs-toggle rs-toggle-pressed" aria-pressed="true">Bold</button>
+<button class="rs-toggle rs-toggle-subtle" aria-pressed="false">Italic</button>
+<button class="rs-toggle rs-toggle-pressed rs-toggle-subtle rs-toggle-subtle-pressed" aria-pressed="true">Underline</button>
+<button class="rs-toggle rs-toggle-subtle" aria-pressed="false" disabled>Strikethrough</button>
 ```
 
 ## Example
@@ -55,8 +59,12 @@ import { useState } from "react";
 import { Toggle } from "@noorddev/vlak-react";
 
 const [bold, setBold] = useState(false);
+const [italic, setItalic] = useState(false);
 
-<Toggle pressed={bold} onPressedChange={setBold} aria-label="Bold">B</Toggle>
+<Toggle pressed={bold} onPressedChange={setBold}>Bold</Toggle>
+<Toggle variant="subtle" pressed={italic} onPressedChange={setItalic}>Italic</Toggle>
+<Toggle variant="subtle" defaultPressed>Underline</Toggle>
+<Toggle variant="subtle" disabled>Strikethrough</Toggle>
 ```
 
 ## Props
@@ -74,6 +82,7 @@ Forwards `ref` to the `HTMLButtonElement`.
 | `pressed` | `boolean` |  |  |
 | `defaultPressed` | `boolean` |  |  |
 | `onPressedChange` | `(pressed: boolean) => void` |  |  |
+| `variant` | `"subtle" \| "default"` | `"default"` | Subtle uses a quiet hover and a soft selected fill. |
 
 ### ToggleGroup
 
@@ -89,6 +98,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | `value` | `string` |  |  |
 | `defaultValue` | `string` |  |  |
 | `onValueChange` | `(value: string) => void` |  |  |
+| `variant` | `"subtle" \| "default"` | `"default"` | Subtle groups use a soft rail and individually rounded selected items. |
 
 ## Keyboard
 
@@ -101,10 +111,11 @@ Forwards `ref` to the `HTMLDivElement`.
 
 - A native <button> with aria-pressed.
 - Give icon-only toggles an aria-label. Controlled with pressed and onPressedChange, or uncontrolled with defaultPressed.
+- Both variants keep a minimum 44px target, a visible keyboard focus ring, and system colors in forced colors. Native disabled prevents activation.
 
 ## Classes
 
-`rs-toggle`, `rs-toggle-group`, `rs-toggle-grouped-on`, `rs-toggle-pressed`
+`rs-toggle`, `rs-toggle-group`, `rs-toggle-grouped`, `rs-toggle-grouped-on`, `rs-toggle-pressed`, `rs-toggle-subtle`, `rs-toggle-subtle-pressed`, `rs-toggle-group-subtle`, `rs-toggle-grouped-subtle`
 
 ## Dependencies
 

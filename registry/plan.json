@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "plan",
+  "type": "registry:component",
+  "title": "Plan",
+  "description": "A collapsible proposed plan with streaming title treatment, actions, and supporting context.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/reasoning.json",
+    "https://vlak.dev/r/shimmer.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/plan.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { vlak } from \"./tokens.stylex\";\nimport { Reasoning, type ReasoningProps } from \"./reasoning\";\nimport { Shimmer } from \"./shimmer\";\n\nexport interface PlanProps extends Omit<ReasoningProps, \"title\" | \"status\"> { title: string; description?: string; streaming?: boolean; actions?: React.ReactNode; footer?: React.ReactNode }\nconst styles = stylex.create({ root: { maxWidth: \"none\" }, description: { margin: \"0 0 1rem\", color: vlak.gray }, actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", marginTop: \"1rem\" }, footer: { borderTopWidth: 1, borderTopStyle: \"solid\", borderTopColor: vlak.divider, paddingTop: \"1rem\", marginTop: \"1rem\" } });\n/** A proposed plan with supplied steps and actions. Execution remains application-owned. */\nexport const Plan = React.forwardRef<HTMLDetailsElement, PlanProps>(function Plan({ title, description, streaming = false, actions, footer, children, className, style, ...props }, ref) {\n  const root = rs([\"rs-plan\", className], styles.root);\n  return <Reasoning ref={ref} defaultOpen {...props} title={<Shimmer active={streaming}>{title}</Shimmer>} status={streaming ? \"streaming\" : \"complete\"} className={root.className} style={{ ...root.style, ...style }}>{description && <p {...rs([\"rs-plan-description\"], styles.description)}><Shimmer active={streaming}>{description}</Shimmer></p>}{children}{actions && <div {...rs([\"rs-plan-actions\"], styles.actions)}>{actions}</div>}{footer && <footer {...rs([\"rs-plan-footer\"], styles.footer)}>{footer}</footer>}</Reasoning>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/plan.tsx"
+    },
+    {
+      "path": "vlak/styles/plan.css",
+      "content": "/* ── plan: generated from packages/react/src/components/plan.tsx ── */\n.rs-plan{max-width:none}\n.rs-plan-description{margin:0 0 1rem;color:var(--text-secondary)}\n.rs-plan-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}\n.rs-plan-footer{border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem;margin-top:1rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/plan.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-plan",
+        "rs-plan-description",
+        "rs-plan-actions",
+        "rs-plan-footer"
+      ],
+      "snippet": "<details class=\"rs-plan\" open><summary>Review plan</summary><ol><li>Read the brief</li><li>Check owners</li></ol></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "reasoning",
+        "shimmer",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Plan"
+      ],
+      "example": "import { Plan, Button } from \"@noorddev/vlak-react\";\n\nexport function ReviewPlan({ streaming, onApprove }: { streaming: boolean; onApprove: () => void }) {\n  return <Plan title=\"Review plan\" description=\"Two steps\" streaming={streaming} actions={<Button variant=\"subtle\" disabled={streaming} onClick={onApprove}>Approve plan</Button>}>\n    <ol><li>Read the brief</li><li>Check owners</li></ol>\n  </Plan>;\n}",
+      "usage": {
+        "use": [
+          "Supply plan content and application-owned actions. The title and description shimmer only while streaming.",
+          "The native disclosure starts open; open/defaultOpen/onOpenChange preserve controlled and uncontrolled usage."
+        ],
+        "avoid": [
+          "Treating a displayed plan as executed work."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

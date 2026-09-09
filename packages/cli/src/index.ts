@@ -107,6 +107,10 @@ Next steps
           reportWrites(outcome.results);
         }
       }
+      const dependencies = [...new Set(outcomes.flatMap(outcome => outcome.item.dependencies ?? []))].filter(name => name !== "@stylexjs/stylex");
+      if (dependencies.length) console.log(`Required packages: ${dependencies.join(", ")}. Install them with your package manager.`);
+      const styles = [...new Set(outcomes.flatMap(outcome => outcome.item.meta?.vlak?.styles ?? []))];
+      for (const stylesheet of styles) console.log(stylesheet.startsWith("@noorddev/vlak-react/") ? `Import the copied styles/vlak/${stylesheet.slice("@noorddev/vlak-react/".length)} stylesheet in your application.` : `Required stylesheet: import "${stylesheet}";`);
       if (unknown.length > 0) process.exit(1);
       break;
     }

@@ -68,14 +68,14 @@ Run the two core builds twice and confirm `git status` is clean the second time:
 - Reading and reach: every interactive target is at least 44px by 44px. Ordinary text is at least 4.5:1, large text and control boundaries are at least 3:1. Body copy stays within 45–90 characters per line and 1.2–1.45 line height; Vlak defaults to 66ch and 1.45.
 - Selected states use a full-surface change in fill, ink, or weight. Never mark selection with a vertical bar, leading border, or inset edge stripe.
 - When a page shell already names an interface, do not repeat that title inside the specimen. Use the specimen header for context, status, or actions instead.
-- Zero runtime dependencies beyond React and `@stylexjs/stylex`.
+- The core React entry has zero runtime dependencies beyond React and `@stylexjs/stylex`. Substantive optional renderers (streaming Markdown, highlighting, JSX preview, and workflow graphs) use documented optional peers through `@noorddev/vlak-react/components/<name>`. Keep their values and types out of the core barrel; ordinary consumers must work without installing those peers.
 - Controlled and uncontrolled: `value` / `defaultValue` / `onValueChange` (or `checked` / `onCheckedChange`, `pressed` / `onPressedChange`, `open` / `onClose`). `className` and `style` merge; native attributes pass through; refs forward on the element a consumer would reach for; stateful files start with `"use client"`.
 
 ## Adding a component
 
 1. Write the leaf in `packages/react/src/components/<name>.tsx`. Styles through `rs()`, tokens from `tokens.stylex.ts`, classes named `rs-<name>-*`.
 2. Add the entry to `packages/core/src/registry.ts`: `name`, `title`, `description`, `category`, `classes`, `css: ["components/<name>.css"]`, `react`, `registryDependencies`, `snippet`, plus `example` (imports from `@noorddev/vlak-react`), `usage` (use and avoid), `keyboard` (only what the code does), `a11y`, and `aliases` (shadcn/ui, Radix, common names). The schema is `packages/core/src/schema.ts`.
-3. Export it from `packages/react/src/index.ts`; `props.json` only lists exports found there.
+3. Export core components from `packages/react/src/index.ts`. For an optional renderer, set `reactImport`, `dependencies`, and any `styles` in the registry and leave it out of the core barrel; the props builder documents its explicit subpath exports.
 4. Rebuild: `pnpm --filter @noorddev/vlak build:css && pnpm --filter @noorddev/vlak build:registry`.
 5. Test in `packages/react/test/`: render, axe, keyboard. Core tests check the registry, CSS parity, props, and docs on their own.
 6. Document: `apps/www/components/examples/<name>/use.tsx` for the site gallery; the registry entry already feeds the component page, the CLI, the MCP server, and `registry/docs/<name>.md`.

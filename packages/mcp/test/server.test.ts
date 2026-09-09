@@ -107,6 +107,7 @@ describe("vlak-mcp", () => {
   it("discovers specialised collections and their application contracts", async () => {
     const { resources } = await client.listResources();
     for (const [category, component, contract] of [
+      ["ai", "conversation", "Show tools and decisions separately"],
       ["civic", "benefit-program", "Supply policy decisions"],
       ["science", "spectrum-plot", "Show the evidence behind a plot"],
       ["creative", "channel-strip", "Connect controls to an engine"],
@@ -126,4 +127,14 @@ describe("vlak-mcp", () => {
       expect(detail.example).toBeTruthy();
     }
   });
+});
+
+it("reports optional renderer imports, engines and styles without changing core installation", async () => {
+  const result = JSON.parse(textOf(await client.callTool({ name: "get_install", arguments: { name: "response-markdown" } })));
+  expect(result.package.import).toContain('from "@noorddev/vlak-react/components/response-markdown"');
+  expect(result.package.install).toContain("streamdown");
+  expect(result.package.install).toContain("shiki");
+  expect(result.package.css).toContain('import "katex/dist/katex.min.css";');
+  const core = JSON.parse(textOf(await client.callTool({ name: "get_install", arguments: { name: "button" } })));
+  expect(core.package.install).toBe("npm install @noorddev/vlak-react");
 });

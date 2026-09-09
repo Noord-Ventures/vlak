@@ -1,0 +1,90 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "confirmation",
+  "type": "registry:component",
+  "title": "Confirmation",
+  "description": "Collects approval or rejection in a surface with a subtle 1px outline and 4px corners, with async recording, error recovery, and 44px actions.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/confirmation.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\n\nexport type ConfirmationStatus = \"pending\" | \"accepted\" | \"rejected\";\ntype Decision = Exclude<ConfirmationStatus, \"pending\">;\n\nexport interface ConfirmationProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  /** Names the proposed action and the confirmation region. */\n  title: React.ReactNode;\n  status?: ConfirmationStatus;\n  defaultStatus?: ConfirmationStatus;\n  onStatusChange?: (status: Decision) => void;\n  /** Records approval. A rejection keeps the proposal pending and allows retry. */\n  onConfirm: () => void | Promise<void>;\n  onReject?: () => void | Promise<void>;\n  confirmLabel?: string;\n  rejectLabel?: string;\n  disabled?: boolean;\n}\n\nconst styles = stylex.create({\n  root: { boxSizing: \"border-box\", minWidth: 0, padding: \"1rem\", display: \"grid\", gap: \"0.75rem\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper },\n  title: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  context: { minWidth: 0, fontSize: vlak.controlFs, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n  actions: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\" },\n  action: { width: \"auto\", minHeight: vlak.hit },\n  status: { margin: 0, color: vlak.gray, fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  error: { margin: 0, color: vlak.ink, fontSize: vlak.controlFs, lineHeight: 1.45, overflowWrap: \"anywhere\" },\n});\n\n/** Records a decision about an application-owned action without executing a tool. */\nexport const Confirmation = React.forwardRef<HTMLElement, ConfirmationProps>(function Confirmation({\n  title, status, defaultStatus = \"pending\", onStatusChange, onConfirm, onReject, confirmLabel = \"Confirm\", rejectLabel = \"Reject\", disabled, className, style, children, ...props\n}, ref) {\n  const id = React.useId();\n  const [innerStatus, setInnerStatus] = React.useState<ConfirmationStatus>(defaultStatus);\n  const current = status ?? innerStatus;\n  const currentRef = React.useRef(current);\n  currentRef.current = current;\n  const [busy, setBusy] = React.useState<Decision | null>(null);\n  const [acknowledged, setAcknowledged] = React.useState(false);\n  const [error, setError] = React.useState(\"\");\n  const [failedDecision, setFailedDecision] = React.useState<Decision | null>(null);\n  const locked = React.useRef(false);\n  const version = React.useRef(0);\n  const mounted = React.useRef(true);\n  const previousStatus = React.useRef(status);\n  React.useEffect(() => { mounted.current = true; return () => { mounted.current = false; version.current++; }; }, []);\n  React.useEffect(() => {\n    if (previousStatus.current === status) return;\n    previousStatus.current = status;\n    version.current++;\n    locked.current = false;\n    setBusy(null);\n    setAcknowledged(false);\n    setError(\"\");\n    setFailedDecision(null);\n  }, [status]);\n\n  const decide = async (decision: Decision) => {\n    if (disabled || locked.current || currentRef.current !== \"pending\") return;\n    locked.current = true;\n    const request = ++version.current;\n    setBusy(decision);\n    setError(\"\");\n    setFailedDecision(null);\n    try {\n      await (decision === \"accepted\" ? onConfirm() : onReject?.());\n    } catch (reason) {\n      if (mounted.current && version.current === request) {\n        setError(reason instanceof Error && reason.message ? reason.message : \"Could not record your decision. Try again.\");\n        setFailedDecision(decision);\n        setBusy(null);\n        locked.current = false;\n      }\n      return;\n    }\n    if (!mounted.current || version.current !== request || currentRef.current !== \"pending\") return;\n    if (status === undefined) {\n      currentRef.current = decision;\n      setInnerStatus(decision);\n    } else {\n      setAcknowledged(true);\n    }\n    setBusy(null);\n    // Controlled owners may need another render or network round trip to acknowledge the decision.\n    // Keep this proposal locked until they change status, or remount it for a new proposal.\n    locked.current = status !== undefined;\n    onStatusChange?.(decision);\n  };\n\n  const root = rs([\"rs-confirmation\", className], styles.root);\n  const heading = rs([\"rs-confirmation-title\"], styles.title);\n  const context = rs([\"rs-confirmation-context\"], styles.context);\n  const actions = rs([\"rs-confirmation-actions\"], styles.actions);\n  const action = rs([\"rs-confirmation-action\"], styles.action);\n  const feedback = rs([\"rs-confirmation-status\"], styles.status);\n  const failure = rs([\"rs-confirmation-error\"], styles.error);\n  const unavailable = disabled || busy !== null || acknowledged || current !== \"pending\";\n  const statusText = busy ? \"Recording decision…\" : current === \"accepted\" ? \"Approval recorded\" : current === \"rejected\" ? \"Rejected\" : acknowledged ? \"Decision recorded; waiting for update\" : \"Awaiting your decision\";\n\n  return <section aria-labelledby={`${id}-title`} {...props} ref={ref} data-status={current} aria-busy={busy !== null || undefined} className={root.className} style={{ ...root.style, ...style }}>\n    <p id={`${id}-title`} className={heading.className} style={heading.style}>{title}</p>\n    {children !== undefined && <div className={context.className} style={context.style}>{children}</div>}\n    <div className={actions.className} style={actions.style}>\n      <Button className={action.className} style={action.style} disabled={unavailable} aria-describedby={error ? `${id}-error` : undefined} onClick={() => void decide(\"accepted\")}>{failedDecision === \"accepted\" ? \"Try again\" : confirmLabel}</Button>\n      <Button variant=\"ghost\" className={action.className} style={action.style} disabled={unavailable} aria-describedby={error ? `${id}-error` : undefined} onClick={() => void decide(\"rejected\")}>{failedDecision === \"rejected\" ? \"Try again\" : rejectLabel}</Button>\n    </div>\n    <p role=\"status\" className={feedback.className} style={feedback.style}>{statusText}</p>\n    {error && <p id={`${id}-error`} role=\"alert\" className={failure.className} style={failure.style}>{error}</p>}\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/confirmation.tsx"
+    },
+    {
+      "path": "vlak/styles/confirmation.css",
+      "content": "/* ── confirmation: generated from packages/react/src/components/confirmation.tsx ── */\n.rs-confirmation{box-sizing:border-box;min-width:0;padding:1rem;display:grid;gap:0.75rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}\n@media (forced-colors: active){.rs-confirmation{border-color:CanvasText}}\n.rs-confirmation-title{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45;overflow-wrap:anywhere}\n.rs-confirmation-context{min-width:0;font-size:var(--control-fs);line-height:1.45;overflow-wrap:anywhere}\n.rs-confirmation-actions{display:flex;flex-wrap:wrap;gap:0.5rem}\n.rs-confirmation-action{width:auto;min-height:var(--hit)}\n.rs-confirmation-status{margin:0;color:var(--text-secondary);font-size:var(--control-label);line-height:1.45}\n.rs-confirmation-error{margin:0;color:var(--text);font-size:var(--control-fs);line-height:1.45;overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/confirmation.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-confirmation",
+        "rs-confirmation-title",
+        "rs-confirmation-context",
+        "rs-confirmation-actions",
+        "rs-confirmation-action",
+        "rs-confirmation-status",
+        "rs-confirmation-error"
+      ],
+      "snippet": "<section class=\"rs-confirmation\" aria-labelledby=\"approval-title\"><p id=\"approval-title\" class=\"rs-confirmation-title\">Include the appendix?</p><div class=\"rs-confirmation-context\">Adds the supplied appendix to the proposed draft.</div><div class=\"rs-confirmation-actions\"><button class=\"rs-btn-primary rs-confirmation-action\" type=\"button\">Confirm</button><button class=\"rs-btn-ghost rs-confirmation-action\" type=\"button\">Reject</button></div><p class=\"rs-confirmation-status\" role=\"status\">Awaiting your decision</p></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Confirmation",
+        "AI Elements Confirmation",
+        "Tool approval",
+        "Action approval",
+        "Human in the loop"
+      ],
+      "example": "import { Confirmation } from \"@noorddev/vlak-react\";\n\nexport function AppendixApproval({ recordApproval }: {\n  recordApproval: (approved: boolean) => void | Promise<void>;\n}) {\n  return <Confirmation title=\"Include the appendix?\" onConfirm={() => recordApproval(true)} onReject={() => recordApproval(false)}>\n    Adds the supplied appendix to the proposed draft. Review it before continuing.\n  </Confirmation>;\n}",
+      "usage": {
+        "use": [
+          "Reviewing a proposed action before the application proceeds.",
+          "Awaiting successful recording of approval or rejection, with a retry when its callback fails."
+        ],
+        "avoid": [
+          "Treating approval recorded as proof that the proposed action has executed.",
+          "Authorizing solely in the browser; application and server code must validate the requested action and its permissions."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between Confirm and Reject while a decision can be made."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates the focused decision or retry button without submitting an enclosing form."
+        }
+      ],
+      "a11y": [
+        "A native section is named by the visible title. Children supply context for the proposed action.",
+        "Pending recording exposes aria-busy, disables both actions, and prevents duplicate callback submissions.",
+        "Only a successful callback records accepted or rejected status. A failed callback leaves the proposal pending, reports an alert, and offers Try again for that decision.",
+        "status and onStatusChange support application-controlled decisions; defaultStatus sets the uncontrolled initial decision. A changed controlled status invalidates an older pending callback result.",
+        "A successfully recorded controlled decision stays locked until status changes. Use a new React key for a new proposal; a pending prop alone cannot resubmit an acknowledged decision.",
+        "The status announces Approval recorded or Rejected. This component records a decision; application code owns tool execution. The ref reaches the section, and native attributes pass through."
+      ]
+    }
+  }
+}

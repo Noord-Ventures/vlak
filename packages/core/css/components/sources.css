@@ -1,0 +1,9 @@
+/* ── sources: generated from packages/react/src/components/sources.tsx ── */
+.rs-sources{min-width:0;color:var(--text)}
+.rs-sources-list{padding-inline-start:1.25rem}
+.rs-sources-link{display:flex;align-items:center;min-height:var(--hit);min-width:var(--hit);color:var(--text-secondary);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.rs-sources-link:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+@media (hover: hover) and (pointer: fine){.rs-sources-link:hover{color:var(--text)}}
+.rs-sources-description{margin:0.25rem 0 0;font-size:var(--control-label);line-height:1.45}
+.rs-sources-quote{margin:0.5rem 0 0;padding:0.75rem;background-color:var(--table-alt);border-radius:var(--radius-sm);color:var(--text);font-size:var(--control-fs);line-height:1.45}
+.rs-sources-empty{margin:0;font-size:var(--control-fs);color:var(--text-secondary);line-height:1.45}

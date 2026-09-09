@@ -11,7 +11,7 @@ import "@noorddev/vlak-react/css";
 import { Button, Dialog, Field, Input } from "@noorddev/vlak-react";
 ```
 
-The stylesheet is 42 KB (12 KB gzipped) and carries the tokens, the page base, the type scale, and every component. Inter (SIL OFL 1.1) loads from the package; no Google Fonts request.
+The stylesheet carries the tokens, the page base, the type scale, and Vlak's component styles. Shipped files have [enforced gzip budgets](../../scripts/size-budget.mjs). Inter (SIL OFL 1.1) loads from the package; no Google Fonts request.
 
 ## Dark scheme
 
@@ -27,16 +27,18 @@ import { Button } from "@noorddev/vlak-react/components/button";
 
 Stateful components are marked `"use client"` and work in React Server Components trees.
 
+Rich rendering uses optional subpaths: `response-markdown`, `highlighted-code`, `jsx-preview`, and `workflow-canvas`. Install the engines listed in each component's documentation. Markdown also needs `katex/dist/katex.min.css`; workflows need `@noorddev/vlak-react/workflow.css`. The root import does not load these engines. See the [AI feature coverage and installation boundaries](../../docs/ai-parity.md).
+
 ## StyleX
 
 The leaves are StyleX. If you already compile StyleX (Linear, Meta, and a growing set of apps do), write your own leaves against Vlak tokens:
 
 ```tsx
 import * as stylex from "@stylexjs/stylex";
-import { vlak, mq } from "@noorddev/vlak-react/stylex";
+import { vlak, mq } from "@noorddev/vlak-react/tokens.stylex";
 
 const styles = stylex.create({
-  panel: { borderTop: `1px solid ${vlak.divider}`, padding: vlak.gap, [mq.phone]: { padding: 12 } },
+  panel: { borderTop: `1px solid ${vlak.divider}`, padding: vlak.pad, [mq.phone]: { padding: 12 } },
 });
 ```
 
@@ -56,6 +58,6 @@ Native elements first: `<dialog>`, `<details>`, the Popover API, real inputs. Wh
 
 ## Requirements
 
-React 18 or 19. Node 18.18 or newer for the build.
+React 18 or 19. The core package supports Node 18.18 or newer. The optional Markdown renderer requires Node 20 or newer in its build or server environment because Streamdown depends on Marked 17.
 
 Docs: [vlak.dev](https://vlak.dev). Licence: MIT.

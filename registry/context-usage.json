@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "context-usage",
+  "type": "registry:component",
+  "title": "Context usage",
+  "description": "A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/progress.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/context-usage.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Collapsible } from \"./collapsible\";\nimport { Progress } from \"./progress\";\n\nexport interface TokenUsage { inputTokens?: number; outputTokens?: number; reasoningTokens?: number; cachedInputTokens?: number }\nexport interface TokenPricing { inputPerMillion?: number; outputPerMillion?: number; reasoningPerMillion?: number; cacheReadPerMillion?: number; currency?: string }\nexport interface ContextUsageProps extends Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, \"title\"> {\n  usedTokens: number; maxTokens: number; usage?: TokenUsage; pricing?: TokenPricing;\n  model?: string; label?: string; defaultOpen?: boolean;\n}\nconst styles = stylex.create({\n  root: { width: \"100%\", minWidth: 0, color: vlak.ink },\n  body: { display: \"grid\", gap: \"0.75rem\" },\n  metadata: { margin: 0, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45 },\n  list: { margin: 0, display: \"grid\", gap: \"0.5rem\", fontSize: vlak.controlFs, fontVariantNumeric: \"tabular-nums\", lineHeight: 1.45 },\n  row: { display: \"flex\", flexWrap: \"wrap\", justifyContent: \"space-between\", gap: \"0.5rem 1rem\" },\n  value: { margin: 0, color: vlak.ink },\n});\nconst valid = (value: number | undefined): value is number => value !== undefined && Number.isFinite(value) && value >= 0;\nconst amount = (value: number | undefined) => valid(value) ? value.toLocaleString(\"en-US\") : \"Unavailable\";\n\n/** Context occupancy and caller-supplied token usage/pricing. No model catalog or prices are fetched. */\nexport const ContextUsage = React.forwardRef<HTMLDetailsElement, ContextUsageProps>(function ContextUsage({ usedTokens, maxTokens, usage, pricing, model, label = \"Context usage\", defaultOpen = false, className, style, ...props }, ref) {\n  const known = valid(usedTokens) && valid(maxTokens) && maxTokens > 0;\n  const percentage = known ? Math.round(usedTokens / maxTokens * 100) : undefined;\n  const cached = usage?.cachedInputTokens;\n  const reasoning = usage?.reasoningTokens;\n  const input = usage?.inputTokens;\n  const output = usage?.outputTokens;\n  // Cached input is a subset of input; reasoning is a subset of output. Optional separate rates replace their parent rates.\n  const buckets = [\n    { count: input, rate: pricing?.inputPerMillion, subset: cached, subsetRate: pricing?.cacheReadPerMillion },\n    { count: output, rate: pricing?.outputPerMillion, subset: reasoning, subsetRate: pricing?.reasoningPerMillion },\n  ];\n  let cost: number | undefined;\n  if (pricing && buckets.every(bucket => valid(bucket.count) && (bucket.rate === undefined || valid(bucket.rate)) && (bucket.subsetRate === undefined || valid(bucket.subsetRate)) && (bucket.count === 0 || valid(bucket.rate)) && (bucket.subset === undefined || (valid(bucket.subset) && bucket.subset <= bucket.count)))) {\n    cost = buckets.reduce((sum, bucket) => {\n      const count = bucket.count!; const subset = valid(bucket.subset) && valid(bucket.subsetRate) ? bucket.subset : 0;\n      return sum + ((count - subset) * (bucket.rate ?? 0) + subset * (bucket.subsetRate ?? 0)) / 1_000_000;\n    }, 0);\n    if (!Number.isFinite(cost)) cost = undefined;\n  }\n  const money = cost === undefined ? \"Unavailable\" : `${cost.toLocaleString(\"en-US\", { minimumFractionDigits: 2, maximumFractionDigits: 6 })} ${pricing?.currency?.trim() || \"USD\"}`;\n  const root = rs([\"rs-context-usage\", className], styles.root);\n  const body = rs([\"rs-context-usage-body\"], styles.body);\n  const metadata = rs([\"rs-context-usage-metadata\"], styles.metadata);\n  const list = rs([\"rs-context-usage-list\"], styles.list);\n  const row = rs([\"rs-context-usage-row\"], styles.row);\n  const value = rs([\"rs-context-usage-value\"], styles.value);\n  const stats = [{ label: \"Input tokens\", value: amount(input) }, { label: \"Output tokens\", value: amount(output) }, { label: \"Reasoning tokens\", value: amount(reasoning) }, { label: \"Cached input tokens\", value: amount(cached) }];\n  return <Collapsible {...props} ref={ref} title={`${label}${percentage === undefined ? \"\" : ` · ${percentage}%`}`} defaultOpen={defaultOpen} className={root.className} style={{ ...root.style, ...style }}>\n    <div {...body}>{model && <p {...metadata}>{model}</p>}{known ? <Progress value={usedTokens} max={maxTokens} label={`${amount(usedTokens)} of ${amount(maxTokens)} tokens`} /> : <p {...metadata}>Context limit unavailable.</p>}\n      {known && usedTokens > maxTokens && <p {...metadata}>The supplied usage exceeds this context limit.</p>}\n      {usage && <dl {...list}>{stats.map(item => <div {...row} key={item.label}><dt>{item.label}</dt><dd {...value}>{item.value}</dd></div>)}</dl>}\n      {pricing && <div {...row}><span {...metadata}>Estimated cost from supplied rates</span><span {...value}>{money}</span></div>}\n    </div>\n  </Collapsible>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/context-usage.tsx"
+    },
+    {
+      "path": "vlak/styles/context-usage.css",
+      "content": "/* ── context-usage: generated from packages/react/src/components/context-usage.tsx ── */\n.rs-context-usage{width:100%;min-width:0;color:var(--text)}\n.rs-context-usage-body{display:grid;gap:0.75rem}\n.rs-context-usage-metadata{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}\n.rs-context-usage-list{margin:0;display:grid;gap:0.5rem;font-size:var(--control-fs);font-variant-numeric:tabular-nums;line-height:1.45}\n.rs-context-usage-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem}\n.rs-context-usage-value{margin:0;color:var(--text)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/context-usage.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-context-usage",
+        "rs-context-usage-body",
+        "rs-context-usage-metadata",
+        "rs-context-usage-list",
+        "rs-context-usage-row",
+        "rs-context-usage-value"
+      ],
+      "snippet": "<details class=\"rs-context-usage rs-disclosure\"><summary class=\"rs-disclosure-summary\">Context usage · 25%</summary><div class=\"rs-context-usage-body\"><p class=\"rs-context-usage-metadata\">512 of 2,048 tokens</p></div></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "collapsible",
+        "progress",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Context",
+        "Token usage",
+        "Context window",
+        "Token cost",
+        "ContextUsage"
+      ],
+      "example": "import { ContextUsage, type TokenPricing } from \"@noorddev/vlak-react\";\n\nexport function ContextExample({ pricing }: { pricing?: TokenPricing }) {\n  return <ContextUsage\n    model=\"Workspace model\"\n    usedTokens={1500}\n    maxTokens={32000}\n    usage={{ inputTokens: 1000, outputTokens: 500, cachedInputTokens: 200, reasoningTokens: 100 }}\n    pricing={pricing}\n  />;\n}",
+      "usage": {
+        "use": [
+          "Supply usedTokens and maxTokens for context occupancy; usage supplies separate input, output, reasoning and cached-input counts.",
+          "pricing accepts inputPerMillion, outputPerMillion, reasoningPerMillion, cacheReadPerMillion and optional currency. No model catalog or prices are fetched.",
+          "Cached input is a subset of input; reasoning is a subset of output. Separate rates replace the parent rate for those subsets rather than adding duplicate charges.",
+          "Missing or invalid data displays Unavailable. Costs are estimates from the supplied rates, not provider billing totals.",
+          "Use open/onToggle for a controlled native disclosure or defaultOpen for the initial state. CSS-only markup shows supplied values."
+        ],
+        "avoid": [
+          "Treating missing token counts or unknown pricing as zero.",
+          "Displaying rates without verifying them in the application that supplies them."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the native disclosure summary"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Opens or closes usage details"
+        }
+      ],
+      "a11y": [
+        "The summary exposes current occupancy in text. The shared Progress names the token range and clamps its visual extent.",
+        "Unknown limits omit the meter; usage above the supplied limit retains the real count and an explanation.",
+        "Native details attributes and its ref are forwarded."
+      ]
+    }
+  }
+}

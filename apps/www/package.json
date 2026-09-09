@@ -2,7 +2,7 @@
   "name": "www",
   "version": "0.4.0",
   "private": true,
-  "description": "vlak.dev — documentation and component gallery for the Vlak design system.",
+  "description": "vlak.dev \u2014 documentation and component gallery for the Vlak design system.",
   "type": "module",
   "scripts": {
     "prebuild": "node scripts/build-deps.mjs",
@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test": "node --experimental-strip-types --test scripts/ai-demo.test.mjs",
     "e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {
@@ -20,7 +21,17 @@
     "next": "^15.5.25",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "three": "^0.184.0"
+    "three": "^0.184.0",
+    "streamdown": "^2.6.0",
+    "shiki": "^3.19.0",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/cjk": "^1.0.3",
+    "mermaid": "^11.12.2",
+    "@xyflow/react": "^12.11.6",
+    "react-jsx-parser": "^2.4.1",
+    "katex": "^0.16.27",
+    "acorn": "^8.15.0",
+    "acorn-jsx": "^5.3.2"
   },
   "devDependencies": {
     "@babel/plugin-syntax-jsx": "^7",

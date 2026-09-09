@@ -252,7 +252,7 @@ for (const [file, owners] of byFile) {
   const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
   const exported = checker
     .getExportsOfModule(moduleSymbol)
-    .filter((s) => publicNames.has(s.name))
+    .filter((s) => publicNames.has(s.name) || owners.some((owner) => owner.reactImport))
     .sort((a, b) => a.name.localeCompare(b.name));
   const entries = exported.map(exportEntry).filter(Boolean);
   const owner = owners[0];

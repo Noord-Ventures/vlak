@@ -1,0 +1,11 @@
+/* ── schema-display: generated from packages/react/src/components/schema-display.tsx ── */
+.rs-schema-display{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+@media (forced-colors: active){.rs-schema-display{border-color:CanvasText}}
+.rs-schema-display-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}
+.rs-schema-display-path{min-width:0;overflow-wrap:anywhere}
+.rs-schema-display-content{padding:1rem;display:grid;gap:0.75rem;min-width:0}
+.rs-schema-display-description{margin:0;color:var(--text-secondary);overflow-wrap:anywhere}
+.rs-schema-display-list{list-style:none;margin:0;padding-inline-start:0.75rem;display:grid;gap:0.75rem;min-width:0}
+.rs-schema-display-property{display:grid;gap:0.25rem;min-width:0;color:var(--text)}
+.rs-schema-display-line{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;overflow-wrap:anywhere;min-width:0}
+.rs-schema-display-note{font-size:0.75rem;color:var(--text-secondary)}

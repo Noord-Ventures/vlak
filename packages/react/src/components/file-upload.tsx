@@ -8,6 +8,7 @@ import { useMergedRefs } from "../merge-refs";
 import { useInputValue } from "../use-input-value";
 import { Button } from "./button";
 import { Progress } from "./progress";
+import { fileSelectionKey as fileKey, selectFiles } from "../file-selection";
 
 export interface FileUploadRejection { file: File; reason: string }
 export interface FileUploadContext { signal: AbortSignal; onProgress: (percentage: number) => void }
@@ -29,18 +30,6 @@ export interface FileUploadProps extends Omit<React.HTMLAttributes<HTMLDivElemen
 }
 
 type UploadState = { status: "uploading" | "complete" | "error" | "cancelled"; progress?: number; error?: string };
-const fileKey = (file: File) => `${file.name}:${file.size}:${file.lastModified}`;
-
-function accepts(file: File, accept?: string) {
-  if (!accept?.trim()) return true;
-  return accept.split(",").some((entry) => {
-    const rule = entry.trim().toLowerCase();
-    if (!rule) return false;
-    if (rule.startsWith(".")) return file.name.toLowerCase().endsWith(rule);
-    if (rule.endsWith("/*")) return file.type.toLowerCase().startsWith(rule.slice(0, -1));
-    return file.type.toLowerCase() === rule;
-  });
-}
 
 const styles = stylex.create({
   root: { display: "grid", gap: "0.75rem", minWidth: 0 },
@@ -109,15 +98,7 @@ export const FileUpload = React.forwardRef<HTMLInputElement, FileUploadProps>(fu
   };
   const choose = (incoming: File[]) => {
     if (disabled) return;
-    const accepted = multiple ? [...files] : [];
-    const added: File[] = [];
-    const rejected: FileUploadRejection[] = [];
-    const limit = multiple ? maxFiles : 1;
-    for (const file of incoming) {
-      if (accepted.some((entry) => fileKey(entry) === fileKey(file))) continue;
-      const reason = !accepts(file, accept) ? "File type is not accepted" : maxSize != null && file.size > maxSize ? `File exceeds ${maxSize} bytes` : limit != null && accepted.length >= limit ? `Choose at most ${limit} ${limit === 1 ? "file" : "files"}` : undefined;
-      if (reason) rejected.push({ file, reason }); else { accepted.push(file); added.push(file); }
-    }
+    const { accepted, added, rejected } = selectFiles(incoming, { files, accept, multiple, maxFiles, maxSize });
     setRejections(rejected);
     if (rejected.length) onReject?.(rejected);
     if (added.length) { setFiles(accepted); for (const file of added) void upload(file); }

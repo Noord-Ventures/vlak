@@ -16,6 +16,8 @@ function discoveryTitle(path: string, metadata: Metadata): string {
   if (path === "/") return `${WORD} · React design system`;
   if (path === "/components") return `React components · ${WORD}`;
   if (path.startsWith("/components/")) return `Accessible React ${authored} component · ${WORD}`;
+  if (path === "/ai") return `AI components for React · ${WORD}`;
+  if (path.startsWith("/ai/")) return `React AI ${authored} component · ${WORD}`;
   if (path === "/interfaces") return `Interface studies · ${WORD}`;
   if (path.startsWith("/interfaces/")) return `${authored} interface study · ${WORD}`;
   if (path === "/docs") return `React design system documentation · ${WORD}`;
@@ -28,7 +30,7 @@ export function pageMetadata(path: string, metadata: Metadata, options: Discover
   const canonical = new URL(`${path.replace(/\/+$/, "")}/`, HOST).href;
   const title = options.searchTitle ?? discoveryTitle(path, metadata);
   const description = metadata.description ?? LAW;
-  const family = ["about", "components", "docs", "interfaces"].find(name => path === `/${name}` || path.startsWith(`/${name}/`));
+  const family = ["about", "ai", "components", "docs", "interfaces"].find(name => path === `/${name}` || path.startsWith(`/${name}/`));
   const prefix = family ? `/${family}` : "";
   const imagePath = options.imagePath ?? (path.startsWith("/components/") ? `${path}/opengraph-image` : `${prefix}/opengraph-image`);
   const image = { url: imagePath, width: 1200, height: 630, alt: `${title}. ${description}` };

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "speech-input",
+  "type": "registry:component",
+  "title": "Speech input",
+  "description": "Starts and stops native speech capture, with final text, optional interim results, and application transcription of recorded audio.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/speech-input.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button, type ButtonProps } from \"./button\";\n\nexport type SpeechInputStatus = \"idle\" | \"requesting\" | \"listening\" | \"processing\" | \"error\" | \"unsupported\";\nexport interface SpeechInputProps extends Omit<ButtonProps, \"onError\"> {\n  onTranscript: (text: string) => void;\n  onInterimTranscript?: (text: string) => void;\n  onAudioRecorded?: (audio: Blob, context: { signal: AbortSignal }) => Promise<string>;\n  onStatusChange?: (status: SpeechInputStatus) => void;\n  onError?: (error: Error) => void;\n  mode?: \"auto\" | \"recognition\" | \"recording\";\n  deviceId?: string;\n  lang?: string;\n  /** Stops and processes a recording after this many seconds. Defaults to 120. */\n  maxDuration?: number;\n}\ninterface RecognitionResult { isFinal: boolean; length: number; [index: number]: { transcript: string } }\ninterface Recognition {\n  continuous: boolean; interimResults: boolean; lang: string;\n  onstart: (() => void) | null; onend: (() => void) | null;\n  onerror: ((event: { error: string }) => void) | null;\n  onresult: ((event: { resultIndex: number; results: { length: number; [index: number]: RecognitionResult } }) => void) | null;\n  start(): void; stop(): void; abort(): void;\n}\ninterface SpeechSession {\n  id: number; abort: AbortController; stream?: MediaStream; recorder?: MediaRecorder;\n  recognition?: Recognition; timer?: ReturnType<typeof setTimeout>; chunks: Blob[];\n}\nconst styles = stylex.create({\n  root: { display: \"inline-flex\", flexDirection: \"column\", alignItems: \"start\", minWidth: 0, maxWidth: \"100%\", color: vlak.ink },\n  message: { margin: 0, marginBlockStart: { default: \"0.5rem\", \":empty\": 0 }, fontSize: vlak.controlLabel, color: vlak.gray, lineHeight: 1.45, maxWidth: \"48ch\" },\n  icon: { width: \"1.125rem\", height: \"1.125rem\", flexShrink: 0 },\n});\n\nfunction recognitionConstructor() {\n  const browser = window as unknown as { SpeechRecognition?: new () => Recognition; webkitSpeechRecognition?: new () => Recognition };\n  return browser.SpeechRecognition ?? browser.webkitSpeechRecognition;\n}\nfunction release(session: SpeechSession) {\n  clearTimeout(session.timer);\n  session.abort.abort();\n  if (session.recognition) {\n    session.recognition.onstart = null; session.recognition.onresult = null; session.recognition.onend = null; session.recognition.onerror = null;\n    try { session.recognition.abort(); } catch { /* Already stopped. */ }\n  }\n  if (session.recorder) {\n    session.recorder.ondataavailable = null; session.recorder.onstop = null; session.recorder.onerror = null;\n    if (session.recorder.state !== \"inactive\") { try { session.recorder.stop(); } catch { /* Already stopped. */ } }\n  }\n  session.stream?.getTracks().forEach(track => { track.stop(); });\n}\n\n/** User-activated speech capture with an application-owned transcription fallback. */\nexport const SpeechInput = React.forwardRef<HTMLButtonElement, SpeechInputProps>(function SpeechInput({ onTranscript, onInterimTranscript, onAudioRecorded, onStatusChange, onError, mode = \"auto\", deviceId, lang = \"en-US\", maxDuration = 120, disabled = false, children, className, style, onClick, \"aria-label\": ariaLabel, \"aria-describedby\": describedBy, ...props }, ref) {\n  const [status, setStatus] = React.useState<SpeechInputStatus>(\"idle\");\n  const [message, setMessage] = React.useState(\"\");\n  const [available, setAvailable] = React.useState(false);\n  const sessionRef = React.useRef<SpeechSession | null>(null);\n  const sequence = React.useRef(0);\n  const mounted = React.useRef(false);\n  const state = React.useRef<SpeechInputStatus>(\"idle\");\n  const callbacks = React.useRef({ onTranscript, onInterimTranscript, onAudioRecorded, onStatusChange, onError });\n  callbacks.current = { onTranscript, onInterimTranscript, onAudioRecorded, onStatusChange, onError };\n  const id = React.useId();\n  const transition = React.useCallback((next: SpeechInputStatus, text = \"\") => {\n    if (!mounted.current) return;\n    state.current = next; setStatus(next); setMessage(text); callbacks.current.onStatusChange?.(next);\n  }, []);\n  const current = (session: SpeechSession) => mounted.current && sessionRef.current === session && !session.abort.signal.aborted;\n  const finish = (session: SpeechSession, next: SpeechInputStatus = \"idle\", text = \"\") => {\n    if (!current(session)) return;\n    sessionRef.current = null; release(session); transition(next, text);\n  };\n  const fail = (session: SpeechSession, reason: unknown) => {\n    if (!current(session)) return;\n    const error = reason instanceof Error ? reason : new Error(String(reason));\n    finish(session, \"error\", error.name === \"NotAllowedError\" ? \"Microphone permission was denied. Allow access and try again.\" : error.message || \"Speech input failed. Try again.\");\n    callbacks.current.onError?.(error);\n  };\n  const hasRecorderCallback = Boolean(onAudioRecorded);\n  // A capture configuration change cancels its previous session; callback identities do not.\n  // biome-ignore lint/correctness/useExhaustiveDependencies: deviceId, lang and disabled invalidate owned capture resources.\n  React.useEffect(() => {\n    mounted.current = true;\n    const recording = typeof MediaRecorder === \"function\" && typeof navigator.mediaDevices?.getUserMedia === \"function\" && hasRecorderCallback;\n    const recognition = Boolean(recognitionConstructor());\n    const supported = mode === \"recording\" ? recording : mode === \"recognition\" ? recognition : recognition || recording;\n    setAvailable(supported);\n    transition(supported ? \"idle\" : \"unsupported\", supported ? \"\" : \"Speech input is unavailable. This browser needs an application transcription service.\");\n    return () => { mounted.current = false; const session = sessionRef.current; sessionRef.current = null; if (session) release(session); };\n  }, [mode, deviceId, lang, disabled, hasRecorderCallback, transition]);\n\n  const stopRecording = (session: SpeechSession) => {\n    if (!current(session)) return;\n    clearTimeout(session.timer);\n    transition(\"processing\", \"Transcribing recording…\");\n    try { session.recorder?.stop(); session.stream?.getTracks().forEach(track => { track.stop(); }); }\n    catch (reason) { fail(session, reason); }\n  };\n  const activate = async () => {\n    const existing = sessionRef.current;\n    if (existing) {\n      if (state.current === \"requesting\" || state.current === \"processing\") { finish(existing, \"idle\", \"Speech input canceled.\"); return; }\n      if (existing.recognition) {\n        clearTimeout(existing.timer); transition(\"processing\", \"Finishing speech…\");\n        try { existing.recognition.stop(); } catch (reason) { fail(existing, reason); }\n      } else stopRecording(existing);\n      return;\n    }\n    if (!available || disabled) return;\n    const session: SpeechSession = { id: ++sequence.current, abort: new AbortController(), chunks: [] };\n    sessionRef.current = session; transition(\"requesting\", \"Waiting for microphone…\");\n    const duration = Number.isFinite(maxDuration) && maxDuration > 0 ? Math.min(maxDuration, 3600) : 120;\n    try {\n      const Constructor = recognitionConstructor();\n      const recordingPreferred = mode === \"recording\" || (mode === \"auto\" && deviceId && callbacks.current.onAudioRecorded);\n      if (Constructor && !recordingPreferred) {\n        const recognition = new Constructor(); session.recognition = recognition;\n        recognition.lang = lang; recognition.continuous = true; recognition.interimResults = true;\n        recognition.onstart = () => { if (current(session)) transition(\"listening\", \"Listening…\"); };\n        recognition.onresult = event => {\n          if (!current(session)) return;\n          let final = \"\"; let interim = \"\";\n          for (let index = event.resultIndex; index < event.results.length; index++) {\n            const result = event.results[index]; if (!result?.[0]) continue;\n            if (result.isFinal) final += result[0].transcript; else interim += result[0].transcript;\n          }\n          if (final.trim()) callbacks.current.onTranscript(final.trim());\n          callbacks.current.onInterimTranscript?.(interim);\n        };\n        recognition.onend = () => finish(session, \"idle\", \"Speech input stopped.\");\n        recognition.onerror = event => fail(session, new Error(event.error === \"not-allowed\" ? \"Microphone permission was denied. Allow access and try again.\" : `Speech recognition stopped: ${event.error}. Try again.`));\n        recognition.start();\n        session.timer = setTimeout(() => { if (current(session)) { transition(\"processing\", \"Finishing speech…\"); try { recognition.stop(); } catch (reason) { fail(session, reason); } } }, duration * 1000);\n      } else {\n        if (!callbacks.current.onAudioRecorded) throw new Error(\"An application transcription service is required for recording.\");\n        const stream = await navigator.mediaDevices.getUserMedia({ audio: deviceId ? { deviceId: { exact: deviceId } } : true });\n        session.stream = stream;\n        if (!current(session)) { stream.getTracks().forEach(track => { track.stop(); }); return; }\n        const mimeType = [\"audio/webm;codecs=opus\", \"audio/mp4\", \"audio/webm\"].find(type => typeof MediaRecorder.isTypeSupported === \"function\" && MediaRecorder.isTypeSupported(type));\n        const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined); session.recorder = recorder;\n        recorder.ondataavailable = event => { if (current(session) && event.data.size) session.chunks.push(event.data); };\n        recorder.onerror = () => fail(session, new Error(\"The microphone recording failed. Try again.\"));\n        recorder.onstop = async () => {\n          if (!current(session)) return;\n          clearTimeout(session.timer); stream.getTracks().forEach(track => { track.stop(); });\n          transition(\"processing\", \"Transcribing recording…\");\n          try {\n            const blob = new Blob(session.chunks, { type: recorder.mimeType || session.chunks[0]?.type || \"\" });\n            if (!blob.size) throw new Error(\"No audio was recorded. Try again.\");\n            const text = await callbacks.current.onAudioRecorded!(blob, { signal: session.abort.signal });\n            if (!current(session)) return;\n            if (text.trim()) callbacks.current.onTranscript(text.trim());\n            finish(session, \"idle\", text.trim() ? \"Transcript ready.\" : \"No speech was detected. Try again.\");\n          } catch (reason) { fail(session, reason); }\n        };\n        recorder.start(); transition(\"listening\", \"Recording…\");\n        session.timer = setTimeout(() => stopRecording(session), duration * 1000);\n      }\n    } catch (reason) { fail(session, reason); }\n  };\n  const root = rs([\"rs-speech-input\"], styles.root);\n  const feedback = rs([\"rs-speech-input-message\"], styles.message);\n  const icon = rs([\"rs-speech-input-icon\"], styles.icon);\n  const active = status === \"listening\" || status === \"requesting\" || status === \"processing\";\n  const label = status === \"requesting\" || status === \"processing\" ? \"Cancel speech input\" : status === \"listening\" ? \"Stop speech input\" : \"Start speech input\";\n  return <span {...root}><Button variant=\"subtle\" {...props} ref={ref} className={className} style={style} disabled={disabled || !available} aria-label={ariaLabel ?? label} aria-describedby={[describedBy, `${id}-status`].filter(Boolean).join(\" \")} aria-pressed={active} onClick={event => { onClick?.(event); if (!event.defaultPrevented) void activate(); }}>\n    <svg {...icon} viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" strokeWidth=\"1\" aria-hidden=\"true\">{active ? <rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"1\" /> : <><rect x=\"8\" y=\"2\" width=\"8\" height=\"14\" rx=\"4\" /><path d=\"M5 10v2a7 7 0 0 0 14 0v-2M12 19v3M8 22h8\" /></>}</svg>{children ?? label}\n  </Button><span {...feedback} id={`${id}-status`} role=\"status\">{message}</span></span>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/speech-input.tsx"
+    },
+    {
+      "path": "vlak/styles/speech-input.css",
+      "content": "/* ── speech-input: generated from packages/react/src/components/speech-input.tsx ── */\n.rs-speech-input{display:inline-flex;flex-direction:column;align-items:start;min-width:0;max-width:100%;color:var(--text)}\n.rs-speech-input-message{margin:0;margin-block-start:0.5rem;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;max-width:48ch}\n.rs-speech-input-message:empty{margin-block-start:0}\n.rs-speech-input-icon{width:1.125rem;height:1.125rem;flex-shrink:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/speech-input.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-speech-input",
+        "rs-speech-input-message",
+        "rs-speech-input-icon"
+      ],
+      "snippet": "<span class=\"rs-speech-input\"><button class=\"rs-btn-subtle\" type=\"button\" aria-pressed=\"false\">Start speech input</button><span class=\"rs-speech-input-message\" role=\"status\">Speech capture requires application code.</span></span>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Speech Input",
+        "Voice input",
+        "Dictation",
+        "MediaRecorder",
+        "Speech recognition"
+      ],
+      "example": "import { SpeechInput } from \"@noorddev/vlak-react\";\n\nexport function Dictation({ onTranscript, endpoint }: {\n  onTranscript: (text: string) => void;\n  endpoint: string; // The application's audio transcription endpoint.\n}) {\n  return <SpeechInput lang=\"en-US\" onTranscript={onTranscript}\n    onAudioRecorded={async (audio, { signal }) => {\n      const body = new FormData();\n      body.append(\"audio\", audio);\n      const response = await fetch(endpoint, { method: \"POST\", body, signal });\n      if (!response.ok) throw new Error(\"Transcription failed. Try again.\");\n      const result: unknown = await response.json();\n      if (!result || typeof result !== \"object\" || !(\"text\" in result) || typeof result.text !== \"string\") {\n        throw new Error(\"The transcription response must contain text.\");\n      }\n      return result.text;\n    }}\n  />;\n}",
+      "usage": {
+        "use": [
+          "Capture speech only after the user activates the button. Stop processes the recording; Cancel discards pending capture or transcription.",
+          "Native speech recognition is feature-detected. Supply onAudioRecorded for browsers that need a MediaRecorder transcription fallback.",
+          "The fallback negotiates an available media type and passes actual audio bytes plus an AbortSignal to the application.",
+          "Use mode=recording and deviceId for a specific input. Recognition mode follows the browser's input choice.",
+          "maxDuration defaults to 120 seconds; configuration changes and unmount cancel owned capture resources.",
+          "Provider credentials and transcription requests belong to the application. CSS-only markup does not record audio."
+        ],
+        "avoid": [
+          "Claiming browser speech recognition always works offline.",
+          "Automatically sending transcribed text to a conversation without the application's send action."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the speech control when available"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Starts, stops, or cancels speech input according to its current state"
+        }
+      ],
+      "a11y": [
+        "The native button has a state-specific label, aria-pressed, and a 44px target.",
+        "A described status region explains listening, processing, unavailable support and recoverable errors.",
+        "The button ref and native button attributes pass through. Unsupported capture is disabled with an explanation.",
+        "Owned streams, listeners, recognition and processing are canceled on cleanup; late results are ignored."
+      ]
+    }
+  }
+}

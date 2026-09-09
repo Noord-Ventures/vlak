@@ -1,6 +1,6 @@
 # Vlak
 
-Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 167 components ship as React, CSS, vendored StyleX source, and machine-readable data.
+Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 215 components ship as React, CSS, vendored StyleX source, and machine-readable data.
 
 [vlak.dev](https://vlak.dev) · [github.com/Noord-Ventures/vlak](https://github.com/Noord-Ventures/vlak)
 
@@ -47,13 +47,15 @@ Vlak treats an interface as a field rather than a stack of cards. Paper, ink, gr
 - **StyleX first.** Atomic, typed, compiled away. Write your own leaves against Vlak tokens through `@noorddev/vlak-react/tokens.stylex`.
 - **Platform first.** `<dialog>`, `<details>`, the Popover API, scroll snap, native inputs. JavaScript only where the platform has nothing.
 - **Accessibility tested.** APG patterns for listbox, menu, grid, and tabs. Focus rings, 3:1 control contrast, reduced motion, forced colours. Every interactive component has an axe test.
-- **Size budget.** 16 KB gzipped for the whole React stylesheet. Zero runtime dependencies beyond React and `@stylexjs/stylex`.
+- **Size budgets.** Shipped stylesheets and component modules have [enforced gzip limits](scripts/size-budget.mjs). Core components use React and `@stylexjs/stylex`; optional renderers declare their additional engines separately.
 - **Layered.** All CSS sits in cascade layers, so your overrides win without `!important`.
 - **Logical properties.** Every leaf paints its inline axis with logical properties. Set `dir="rtl"` and the system mirrors.
 - **Tokens as data.** Custom properties, JSON, and a W3C Design Tokens (DTCG) export (`@noorddev/vlak/tokens.dtcg`) for Style Dictionary, Figma Variables, and Tokens Studio.
 - **Machine-readable.** Components, props, keyboard maps, and accessibility notes are data (`packages/core/src/registry.ts` plus props extracted from the types), served as JSON, markdown, `llms.txt`, CLI output, and MCP resources.
 
 ## For agents
+
+For assistant interfaces, use [the AI interface guide](docs/ai.md) and [AI Elements feature coverage](docs/ai-parity.md). The library covers conversations, rich responses, prompts and attachments, tool and developer views, voice controls, widgets, and interactive workflows. Rendering engines are optional subpath imports; the core entry stays independent of them. The application supplies its model, data, persistence, and execution.
 
 Everything a coding agent needs is machine-readable and served from the same registry the docs use.
 

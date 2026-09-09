@@ -1,0 +1,115 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "inline-citation",
+  "type": "registry:component",
+  "title": "Inline citation",
+  "description": "A quiet inline source trigger opening a counted, keyboard-navigable preview with links, descriptions and quotes.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/sources.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/inline-citation.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport { createPortal } from \"react-dom\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useOverlayPosition } from \"./use-overlay-position\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\nimport { sourceHref, type CitationSource } from \"./sources\";\n\nexport interface InlineCitationProps extends React.HTMLAttributes<HTMLSpanElement> {\n  sources: readonly CitationSource[];\n  label?: string;\n  open?: boolean;\n  defaultOpen?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  index?: number;\n  defaultIndex?: number;\n  onIndexChange?: (index: number) => void;\n}\nconst styles = stylex.create({\n  root: { display: \"inline\", color: vlak.ink },\n  trigger: { display: \"inline-flex\", verticalAlign: \"middle\", paddingInline: \"0.5rem\", fontVariantNumeric: \"tabular-nums\", fontSize: vlak.controlLabel },\n  panel: { position: \"fixed\", zIndex: vlak.zFloat, inset: \"auto\", margin: 0, width: \"22rem\", maxWidth: \"calc(100vw - 16px)\", boxSizing: \"border-box\", padding: \"0.75rem\", display: \"grid\", gap: \"0.75rem\", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, fontFamily: \"inherit\", fontSize: vlak.controlFs, lineHeight: 1.45, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n  header: { display: \"flex\", alignItems: \"center\", justifyContent: \"space-between\", gap: \"0.5rem\" },\n  navigation: { display: \"flex\", alignItems: \"center\", gap: 0 },\n  count: { color: vlak.gray, fontSize: vlak.controlLabel, fontVariantNumeric: \"tabular-nums\" },\n  title: { margin: 0, fontSize: vlak.controlFs, fontWeight: 600, lineHeight: 1.45 },\n  link: { display: \"flex\", alignItems: \"center\", minHeight: vlak.hit, minWidth: vlak.hit, color: { default: vlak.gray, \":hover\": { default: null, [mq.hover]: vlak.ink } }, overflowWrap: \"anywhere\", fontSize: vlak.controlLabel, textUnderlineOffset: 3, \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n  description: { margin: 0, color: vlak.gray, fontSize: vlak.controlFs, lineHeight: 1.45 },\n  quote: { margin: 0, padding: \"0.75rem\", backgroundColor: vlak.tableAlt, borderRadius: vlak.radiusSm, color: vlak.ink, fontSize: vlak.controlFs, lineHeight: 1.45 },\n});\n\n/** A keyboard-reachable source preview with count, quotes and navigation through multiple citations. */\nexport const InlineCitation = React.forwardRef<HTMLSpanElement, InlineCitationProps>(function InlineCitation({ sources, label, open, defaultOpen = false, onOpenChange, index, defaultIndex = 0, onIndexChange, className, style, children, ...props }, ref) {\n  const [innerOpen, setInnerOpen] = React.useState(defaultOpen);\n  const [innerIndex, setInnerIndex] = React.useState(defaultIndex);\n  const [mounted, setMounted] = React.useState(false);\n  const expanded = (open ?? innerOpen) && sources.length > 0;\n  const active = Math.max(0, Math.min(sources.length - 1, Number.isFinite(index ?? innerIndex) ? index ?? innerIndex : 0));\n  const source = sources[active];\n  const triggerRef = React.useRef<HTMLButtonElement>(null);\n  const panelRef = React.useRef<HTMLDivElement>(null);\n  const id = React.useId();\n  const callbacks = React.useRef({ onOpenChange, onIndexChange }); callbacks.current = { onOpenChange, onIndexChange };\n  const changeOpen = React.useCallback((next: boolean, restore = false) => { if (open === undefined) setInnerOpen(next); callbacks.current.onOpenChange?.(next); if (restore) triggerRef.current?.focus(); }, [open]);\n  const changeIndex = (next: number) => { const bounded = Math.max(0, Math.min(sources.length - 1, next)); if (bounded === active) return; if (index === undefined) setInnerIndex(bounded); callbacks.current.onIndexChange?.(bounded); };\n  React.useEffect(() => setMounted(true), []);\n  const position = useOverlayPosition(mounted && expanded, panelRef, triggerRef, undefined, \"bottom\", { matchAnchorWidth: false });\n  React.useEffect(() => {\n    // The positioning layout effect first measures a hidden panel. Browsers cannot focus it\n    // until that effect's visible placement has been committed to the DOM.\n    if (mounted && expanded && position.visibility === \"visible\") panelRef.current?.focus({ preventScroll: true });\n  }, [expanded, mounted, position.visibility]);\n  React.useEffect(() => {\n    if (!mounted || !expanded) return;\n    const outside = (event: PointerEvent) => { const target = event.target as Node; if (!panelRef.current?.contains(target) && !triggerRef.current?.contains(target)) changeOpen(false); };\n    const escapeKey = (event: KeyboardEvent) => { if (event.key === \"Escape\") { event.preventDefault(); changeOpen(false, true); } };\n    document.addEventListener(\"pointerdown\", outside); document.addEventListener(\"keydown\", escapeKey);\n    return () => { document.removeEventListener(\"pointerdown\", outside); document.removeEventListener(\"keydown\", escapeKey); };\n  }, [expanded, mounted, changeOpen]);\n  const root = rs([\"rs-inline-citation\", className], styles.root);\n  const trigger = rs([\"rs-inline-citation-trigger\"], styles.trigger);\n  const panel = rs([\"rs-inline-citation-panel\"], styles.panel);\n  const header = rs([\"rs-inline-citation-header\"], styles.header);\n  const navigation = rs([\"rs-inline-citation-navigation\"], styles.navigation);\n  const count = rs([\"rs-inline-citation-count\"], styles.count);\n  const title = rs([\"rs-inline-citation-title\"], styles.title);\n  const link = rs([\"rs-inline-citation-link\"], styles.link);\n  const description = rs([\"rs-inline-citation-description\"], styles.description);\n  const quote = rs([\"rs-inline-citation-quote\"], styles.quote);\n  return <span ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>{children}<Button {...trigger} ref={triggerRef} variant=\"subtle\" size=\"sm\" aria-label={label ?? `View ${sources.length} ${sources.length === 1 ? \"source\" : \"sources\"}`} aria-haspopup=\"dialog\" aria-expanded={expanded} aria-controls={expanded ? id : undefined} disabled={!sources.length} onClick={() => changeOpen(!expanded)}>{label ?? `[${sources.length}]`}</Button>\n    {mounted && expanded && source && createPortal(<div {...panel} ref={panelRef} id={id} role=\"dialog\" aria-label=\"Citation sources\" tabIndex={-1} style={{ ...panel.style, ...position }} onKeyDown={event => {\n      if ([\"ArrowLeft\", \"ArrowRight\", \"Home\", \"End\"].includes(event.key)) { event.preventDefault(); const rtl = getComputedStyle(event.currentTarget).direction === \"rtl\"; changeIndex(event.key === \"Home\" ? 0 : event.key === \"End\" ? sources.length - 1 : active + ((event.key === \"ArrowRight\") !== rtl ? 1 : -1)); }\n      if (event.key === \"Tab\") {\n        const focusable = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], [tabindex=\"0\"]'));\n        const first = focusable[0]; const last = focusable.at(-1);\n        if (event.shiftKey && (document.activeElement === first || document.activeElement === event.currentTarget)) { event.preventDefault(); changeOpen(false, true); }\n        else if (!event.shiftKey && document.activeElement === last) {\n          event.preventDefault(); const candidates = Array.from(document.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex=\"0\"]')).filter(element => !panelRef.current?.contains(element));\n          const next = candidates[candidates.indexOf(triggerRef.current!) + 1]; changeOpen(false); (next ?? triggerRef.current)?.focus();\n        }\n      }\n    }}><div {...header}><span {...count} role=\"status\">Source {active + 1} of {sources.length}</span><div {...navigation}>\n      <Button variant=\"subtle\" size=\"icon\" aria-label=\"Previous source\" aria-disabled={active <= 0} onClick={() => changeIndex(active - 1)}><Icon name=\"chevron-left\" /></Button>\n      <Button variant=\"subtle\" size=\"icon\" aria-label=\"Next source\" aria-disabled={active >= sources.length - 1} onClick={() => changeIndex(active + 1)}><Icon name=\"chevron-right\" /></Button>\n      <Button variant=\"subtle\" size=\"icon\" aria-label=\"Close sources\" onClick={() => changeOpen(false, true)}><Icon name=\"close\" /></Button>\n    </div></div><h3 {...title}>{source.title}</h3>{sourceHref(source.url) && <a {...link} href={sourceHref(source.url)} target=\"_blank\" rel=\"noopener noreferrer\" aria-label={`${source.title} (new tab)`}>{source.url}<span aria-hidden=\"true\"> ↗</span></a>}{source.description && <p {...description}>{source.description}</p>}{source.quote && <blockquote {...quote}>{source.quote}</blockquote>}</div>, document.body)}\n  </span>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/inline-citation.tsx"
+    },
+    {
+      "path": "vlak/use-overlay-position.ts",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\n\n/** Keep lightweight overlays inside the visual viewport. The native top layer avoids clipping. */\nexport function useOverlayPosition(\n  open: boolean,\n  panel: React.RefObject<HTMLElement | null>,\n  anchor: React.RefObject<HTMLElement | null>,\n  point?: { x: number; y: number } | null,\n  placement: \"bottom\" | \"inline-end\" = \"bottom\",\n  options?: { popover?: \"auto\" | \"manual\"; edge?: number; matchAnchorWidth?: boolean },\n) {\n  const [position, setPosition] = React.useState<React.CSSProperties>({ visibility: \"hidden\" });\n  React.useLayoutEffect(() => {\n    const element = panel.current;\n    if (!open || !element) return;\n    const native = typeof element.showPopover === \"function\";\n    if (native) {\n      element.setAttribute(\"popover\", options?.popover ?? \"manual\");\n      if (!element.matches(\":popover-open\")) element.showPopover();\n    }\n    const place = () => {\n      const viewport = window.visualViewport;\n      const edge = Math.max(0, options?.edge ?? 8);\n      const leftEdge = (viewport?.offsetLeft ?? 0) + edge;\n      const topEdge = (viewport?.offsetTop ?? 0) + edge;\n      const viewportWidth = viewport?.width ?? window.innerWidth;\n      const viewportHeight = viewport?.height ?? window.innerHeight;\n      const rightEdge = leftEdge + viewportWidth - edge * 2;\n      const bottomEdge = topEdge + viewportHeight - edge * 2;\n      const target = anchor.current?.getBoundingClientRect();\n      const paint = getComputedStyle(element);\n      const borderX = (Number.parseFloat(paint.borderLeftWidth) || 0) + (Number.parseFloat(paint.borderRightWidth) || 0);\n      const borderY = (Number.parseFloat(paint.borderTopWidth) || 0) + (Number.parseFloat(paint.borderBottomWidth) || 0);\n      const matchAnchor = options?.matchAnchorWidth !== false;\n      let panelWidth = element.scrollWidth + borderX;\n      if (!matchAnchor) {\n        // Measure the authored width without the last placement’s viewport clamp.\n        // Restoring it here also keeps resize observation tied to the final layout.\n        const { width, minWidth, maxWidth } = element.style;\n        element.style.width = \"\";\n        element.style.minWidth = \"\";\n        element.style.maxWidth = \"\";\n        panelWidth = element.getBoundingClientRect().width;\n        Object.assign(element.style, { width, minWidth, maxWidth });\n      }\n      const width = Math.min(Math.max(panelWidth, matchAnchor ? target?.width ?? 0 : 0), viewportWidth - edge * 2);\n      const height = Math.min(element.scrollHeight + borderY, viewportHeight - edge * 2);\n      let left = point?.x ?? target?.left ?? leftEdge;\n      let top = point?.y ?? (target ? target.bottom + 6 : topEdge);\n      if (placement === \"inline-end\" && target) {\n        const rtl = getComputedStyle(anchor.current!).direction === \"rtl\";\n        left = rtl ? target.left - width - 4 : target.right + 4;\n        if (left + width > rightEdge) left = target.left - width - 4;\n        if (left < leftEdge) left = target.right + 4;\n        top = target.top;\n      }\n      if (top + height > bottomEdge) {\n        top = placement === \"inline-end\" ? bottomEdge - height : point?.y !== undefined ? point.y - height : target ? target.top - height - 6 : bottomEdge - height;\n      }\n      left = Math.max(leftEdge, Math.min(left, rightEdge - width));\n      top = Math.max(topEdge, Math.min(top, bottomEdge - height));\n      const next: React.CSSProperties = {\n        position: \"fixed\", inset: \"auto\", left, top, margin: 0,\n        minWidth: matchAnchor ? Math.min(target?.width ?? 0, viewportWidth - edge * 2) : 0,\n        maxWidth: viewportWidth - edge * 2, maxHeight: viewportHeight - edge * 2,\n        width, overflow: \"auto\", visibility: \"visible\",\n      };\n      setPosition((previous) => JSON.stringify(previous) === JSON.stringify(next) ? previous : next);\n    };\n    place();\n    const observer = typeof ResizeObserver === \"undefined\" ? undefined : new ResizeObserver(place);\n    observer?.observe(element);\n    if (anchor.current) observer?.observe(anchor.current);\n    window.addEventListener(\"resize\", place);\n    window.addEventListener(\"scroll\", place, true);\n    window.visualViewport?.addEventListener(\"resize\", place);\n    window.visualViewport?.addEventListener(\"scroll\", place);\n    return () => {\n      observer?.disconnect();\n      window.removeEventListener(\"resize\", place);\n      window.removeEventListener(\"scroll\", place, true);\n      window.visualViewport?.removeEventListener(\"resize\", place);\n      window.visualViewport?.removeEventListener(\"scroll\", place);\n    };\n  }, [open, panel, anchor, point?.x, point?.y, placement, options?.popover, options?.edge, options?.matchAnchorWidth]);\n  return position;\n}\n",
+      "type": "registry:file",
+      "target": "components/vlak/use-overlay-position.ts"
+    },
+    {
+      "path": "vlak/styles/inline-citation.css",
+      "content": "/* ── inline-citation: generated from packages/react/src/components/inline-citation.tsx ── */\n.rs-inline-citation{display:inline;color:var(--text)}\n.rs-inline-citation-trigger{display:inline-flex;vertical-align:middle;padding-inline:0.5rem;font-variant-numeric:tabular-nums;font-size:var(--control-label)}\n.rs-inline-citation-panel{position:fixed;z-index:var(--z-float);inset:auto;margin:0;width:22rem;max-width:calc(100vw - 16px);box-sizing:border-box;padding:0.75rem;display:grid;gap:0.75rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);font-family:inherit;font-size:var(--control-fs);line-height:1.45}\n.rs-inline-citation-panel:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n@media (forced-colors: active){.rs-inline-citation-panel{border-color:CanvasText}}\n.rs-inline-citation-header{display:flex;align-items:center;justify-content:space-between;gap:0.5rem}\n.rs-inline-citation-navigation{display:flex;align-items:center;gap:0}\n.rs-inline-citation-count{color:var(--text-secondary);font-size:var(--control-label);font-variant-numeric:tabular-nums}\n.rs-inline-citation-title{margin:0;font-size:var(--control-fs);font-weight:600;line-height:1.45}\n.rs-inline-citation-link{display:flex;align-items:center;min-height:var(--hit);min-width:var(--hit);color:var(--text-secondary);overflow-wrap:anywhere;font-size:var(--control-label);text-underline-offset:3px}\n.rs-inline-citation-link:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n@media (hover: hover) and (pointer: fine){.rs-inline-citation-link:hover{color:var(--text)}}\n.rs-inline-citation-description{margin:0;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45}\n.rs-inline-citation-quote{margin:0;padding:0.75rem;background-color:var(--table-alt);border-radius:var(--radius-sm);color:var(--text);font-size:var(--control-fs);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/inline-citation.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-inline-citation",
+        "rs-inline-citation-trigger",
+        "rs-inline-citation-panel",
+        "rs-inline-citation-header",
+        "rs-inline-citation-navigation",
+        "rs-inline-citation-count",
+        "rs-inline-citation-title",
+        "rs-inline-citation-link",
+        "rs-inline-citation-description",
+        "rs-inline-citation-quote"
+      ],
+      "snippet": "<span class=\"rs-inline-citation\">Read the brief<button class=\"rs-btn-subtle rs-btn-sm rs-inline-citation-trigger\" type=\"button\" aria-label=\"View 2 sources\" aria-haspopup=\"dialog\" aria-expanded=\"false\">[2]</button></span>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "sources",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Inline Citation",
+        "Citation card",
+        "Source preview",
+        "Citation carousel"
+      ],
+      "example": "import { InlineCitation } from \"@noorddev/vlak-react\";\n\n<p>The brief names an owner for every decision. <InlineCitation sources={[\n  { id: \"brief\", title: \"Project brief\", url: \"https://example.com/brief\", quote: \"Every decision has an owner.\" },\n  { id: \"notes\", title: \"Review notes\", url: \"https://example.com/notes\", description: \"The next review\" },\n]} /></p>",
+      "usage": {
+        "use": [
+          "Attach one or more application-supplied sources to a specific claim.",
+          "The count and quote change as the reader navigates sources; index/onIndexChange can make source selection application-owned.",
+          "Use open/onOpenChange or defaultOpen for preview state. Empty source arrays disable the trigger.",
+          "The preview is portaled outside the text paragraph, follows the trigger and stays inside the viewport.",
+          "CSS-only markup provides a named trigger; opening, focus and source navigation require React or application code."
+        ],
+        "avoid": [
+          "Hiding citations behind pointer-only hover behavior.",
+          "Treating a source card as proof that the application verified the linked content."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Enter, Space",
+          "does": "Opens the source dialog or activates its focused control"
+        },
+        {
+          "keys": "Arrow Left, Arrow Right",
+          "does": "Moves through sources, following text direction"
+        },
+        {
+          "keys": "Home, End",
+          "does": "Moves to the first or last source"
+        },
+        {
+          "keys": "Escape",
+          "does": "Closes the preview and restores trigger focus"
+        },
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves through preview controls and returns to document focus order at its boundaries"
+        }
+      ],
+      "a11y": [
+        "The 44px trigger exposes its source count, dialog relationship and expanded state.",
+        "The nonmodal dialog receives focus on open. Its source position uses a status region; boundary navigation remains focusable with aria-disabled.",
+        "Close and Escape restore trigger focus; outside interaction dismisses without stealing focus.",
+        "Links identify new-tab behavior. Native span attributes, class/style and the span ref are forwarded."
+      ]
+    }
+  }
+}

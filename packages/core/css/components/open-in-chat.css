@@ -1,0 +1,7 @@
+/* ── open-in-chat: generated from packages/react/src/components/open-in-chat.tsx ── */
+.rs-open-in-chat{min-width:0;color:var(--text)}
+.rs-open-in-chat-list{margin:0;padding:0;list-style-type:none;display:grid;gap:0}
+.rs-open-in-chat-link{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-width:var(--hit);min-height:var(--hit);color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;text-decoration:none;padding-inline:0.5rem;border-radius:var(--radius-sm)}
+.rs-open-in-chat-link:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+@media (hover: hover) and (pointer: fine){.rs-open-in-chat-link:hover{color:var(--text)}}
+.rs-open-in-chat-note{margin:0.5rem 0 0;font-size:var(--control-label);line-height:1.45;color:var(--text-secondary)}

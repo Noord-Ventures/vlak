@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cleanup, render } from "@testing-library/react";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import * as Vlak from "../src";
 
 /**
@@ -37,6 +37,16 @@ const NOT_COMPONENTS = [
   "formatMediaTime",
   "diffLines",
   "describeQuery",
+  "getToolCallPresentation",
+  "formatEnvironmentExports",
+  "useAudioDevices",
+  "useAudioPlayer",
+  "serializeConversation",
+  "useFileAttachments",
+  "parseStackTrace",
+  "isPreviewUrl",
+  "sourceHref",
+  "openInChatHref",
 ] as const;
 
 /** Components with no single DOM root to forward to, and why. */
@@ -137,9 +147,54 @@ const domainCases: Record<string, Case> = {
   SpacingControl: { props: { label: "Padding", defaultValue: { top: 8, right: 12, bottom: 8, left: 12 }, unit: "px" }, tag: "fieldset" },
 };
 
+const aiCases: Record<string, Case> = {
+  Attachments: { tag: "ul", props: { variant: "inline" } },
+  Attachment: { tag: "li", props: { data: { id: "brief", name: "Brief.txt", mediaType: "text/plain" }, onRemove: noop }, wrap: el => <Vlak.Attachments>{el}</Vlak.Attachments> },
+  ResponseBranch: { tag: "div", props: { branches: [{ id: "first", content: "Recorded response" }, { id: "second", content: "Revised response" }] } },
+  Shimmer: { tag: "span", props: { children: "Reviewing brief" } },
+  Plan: { tag: "details", props: { title: "Review plan", children: "Read the brief" } },
+  Task: { tag: "details", props: { title: "Read sources", items: [{ id: "brief", content: "Read brief", state: "complete" }] } },
+  ThoughtSteps: { tag: "details", props: { steps: [{ id: "review", title: "Compare owners", state: "active" }] } },
+  Checkpoint: { tag: "div", props: { label: "Before editing", onRestore: noop } },
+  Suggestions: { tag: "div" },
+  Suggestion: { tag: "button", props: { value: "Review the brief", onSelect: noop } },
+  WorkQueue: { tag: "section", props: { sections: [{ id: "next", title: "Next steps", items: [{ id: "review", content: "Review brief" }] }] } },
+  GeneratedImage: { tag: "img", props: { alt: "Recorded chart", image: { mediaType: "image/png", base64: "AAAA" } } },
+  ConversationDownload: { tag: "button", props: { messages: [{ role: "user", content: "Review the brief" }] } },
+  ResponseEditor: { tag: "form", props: { text: "Draft response", onSave: noop, onCancel: noop } },
+  Agent: { tag: "article", props: { name: "Brief reviewer", tools: [{ name: "readBrief", inputSchema: { type: "object" } }] } },
+  Artifact: { tag: "section", props: { title: "Review notes", children: "One finding" } },
+  Commit: { tag: "article", props: { hash: "a1b2c3d4", message: "Clarify owner", files: [{ path: "brief.md", status: "modified" }] } },
+  EnvironmentVariables: { tag: "section", props: { variables: [{ name: "APP_MODE", value: "preview" }] } },
+  PackageInfo: { tag: "article", props: { name: "example-library", currentVersion: "1.0.0", newVersion: "1.1.0" } },
+  SchemaDisplay: { tag: "article", props: { method: "POST", path: "/reviews", responseBody: [{ name: "summary", type: "string" }] } },
+  Snippet: { tag: "figure", props: { code: "pnpm add example-library" } },
+  SnippetCopy: { tag: "span", props: { value: "pnpm add example-library" } },
+  TestResults: { tag: "section", props: { suites: [{ id: "review", name: "Review", tests: [{ id: "owner", name: "Owner exists", status: "passed" }] }] } },
+  Terminal: { tag: "section", props: { output: "Ready" } },
+  StackTrace: { tag: "article", props: { trace: "Error: Missing owner\n    at review (/app/review.ts:12:3)" } },
+  Sandbox: { tag: "details", props: { title: "Recorded run", code: "console.log(3)", output: "3" } },
+  WebPreview: { tag: "section", props: { title: "Review preview", defaultUrl: "about:blank" } },
+  ContextUsage: { tag: "details", props: { usedTokens: 1200, maxTokens: 8000 } },
+  ModelSelector: { tag: "div", props: { models: [{ id: "fast", name: "Fast model" }], defaultValue: "fast" } },
+  InlineCitation: { tag: "span", props: { sources: [{ id: "brief", title: "Launch brief", url: "https://example.com/brief" }] } },
+  Sources: { tag: "details", props: { sources: [{ id: "brief", title: "Launch brief", url: "https://example.com/brief" }] } },
+  OpenInChat: { tag: "details", props: { prompt: "Review the brief", providers: ["chatgpt"] } },
+  // AudioPlayer intentionally forwards to the native playback element inside its visual region.
+  AudioPlayer: { tag: "audio", props: { title: "Spoken brief", transcript: "Ready for review" } },
+  AudioPlayerControls: { tag: "div", props: { seekOffset: 5 }, wrap: el => <Vlak.AudioPlayer title="Spoken brief">{el}</Vlak.AudioPlayer> },
+  MicSelector: { tag: "div", props: { label: "Microphone" } },
+  // SpeechInput and ConversationDownload expose their primary button despite status siblings.
+  SpeechInput: { tag: "button", props: { onTranscript: noop } },
+  VoiceSelector: { tag: "div", props: { voices: [{ id: "mina", name: "Mina", language: "English" }], defaultValue: "mina" } },
+  Transcription: { tag: "div", props: { segments: [{ id: "first", startSecond: 0, endSecond: 3, text: "The brief is ready." }] } },
+  Persona: { tag: "div", props: { state: "idle", label: "Assistant" } },
+};
+
 const cases: Record<string, Case> = {
   ...healthCases,
   ...domainCases,
+  ...aiCases,
   NumberField: { props: { label: "Count" }, tag: "input" },
   RangeSlider: { props: { label: "Range" }, tag: "fieldset" },
   MultiSelect: { props: { options: option, label: "Cities" }, tag: "fieldset" },
@@ -308,6 +363,15 @@ const cases: Record<string, Case> = {
   FlowAdd: { tag: "button" },
   FlowPlus: { tag: "span" },
   Assistant: { tag: "div" },
+  Chat: { tag: "section", props: { title: "Project chat", composer: <textarea aria-label="Message" /> } },
+  Conversation: { tag: "div" },
+  Response: { tag: "article" },
+  ResponseActions: { tag: "div", props: { text: "Example response" } },
+  Widget: { tag: "section", props: { title: "Project widget" } },
+  WidgetEmbed: { tag: "iframe", props: { title: "Project calendar", src: "about:blank" } },
+  Reasoning: { tag: "details" },
+  ToolCall: { tag: "details", props: { title: "Read brief" } },
+  Confirmation: { tag: "section", props: { title: "Approve note", onConfirm: noop } },
   AssistantHead: { tag: "div" },
   AssistantTitle: { tag: "span" },
   AssistantStatus: { tag: "span" },
@@ -334,6 +398,8 @@ const cases: Record<string, Case> = {
 const exportsByName = Vlak as unknown as Record<string, unknown>;
 
 beforeAll(() => {
+  // jsdom cannot play media; cleanup still pauses each owned native element.
+  vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(noop);
   // jsdom has no modal dialogs: mirror the open state and the close event.
   HTMLDialogElement.prototype.showModal = function () {
     this.open = true;
@@ -345,6 +411,7 @@ beforeAll(() => {
 });
 
 afterEach(cleanup);
+afterAll(() => vi.restoreAllMocks());
 
 describe("ref forwarding", () => {
   it("accounts for every export", () => {

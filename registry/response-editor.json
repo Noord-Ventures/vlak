@@ -1,0 +1,84 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "response-editor",
+  "type": "registry:component",
+  "title": "Response editor",
+  "description": "A multiline message editor that preserves failed drafts and ignores cancelled saves.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/textarea.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/response-editor.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { Textarea } from \"./textarea\";\nimport { Button } from \"./button\";\nimport { vlak } from \"./tokens.stylex\";\n\nexport interface ResponseEditorProps extends Omit<React.FormHTMLAttributes<HTMLFormElement>, \"onSubmit\" | \"onError\"> { text: string; onSave: (text: string) => void | Promise<void>; onCancel: () => void; label?: string; saveLabel?: string; disabled?: boolean; onError?: (error: unknown) => void }\nconst styles = stylex.create({ root: { display: \"grid\", gap: \"0.75rem\", minWidth: 0 }, actions: { display: \"flex\", gap: \"0.5rem\", flexWrap: \"wrap\" }, error: { margin: 0, color: vlak.ink, fontSize: \"0.8125rem\" } });\n/** Multiline message editing with async save, cancellation, and failed-draft retention. */\nexport const ResponseEditor = React.forwardRef<HTMLFormElement, ResponseEditorProps>(function ResponseEditor({ text, onSave, onCancel, label = \"Edit message\", saveLabel = \"Save message\", disabled, onError, className, style, onKeyDown, ...props }, ref) {\n  const [draft, setDraft] = React.useState(text);\n  const [pending, setPending] = React.useState(false);\n  const [failed, setFailed] = React.useState(false);\n  const version = React.useRef(0);\n  const busy = React.useRef(false);\n  React.useEffect(() => { version.current++; setDraft(text); setFailed(false); setPending(false); busy.current = false; return () => { version.current++; }; }, [text]);\n  const cancel = () => { version.current++; busy.current = false; setPending(false); onCancel(); };\n  const root = rs([\"rs-response-editor\", className], styles.root);\n  return <form ref={ref} aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }} onKeyDown={event => { onKeyDown?.(event); if (!event.defaultPrevented && !event.nativeEvent.isComposing && event.key === \"Escape\") { event.preventDefault(); cancel(); } }} onSubmit={async event => { event.preventDefault(); if (busy.current || disabled || !draft.trim()) return; busy.current = true; setPending(true); setFailed(false); const token = version.current; try { await onSave(draft); } catch (error) { if (token === version.current) { setFailed(true); onError?.(error); } } finally { if (token === version.current) { busy.current = false; setPending(false); } } }}>\n    <Textarea label={label} rows={3} value={draft} onChange={event => setDraft(event.target.value)} disabled={disabled} readOnly={pending} />\n    <div {...rs([\"rs-response-editor-actions\"], styles.actions)}><Button type=\"submit\" variant=\"subtle\" disabled={disabled || !draft.trim()} aria-disabled={pending || undefined} aria-busy={pending}>{pending ? \"Saving…\" : saveLabel}</Button><Button variant=\"subtle\" onClick={cancel}>Cancel</Button></div>\n    {failed && <p {...rs([\"rs-response-editor-error\"], styles.error)} role=\"alert\">The message could not be saved. Your draft is still here.</p>}\n  </form>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/response-editor.tsx"
+    },
+    {
+      "path": "vlak/styles/response-editor.css",
+      "content": "/* ── response-editor: generated from packages/react/src/components/response-editor.tsx ── */\n.rs-response-editor{display:grid;gap:0.75rem;min-width:0}\n.rs-response-editor-actions{display:flex;gap:0.5rem;flex-wrap:wrap}\n.rs-response-editor-error{margin:0;color:var(--text);font-size:0.8125rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/response-editor.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-response-editor",
+        "rs-response-editor-actions",
+        "rs-response-editor-error"
+      ],
+      "snippet": "<form class=\"rs-response-editor\" aria-label=\"Edit message\"><label>Message<textarea>Review the brief</textarea></label><div class=\"rs-response-editor-actions\"><button class=\"rs-btn-subtle\" type=\"submit\">Save message</button></div></form>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "textarea",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Response editor"
+      ],
+      "example": "import { ResponseEditor } from \"@noorddev/vlak-react\";\n\nexport function EditMessage({ text, onSave, onCancel }: {\n  text: string;\n  onSave: (text: string) => void | Promise<void>;\n  onCancel: () => void;\n}) {\n  return <ResponseEditor text={text} onSave={onSave} onCancel={onCancel} />;\n}",
+      "usage": {
+        "use": [
+          "Edit a supplied message with an application-owned async save. Failed saves preserve the draft.",
+          "Compose this editor with ResponseBranch when editing produces another response version. The application owns regenerate requests and history.",
+          "Escape or Cancel invalidates local pending feedback and calls onCancel."
+        ],
+        "avoid": [
+          "Treating local cancellation as cancellation of a backend operation; pass and manage that signal in the application."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        },
+        {
+          "keys": "Escape",
+          "does": "Cancels the editor and invalidates pending feedback"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

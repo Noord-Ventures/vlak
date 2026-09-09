@@ -17,6 +17,7 @@ import { checkSpecialists } from "./specialist-e2e.mjs";
 import { checkActivityRingDelight } from "./activity-rings-e2e.mjs";
 import { checkDomainSpecialists } from "./domain-specialist-e2e.mjs";
 import { checkMicroscopyInterface } from "./microscopy-interface-e2e.mjs";
+import { checkAIInteractions } from "./ai-parity-e2e.mjs";
 
 const require = createRequire(import.meta.url);
 const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
@@ -25,7 +26,7 @@ const { catalogComponents } = await import("@noorddev/vlak");
 
 const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".json": "application/json", ".woff2": "font/woff2", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml", ".txt": "text/plain", ".md": "text/markdown" };
 const server = createServer((req, res) => {
-  let p = decodeURIComponent(new URL(req.url, "http://x").pathname);
+  const p = decodeURIComponent(new URL(req.url, "http://x").pathname);
   let file = join(out, p);
   if (existsSync(file) && statSync(file).isDirectory()) file = join(file, "index.html");
   if (!existsSync(file)) file = join(out, `${p.replace(/\/$/, "")}.html`);
@@ -63,23 +64,29 @@ const browser = await chromium.launch(
 
 /* axe on every page, desktop. */
 const docs = ["", "frameworks/", "theming/", "tokens/", "layers/", "stylex/", "accessibility/", "health/", "civic/", "science/", "creative/", "engineering/", "geospatial/", "robotics/", "electronics/", "microbiology/", "agents/"].map((d) => `/docs/${d}`);
-const pages = ["/", ...docs, "/components/", "/about/", "/interfaces/", "/interfaces/evening/", "/interfaces/microscopy/", ...catalogComponents.map((c) => `/components/${c.name}/`)];
+const componentPages = catalogComponents.map((component) => `/${component.category === "ai" ? "ai" : "components"}/${component.name}/`);
+const pages = ["/", ...docs, "/components/", "/ai/", "/ai/widgets/", "/about/", "/interfaces/", "/interfaces/evening/", "/interfaces/microscopy/", ...componentPages];
 const desk = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 for (const path of pages) {
   const errors = [];
-  desk.once("pageerror", (e) => errors.push(e.message));
-  await desk.goto(base + path, { waitUntil: "networkidle" });
-  await desk.addScriptTag({ content: axeSource });
-  const result = await desk.evaluate(() =>
-    axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"] }, rules: { region: { enabled: false } } }),
-  );
-  for (const v of result.violations) {
-    fail(`${path}: axe ${v.id} (${v.impact}): ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join("\n      ")}`);
-  }
-  for (const e of errors) fail(`${path}: page error ${e}`);
-  if ((await desk.locator("main").count()) !== 1) fail(`${path}: expected exactly one <main>`);
-  if ((await desk.locator('.preview-box .rs-use, .preview-box [data-use], .gallery .rs-use, .gallery [data-use]').count()) !== 0) {
-    fail(`${path}: Preview contains an In action composition`);
+  const collectError = error => errors.push(error.message);
+  desk.on("pageerror", collectError);
+  try {
+    await desk.goto(base + path, { waitUntil: "networkidle" });
+    await desk.addScriptTag({ content: axeSource });
+    const result = await desk.evaluate(() =>
+      axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "best-practice"] }, rules: { region: { enabled: false } } }),
+    );
+    for (const v of result.violations) {
+      fail(`${path}: axe ${v.id} (${v.impact}): ${v.help}\n      ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join("\n      ")}`);
+    }
+    if ((await desk.locator("main").count()) !== 1) fail(`${path}: expected exactly one <main>`);
+    if ((await desk.locator('.preview-box .rs-use, .preview-box [data-use], .gallery .rs-use, .gallery [data-use]').count()) !== 0) {
+      fail(`${path}: Preview contains an In action composition`);
+    }
+  } finally {
+    desk.off("pageerror", collectError);
+    for (const error of errors) fail(`${path}: page error ${error}`);
   }
 }
 
@@ -167,7 +174,7 @@ await desk.close();
 
 /* Phone. */
 const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-for (const path of ["/", "/docs/", "/components/", "/about/", "/interfaces/evening/", ...catalogComponents.map(c => `/components/${c.name}/`)]) {
+for (const path of ["/", "/docs/", "/components/", "/ai/", "/ai/widgets/", "/about/", "/interfaces/evening/", ...componentPages]) {
   await phone.goto(base + path, { waitUntil: "networkidle" });
   const overflow = await phone.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   if (overflow > 0) fail(`${path}: horizontal overflow of ${overflow}px at 390px`);
@@ -210,17 +217,31 @@ if (longBreadcrumb.overflow > 0 || !longBreadcrumb.fits || longBreadcrumb.ellips
 await phone.setViewportSize({ width: 390, height: 844 });
 await phone.goto(`${base}/components/toggle/`, { waitUntil: "networkidle" });
 const standaloneToggle = phone.locator(".preview-box .rs-toggle");
-if (await standaloneToggle.count() !== 1 || await phone.locator(".preview-box .rs-toggle-group").count() !== 0) {
-  fail("phone: Toggle preview must render one standalone Toggle, not ToggleGroup");
+if (await standaloneToggle.count() !== 4 || await phone.locator(".preview-box .rs-toggle-group").count() !== 0 || await phone.locator(".preview-box .rs-toggle-subtle").count() !== 3) {
+  fail("phone: Toggle preview must render one default and three subtle standalone controls");
 } else {
-  const before = await standaloneToggle.getAttribute("aria-pressed");
-  await standaloneToggle.click();
-  if (await standaloneToggle.getAttribute("aria-pressed") === before) fail("phone: standalone Toggle preview does not change pressed state");
+  for (const name of ["Default", "Subtle", "Pressed"]) {
+    const toggle = phone.locator(".preview-box").getByRole("button", { name, exact: true });
+    const before = await toggle.getAttribute("aria-pressed");
+    await toggle.focus(); await phone.keyboard.press("Space");
+    if (await toggle.getAttribute("aria-pressed") === before) fail(`phone: ${name} standalone Toggle does not change pressed state`);
+  }
+  if (!(await phone.locator(".preview-box").getByRole("button", { name: "Disabled", exact: true }).isDisabled())) fail("phone: disabled subtle Toggle is enabled");
 }
 await phone.goto(`${base}/components/toggle-group/`, { waitUntil: "networkidle" });
-if (await phone.locator(".preview-box .rs-toggle-group .rs-toggle").count() !== 3) fail("phone: Toggle group preview must retain its three grouped options");
-const narrowToggles = await phone.locator('.preview-box .rs-toggle').evaluateAll(controls => controls.filter(control => Number.parseFloat(getComputedStyle(control).paddingInlineStart) < 20).length);
-if (narrowToggles) fail("phone: toggle segments must keep 20px horizontal padding");
+if (await phone.locator(".preview-box .rs-toggle-group").count() !== 2) fail("phone: Toggle group preview must show default and subtle groups");
+for (const [name, padding] of [["Default alignment", 20], ["Subtle alignment", 10]]) {
+  const group = phone.locator(".preview-box").getByRole("group", { name, exact: true });
+  const toggles = group.locator(".rs-toggle");
+  if (await toggles.count() !== 3) { fail(`phone: ${name} must retain three grouped options`); continue; }
+  const invalid = await toggles.evaluateAll((controls, minimum) => controls.map(control => {
+    const style = getComputedStyle(control); const rect = control.getBoundingClientRect();
+    return { width: rect.width, height: rect.height, start: Number.parseFloat(style.paddingInlineStart), end: Number.parseFloat(style.paddingInlineEnd) };
+  }).filter(control => control.width < 43.9 || control.height < 43.9 || control.start < minimum - 0.1 || control.end < minimum - 0.1), padding);
+  if (invalid.length) fail(`phone: ${name} needs 44px targets and ${padding}px inline padding: ${JSON.stringify(invalid)}`);
+  await group.getByRole("button", { name: "Center", exact: true }).focus(); await phone.keyboard.press("Space");
+  if (await group.locator('[aria-pressed="true"]').count() !== 1 || await group.getByRole("button", { name: "Center", exact: true }).getAttribute("aria-pressed") !== "true") fail(`phone: ${name} keyboard selection is not exclusive`);
+}
 await phone.goto(`${base}/components/tag-input/`, { waitUntil: "networkidle" });
 const tagRemoveSpacing = await phone.locator(".preview-box .rs-tag-input-remove").evaluateAll(buttons => buttons.map(button => {
   const hit = button.getBoundingClientRect();
@@ -284,6 +305,7 @@ if (await phone.evaluate(() => document.querySelector("#navPanel")?.getAttribute
 if (!(await phone.evaluate(() => document.activeElement?.classList.contains("nav-toggle")))) fail("phone menu: focus did not return to the toggle");
 await phone.close();
 
+await checkAIInteractions({ browser, base, fail });
 await checkHealthCollection({ browser, base, components: catalogComponents, axeSource, fail });
 await checkDomainCollections({ browser, base, components: catalogComponents, axeSource, fail });
 await checkSiteRails({ browser, base, fail });

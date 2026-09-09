@@ -38,7 +38,11 @@
       "types": "./dist/components/*.d.ts",
       "default": "./dist/components/*.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./workflow.css": {
+      "types": "./dist/workflow.css.d.ts",
+      "default": "./dist/workflow.css"
+    }
   },
   "files": [
     "dist"
@@ -54,7 +58,17 @@
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "streamdown": "^2.6.0",
+    "shiki": "^3.19.0",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/cjk": "^1.0.3",
+    "mermaid": "^11.12.2",
+    "@xyflow/react": "^12.11.6",
+    "react-jsx-parser": "^2.4.1",
+    "katex": "^0.16.27",
+    "acorn": "^8.15.0",
+    "acorn-jsx": "^5.3.2"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
@@ -72,7 +86,17 @@
     "react-dom": "^19.2.8",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7",
-    "vitest-axe": "^0.1.0"
+    "vitest-axe": "^0.1.0",
+    "streamdown": "^2.6.0",
+    "shiki": "^3.19.0",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/cjk": "^1.0.3",
+    "mermaid": "^11.12.2",
+    "@xyflow/react": "^12.11.6",
+    "react-jsx-parser": "^2.4.1",
+    "katex": "^0.16.27",
+    "acorn": "^8.15.0",
+    "acorn-jsx": "^5.3.2"
   },
   "engines": {
     "node": ">=18.18"
@@ -84,15 +108,47 @@
     "stylex",
     "accessible",
     "monochrome",
-    "shadcn"
-    ,"ui-library"
-    ,"typescript"
-    ,"a11y"
-    ,"accessible-components"
-    ,"react-component-library"
-    ,"dashboard"
-    ,"data-table"
-    ,"agent-ui"
+    "shadcn",
+    "ui-library",
+    "typescript",
+    "a11y",
+    "accessible-components",
+    "react-component-library",
+    "dashboard",
+    "data-table",
+    "agent-ui"
   ],
-  "author": "Renato Valdés Olmos"
+  "author": "Renato Vald\u00e9s Olmos",
+  "peerDependenciesMeta": {
+    "streamdown": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    },
+    "@streamdown/math": {
+      "optional": true
+    },
+    "@streamdown/cjk": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    },
+    "@xyflow/react": {
+      "optional": true
+    },
+    "react-jsx-parser": {
+      "optional": true
+    },
+    "katex": {
+      "optional": true
+    },
+    "acorn": {
+      "optional": true
+    },
+    "acorn-jsx": {
+      "optional": true
+    }
+  }
 }

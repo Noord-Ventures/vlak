@@ -1,6 +1,6 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { catalogComponents, type VlakComponent, type VlakExport, type VlakPropsJson } from "@noorddev/vlak";
 import propsJson from "@noorddev/vlak/props";
 import { chrome } from "@/app/site.stylex";
@@ -29,7 +29,7 @@ export async function generateMetadata({
   const { name } = await params;
   const component = catalogComponents.find((c) => c.name === name);
   if (!component) notFound();
-  return pageMetadata(`/components/${name}`, { title: component.title, description: component.description });
+  return pageMetadata(`/${component.category === "ai" ? "ai" : "components"}/${name}`, { title: component.title, description: component.description, ...(component.category === "ai" ? { robots: { index: false } } : {}) });
 }
 
 function pascal(name: string) {
@@ -107,6 +107,8 @@ export default async function ComponentPage({
   const { name } = await params;
   const component = catalogComponents.find((c) => c.name === name);
   if (!component) notFound();
+
+  if (component.category === "ai") permanentRedirect(`/ai/${name}/`);
 
   const example = component.example ?? reactUsage[component.name];
   const exports = props.components[component.name]?.exports ?? [];

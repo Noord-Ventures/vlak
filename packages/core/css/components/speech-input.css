@@ -1,0 +1,5 @@
+/* ── speech-input: generated from packages/react/src/components/speech-input.tsx ── */
+.rs-speech-input{display:inline-flex;flex-direction:column;align-items:start;min-width:0;max-width:100%;color:var(--text)}
+.rs-speech-input-message{margin:0;margin-block-start:0.5rem;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45;max-width:48ch}
+.rs-speech-input-message:empty{margin-block-start:0}
+.rs-speech-input-icon{width:1.125rem;height:1.125rem;flex-shrink:0}

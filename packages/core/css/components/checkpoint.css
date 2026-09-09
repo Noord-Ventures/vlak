@@ -1,0 +1,4 @@
+/* ── checkpoint: generated from packages/react/src/components/checkpoint.tsx ── */
+.rs-checkpoint{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;color:var(--text-secondary);font-size:0.8125rem}
+.rs-checkpoint-line{height:1px;background-color:var(--divider);flex:1 1 1rem}
+.rs-checkpoint-error{flex-basis:100%;color:var(--text);margin:0}

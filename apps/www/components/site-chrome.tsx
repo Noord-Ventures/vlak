@@ -239,6 +239,7 @@ function SettingsBody({
 const links = [
   { href: "/", label: "Home", corner: false },
   { href: "/components", label: "Components", corner: true },
+  { href: "/ai", label: "AI", corner: true },
   { href: "/interfaces", label: "Interfaces", corner: true },
   { href: "/docs", label: "Docs", corner: true },
   { href: "/about", label: "About", corner: true },

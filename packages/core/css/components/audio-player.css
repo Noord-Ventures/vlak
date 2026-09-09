@@ -1,0 +1,9 @@
+/* ── audio-player: generated from packages/react/src/components/audio-player.tsx ── */
+.rs-audio-player{display:grid;gap:0.75rem;width:100%;min-width:0;padding:0.75rem;box-sizing:border-box;color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm)}
+@media (forced-colors: active){.rs-audio-player{border-color:CanvasText}}
+.rs-audio-player-heading{margin:0;font-size:var(--control-fs);line-height:1.45;font-weight:500}
+.rs-audio-player-controls{display:grid;gap:0.75rem;min-width:0}
+.rs-audio-player-row{display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem}
+.rs-audio-player-volume{flex:1 1 6rem;min-width:4rem;max-width:10rem}
+.rs-audio-player-status{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
+.rs-audio-player-transcript{font-size:var(--control-fs);line-height:1.45;max-width:66ch}

@@ -1,8 +1,17 @@
 /* ── message-composer: generated from packages/react/src/components/message-composer.tsx ── */
 .rs-message-composer{display:flex;flex-direction:column;width:100%;min-width:0;gap:0.75rem;color:var(--text)}
+.rs-message-composer-compact{gap:0.5rem}
+.rs-message-composer-row{display:flex;align-items:flex-end;gap:0.25rem;padding:0.25rem;min-width:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:var(--bg)}
+.rs-message-composer-area{box-sizing:border-box;flex:1 1 0%;width:100%;min-width:0;min-height:var(--hit);font-family:inherit;font-size:1rem;line-height:1.375;color:var(--text);background-color:transparent;border-width:0;border-radius:var(--radius-sm);padding-block:0.6875rem;padding-inline:0.5rem;resize:none;overflow-y:hidden;outline-width:0;outline-style:none;outline-color:var(--text);outline-offset:-2px}
+.rs-message-composer-area:focus-visible{outline-width:2px;outline-style:solid}
 .rs-message-composer-actions{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:0.75rem}
 .rs-message-composer-action{width:auto;min-width:var(--hit);min-height:var(--hit);padding-inline:0.875rem}
-.rs-message-composer-files{display:flex;flex-wrap:wrap;gap:0.5rem;list-style-type:none;padding:0;margin:0}
-.rs-message-composer-file{display:flex;align-items:center;gap:0.5rem;max-width:100%;overflow-wrap:anywhere;font-size:0.8125rem}
+.rs-message-composer-icon-action{flex:0 0 auto;flex-basis:var(--hit);width:var(--hit);max-width:var(--hit);height:var(--hit);min-height:var(--hit);padding-inline:0;align-self:flex-end}
+@media (max-width: 640px){.rs-message-composer-icon-action{width:var(--hit);padding-inline:0}}
+.rs-message-composer-files{min-width:0}
+.rs-message-composer-file{min-width:0}
+.rs-message-composer-tools{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;min-width:0}
+.rs-message-composer-drag{outline-width:2px;outline-style:dashed;outline-color:var(--text);outline-offset:4px}
 .rs-message-composer-hint{margin:0;font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}
 .rs-message-composer-input{display:none}
+.rs-message-composer-sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border-width:0}

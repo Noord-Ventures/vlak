@@ -1,0 +1,94 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sources",
+  "type": "registry:component",
+  "title": "Sources",
+  "description": "A counted native disclosure of application-supplied references, descriptions and supporting quotes.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/references.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/sources.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Collapsible } from \"./collapsible\";\nimport { Refs, RefItem } from \"./references\";\n\nexport interface CitationSource { id: string; title: string; url: string; description?: string; quote?: string }\nexport interface SourcesProps extends Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, \"title\"> {\n  sources: readonly CitationSource[];\n  label?: string;\n  defaultOpen?: boolean;\n}\n/** External web addresses and document-relative references; executable URL schemes are omitted. */\nexport function sourceHref(value: string): string | undefined {\n  const input = value.trim();\n  if (!input || Array.from(input).some(character => character.charCodeAt(0) < 32 || character.charCodeAt(0) === 127)) return undefined;\n  try { const url = new URL(input, \"https://vlak.invalid\"); return url.protocol === \"https:\" || url.protocol === \"http:\" ? input : undefined; } catch { return undefined; }\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, color: vlak.ink },\n  list: { paddingInlineStart: \"1.25rem\" },\n  link: { display: \"flex\", alignItems: \"center\", minHeight: vlak.hit, minWidth: vlak.hit, color: { default: vlak.gray, \":hover\": { default: null, [mq.hover]: vlak.ink } }, textDecoration: \"underline\", textUnderlineOffset: 3, overflowWrap: \"anywhere\", \":focus-visible\": { outlineWidth: 2, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 } },\n  description: { margin: \"0.25rem 0 0\", fontSize: vlak.controlLabel, lineHeight: 1.45 },\n  quote: { margin: \"0.5rem 0 0\", padding: \"0.75rem\", backgroundColor: vlak.tableAlt, borderRadius: vlak.radiusSm, color: vlak.ink, fontSize: vlak.controlFs, lineHeight: 1.45 },\n  empty: { margin: 0, fontSize: vlak.controlFs, color: vlak.gray, lineHeight: 1.45 },\n});\n\n/** A counted native disclosure of application-supplied source links and optional quotes. */\nexport const Sources = React.forwardRef<HTMLDetailsElement, SourcesProps>(function Sources({ sources, label = \"Sources\", defaultOpen = false, className, style, ...props }, ref) {\n  const root = rs([\"rs-sources\", className], styles.root);\n  const list = rs([\"rs-sources-list\"], styles.list);\n  const link = rs([\"rs-sources-link\"], styles.link);\n  const description = rs([\"rs-sources-description\"], styles.description);\n  const quote = rs([\"rs-sources-quote\"], styles.quote);\n  const empty = rs([\"rs-sources-empty\"], styles.empty);\n  return <Collapsible {...props} ref={ref} title={`${label} (${sources.length})`} defaultOpen={defaultOpen} className={root.className} style={{ ...root.style, ...style }}>\n    {sources.length ? <Refs {...list}>{sources.map(source => <RefItem key={source.id}>\n      {sourceHref(source.url) ? <a {...link} href={sourceHref(source.url)} target=\"_blank\" rel=\"noopener noreferrer\" aria-label={`${source.title} (new tab)`}>{source.title}<span aria-hidden=\"true\"> ↗</span></a> : <span>{source.title}</span>}\n      {source.description && <p {...description}>{source.description}</p>}\n      {source.quote && <blockquote {...quote}>{source.quote}</blockquote>}\n    </RefItem>)}</Refs> : <p {...empty}>No sources supplied.</p>}\n  </Collapsible>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/sources.tsx"
+    },
+    {
+      "path": "vlak/styles/sources.css",
+      "content": "/* ── sources: generated from packages/react/src/components/sources.tsx ── */\n.rs-sources{min-width:0;color:var(--text)}\n.rs-sources-list{padding-inline-start:1.25rem}\n.rs-sources-link{display:flex;align-items:center;min-height:var(--hit);min-width:var(--hit);color:var(--text-secondary);text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}\n.rs-sources-link:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n@media (hover: hover) and (pointer: fine){.rs-sources-link:hover{color:var(--text)}}\n.rs-sources-description{margin:0.25rem 0 0;font-size:var(--control-label);line-height:1.45}\n.rs-sources-quote{margin:0.5rem 0 0;padding:0.75rem;background-color:var(--table-alt);border-radius:var(--radius-sm);color:var(--text);font-size:var(--control-fs);line-height:1.45}\n.rs-sources-empty{margin:0;font-size:var(--control-fs);color:var(--text-secondary);line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/sources.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-sources",
+        "rs-sources-list",
+        "rs-sources-link",
+        "rs-sources-description",
+        "rs-sources-quote",
+        "rs-sources-empty"
+      ],
+      "snippet": "<details class=\"rs-sources rs-disclosure\"><summary class=\"rs-disclosure-summary\">Sources (1)</summary><ol class=\"rs-refs rs-sources-list\"><li class=\"rs-cite-item\"><a class=\"rs-sources-link\" href=\"https://example.com/brief\" target=\"_blank\" rel=\"noopener noreferrer\">Project brief</a></li></ol></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "collapsible",
+        "references",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Sources",
+        "Source list",
+        "References",
+        "Citations"
+      ],
+      "example": "import { Sources } from \"@noorddev/vlak-react\";\n\n<Sources defaultOpen sources={[\n  { id: \"brief\", title: \"Project brief\", url: \"https://example.com/brief\", description: \"Scope and owners\", quote: \"Every decision has an owner.\" },\n]} />",
+      "usage": {
+        "use": [
+          "Present the references an application used to support an answer.",
+          "Supply stable ids, titles, URLs and optional descriptions or exact source quotes.",
+          "The native disclosure composes Refs and RefItem. Use open/onToggle or defaultOpen for disclosure state.",
+          "Web URLs and document-relative links are accepted; executable schemes are not rendered as links.",
+          "Links open a new tab with opener isolation. CSS-only markup retains native disclosure and link behavior."
+        ],
+        "avoid": [
+          "Presenting an unverified model-generated URL as an independently checked source.",
+          "Fetching sources or inferring quotations inside the component."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches the source summary and visible reference links"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Opens or closes the native source disclosure"
+        },
+        {
+          "keys": "Enter on a link",
+          "does": "Opens the chosen reference in a new tab"
+        }
+      ],
+      "a11y": [
+        "The summary includes the number of supplied references. An ordered list preserves source order and optional blockquotes identify quoted text.",
+        "Source links have 44px minimum height and identify new-tab behavior in their accessible name.",
+        "Native details attributes and its ref are forwarded."
+      ]
+    }
+  }
+}

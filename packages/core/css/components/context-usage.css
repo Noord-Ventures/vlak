@@ -1,0 +1,7 @@
+/* ── context-usage: generated from packages/react/src/components/context-usage.tsx ── */
+.rs-context-usage{width:100%;min-width:0;color:var(--text)}
+.rs-context-usage-body{display:grid;gap:0.75rem}
+.rs-context-usage-metadata{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}
+.rs-context-usage-list{margin:0;display:grid;gap:0.5rem;font-size:var(--control-fs);font-variant-numeric:tabular-nums;line-height:1.45}
+.rs-context-usage-row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0.5rem 1rem}
+.rs-context-usage-value{margin:0;color:var(--text)}

@@ -23,6 +23,7 @@ const groups = [
     title: "Resources",
     links: [
       { href: "/components/", title: "Components" },
+      { href: "/ai/", title: "AI" },
       { href: "/interfaces/", title: "Interfaces" },
       { href: "/use-cases/", title: "Use cases" },
       { href: "/docs/", title: "Docs" },

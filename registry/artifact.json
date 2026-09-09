@@ -1,0 +1,89 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "artifact",
+  "type": "registry:component",
+  "title": "Artifact",
+  "description": "Frames generated content with header actions, an optional scroll region and a close request.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/artifact.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\n\nexport interface ArtifactProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  title: React.ReactNode;\n  description?: React.ReactNode;\n  actions?: React.ReactNode;\n  footer?: React.ReactNode;\n  /** Requests closing; the application owns visibility and focus restoration. */\n  onClose?: () => void;\n  closeLabel?: string;\n  /** Optional height cap for long generated content. */\n  maxHeight?: React.CSSProperties[\"maxHeight\"];\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", flexDirection: \"column\", minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper },\n  header: { display: \"flex\", alignItems: \"center\", flexWrap: \"wrap\", gap: \"0.75rem\", padding: \"0.75rem 1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  heading: { display: \"grid\", gap: \"0.25rem\", minWidth: 0, flex: \"1 1 auto\", overflowWrap: \"anywhere\" },\n  title: { fontSize: \"0.875rem\", fontWeight: 600, lineHeight: 1.45 },\n  description: { fontSize: \"0.75rem\", lineHeight: 1.45, color: vlak.gray },\n  actions: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.25rem\" },\n  content: { minWidth: 0, overflow: \"auto\", padding: \"1rem\", fontSize: \"0.875rem\", lineHeight: 1.45, outlineColor: vlak.ink, outlineOffset: -2 },\n  footer: { padding: \"0.75rem 1rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, color: vlak.gray, fontSize: \"0.75rem\", lineHeight: 1.45 },\n});\n\n/** Generated content with header actions, a close request and an optional scroll region. */\nexport const Artifact = React.forwardRef<HTMLElement, ArtifactProps>(function Artifact({ title, description, actions, footer, onClose, closeLabel = \"Close artifact\", maxHeight, children, className, style, \"aria-label\": label, \"aria-labelledby\": labelledBy, ...props }, ref) {\n  const titleId = React.useId();\n  const root = rs([\"rs-artifact\", className], styles.root);\n  const header = rs([\"rs-artifact-header\"], styles.header);\n  const heading = rs([\"rs-artifact-heading\"], styles.heading);\n  const titleStyle = rs([\"rs-artifact-title\"], styles.title);\n  const descriptionStyle = rs([\"rs-artifact-description\"], styles.description);\n  const actionStyle = rs([\"rs-artifact-actions\"], styles.actions);\n  const content = rs([\"rs-artifact-content\"], styles.content);\n  const footerStyle = rs([\"rs-artifact-footer\"], styles.footer);\n  return <section {...props} ref={ref} aria-label={label} aria-labelledby={labelledBy ?? (label == null ? titleId : undefined)} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}><div {...heading}><span {...titleStyle} id={titleId}>{title}</span>{description != null && <div {...descriptionStyle}>{description}</div>}</div>\n      {(actions != null || onClose) && <div {...actionStyle}>{actions}{onClose && <Button type=\"button\" variant=\"subtle\" size=\"icon\" aria-label={closeLabel} title={closeLabel} onClick={onClose}><Icon name=\"close\" /></Button>}</div>}\n    </header>\n    <div className={content.className} style={{ ...content.style, maxHeight }} tabIndex={maxHeight != null ? 0 : undefined}>{children}</div>\n    {footer != null && <footer {...footerStyle}>{footer}</footer>}\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/artifact.tsx"
+    },
+    {
+      "path": "vlak/styles/artifact.css",
+      "content": "/* ── artifact: generated from packages/react/src/components/artifact.tsx ── */\n.rs-artifact{display:flex;flex-direction:column;min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg)}\n@media (forced-colors: active){.rs-artifact{border-color:CanvasText}}\n.rs-artifact-header{display:flex;align-items:center;flex-wrap:wrap;gap:0.75rem;padding:0.75rem 1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-artifact-heading{display:grid;gap:0.25rem;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}\n.rs-artifact-title{font-size:0.875rem;font-weight:600;line-height:1.45}\n.rs-artifact-description{font-size:0.75rem;line-height:1.45;color:var(--text-secondary)}\n.rs-artifact-actions{display:flex;flex-wrap:wrap;align-items:center;gap:0.25rem}\n.rs-artifact-content{min-width:0;overflow:auto;padding:1rem;font-size:0.875rem;line-height:1.45;outline-color:var(--text);outline-offset:-2px}\n.rs-artifact-footer{padding:0.75rem 1rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);color:var(--text-secondary);font-size:0.75rem;line-height:1.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/artifact.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-artifact",
+        "rs-artifact-header",
+        "rs-artifact-heading",
+        "rs-artifact-title",
+        "rs-artifact-description",
+        "rs-artifact-actions",
+        "rs-artifact-content",
+        "rs-artifact-footer"
+      ],
+      "snippet": "<section class=\"rs-artifact\" aria-labelledby=\"artifact-title\"><header class=\"rs-artifact-header\"><div class=\"rs-artifact-heading\"><span class=\"rs-artifact-title\" id=\"artifact-title\">Review notes</span><div class=\"rs-artifact-description\">Draft 1</div></div></header><div class=\"rs-artifact-content\"><p>Retain the original draft when sending fails.</p></div><footer class=\"rs-artifact-footer\">Local draft</footer></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Artifact",
+        "Generated document",
+        "Artifact panel"
+      ],
+      "example": "import { Artifact, Button } from \"@noorddev/vlak-react\";\n\nexport function ReviewArtifact({ onRevise }: { onRevise: () => void }) {\n  return <Artifact title=\"Review notes\" description=\"Draft 1\" maxHeight=\"20rem\" actions={<Button variant=\"subtle\" onClick={onRevise}>Revise draft</Button>} footer=\"Local draft\">\n    <p>Retain the original draft when sending fails.</p>\n  </Artifact>;\n}",
+      "usage": {
+        "use": [
+          "Generated documents, code or previews with actions placed in their header.",
+          "Pass onClose to request dismissal; the application controls visibility and restores focus to the opener.",
+          "Set maxHeight to create a keyboard-reachable scroll region for long content."
+        ],
+        "avoid": [
+          "Treating the container as a renderer or code execution environment.",
+          "Removing the view after close without returning focus to a useful control."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches supplied actions, the labelled close control and a height-limited content region."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space activates the focused button."
+        }
+      ],
+      "a11y": [
+        "A section is named by its visible title, unless a custom accessible name is supplied.",
+        "The close control uses an icon, a descriptive accessible label and a 44px target.",
+        "Content remains mounted until the application accepts the close request."
+      ]
+    }
+  }
+}

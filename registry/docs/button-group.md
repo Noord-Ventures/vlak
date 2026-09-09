@@ -1,6 +1,6 @@
 # Button group
 
-Keeps related actions together as joined ghost buttons with 1px dividers.
+Keeps related actions together as joined buttons with 1px dividers and one outer frame.
 
 Category: actions  
 Name: `button-group`  
@@ -10,11 +10,12 @@ Page: https://vlak.dev/components/button-group/
 ## When to use
 
 - Two to four related actions that read as one control.
-- Ghost buttons; the group owns the outer stroke and the seams.
+- Ghost or subtle buttons; the group owns the outer stroke and the seams.
+- For application-owned selection, give each subtle Button aria-pressed and update the selection from its onClick handler.
 
 ## When not to
 
-- Exclusive selection; use ToggleGroup, which tracks the pressed option.
+- Expecting the group to manage selection automatically; use ToggleGroup when it should own that behavior.
 - Unrelated actions in one row; space them instead.
 
 ## Install

@@ -1,0 +1,15 @@
+/* ── transcription: generated from packages/react/src/components/transcription.tsx ── */
+.rs-transcription{display:grid;gap:0.5rem;min-width:0;color:var(--text)}
+.rs-transcription-viewport{overflow-y:auto;min-width:0;overscroll-behavior:contain;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm)}
+.rs-transcription-viewport:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+@media (forced-colors: active){.rs-transcription-viewport{border-color:CanvasText}}
+.rs-transcription-list{margin:0;padding:0;list-style-type:none}
+.rs-transcription-segment{display:grid;grid-template-columns:4.5rem minmax(0, 1fr);align-items:start;gap:0.75rem;width:100%;min-height:var(--hit);box-sizing:border-box;padding:0.75rem;border-width:0;border-radius:0;background-color:transparent;color:var(--text-secondary);font-size:var(--control-fs);line-height:1.45;font-family:inherit;text-align:start;overflow-wrap:anywhere}
+.rs-transcription-interactive{cursor:pointer;color:var(--text-secondary)}
+.rs-transcription-interactive:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+@media (hover: hover) and (pointer: fine){.rs-transcription-interactive:hover{color:var(--text)}}
+.rs-transcription-active{background-color:var(--control-fill);color:var(--text);font-weight:500}
+@media (forced-colors: active){.rs-transcription-active{background-color:Highlight;color:HighlightText}}
+.rs-transcription-time{font-size:var(--control-label);font-variant-numeric:tabular-nums;padding-top:0.125rem}
+.rs-transcription-speaker{display:block;font-size:var(--control-label);margin-bottom:0.25rem}
+.rs-transcription-empty{margin:0;padding:0.75rem;font-size:var(--control-fs);color:var(--text-secondary)}

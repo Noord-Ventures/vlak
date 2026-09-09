@@ -1,0 +1,5 @@
+/* ── plan: generated from packages/react/src/components/plan.tsx ── */
+.rs-plan{max-width:none}
+.rs-plan-description{margin:0 0 1rem;color:var(--text-secondary)}
+.rs-plan-actions{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem}
+.rs-plan-footer{border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);padding-top:1rem;margin-top:1rem}

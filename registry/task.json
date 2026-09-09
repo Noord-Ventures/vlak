@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "task",
+  "type": "registry:component",
+  "title": "Task",
+  "description": "A default-open task disclosure with supplied item states and file references.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/reasoning.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/task.tsx",
+      "content": "\"use client\";\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { rs } from \"./rs\";\nimport { vlak } from \"./tokens.stylex\";\nimport { Reasoning, type ReasoningProps } from \"./reasoning\";\n\nexport interface TaskItem { id: string; content: React.ReactNode; file?: React.ReactNode; state?: \"pending\" | \"active\" | \"complete\" }\nexport interface TaskProps extends ReasoningProps { items?: readonly TaskItem[] }\nconst styles = stylex.create({ root: { maxWidth: \"none\" }, list: { display: \"grid\", gap: \"0.75rem\", listStyleType: \"none\", padding: 0, margin: 0 }, item: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.5rem\", color: vlak.gray, fontSize: \"0.875rem\" }, active: { color: vlak.ink, fontWeight: 600 }, file: { display: \"inline-flex\", alignItems: \"center\", gap: \"0.25rem\", borderWidth: 1, borderStyle: \"solid\", borderColor: vlak.divider, borderRadius: vlak.radiusSm, padding: \"0.25rem 0.5rem\", fontSize: \"0.75rem\" } });\n/** A default-open task disclosure with supplied rows and file references. */\nexport const Task = React.forwardRef<HTMLDetailsElement, TaskProps>(function Task({ items = [], children, className, style, ...props }, ref) {\n  const root = rs([\"rs-task\", className], styles.root);\n  return <Reasoning ref={ref} defaultOpen title=\"Task\" {...props} className={root.className} style={{ ...root.style, ...style }}><ul {...rs([\"rs-task-list\"], styles.list)}>{items.map(item => { const active = item.state === \"active\"; return <li key={item.id} {...rs([\"rs-task-item\", active && \"rs-task-active\"], styles.item, active && styles.active)} data-state={item.state}><span role=\"img\" aria-label={item.state ?? \"Task item\"}>{item.state === \"complete\" ? \"✓\" : item.state === \"active\" ? \"◉\" : \"○\"}</span><span>{item.content}</span>{item.file && <span {...rs([\"rs-task-file\"], styles.file)}>{item.file}</span>}</li>; })}</ul>{children}</Reasoning>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/task.tsx"
+    },
+    {
+      "path": "vlak/styles/task.css",
+      "content": "/* ── task: generated from packages/react/src/components/task.tsx ── */\n.rs-task{max-width:none}\n.rs-task-list{display:grid;gap:0.75rem;list-style-type:none;padding:0;margin:0}\n.rs-task-item{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text-secondary);font-size:0.875rem}\n.rs-task-active{color:var(--text);font-weight:600}\n.rs-task-file{display:inline-flex;align-items:center;gap:0.25rem;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);padding:0.25rem 0.5rem;font-size:0.75rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/task.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-task",
+        "rs-task-list",
+        "rs-task-item",
+        "rs-task-active",
+        "rs-task-file"
+      ],
+      "snippet": "<details class=\"rs-task\" open><summary>Read sources</summary><ul class=\"rs-task-list\"><li class=\"rs-task-item\">Read launch-brief.md</li></ul></details>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "reasoning",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Task"
+      ],
+      "example": "import { Task } from \"@noorddev/vlak-react\";\n\n<Task title=\"Read sources\" items={[{ id: \"brief\", content: \"Read the launch brief\", state: \"complete\", file: \"launch-brief.md\" }]} />",
+      "usage": {
+        "use": [
+          "Supply pending, active, and complete items with optional file badges.",
+          "Use children for additional supplied task content."
+        ],
+        "avoid": [
+          "Expecting this display to run tasks or infer their completion."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves through the supplied native controls in reading order"
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates focused buttons and disclosure summaries"
+        }
+      ],
+      "a11y": [
+        "Native attributes, className, style, and the forwarded ref reach the outer element.",
+        "Interactive content requires accessible names; progress text is not announced for every streamed token."
+      ]
+    }
+  }
+}

@@ -94,11 +94,9 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
   const needle = searchValue.trim().toLowerCase();
   const matches = needle ? options.filter((o) => optionText(o).toLowerCase().includes(needle)) : options;
   const hasList = open && matches.length > 0;
-
-  /* Keep the highlight on a real row as the filter shrinks the list. */
-  React.useEffect(() => {
-    setActiveIndex((i) => Math.max(0, Math.min(matches.length - 1, i)));
-  }, [matches.length]);
+  const enabled = matches.flatMap((option, index) => option.disabled ? [] : [index]);
+  const active = enabled.includes(activeIndex) ? activeIndex : enabled[0] ?? -1;
+  React.useEffect(() => { if (disabled) setOpen(false); }, [disabled]);
 
   React.useEffect(() => {
     if (!open) return;
@@ -111,16 +109,18 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
 
   React.useEffect(() => {
     if (hasList) activeRef.current?.scrollIntoView?.({ block: "nearest" });
-  }, [hasList, activeIndex]);
+  }, [hasList, active]);
 
   const openList = (at: "selected" | "last" = "selected") => {
     setSearchValue("");
-    const selectedIndex = options.findIndex((o) => o.value === current);
-    setActiveIndex(at === "last" ? Math.max(0, options.length - 1) : Math.max(0, selectedIndex));
+    const available = options.flatMap((option, index) => option.disabled ? [] : [index]);
+    const selectedIndex = options.findIndex((o) => o.value === current && !o.disabled);
+    setActiveIndex(at === "last" ? available.at(-1) ?? -1 : selectedIndex >= 0 ? selectedIndex : available[0] ?? -1);
     setOpen(true);
   };
 
   const pick = (option: SelectOption) => {
+    if (disabled || option.disabled) return;
     if (!isControlled) setInner(option.value);
     onValueChange?.(option.value);
     setSearchValue("");
@@ -130,7 +130,11 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;
-    const last = matches.length - 1;
+    const move = (offset: number) => {
+      if (!enabled.length) { setActiveIndex(-1); return; }
+      const next = Math.max(0, Math.min(enabled.length - 1, enabled.indexOf(active) + offset));
+      setActiveIndex(enabled[next]!);
+    };
     if (!open) {
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -144,34 +148,32 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setActiveIndex((i) => Math.min(last, i + 1));
+        move(1);
         return;
       case "ArrowUp":
         e.preventDefault();
-        setActiveIndex((i) => Math.max(0, i - 1));
+        move(-1);
         return;
       case "Home":
         e.preventDefault();
-        setActiveIndex(0);
+        setActiveIndex(enabled[0] ?? -1);
         return;
       case "End":
         e.preventDefault();
-        setActiveIndex(Math.max(0, last));
+        setActiveIndex(enabled.at(-1) ?? -1);
         return;
       case "PageUp":
         e.preventDefault();
-        setActiveIndex((i) => Math.max(0, i - PAGE));
+        move(-PAGE);
         return;
       case "PageDown":
         e.preventDefault();
-        setActiveIndex((i) => Math.min(Math.max(0, last), i + PAGE));
+        move(PAGE);
         return;
       case "Enter": {
-        const match = matches[activeIndex];
-        if (match) {
-          e.preventDefault();
-          pick(match);
-        }
+        e.preventDefault();
+        const match = matches[active];
+        if (match) pick(match);
         return;
       }
       case "Escape":
@@ -214,7 +216,7 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
         aria-labelledby={ariaLabelledby}
         aria-expanded={open}
         aria-controls={hasList ? listboxId : undefined}
-        aria-activedescendant={hasList && matches[activeIndex] ? optionId(activeIndex) : undefined}
+        aria-activedescendant={hasList && active >= 0 ? optionId(active) : undefined}
         aria-autocomplete="list"
         disabled={disabled}
         placeholder={placeholder}
@@ -246,23 +248,25 @@ export const Combobox = React.forwardRef<HTMLDivElement, ComboboxProps>(function
             </div>
           )}
           {matches.map((option, index) => {
-            const active = index === activeIndex;
+            const highlighted = index === active && !option.disabled;
             const row = rs(
-              ["rs-menu-item", active && "rs-menu-item-active"],
+              ["rs-menu-item", highlighted && "rs-menu-item-active", option.disabled && "rs-menu-item-disabled"],
               menuStyles.item,
-              active && menuStyles.itemActive,
+              highlighted && menuStyles.itemActive,
+              option.disabled && menuStyles.itemDisabled,
             );
             return (
               <div
                 key={option.value}
                 id={optionId(index)}
-                ref={active ? activeRef : undefined}
+                ref={highlighted ? activeRef : undefined}
                 role="option"
                 tabIndex={-1}
                 aria-selected={option.value === current}
+                aria-disabled={option.disabled || undefined}
                 className={row.className}
                 style={row.style}
-                onPointerEnter={() => setActiveIndex(index)}
+                onPointerEnter={() => { if (!option.disabled) setActiveIndex(index); }}
                 onClick={() => pick(option)}
               >
                 {option.label}

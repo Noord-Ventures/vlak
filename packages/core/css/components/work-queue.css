@@ -1,0 +1,10 @@
+/* ── work-queue: generated from packages/react/src/components/work-queue.tsx ── */
+.rs-work-queue{display:grid;gap:0.75rem;min-width:0;color:var(--text)}
+.rs-work-queue-section{max-width:none}
+.rs-work-queue-list{display:grid;gap:1rem;padding:0;margin:0;list-style-type:none;max-height:24rem;overflow-y:auto}
+.rs-work-queue-item{display:grid;gap:0.5rem;padding-block:0.5rem;min-width:0}
+.rs-work-queue-row{display:flex;align-items:center;flex-wrap:wrap;justify-content:space-between;gap:0.5rem;min-width:0}
+.rs-work-queue-content{flex:1 1 12rem;min-width:0}
+.rs-work-queue-complete{color:var(--text-secondary);text-decoration-line:line-through}
+.rs-work-queue-detail{color:var(--text-secondary);font-size:0.8125rem;line-height:1.45}
+.rs-work-queue-actions{display:flex;gap:0.25rem;flex-wrap:wrap}

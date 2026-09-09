@@ -1,21 +1,24 @@
 # Button
 
-Triggers an action. Solid primary or 1px ghost, with a minimum 44px target at every size.
+Triggers an action with solid primary, 1px ghost, or borderless subtle styling. Every target is at least 44px; icon size is a 44px square.
 
 Category: actions  
 Name: `button`  
-Also known as: Button, Primary button, Ghost button, Secondary button  
+Also known as: Button, Primary button, Ghost button, Secondary button, Subtle button, Icon button  
 Page: https://vlak.dev/components/button/
 
 ## When to use
 
 - One primary action per view, with ghost for the secondary action.
+- Subtle for supporting actions in a toolbar or response. Its transparent surface stays unchanged while muted text turns to ink on hover.
+- Inside ButtonGroup, subtle buttons use an opaque paper surface and a soft fill for application-supplied aria-pressed selection.
+- Icon size for an icon-only action with a 44px square target and an accessible label.
 - Submitting a form or answering a dialog.
 
 ## When not to
 
 - Navigation that changes the URL; use Link or a nav component.
-- On and off state; use Toggle or Switch, which carry aria-pressed and aria-checked.
+- Standalone persistent settings; use Toggle or Switch. ButtonGroup can present application-owned selection with aria-pressed.
 
 ## Install
 
@@ -47,16 +50,23 @@ npx shadcn add https://vlak.dev/r/button.json
 ```html
 <button class="rs-btn-primary">Primary action</button>
 <button class="rs-btn-ghost">Secondary</button>
+<button class="rs-btn-subtle">Details</button>
+<button class="rs-btn-subtle" disabled>Unavailable</button>
+<button class="rs-btn-subtle rs-btn-icon" aria-label="Download"><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" aria-hidden="true"><path d="M3.5 11.5V13h9v-1.5M8 3.5v7M5.5 8 8 10.5 10.5 8" /></svg></button>
 ```
 
 ## Example
 
 ```tsx
-import { Button } from "@noorddev/vlak-react";
+import { Button, Icon } from "@noorddev/vlak-react";
 
 <Button>Primary action</Button>
 <Button variant="ghost" size="sm">Secondary</Button>
-<Button disabled>Saving…</Button>
+<Button variant="subtle">Details</Button>
+<Button variant="subtle" disabled>Unavailable</Button>
+<Button variant="subtle" size="icon" aria-label="Download">
+  <Icon name="download" />
+</Button>
 ```
 
 ## Props
@@ -69,8 +79,8 @@ Forwards `ref` to the `HTMLButtonElement`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `"primary" \| "ghost"` | `"primary"` | Solid ink primary or hairline ghost. One primary per view. |
-| `size` | `"default" \| "sm"` | `"default"` |  |
+| `variant` | `"primary" \| "ghost" \| "subtle"` | `"primary"` | Solid ink primary, hairline ghost, or borderless subtle. One primary per view. |
+| `size` | `"default" \| "sm" \| "icon"` | `"default"` | Icon buttons stay square at every breakpoint. Supply an accessible name. |
 | `grouped` | `boolean` | `false` | Flush into a ButtonGroup: no own stroke, one ink seam. |
 
 ## Keyboard
@@ -83,12 +93,12 @@ Forwards `ref` to the `HTMLButtonElement`.
 ## Accessibility
 
 - Renders a native <button>; type defaults to "button", so pass type="submit" inside a form.
-- The visible text is the name. Give icon-only buttons an aria-label.
+- The visible text is the name. Icon size changes the shape, not the accessible name; give icon-only buttons an aria-label and hide decorative icons.
 - 2px ink focus ring on :focus-visible. disabled uses the native attribute and 40% opacity; forced colors keep system colors.
 
 ## Classes
 
-`rs-btn-primary`, `rs-btn-ghost`, `rs-btn-sm`, `rs-btn-grouped`, `rs-btn-grouped-ghost`
+`rs-btn-primary`, `rs-btn-ghost`, `rs-btn-subtle`, `rs-btn-sm`, `rs-btn-icon`, `rs-btn-grouped`, `rs-btn-grouped-ghost`, `rs-btn-grouped-subtle`
 
 ## Dependencies
 

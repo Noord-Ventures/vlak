@@ -1,0 +1,93 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "response",
+  "type": "registry:component",
+  "title": "Response",
+  "description": "Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, status, and an action slot.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/response.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport type ResponseStatus = \"streaming\" | \"complete\" | \"error\" | \"stopped\";\n\nexport interface ResponseProps extends React.HTMLAttributes<HTMLElement> {\n  /** The speaker's identity, separate from the native ARIA role. */\n  from?: \"user\" | \"assistant\";\n  author?: React.ReactNode;\n  status?: ResponseStatus;\n  /** A short status phrase. Keep token-by-token updates in children. */\n  statusLabel?: string;\n  errorMessage?: string;\n  /** Explicit text to copy. Omit to hide the copy action. */\n  copyText?: string;\n  copyLabel?: string;\n  copiedLabel?: string;\n  copyErrorLabel?: string;\n  /** Application-owned actions, such as retry or feedback buttons. */\n  actions?: React.ReactNode;\n  /** Rendered content. Supply your own markdown renderer here when needed. */\n  children?: React.ReactNode;\n}\n\nconst statusLabels: Record<ResponseStatus, string> = {\n  streaming: \"Responding\",\n  complete: \"Complete\",\n  error: \"Response failed\",\n  stopped: \"Stopped\",\n};\n\nconst styles = stylex.create({\n  root: {\n    boxSizing: \"border-box\",\n    display: \"flex\",\n    flexDirection: \"column\",\n    gap: \"0.875rem\",\n    minWidth: 0,\n    width: \"100%\",\n    maxWidth: \"66ch\",\n    alignSelf: \"flex-start\",\n    marginInlineStart: 0,\n    marginInlineEnd: \"auto\",\n    paddingBlock: \"1.25rem\",\n    paddingInline: 0,\n    color: vlak.ink,\n    fontSize: \"0.9375rem\",\n    lineHeight: 1.45,\n    overflowWrap: \"anywhere\",\n  },\n  user: {\n    width: \"fit-content\",\n    maxWidth: \"min(85%, 66ch)\",\n    alignSelf: \"flex-end\",\n    marginInlineStart: \"auto\",\n    marginInlineEnd: 0,\n    backgroundColor: vlak.tableAlt,\n    borderRadius: vlak.radiusSm,\n    paddingBlock: \"1rem\",\n    paddingInline: \"1rem\",\n  },\n  header: {\n    display: \"flex\",\n    alignItems: \"baseline\",\n    justifyContent: \"space-between\",\n    flexWrap: \"wrap\",\n    gap: \"0.5rem\",\n  },\n  author: {\n    fontWeight: 600,\n    fontSize: \"0.84375rem\",\n  },\n  status: {\n    color: vlak.gray,\n    fontSize: \"0.8125rem\",\n  },\n  content: {\n    minWidth: 0,\n    overflowWrap: \"anywhere\",\n    whiteSpace: \"pre-wrap\",\n  },\n  error: {\n    margin: 0,\n    color: vlak.ink,\n    fontSize: \"0.875rem\",\n  },\n  actions: {\n    display: \"flex\",\n    alignItems: \"center\",\n    flexWrap: \"wrap\",\n    gap: \"0.5rem\",\n  },\n  copy: {\n    boxSizing: \"border-box\",\n    minHeight: vlak.hit,\n    minWidth: vlak.hit,\n    paddingBlock: \"0.5rem\",\n    paddingInline: \"0.75rem\",\n    borderWidth: vlak.hairline,\n    borderStyle: \"solid\",\n    borderColor: {\n      default: vlak.controlBorder,\n      [mq.forcedColors]: \"ButtonText\",\n    },\n    borderRadius: vlak.radiusSm,\n    backgroundColor: {\n      default: \"transparent\",\n      \":hover:not(:disabled)\": { default: null, [mq.hover]: vlak.controlFill },\n      [mq.forcedColors]: \"ButtonFace\",\n    },\n    color: {\n      default: vlak.ink,\n      [mq.forcedColors]: \"ButtonText\",\n    },\n    fontFamily: \"inherit\",\n    fontSize: \"0.8125rem\",\n    fontWeight: 500,\n    lineHeight: 1.45,\n    cursor: { default: \"pointer\", \":disabled\": \"wait\" },\n    outlineWidth: { default: null, \":focus-visible\": 2 },\n    outlineStyle: { default: null, \":focus-visible\": \"solid\" },\n    outlineColor: { default: null, \":focus-visible\": vlak.ink },\n    outlineOffset: { default: null, \":focus-visible\": 2 },\n  },\n  copyStatus: {\n    color: vlak.gray,\n    fontSize: \"0.8125rem\",\n  },\n});\n\n/** One message with application-rendered content and a separate status announcement. */\nexport const Response = React.forwardRef<HTMLElement, ResponseProps>(function Response(\n  {\n    from = \"assistant\",\n    author,\n    status = \"complete\",\n    statusLabel,\n    errorMessage,\n    copyText,\n    copyLabel = \"Copy response\",\n    copiedLabel = \"Copied\",\n    copyErrorLabel = \"Could not copy. Try again.\",\n    actions,\n    children,\n    className,\n    style,\n    \"aria-labelledby\": labelledBy,\n    \"aria-label\": label,\n    ...props\n  },\n  ref,\n) {\n  const authorId = React.useId();\n  const [copyState, setCopyState] = React.useState<\"idle\" | \"pending\" | \"copied\" | \"error\">(\"idle\");\n  const copyRequest = React.useRef(0);\n  const copyPending = React.useRef(false);\n\n  // biome-ignore lint/correctness/useExhaustiveDependencies: New copy text invalidates pending writes and their feedback.\n  React.useEffect(() => {\n    copyRequest.current += 1;\n    copyPending.current = false;\n    setCopyState(\"idle\");\n    return () => { copyRequest.current += 1; };\n  }, [copyText]);\n\n  async function copy() {\n    if (copyText === undefined || copyPending.current) return;\n    const request = ++copyRequest.current;\n    copyPending.current = true;\n    setCopyState(\"pending\");\n    try {\n      if (!navigator.clipboard?.writeText) throw new Error(\"Clipboard unavailable\");\n      await navigator.clipboard.writeText(copyText);\n      if (request === copyRequest.current) setCopyState(\"copied\");\n    } catch {\n      if (request === copyRequest.current) setCopyState(\"error\");\n    } finally {\n      if (request === copyRequest.current) copyPending.current = false;\n    }\n  }\n\n  const root = rs([\"rs-response\", from === \"user\" && \"rs-response-user\", className], styles.root, from === \"user\" && styles.user);\n  const header = rs([\"rs-response-header\"], styles.header);\n  const authorStyle = rs([\"rs-response-author\"], styles.author);\n  const statusStyle = rs([\"rs-response-status\"], styles.status);\n  const content = rs([\"rs-response-content\"], styles.content);\n  const error = rs([\"rs-response-error\"], styles.error);\n  const actionsStyle = rs([\"rs-response-actions\"], styles.actions);\n  const copyStyle = rs([\"rs-response-copy\"], styles.copy);\n  const copyStatus = rs([\"rs-response-copy-status\"], styles.copyStatus);\n  const showActions = copyText !== undefined || actions != null;\n\n  return (\n    <article\n      ref={ref}\n      {...props}\n      aria-label={label}\n      aria-labelledby={labelledBy ?? (label ? undefined : authorId)}\n      data-from={from}\n      data-status={status}\n      className={root.className}\n      style={{ ...root.style, ...style }}\n    >\n      <div {...header}>\n        <span id={authorId} {...authorStyle}>{author ?? (from === \"user\" ? \"You\" : \"Assistant\")}</span>\n        <span {...statusStyle} role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">\n          {statusLabel ?? statusLabels[status]}\n        </span>\n      </div>\n      <div {...content}>{children}</div>\n      {status === \"error\" && errorMessage && <p {...error}>{errorMessage}</p>}\n      {showActions && <div {...actionsStyle}>\n        {copyText !== undefined && <>\n          <button type=\"button\" {...copyStyle} disabled={copyState === \"pending\"} onClick={copy}>\n            {copyLabel}\n          </button>\n          <span {...copyStatus} role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">\n            {copyState === \"copied\" ? copiedLabel : copyState === \"error\" ? copyErrorLabel : \"\"}\n          </span>\n        </>}\n        {actions}\n      </div>}\n    </article>\n  );\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/response.tsx"
+    },
+    {
+      "path": "vlak/styles/response.css",
+      "content": "/* ── response: generated from packages/react/src/components/response.tsx ── */\n.rs-response{box-sizing:border-box;display:flex;flex-direction:column;gap:0.875rem;min-width:0;width:100%;max-width:66ch;align-self:flex-start;margin-inline-start:0;margin-inline-end:auto;padding-block:1.25rem;padding-inline:0;color:var(--text);font-size:0.9375rem;line-height:1.45;overflow-wrap:anywhere}\n.rs-response-user{width:fit-content;max-width:min(85%, 66ch);align-self:flex-end;margin-inline-start:auto;margin-inline-end:0;background-color:var(--table-alt);border-radius:var(--radius-sm);padding-block:1rem;padding-inline:1rem}\n.rs-response-header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}\n.rs-response-author{font-weight:600;font-size:0.84375rem}\n.rs-response-status{color:var(--text-secondary);font-size:0.8125rem}\n.rs-response-content{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}\n.rs-response-error{margin:0;color:var(--text);font-size:0.875rem}\n.rs-response-actions{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem}\n.rs-response-copy{box-sizing:border-box;min-height:var(--hit);min-width:var(--hit);padding-block:0.5rem;padding-inline:0.75rem;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:var(--radius-sm);background-color:transparent;color:var(--text);font-family:inherit;font-size:0.8125rem;font-weight:500;line-height:1.45;cursor:pointer}\n.rs-response-copy:disabled{cursor:wait}\n.rs-response-copy:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n@media (forced-colors: active){.rs-response-copy{border-color:ButtonText;background-color:ButtonFace;color:ButtonText}}\n@media (hover: hover) and (pointer: fine){.rs-response-copy:hover:not(:disabled){background-color:var(--control-fill)}}\n.rs-response-copy-status{color:var(--text-secondary);font-size:0.8125rem}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/response.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-response",
+        "rs-response-user",
+        "rs-response-header",
+        "rs-response-author",
+        "rs-response-status",
+        "rs-response-content",
+        "rs-response-error",
+        "rs-response-actions",
+        "rs-response-copy",
+        "rs-response-copy-status"
+      ],
+      "snippet": "<article class=\"rs-response\" aria-labelledby=\"response-author\"><div class=\"rs-response-header\"><span class=\"rs-response-author\" id=\"response-author\">Assistant</span><span class=\"rs-response-status\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">Complete</span></div><div class=\"rs-response-content\"><p>The lease renews on 1 October.</p></div></article>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI response",
+        "Chat message",
+        "Assistant message",
+        "AI Elements Message",
+        "Streaming response"
+      ],
+      "example": "import { Response, ResponseActions } from \"@noorddev/vlak-react\";\n\nexport function LeaseExchange() {\n  return <>\n    <Response from=\"user\">When does the lease renew?</Response>\n    <Response from=\"assistant\" status=\"complete\" actions={<ResponseActions text=\"The lease renews on 1 October.\" />}>\n      <p>The lease renews on <strong>1 October</strong>.</p>\n    </Response>\n  </>;\n}",
+      "usage": {
+        "use": [
+          "A user or assistant message whose content and response status come from the application.",
+          "Pass plain text or rendered React content as children. To render markdown, supply an external markdown renderer in the children slot and configure its content and link safety in your application.",
+          "Place ResponseActions in actions for icon controls that copy, narrate, rate, and share the response. Omit copyText when using that action bar.",
+          "Use actions for other application-owned controls. Provide copyText for a standalone copy button when a full action bar is not needed."
+        ],
+        "avoid": [
+          "Assuming this component calls a model or parses markdown. It does neither.",
+          "Putting changing token content in statusLabel. Reserve that label for short phase changes.",
+          "Injecting untrusted markup or unsafe links through an external renderer."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Reaches the optional copy button, supplied actions, and links in the rendered content."
+        },
+        {
+          "keys": "Enter, Space on Copy response",
+          "does": "Copies the explicit copyText value and reports success only after the clipboard write resolves."
+        }
+      ],
+      "a11y": [
+        "A semantic article is named by its visible speaker. from identifies user or assistant without taking over the native role attribute.",
+        "Status is a separate polite, atomic live region. Changing response tokens are ordinary readable content and do not repeat the whole message through a live region.",
+        "The streaming, complete, error, and stopped states are supplied by the application. An errorMessage is visible when status is error; the short response status announces the failure.",
+        "Copy is shown only with copyText. Clipboard denial or unavailability reports a readable failure and allows retry. Pending writes prevent duplicate activation, and stale writes cannot announce success for new content.",
+        "The 44px copy control has a focus outline and forced-colors styling. Native article attributes, className, style, and the article ref are forwarded."
+      ]
+    }
+  }
+}

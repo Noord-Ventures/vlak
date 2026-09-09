@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "agent",
+  "type": "registry:component",
+  "title": "Agent",
+  "description": "Inspects an agent’s model, instructions, tool definitions and output schema in a 4px surface.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/badge.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/code-block.json",
+    "https://vlak.dev/r/json-viewer.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/agent.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Badge } from \"./badge\";\nimport { Collapsible } from \"./collapsible\";\nimport { CodeBlock } from \"./code-block\";\nimport { JSONViewer } from \"./json-viewer\";\n\nexport interface AgentToolDefinition { name: string; description?: string; inputSchema?: unknown }\nexport interface AgentProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  name: string;\n  model?: string;\n  instructions?: React.ReactNode;\n  tools?: AgentToolDefinition[];\n  outputSchema?: unknown;\n  /** Optional rich/schema renderer. The default safely displays objects or escaped source text. */\n  renderSchema?: (schema: unknown, context: \"input\" | \"output\") => React.ReactNode;\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.75rem\", padding: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  title: { fontWeight: 600, overflowWrap: \"anywhere\" },\n  content: { display: \"grid\", gap: \"1rem\", padding: \"1rem\", minWidth: 0 },\n  section: { display: \"grid\", gap: \"0.5rem\", minWidth: 0 },\n  label: { fontSize: \"0.75rem\", color: vlak.gray, fontWeight: 600 },\n  instructions: { whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\", minWidth: 0 },\n  description: { color: vlak.gray, margin: \"0 0 0.75rem\", overflowWrap: \"anywhere\" },\n});\n\n/** Inspect agent configuration without instantiating tools or executing instructions. */\nexport const Agent = React.forwardRef<HTMLElement, AgentProps>(function Agent({ name, model, instructions, tools = [], outputSchema, renderSchema, children, className, style, ...props }, ref) {\n  const root = rs([\"rs-agent\", className], styles.root);\n  const header = rs([\"rs-agent-header\"], styles.header);\n  const title = rs([\"rs-agent-title\"], styles.title);\n  const content = rs([\"rs-agent-content\"], styles.content);\n  const section = rs([\"rs-agent-section\"], styles.section);\n  const label = rs([\"rs-agent-label\"], styles.label);\n  const instructionsStyle = rs([\"rs-agent-instructions\"], styles.instructions);\n  const description = rs([\"rs-agent-description\"], styles.description);\n  const schema = (value: unknown, context: \"input\" | \"output\") => renderSchema ? renderSchema(value, context) : typeof value === \"string\" ? <CodeBlock code={value} language={context === \"output\" ? \"TypeScript\" : \"JSON\"} /> : <JSONViewer data={value} label={`${context === \"input\" ? \"Input\" : \"Output\"} schema`} searchable={false} />;\n  return <article aria-label={`Agent ${name}`} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}><span {...title}>{name}</span>{model && <Badge variant=\"muted\">{model}</Badge>}</header>\n    <div {...content}>{instructions != null && <div {...section}><span {...label}>Instructions</span><div {...instructionsStyle}>{instructions}</div></div>}\n      {tools.length > 0 && <div {...section}><span {...label}>Tools ({tools.length})</span>{tools.map(tool => <Collapsible key={tool.name} title={tool.name}>{tool.description && <p {...description}>{tool.description}</p>}{tool.inputSchema !== undefined ? schema(tool.inputSchema, \"input\") : <p {...description}>No input schema supplied.</p>}</Collapsible>)}</div>}\n      {outputSchema !== undefined && <div {...section}><span {...label}>Output schema</span>{schema(outputSchema, \"output\")}</div>}{children}\n    </div>\n  </article>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/agent.tsx"
+    },
+    {
+      "path": "vlak/styles/agent.css",
+      "content": "/* ── agent: generated from packages/react/src/components/agent.tsx ── */\n.rs-agent{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-agent{border-color:CanvasText}}\n.rs-agent-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-agent-title{font-weight:600;overflow-wrap:anywhere}\n.rs-agent-content{display:grid;gap:1rem;padding:1rem;min-width:0}\n.rs-agent-section{display:grid;gap:0.5rem;min-width:0}\n.rs-agent-label{font-size:0.75rem;color:var(--text-secondary);font-weight:600}\n.rs-agent-instructions{white-space:pre-wrap;overflow-wrap:anywhere;min-width:0}\n.rs-agent-description{color:var(--text-secondary);margin:0 0 0.75rem;overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/agent.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-agent",
+        "rs-agent-header",
+        "rs-agent-title",
+        "rs-agent-content",
+        "rs-agent-section",
+        "rs-agent-label",
+        "rs-agent-instructions",
+        "rs-agent-description"
+      ],
+      "snippet": "<article class=\"rs-agent\" aria-label=\"Agent Code reviewer\"><header class=\"rs-agent-header\"><span class=\"rs-agent-title\">Code reviewer</span></header><div class=\"rs-agent-content\"><div class=\"rs-agent-section\"><span class=\"rs-agent-label\">Instructions</span><div class=\"rs-agent-instructions\">Review the supplied diff and cite relevant files.</div></div></div></article>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "badge",
+        "collapsible",
+        "code-block",
+        "json-viewer",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Agent",
+        "Agent configuration",
+        "Tool definitions"
+      ],
+      "example": "import { Agent } from \"@noorddev/vlak-react\";\n\n<Agent name=\"Code reviewer\" model=\"Workspace model\" instructions=\"Review the supplied diff.\" tools={[{ name: \"read_file\", inputSchema: { type: \"object\", properties: { path: { type: \"string\" } } } }]} outputSchema=\"type Review = { summary: string }\" />",
+      "usage": {
+        "use": [
+          "Inspect supplied model configuration, instructions and named tools before starting work.",
+          "Use renderSchema to supply a syntax renderer; objects use the bounded JsonViewer by default and strings use CodeBlock."
+        ],
+        "avoid": [
+          "Executing tool definitions or treating displayed instructions as authorization.",
+          "Assuming this component calls a model or highlights source without a supplied renderer."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches tool disclosures and schema controls."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space on a summary expands or collapses a tool schema."
+        }
+      ],
+      "a11y": [
+        "An article has an accessible agent name; model and tool identities are visible text.",
+        "Native tool disclosures provide keyboard access. The default object viewer does not invoke getters.",
+        "Instructions accept React content; applications configure any Markdown renderer they supply."
+      ]
+    }
+  }
+}

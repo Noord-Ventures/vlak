@@ -1,0 +1,100 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "web-preview",
+  "type": "registry:component",
+  "title": "Web preview",
+  "description": "Provides URL navigation, a sandboxed iframe and a collapsible console of supplied log messages.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/button.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/input.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/widget.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/web-preview.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Button } from \"./button\";\nimport { Icon } from \"./icons\";\nimport { Input } from \"./input\";\nimport { Collapsible } from \"./collapsible\";\nimport { WidgetEmbed } from \"./widget\";\n\nexport interface WebPreviewLog { id?: string; level: \"log\" | \"info\" | \"warn\" | \"error\"; message: string; timestamp?: string | Date }\nexport interface WebPreviewProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  title?: string;\n  url?: string;\n  defaultUrl?: string;\n  onUrlChange?: (url: string) => void;\n  onBack?: () => void;\n  onForward?: () => void;\n  canGoBack?: boolean;\n  canGoForward?: boolean;\n  onReload?: () => void;\n  logs?: WebPreviewLog[];\n  maxLogEntries?: number;\n  /** iframe permissions remain application-controlled; scripts and forms are allowed without same-origin access by default. */\n  frameProps?: Omit<React.IframeHTMLAttributes<HTMLIFrameElement>, \"src\" | \"srcDoc\" | \"title\" | \"children\">;\n}\nexport function isPreviewUrl(value: string): boolean {\n  if (value === \"about:blank\") return true;\n  if ([...value].some(character => character.charCodeAt(0) <= 32 || character.charCodeAt(0) === 127) || value.startsWith(\"//\") || value.includes(\"\\\\\")) return false;\n  if (value.startsWith(\"/\")) return true;\n  try { const url = new URL(value); return [\"http:\", \"https:\"].includes(url.protocol) && !url.username && !url.password; } catch { return false; }\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  navigation: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.25rem\", padding: \"0.5rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  address: { minWidth: \"8rem\", flex: \"1 1 auto\" },\n  body: { minWidth: 0, overflow: \"auto\" },\n  status: { padding: \"0.5rem 1rem\", margin: 0, color: vlak.gray, fontSize: \"0.75rem\" },\n  console: { padding: \"0 1rem 0.75rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider },\n  logs: { listStyle: \"none\", margin: 0, padding: 0, maxHeight: \"14rem\", overflow: \"auto\", outlineColor: vlak.ink, outlineOffset: 2 },\n  log: { display: \"grid\", gap: \"0.25rem\", paddingBlock: \"0.5rem\", borderTopWidth: vlak.hairline, borderTopStyle: \"solid\", borderTopColor: vlak.divider, color: vlak.ink },\n  level: { fontSize: \"0.75rem\", fontWeight: 600 },\n  message: { whiteSpace: \"pre-wrap\", overflowWrap: \"anywhere\", fontFamily: \"ui-monospace, SFMono-Regular, Menlo, monospace\", margin: 0 },\n});\n\n/** URL navigation and a sandboxed iframe with host-supplied console messages. */\nexport const WebPreview = React.forwardRef<HTMLElement, WebPreviewProps>(function WebPreview({ title = \"Web preview\", url, defaultUrl = \"about:blank\", onUrlChange, onBack, onForward, canGoBack = false, canGoForward = false, onReload, logs = [], maxLogEntries = 200, frameProps, className, style, children, ...props }, ref) {\n  const [innerUrl, setInnerUrl] = React.useState(defaultUrl);\n  const current = url ?? innerUrl;\n  const [draft, setDraft] = React.useState(current);\n  const [status, setStatus] = React.useState(\"Loading preview…\");\n  const [validation, setValidation] = React.useState(\"\");\n  const [reload, setReload] = React.useState(0);\n  const valid = isPreviewUrl(current);\n  React.useEffect(() => { setDraft(current); setValidation(\"\"); setStatus(\"Loading preview…\"); }, [current]);\n  const navigate = (event: React.FormEvent) => {\n    event.preventDefault();\n    const candidate = draft.trim();\n    if (!isPreviewUrl(candidate)) { setValidation(\"Enter an http or https URL, a local path starting with /, or about:blank.\"); return; }\n    setValidation(\"\");\n    if (url === undefined) setInnerUrl(candidate);\n    onUrlChange?.(candidate);\n    setStatus(candidate === current ? \"Preview address is unchanged.\" : url === undefined ? \"Loading preview…\" : \"Navigation requested.\");\n  };\n  const root = rs([\"rs-web-preview\", className], styles.root);\n  const navigation = rs([\"rs-web-preview-navigation\"], styles.navigation);\n  const address = rs([\"rs-web-preview-address\"], styles.address);\n  const body = rs([\"rs-web-preview-body\"], styles.body);\n  const statusStyle = rs([\"rs-web-preview-status\"], styles.status);\n  const consoleStyle = rs([\"rs-web-preview-console\"], styles.console);\n  const list = rs([\"rs-web-preview-logs\"], styles.logs);\n  const logStyle = rs([\"rs-web-preview-log\"], styles.log);\n  const level = rs([\"rs-web-preview-level\"], styles.level);\n  const message = rs([\"rs-web-preview-message\"], styles.message);\n  const logLimit = Number.isFinite(maxLogEntries) ? Math.min(2000, Math.max(1, Math.floor(maxLogEntries))) : 200;\n  return <section aria-label={title} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <form onSubmit={navigate}><div {...navigation} role=\"group\" aria-label={`${title} navigation`}>{onBack && <Button type=\"button\" variant=\"subtle\" size=\"icon\" aria-label=\"Back\" title=\"Back\" disabled={!canGoBack} onClick={onBack}><Icon name=\"chevron-left\" /></Button>}{onForward && <Button type=\"button\" variant=\"subtle\" size=\"icon\" aria-label=\"Forward\" title=\"Forward\" disabled={!canGoForward} onClick={onForward}><Icon name=\"chevron-right\" /></Button>}\n      <Button type=\"button\" variant=\"subtle\" aria-label=\"Reload preview\" disabled={!valid} onClick={() => { setReload(value => value + 1); setStatus(\"Loading preview…\"); onReload?.(); }}>Reload</Button><div {...address}><Input plain aria-label=\"Preview URL\" inputMode=\"url\" value={draft} readOnly={url !== undefined && !onUrlChange} onChange={event => setDraft(event.currentTarget.value)} aria-invalid={!!validation} /></div><Button type=\"submit\" variant=\"subtle\" disabled={url !== undefined && !onUrlChange}>Go</Button>\n    </div></form>\n    <p {...statusStyle} role={validation || !valid ? \"alert\" : \"status\"}>{validation || (!valid ? \"This preview address is not supported.\" : status)}</p>\n    <div {...body}>{valid && <WidgetEmbed {...frameProps} key={`${current}:${reload}`} src={current} title={title} onLoad={event => { setStatus(\"Preview loaded.\"); frameProps?.onLoad?.(event); }} onError={event => { setStatus(\"Preview could not load. Try reloading.\"); frameProps?.onError?.(event); }} />}</div>\n    <Collapsible {...consoleStyle} title={`Console (${logs.length})`}><ul {...list} tabIndex={0} aria-label=\"Preview console messages\">{logs.slice(-logLimit).map((log, index) => { const date = log.timestamp == null ? undefined : new Date(log.timestamp); const iso = date && Number.isFinite(date.getTime()) ? date.toISOString() : undefined; return <li key={log.id ?? index} {...logStyle}><span {...level}>{log.level}{iso && <> · <time dateTime={iso}>{iso.slice(11, 19)} UTC</time></>}</span><pre {...message}>{log.message}</pre></li>; })}</ul>{logs.length === 0 && <p {...message}>No console output supplied.</p>}{logs.length > logLimit && <p {...message}>Showing the latest {logLimit} messages.</p>}</Collapsible>{children}\n  </section>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/web-preview.tsx"
+    },
+    {
+      "path": "vlak/styles/web-preview.css",
+      "content": "/* ── web-preview: generated from packages/react/src/components/web-preview.tsx ── */\n.rs-web-preview{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-web-preview{border-color:CanvasText}}\n.rs-web-preview-navigation{display:flex;flex-wrap:wrap;align-items:center;gap:0.25rem;padding:0.5rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-web-preview-address{min-width:8rem;flex:1 1 auto}\n.rs-web-preview-body{min-width:0;overflow:auto}\n.rs-web-preview-status{padding:0.5rem 1rem;margin:0;color:var(--text-secondary);font-size:0.75rem}\n.rs-web-preview-console{padding:0 1rem 0.75rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}\n.rs-web-preview-logs{list-style:none;margin:0;padding:0;max-height:14rem;overflow:auto;outline-color:var(--text);outline-offset:2px}\n.rs-web-preview-log{display:grid;gap:0.25rem;padding-block:0.5rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider);color:var(--text)}\n.rs-web-preview-level{font-size:0.75rem;font-weight:600}\n.rs-web-preview-message{white-space:pre-wrap;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;margin:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/web-preview.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-web-preview",
+        "rs-web-preview-navigation",
+        "rs-web-preview-address",
+        "rs-web-preview-body",
+        "rs-web-preview-status",
+        "rs-web-preview-console",
+        "rs-web-preview-logs",
+        "rs-web-preview-log",
+        "rs-web-preview-level",
+        "rs-web-preview-message"
+      ],
+      "snippet": "<section class=\"rs-web-preview\" aria-label=\"Calendar preview\"><div class=\"rs-web-preview-body\"><iframe class=\"rs-widget-embed\" title=\"Calendar preview\" src=\"about:blank\" sandbox=\"allow-scripts allow-forms\" loading=\"lazy\" referrerpolicy=\"no-referrer\"></iframe></div><p class=\"rs-web-preview-status\" role=\"status\">Preview loaded.</p></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "button",
+        "icons",
+        "input",
+        "collapsible",
+        "widget",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Web Preview",
+        "Generated page preview",
+        "Iframe console"
+      ],
+      "example": "import { WebPreview } from \"@noorddev/vlak-react\";\n\n<WebPreview title=\"Generated page\" defaultUrl=\"about:blank\" frameProps={{ height: 320 }} logs={[{ level: \"info\", message: \"Preview ready\" }]} />",
+      "usage": {
+        "use": [
+          "Preview a supplied http/https URL, local path or about:blank.",
+          "Use url/onUrlChange for controlled navigation. Optional onBack/onForward callbacks and canGoBack/canGoForward flags let the host own history.",
+          "Pass frameProps for explicit iframe permissions and native load/error events; the default does not grant same-origin access.",
+          "Supply logs from a trusted application channel. maxLogEntries bounds the visible console tail."
+        ],
+        "avoid": [
+          "Evaluating JavaScript URLs or embedding executable data URLs in the address field.",
+          "Claiming automatic console capture from a cross-origin iframe.",
+          "Treating iframe load as proof that a provider page accepted framing or successfully ran its application."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches enabled navigation controls, the address, iframe and console disclosure."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter in the address field requests navigation; Enter or Space activates the focused button."
+        }
+      ],
+      "a11y": [
+        "The iframe, address, navigation form and console list have accessible names.",
+        "URL validation is visible and invalid protocols never reach iframe src.",
+        "Controlled navigation leaves the previous source in place until the host supplies a new url.",
+        "Log levels use text and messages are escaped; history and external application behavior remain host-owned."
+      ]
+    }
+  }
+}

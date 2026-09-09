@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "persona",
+  "type": "registry:component",
+  "title": "Persona",
+  "description": "A monochrome assistant visual with idle, listening, thinking, speaking, and asleep states, plus a custom visual slot.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/persona.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport type PersonaState = \"idle\" | \"listening\" | \"thinking\" | \"speaking\" | \"asleep\";\nexport interface PersonaProps extends React.HTMLAttributes<HTMLDivElement> {\n  state?: PersonaState;\n  size?: number;\n  label?: string;\n  /** A custom decorative visual. The application owns its rendering lifecycle. */\n  children?: React.ReactNode;\n}\nconst breathe = stylex.keyframes({ \"0%, 100%\": { transform: \"scaleY(0.35)\" }, \"50%\": { transform: \"scaleY(1)\" } });\nconst styles = stylex.create({\n  root: { display: \"inline-grid\", placeItems: \"center\", flexShrink: 0, verticalAlign: \"middle\", color: vlak.ink, overflow: \"hidden\", borderRadius: \"50%\", backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: \"Canvas\" } },\n  visual: { display: \"flex\", alignItems: \"center\", justifyContent: \"center\", gap: \"8%\", width: \"60%\", height: \"50%\" },\n  bar: { width: \"12%\", height: \"100%\", backgroundColor: { default: \"currentColor\", [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, transformOrigin: \"center\", animationName: { default: breathe, [mq.reduce]: \"none\", [mq.forcedColors]: \"none\" }, animationDuration: \"1.8s\", animationTimingFunction: \"ease-in-out\", animationIterationCount: \"infinite\", animationPlayState: \"paused\" },\n  running: { animationPlayState: \"running\" },\n  listening: { animationDuration: \"1s\" },\n  thinking: { animationDuration: \"1.4s\" },\n  speaking: { animationDuration: \"0.55s\" },\n  asleep: { height: \"16%\", animationName: \"none\" },\n});\n\n/** Five conversational states with a native monochrome visual and a custom rendering slot. */\nexport const Persona = React.forwardRef<HTMLDivElement, PersonaProps>(function Persona({ state = \"idle\", size = 48, label, children, className, style, ...props }, ref) {\n  const rootRef = React.useRef<HTMLDivElement>(null);\n  const [visible, setVisible] = React.useState(false);\n  React.useEffect(() => {\n    let intersecting = true;\n    const update = () => setVisible(intersecting && document.visibilityState !== \"hidden\");\n    const observer = typeof IntersectionObserver === \"function\" ? new IntersectionObserver(entries => { intersecting = entries[0]?.isIntersecting ?? true; update(); }) : null;\n    if (rootRef.current) observer?.observe(rootRef.current);\n    document.addEventListener(\"visibilitychange\", update); update();\n    return () => { observer?.disconnect(); document.removeEventListener(\"visibilitychange\", update); };\n  }, []);\n  const diameter = Number.isFinite(size) ? Math.max(1, size) : 48;\n  const root = rs([\"rs-persona\", className], styles.root);\n  const visual = rs([\"rs-persona-visual\"], styles.visual);\n  const bar = rs([\"rs-persona-bar\", visible && \"rs-persona-running\", state === \"listening\" && \"rs-persona-listening\", state === \"thinking\" && \"rs-persona-thinking\", state === \"speaking\" && \"rs-persona-speaking\", state === \"asleep\" && \"rs-persona-asleep\"], styles.bar, visible && styles.running, state === \"listening\" && styles.listening, state === \"thinking\" && styles.thinking, state === \"speaking\" && styles.speaking, state === \"asleep\" && styles.asleep);\n  return <div {...props} ref={node => { rootRef.current = node; if (typeof ref === \"function\") ref(node); else if (ref) ref.current = node; }} role={label ? \"img\" : undefined} aria-label={label ? `${label}: ${state}` : undefined} aria-hidden={label ? undefined : true} data-state={state} className={root.className} style={{ ...root.style, width: diameter, height: diameter, ...style }}>\n    {children ?? <span {...visual} aria-hidden=\"true\">{[0, 1, 2, 3].map(index => <span key={index} {...bar} style={{ ...bar.style, animationDelay: `${index * -0.22}s` }} />)}</span>}\n  </div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/persona.tsx"
+    },
+    {
+      "path": "vlak/styles/persona.css",
+      "content": "/* ── persona: generated from packages/react/src/components/persona.tsx ── */\n@keyframes rs-anim-breathe{0%, 100%{transform:scaleY(0.35)}50%{transform:scaleY(1)}}\n.rs-persona{display:inline-grid;place-items:center;flex-shrink:0;vertical-align:middle;color:var(--text);overflow:hidden;border-radius:50%;background-color:var(--control-fill)}\n@media (forced-colors: active){.rs-persona{background-color:Canvas}}\n.rs-persona-visual{display:flex;align-items:center;justify-content:center;gap:8%;width:60%;height:50%}\n.rs-persona-bar{width:12%;height:100%;background-color:currentColor;border-radius:var(--radius-sm);transform-origin:center;animation-name:rs-anim-breathe;animation-duration:1.8s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:paused}\n@media (forced-colors: active){.rs-persona-bar{background-color:CanvasText;animation-name:none}}\n@media (prefers-reduced-motion: reduce){.rs-persona-bar{animation-name:none}}\n.rs-persona-running{animation-play-state:running}\n.rs-persona-listening{animation-duration:1s}\n.rs-persona-thinking{animation-duration:1.4s}\n.rs-persona-speaking{animation-duration:0.55s}\n.rs-persona-asleep{height:16%;animation-name:none}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/persona.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-persona",
+        "rs-persona-visual",
+        "rs-persona-bar",
+        "rs-persona-running",
+        "rs-persona-listening",
+        "rs-persona-thinking",
+        "rs-persona-speaking",
+        "rs-persona-asleep"
+      ],
+      "snippet": "<div class=\"rs-persona\" role=\"img\" aria-label=\"Assistant: thinking\" data-state=\"thinking\" style=\"width:48px;height:48px\"><span class=\"rs-persona-visual\" aria-hidden=\"true\"><span class=\"rs-persona-bar rs-persona-thinking\"></span><span class=\"rs-persona-bar rs-persona-thinking\"></span><span class=\"rs-persona-bar rs-persona-thinking\"></span><span class=\"rs-persona-bar rs-persona-thinking\"></span></span></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Persona",
+        "AI avatar",
+        "Assistant visual",
+        "Voice state",
+        "Orb"
+      ],
+      "example": "import type { ReactNode } from \"react\";\nimport { Persona, type PersonaState } from \"@noorddev/vlak-react\";\n\nexport function AssistantPersona({ state = \"idle\", visual }: {\n  state?: PersonaState;\n  visual?: ReactNode; // Optional application-owned decorative renderer.\n}) {\n  return <Persona state={state} size={32} label=\"Assistant\">{visual}</Persona>;\n}",
+      "usage": {
+        "use": [
+          "Drive state from actual application recording, generation and playback events.",
+          "The default visual uses native CSS, pauses when offscreen or the document is hidden, and stops animation for reduced motion and forced colors.",
+          "Supply children for a custom decorative visual such as an application-owned Orbkit renderer. Its graphics lifecycle remains application-owned.",
+          "Omit label for a decorative visual beside an already named response. Add label to expose the visual and state as an image."
+        ],
+        "avoid": [
+          "Mounting a separate graphics runtime for every historical message.",
+          "Using animation alone to communicate an error or progress that needs readable text."
+        ]
+      },
+      "keyboard": [],
+      "a11y": [
+        "The default is decorative. A supplied label exposes a named image including the current conversational state.",
+        "Animation respects reduced motion, forced colors, viewport visibility and document visibility.",
+        "The component forwards native div attributes, class/style and ref; it does not request audio permissions or play speech."
+      ]
+    }
+  }
+}

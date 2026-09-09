@@ -1,0 +1,90 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "schema-display",
+  "type": "registry:component",
+  "title": "Schema display",
+  "description": "Displays an endpoint’s method, path, parameters and nested request and response schemas.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/badge.json",
+    "https://vlak.dev/r/collapsible.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/schema-display.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Badge } from \"./badge\";\nimport { Collapsible } from \"./collapsible\";\n\nexport interface SchemaProperty { name: string; type: string; required?: boolean; description?: string; properties?: SchemaProperty[]; items?: SchemaProperty }\nexport interface SchemaParameter extends SchemaProperty { location?: \"path\" | \"query\" | \"header\" | \"cookie\" }\nexport interface SchemaDisplayProps extends React.HTMLAttributes<HTMLElement> {\n  method: \"GET\" | \"POST\" | \"PUT\" | \"PATCH\" | \"DELETE\" | \"HEAD\" | \"OPTIONS\";\n  path: string;\n  description?: React.ReactNode;\n  parameters?: SchemaParameter[];\n  requestBody?: SchemaProperty[];\n  responseBody?: SchemaProperty[];\n  /** Bounds recursive schema rendering. Defaults to 6 levels and 200 properties. */\n  maxDepth?: number;\n  maxNodes?: number;\n}\nconst styles = stylex.create({\n  root: { minWidth: 0, width: \"100%\", borderWidth: vlak.hairline, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"CanvasText\" }, borderRadius: vlak.radiusSm, color: vlak.ink, backgroundColor: vlak.paper, fontSize: \"0.875rem\", lineHeight: 1.45 },\n  header: { display: \"flex\", flexWrap: \"wrap\", alignItems: \"center\", gap: \"0.75rem\", padding: \"1rem\", borderBottomWidth: vlak.hairline, borderBottomStyle: \"solid\", borderBottomColor: vlak.divider },\n  path: { minWidth: 0, overflowWrap: \"anywhere\" },\n  content: { padding: \"1rem\", display: \"grid\", gap: \"0.75rem\", minWidth: 0 },\n  description: { margin: 0, color: vlak.gray, overflowWrap: \"anywhere\" },\n  list: { listStyle: \"none\", margin: 0, paddingInlineStart: \"0.75rem\", display: \"grid\", gap: \"0.75rem\", minWidth: 0 },\n  property: { display: \"grid\", gap: \"0.25rem\", minWidth: 0, color: vlak.ink },\n  line: { display: \"flex\", flexWrap: \"wrap\", gap: \"0.5rem\", alignItems: \"center\", overflowWrap: \"anywhere\", minWidth: 0 },\n  note: { fontSize: \"0.75rem\", color: vlak.gray },\n});\n\n/** Endpoint documentation with bounded, expandable object and array schemas. */\nexport const SchemaDisplay = React.forwardRef<HTMLElement, SchemaDisplayProps>(function SchemaDisplay({ method, path, description, parameters, requestBody, responseBody, maxDepth = 6, maxNodes = 200, children, className, style, ...props }, ref) {\n  const root = rs([\"rs-schema-display\", className], styles.root);\n  const header = rs([\"rs-schema-display-header\"], styles.header);\n  const pathStyle = rs([\"rs-schema-display-path\"], styles.path);\n  const content = rs([\"rs-schema-display-content\"], styles.content);\n  const descriptionStyle = rs([\"rs-schema-display-description\"], styles.description);\n  const list = rs([\"rs-schema-display-list\"], styles.list);\n  const propertyStyle = rs([\"rs-schema-display-property\"], styles.property);\n  const line = rs([\"rs-schema-display-line\"], styles.line);\n  const note = rs([\"rs-schema-display-note\"], styles.note);\n  const depthLimit = Number.isFinite(maxDepth) ? Math.min(20, Math.max(1, Math.floor(maxDepth))) : 6;\n  let remaining = Number.isFinite(maxNodes) ? Math.min(2000, Math.max(1, Math.floor(maxNodes))) : 200;\n  const renderProperties = (properties: SchemaParameter[], depth: number, parents: Set<SchemaProperty>): React.ReactNode => {\n    const nodes: React.ReactNode[] = [];\n    for (const [index, property] of properties.entries()) {\n      if (remaining-- <= 0) { nodes.push(<li key=\"limit\" {...note}>More properties omitted.</li>); break; }\n      const nested = property.properties ?? (property.items ? [property.items] : undefined);\n      const circular = parents.has(property);\n      const nextParents = new Set(parents).add(property);\n      nodes.push(<li key={`${index}:${property.name}`} {...propertyStyle}><div {...line}><code>{property.name}</code><Badge variant=\"muted\">{property.type}</Badge>{property.location && <span {...note}>{property.location}</span>}{property.required && <strong {...note}>Required</strong>}</div>\n        {property.description && <p {...descriptionStyle}>{property.description}</p>}\n        {nested && (circular ? <span {...note}>Recursive reference.</span> : depth >= depthLimit ? <span {...note}>Depth limit reached.</span> : <Collapsible title={`${property.items ? \"Items\" : \"Properties\"} of ${property.name}`} defaultOpen={depth === 0}>{renderProperties(nested, depth + 1, nextParents)}</Collapsible>)}\n      </li>);\n    }\n    return <ul {...list}>{nodes}</ul>;\n  };\n  return <article aria-label={`${method} ${path}`} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>\n    <header {...header}><Badge variant=\"muted\">{method}</Badge><code {...pathStyle}>{path}</code></header>\n    <div {...content}>{description != null && <div {...descriptionStyle}>{description}</div>}\n      {parameters != null && <Collapsible title={`Parameters (${parameters.length})`} defaultOpen>{parameters.length ? renderProperties(parameters, 0, new Set()) : <p {...descriptionStyle}>No parameters.</p>}</Collapsible>}\n      {requestBody != null && <Collapsible title=\"Request body\" defaultOpen>{requestBody.length ? renderProperties(requestBody, 0, new Set()) : <p {...descriptionStyle}>No request body.</p>}</Collapsible>}\n      {responseBody != null && <Collapsible title=\"Response body\" defaultOpen>{responseBody.length ? renderProperties(responseBody, 0, new Set()) : <p {...descriptionStyle}>No response body.</p>}</Collapsible>}{children}\n    </div>\n  </article>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/schema-display.tsx"
+    },
+    {
+      "path": "vlak/styles/schema-display.css",
+      "content": "/* ── schema-display: generated from packages/react/src/components/schema-display.tsx ── */\n.rs-schema-display{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}\n@media (forced-colors: active){.rs-schema-display{border-color:CanvasText}}\n.rs-schema-display-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;padding:1rem;border-bottom-width:1px;border-bottom-style:solid;border-bottom-color:var(--divider)}\n.rs-schema-display-path{min-width:0;overflow-wrap:anywhere}\n.rs-schema-display-content{padding:1rem;display:grid;gap:0.75rem;min-width:0}\n.rs-schema-display-description{margin:0;color:var(--text-secondary);overflow-wrap:anywhere}\n.rs-schema-display-list{list-style:none;margin:0;padding-inline-start:0.75rem;display:grid;gap:0.75rem;min-width:0}\n.rs-schema-display-property{display:grid;gap:0.25rem;min-width:0;color:var(--text)}\n.rs-schema-display-line{display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center;overflow-wrap:anywhere;min-width:0}\n.rs-schema-display-note{font-size:0.75rem;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/schema-display.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ai",
+      "classes": [
+        "rs-schema-display",
+        "rs-schema-display-header",
+        "rs-schema-display-path",
+        "rs-schema-display-content",
+        "rs-schema-display-description",
+        "rs-schema-display-list",
+        "rs-schema-display-property",
+        "rs-schema-display-line",
+        "rs-schema-display-note"
+      ],
+      "snippet": "<article class=\"rs-schema-display\" aria-label=\"POST /reviews\"><header class=\"rs-schema-display-header\"><span class=\"rs-badge-muted\">POST</span><code class=\"rs-schema-display-path\">/reviews</code></header><div class=\"rs-schema-display-content\"><details class=\"rs-disclosure\" open><summary class=\"rs-disclosure-summary\">Request body</summary><ul class=\"rs-schema-display-list\"><li class=\"rs-schema-display-property\"><div class=\"rs-schema-display-line\"><code>diff</code><span class=\"rs-badge-muted\">string</span><strong class=\"rs-schema-display-note\">Required</strong></div></li></ul></details></div></article>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "badge",
+        "collapsible",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "AI Elements Schema Display",
+        "API endpoint",
+        "Request schema"
+      ],
+      "example": "import { SchemaDisplay } from \"@noorddev/vlak-react\";\n\n<SchemaDisplay method=\"POST\" path=\"/projects/{projectId}/reviews\" parameters={[{ name: \"projectId\", type: \"string\", required: true, location: \"path\" }]} requestBody={[{ name: \"diff\", type: \"string\", required: true }]} responseBody={[{ name: \"id\", type: \"string\", required: true }]} />",
+      "usage": {
+        "use": [
+          "Endpoint documentation with parameter locations, required fields, nested objects and array item schemas.",
+          "Use maxDepth and maxNodes to bound rendering of large schemas; defaults are 6 levels and 200 properties.",
+          "Adapt an API specification to SchemaProperty records before rendering."
+        ],
+        "avoid": [
+          "Treating this view as an OpenAPI validator or request executor.",
+          "Embedding markup in endpoint paths; strings are deliberately rendered as text."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Tab reaches each native schema summary."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Enter or Space toggles parameters, bodies and nested properties."
+        }
+      ],
+      "a11y": [
+        "Endpoint method and path name the article, while types, locations and required flags are readable text.",
+        "Recursive references, depth limits and omitted properties have explicit labels.",
+        "Paths and descriptions are escaped React text; no markup interpolation is used."
+      ]
+    }
+  }
+}

@@ -1,6 +1,15 @@
 "use client";
 
+import dynamic from "next/dynamic";
+
 import type { ComponentType } from "react";
+import { aiAttachmentPreviews } from "./ai-attachments";
+import { aiCodeToolsPreviews } from "./ai-code-tools";
+import { aiChatControlPreviews } from "./ai-chat-controls";
+import { aiWorkPatternPreviews } from "./ai-work-patterns";
+import { aiVoicePreviews } from "./ai-voice";
+import { aiCodePreviews } from "./ai-code";
+import { aiPreviews } from "./ai";
 import { inputNavigationPreviews } from "./input-navigation";
 import { dataPreviews } from "./data";
 import { mediaPreviews } from "./media";
@@ -21,6 +30,17 @@ import { microbiologyPreviews } from "./microbiology";
 
 /** Raw, interactive specimens. Editorial compositions belong only in In action. */
 export const additionPreviews: Record<string, ComponentType> = {
+  ...aiAttachmentPreviews,
+  ...aiCodeToolsPreviews,
+  ...aiChatControlPreviews,
+  "workflow-canvas": dynamic(() => import("./ai-workflow").then(module => module.aiWorkflowPreviews["workflow-canvas"])),
+  "response-branch": dynamic(() => import("./ai-rich-response").then(module => module.ResponseBranchPreview)),
+  "highlighted-code": dynamic(() => import("./ai-rich-response").then(module => module.HighlightedCodePreview)),
+  "response-markdown": dynamic(() => import("./ai-rich-response").then(module => module.MarkdownPreview)),
+  ...aiWorkPatternPreviews,
+  ...aiVoicePreviews,
+  ...aiCodePreviews,
+  ...aiPreviews,
   ...inputNavigationPreviews,
   ...dataPreviews,
   ...mediaPreviews,

@@ -1,0 +1,6 @@
+/* ── conversation: generated from packages/react/src/components/conversation.tsx ── */
+.rs-conversation{display:flex;flex-direction:column;gap:0.75rem;width:100%;min-width:0;color:var(--text)}
+.rs-conversation-viewport{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;min-height:0;min-width:0;box-sizing:border-box;padding:0.25rem;scroll-behavior:auto}
+.rs-conversation-viewport:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:-2px}
+.rs-conversation-content{display:flex;flex-direction:column;gap:1.25rem;min-width:0;overflow-wrap:anywhere}
+.rs-conversation-footer{display:flex;justify-content:center}

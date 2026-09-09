@@ -74,6 +74,7 @@ Forwards `ref` to the `HTMLUListElement`.
 | `expanded` | `string[]` |  |  |
 | `defaultExpanded` | `string[]` | `[]` |  |
 | `onExpandedChange` | `(ids: string[]) => void` |  |  |
+| `renderLabel` | `(node: TreeNode, state: { selected: boolean; expanded: boolean; }) => ReactNode` |  | Custom non-interactive row content. The node's plain label still names the tree item. |
 
 ## Keyboard
 
@@ -87,7 +88,7 @@ Forwards `ref` to the `HTMLUListElement`.
 
 ## Classes
 
-`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`, `rs-tree-view-label`
+`rs-tree-view`, `rs-tree-view-group`, `rs-tree-view-item`, `rs-tree-view-selected`, `rs-tree-view-disabled`, `rs-tree-view-spacer`, `rs-tree-view-disclosure`, `rs-tree-view-label`, `rs-tree-view-icon`
 
 ## Dependencies
 

@@ -1,0 +1,5 @@
+/* ── mic-selector: generated from packages/react/src/components/mic-selector.tsx ── */
+.rs-mic-selector{display:grid;gap:0.5rem;min-width:0;width:100%;color:var(--text)}
+.rs-mic-selector-label{font-size:var(--control-fs);font-weight:500;line-height:1.45}
+.rs-mic-selector-actions{display:flex;flex-wrap:wrap;gap:0.5rem}
+.rs-mic-selector-message{margin:0;font-size:var(--control-label);color:var(--text-secondary);line-height:1.45}

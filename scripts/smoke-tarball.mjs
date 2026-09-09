@@ -7,7 +7,7 @@
 //   - @noorddev/vlak-cli: init + add from the tarball, offline
 //   - publint and are-the-types-wrong on each tarball
 //
-// Run after `pnpm build`. Needs network for react/react-dom.
+// Run after `pnpm build`. Needs network for React and optional rendering engines.
 import { execSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -18,8 +18,46 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 168;
+const expectedCatalogueSize = 215;
+const parityCore = [
+  ["attachments", "Attachments"], ["response-branch", "ResponseBranch"],
+  ["shimmer", "Shimmer"], ["plan", "Plan"], ["task", "Task"], ["thought-steps", "ThoughtSteps"],
+  ["checkpoint", "Checkpoint"], ["suggestions", "Suggestions"], ["work-queue", "WorkQueue"],
+  ["generated-image", "GeneratedImage"], ["conversation-export", "ConversationDownload"], ["response-editor", "ResponseEditor"],
+  ["agent", "Agent"], ["artifact", "Artifact"], ["commit", "Commit"], ["environment-variables", "EnvironmentVariables"],
+  ["package-info", "PackageInfo"], ["schema-display", "SchemaDisplay"], ["snippet", "Snippet"], ["test-results", "TestResults"],
+  ["terminal", "Terminal"], ["stack-trace", "StackTrace"], ["sandbox", "Sandbox"], ["web-preview", "WebPreview"],
+  ["context-usage", "ContextUsage"], ["model-selector", "ModelSelector"], ["inline-citation", "InlineCitation"], ["sources", "Sources"], ["open-in-chat", "OpenInChat"],
+  ["audio-player", "AudioPlayer"], ["mic-selector", "MicSelector"], ["speech-input", "SpeechInput"],
+  ["voice-selector", "VoiceSelector"], ["transcription", "Transcription"], ["persona", "Persona"],
+];
+const optionalAdditions = [
+  ["response-markdown", "ResponseMarkdown"], ["highlighted-code", "HighlightedCode"],
+  ["jsx-preview", "JSXPreview"], ["workflow-canvas", "WorkflowCanvas"],
+];
+if (new Set([...parityCore, ...optionalAdditions].map(([name]) => name)).size !== 39) throw new Error("Expected 39 parity catalogue entries");
+const reactManifest = JSON.parse(readFileSync(join(root, "packages/react/package.json"), "utf8"));
+const optionalEngines = Object.entries(reactManifest.peerDependencies).filter(([name]) => reactManifest.peerDependenciesMeta?.[name]?.optional);
+const withoutOptionalEngines = `
+for (const name of ${JSON.stringify(optionalEngines.map(([name]) => name))}) {
+  let installed = false;
+  try { import.meta.resolve(name); installed = true; } catch (error) { if (error.code !== "ERR_MODULE_NOT_FOUND") throw error; }
+  if (installed) throw new Error("Core consumer unexpectedly installed optional engine: " + name);
+}
+console.log("  ✓ core install/import works without any optional rendering engines");
+`;
 const additions = [
+  ...parityCore,
+  ["attachments", "Attachment"], ["suggestions", "Suggestion"], ["snippet", "SnippetCopy"], ["audio-player", "AudioPlayerControls"],
+  ["chat", "Chat"],
+  ["conversation", "Conversation"],
+  ["response", "Response"],
+  ["response-actions", "ResponseActions"],
+  ["widget", "Widget"],
+  ["widget", "WidgetEmbed"],
+  ["reasoning", "Reasoning"],
+  ["tool-call", "ToolCall"],
+  ["confirmation", "Confirmation"],
   ["calendar-popover", "CalendarPopover"],
   ["joint-panel", "JointPanel"],
   ["robot-pose", "RobotPose"],
@@ -64,6 +102,54 @@ const additions = [
 const renderAdditions = `
 const additions = ${JSON.stringify(additions)};
 const fixtureProps = {
+  Attachments: { variant: "inline", children: h(R.Attachment, { data: { id: "brief", name: "Project brief.txt", mediaType: "text/plain", size: 342 }, onRemove() {} }) },
+  Attachment: { data: { id: "drawing", name: "drawing.svg", mediaType: "image/svg+xml", url: "blob:https://example.com/drawing" }, onRemove() {} },
+  ResponseBranch: { branches: [{ id: "first", content: "First recorded response" }, { id: "second", content: "Revised recorded response" }], defaultValue: "second" },
+  Shimmer: { children: "Reviewing brief", active: true },
+  Plan: { title: "Review plan", description: "Read the brief and compare ownership", actions: h(R.Button, { variant: "subtle" }, "Approve plan"), children: "Check each launch milestone." },
+  Task: { title: "Read sources", items: [{ id: "brief", content: "Read launch brief", state: "complete", file: "brief.md" }] },
+  ThoughtSteps: { defaultOpen: true, steps: [{ id: "source", title: "Read the source", state: "complete", sources: h("a", { href: "/brief" }, "Launch brief") }, { id: "review", title: "Compare owners", state: "active", content: "One owner is missing." }] },
+  Checkpoint: { label: "Before editing", onRestore() {} },
+  Suggestions: { children: h(R.Suggestion, { value: "Review launch brief", onSelect() {} }, "Review brief") },
+  Suggestion: { value: "Review launch brief", onSelect() {}, children: "Review brief" },
+  WorkQueue: { sections: [{ id: "review", title: "Next steps", items: [{ id: "brief", content: "Review brief", completed: false, description: "Confirm the owner" }] }], onItemCheckedChange() {} },
+  GeneratedImage: { alt: "Recorded chart", image: { mediaType: "image/png", base64: "AAAA" } },
+  ConversationDownload: { messages: [{ role: "user", content: "Review the brief" }, { role: "assistant", parts: [{ type: "text", text: "One finding" }, { type: "tool", name: "read", output: { sections: 3 } }] }], title: "Brief review" },
+  ResponseEditor: { text: "Draft response", onSave() {}, onCancel() {} },
+  Agent: { name: "Brief reviewer", model: "Supplied model", instructions: "Compare the supplied milestones", tools: [{ name: "readBrief", description: "Read the supplied document", inputSchema: { type: "object", properties: { path: { type: "string" } } } }], outputSchema: { type: "object" } },
+  Artifact: { title: "Review notes", description: "Recorded findings", children: "One milestone needs an owner", onClose() {} },
+  Commit: { hash: "a1b2c3d4e5f6", message: "Clarify the launch owner", author: "Robin Ellis", timestamp: "2026-09-09T08:00:00Z", timeLabel: "9 September", defaultOpen: true, files: [{ path: "brief.md", status: "modified", additions: 3, deletions: 1 }], onFileSelect() {} },
+  EnvironmentVariables: { variables: [{ name: "SERVICE_TOKEN", value: "private-smoke-fixture", required: true, description: "Application credential" }] },
+  PackageInfo: { name: "example-library", currentVersion: "1.0.0", newVersion: "1.1.0", changeType: "minor", dependencies: [{ name: "react", version: ">=18", kind: "peer" }] },
+  SchemaDisplay: { method: "POST", path: "/reviews", parameters: [{ name: "project", type: "string", location: "query", required: true }], responseBody: [{ name: "result", type: "object", properties: [{ name: "summary", type: "string", required: true }] }] },
+  Snippet: { code: "pnpm add example-library", prefix: "$" },
+  SnippetCopy: { value: "pnpm add example-library" },
+  TestResults: { suites: [{ id: "review", name: "Review tests", tests: [{ id: "owner", name: "Requires an owner", status: "passed", duration: 8 }, { id: "date", name: "Requires a date", status: "failed", error: "Missing launch date", stack: "Error: Missing launch date" }] }], onRetry() {} },
+  Terminal: { output: "Reading brief\\n\\u001b[32mReady\\u001b[0m", streaming: true, onClear() {} },
+  StackTrace: { trace: "Error: Missing owner\\n    at review (/app/review.ts:12:3)", defaultOpen: true, onFilePathClick() {} },
+  Sandbox: { title: "Recorded run", state: "complete", code: "console.log(3)", language: "JavaScript", output: "3" },
+  WebPreview: { title: "Review preview", defaultUrl: "https://example.com/preview", logs: [{ id: "ready", level: "info", message: "Preview ready" }] },
+  ContextUsage: { usedTokens: 1200, maxTokens: 8000, usage: { inputTokens: 1000, outputTokens: 200 }, pricing: { inputPerMillion: 1, outputPerMillion: 2 }, model: "Supplied model", defaultOpen: true },
+  ModelSelector: { models: [{ id: "fast", name: "Fast model", provider: "Example provider", description: "Short drafts" }, { id: "careful", name: "Careful model", provider: "Example provider", disabled: true }], defaultValue: "fast", onValueChange() {} },
+  InlineCitation: { sources: [{ id: "brief", title: "Launch brief", url: "https://example.com/brief", quote: "Every milestone has an owner" }], children: "1" },
+  Sources: { sources: [{ id: "brief", title: "Launch brief", url: "https://example.com/brief", description: "Supplied source" }], defaultOpen: true },
+  OpenInChat: { prompt: "Review the launch brief", providers: ["chatgpt", "claude"], defaultOpen: true },
+  AudioPlayer: { title: "Spoken brief", src: "https://example.com/brief.wav", transcript: "The brief is ready for review." },
+  AudioPlayerControls: { seekOffset: 5 },
+  MicSelector: { label: "Microphone", onValueChange() {} },
+  SpeechInput: { onTranscript() {} },
+  VoiceSelector: { voices: [{ id: "mina", name: "Mina", provider: "Example provider", language: "English", previewSrc: "https://example.com/sample.wav", previewText: "The brief is ready." }], defaultValue: "mina", onValueChange() {} },
+  Transcription: { currentTime: 2, segments: [{ id: "first", startSecond: 0, endSecond: 4, speaker: "Mina", text: "The brief is ready." }], onSeek() {} },
+  Persona: { state: "thinking", label: "Assistant: thinking" },
+  Chat: { title: "Example chat", composer: "Write a message", children: "Recorded response" },
+  Conversation: { label: "Example conversation" },
+  Response: { children: "Recorded response", status: "complete" },
+  ResponseActions: { text: "Recorded response" },
+  Widget: { title: "Recorded result", provider: "Example integration", children: "Three files found" },
+  WidgetEmbed: { title: "Embedded result", src: "https://example.com/embed", height: 360 },
+  Reasoning: { title: "Work summary", children: "Compared the supplied brief" },
+  ToolCall: { title: "Read brief", state: "complete", output: "3 sections read" },
+  Confirmation: { title: "Approve note", onConfirm() {} },
   CalendarPopover: { label: "Deadline", defaultValue: "2026-07-24", name: "deadline" },
   JointPanel: {"label": "Robot joints", "joints": []},
   RobotPose: {"label": "Recorded pose", "poses": []},
@@ -100,7 +186,7 @@ const fixtureProps = {
   TreeView: { label: "Files", nodes: [{ id: "file", label: "Readme" }] }, Toolbar: { label: "Actions", actions: [] }, BottomNavigation: { items: [] }, OverflowList: { items: [] }, QueryBuilder: { fields: [] },
   VirtualList: { label: "Records", items: [] }, MasterDetail: { items: [] }, PropertyGrid: { fields: [] },
   MediaScrubber: { duration: 60 }, MediaPlayer: { src: "/recording.mp3", label: "Recording" }, Waveform: { samples: [0.2, 0.6], duration: 60 }, ImageViewer: { images: [] },
-  MessageComposer: { onSend() {} }, FileBrowser: { entries: [] }, KanbanBoard: { columns: [] }, Scheduler: { events: [], defaultView: "agenda", defaultValue: new Date("2026-09-06T00:00:00Z"), timeZone: "UTC" },
+  MessageComposer: { compact: true, maxRows: 6, defaultValue: "Review the launch brief", tools: h(R.Button, { variant: "subtle" }, "Add context"), onSend() {} }, FileBrowser: { entries: [] }, KanbanBoard: { columns: [] }, Scheduler: { events: [], defaultView: "agenda", defaultValue: new Date("2026-09-06T00:00:00Z"), timeZone: "UTC" },
   HealthMetric: { label: "Recorded amount", value: 2, unit: "units", status: "available", source: "Fictional fixture" },
   ReferenceRange: { label: "Example assay", value: 2, minimum: 1, maximum: 3, unit: "units", rangeLabel: "Supplied example interval" },
   LabResults: { label: "Example results", results: [{ id: "assay", name: "Example assay", value: 2, unit: "units", status: "final", minimum: 1, maximum: 3, note: "Fictional fixture" }] },
@@ -139,12 +225,88 @@ for (const [name, exported] of additions) {
   if (!R[exported]) throw new Error("Missing root export: " + exported);
   const leaf = await import("@noorddev/vlak-react/components/" + name);
   if (leaf[exported] !== R[exported]) throw new Error("Mismatched leaf export: " + exported);
-  const markup = renderToString(h(R[exported], fixtureProps[exported] ?? {}));
+  const element = h(R[exported], fixtureProps[exported] ?? {});
+  const markup = renderToString(exported === "AudioPlayerControls" ? h(R.AudioPlayer, { title: "Spoken brief", src: "/brief.wav" }, element) : exported === "Attachment" ? h(R.Attachments, null, element) : element);
   if (!markup.includes("rs-")) throw new Error("Empty or unstyled SSR: " + exported);
   if (exported === "StagePositionList" && !(markup.startsWith("<fieldset") && markup.includes("Supplied frame (stage-smoke)") && markup.includes(">0.0001<") && markup.includes(">0<") && markup.includes("Not supplied") && markup.includes("field-01") && markup.includes("Move down"))) throw new Error("Stage position fixture lost its native root, coordinate context or supplied values");
+  if (exported === "Attachment" && (!markup.includes('download="drawing.svg"') || markup.includes('target="_blank"'))) throw new Error("Local attachments must download instead of opening an active document");
+  if (exported === "ResponseBranch" && (!markup.includes("Revised recorded response") || markup.includes("First recorded response"))) throw new Error("ResponseBranch must render only the selected alternative");
+  if (exported === "EnvironmentVariables" && markup.includes("private-smoke-fixture")) throw new Error("Environment values must remain masked in server output");
   additionHtml += markup;
 }
+for (const [name, exported] of [["attachments", "useFileAttachments"], ["mic-selector", "useAudioDevices"], ["audio-player", "useAudioPlayer"], ["conversation-export", "serializeConversation"], ["tool-call", "getToolCallPresentation"], ["stack-trace", "parseStackTrace"], ["environment-variables", "formatEnvironmentExports"]]) {
+  const leaf = await import("@noorddev/vlak-react/components/" + name);
+  if (typeof R[exported] !== "function" || leaf[exported] !== R[exported]) throw new Error("Missing or mismatched helper export: " + exported);
+}
+const transcript = R.serializeConversation(fixtureProps.ConversationDownload.messages, { title: "Brief review" });
+if (!transcript.includes("## user") || !transcript.includes("One finding") || transcript.includes("[object Object]")) throw new Error("Structured conversation export failed");
+if (R.getToolCallPresentation({ type: "dynamic-tool", toolName: "Read brief", state: "input-available" }).state !== "queued") throw new Error("Tool input availability must not imply execution");
 console.log("  ✓ all " + additions.length + " new root/leaf exports render, " + additionHtml.length + " chars");
+`;
+
+// Optional engines are installed only after both clean core consumers have passed.
+// These checks exercise the packed entry points, not a source checkout or bundler alias.
+const renderOptional = `const optionalAdditions = ${JSON.stringify(optionalAdditions)};\n` + String.raw`
+import { createElement as h } from "react";
+import { renderToString } from "react-dom/server";
+import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
+import props from "@noorddev/vlak/props" with { type: "json" };
+import { catalogComponents } from "@noorddev/vlak";
+import * as R from "@noorddev/vlak-react";
+import { ResponseMarkdown } from "@noorddev/vlak-react/components/response-markdown";
+import { HighlightedCode } from "@noorddev/vlak-react/components/highlighted-code";
+import { JSXPreview } from "@noorddev/vlak-react/components/jsx-preview";
+import * as W from "@noorddev/vlak-react/components/workflow-canvas";
+const require = createRequire(import.meta.url);
+const assert = (ok, message) => { if (!ok) throw new Error(message); };
+for (const [name, exported] of optionalAdditions) {
+  assert(!(exported in R), "Optional renderer leaked into the core entry: " + exported);
+  assert(props.components[name]?.exports.some(entry => entry.name === exported), "Missing optional props: " + exported);
+  const component = catalogComponents.find(entry => entry.name === name);
+  assert(component?.reactImport === "@noorddev/vlak-react/components/" + name, "Missing optional import metadata: " + name);
+  assert(component.dependencies?.length > 0, "Missing optional dependency metadata: " + name);
+  for (const dependency of component.dependencies) {
+    // Registry install specifications include ranges; module resolution needs only the package name.
+    const version = dependency.lastIndexOf("@");
+    import.meta.resolve(version > 0 ? dependency.slice(0, version) : dependency);
+  }
+}
+const fence = String.fromCharCode(96).repeat(3);
+const source = "const count = 3;";
+const code = renderToString(h(HighlightedCode, { code: source, language: "typescript", lineNumbers: true, filename: "count.ts" }));
+assert(code.includes(source) && code.includes("rs-highlighted-code") && code.includes("Copy code"), "HighlightedCode must server-render readable source and controls");
+const unknown = renderToString(h(HighlightedCode, { code: "custom => syntax", language: "not-a-real-language" }));
+assert(unknown.includes("custom =&gt; syntax"), "Unknown code languages must retain plain source");
+const markdown = ["# Review", "", "| Owner | State |", "| --- | --- |", "| Robin | Ready |", "", "- [x] Brief reviewed", "", fence + "ts", source, fence, "", "$$", "x^2 + 1", "$$"].join("\n");
+const rich = renderToString(h(ResponseMarkdown, { children: markdown }));
+assert(rich.includes("rs-response-markdown") && rich.includes("<table") && rich.includes("katex") && rich.includes(source), "Rich response lost Markdown, code, table or math output");
+const partial = renderToString(h(ResponseMarkdown, { streaming: true, children: "A **partial response\n\n" + fence + "ts\nconst pending =" }));
+assert(partial.includes("partial response") && partial.includes("const pending ="), "Partial streamed syntax must remain readable");
+const unsafe = renderToString(h(ResponseMarkdown, { children: '[unsafe](javascript:alert(1))\n\n<script>alert(1)</script>\n\n![Remote diagram](https://untrusted.example/image.png)' }));
+assert(!/href="javascript:|<script\b|<img\b/.test(unsafe), "Markdown must not activate unsafe links, raw HTML or unapproved remote images");
+const image = renderToString(h(ResponseMarkdown, { baseUrl: "https://assets.example/docs/", imageOrigins: ["https://assets.example"], children: "![Diagram](diagram.png)" }));
+assert(image.includes('src="https://assets.example/docs/diagram.png"'), "An allowed relative image must use its validated resolved origin");
+const diagram = renderToString(h(ResponseMarkdown, { children: fence + "mermaid\ngraph TD; Brief-->Review;\n" + fence }));
+assert(diagram.includes("Brief") && diagram.includes("Review"), "Mermaid must server-render a readable source fallback");
+assert(readFileSync(require.resolve("katex/dist/katex.min.css"), "utf8").includes(".katex"), "KaTeX stylesheet is unavailable");
+const preview = renderToString(h(JSXPreview, { jsx: '<div>{summary}</div>', bindings: { summary: "Ready for review" } }));
+assert(preview.includes("rs-jsx-preview") && preview.includes("Preparing preview"), "JSXPreview must expose its honest server placeholder");
+const rejected = renderToString(h(JSXPreview, { jsx: '<script>alert(1)</script>' }));
+assert(rejected.includes('role="alert"') && !rejected.includes("<script>"), "JSXPreview must reject active markup even before mounting");
+for (const exported of ["WorkflowCanvas", "WorkflowNode", "WorkflowEdge", "WorkflowConnection", "WorkflowControls", "WorkflowPanel", "WorkflowToolbar"]) {
+  assert(typeof W[exported] === "function" || typeof W[exported] === "object", "Missing workflow export: " + exported);
+  assert(props.components["workflow-canvas"]?.exports.some(entry => entry.name === exported), "Missing workflow props: " + exported);
+}
+const graph = renderToString(h(W.WorkflowCanvas, {
+  width: 900, height: 400, style: { height: 400 }, fitView: false,
+  nodes: [{ id: "brief", type: "vlak", position: { x: 20, y: 20 }, width: 288, height: 120, data: { title: "Read brief", target: false } }, { id: "review", type: "vlak", position: { x: 380, y: 20 }, width: 288, height: 120, data: { title: "Review owners", source: false } }],
+  edges: [{ id: "brief-review", type: "vlak", source: "brief", target: "review" }], onNodesChange() {}, onEdgesChange() {}, onConnect() {},
+}, h(W.WorkflowControls), h(W.WorkflowPanel, { position: "top-left" }, "Review workflow")));
+assert(graph.includes("react-flow") && graph.includes("rs-workflow-canvas") && graph.includes("Review workflow"), "WorkflowCanvas must render the real engine and composed panel");
+const workflowCss = readFileSync(require.resolve("@noorddev/vlak-react/workflow.css"), "utf8");
+assert(workflowCss.includes("@layer vlak.engine {") && workflowCss.includes(".react-flow__edge-path") && workflowCss.includes("MIT License") && workflowCss.includes("Copyright") && !/@import\b/.test(workflowCss), "Workflow stylesheet must bundle engine rules in the lower cascade layer, preserve the MIT notice, and avoid unresolved imports");
+console.log("  ✓ optional Markdown/code/math, safe URLs, JSX boundary, and real graph entries server-render");
 `;
 
 function sourceFiles(dir) {
@@ -183,10 +345,13 @@ import * as vlak from "@noorddev/vlak-react";
 import { Button } from "@noorddev/vlak-react/components/button";
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
+${withoutOptionalEngines}
 const checks = [];
 checks.push(["tokens", vlakTokens.color.light.paper === "#FAF8F2"]);
 checks.push(["catalogue", catalogComponents.length === ${expectedCatalogueSize}]);
 checks.push(["props json", typeof props.components === "object"]);
+checks.push(["optional engines remain subpaths", ${JSON.stringify(optionalAdditions)}.every(([, exported]) => !(exported in vlak))]);
+require("node:fs").writeFileSync(new URL("./catalogue.json", import.meta.url), JSON.stringify(catalogComponents));
 const R = vlak;
 ${renderAdditions}
 checks.push(["new component props", additions.every(([name, exported]) => props.components[name]?.exports.some(entry => entry.name === exported))]);
@@ -225,6 +390,7 @@ if (failed.length) process.exit(1);
 import { renderToString } from "react-dom/server";
 import { createElement as h } from "react";
 import * as R from "@noorddev/vlak-react";
+${withoutOptionalEngines}
 const warnings = new Set();
 console.error = (...a) => { let i = 1; warnings.add(String(a[0]).replace(/%s/g, () => String(a[i++])).slice(0, 120)); };
 ${renderAdditions}
@@ -246,24 +412,48 @@ if (bad.length) process.exit(1);
   process.stdout.write(run("node render.mjs", r18));
   log("react 18 render clean");
 
+  /* 3c. Only now install the explicitly selected optional engines, in each major. */
+  const engineArguments = optionalEngines.map(([name, range]) => `'${name}@${range.replaceAll("'", "'\\''")}'`).join(" ");
+  for (const [consumer, major] of [[work, 19], [r18, 18]]) {
+    run(`npm install --no-audit --no-fund --silent ${engineArguments}`, consumer);
+    writeFileSync(join(consumer, "optional.mjs"), renderOptional);
+    process.stdout.write(run("node optional.mjs", consumer));
+    log(`react ${major}: optional renderer entries clean`);
+  }
+
   /* 4. The CLI from its tarball, offline. */
   const app = join(work, "app");
   run(`mkdir -p ${app}`);
   run("npx vlak init", app);
-  run(`npx vlak add button dialog bar-chart ${additions.map(([name]) => name).join(" ")}`, app);
+  const allAdditions = [...additions, ...optionalAdditions];
+  const addOutput = run(`npx vlak add button dialog bar-chart ${[...new Set(allAdditions.map(([name]) => name))].join(" ")}`, app);
   for (const f of ["styles/vlak.css", "styles/fonts/inter/OFL.txt", "index.html", "vlak.json", "components/vlak/button.tsx", "components/vlak/dialog.tsx", "components/vlak/charts/bar.tsx", "components/vlak/rs.ts", "components/vlak/use-input-value.ts", "components/vlak/use-overlay-position.ts", "components/vlak/merge-refs.ts"]) {
     if (!existsSync(join(app, f))) throw new Error(`cli: expected ${f}`);
   }
   const listed = JSON.parse(run("npx vlak list --json", app));
   if (!Array.isArray(listed) || listed.length !== expectedCatalogueSize) throw new Error(`cli: expected ${expectedCatalogueSize} public entries, got ${listed.length}`);
   const installedCss = readFileSync(join(app, "styles", "vlak.css"), "utf8");
-  for (const [name, exported] of additions) {
+  const catalogue = JSON.parse(readFileSync(join(work, "catalogue.json"), "utf8"));
+  for (const [name, exported] of allAdditions) {
     const file = join(app, "components", "vlak", `${name}.tsx`);
     if (!existsSync(file)) throw new Error(`cli: missing ${name} source`);
     if (!new RegExp(`export (?:const|function|class) ${exported}\\b`).test(readFileSync(file, "utf8"))) throw new Error(`cli: missing ${exported} source export`);
     if (!listed.some(item => item.name === name)) throw new Error(`cli: missing ${name} catalogue entry`);
     // CLI init ships the complete CSS-first stylesheet; add vendors source only.
-    if (!installedCss.includes(`.rs-${name}`)) throw new Error(`cli: missing ${name} styles in vlak.css`);
+    const entry = catalogue.find(component => component.name === name);
+    if (!entry) throw new Error(`cli: missing ${name} packed registry metadata`);
+    if (entry.css.length && !entry.classes.some(className => installedCss.includes(`.${className}`))) throw new Error(`cli: missing ${name} styles in vlak.css`);
+    if (name === "conversation-export" && (entry.css.some(file => file !== "components/button.css") || !entry.registryDependencies.includes("button") || !installedCss.includes(".rs-btn-subtle"))) throw new Error("cli: conversation-export must compose the shared Button without a phantom stylesheet");
+  }
+  for (const [name] of optionalAdditions) {
+    const entry = catalogue.find(component => component.name === name);
+    for (const dependency of entry.dependencies) if (!addOutput.includes(dependency)) throw new Error(`cli: did not report ${name}'s required ${dependency} package`);
+    for (const stylesheet of entry.styles ?? []) {
+      if (stylesheet.startsWith("@noorddev/vlak-react/")) {
+        const copied = join(app, "styles", "vlak", stylesheet.slice("@noorddev/vlak-react/".length));
+        if (!existsSync(copied)) throw new Error(`cli: missing optional engine stylesheet ${copied}`);
+      } else if (!addOutput.includes(stylesheet)) throw new Error(`cli: did not report required stylesheet ${stylesheet}`);
+    }
   }
   const vendored = sourceFiles(join(app, "components", "vlak"));
   for (const file of vendored) {
@@ -274,7 +464,7 @@ if (bad.length) process.exit(1);
     }
     if (/from\s*["']@noorddev\/vlak-react/.test(source)) throw new Error(`cli: vendored source leaked a package dependency in ${file}`);
   }
-  log(`cli: all ${additions.length} additions present, ${vendored.length} source files have complete relative import closure`);
+  log(`cli: all ${new Set(allAdditions.map(([name]) => name)).size} added catalogue entries present, ${vendored.length} source files have complete relative import closure`);
   log(`cli: init + add wrote the tree, list --json has ${listed.length} entries`);
 
   log("ok");

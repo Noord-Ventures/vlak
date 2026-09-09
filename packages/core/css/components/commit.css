@@ -1,0 +1,12 @@
+/* ── commit: generated from packages/react/src/components/commit.tsx ── */
+.rs-commit{min-width:0;width:100%;border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);color:var(--text);background-color:var(--bg);font-size:0.875rem;line-height:1.45}
+@media (forced-colors: active){.rs-commit{border-color:CanvasText}}
+.rs-commit-header{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem;padding:0.75rem 1rem}
+.rs-commit-heading{display:grid;gap:0.25rem;min-width:0;flex:1 1 auto;overflow-wrap:anywhere}
+.rs-commit-message{font-weight:600}
+.rs-commit-metadata{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;color:var(--text-secondary);font-size:0.75rem}
+.rs-commit-content{padding:0 1rem 1rem;min-width:0}
+.rs-commit-list{list-style:none;padding:0;margin:0;color:var(--text)}
+.rs-commit-file{display:flex;flex-wrap:wrap;align-items:center;gap:0.5rem;min-width:0;padding-block:0.5rem;border-top-width:1px;border-top-style:solid;border-top-color:var(--divider)}
+.rs-commit-path{min-width:0;flex:1 1 auto;overflow-wrap:anywhere;font-family:ui-monospace, SFMono-Regular, Menlo, monospace;text-align:start}
+.rs-commit-count{color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums}
