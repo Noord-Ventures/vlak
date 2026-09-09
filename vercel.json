@@ -6,9 +6,16 @@
   "functions": {
     "api/mcp.ts": {
       "maxDuration": 30
+    },
+    "api/openai-apps-challenge.ts": {
+      "maxDuration": 10
     }
   },
   "rewrites": [
+    {
+      "source": "/.well-known/openai-apps-challenge",
+      "destination": "/api/openai-apps-challenge"
+    },
     {
       "source": "/mcp",
       "destination": "/api/mcp"
