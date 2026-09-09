@@ -1,6 +1,20 @@
 # Vlak
 
-Vlak is a minimal design system for product exploration. Its name is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure. The 167 components ship as React, CSS, vendored StyleX source, and machine-readable data.
+[![GitHub stars](https://img.shields.io/github/stars/Noord-Ventures/vlak?style=social)](https://github.com/Noord-Ventures/vlak/stargazers) [![npm downloads](https://img.shields.io/npm/dm/%40noorddev%2Fvlak-react?style=flat-square&color=1a1a1a)](https://www.npmjs.com/package/@noorddev/vlak-react) [![CI](https://img.shields.io/github/actions/workflow/status/Noord-Ventures/vlak/ci.yml?branch=main&style=flat-square&label=build&color=1a1a1a)](https://github.com/Noord-Ventures/vlak/actions/workflows/ci.yml) [![MIT license](https://img.shields.io/github/license/Noord-Ventures/vlak?style=flat-square&color=1a1a1a)](LICENSE)
+
+A constraint-first design system for product exploration. 167 accessible components ship as React, CSS, vendored StyleX source, a shadcn-compatible registry, CLI tooling, and machine-readable context for coding agents.
+
+[Browse components](https://vlak.dev/components/) · [Try the interfaces](https://vlak.dev/interfaces/) · [Install Vlak](https://vlak.dev/docs/) · [Use with coding agents](https://vlak.dev/docs/agents/)
+
+<p align="center">
+  <a href="https://vlak.dev/review/vlak-openai-plugin-demo.mp4">
+    <img src="assets/vlak-chatgpt-demo.png" alt="ChatGPT discovering Vlak's component tools through its hosted MCP server" width="960" />
+  </a>
+  <br />
+  <sub>▶ Watch ChatGPT discover Vlak and use its component system — 50 seconds.</sub>
+</p>
+
+Vlak is Dutch for plane or surface: the field where type, controls, and content are arranged. A modular grid gives that field its structure.
 
 [vlak.dev](https://vlak.dev) · [github.com/Noord-Ventures/vlak](https://github.com/Noord-Ventures/vlak)
 

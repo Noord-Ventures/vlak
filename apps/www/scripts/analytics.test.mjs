@@ -31,6 +31,11 @@ test("custom events emit only fixed identifiers, never arbitrary payload fields"
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "form_text", data: { value: "secret" } } }, paths), null);
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "network_click", data: { destination: "private@example.com" } } }, paths), null);
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "docs_click", data: { path: "/docs/private-token" } } }, paths), null);
+  assert.deepEqual(
+    beforeSend({ type: "event", url: "https://vlak.dev/interfaces/room?draft=private", payload: { name: "interface_video_play", data: { slug: "room", title: "private" } } }, paths),
+    { type: "event", url: "https://vlak.dev/interfaces/room", payload: { name: "interface_video_play", data: { source: "vlak", slug: "room" } } },
+  );
+  assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/interfaces/room", payload: { name: "interface_video_play", data: { slug: "private" } } }, paths), null);
 });
 
 test("install-copy classification returns an enum without passing source content", () => {

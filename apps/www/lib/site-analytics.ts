@@ -10,12 +10,14 @@ export const publicSitePaths = [
   "/interfaces/render", "/interfaces/room", "/interfaces/wall", "/swag",
   "/interfaces/microbiology", "/interfaces/genome", "/interfaces/protein", "/interfaces/robotics",
   "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
+  "/interfaces/calendar", "/interfaces/desktop-os", "/interfaces/documentation",
+  "/interfaces/microscopy", "/interfaces/mobile-os", "/interfaces/music-player", "/interfaces/video-player",
   "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
   "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",
   "/use-cases/enterprise-software", "/use-cases/consumer-software",
 ];
 
-type EventName = "acquisition" | "docs_click" | "get_started_click" | "github_click" | "install_copy" | "network_click";
+type EventName = "acquisition" | "docs_click" | "get_started_click" | "github_click" | "install_copy" | "interface_video_play" | "network_click";
 type EventData = Record<string, string>;
 type AnalyticsEvent = { type: "pageview" | "event"; url: string; payload?: { name: string; data?: EventData } };
 type AnalyticsQueue = (command: string, value: unknown) => void;
@@ -75,6 +77,11 @@ function safeEventData(name: string | undefined, data: EventData = {}, paths: Se
     const path = normalizePath(data.path || "");
     if (!paths.has(path) || !/^\/docs(?:\/|$)/.test(path)) return null;
     return { ...result, path };
+  }
+  if (name === "interface_video_play") {
+    const slug = data.slug;
+    if (!slug || !paths.has(`/interfaces/${slug}`)) return null;
+    return { ...result, slug };
   }
   return name === "github_click" ? result : null;
 }
