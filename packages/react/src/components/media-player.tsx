@@ -28,7 +28,7 @@ const styles = stylex.create({
   root: { width: "100%", minWidth: 0, color: vlak.ink, display: "flex", flexDirection: "column", gap: "1rem" },
   media: { display: "block", width: "100%", maxHeight: "32rem", backgroundColor: vlak.controlFill },
   heading: { margin: 0, fontSize: "1rem", fontWeight: 600, lineHeight: 1.45, overflowWrap: "anywhere" },
-  controls: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "0.75rem" },
+  controls: { display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "0.75rem" },
   action: {
     width: { default: "auto", [mq.phone]: "auto" },
     paddingInline: "0.75rem",
