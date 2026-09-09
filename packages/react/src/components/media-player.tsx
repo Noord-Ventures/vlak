@@ -36,6 +36,7 @@ const styles = stylex.create({
     minHeight: vlak.hit,
   },
   volume: { flex: "0 1 8rem", minWidth: "5rem" },
+  select: { flex: "0 1 auto", width: "max-content", minWidth: 0, maxWidth: "100%" },
   status: { margin: 0, fontSize: "0.875rem", color: vlak.gray, lineHeight: 1.45 },
   transcript: { lineHeight: 1.45, maxWidth: "66ch" },
   summary: { minHeight: vlak.hit, cursor: "pointer", display: "flex", alignItems: "center", fontWeight: 500, ":focus-visible": { outlineWidth: 2, outlineStyle: "solid", outlineColor: vlak.ink, outlineOffset: 2 } },
@@ -87,6 +88,7 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
   // Composed Button atomics keep their phone width, so preserve this row's intrinsic sizing.
   const action = { ...actionSx, style: { ...actionSx.style, width: "auto" } };
   const volumeStyle = rs(["rs-media-player-volume"], styles.volume);
+  const selectStyle = rs(["rs-media-player-select"], styles.select);
   const message = rs(["rs-media-player-status"], styles.status);
   const transcriptStyle = rs(["rs-media-player-transcript"], styles.transcript);
   const summary = rs(["rs-media-player-summary"], styles.summary);
@@ -114,8 +116,8 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
         <PlaybackControls playing={playing} disabled={failed} onPlayingChange={next => { void toggle(next); }} />
         <Button {...action} variant="ghost" aria-label={muted ? "Unmute" : "Mute"} onClick={() => { if (mediaRef.current) { mediaRef.current.muted = !muted; setMuted(!muted); } }}><Icon name={muted ? "volume-off" : "volume"} /></Button>
         <div {...volumeStyle}><Slider aria-label="Volume" min={0} max={1} step={0.05} value={muted ? 0 : volume} onValueChange={next => { if (mediaRef.current) { mediaRef.current.volume = next; mediaRef.current.muted = false; setVolume(next); setMuted(false); } }} /></div>
-        <NativeSelect aria-label="Playback speed" value={String(speed)} onChange={event => { const next = Number(event.target.value); if (mediaRef.current) mediaRef.current.playbackRate = next; setSpeed(next); }}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => <option key={rate} value={String(rate)}>{rate}× speed</option>)}</NativeSelect>
-        {kind === "video" && tracks.length > 0 && <NativeSelect aria-label="Captions" value={captions} onChange={event => { setCaptions(event.target.value); applyCaptions(event.target.value); }}><option value="-1">Captions off</option>{tracks.map((track, index) => <option key={track.src} value={String(index)}>{track.label}</option>)}</NativeSelect>}
+        <div {...selectStyle}><NativeSelect aria-label="Playback speed" value={String(speed)} onChange={event => { const next = Number(event.target.value); if (mediaRef.current) mediaRef.current.playbackRate = next; setSpeed(next); }}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => <option key={rate} value={String(rate)}>{rate}× speed</option>)}</NativeSelect></div>
+        {kind === "video" && tracks.length > 0 && <div {...selectStyle}><NativeSelect aria-label="Captions" value={captions} onChange={event => { setCaptions(event.target.value); applyCaptions(event.target.value); }}><option value="-1">Captions off</option>{tracks.map((track, index) => <option key={track.src} value={String(index)}>{track.label}</option>)}</NativeSelect></div>}
         {kind === "video" && canFullscreen && <Button {...action} variant="ghost" aria-label="Full screen" onClick={() => { void containerRef.current?.requestFullscreen().catch(() => setStatus("Full screen is unavailable in this browser.")); }}><Icon name="expand" /></Button>}
       </div>
     </>}

@@ -162,6 +162,7 @@ export const mediaAdditions: VlakComponent[] = [
       "rs-media-player-controls",
       "rs-media-player-action",
       "rs-media-player-volume",
+      "rs-media-player-select",
       "rs-media-player-status",
       "rs-media-player-transcript",
       "rs-media-player-summary"

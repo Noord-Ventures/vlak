@@ -453,6 +453,7 @@ body{
 .rs-media-player-action{width:auto;padding-inline:0.75rem;min-width:var(--hit);min-height:var(--hit)}
 @media (max-width: 640px){.rs-media-player-action{width:auto}}
 .rs-media-player-volume{flex:0 1 8rem;min-width:5rem}
+.rs-media-player-select{flex:0 1 auto;width:max-content;min-width:0;max-width:100%}
 .rs-media-player-status{margin:0;font-size:0.875rem;color:var(--text-secondary);line-height:1.45}
 .rs-media-player-transcript{line-height:1.45;max-width:66ch}
 .rs-media-player-summary{min-height:var(--hit);cursor:pointer;display:flex;align-items:center;font-weight:500}
