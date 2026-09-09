@@ -1,6 +1,7 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { Callout } from "@noorddev/vlak-react";
+import { MediaPlayer } from "@noorddev/vlak-react/components/media-player";
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { COMMAND, DOOR, HOST, INSTALL } from "../specimen";
@@ -40,6 +41,51 @@ export default function DocsPage() {
       title="Getting started"
       summary="Install precompiled React components, vendor the StyleX source, or use the CSS classes directly. All three are generated from the same leaves."
     >
+      <h2 className="section-label">Developer walkthrough</h2>
+      <MediaPlayer
+        title="Build with Vlak in 60 seconds"
+        src="/films/vlak-developer-60s-2f141701.mp4"
+        poster="/films/vlak-developer-d24f4669.jpg"
+        preload="none"
+        style={{ marginTop: 12 }}
+        transcript={
+          <>
+            <p className="rs-t-body">
+              <strong>0:00 · Start with the components.</strong> Buttons, inputs, selects,
+              switches, tabs and checkboxes appear in a grid.
+            </p>
+            <p className="rs-t-body">
+              <strong>0:04 · Connect your coding agent.</strong> Add https://vlak.dev/mcp to
+              an MCP-compatible agent. Its six tools provide component references, installation
+              instructions, design tokens and the guide. Your coding agent builds the interface.
+            </p>
+            <p className="rs-t-body">
+              <strong>0:10 · Describe what you need.</strong> The prompt asks for account
+              settings with Vlak. The response identifies the components to use.
+            </p>
+            <p className="rs-t-body">
+              <strong>0:17 · Read the API and try the control.</strong> The Select example
+              shows its options, value and onValueChange props. Arrow keys open the menu and move
+              between cities; Enter selects Amsterdam.
+            </p>
+            <p className="rs-t-body">
+              <strong>0:27 · Install and build.</strong> Choose the React package, vendored
+              source or CSS. The account form assembles, changes theme, shows a missing-email
+              error and confirms a local save after the email is entered.
+            </p>
+            <p className="rs-t-body">
+              <strong>0:45 · Explore interfaces.</strong> Agent management, robot debugging
+              and microscopy planning show the components in use. A grid follows with the text,
+              &ldquo;168 components. One visual language.&rdquo;
+            </p>
+            <p className="rs-t-body">
+              <strong>0:55 · Vlak.dev.</strong> The closing title briefly switches between
+              light and dark. Interface clicks accompany the film; a distorted synth plays at
+              the end. There is no spoken narration.
+            </p>
+          </>
+        }
+      />
       <h2 className="section-label">1. Install the React package</h2>
       <CodeBlock code={INSTALL} />
       <CodeBlock code={packageUsage} />
