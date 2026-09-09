@@ -244,16 +244,22 @@ function claims(component, exportName) {
   return component.title.toLowerCase().split(/\s+/).some((w) => w.length > 2 && squash(w) === key);
 }
 
+/* Public helpers in companion files belong to their visual entry's documentation.
+   Source installation already follows the local import graph automatically. */
+const companionSources = new Map([
+  ["components/context-usage.tsx", ["components/context-pricing.tsx"]],
+]);
+
 /* ── Build ── */
 const components = {};
 for (const [file, owners] of byFile) {
-  const sourceFile = program.getSourceFile(join(reactSrc, file));
-  if (!sourceFile) throw new Error(`${file}: not in the program`);
-  const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
-  const exported = checker
-    .getExportsOfModule(moduleSymbol)
-    .filter((s) => publicNames.has(s.name) || owners.some((owner) => owner.reactImport))
-    .sort((a, b) => a.name.localeCompare(b.name));
+  const exported = [file, ...(companionSources.get(file) ?? [])].flatMap((source) => {
+    const sourceFile = program.getSourceFile(join(reactSrc, source));
+    if (!sourceFile) throw new Error(`${source}: not in the program`);
+    const moduleSymbol = checker.getSymbolAtLocation(sourceFile);
+    return checker.getExportsOfModule(moduleSymbol)
+      .filter((s) => publicNames.has(s.name) || owners.some((owner) => owner.reactImport));
+  }).sort((a, b) => a.name.localeCompare(b.name));
   const entries = exported.map(exportEntry).filter(Boolean);
   const owner = owners[0];
   const taken = new Set();

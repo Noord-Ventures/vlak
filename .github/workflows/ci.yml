@@ -31,6 +31,13 @@ jobs:
         run: pnpm lint
       - name: Build packages
         run: pnpm build
+      - name: Reference app route types, typecheck, and server tests
+        env:
+          AI_REFERENCE_MODE: fixture
+          OPENAI_API_KEY: ""
+        run: |
+          pnpm --filter @noorddev/vlak-assistant-reference typecheck
+          pnpm --filter @noorddev/vlak-assistant-reference test
       - name: Generated files are committed and current
         run: |
           git status --porcelain -- packages/core/css packages/core/tokens packages/core/props registry
@@ -77,6 +84,11 @@ jobs:
         run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs apps/www/scripts/desktop-os.test.mjs apps/www/scripts/calendar-model.test.mjs
       - name: Build the site
         run: pnpm --filter www build
+      - name: Build the reference app
+        env:
+          AI_REFERENCE_MODE: fixture
+          OPENAI_API_KEY: ""
+        run: pnpm --filter @noorddev/vlak-assistant-reference build
       - name: Canonical pages, sharing metadata, sitemap and agent links
         run: node apps/www/scripts/check-discovery.mjs
       - name: Agent plugin, MCP and model-readable docs
@@ -92,6 +104,41 @@ jobs:
           SITE_URL=http://localhost:3016 node apps/www/scripts/interface-preview-e2e.mjs
       - name: axe, keyboard, and phone checks over the export
         run: pnpm --filter www e2e
+      - name: Reference app fixture and recovery browser checks
+        env:
+          AI_REFERENCE_MODE: fixture
+          OPENAI_API_KEY: ""
+          AI_REFERENCE_BASE: http://localhost:3211
+          AI_REFERENCE_ARTIFACTS: ${{ runner.temp }}/vlak-assistant-e2e
+          AI_REFERENCE_RECOVERY_ARTIFACTS: ${{ runner.temp }}/vlak-assistant-recovery-e2e
+        run: |
+          umask 077
+          AI_REFERENCE_DATA_DIR="$(mktemp -d "$RUNNER_TEMP/vlak-assistant-data.XXXXXX")"
+          export AI_REFERENCE_DATA_DIR
+          (
+            cd apps/assistant
+            exec node node_modules/next/dist/bin/next start -p 3211
+          ) > "$RUNNER_TEMP/vlak-assistant-server.log" 2>&1 &
+          ASSISTANT_SERVER_PID=$!
+          cleanup_assistant() {
+            kill "$ASSISTANT_SERVER_PID" 2>/dev/null || true
+            wait "$ASSISTANT_SERVER_PID" 2>/dev/null || true
+            rm -rf "$AI_REFERENCE_DATA_DIR"
+          }
+          trap cleanup_assistant EXIT
+          curl --retry 20 --retry-connrefused --retry-delay 1 --retry-max-time 60 --max-time 5 -fsS "$AI_REFERENCE_BASE/" > /dev/null
+          pnpm --filter @noorddev/vlak-assistant-reference e2e
+          pnpm --filter @noorddev/vlak-assistant-reference test:recovery
+      - name: Reference app reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: assistant-reference
+          path: |
+            ${{ runner.temp }}/vlak-assistant-e2e
+            ${{ runner.temp }}/vlak-assistant-recovery-e2e
+            ${{ runner.temp }}/vlak-assistant-server.log
+          retention-days: 7
       - uses: actions/upload-artifact@v4
         if: always()
         with:

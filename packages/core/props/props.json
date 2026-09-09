@@ -18,7 +18,7 @@
             {
               "name": "maxTokens",
               "type": "number",
-              "required": true
+              "required": false
             },
             {
               "name": "usage",
@@ -28,6 +28,17 @@
             {
               "name": "pricing",
               "type": "TokenPricing",
+              "required": false
+            },
+            {
+              "name": "modelId",
+              "type": "string",
+              "required": false,
+              "description": "Optional metadata from an application-owned Tokenlens/models.dev catalog. Explicit limits and rates take precedence."
+            },
+            {
+              "name": "catalog",
+              "type": "Readonly<Record<string, { id?: string; models: Readonly<Record<string, ContextModelPricing>>; }>>",
               "required": false
             },
             {
@@ -48,6 +59,12 @@
               "default": "false"
             }
           ]
+        },
+        {
+          "name": "resolveContextPricing",
+          "kind": "function",
+          "description": "Resolve cached catalog metadata without fetching, timers, or a bundled pricing snapshot. Qualified provider/model ids select the provider's prices; providerless ids must be unique. Catalogs may be obtained with Tokenlens or models.dev in application/server code.",
+          "props": []
         }
       ]
     },
@@ -1764,7 +1781,7 @@
         {
           "name": "Persona",
           "kind": "component",
-          "description": "Five conversational states with a native monochrome visual and a custom rendering slot.",
+          "description": "Three native monochrome visuals share five conversational states and an optional custom renderer.",
           "extends": "HTMLAttributes<HTMLDivElement>",
           "ref": "HTMLDivElement",
           "props": [
@@ -1773,6 +1790,12 @@
               "type": "PersonaState",
               "required": false,
               "default": "\"idle\""
+            },
+            {
+              "name": "variant",
+              "type": "PersonaVariant",
+              "required": false,
+              "default": "\"waveform\""
             },
             {
               "name": "size",
@@ -1786,10 +1809,35 @@
               "required": false
             },
             {
+              "name": "intensity",
+              "type": "number",
+              "required": false,
+              "description": "Input/output energy in the range 0–1. Asleep always settles to zero."
+            },
+            {
+              "name": "paused",
+              "type": "boolean",
+              "required": false,
+              "default": "false",
+              "description": "Stop motion without changing the conversational state."
+            },
+            {
+              "name": "onMotionChange",
+              "type": "(animated: boolean) => void",
+              "required": false,
+              "description": "Called initially and whenever the effective motion policy changes."
+            },
+            {
               "name": "children",
               "type": "ReactNode",
               "required": false,
               "description": "A custom decorative visual. The application owns its rendering lifecycle."
+            },
+            {
+              "name": "renderVisual",
+              "type": "(context: PersonaVisualContext) => ReactNode",
+              "required": false,
+              "description": "Custom visuals should honor animated and release their own rendering resources."
             }
           ]
         }
@@ -2453,6 +2501,13 @@
               "description": "Plain text used for copying, narration, and the default share action."
             },
             {
+              "name": "actions",
+              "type": "readonly ResponseAction[]",
+              "required": false,
+              "default": "[\"copy\", \"read\", \"feedback\", \"share\"]",
+              "description": "Built-in controls in display and keyboard order. Omit for all four; duplicates are ignored."
+            },
+            {
               "name": "feedback",
               "type": "ResponseFeedback",
               "required": false
@@ -2634,6 +2689,12 @@
               "required": false
             },
             {
+              "name": "avatar",
+              "type": "ReactNode",
+              "required": false,
+              "description": "An application-owned avatar beside the author."
+            },
+            {
               "name": "status",
               "type": "ResponseStatus",
               "required": false,
@@ -2681,12 +2742,24 @@
               "description": "Application-owned actions, such as retry or feedback buttons."
             },
             {
+              "name": "renderLayout",
+              "type": "(parts: ResponseParts, state: ResponseState) => ReactNode",
+              "required": false,
+              "description": "Rearranges the same content and controls. Render each part once; keep the status announcement."
+            },
+            {
               "name": "children",
               "type": "ReactNode",
               "required": false,
               "description": "Rendered content. Supply your own markdown renderer here when needed."
             }
           ]
+        },
+        {
+          "name": "useResponse",
+          "kind": "hook",
+          "description": "Reads speaker and response status from a custom descendant without threading props.",
+          "props": []
         }
       ]
     },
@@ -4824,6 +4897,19 @@
               "required": false
             },
             {
+              "name": "renderLayout",
+              "type": "(parts: MessageComposerParts, state: MessageComposerState) => ReactNode",
+              "required": false,
+              "description": "Rearranges the provided controls. Render input and submit once; feedback stays in the form."
+            },
+            {
+              "name": "textareaProps",
+              "type": "MessageComposerTextareaProps",
+              "required": false,
+              "default": "{}",
+              "description": "Native textarea attributes and handlers. Prevent a key's default to override its shortcut."
+            },
+            {
               "name": "maxLength",
               "type": "number",
               "required": false
@@ -4863,6 +4949,12 @@
               "description": "Maximum visible draft lines in compact mode, clamped to 1–20."
             }
           ]
+        },
+        {
+          "name": "useMessageComposer",
+          "kind": "hook",
+          "description": "Reads the nearest composer's draft and validated commands from a custom child or tool.",
+          "props": []
         }
       ]
     },

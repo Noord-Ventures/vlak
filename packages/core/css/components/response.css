@@ -3,6 +3,8 @@
 .rs-response-user{width:fit-content;max-width:min(85%, 66ch);align-self:flex-end;margin-inline-start:auto;margin-inline-end:0;background-color:var(--table-alt);border-radius:var(--radius-sm);padding-block:1rem;padding-inline:1rem}
 .rs-response-header{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:0.5rem}
 .rs-response-author{font-weight:600;font-size:0.84375rem}
+.rs-response-identity{display:flex;align-items:center;gap:0.5rem;min-width:0}
+.rs-response-avatar{display:inline-flex;flex-shrink:0;align-items:center;justify-content:center}
 .rs-response-status{color:var(--text-secondary);font-size:0.8125rem}
 .rs-response-content{min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
 .rs-response-error{margin:0;color:var(--text);font-size:0.875rem}

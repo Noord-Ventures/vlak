@@ -4,15 +4,19 @@ import * as React from "react";
 import * as stylex from "@stylexjs/stylex";
 import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
+import { useMergedRefs } from "../merge-refs";
 import { useOverlayPosition } from "../use-overlay-position";
 import { MenuPanel, type MenuCloseReason } from "./dropdown-menu";
 import { Button } from "./button";
 
 export type ResponseFeedback = "positive" | "negative" | null;
+export type ResponseAction = "copy" | "read" | "feedback" | "share";
 
 export interface ResponseActionsProps extends React.HTMLAttributes<HTMLDivElement> {
   /** Plain text used for copying, narration, and the default share action. */
   text: string;
+  /** Built-in controls in display and keyboard order. Omit for all four; duplicates are ignored. */
+  actions?: readonly ResponseAction[];
   feedback?: ResponseFeedback;
   defaultFeedback?: ResponseFeedback;
   /** A rejected promise preserves the previous selection and allows retry. */
@@ -46,8 +50,13 @@ function ActionGlyph({ name }: { name: ActionIcon }) {
 
 /** Compact message actions. Speech and sharing run only after a button activation. */
 export const ResponseActions = React.forwardRef<HTMLDivElement, ResponseActionsProps>(function ResponseActions({
-  text, feedback, defaultFeedback = null, onFeedback, onShare, onReadingChange, className, style, children, "aria-label": label = "Response actions", ...props
+  text, actions = ["copy", "read", "feedback", "share"], feedback, defaultFeedback = null, onFeedback, onShare, onReadingChange, className, style, children, "aria-label": label = "Response actions", ...props
 }, ref) {
+  const actionOrder = [...new Set(actions)];
+  const hasRead = actionOrder.includes("read");
+  const hasFeedback = actionOrder.includes("feedback");
+  const rootRef = React.useRef<HTMLDivElement>(null);
+  const mergedRef = useMergedRefs(rootRef, ref);
   const [innerFeedback, setInnerFeedback] = React.useState<ResponseFeedback>(defaultFeedback);
   const selected = feedback === undefined ? innerFeedback : feedback;
   const [busy, setBusy] = React.useState(false);
@@ -119,6 +128,15 @@ export const ResponseActions = React.forwardRef<HTMLDivElement, ResponseActionsP
   React.useEffect(() => {
     setCanRead(typeof window.speechSynthesis?.speak === "function" && typeof window.SpeechSynthesisUtterance === "function");
   }, []);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Removing a control closes its owned interaction, without restarting on unrelated renders.
+  React.useEffect(() => {
+    if (!hasRead) stopReading();
+    if (!hasFeedback && feedbackOpen) {
+      setFeedbackOpen(false);
+      rootRef.current?.querySelector<HTMLButtonElement>("button:not(:disabled)")?.focus();
+    }
+  }, [hasRead, hasFeedback]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: Replacing message text invalidates its pending actions and narration.
   React.useEffect(() => {
@@ -210,15 +228,18 @@ export const ResponseActions = React.forwardRef<HTMLDivElement, ResponseActionsP
   const menu = rs(["rs-response-actions-menu"], styles.menu);
   const status = rs(["rs-response-actions-status"], styles.status);
   const readingLabel = reading ? "Stop reading" : "Read aloud";
-  return <div role="group" aria-label={label} {...props} ref={ref} className={root.className} style={{ ...root.style, ...style }}>
-    <Button variant="subtle" size="icon" aria-label="Copy response" title="Copy response" disabled={busy || !text} onClick={copy}><ActionGlyph name="copy" /></Button>
-    <Button variant="subtle" size="icon" aria-label={readingLabel} title={canRead ? readingLabel : "Read aloud is unavailable in this browser"} disabled={!canRead || !text} onClick={narrate}><ActionGlyph name={reading ? "stop" : "read"} /></Button>
-    <Button {...feedbackButton} variant="subtle" size="icon" ref={feedbackTrigger} id={`${feedbackId}-trigger`} aria-label="Rate response" title={selected === null ? "Rate response" : selected === "positive" ? "Rate response: Helpful" : "Rate response: Unhelpful"} aria-haspopup="menu" aria-expanded={feedbackOpen} aria-controls={feedbackOpen ? `${feedbackId}-menu` : undefined} aria-disabled={busy || undefined} data-feedback={selected ?? "none"} onClick={() => feedbackOpen ? closeFeedback("select") : openFeedback()} onKeyDown={feedbackKeyDown}><ActionGlyph name="feedback" /></Button>
-    {feedbackOpen && <MenuPanel id={`${feedbackId}-menu`} panelRef={feedbackPanel} labelledBy={`${feedbackId}-trigger`} initial={initialChoice} className={menu.className} style={{ ...menu.style, ...placement }} onClose={closeFeedback} items={[
+  const controls: Record<ResponseAction, React.ReactNode> = {
+    copy: <Button variant="subtle" size="icon" aria-label="Copy response" title="Copy response" disabled={busy || !text} onClick={copy}><ActionGlyph name="copy" /></Button>,
+    read: <Button variant="subtle" size="icon" aria-label={readingLabel} title={canRead ? readingLabel : "Read aloud is unavailable in this browser"} disabled={!canRead || !text} onClick={narrate}><ActionGlyph name={reading ? "stop" : "read"} /></Button>,
+    feedback: <><Button {...feedbackButton} variant="subtle" size="icon" ref={feedbackTrigger} id={`${feedbackId}-trigger`} aria-label="Rate response" title={selected === null ? "Rate response" : selected === "positive" ? "Rate response: Helpful" : "Rate response: Unhelpful"} aria-haspopup="menu" aria-expanded={feedbackOpen} aria-controls={feedbackOpen ? `${feedbackId}-menu` : undefined} aria-disabled={busy || undefined} data-feedback={selected ?? "none"} onClick={() => feedbackOpen ? closeFeedback("select") : openFeedback()} onKeyDown={feedbackKeyDown}><ActionGlyph name="feedback" /></Button>
+    {feedbackOpen && hasFeedback && <MenuPanel id={`${feedbackId}-menu`} panelRef={feedbackPanel} labelledBy={`${feedbackId}-trigger`} initial={initialChoice} className={menu.className} style={{ ...menu.style, ...placement }} onClose={closeFeedback} items={[
       { label: "Helpful response", checked: selected === "positive", disabled: busy, onSelect: () => rate("positive") },
       { label: "Unhelpful response", checked: selected === "negative", disabled: busy, onSelect: () => rate("negative") },
-    ]} />}
-    <Button variant="subtle" size="icon" aria-label="Share response" title="Share response" disabled={busy || !text} onClick={share}><ActionGlyph name="share" /></Button>
+    ]} />}</>,
+    share: <Button variant="subtle" size="icon" aria-label="Share response" title="Share response" disabled={busy || !text} onClick={share}><ActionGlyph name="share" /></Button>,
+  };
+  return <div role="group" aria-label={label} {...props} ref={mergedRef} className={root.className} style={{ ...root.style, ...style }}>
+    {actionOrder.map(action => <React.Fragment key={action}>{controls[action]}</React.Fragment>)}
     {children}
     <span {...status} role="status" aria-live="polite" aria-atomic="true">{message}</span>
   </div>;

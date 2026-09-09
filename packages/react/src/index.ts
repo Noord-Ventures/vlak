@@ -15,7 +15,7 @@ export { MediaPlayer, type MediaPlayerProps } from "./components/media-player";
 export { Waveform, type WaveformProps } from "./components/waveform";
 export { ImageViewer, type ImageViewerProps } from "./components/image-viewer";
 export { CanvasControls, type CanvasControlsProps } from "./components/canvas-controls";
-export { MessageComposer, type MessageComposerProps, type MessageAttachmentRejection, type MessageComposerAttachmentActions } from "./components/message-composer";
+export { MessageComposer, useMessageComposer, type MessageComposerProps, type MessageAttachmentRejection, type MessageComposerAttachmentActions, type MessageComposerState, type MessageComposerParts, type MessageComposerTextareaProps } from "./components/message-composer";
 export type { MultiSelectOption } from "./components/multi-select";
 export type { TransferListOption } from "./components/transfer-list";
 export type { DateRangeValue } from "./components/date-range-picker";
@@ -291,8 +291,8 @@ export { ColonyPlate, type ColonyMarker, type ColonyPlateProps } from "./compone
 export { CultureLog, type CultureCondition, type CultureAction, type CultureObservation, type CultureLogProps } from "./components/culture-log";
 export { Chat, type ChatProps } from "./components/chat";
 export { Conversation, type ConversationProps } from "./components/conversation";
-export { Response, type ResponseProps, type ResponseStatus } from "./components/response";
-export { ResponseActions, type ResponseActionsProps, type ResponseFeedback } from "./components/response-actions";
+export { Response, useResponse, type ResponseProps, type ResponseStatus, type ResponseState, type ResponseParts } from "./components/response";
+export { ResponseActions, type ResponseActionsProps, type ResponseFeedback, type ResponseAction } from "./components/response-actions";
 export { Widget, WidgetEmbed, type WidgetProps, type WidgetEmbedProps, type WidgetStatus } from "./components/widget";
 export { Reasoning, type ReasoningProps, type ReasoningStatus } from "./components/reasoning";
 export { ToolCall, getToolCallPresentation, type ToolCallProps, type ToolCallState, type ToolPartPresentationInput, type ToolPartPresentation } from "./components/tool-call";
@@ -309,7 +309,7 @@ export { type AudioDeviceStatus, type AudioDevicesState, useAudioDevices, type M
 export { type SpeechInputStatus, type SpeechInputProps, SpeechInput } from "./components/speech-input";
 export { type VoiceOption, type VoiceSelectorProps, VoiceSelector } from "./components/voice-selector";
 export { type TranscriptionSegment, type TranscriptionProps, Transcription } from "./components/transcription";
-export { type PersonaState, type PersonaProps, Persona } from "./components/persona";
+export { type PersonaState, type PersonaVariant, type PersonaVisualContext, type PersonaProps, Persona } from "./components/persona";
 export { type GeneratedSpeechAudio, type AudioPlayerProps, type AudioPlayerState, type AudioPlayerControlsProps, useAudioPlayer, AudioPlayer, AudioPlayerControls } from "./components/audio-player";
 export { type ResponseBranchItem, type ResponseBranchProps, ResponseBranch } from "./components/response-branch";
 export { type ShimmerProps, Shimmer } from "./components/shimmer";
@@ -328,6 +328,7 @@ export { type StackFrame, type ParsedStackTrace, type StackTraceProps, parseStac
 export { type SandboxProps, Sandbox } from "./components/sandbox";
 export { type WebPreviewLog, type WebPreviewProps, isPreviewUrl, WebPreview } from "./components/web-preview";
 export { type TokenUsage, type TokenPricing, type ContextUsageProps, ContextUsage } from "./components/context-usage";
+export { resolveContextPricing, type ContextModelCost, type ContextModelPricing, type ContextPricingCatalog, type ResolvedContextPricing, type ContextPricingOptions } from "./components/context-pricing";
 export { type ModelOption, type ModelSelectorProps, ModelSelector } from "./components/model-selector";
 export { type CitationSource, type SourcesProps, sourceHref, Sources } from "./components/sources";
 export { type InlineCitationProps, InlineCitation } from "./components/inline-citation";

@@ -25,6 +25,13 @@ describe("props.json", () => {
     }
   });
 
+  it("documents composition hooks and the context-pricing companion with their visual entries", () => {
+    expect(props.components["message-composer"]?.exports.some(entry => entry.name === "useMessageComposer" && entry.kind === "hook")).toBe(true);
+    expect(props.components.response?.exports.some(entry => entry.name === "useResponse" && entry.kind === "hook")).toBe(true);
+    expect(props.components["context-usage"]?.exports.some(entry => entry.name === "resolveContextPricing" && entry.kind === "function")).toBe(true);
+    expect(props.components["context-pricing"]).toBeUndefined();
+  });
+
   it("names only registry components", () => {
     const names = new Set(vlakComponents.map((c) => c.name));
     for (const name of Object.keys(props.components)) expect(names.has(name), `${name} is not in the registry`).toBe(true);

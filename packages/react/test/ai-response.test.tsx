@@ -3,7 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-li
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Response } from "../src/components/response";
+import { Response, useResponse } from "../src/components/response";
 import { Reasoning } from "../src/components/reasoning";
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
@@ -147,5 +147,41 @@ describe("Reasoning", () => {
     expect(details.open).toBe(true);
     expect(screen.getByRole("status").textContent).toBe("Complete");
     await expectNoViolations(container);
+  });
+});
+
+
+describe("Response composition", () => {
+  it("rearranges avatar, content and actions while descendants receive status and naming stays valid", async () => {
+    function ContextAction() {
+      const response = useResponse();
+      return <button type="button" disabled={response.status === "streaming"}>{response.from === "assistant" ? "Retry reply" : "Edit message"}</button>;
+    }
+    const layout = (parts: import("../src/components/response").ResponseParts) => <>{parts.avatar}<div>{parts.status}{parts.content}{parts.error}</div><footer>{parts.actions}</footer></>;
+    const { container, rerender } = render(<Response author="Research assistant" avatar={<span aria-hidden="true">●</span>} status="streaming" renderLayout={layout} actions={<ContextAction />}>Partial answer</Response>);
+    const article = screen.getByRole("article", { name: "Research assistant" });
+    expect(article.hasAttribute("aria-labelledby")).toBe(false);
+    expect(container.querySelector(".rs-response-avatar")).toBeTruthy();
+    expect(screen.getByRole<HTMLButtonElement>("button", { name: "Retry reply" }).disabled).toBe(true);
+    expect(screen.getByText("Partial answer").closest("[aria-live], [aria-busy]")).toBeNull();
+    rerender(<Response from="user" renderLayout={layout} actions={<ContextAction />}>Updated request</Response>);
+    expect(screen.getByRole("article", { name: "You" }).classList.contains("rs-response-user")).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>("button", { name: "Edit message" }).disabled).toBe(false);
+    expect(screen.getByRole("status").textContent).toBe("Complete");
+    await expectNoViolations(container);
+  });
+
+  it("keeps default avatar identity named and copies explicit text in a custom footer", async () => {
+    const user = userEvent.setup();
+    const write = vi.spyOn(navigator.clipboard, "writeText").mockResolvedValue();
+    const { rerender } = render(<Response avatar={<span aria-hidden="true">●</span>} author="Assistant">Answer</Response>);
+    expect(screen.getByRole("article", { name: "Assistant" }).querySelector(".rs-response-identity")).toBeTruthy();
+    rerender(<Response aria-label="First answer" copyText="Exact answer" renderLayout={parts => <>{parts.content}{parts.status}<footer>{parts.actions}</footer></>}>Answer</Response>);
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Copy response" }));
+    await user.keyboard("{Enter}");
+    await screen.findByText("Copied");
+    expect(write).toHaveBeenCalledWith("Exact answer");
+    expect(screen.getByRole("article", { name: "First answer" })).toBeTruthy();
   });
 });

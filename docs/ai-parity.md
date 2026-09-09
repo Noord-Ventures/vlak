@@ -25,13 +25,13 @@ Each component's generated docs, registry item, CLI output and MCP installation 
 | [Chain of thought](https://elements.ai-sdk.dev/components/chain-of-thought) | [ThoughtSteps](https://vlak.dev/ai/thought-steps/) | Supplied step summaries, progress, evidence, images and captions. |
 | [Checkpoint](https://elements.ai-sdk.dev/components/checkpoint) | [Checkpoint](https://vlak.dev/ai/checkpoint/) | Async restore callback, duplicate protection and retry feedback. |
 | [Confirmation](https://elements.ai-sdk.dev/components/confirmation) | [Confirmation](https://vlak.dev/ai/confirmation/) | Approval, rejection, pending work, failed decisions and retry. |
-| [Context](https://elements.ai-sdk.dev/components/context) | [ContextUsage](https://vlak.dev/ai/context-usage/) | Used/total context, token categories and cost from supplied rates. |
+| [Context](https://elements.ai-sdk.dev/components/context) | [ContextUsage, resolveContextPricing](https://vlak.dev/ai/context-usage/) | Used/total context, token categories, supplied catalog resolution and explicit pricing overrides. |
 | [Conversation](https://elements.ai-sdk.dev/components/conversation) | [Conversation, ConversationDownload](https://vlak.dev/ai/conversation/) | Scroll following with scrollback preservation and structured Markdown export. |
 | [Inline citation](https://elements.ai-sdk.dev/components/inline-citation) | [InlineCitation](https://vlak.dev/ai/inline-citation/) | Multiple sources, quotes, source navigation and focus restoration. |
-| [Message](https://elements.ai-sdk.dev/components/message) | [Response, ResponseMarkdown, ResponseBranch, ResponseEditor](https://vlak.dev/ai/response/) | Roles, streamed rich text, actions, alternatives, multiline editing and regeneration callbacks. |
+| [Message](https://elements.ai-sdk.dev/components/message) | [Response, ResponseMarkdown, ResponseBranch, ResponseEditor](https://vlak.dev/ai/response/) | Roles, avatar and layout slots, context hook, streamed rich text, ordered actions, alternatives, editing and regeneration callbacks. |
 | [Model selector](https://elements.ai-sdk.dev/components/model-selector) | [ModelSelector](https://vlak.dev/ai/model-selector/) | Searchable supplied models, provider metadata and disabled options. |
 | [Plan](https://elements.ai-sdk.dev/components/plan) | [Plan](https://vlak.dev/ai/plan/) | Disclosure, streaming title, content, footer and application actions. |
-| [Prompt input](https://elements.ai-sdk.dev/components/prompt-input) | [MessageComposer](https://vlak.dev/components/message-composer/) | One-line growth with a cap, send/stop, paste/drop, file limits, screenshot capture and composable tools. |
+| [Prompt input](https://elements.ai-sdk.dev/components/prompt-input) | [MessageComposer, useMessageComposer](https://vlak.dev/components/message-composer/) | One-line growth with a cap, send/stop, paste/drop, file limits, screenshot capture, layout slots, native textarea customization and validated context commands. |
 | [Queue](https://elements.ai-sdk.dev/components/queue) | [WorkQueue](https://vlak.dev/ai/work-queue/) | Prompt/todo sections, counts, completion callbacks, attachments and item actions. |
 | [Reasoning](https://elements.ai-sdk.dev/components/reasoning) | [Reasoning](https://vlak.dev/ai/reasoning/) | Chevron disclosure, streaming status, optional duration and opt-in open/close policy. |
 | [Shimmer](https://elements.ai-sdk.dev/components/shimmer) | [Shimmer](https://vlak.dev/ai/shimmer/) | Animated text with timing/spread and reduced-motion fallback. |
@@ -92,14 +92,26 @@ Each component's generated docs, registry item, CLI output and MCP installation 
 
 ## Deliberate differences and application responsibilities
 
-Vlak retains monochrome surfaces, subtle buttons, chevrons, 4px control corners, and native controls. Syntax highlighting uses monochrome token emphasis; Terminal can opt into the original ANSI colors. Persona supports the five conversational states and a custom visual slot, including the requested Orbkit avatar used by the site, instead of requiring Rive artwork.
+Vlak retains monochrome surfaces, subtle buttons, chevrons, 4px control corners, and native controls. Syntax highlighting uses monochrome token emphasis; Terminal can opt into the original ANSI colors. Persona has waveform, orb, and rings variants, five conversational states, intensity and pause controls, and a custom renderer that receives the effective motion policy. The site also demonstrates the Orbkit avatar. Vlak does not include Vercel's six Rive artwork files or claim Rive API compatibility.
 
 Models, voices, sources, usage counts and prices are supplied by the application. ContextUsage does not ship an automatically updated pricing catalog. SpeechInput can capture audio locally; recorded-audio transcription requires the application's callback. The graph editor has an example connection form for keyboard-only creation as well as pointer handles.
 
 JSXPreview accepts constrained data expressions and registered display components. It rejects active HTML, calls, functions and prototype access; it is not arbitrary JavaScript execution. WebPreview uses an iframe and supplied logs. Sandbox and Agent display application results/configuration; neither executes code or runs an agent. The current upstream components have the same application-owned execution boundary.
 
-The application also owns model requests, tool execution, approval verification, conversation persistence, regeneration, file upload/download policy and graph execution. The [integration guide](https://vlak.dev/docs/ai.md) shows the AI SDK lifecycle mapping without making the SDK a primitive dependency.
+The application also owns model requests, tool execution, approval verification, conversation persistence, regeneration, file upload/download policy and graph execution. The [integration guide](https://vlak.dev/docs/ai.md) shows the AI SDK lifecycle mapping without making the SDK a primitive dependency. A separate [runnable reference app](https://github.com/Noord-Ventures/vlak/tree/codex/ai-elements/apps/assistant) implements the chat integration with AI SDK 7, OpenAI, server-verified approvals, local persistence, upload ownership, editing, regeneration and version restoration.
+
+These APIs offer composition through slots and context hooks rather than matching every upstream compound-component export. Coverage does not mean identical artwork, import compatibility, or measured superiority. The reference app is an integration example, not a hosted authentication, storage, or agent-execution service.
 
 ## Verification
 
 Focused tests exercise streaming syntax and code identity, parser boundaries, message alternatives, failed drafts, async cancellation, denied media permissions, device changes, transcript seeks, disabled model selection, clipboard failures, nested schemas, ANSI output and real graph keyboard behavior. Full package, distribution and browser checks validate the integrated catalog; this matrix records capabilities rather than treating catalog counts as evidence of parity.
+
+The 10 September 2026 follow-up verifies:
+
+- 1,421 package tests, including public exports, ref coverage, accessibility, generated CSS and registry integrity. Packed distributions pass React 18/19, optional renderer, copied-source import closure, publint and type-resolution checks.
+- AI interactions at 1280px and 390px in Chromium 141, Firefox 142 and WebKit 26. Checks cover keyboard input, citation placement, graph endpoints, compact composers, media failures, reduced motion, forced colors and cleanup. Native recording tests use synthetic browser audio tracks, never a physical microphone.
+- Nine reference-server tests for ownership, request limits, canonical history, signed approvals, tampering, idempotency, edits, stopping, replay and stable message IDs.
+- Fourteen reference-app scenarios across desktop and phone widths, with axe checks and no page overflow. These use the explicitly marked deterministic model fixture and include a connection dropped after the server saved its response.
+- A separate live OpenAI smoke run: brief reading, streamed text and reported usage, approval before a task write, one persisted task after approval, and saved partial output after Stop. This run uses server credentials and is opt-in.
+
+Run the library browser matrix with `node apps/www/scripts/ai-cross-browser-e2e.mjs`. The reference app README documents its server, browser, recovery and optional live checks. These are functional and accessibility checks; they are not comparative performance benchmarks or proof that one library is universally better.

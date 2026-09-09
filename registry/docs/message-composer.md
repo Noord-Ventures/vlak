@@ -17,11 +17,15 @@ Page: https://vlak.dev/components/message-composer/
 - Use files, defaultFiles, and onFilesChange to lift attachment selection alongside controlled text.
 - Picker, paste, and drop share accept, maxFiles, maxFileSize, and multiple validation. onAttachmentError receives rejected files and reasons.
 - Use tools for model selectors or application controls, and renderAttachments for custom preview composition.
+- useMessageComposer reads the current draft, files, previews, pending and generation state, and validated commands from a descendant. It requires a surrounding MessageComposer.
+- renderLayout receives MessageComposerParts and state to arrange input, submit, attach, screenshot, attachments, and tools. Render input and submit once; hidden file selection and feedback remain owned by the form.
+- textareaProps forwards native attributes, events, and a merged ref to the actual field. Prevent a keyboard event default to override its shortcut; required draft and submission behavior stay in the composer.
 - Enable globalDrop on one composer per page when file drops outside the field should attach there. allowScreenshot adds explicit browser screen selection when supported.
 
 ## When not to
 
 - An arbitrary multi-field form or uploading files without a message.
+- Calling useMessageComposer outside its provider or invoking commands while rendering. Run commands from user actions or application effects.
 - Assuming browser file checks replace the application upload policy or that attachment selection uploads files automatically.
 
 ## Install
@@ -34,7 +38,7 @@ npm install @noorddev/vlak-react
 
 ```tsx
 import "@noorddev/vlak-react/css";
-import { MessageComposer } from "@noorddev/vlak-react";
+import { MessageComposer, useMessageComposer } from "@noorddev/vlak-react";
 ```
 
 **Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
@@ -58,9 +62,26 @@ npx shadcn add https://vlak.dev/r/message-composer.json
 ## Example
 
 ```tsx
-import { MessageComposer } from "@noorddev/vlak-react";
+"use client";
+import { Button, MessageComposer, useMessageComposer, type ComposedMessage } from "@noorddev/vlak-react";
 
-<MessageComposer compact maxRows={6} sendOnEnter onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept="image/*,.pdf" maxFiles={4} maxFileSize={10 * 1024 * 1024} allowScreenshot />
+function ClearDraft() {
+  const draft = useMessageComposer();
+  return <Button variant="subtle" size="sm" disabled={draft.disabled || !draft.value}
+    onClick={() => { draft.setValue(""); draft.focus(); }}>Clear draft</Button>;
+}
+
+export function ProjectComposer({ onSend, generating = false, onStop }: {
+  onSend: (message: ComposedMessage) => void | Promise<void>;
+  generating?: boolean;
+  onStop?: () => void;
+}) {
+  return <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend}
+    generating={generating} onStop={onStop} tools={<ClearDraft />}
+    textareaProps={{ "aria-label": "Ask about the project", autoComplete: "off" }}
+    allowAttachments accept="image/*,.pdf" maxFiles={4}
+    maxFileSize={10 * 1024 * 1024} allowScreenshot />;
+}
 ```
 
 ## Props
@@ -95,12 +116,18 @@ Forwards `ref` to the `HTMLTextAreaElement`.
 | `allowScreenshot` | `boolean` | `false` | Shows a user-activated browser screen capture action when available. |
 | `tools` | `ReactNode` |  | Application-owned model selectors, capability controls, or other tools. |
 | `renderAttachments` | `(attachments: AttachmentData[], actions: MessageComposerAttachmentActions) => ReactNode` |  |  |
+| `renderLayout` | `(parts: MessageComposerParts, state: MessageComposerState) => ReactNode` |  | Rearranges the provided controls. Render input and submit once; feedback stays in the form. |
+| `textareaProps` | `MessageComposerTextareaProps` | `{}` | Native textarea attributes and handlers. Prevent a key's default to override its shortcut. |
 | `maxLength` | `number` |  |  |
 | `sendOnEnter` | `boolean` | `false` | Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter. |
 | `generating` | `boolean` | `false` | Application-owned response generation, separate from submission pending state. |
 | `onStop` | `() => void` |  | Requests that the application stop generation; does not itself cancel a network request. |
 | `compact` | `boolean` | `false` | A single-line draft with an inline icon action; grows as the message wraps. |
 | `maxRows` | `number` | `6` | Maximum visible draft lines in compact mode, clamped to 1–20. |
+
+### Functions
+
+- `useMessageComposer` (hook): Reads the nearest composer's draft and validated commands from a custom child or tool.
 
 ## Keyboard
 
@@ -120,6 +147,7 @@ Forwards `ref` to the `HTMLTextAreaElement`.
 - Rejected attachments remain visible in an alert. File previews have named remove controls and preserve object addresses until removal.
 - Screenshot capture starts only from its button, uses the browser chooser, and stops display tracks after capture, cancellation, or unmount.
 - If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match.
+- Custom layouts retain the form, validation, shortcuts, and feedback. Keep the provided field and action names and their natural reading order.
 
 ## Classes
 

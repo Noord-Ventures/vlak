@@ -457,6 +457,34 @@ Compose an assistant from Vlak components and application-supplied messages. Vla
 
 Core components use React and StyleX. They work with any provider and do not require the AI SDK or AI Elements. Rich rendering is available through official optional subpaths, with their parser and media dependencies installed only when needed.
 
+## Runnable reference app
+
+The [assistant reference app](https://github.com/Noord-Ventures/vlak/tree/codex/ai-elements/apps/assistant) is a complete Next.js application using AI SDK 7, the OpenAI Responses provider, and the published Vlak components. The static documentation examples remain usable without credentials.
+
+From this repository:
+
+```sh
+pnpm install
+pnpm build
+cp apps/assistant/.env.example apps/assistant/.env.local
+# Set OPENAI_API_KEY in that ignored server file.
+pnpm --filter @noorddev/vlak-assistant-reference dev
+```
+
+Open `http://localhost:3211`. Choose a Responses API model available to your OpenAI project with `AI_MODEL`. The key stays on the server. The app demonstrates streamed Markdown, file uploads, saved conversations, edits, regeneration, previous versions, read-only tool results, and an approved task-writing tool. The same widget surface hosts a React result and a sandboxed iframe example.
+
+This app sends explicit request intents to the server. The server loads canonical history, resolves only session-owned uploads, and verifies a pending approval before executing a write. The browser cannot authorize a tool by inventing an assistant message. Local storage and an anonymous private session keep this reference runnable; deployments need persistent storage and the product's authentication and retention policy. The app README documents those boundaries and the separate deterministic fixture mode used for protocol tests.
+
+## Customize composition
+
+`MessageComposer` offers `renderLayout(parts, state)` and `useMessageComposer()` for custom input, attachment, and tool placement. Its validated commands remain the same when a child adds files, submits, or stops. `textareaProps` merges native attributes, events, and the input ref. Render the supplied input and send control once.
+
+`Response` offers an avatar slot, `renderLayout(parts, state)`, and `useResponse()`. Use the complete header or its identity/status parts, then place content and actions as needed. Keep the status announcement in custom layouts. `ResponseActions` accepts an ordered `actions` array using `copy`, `read`, `feedback`, and `share`; omitted actions keep all four defaults.
+
+`Persona` includes waveform, orb, and rings variants. All five conversational states share intensity, pause, visibility, reduced-motion, and forced-colors behavior. A custom `renderVisual` receives the effective animation policy, so a custom engine can release resources and stop consistently.
+
+`ContextUsage` can resolve a model name, context limit, and rates from a supplied Tokenlens/models.dev-shaped catalog via `modelId` and `catalog`. `resolveContextPricing` is also exported for application code. Explicit values override the catalog; unknown or ambiguous models stay unknown. Vlak does not fetch or bundle changing prices.
+
 ## Choose the pieces
 
 | Component | Use it for |
@@ -594,6 +622,28 @@ Use `files`, `defaultFiles`, and `onFilesChange` to manage attachments outside t
 
 `tools` holds application controls such as model selection. `globalDrop` also accepts files dropped outside the field; enable it on one composer per page. `allowScreenshot` adds a button that opens the browser's screen chooser on activation. Unsupported browsers show it disabled. Display tracks stop after capture, cancellation, or unmount. Screenshots pass through the same attachment validation.
 
+`useMessageComposer()` gives descendant tools the current draft, files, previews, and validated commands such as `setValue`, `addFiles`, `submit`, `stop`, and `focus`. It must run inside a component rendered beneath `MessageComposer`. `textareaProps` reaches the actual field, including its ref and native events; preventing a keyboard event's default overrides that shortcut.
+
+Use `renderLayout(parts, state)` to arrange existing controls. Render `input` and `submit` once. The form keeps its hidden file picker, validation, shortcut description, and feedback outside your layout:
+
+```tsx
+import { MessageComposer, type ComposedMessage } from "@noorddev/vlak-react";
+
+export function ComposedDraft({ onSend }: {
+  onSend: (message: ComposedMessage) => void | Promise<void>;
+}) {
+  return <MessageComposer onSend={onSend} allowAttachments
+    renderLayout={({ input, submit, attach, screenshot, attachments, tools }) => <>
+      {attachments}
+      {input}
+      <div style={{ display: "flex", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+        {attach}{screenshot}{tools}{submit}
+      </div>
+    </>}
+  />;
+}
+```
+
 For received files or upload state, compose `Attachment` items inside `Attachments`. Supply `data` with a stable identity, filename, media type, size, and optional address. The application controls `status`, `progress`, `error`, and `onRetry`; use `preview` to supply captions, transcripts, or other specialized media content. Failed sends retain the current draft. A successful send preserves text or files that the application replaced while the request was pending.
 
 ## Render response content
@@ -649,6 +699,8 @@ import {
 
 Supply source IDs that are unique across the page. Show source links only when the application has a corresponding source. Pass the intended plain text to `ResponseActions`; it does not scrape rendered children. Omit `Response.copyText` when using the action bar to avoid a second copy control.
 
+`Response` also accepts an `avatar` and `renderLayout(parts, state)`. Use the complete `header`, or its separate `avatar`, `author`, and `status` parts; keep each part once along with `content`, `error`, and `actions`. The status part carries the phase announcement. `useResponse()` lets descendant content or actions read the speaker and response state without passing them through each layer. A custom layout retains an article name, and an explicit accessible name can describe a custom author.
+
 Use `Reasoning` for a work summary or explanation that the provider makes available for display. It does not retrieve private model reasoning. `variant="inline"` uses a padded summary with a text-color hover; the default panel has a subtle 1px outline and 4px corners. Its chevron points right when closed and down when open. The native disclosure keeps the reader's open or closed choice as content changes. Only label a response `complete` after completion; use `stopped` for an interrupted response and `error` for a failed one.
 
 `ResponseBranch` navigates application-owned alternatives. Each item has a stable `id`, React `content`, and an optional `label`. Use `value` and `onValueChange` for controlled selection, or `defaultValue` for an initial alternative. The component does not generate responses or persist a message graph. Keep original alternatives when implementing edit or retry, and let the application decide which later turns belong to each branch.
@@ -657,7 +709,29 @@ Use `Reasoning` for a work summary or explanation that the provider makes availa
 
 `ResponseActions` supplies four named 44px icon buttons for copy, read aloud, feedback, and share. They compose `Button variant="subtle" size="icon"`, with transparent surfaces and a text-color hover. One combined thumbs icon opens helpful and unhelpful choices; choosing the checked item again clears it. The menu supports arrow keys, Enter, Space, Escape, and Tab. Narration starts only on activation and offers a stop control; it is disabled when browser speech is unavailable. `onReadingChange` can coordinate an avatar with narration. Sharing uses `onShare` when supplied, otherwise native sharing or a clipboard fallback.
 
+Set `actions` to any ordered subset of `"copy"`, `"read"`, `"feedback"`, and `"share"`; duplicates are ignored. All four remain the default, and `children` adds application actions. Removing `read` stops this response's narration; removing `feedback` closes its menu.
+
 Feedback stays local unless `onFeedback` persists it. Use `feedback` for controlled selection or `defaultFeedback` for an initial value; callbacks receive `"positive"`, `"negative"`, or `null` when cleared. Rejected callbacks preserve the previous choice for retry. Completed actions and failures are announced, and replacing the text invalidates pending results.
+
+## Use a conversational visual
+
+`Persona` offers native `waveform`, `orb`, and `rings` variants for `idle`, `listening`, `thinking`, `speaking`, and `asleep`. Waveform is the default. Supply measured `intensity` from zero to one, or use each state's representative level. `asleep` settles to zero. A controlled `paused` prop stops motion without changing the conversational state.
+
+```tsx
+import { Persona, type PersonaState } from "@noorddev/vlak-react";
+
+export function SpeakerVisual({ state, level }: { state: PersonaState; level?: number }) {
+  return <Persona variant="orb" state={state} intensity={level} size={32} />;
+}
+```
+
+The native visuals stop when offscreen, the page is hidden, reduced motion or forced colors is active, or the caller pauses them. `onMotionChange(animated)` reports this effective motion policy. `renderVisual` receives `{ state, size, intensity, animated }` for an application-owned renderer; it should honor `animated` and release its resources on unmount. Existing `children` can supply custom content. Omit `label` beside an already named message, or provide one to expose the visual and state as an image. The native variants need no graphics engine or downloaded artwork.
+
+## Resolve supplied context metadata
+
+`ContextUsage` accepts explicit `maxTokens` and `pricing`, or `modelId` with an application-supplied Tokenlens or models.dev catalog. Explicit `model`, `maxTokens`, and `pricing` replace the resolved values. Nothing is fetched or bundled as a pricing snapshot.
+
+For a custom presentation, `resolveContextPricing(modelId, catalog, { inputTokens })` returns the same model name, context limit, and token rates. Qualify ids as `provider/model` when provider pricing matters; providerless ids must match exactly one model. Context pricing tiers require the actual input count. Missing, ambiguous, or invalid information stays unavailable, and calculated costs remain estimates from the supplied rates.
 
 ## Show tools and decisions separately
 
@@ -884,13 +958,13 @@ Each component's generated docs, registry item, CLI output and MCP installation 
 | [Chain of thought](https://elements.ai-sdk.dev/components/chain-of-thought) | [ThoughtSteps](https://vlak.dev/ai/thought-steps/) | Supplied step summaries, progress, evidence, images and captions. |
 | [Checkpoint](https://elements.ai-sdk.dev/components/checkpoint) | [Checkpoint](https://vlak.dev/ai/checkpoint/) | Async restore callback, duplicate protection and retry feedback. |
 | [Confirmation](https://elements.ai-sdk.dev/components/confirmation) | [Confirmation](https://vlak.dev/ai/confirmation/) | Approval, rejection, pending work, failed decisions and retry. |
-| [Context](https://elements.ai-sdk.dev/components/context) | [ContextUsage](https://vlak.dev/ai/context-usage/) | Used/total context, token categories and cost from supplied rates. |
+| [Context](https://elements.ai-sdk.dev/components/context) | [ContextUsage, resolveContextPricing](https://vlak.dev/ai/context-usage/) | Used/total context, token categories, supplied catalog resolution and explicit pricing overrides. |
 | [Conversation](https://elements.ai-sdk.dev/components/conversation) | [Conversation, ConversationDownload](https://vlak.dev/ai/conversation/) | Scroll following with scrollback preservation and structured Markdown export. |
 | [Inline citation](https://elements.ai-sdk.dev/components/inline-citation) | [InlineCitation](https://vlak.dev/ai/inline-citation/) | Multiple sources, quotes, source navigation and focus restoration. |
-| [Message](https://elements.ai-sdk.dev/components/message) | [Response, ResponseMarkdown, ResponseBranch, ResponseEditor](https://vlak.dev/ai/response/) | Roles, streamed rich text, actions, alternatives, multiline editing and regeneration callbacks. |
+| [Message](https://elements.ai-sdk.dev/components/message) | [Response, ResponseMarkdown, ResponseBranch, ResponseEditor](https://vlak.dev/ai/response/) | Roles, avatar and layout slots, context hook, streamed rich text, ordered actions, alternatives, editing and regeneration callbacks. |
 | [Model selector](https://elements.ai-sdk.dev/components/model-selector) | [ModelSelector](https://vlak.dev/ai/model-selector/) | Searchable supplied models, provider metadata and disabled options. |
 | [Plan](https://elements.ai-sdk.dev/components/plan) | [Plan](https://vlak.dev/ai/plan/) | Disclosure, streaming title, content, footer and application actions. |
-| [Prompt input](https://elements.ai-sdk.dev/components/prompt-input) | [MessageComposer](https://vlak.dev/components/message-composer/) | One-line growth with a cap, send/stop, paste/drop, file limits, screenshot capture and composable tools. |
+| [Prompt input](https://elements.ai-sdk.dev/components/prompt-input) | [MessageComposer, useMessageComposer](https://vlak.dev/components/message-composer/) | One-line growth with a cap, send/stop, paste/drop, file limits, screenshot capture, layout slots, native textarea customization and validated context commands. |
 | [Queue](https://elements.ai-sdk.dev/components/queue) | [WorkQueue](https://vlak.dev/ai/work-queue/) | Prompt/todo sections, counts, completion callbacks, attachments and item actions. |
 | [Reasoning](https://elements.ai-sdk.dev/components/reasoning) | [Reasoning](https://vlak.dev/ai/reasoning/) | Chevron disclosure, streaming status, optional duration and opt-in open/close policy. |
 | [Shimmer](https://elements.ai-sdk.dev/components/shimmer) | [Shimmer](https://vlak.dev/ai/shimmer/) | Animated text with timing/spread and reduced-motion fallback. |
@@ -951,17 +1025,29 @@ Each component's generated docs, registry item, CLI output and MCP installation 
 
 ## Deliberate differences and application responsibilities
 
-Vlak retains monochrome surfaces, subtle buttons, chevrons, 4px control corners, and native controls. Syntax highlighting uses monochrome token emphasis; Terminal can opt into the original ANSI colors. Persona supports the five conversational states and a custom visual slot, including the requested Orbkit avatar used by the site, instead of requiring Rive artwork.
+Vlak retains monochrome surfaces, subtle buttons, chevrons, 4px control corners, and native controls. Syntax highlighting uses monochrome token emphasis; Terminal can opt into the original ANSI colors. Persona has waveform, orb, and rings variants, five conversational states, intensity and pause controls, and a custom renderer that receives the effective motion policy. The site also demonstrates the Orbkit avatar. Vlak does not include Vercel's six Rive artwork files or claim Rive API compatibility.
 
 Models, voices, sources, usage counts and prices are supplied by the application. ContextUsage does not ship an automatically updated pricing catalog. SpeechInput can capture audio locally; recorded-audio transcription requires the application's callback. The graph editor has an example connection form for keyboard-only creation as well as pointer handles.
 
 JSXPreview accepts constrained data expressions and registered display components. It rejects active HTML, calls, functions and prototype access; it is not arbitrary JavaScript execution. WebPreview uses an iframe and supplied logs. Sandbox and Agent display application results/configuration; neither executes code or runs an agent. The current upstream components have the same application-owned execution boundary.
 
-The application also owns model requests, tool execution, approval verification, conversation persistence, regeneration, file upload/download policy and graph execution. The [integration guide](https://vlak.dev/docs/ai.md) shows the AI SDK lifecycle mapping without making the SDK a primitive dependency.
+The application also owns model requests, tool execution, approval verification, conversation persistence, regeneration, file upload/download policy and graph execution. The [integration guide](https://vlak.dev/docs/ai.md) shows the AI SDK lifecycle mapping without making the SDK a primitive dependency. A separate [runnable reference app](https://github.com/Noord-Ventures/vlak/tree/codex/ai-elements/apps/assistant) implements the chat integration with AI SDK 7, OpenAI, server-verified approvals, local persistence, upload ownership, editing, regeneration and version restoration.
+
+These APIs offer composition through slots and context hooks rather than matching every upstream compound-component export. Coverage does not mean identical artwork, import compatibility, or measured superiority. The reference app is an integration example, not a hosted authentication, storage, or agent-execution service.
 
 ## Verification
 
 Focused tests exercise streaming syntax and code identity, parser boundaries, message alternatives, failed drafts, async cancellation, denied media permissions, device changes, transcript seeks, disabled model selection, clipboard failures, nested schemas, ANSI output and real graph keyboard behavior. Full package, distribution and browser checks validate the integrated catalog; this matrix records capabilities rather than treating catalog counts as evidence of parity.
+
+The 10 September 2026 follow-up verifies:
+
+- 1,421 package tests, including public exports, ref coverage, accessibility, generated CSS and registry integrity. Packed distributions pass React 18/19, optional renderer, copied-source import closure, publint and type-resolution checks.
+- AI interactions at 1280px and 390px in Chromium 141, Firefox 142 and WebKit 26. Checks cover keyboard input, citation placement, graph endpoints, compact composers, media failures, reduced motion, forced colors and cleanup. Native recording tests use synthetic browser audio tracks, never a physical microphone.
+- Nine reference-server tests for ownership, request limits, canonical history, signed approvals, tampering, idempotency, edits, stopping, replay and stable message IDs.
+- Fourteen reference-app scenarios across desktop and phone widths, with axe checks and no page overflow. These use the explicitly marked deterministic model fixture and include a connection dropped after the server saved its response.
+- A separate live OpenAI smoke run: brief reading, streamed text and reported usage, approval before a task write, one persisted task after approval, and saved partial output after Stop. This run uses server credentials and is opt-in.
+
+Run the library browser matrix with `node apps/www/scripts/ai-cross-browser-e2e.mjs`. The reference app README documents its server, browser, recovery and optional live checks. These are functional and accessibility checks; they are not comparative performance benchmarks or proof that one library is universally better.
 
 
 ---
@@ -1355,7 +1441,7 @@ npx @noorddev/vlak-cli add well-plate
 
 # Context usage
 
-A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates.
+A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates or model catalogs.
 
 Category: ai  
 Name: `context-usage`  
@@ -1366,6 +1452,9 @@ Page: https://vlak.dev/ai/context-usage/
 
 - Supply usedTokens and maxTokens for context occupancy; usage supplies separate input, output, reasoning and cached-input counts.
 - pricing accepts inputPerMillion, outputPerMillion, reasoningPerMillion, cacheReadPerMillion and optional currency. No model catalog or prices are fetched.
+- Pass modelId and a supplied Tokenlens or models.dev catalog to resolve a model name, context limit, and rates. Explicit model, maxTokens, and pricing replace their resolved counterparts.
+- resolveContextPricing exposes the same lookup for application composition. Qualified provider/model ids select provider pricing; a providerless id must match exactly one model.
+- Catalog context tiers require the actual input token count through usage.inputTokens, or inputTokens in resolver options. Unknown, ambiguous, or invalid metadata remains unavailable.
 - Cached input is a subset of input; reasoning is a subset of output. Separate rates replace the parent rate for those subsets rather than adding duplicate charges.
 - Missing or invalid data displays Unavailable. Costs are estimates from the supplied rates, not provider billing totals.
 - Use open/onToggle for a controlled native disclosure or defaultOpen for the initial state. CSS-only markup shows supplied values.
@@ -1385,7 +1474,7 @@ npm install @noorddev/vlak-react
 
 ```tsx
 import "@noorddev/vlak-react/css";
-import { ContextUsage } from "@noorddev/vlak-react";
+import { ContextUsage, resolveContextPricing } from "@noorddev/vlak-react";
 ```
 
 **Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
@@ -1409,15 +1498,17 @@ npx shadcn add https://vlak.dev/r/context-usage.json
 ## Example
 
 ```tsx
-import { ContextUsage, type TokenPricing } from "@noorddev/vlak-react";
+import { ContextUsage, type ContextPricingCatalog } from "@noorddev/vlak-react";
 
-export function ContextExample({ pricing }: { pricing?: TokenPricing }) {
+export function ContextExample({ modelId, catalog }: {
+  modelId: string;
+  catalog: ContextPricingCatalog;
+}) {
   return <ContextUsage
-    model="Workspace model"
+    modelId={modelId}
+    catalog={catalog}
     usedTokens={1500}
-    maxTokens={32000}
     usage={{ inputTokens: 1000, outputTokens: 500, cachedInputTokens: 200, reasoningTokens: 100 }}
-    pricing={pricing}
   />;
 }
 ```
@@ -1435,12 +1526,18 @@ Forwards `ref` to the `HTMLDetailsElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `usedTokens` (required) | `number` |  |  |
-| `maxTokens` (required) | `number` |  |  |
+| `maxTokens` | `number` |  |  |
 | `usage` | `TokenUsage` |  |  |
 | `pricing` | `TokenPricing` |  |  |
+| `modelId` | `string` |  | Optional metadata from an application-owned Tokenlens/models.dev catalog. Explicit limits and rates take precedence. |
+| `catalog` | `Readonly<Record<string, { id?: string; models: Readonly<Record<string, ContextModelPricing>>; }>>` |  |  |
 | `model` | `string` |  |  |
 | `label` | `string` | `"Context usage"` |  |
 | `defaultOpen` | `boolean` | `false` |  |
+
+### Functions
+
+- `resolveContextPricing` (function): Resolve cached catalog metadata without fetching, timers, or a bundled pricing snapshot. Qualified provider/model ids select the provider's prices; providerless ids must be unique. Catalogs may be obtained with Tokenlens or models.dev in application/server code.
 
 ## Keyboard
 
@@ -4789,7 +4886,7 @@ CSS: `packages/core/css/components/transcription.css`
 
 # Persona
 
-A monochrome assistant visual with idle, listening, thinking, speaking, and asleep states, plus a custom visual slot.
+Native monochrome waveform, fluid orb, and ring visuals with five conversational states, live intensity, and a custom renderer.
 
 Category: ai  
 Name: `persona`  
@@ -4799,8 +4896,12 @@ Page: https://vlak.dev/ai/persona/
 ## When to use
 
 - Drive state from actual application recording, generation and playback events.
-- The default visual uses native CSS, pauses when offscreen or the document is hidden, and stops animation for reduced motion and forced colors.
-- Supply children for a custom decorative visual such as an application-owned Orbkit renderer. Its graphics lifecycle remains application-owned.
+- Choose waveform, orb, or rings. Waveform remains the default. All five states work with each native visual without an external graphics runtime.
+- Supply intensity from zero to one for measured input or output energy; it is clamped, and asleep always settles to zero. Otherwise each state provides a representative intensity.
+- Motion pauses when offscreen, the document is hidden, paused is true, or state is asleep. Reduced motion and forced colors keep a static visual.
+- onMotionChange reports the effective motion policy initially and when it changes. It does not report asset loading or custom engine playback events.
+- Supply children for static custom content, or renderVisual for state, normalized size and intensity, and animated. A custom graphics renderer should honor animated and release its own resources.
+- CSS-only markup shows a static representative visual; the React component manages visibility and user preference changes.
 - Omit label for a decorative visual beside an already named response. Add label to expose the visual and state as an image.
 
 ## When not to
@@ -4836,20 +4937,24 @@ npx shadcn add https://vlak.dev/r/persona.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-persona" role="img" aria-label="Assistant: thinking" data-state="thinking" style="width:48px;height:48px"><span class="rs-persona-visual" aria-hidden="true"><span class="rs-persona-bar rs-persona-thinking"></span><span class="rs-persona-bar rs-persona-thinking"></span><span class="rs-persona-bar rs-persona-thinking"></span><span class="rs-persona-bar rs-persona-thinking"></span></span></div>
+<div class="rs-persona rs-persona-thinking" role="img" aria-label="Assistant: thinking" data-state="thinking" data-variant="orb" style="width:48px;height:48px"><span class="rs-persona-orb" aria-hidden="true"><span class="rs-persona-orb-surface"></span></span></div>
 ```
 
 ## Example
 
 ```tsx
+import { Persona, type PersonaState, type PersonaVariant, type PersonaVisualContext } from "@noorddev/vlak-react";
 import type { ReactNode } from "react";
-import { Persona, type PersonaState } from "@noorddev/vlak-react";
 
-export function AssistantPersona({ state = "idle", visual }: {
+export function AssistantPersona({ state = "idle", variant = "orb", intensity, paused, renderVisual }: {
   state?: PersonaState;
-  visual?: ReactNode; // Optional application-owned decorative renderer.
+  variant?: PersonaVariant;
+  intensity?: number;
+  paused?: boolean;
+  renderVisual?: (context: PersonaVisualContext) => ReactNode;
 }) {
-  return <Persona state={state} size={32} label="Assistant">{visual}</Persona>;
+  return <Persona state={state} variant={variant} intensity={intensity} paused={paused}
+    size={48} label="Assistant" renderVisual={renderVisual} />;
 }
 ```
 
@@ -4857,7 +4962,7 @@ export function AssistantPersona({ state = "idle", visual }: {
 
 ### Persona
 
-Five conversational states with a native monochrome visual and a custom rendering slot.
+Three native monochrome visuals share five conversational states and an optional custom renderer.
 
 Extends `HTMLAttributes<HTMLDivElement>`: every native attribute, `className`, `style`, and event handler passes through.
 
@@ -4866,9 +4971,14 @@ Forwards `ref` to the `HTMLDivElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `state` | `PersonaState` | `"idle"` |  |
+| `variant` | `PersonaVariant` | `"waveform"` |  |
 | `size` | `number` | `48` |  |
 | `label` | `string` |  |  |
+| `intensity` | `number` |  | Input/output energy in the range 0–1. Asleep always settles to zero. |
+| `paused` | `boolean` | `false` | Stop motion without changing the conversational state. |
+| `onMotionChange` | `(animated: boolean) => void` |  | Called initially and whenever the effective motion policy changes. |
 | `children` | `ReactNode` |  | A custom decorative visual. The application owns its rendering lifecycle. |
+| `renderVisual` | `(context: PersonaVisualContext) => ReactNode` |  | Custom visuals should honor animated and release their own rendering resources. |
 
 ## Accessibility
 
@@ -4878,7 +4988,7 @@ Forwards `ref` to the `HTMLDivElement`.
 
 ## Classes
 
-`rs-persona`, `rs-persona-visual`, `rs-persona-bar`, `rs-persona-running`, `rs-persona-listening`, `rs-persona-thinking`, `rs-persona-speaking`, `rs-persona-asleep`
+`rs-persona`, `rs-persona-visual`, `rs-persona-bar`, `rs-persona-running`, `rs-persona-listening`, `rs-persona-thinking`, `rs-persona-speaking`, `rs-persona-asleep`, `rs-persona-orb`, `rs-persona-orb-surface`, `rs-persona-rings`, `rs-persona-ring`
 
 ## Dependencies
 
@@ -6149,7 +6259,7 @@ CSS: `packages/core/css/components/widget.css`
 
 # Response actions
 
-Four subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
+Selectable subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
 
 Category: ai  
 Name: `response-actions`  
@@ -6159,12 +6269,13 @@ Page: https://vlak.dev/ai/response-actions/
 ## When to use
 
 - Place in the actions slot of Response and supply the same plain text the reader sees.
+- actions chooses the built-in controls and their display and keyboard order: copy, read, feedback, share. The default includes all four; duplicates are ignored. Add custom controls as children.
 - Each action composes a subtle icon Button. Muted text turns to ink on hover while the surface stays transparent.
 - The combined feedback icon opens helpful and unhelpful choices. Selecting the checked choice again clears it.
 - Use onFeedback to persist positive, negative, or cleared feedback. A rejected promise keeps the previous selection available for retry.
 - Use feedback for controlled selection or defaultFeedback for an initial local selection.
 - Supply onShare for an application-owned share flow. Otherwise the browser shares the text or copies it when native sharing is unavailable.
-- Read aloud uses browser speech only after activation. onReadingChange can coordinate an avatar with narration.
+- Read aloud uses browser speech only after activation. onReadingChange can coordinate an avatar with narration. Removing read stops owned narration; removing feedback closes its menu.
 - CSS-only markup supplies named controls; clipboard, speech, the feedback menu, and sharing require React or application code.
 
 ## When not to
@@ -6209,12 +6320,14 @@ npx shadcn add https://vlak.dev/r/response-actions.json
 ```tsx
 "use client";
 import { useState } from "react";
-import { Response, ResponseActions, type ResponseFeedback } from "@noorddev/vlak-react";
+import { Response, ResponseActions, type ResponseAction, type ResponseFeedback } from "@noorddev/vlak-react";
+
+const controls: readonly ResponseAction[] = ["copy", "read", "feedback", "share"];
 
 export function AnswerActions() {
   const [feedback, setFeedback] = useState<ResponseFeedback>(null);
   const answer = "The brief now names one owner and one next step.";
-  return <Response actions={<ResponseActions text={answer} feedback={feedback} onFeedback={setFeedback} />}>
+  return <Response actions={<ResponseActions text={answer} actions={controls} feedback={feedback} onFeedback={setFeedback} />}>
     <p>{answer}</p>
   </Response>;
 }
@@ -6233,6 +6346,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `text` (required) | `string` |  | Plain text used for copying, narration, and the default share action. |
+| `actions` | `readonly ResponseAction[]` | `["copy", "read", "feedback", "share"]` | Built-in controls in display and keyboard order. Omit for all four; duplicates are ignored. |
 | `feedback` | `ResponseFeedback` |  |  |
 | `defaultFeedback` | `ResponseFeedback` | `null` |  |
 | `onFeedback` | `(value: ResponseFeedback) => void \| Promise<void>` |  | A rejected promise preserves the previous selection and allows retry. |
@@ -6502,7 +6616,7 @@ CSS: `packages/core/css/components/confirmation.css`
 
 # Response
 
-Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, status, and an action slot.
+Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, avatars, status, actions, and a custom layout API.
 
 Category: ai  
 Name: `response`  
@@ -6514,6 +6628,8 @@ Page: https://vlak.dev/ai/response/
 - A user or assistant message whose content and response status come from the application.
 - Pass plain text or rendered React content as children. To render markdown, supply an external markdown renderer in the children slot and configure its content and link safety in your application.
 - Place ResponseActions in actions for icon controls that copy, narrate, rate, and share the response. Omit copyText when using that action bar.
+- Use avatar for an application-owned visual and renderLayout to rearrange ResponseParts. Render the complete header or its avatar, author, and status parts once; retain content, errors, and actions.
+- useResponse reads speaker, author, status, statusLabel, and errorMessage from a descendant. It requires a surrounding Response.
 - Use actions for other application-owned controls. Provide copyText for a standalone copy button when a full action bar is not needed.
 
 ## When not to
@@ -6532,7 +6648,7 @@ npm install @noorddev/vlak-react
 
 ```tsx
 import "@noorddev/vlak-react/css";
-import { Response } from "@noorddev/vlak-react";
+import { Response, useResponse } from "@noorddev/vlak-react";
 ```
 
 **Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
@@ -6550,18 +6666,35 @@ npx shadcn add https://vlak.dev/r/response.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<article class="rs-response" aria-labelledby="response-author"><div class="rs-response-header"><span class="rs-response-author" id="response-author">Assistant</span><span class="rs-response-status" role="status" aria-live="polite" aria-atomic="true">Complete</span></div><div class="rs-response-content"><p>The lease renews on 1 October.</p></div></article>
+<article class="rs-response" aria-labelledby="response-author"><div class="rs-response-header"><div class="rs-response-identity"><span class="rs-response-avatar" aria-hidden="true"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor"><circle cx="10" cy="10" r="7" /></svg></span><span class="rs-response-author" id="response-author">Assistant</span></div><span class="rs-response-status" role="status" aria-live="polite" aria-atomic="true">Complete</span></div><div class="rs-response-content"><p>The lease renews on 1 October.</p></div></article>
 ```
 
 ## Example
 
 ```tsx
-import { Response, ResponseActions } from "@noorddev/vlak-react";
+"use client";
+import { Persona, Response, ResponseActions, useResponse } from "@noorddev/vlak-react";
+
+function CompletedActions({ text }: { text: string }) {
+  const { status } = useResponse();
+  return status === "complete" ? <ResponseActions text={text} /> : null;
+}
 
 export function LeaseExchange() {
   return <>
     <Response from="user">When does the lease renew?</Response>
-    <Response from="assistant" status="complete" actions={<ResponseActions text="The lease renews on 1 October." />}>
+    <Response from="assistant" status="complete"
+      avatar={<Persona variant="orb" size={20} />}
+      actions={<CompletedActions text="The lease renews on 1 October." />}
+      renderLayout={({ avatar, author, status, content, error, actions }) =>
+        <div style={{ display: "grid", gridTemplateColumns: "auto minmax(0, 1fr)", gap: 12 }}>
+          {avatar}
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>{author}{status}</div>
+            {content}{error}{actions}
+          </div>
+        </div>}
+    >
       <p>The lease renews on <strong>1 October</strong>.</p>
     </Response>
   </>;
@@ -6582,6 +6715,7 @@ Forwards `ref` to the `HTMLElement`.
 | --- | --- | --- | --- |
 | `from` | `"user" \| "assistant"` | `"assistant"` | The speaker's identity, separate from the native ARIA role. |
 | `author` | `ReactNode` |  |  |
+| `avatar` | `ReactNode` |  | An application-owned avatar beside the author. |
 | `status` | `ResponseStatus` | `"complete"` |  |
 | `statusLabel` | `string` |  | A short status phrase. Keep token-by-token updates in children. |
 | `errorMessage` | `string` |  |  |
@@ -6590,7 +6724,12 @@ Forwards `ref` to the `HTMLElement`.
 | `copiedLabel` | `string` | `"Copied"` |  |
 | `copyErrorLabel` | `string` | `"Could not copy. Try again."` |  |
 | `actions` | `ReactNode` |  | Application-owned actions, such as retry or feedback buttons. |
+| `renderLayout` | `(parts: ResponseParts, state: ResponseState) => ReactNode` |  | Rearranges the same content and controls. Render each part once; keep the status announcement. |
 | `children` | `ReactNode` |  | Rendered content. Supply your own markdown renderer here when needed. |
+
+### Functions
+
+- `useResponse` (hook): Reads speaker and response status from a custom descendant without threading props.
 
 ## Keyboard
 
@@ -6602,6 +6741,7 @@ Forwards `ref` to the `HTMLElement`.
 ## Accessibility
 
 - A semantic article is named by its visible speaker. from identifies user or assistant without taking over the native role attribute.
+- Custom layouts retain a fallback article name. Keep the supplied status part so phase changes remain announced, and give a non-text custom author an explicit accessible name when needed.
 - Status is a separate polite, atomic live region. Changing response tokens are ordinary readable content and do not repeat the whole message through a live region.
 - The streaming, complete, error, and stopped states are supplied by the application. An errorMessage is visible when status is error; the short response status announces the failure.
 - Copy is shown only with copyText. Clipboard denial or unavailability reports a readable failure and allows retry. Pending writes prevent duplicate activation, and stale writes cannot announce success for new content.
@@ -6609,7 +6749,7 @@ Forwards `ref` to the `HTMLElement`.
 
 ## Classes
 
-`rs-response`, `rs-response-user`, `rs-response-header`, `rs-response-author`, `rs-response-status`, `rs-response-content`, `rs-response-error`, `rs-response-actions`, `rs-response-copy`, `rs-response-copy-status`
+`rs-response`, `rs-response-user`, `rs-response-header`, `rs-response-identity`, `rs-response-avatar`, `rs-response-author`, `rs-response-status`, `rs-response-content`, `rs-response-error`, `rs-response-actions`, `rs-response-copy`, `rs-response-copy-status`
 
 ## Dependencies
 
@@ -10421,11 +10561,15 @@ Page: https://vlak.dev/components/message-composer/
 - Use files, defaultFiles, and onFilesChange to lift attachment selection alongside controlled text.
 - Picker, paste, and drop share accept, maxFiles, maxFileSize, and multiple validation. onAttachmentError receives rejected files and reasons.
 - Use tools for model selectors or application controls, and renderAttachments for custom preview composition.
+- useMessageComposer reads the current draft, files, previews, pending and generation state, and validated commands from a descendant. It requires a surrounding MessageComposer.
+- renderLayout receives MessageComposerParts and state to arrange input, submit, attach, screenshot, attachments, and tools. Render input and submit once; hidden file selection and feedback remain owned by the form.
+- textareaProps forwards native attributes, events, and a merged ref to the actual field. Prevent a keyboard event default to override its shortcut; required draft and submission behavior stay in the composer.
 - Enable globalDrop on one composer per page when file drops outside the field should attach there. allowScreenshot adds explicit browser screen selection when supported.
 
 ## When not to
 
 - An arbitrary multi-field form or uploading files without a message.
+- Calling useMessageComposer outside its provider or invoking commands while rendering. Run commands from user actions or application effects.
 - Assuming browser file checks replace the application upload policy or that attachment selection uploads files automatically.
 
 ## Install
@@ -10438,7 +10582,7 @@ npm install @noorddev/vlak-react
 
 ```tsx
 import "@noorddev/vlak-react/css";
-import { MessageComposer } from "@noorddev/vlak-react";
+import { MessageComposer, useMessageComposer } from "@noorddev/vlak-react";
 ```
 
 **Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
@@ -10462,9 +10606,26 @@ npx shadcn add https://vlak.dev/r/message-composer.json
 ## Example
 
 ```tsx
-import { MessageComposer } from "@noorddev/vlak-react";
+"use client";
+import { Button, MessageComposer, useMessageComposer, type ComposedMessage } from "@noorddev/vlak-react";
 
-<MessageComposer compact maxRows={6} sendOnEnter onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept="image/*,.pdf" maxFiles={4} maxFileSize={10 * 1024 * 1024} allowScreenshot />
+function ClearDraft() {
+  const draft = useMessageComposer();
+  return <Button variant="subtle" size="sm" disabled={draft.disabled || !draft.value}
+    onClick={() => { draft.setValue(""); draft.focus(); }}>Clear draft</Button>;
+}
+
+export function ProjectComposer({ onSend, generating = false, onStop }: {
+  onSend: (message: ComposedMessage) => void | Promise<void>;
+  generating?: boolean;
+  onStop?: () => void;
+}) {
+  return <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend}
+    generating={generating} onStop={onStop} tools={<ClearDraft />}
+    textareaProps={{ "aria-label": "Ask about the project", autoComplete: "off" }}
+    allowAttachments accept="image/*,.pdf" maxFiles={4}
+    maxFileSize={10 * 1024 * 1024} allowScreenshot />;
+}
 ```
 
 ## Props
@@ -10499,12 +10660,18 @@ Forwards `ref` to the `HTMLTextAreaElement`.
 | `allowScreenshot` | `boolean` | `false` | Shows a user-activated browser screen capture action when available. |
 | `tools` | `ReactNode` |  | Application-owned model selectors, capability controls, or other tools. |
 | `renderAttachments` | `(attachments: AttachmentData[], actions: MessageComposerAttachmentActions) => ReactNode` |  |  |
+| `renderLayout` | `(parts: MessageComposerParts, state: MessageComposerState) => ReactNode` |  | Rearranges the provided controls. Render input and submit once; feedback stays in the form. |
+| `textareaProps` | `MessageComposerTextareaProps` | `{}` | Native textarea attributes and handlers. Prevent a key's default to override its shortcut. |
 | `maxLength` | `number` |  |  |
 | `sendOnEnter` | `boolean` | `false` | Enter submits, Shift+Enter inserts a line. Otherwise use Cmd/Ctrl+Enter. |
 | `generating` | `boolean` | `false` | Application-owned response generation, separate from submission pending state. |
 | `onStop` | `() => void` |  | Requests that the application stop generation; does not itself cancel a network request. |
 | `compact` | `boolean` | `false` | A single-line draft with an inline icon action; grows as the message wraps. |
 | `maxRows` | `number` | `6` | Maximum visible draft lines in compact mode, clamped to 1–20. |
+
+### Functions
+
+- `useMessageComposer` (hook): Reads the nearest composer's draft and validated commands from a custom child or tool.
 
 ## Keyboard
 
@@ -10524,6 +10691,7 @@ Forwards `ref` to the `HTMLTextAreaElement`.
 - Rejected attachments remain visible in an alert. File previews have named remove controls and preserve object addresses until removal.
 - Screenshot capture starts only from its button, uses the browser chooser, and stops display tracks after capture, cancellation, or unmount.
 - If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match.
+- Custom layouts retain the form, validation, shortcuts, and feedback. Keep the provided field and action names and their natural reading order.
 
 ## Classes
 

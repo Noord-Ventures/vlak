@@ -21,17 +21,20 @@ export async function checkAIInteractions({ browser, base, fail }) {
         const edge = preview.locator(".react-flow__edge").first();
         await edge.waitFor({ state: "visible" });
         const path = edge.locator(".react-flow__edge-path");
-        const endpoints = await preview.evaluate(root => {
+        const endpoints = await preview.evaluate((root, webkit) => {
           const edgePath = root.querySelector(".react-flow__edge-path");
           const source = root.querySelector('[data-testid="rf__node-brief"] .source');
           const target = root.querySelector('[data-testid="rf__node-review"] .target');
-          const matrix = edgePath.getScreenCTM();
-          const start = edgePath.getPointAtLength(0).matrixTransform(matrix);
-          const end = edgePath.getPointAtLength(edgePath.getTotalLength()).matrixTransform(matrix);
+          // WebKit's getScreenCTM omits ancestor CSS scale. Project this scale/translate-only
+          // fixture from its bounds there; Firefox includes stroke in client bounds, so use CTM.
+          const local = edgePath.getBBox(); const client = edgePath.getBoundingClientRect();
+          const project = point => webkit ? ({ x: client.x + (point.x - local.x) * (local.width ? client.width / local.width : 1), y: client.y + (point.y - local.y) * (local.height ? client.height / local.height : 1) }) : point.matrixTransform(edgePath.getScreenCTM());
+          const start = project(edgePath.getPointAtLength(0));
+          const end = project(edgePath.getPointAtLength(edgePath.getTotalLength()));
           const from = source.getBoundingClientRect(); const to = target.getBoundingClientRect();
           const hit = getComputedStyle(source, "::before");
           return { startGap: Math.hypot(start.x - from.right, start.y - from.y - from.height / 2), endGap: Math.hypot(end.x - to.left, end.y - to.y - to.height / 2), hitWidth: Number.parseFloat(hit.width), hitHeight: Number.parseFloat(hit.height) };
-        });
+        }, browser.browserType().name() === "webkit");
         ensure(endpoints.startGap < 1.5 && endpoints.endGap < 1.5 && endpoints.hitWidth >= 44 && endpoints.hitHeight >= 44, `edges and handles do not share visible geometry with 44px targets: ${JSON.stringify(endpoints)}`);
         const restingStroke = await path.evaluate(element => getComputedStyle(element).stroke);
         await edge.focus();
@@ -64,6 +67,7 @@ export async function checkAIInteractions({ browser, base, fail }) {
         await dialog.getByText("Review the draft together on Thursday.", { exact: true }).waitFor({ state: "visible" });
         const bounds = await dialog.boundingBox();
         ensure(bounds && bounds.x >= -1 && bounds.x + bounds.width <= width + 1, "citation dialog escapes the viewport");
+        ensure(bounds.height < 400, `short citation content stretches toward the viewport height: ${bounds.height}px`);
         await page.keyboard.press("Escape");
         await dialog.waitFor({ state: "hidden" });
         ensure(await trigger.evaluate(element => element === document.activeElement), "Escape does not restore citation trigger focus");

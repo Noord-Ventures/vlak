@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, type ComponentType } from "react";
-import { AudioPlayer, AudioPlayerControls, Button, ButtonGroup, MicSelector, Persona, SpeechInput, Transcription, VoiceSelector, type PersonaState, type SpeechInputStatus } from "@noorddev/vlak-react";
+import { useId, useState, type ComponentType } from "react";
+import { AiAvatar } from "@/components/ai-avatar";
+import { AudioPlayer, AudioPlayerControls, Button, ButtonGroup, MicSelector, Persona, Slider, SpeechInput, Transcription, VoiceSelector, type PersonaState, type SpeechInputStatus } from "@noorddev/vlak-react";
 
 function toneAudio() {
   const rate = 8000; const samples = rate * 8;
@@ -29,7 +30,20 @@ export function TranscriptionPreview({ label = "Brief transcript" }: { label?: s
 }
 export function PersonaPreview() {
   const [state, setState] = useState<PersonaState>("idle");
-  return <div style={{ display: "grid", gap: 24, width: "100%", justifyItems: "start" }}><Persona state={state} label="Assistant" /><ButtonGroup aria-label="Persona state" style={{ display: "flex", flexWrap: "wrap" }}>{(["idle", "listening", "thinking", "speaking", "asleep"] as const).map(value => <Button key={value} variant="subtle" size="sm" aria-pressed={state === value} onClick={() => setState(value)}>{value.charAt(0).toUpperCase() + value.slice(1)}</Button>)}</ButtonGroup></div>;
+  const [visual, setVisual] = useState<"waveform" | "orb" | "rings" | "mosaic">("orb");
+  const [paused, setPaused] = useState(false);
+  const [intensity, setIntensity] = useState<number | undefined>();
+  const intensityId = useId();
+  const levels = { idle: 0.25, listening: 0.65, thinking: 0.45, speaking: 0.85, asleep: 0 };
+  return <div style={{ display: "grid", gap: 24, width: "100%", justifyItems: "start" }}>
+    <div style={{ display: "flex", gap: 24, alignItems: "center", minHeight: 112 }}>
+      <Persona state={state} variant={visual === "mosaic" ? "orb" : visual} size={96} intensity={intensity} paused={paused} label="Assistant" renderVisual={visual === "mosaic" ? ({ state: current, size, animated }) => <AiAvatar size={size} state={current === "thinking" || current === "speaking" ? current : "idle"} paused={!animated} /> : undefined} />
+      <Button variant="subtle" size="sm" aria-pressed={paused} onClick={() => setPaused(value => !value)}>{paused ? "Resume motion" : "Pause motion"}</Button>
+    </div>
+    <ButtonGroup aria-label="Persona visual" style={{ display: "flex", flexWrap: "wrap" }}>{(["waveform", "orb", "rings", "mosaic"] as const).map(value => <Button key={value} variant="subtle" size="sm" aria-pressed={visual === value} onClick={() => setVisual(value)}>{value.charAt(0).toUpperCase() + value.slice(1)}{value === "mosaic" ? " (custom)" : ""}</Button>)}</ButtonGroup>
+    <ButtonGroup aria-label="Persona state" style={{ display: "flex", flexWrap: "wrap" }}>{(["idle", "listening", "thinking", "speaking", "asleep"] as const).map(value => <Button key={value} variant="subtle" size="sm" aria-pressed={state === value} onClick={() => { setState(value); setIntensity(undefined); }}>{value.charAt(0).toUpperCase() + value.slice(1)}</Button>)}</ButtonGroup>
+    {visual !== "mosaic" && <div style={{ display: "grid", width: "100%", maxWidth: 320 }}><label htmlFor={intensityId}>Intensity</label><Slider id={intensityId} min={0} max={1} step={0.01} value={state === "asleep" ? 0 : intensity ?? levels[state]} disabled={state === "asleep"} onValueChange={setIntensity} /></div>}
+  </div>;
 }
 export const aiVoicePreviews: Record<string, ComponentType> = {
   "audio-player": AudioPlayerPreview,

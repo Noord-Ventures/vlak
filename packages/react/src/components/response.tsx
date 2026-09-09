@@ -7,10 +7,38 @@ import { rs } from "../rs";
 
 export type ResponseStatus = "streaming" | "complete" | "error" | "stopped";
 
+export interface ResponseState {
+  from: "user" | "assistant";
+  author: React.ReactNode;
+  status: ResponseStatus;
+  statusLabel: string;
+  errorMessage?: string;
+}
+export interface ResponseParts {
+  /** The complete identity and status row. Use this or its individual parts. */
+  header: React.ReactNode;
+  avatar: React.ReactNode;
+  author: React.ReactNode;
+  status: React.ReactNode;
+  content: React.ReactNode;
+  error: React.ReactNode;
+  actions: React.ReactNode;
+}
+const ResponseContext = React.createContext<ResponseState | null>(null);
+
+/** Reads speaker and response status from a custom descendant without threading props. */
+export function useResponse(): ResponseState {
+  const context = React.useContext(ResponseContext);
+  if (!context) throw new Error("useResponse must be used inside Response.");
+  return context;
+}
+
 export interface ResponseProps extends React.HTMLAttributes<HTMLElement> {
   /** The speaker's identity, separate from the native ARIA role. */
   from?: "user" | "assistant";
   author?: React.ReactNode;
+  /** An application-owned avatar beside the author. */
+  avatar?: React.ReactNode;
   status?: ResponseStatus;
   /** A short status phrase. Keep token-by-token updates in children. */
   statusLabel?: string;
@@ -22,6 +50,8 @@ export interface ResponseProps extends React.HTMLAttributes<HTMLElement> {
   copyErrorLabel?: string;
   /** Application-owned actions, such as retry or feedback buttons. */
   actions?: React.ReactNode;
+  /** Rearranges the same content and controls. Render each part once; keep the status announcement. */
+  renderLayout?: (parts: ResponseParts, state: ResponseState) => React.ReactNode;
   /** Rendered content. Supply your own markdown renderer here when needed. */
   children?: React.ReactNode;
 }
@@ -74,6 +104,8 @@ const styles = stylex.create({
     fontWeight: 600,
     fontSize: "0.84375rem",
   },
+  identity: { display: "flex", alignItems: "center", gap: "0.5rem", minWidth: 0 },
+  avatar: { display: "inline-flex", flexShrink: 0, alignItems: "center", justifyContent: "center" },
   status: {
     color: vlak.gray,
     fontSize: "0.8125rem",
@@ -137,6 +169,7 @@ export const Response = React.forwardRef<HTMLElement, ResponseProps>(function Re
   {
     from = "assistant",
     author,
+    avatar,
     status = "complete",
     statusLabel,
     errorMessage,
@@ -145,6 +178,7 @@ export const Response = React.forwardRef<HTMLElement, ResponseProps>(function Re
     copiedLabel = "Copied",
     copyErrorLabel = "Could not copy. Try again.",
     actions,
+    renderLayout,
     children,
     className,
     style,
@@ -186,6 +220,8 @@ export const Response = React.forwardRef<HTMLElement, ResponseProps>(function Re
   const root = rs(["rs-response", from === "user" && "rs-response-user", className], styles.root, from === "user" && styles.user);
   const header = rs(["rs-response-header"], styles.header);
   const authorStyle = rs(["rs-response-author"], styles.author);
+  const identity = rs(["rs-response-identity"], styles.identity);
+  const avatarStyle = rs(["rs-response-avatar"], styles.avatar);
   const statusStyle = rs(["rs-response-status"], styles.status);
   const content = rs(["rs-response-content"], styles.content);
   const error = rs(["rs-response-error"], styles.error);
@@ -193,37 +229,39 @@ export const Response = React.forwardRef<HTMLElement, ResponseProps>(function Re
   const copyStyle = rs(["rs-response-copy"], styles.copy);
   const copyStatus = rs(["rs-response-copy-status"], styles.copyStatus);
   const showActions = copyText !== undefined || actions != null;
+  const state: ResponseState = { from, author: author ?? (from === "user" ? "You" : "Assistant"), status, statusLabel: statusLabel ?? statusLabels[status], errorMessage };
+  const authorPart = <span id={authorId} {...authorStyle}>{state.author}</span>;
+  const avatarPart = avatar != null ? <span {...avatarStyle}>{avatar}</span> : null;
+  const statusPart = <span {...statusStyle} role="status" aria-live="polite" aria-atomic="true">{state.statusLabel}</span>;
+  const parts: ResponseParts = {
+    avatar: avatarPart,
+    author: authorPart,
+    status: statusPart,
+    header: <div {...header}>{avatarPart ? <div {...identity}>{avatarPart}{authorPart}</div> : authorPart}{statusPart}</div>,
+    content: <div {...content}>{children}</div>,
+    error: status === "error" && errorMessage ? <p {...error}>{errorMessage}</p> : null,
+    actions: showActions ? <div {...actionsStyle}>
+      {copyText !== undefined && <>
+        <button type="button" {...copyStyle} disabled={copyState === "pending"} onClick={copy}>{copyLabel}</button>
+        <span {...copyStatus} role="status" aria-live="polite" aria-atomic="true">{copyState === "copied" ? copiedLabel : copyState === "error" ? copyErrorLabel : ""}</span>
+      </>}
+      {actions}
+    </div> : null,
+  };
+  const accessibleLabel = label ?? (renderLayout && !labelledBy ? (typeof state.author === "string" ? state.author : from === "user" ? "You" : "Assistant") : undefined);
 
   return (
-    <article
+    <ResponseContext.Provider value={state}><article
       ref={ref}
       {...props}
-      aria-label={label}
-      aria-labelledby={labelledBy ?? (label ? undefined : authorId)}
+      aria-label={accessibleLabel}
+      aria-labelledby={labelledBy ?? (accessibleLabel ? undefined : authorId)}
       data-from={from}
       data-status={status}
       className={root.className}
       style={{ ...root.style, ...style }}
     >
-      <div {...header}>
-        <span id={authorId} {...authorStyle}>{author ?? (from === "user" ? "You" : "Assistant")}</span>
-        <span {...statusStyle} role="status" aria-live="polite" aria-atomic="true">
-          {statusLabel ?? statusLabels[status]}
-        </span>
-      </div>
-      <div {...content}>{children}</div>
-      {status === "error" && errorMessage && <p {...error}>{errorMessage}</p>}
-      {showActions && <div {...actionsStyle}>
-        {copyText !== undefined && <>
-          <button type="button" {...copyStyle} disabled={copyState === "pending"} onClick={copy}>
-            {copyLabel}
-          </button>
-          <span {...copyStatus} role="status" aria-live="polite" aria-atomic="true">
-            {copyState === "copied" ? copiedLabel : copyState === "error" ? copyErrorLabel : ""}
-          </span>
-        </>}
-        {actions}
-      </div>}
-    </article>
+      {renderLayout ? renderLayout(parts, state) : <>{parts.header}{parts.content}{parts.error}{parts.actions}</>}
+    </article></ResponseContext.Provider>
   );
 });

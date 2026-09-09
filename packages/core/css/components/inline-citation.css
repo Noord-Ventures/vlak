@@ -1,7 +1,7 @@
 /* ── inline-citation: generated from packages/react/src/components/inline-citation.tsx ── */
 .rs-inline-citation{display:inline;color:var(--text)}
 .rs-inline-citation-trigger{display:inline-flex;vertical-align:middle;padding-inline:0.5rem;font-variant-numeric:tabular-nums;font-size:var(--control-label)}
-.rs-inline-citation-panel{position:fixed;z-index:var(--z-float);inset:auto;margin:0;width:22rem;max-width:calc(100vw - 16px);box-sizing:border-box;padding:0.75rem;display:grid;gap:0.75rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);font-family:inherit;font-size:var(--control-fs);line-height:1.45}
+.rs-inline-citation-panel{position:fixed;z-index:var(--z-float);inset:auto;margin:0;width:22rem;max-width:calc(100vw - 16px);box-sizing:border-box;padding:0.75rem;display:grid;grid-auto-rows:min-content;gap:0.75rem;background-color:var(--bg);color:var(--text);border-width:1px;border-style:solid;border-color:var(--divider);border-radius:var(--radius-sm);font-family:inherit;font-size:var(--control-fs);line-height:1.45}
 .rs-inline-citation-panel:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text);outline-offset:2px}
 @media (forced-colors: active){.rs-inline-citation-panel{border-color:CanvasText}}
 .rs-inline-citation-header{display:flex;align-items:center;justify-content:space-between;gap:0.5rem}

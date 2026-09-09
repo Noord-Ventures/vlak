@@ -1,6 +1,6 @@
 # Response actions
 
-Four subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
+Selectable subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
 
 Category: ai  
 Name: `response-actions`  
@@ -10,12 +10,13 @@ Page: https://vlak.dev/ai/response-actions/
 ## When to use
 
 - Place in the actions slot of Response and supply the same plain text the reader sees.
+- actions chooses the built-in controls and their display and keyboard order: copy, read, feedback, share. The default includes all four; duplicates are ignored. Add custom controls as children.
 - Each action composes a subtle icon Button. Muted text turns to ink on hover while the surface stays transparent.
 - The combined feedback icon opens helpful and unhelpful choices. Selecting the checked choice again clears it.
 - Use onFeedback to persist positive, negative, or cleared feedback. A rejected promise keeps the previous selection available for retry.
 - Use feedback for controlled selection or defaultFeedback for an initial local selection.
 - Supply onShare for an application-owned share flow. Otherwise the browser shares the text or copies it when native sharing is unavailable.
-- Read aloud uses browser speech only after activation. onReadingChange can coordinate an avatar with narration.
+- Read aloud uses browser speech only after activation. onReadingChange can coordinate an avatar with narration. Removing read stops owned narration; removing feedback closes its menu.
 - CSS-only markup supplies named controls; clipboard, speech, the feedback menu, and sharing require React or application code.
 
 ## When not to
@@ -60,12 +61,14 @@ npx shadcn add https://vlak.dev/r/response-actions.json
 ```tsx
 "use client";
 import { useState } from "react";
-import { Response, ResponseActions, type ResponseFeedback } from "@noorddev/vlak-react";
+import { Response, ResponseActions, type ResponseAction, type ResponseFeedback } from "@noorddev/vlak-react";
+
+const controls: readonly ResponseAction[] = ["copy", "read", "feedback", "share"];
 
 export function AnswerActions() {
   const [feedback, setFeedback] = useState<ResponseFeedback>(null);
   const answer = "The brief now names one owner and one next step.";
-  return <Response actions={<ResponseActions text={answer} feedback={feedback} onFeedback={setFeedback} />}>
+  return <Response actions={<ResponseActions text={answer} actions={controls} feedback={feedback} onFeedback={setFeedback} />}>
     <p>{answer}</p>
   </Response>;
 }
@@ -84,6 +87,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `text` (required) | `string` |  | Plain text used for copying, narration, and the default share action. |
+| `actions` | `readonly ResponseAction[]` | `["copy", "read", "feedback", "share"]` | Built-in controls in display and keyboard order. Omit for all four; duplicates are ignored. |
 | `feedback` | `ResponseFeedback` |  |  |
 | `defaultFeedback` | `ResponseFeedback` | `null` |  |
 | `onFeedback` | `(value: ResponseFeedback) => void \| Promise<void>` |  | A rejected promise preserves the previous selection and allows retry. |

@@ -269,3 +269,51 @@ describe("ResponseActions", () => {
     expect(copy).toHaveBeenCalledOnce();
   });
 });
+
+
+describe("ResponseActions selection", () => {
+  it("renders a unique subset in the requested keyboard order and retains custom children", async () => {
+    const user = userEvent.setup();
+    const share = vi.fn().mockResolvedValue(undefined);
+    const feedback = vi.fn().mockResolvedValue(undefined);
+    const { container, rerender } = render(<ResponseActions text="Answer" actions={["share", "feedback", "share"]} onShare={share} onFeedback={feedback}><button type="button">Retry answer</button></ResponseActions>);
+    expect(screen.getAllByRole("button").map(button => button.getAttribute("aria-label") || button.textContent)).toEqual(["Share response", "Rate response", "Retry answer"]);
+    await user.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Share response" }));
+    await user.keyboard("{Enter}");
+    await screen.findByText("Shared");
+    expect(share).toHaveBeenCalledOnce();
+    await user.tab();
+    await user.keyboard("{ArrowDown}{ArrowDown}{Enter}");
+    await waitFor(() => expect(feedback).toHaveBeenCalledWith("negative"));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Rate response" }));
+    const result = await axe(container, { rules: { "color-contrast": { enabled: false } } });
+    (expect(result) as unknown as { toHaveNoViolations(): void }).toHaveNoViolations();
+    rerender(<ResponseActions text="Answer" actions={[]}><button type="button">Retry answer</button></ResponseActions>);
+    expect(screen.getAllByRole("button")).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "Retry answer" })).toBeTruthy();
+  });
+
+  it("closes removed feedback controls and stops only its owned narration when read is removed", async () => {
+    const user = userEvent.setup();
+    const speech = mockSpeech();
+    const reading = vi.fn();
+    const { rerender } = render(<ResponseActions text="Answer" actions={["feedback", "copy", "read"]} onReadingChange={reading} />);
+    await user.click(screen.getByRole("button", { name: "Read aloud" }));
+    const utterance = speech.speak.mock.calls[0]![0];
+    await user.click(screen.getByRole("button", { name: "Rate response" }));
+    expect(screen.getByRole("menu")).toBeTruthy();
+    rerender(<ResponseActions text="Answer" actions={["copy"]} onReadingChange={reading} />);
+    expect(screen.queryByRole("menu")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Copy response" }));
+    expect(speech.cancel).toHaveBeenCalledOnce();
+    expect(reading).toHaveBeenLastCalledWith(false);
+    expect(utterance.onend).toBeNull();
+    rerender(<ResponseActions text="Answer" actions={["copy", "feedback", "read"]} onReadingChange={reading} />);
+    expect(screen.getByRole("button", { name: "Rate response" }).getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("button", { name: "Read aloud" })).toBeTruthy();
+    speech.speaking = true;
+    rerender(<ResponseActions text="Answer" actions={["copy"]} onReadingChange={reading} />);
+    expect(speech.cancel).toHaveBeenCalledOnce();
+  });
+});

@@ -4,7 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-libra
 import userEvent from "@testing-library/user-event";
 import { axe } from "vitest-axe";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MessageComposer } from "../src/components/message-composer";
+import { MessageComposer, useMessageComposer, type MessageComposerState } from "../src/components/message-composer";
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 
@@ -117,5 +117,111 @@ describe("Compact MessageComposer", () => {
     expect(renderToString(<MessageComposer compact onSend={() => {}} />)).toContain('rows="1"');
     const { container } = render(<MessageComposer compact allowAttachments onSend={() => {}} />);
     expect(await axe(container, { rules: { "color-contrast": { enabled: false } } })).toHaveNoViolations();
+  });
+});
+
+
+describe("MessageComposer composition", () => {
+  it("rearranges controls while custom tools share the draft and validated attachment state", async () => {
+    const user = userEvent.setup();
+    const send = vi.fn();
+    const reject = vi.fn();
+    const first = new File(["a"], "first.txt", { type: "text/plain" });
+    const second = new File(["b"], "second.txt", { type: "text/plain" });
+    const wrong = new File(["c"], "third.pdf", { type: "application/pdf" });
+    function Tools() {
+      const composer = useMessageComposer();
+      return <><button type="button" onClick={() => { composer.setValue("Review the brief"); composer.addFiles([first]); composer.addFiles([second, wrong]); composer.focus(); }}>Use brief</button><button type="button" disabled={!composer.canAttach} onClick={composer.openFileDialog}>Choose a file</button><span data-testid="selection">{composer.files.length} selected</span></>;
+    }
+    const { container } = render(<MessageComposer compact sendOnEnter allowAttachments accept=".txt" maxFiles={2} onAttachmentError={reject} onSend={send} tools={<Tools />} renderLayout={parts => <><div>{parts.tools}</div>{parts.attachments}<div data-testid="custom-draft">{parts.input}</div><footer>{parts.submit}</footer></>} />);
+    await user.click(screen.getByRole("button", { name: "Use brief" }));
+    expect(screen.getByTestId("selection").textContent).toBe("2 selected");
+    expect(reject.mock.lastCall?.[0][0].code).toBe("accept");
+    expect(screen.getByRole("alert").textContent).toContain("third.pdf");
+    expect(document.activeElement).toBe(screen.getByRole("textbox"));
+    expect(screen.getAllByRole("textbox")).toHaveLength(1);
+    const picker = screen.getByLabelText("Attach files", { selector: "input" });
+    const click = vi.spyOn(picker, "click");
+    await user.click(screen.getByRole("button", { name: "Choose a file" }));
+    expect(click).toHaveBeenCalledOnce();
+    screen.getByRole("textbox").focus();
+    await user.keyboard("{Enter}");
+    await waitFor(() => expect(screen.getByRole<HTMLTextAreaElement>("textbox").value).toBe(""));
+    expect(send).toHaveBeenCalledWith({ text: "Review the brief", files: [first, second] });
+    expect(screen.getByTestId("selection").textContent).toBe("0 selected");
+    expect(await axe(container, { rules: { "color-contrast": { enabled: false } } })).toHaveNoViolations();
+  });
+
+  it("merges native textarea attributes, refs, descriptions and cancelable keyboard handlers", async () => {
+    const ref = React.createRef<HTMLTextAreaElement>();
+    const fieldRef = React.createRef<HTMLTextAreaElement>();
+    const send = vi.fn();
+    const key = vi.fn((event: React.KeyboardEvent<HTMLTextAreaElement>) => event.preventDefault());
+    const changed = vi.fn();
+    const { rerender } = render(<><p id="extra-help">Additional context</p><MessageComposer ref={ref} compact sendOnEnter defaultValue="Draft" onSend={send} textareaProps={{ ref: fieldRef, name: "prompt", className: "custom-area", style: { letterSpacing: "1px" }, "aria-describedby": "extra-help", onKeyDown: key, onChange: changed }} /></>);
+    const area = screen.getByRole<HTMLTextAreaElement>("textbox");
+    expect(ref.current).toBe(area);
+    expect(fieldRef.current).toBe(area);
+    expect(area.name).toBe("prompt");
+    expect(area.classList.contains("rs-message-composer-area")).toBe(true);
+    expect(area.classList.contains("custom-area")).toBe(true);
+    expect(area.style.letterSpacing).toBe("1px");
+    expect(area.getAttribute("aria-describedby")?.split(" ")).toHaveLength(2);
+    fireEvent.change(area, { target: { value: "Updated" } });
+    expect(changed).toHaveBeenCalledOnce();
+    expect(area.value).toBe("Updated");
+    fireEvent.keyDown(area, { key: "Enter" });
+    expect(key).toHaveBeenCalledOnce();
+    expect(send).not.toHaveBeenCalled();
+    rerender(<MessageComposer compact sendOnEnter defaultValue="Draft" onSend={send} />);
+    const next = screen.getByRole("textbox");
+    fireEvent.compositionStart(next);
+    fireEvent.keyDown(next, { key: "Enter", isComposing: false });
+    expect(send).not.toHaveBeenCalled();
+    fireEvent.compositionEnd(next);
+    fireEvent.keyDown(next, { key: "Enter", keyCode: 229 });
+    expect(send).not.toHaveBeenCalled();
+    fireEvent.keyDown(next, { key: "Enter" });
+    await waitFor(() => expect(send).toHaveBeenCalledOnce());
+  });
+
+  it("guards custom commands during submission and keeps failure feedback outside the custom layout", async () => {
+    const file = new File(["brief"], "brief.txt");
+    let controller!: MessageComposerState;
+    let fail!: (error: Error) => void;
+    const send = vi.fn(() => new Promise<void>((_resolve, reject) => { fail = reject; }));
+    function Observer() { controller = useMessageComposer(); return null; }
+    render(<MessageComposer compact defaultValue="Keep this" allowAttachments defaultFiles={[file]} onSend={send} renderLayout={parts => <>{parts.input}{parts.submit}<Observer /></>} />);
+    let sent!: Promise<boolean>;
+    act(() => { sent = controller.submit(); });
+    expect(controller.pending).toBe(true);
+    expect(controller.canSubmit).toBe(false);
+    act(() => { controller.setValue("Lost draft"); controller.clearAttachments(); controller.addFiles([new File(["new"], "new.txt")]); });
+    expect(controller.value).toBe("Keep this");
+    expect(controller.files).toEqual([file]);
+    expect(await controller.submit()).toBe(false);
+    await act(async () => { fail(new Error("offline")); expect(await sent).toBe(false); });
+    expect(send).toHaveBeenCalledOnce();
+    expect(controller.failed).toBe(true);
+    const feedback = screen.getByRole("status");
+    expect(feedback.textContent).toContain("draft is still here");
+    expect(feedback.classList.contains("rs-message-composer-sr-only")).toBe(false);
+    expect(screen.getByRole<HTMLTextAreaElement>("textbox").value).toBe("Keep this");
+  });
+
+  it("honors controlled state and native validity from custom submit commands", async () => {
+    let controller!: MessageComposerState;
+    function Observer() { controller = useMessageComposer(); return null; }
+    const changed = vi.fn();
+    const send = vi.fn();
+    const invalid = vi.fn();
+    const file = new File(["brief"], "brief.txt");
+    render(<MessageComposer compact value="" onValueChange={changed} files={[file]} allowAttachments onSend={send} textareaProps={{ required: true, onInvalid: invalid }}><Observer /></MessageComposer>);
+    act(() => controller.setValue("Requested draft"));
+    expect(changed).toHaveBeenCalledWith("Requested draft");
+    expect(controller.value).toBe("");
+    expect(await controller.submit()).toBe(false);
+    expect(invalid).toHaveBeenCalledOnce();
+    expect(send).not.toHaveBeenCalled();
   });
 });

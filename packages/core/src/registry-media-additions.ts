@@ -341,7 +341,7 @@ export const mediaAdditions: VlakComponent[] = [
       "attachments"
     ],
     "snippet": "<form class=\"rs-message-composer\" aria-label=\"Message\"><label>Message<textarea class=\"rs-textarea\" placeholder=\"Write a message…\"></textarea></label><div class=\"rs-message-composer-actions\"><button class=\"rs-btn-primary\" type=\"submit\">Send</button></div></form>",
-    "example": "import { MessageComposer } from \"@noorddev/vlak-react\";\n\n<MessageComposer compact maxRows={6} sendOnEnter onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept=\"image/*,.pdf\" maxFiles={4} maxFileSize={10 * 1024 * 1024} allowScreenshot />",
+    "example": "\"use client\";\nimport { Button, MessageComposer, useMessageComposer, type ComposedMessage } from \"@noorddev/vlak-react\";\n\nfunction ClearDraft() {\n  const draft = useMessageComposer();\n  return <Button variant=\"subtle\" size=\"sm\" disabled={draft.disabled || !draft.value}\n    onClick={() => { draft.setValue(\"\"); draft.focus(); }}>Clear draft</Button>;\n}\n\nexport function ProjectComposer({ onSend, generating = false, onStop }: {\n  onSend: (message: ComposedMessage) => void | Promise<void>;\n  generating?: boolean;\n  onStop?: () => void;\n}) {\n  return <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend}\n    generating={generating} onStop={onStop} tools={<ClearDraft />}\n    textareaProps={{ \"aria-label\": \"Ask about the project\", autoComplete: \"off\" }}\n    allowAttachments accept=\"image/*,.pdf\" maxFiles={4}\n    maxFileSize={10 * 1024 * 1024} allowScreenshot />;\n}",
     "usage": {
       "use": [
         "Chat, comments, or a support reply.",
@@ -352,10 +352,14 @@ export const mediaAdditions: VlakComponent[] = [
         "Use files, defaultFiles, and onFilesChange to lift attachment selection alongside controlled text.",
         "Picker, paste, and drop share accept, maxFiles, maxFileSize, and multiple validation. onAttachmentError receives rejected files and reasons.",
         "Use tools for model selectors or application controls, and renderAttachments for custom preview composition.",
+        "useMessageComposer reads the current draft, files, previews, pending and generation state, and validated commands from a descendant. It requires a surrounding MessageComposer.",
+        "renderLayout receives MessageComposerParts and state to arrange input, submit, attach, screenshot, attachments, and tools. Render input and submit once; hidden file selection and feedback remain owned by the form.",
+        "textareaProps forwards native attributes, events, and a merged ref to the actual field. Prevent a keyboard event default to override its shortcut; required draft and submission behavior stay in the composer.",
         "Enable globalDrop on one composer per page when file drops outside the field should attach there. allowScreenshot adds explicit browser screen selection when supported."
       ],
       "avoid": [
         "An arbitrary multi-field form or uploading files without a message.",
+        "Calling useMessageComposer outside its provider or invoking commands while rendering. Run commands from user actions or application effects.",
         "Assuming browser file checks replace the application upload policy or that attachment selection uploads files automatically."
       ]
     },
@@ -381,7 +385,8 @@ export const mediaAdditions: VlakComponent[] = [
       "Compact icon actions retain readable names, titles, and 44px targets. Failed sends remain visible beneath the field; other status updates are available to assistive technology.",
       "Rejected attachments remain visible in an alert. File previews have named remove controls and preserve object addresses until removal.",
       "Screenshot capture starts only from its button, uses the browser chooser, and stops display tracks after capture, cancellation, or unmount.",
-      "If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match."
+      "If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match.",
+      "Custom layouts retain the form, validation, shortcuts, and feedback. Keep the provided field and action names and their natural reading order."
     ],
     "aliases": [
       "MessageComposer",

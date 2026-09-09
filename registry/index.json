@@ -111,7 +111,7 @@
       "name": "context-usage",
       "type": "registry:component",
       "title": "Context usage",
-      "description": "A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates.",
+      "description": "A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates or model catalogs.",
       "registryDependencies": [
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
@@ -151,11 +151,14 @@
             "Token cost",
             "ContextUsage"
           ],
-          "example": "import { ContextUsage, type TokenPricing } from \"@noorddev/vlak-react\";\n\nexport function ContextExample({ pricing }: { pricing?: TokenPricing }) {\n  return <ContextUsage\n    model=\"Workspace model\"\n    usedTokens={1500}\n    maxTokens={32000}\n    usage={{ inputTokens: 1000, outputTokens: 500, cachedInputTokens: 200, reasoningTokens: 100 }}\n    pricing={pricing}\n  />;\n}",
+          "example": "import { ContextUsage, type ContextPricingCatalog } from \"@noorddev/vlak-react\";\n\nexport function ContextExample({ modelId, catalog }: {\n  modelId: string;\n  catalog: ContextPricingCatalog;\n}) {\n  return <ContextUsage\n    modelId={modelId}\n    catalog={catalog}\n    usedTokens={1500}\n    usage={{ inputTokens: 1000, outputTokens: 500, cachedInputTokens: 200, reasoningTokens: 100 }}\n  />;\n}",
           "usage": {
             "use": [
               "Supply usedTokens and maxTokens for context occupancy; usage supplies separate input, output, reasoning and cached-input counts.",
               "pricing accepts inputPerMillion, outputPerMillion, reasoningPerMillion, cacheReadPerMillion and optional currency. No model catalog or prices are fetched.",
+              "Pass modelId and a supplied Tokenlens or models.dev catalog to resolve a model name, context limit, and rates. Explicit model, maxTokens, and pricing replace their resolved counterparts.",
+              "resolveContextPricing exposes the same lookup for application composition. Qualified provider/model ids select provider pricing; a providerless id must match exactly one model.",
+              "Catalog context tiers require the actual input token count through usage.inputTokens, or inputTokens in resolver options. Unknown, ambiguous, or invalid metadata remains unavailable.",
               "Cached input is a subset of input; reasoning is a subset of output. Separate rates replace the parent rate for those subsets rather than adding duplicate charges.",
               "Missing or invalid data displays Unavailable. Costs are estimates from the supplied rates, not provider billing totals.",
               "Use open/onToggle for a controlled native disclosure or defaultOpen for the initial state. CSS-only markup shows supplied values."
@@ -187,6 +190,11 @@
           "path": "vlak/context-usage.tsx",
           "type": "registry:component",
           "target": "components/vlak/context-usage.tsx"
+        },
+        {
+          "path": "vlak/context-pricing.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/context-pricing.tsx"
         },
         {
           "path": "vlak/styles/context-usage.css",
@@ -2865,7 +2873,7 @@
       "name": "persona",
       "type": "registry:component",
       "title": "Persona",
-      "description": "A monochrome assistant visual with idle, listening, thinking, speaking, and asleep states, plus a custom visual slot.",
+      "description": "Native monochrome waveform, fluid orb, and ring visuals with five conversational states, live intensity, and a custom renderer.",
       "registryDependencies": [
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
@@ -2889,9 +2897,13 @@
             "rs-persona-listening",
             "rs-persona-thinking",
             "rs-persona-speaking",
-            "rs-persona-asleep"
+            "rs-persona-asleep",
+            "rs-persona-orb",
+            "rs-persona-orb-surface",
+            "rs-persona-rings",
+            "rs-persona-ring"
           ],
-          "snippet": "<div class=\"rs-persona\" role=\"img\" aria-label=\"Assistant: thinking\" data-state=\"thinking\" style=\"width:48px;height:48px\"><span class=\"rs-persona-visual\" aria-hidden=\"true\"><span class=\"rs-persona-bar rs-persona-thinking\"></span><span class=\"rs-persona-bar rs-persona-thinking\"></span><span class=\"rs-persona-bar rs-persona-thinking\"></span><span class=\"rs-persona-bar rs-persona-thinking\"></span></span></div>",
+          "snippet": "<div class=\"rs-persona rs-persona-thinking\" role=\"img\" aria-label=\"Assistant: thinking\" data-state=\"thinking\" data-variant=\"orb\" style=\"width:48px;height:48px\"><span class=\"rs-persona-orb\" aria-hidden=\"true\"><span class=\"rs-persona-orb-surface\"></span></span></div>",
           "cssOnly": false,
           "registryDependencies": [
             "vlak-lib"
@@ -2903,12 +2915,16 @@
             "Voice state",
             "Orb"
           ],
-          "example": "import type { ReactNode } from \"react\";\nimport { Persona, type PersonaState } from \"@noorddev/vlak-react\";\n\nexport function AssistantPersona({ state = \"idle\", visual }: {\n  state?: PersonaState;\n  visual?: ReactNode; // Optional application-owned decorative renderer.\n}) {\n  return <Persona state={state} size={32} label=\"Assistant\">{visual}</Persona>;\n}",
+          "example": "import { Persona, type PersonaState, type PersonaVariant, type PersonaVisualContext } from \"@noorddev/vlak-react\";\nimport type { ReactNode } from \"react\";\n\nexport function AssistantPersona({ state = \"idle\", variant = \"orb\", intensity, paused, renderVisual }: {\n  state?: PersonaState;\n  variant?: PersonaVariant;\n  intensity?: number;\n  paused?: boolean;\n  renderVisual?: (context: PersonaVisualContext) => ReactNode;\n}) {\n  return <Persona state={state} variant={variant} intensity={intensity} paused={paused}\n    size={48} label=\"Assistant\" renderVisual={renderVisual} />;\n}",
           "usage": {
             "use": [
               "Drive state from actual application recording, generation and playback events.",
-              "The default visual uses native CSS, pauses when offscreen or the document is hidden, and stops animation for reduced motion and forced colors.",
-              "Supply children for a custom decorative visual such as an application-owned Orbkit renderer. Its graphics lifecycle remains application-owned.",
+              "Choose waveform, orb, or rings. Waveform remains the default. All five states work with each native visual without an external graphics runtime.",
+              "Supply intensity from zero to one for measured input or output energy; it is clamped, and asleep always settles to zero. Otherwise each state provides a representative intensity.",
+              "Motion pauses when offscreen, the document is hidden, paused is true, or state is asleep. Reduced motion and forced colors keep a static visual.",
+              "onMotionChange reports the effective motion policy initially and when it changes. It does not report asset loading or custom engine playback events.",
+              "Supply children for static custom content, or renderVisual for state, normalized size and intensity, and animated. A custom graphics renderer should honor animated and release its own resources.",
+              "CSS-only markup shows a static representative visual; the React component manages visibility and user preference changes.",
               "Omit label for a decorative visual beside an already named response. Add label to expose the visual and state as an image."
             ],
             "avoid": [
@@ -3951,7 +3967,7 @@
       "name": "response-actions",
       "type": "registry:component",
       "title": "Response actions",
-      "description": "Four subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.",
+      "description": "Selectable subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.",
       "registryDependencies": [
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
@@ -3991,16 +4007,17 @@
             "Thumbs up",
             "Thumbs down"
           ],
-          "example": "\"use client\";\nimport { useState } from \"react\";\nimport { Response, ResponseActions, type ResponseFeedback } from \"@noorddev/vlak-react\";\n\nexport function AnswerActions() {\n  const [feedback, setFeedback] = useState<ResponseFeedback>(null);\n  const answer = \"The brief now names one owner and one next step.\";\n  return <Response actions={<ResponseActions text={answer} feedback={feedback} onFeedback={setFeedback} />}>\n    <p>{answer}</p>\n  </Response>;\n}",
+          "example": "\"use client\";\nimport { useState } from \"react\";\nimport { Response, ResponseActions, type ResponseAction, type ResponseFeedback } from \"@noorddev/vlak-react\";\n\nconst controls: readonly ResponseAction[] = [\"copy\", \"read\", \"feedback\", \"share\"];\n\nexport function AnswerActions() {\n  const [feedback, setFeedback] = useState<ResponseFeedback>(null);\n  const answer = \"The brief now names one owner and one next step.\";\n  return <Response actions={<ResponseActions text={answer} actions={controls} feedback={feedback} onFeedback={setFeedback} />}>\n    <p>{answer}</p>\n  </Response>;\n}",
           "usage": {
             "use": [
               "Place in the actions slot of Response and supply the same plain text the reader sees.",
+              "actions chooses the built-in controls and their display and keyboard order: copy, read, feedback, share. The default includes all four; duplicates are ignored. Add custom controls as children.",
               "Each action composes a subtle icon Button. Muted text turns to ink on hover while the surface stays transparent.",
               "The combined feedback icon opens helpful and unhelpful choices. Selecting the checked choice again clears it.",
               "Use onFeedback to persist positive, negative, or cleared feedback. A rejected promise keeps the previous selection available for retry.",
               "Use feedback for controlled selection or defaultFeedback for an initial local selection.",
               "Supply onShare for an application-owned share flow. Otherwise the browser shares the text or copies it when native sharing is unavailable.",
-              "Read aloud uses browser speech only after activation. onReadingChange can coordinate an avatar with narration.",
+              "Read aloud uses browser speech only after activation. onReadingChange can coordinate an avatar with narration. Removing read stops owned narration; removing feedback closes its menu.",
               "CSS-only markup supplies named controls; clipboard, speech, the feedback menu, and sharing require React or application code."
             ],
             "avoid": [
@@ -4247,7 +4264,7 @@
       "name": "response",
       "type": "registry:component",
       "title": "Response",
-      "description": "Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, status, and an action slot.",
+      "description": "Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, avatars, status, actions, and a custom layout API.",
       "registryDependencies": [
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
@@ -4267,6 +4284,8 @@
             "rs-response",
             "rs-response-user",
             "rs-response-header",
+            "rs-response-identity",
+            "rs-response-avatar",
             "rs-response-author",
             "rs-response-status",
             "rs-response-content",
@@ -4275,7 +4294,7 @@
             "rs-response-copy",
             "rs-response-copy-status"
           ],
-          "snippet": "<article class=\"rs-response\" aria-labelledby=\"response-author\"><div class=\"rs-response-header\"><span class=\"rs-response-author\" id=\"response-author\">Assistant</span><span class=\"rs-response-status\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">Complete</span></div><div class=\"rs-response-content\"><p>The lease renews on 1 October.</p></div></article>",
+          "snippet": "<article class=\"rs-response\" aria-labelledby=\"response-author\"><div class=\"rs-response-header\"><div class=\"rs-response-identity\"><span class=\"rs-response-avatar\" aria-hidden=\"true\"><svg viewBox=\"0 0 20 20\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\"><circle cx=\"10\" cy=\"10\" r=\"7\" /></svg></span><span class=\"rs-response-author\" id=\"response-author\">Assistant</span></div><span class=\"rs-response-status\" role=\"status\" aria-live=\"polite\" aria-atomic=\"true\">Complete</span></div><div class=\"rs-response-content\"><p>The lease renews on 1 October.</p></div></article>",
           "cssOnly": false,
           "registryDependencies": [
             "vlak-lib"
@@ -4287,12 +4306,14 @@
             "AI Elements Message",
             "Streaming response"
           ],
-          "example": "import { Response, ResponseActions } from \"@noorddev/vlak-react\";\n\nexport function LeaseExchange() {\n  return <>\n    <Response from=\"user\">When does the lease renew?</Response>\n    <Response from=\"assistant\" status=\"complete\" actions={<ResponseActions text=\"The lease renews on 1 October.\" />}>\n      <p>The lease renews on <strong>1 October</strong>.</p>\n    </Response>\n  </>;\n}",
+          "example": "\"use client\";\nimport { Persona, Response, ResponseActions, useResponse } from \"@noorddev/vlak-react\";\n\nfunction CompletedActions({ text }: { text: string }) {\n  const { status } = useResponse();\n  return status === \"complete\" ? <ResponseActions text={text} /> : null;\n}\n\nexport function LeaseExchange() {\n  return <>\n    <Response from=\"user\">When does the lease renew?</Response>\n    <Response from=\"assistant\" status=\"complete\"\n      avatar={<Persona variant=\"orb\" size={20} />}\n      actions={<CompletedActions text=\"The lease renews on 1 October.\" />}\n      renderLayout={({ avatar, author, status, content, error, actions }) =>\n        <div style={{ display: \"grid\", gridTemplateColumns: \"auto minmax(0, 1fr)\", gap: 12 }}>\n          {avatar}\n          <div style={{ minWidth: 0 }}>\n            <div style={{ display: \"flex\", justifyContent: \"space-between\", gap: 12 }}>{author}{status}</div>\n            {content}{error}{actions}\n          </div>\n        </div>}\n    >\n      <p>The lease renews on <strong>1 October</strong>.</p>\n    </Response>\n  </>;\n}",
           "usage": {
             "use": [
               "A user or assistant message whose content and response status come from the application.",
               "Pass plain text or rendered React content as children. To render markdown, supply an external markdown renderer in the children slot and configure its content and link safety in your application.",
               "Place ResponseActions in actions for icon controls that copy, narrate, rate, and share the response. Omit copyText when using that action bar.",
+              "Use avatar for an application-owned visual and renderLayout to rearrange ResponseParts. Render the complete header or its avatar, author, and status parts once; retain content, errors, and actions.",
+              "useResponse reads speaker, author, status, statusLabel, and errorMessage from a descendant. It requires a surrounding Response.",
               "Use actions for other application-owned controls. Provide copyText for a standalone copy button when a full action bar is not needed."
             ],
             "avoid": [
@@ -4313,6 +4334,7 @@
           ],
           "a11y": [
             "A semantic article is named by its visible speaker. from identifies user or assistant without taking over the native role attribute.",
+            "Custom layouts retain a fallback article name. Keep the supplied status part so phase changes remain announced, and give a non-text custom author an explicit accessible name when needed.",
             "Status is a separate polite, atomic live region. Changing response tokens are ordinary readable content and do not repeat the whole message through a live region.",
             "The streaming, complete, error, and stopped states are supplied by the application. An errorMessage is visible when status is error; the short response status announces the failure.",
             "Copy is shown only with copyText. Clipboard denial or unavailability reports a readable failure and allows retry. Pending writes prevent duplicate activation, and stale writes cannot announce success for new content.",
@@ -7393,7 +7415,7 @@
             "Comment composer",
             "AI Elements PromptInput"
           ],
-          "example": "import { MessageComposer } from \"@noorddev/vlak-react\";\n\n<MessageComposer compact maxRows={6} sendOnEnter onSend={async ({ text, files }) => sendMessage(text, files)} generating={generating} onStop={stopResponse} allowAttachments accept=\"image/*,.pdf\" maxFiles={4} maxFileSize={10 * 1024 * 1024} allowScreenshot />",
+          "example": "\"use client\";\nimport { Button, MessageComposer, useMessageComposer, type ComposedMessage } from \"@noorddev/vlak-react\";\n\nfunction ClearDraft() {\n  const draft = useMessageComposer();\n  return <Button variant=\"subtle\" size=\"sm\" disabled={draft.disabled || !draft.value}\n    onClick={() => { draft.setValue(\"\"); draft.focus(); }}>Clear draft</Button>;\n}\n\nexport function ProjectComposer({ onSend, generating = false, onStop }: {\n  onSend: (message: ComposedMessage) => void | Promise<void>;\n  generating?: boolean;\n  onStop?: () => void;\n}) {\n  return <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend}\n    generating={generating} onStop={onStop} tools={<ClearDraft />}\n    textareaProps={{ \"aria-label\": \"Ask about the project\", autoComplete: \"off\" }}\n    allowAttachments accept=\"image/*,.pdf\" maxFiles={4}\n    maxFileSize={10 * 1024 * 1024} allowScreenshot />;\n}",
           "usage": {
             "use": [
               "Chat, comments, or a support reply.",
@@ -7404,10 +7426,14 @@
               "Use files, defaultFiles, and onFilesChange to lift attachment selection alongside controlled text.",
               "Picker, paste, and drop share accept, maxFiles, maxFileSize, and multiple validation. onAttachmentError receives rejected files and reasons.",
               "Use tools for model selectors or application controls, and renderAttachments for custom preview composition.",
+              "useMessageComposer reads the current draft, files, previews, pending and generation state, and validated commands from a descendant. It requires a surrounding MessageComposer.",
+              "renderLayout receives MessageComposerParts and state to arrange input, submit, attach, screenshot, attachments, and tools. Render input and submit once; hidden file selection and feedback remain owned by the form.",
+              "textareaProps forwards native attributes, events, and a merged ref to the actual field. Prevent a keyboard event default to override its shortcut; required draft and submission behavior stay in the composer.",
               "Enable globalDrop on one composer per page when file drops outside the field should attach there. allowScreenshot adds explicit browser screen selection when supported."
             ],
             "avoid": [
               "An arbitrary multi-field form or uploading files without a message.",
+              "Calling useMessageComposer outside its provider or invoking commands while rendering. Run commands from user actions or application effects.",
               "Assuming browser file checks replace the application upload policy or that attachment selection uploads files automatically."
             ]
           },
@@ -7433,7 +7459,8 @@
             "Compact icon actions retain readable names, titles, and 44px targets. Failed sends remain visible beneath the field; other status updates are available to assistive technology.",
             "Rejected attachments remain visible in an alert. File previews have named remove controls and preserve object addresses until removal.",
             "Screenshot capture starts only from its button, uses the browser chooser, and stops display tracks after capture, cancellation, or unmount.",
-            "If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match."
+            "If controlled text or files change during a pending send, successful completion clears only the submitted draft and files that still match.",
+            "Custom layouts retain the form, validation, shortcuts, and feedback. Keep the provided field and action names and their natural reading order."
           ]
         }
       },

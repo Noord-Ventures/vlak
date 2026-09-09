@@ -146,7 +146,7 @@
 
 ## AI
 
-- [Context usage](context-usage.md): A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates.
+- [Context usage](context-usage.md): A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates or model catalogs.
 - [Model selector](model-selector.md): Searches a supplied model catalog by name, provider and capabilities, with metadata and controlled selection.
 - [Sources](sources.md): A counted native disclosure of application-supplied references, descriptions and supporting quotes.
 - [Inline citation](inline-citation.md): A quiet inline source trigger opening a counted, keyboard-navigable preview with links, descriptions and quotes.
@@ -176,7 +176,7 @@
 - [Speech input](speech-input.md): Starts and stops native speech capture, with final text, optional interim results, and application transcription of recorded audio.
 - [Voice selector](voice-selector.md): Searches application-supplied voice names and metadata, with controlled selection and optional audio preview playback.
 - [Transcription](transcription.md): Displays timestamped speech segments, highlights playback time, and optionally seeks a player through accessible phrase controls.
-- [Persona](persona.md): A monochrome assistant visual with idle, listening, thinking, speaking, and asleep states, plus a custom visual slot.
+- [Persona](persona.md): Native monochrome waveform, fluid orb, and ring visuals with five conversational states, live intensity, and a custom renderer.
 - [Agent](agent.md): Inspects an agent’s model, instructions, tool definitions and output schema in a 4px surface.
 - [Artifact](artifact.md): Frames generated content with header actions, an optional scroll region and a close request.
 - [Commit](commit.md): Shows a commit message, full-hash copy, author and time, with expandable changed files.
@@ -188,10 +188,10 @@
 - [Chat](chat.md): A subtle 1px outline with 4px corners, a named header, scrollable conversation, and a composer anchored below the history.
 - [Conversation](conversation.md): Keeps a scrollable message history at the latest response until the reader scrolls back.
 - [Widget](widget.md): A surface with a subtle 1px outline and 4px corners for React content and provider iframes, with attribution, data states, actions, and supporting context.
-- [Response actions](response-actions.md): Four subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
+- [Response actions](response-actions.md): Selectable subtle 44px icon controls for copying, reading aloud, rating through a combined feedback menu, and sharing an assistant response.
 - [Tool call](tool-call.md): Shows tool input, output, and execution state in a native disclosure with a subtle 1px outline, 4px corners, and a 44px summary.
 - [Confirmation](confirmation.md): Collects approval or rejection in a surface with a subtle 1px outline and 4px corners, with async recording, error recovery, and 44px actions.
-- [Response](response.md): Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, status, and an action slot.
+- [Response](response.md): Presents user messages in right-aligned soft bubbles and assistant responses on the left, with speaker identity, avatars, status, actions, and a custom layout API.
 - [Reasoning](reasoning.md): A native disclosure for supplied work summaries, with a chevron and 44px control. Panels use a subtle 1px outline and 4px corners.
 
 ## Health

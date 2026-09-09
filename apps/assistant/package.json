@@ -1,0 +1,42 @@
+{
+  "name": "@noorddev/vlak-assistant-reference",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3211",
+    "build": "next build",
+    "start": "next start -p 3211",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "node --experimental-strip-types --test test/*.test.ts",
+    "e2e": "node scripts/e2e.mjs",
+    "test:recovery": "node scripts/recovery-e2e.mjs",
+    "test:live": "node scripts/live-smoke.mjs"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.62",
+    "@ai-sdk/react": "^4.0.97",
+    "@noorddev/vlak": "workspace:*",
+    "@noorddev/vlak-react": "workspace:*",
+    "@streamdown/cjk": "^1.0.3",
+    "@streamdown/math": "^1.0.2",
+    "@stylexjs/stylex": "^0.19.0",
+    "ai": "^7.0.94",
+    "katex": "^0.16.47",
+    "mermaid": "^11.17.2",
+    "next": "^15.5.25",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "shiki": "^3.23.0",
+    "streamdown": "^2.6.0",
+    "zod": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.4.1",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "axe-core": "^4.13.0",
+    "playwright": "1.56.1",
+    "typescript": "^5.9.3"
+  }
+}

@@ -6,11 +6,14 @@ import { vlak } from "../tokens.stylex";
 import { rs } from "../rs";
 import { Collapsible } from "./collapsible";
 import { Progress } from "./progress";
+import { resolveContextPricing, type ContextPricingCatalog } from "./context-pricing";
 
 export interface TokenUsage { inputTokens?: number; outputTokens?: number; reasoningTokens?: number; cachedInputTokens?: number }
 export interface TokenPricing { inputPerMillion?: number; outputPerMillion?: number; reasoningPerMillion?: number; cacheReadPerMillion?: number; currency?: string }
 export interface ContextUsageProps extends Omit<React.DetailsHTMLAttributes<HTMLDetailsElement>, "title"> {
-  usedTokens: number; maxTokens: number; usage?: TokenUsage; pricing?: TokenPricing;
+  usedTokens: number; maxTokens?: number; usage?: TokenUsage; pricing?: TokenPricing;
+  /** Optional metadata from an application-owned Tokenlens/models.dev catalog. Explicit limits and rates take precedence. */
+  modelId?: string; catalog?: ContextPricingCatalog;
   model?: string; label?: string; defaultOpen?: boolean;
 }
 const styles = stylex.create({
@@ -25,7 +28,11 @@ const valid = (value: number | undefined): value is number => value !== undefine
 const amount = (value: number | undefined) => valid(value) ? value.toLocaleString("en-US") : "Unavailable";
 
 /** Context occupancy and caller-supplied token usage/pricing. No model catalog or prices are fetched. */
-export const ContextUsage = React.forwardRef<HTMLDetailsElement, ContextUsageProps>(function ContextUsage({ usedTokens, maxTokens, usage, pricing, model, label = "Context usage", defaultOpen = false, className, style, ...props }, ref) {
+export const ContextUsage = React.forwardRef<HTMLDetailsElement, ContextUsageProps>(function ContextUsage({ usedTokens, maxTokens: explicitLimit, usage, pricing: explicitPricing, model: explicitModel, modelId, catalog, label = "Context usage", defaultOpen = false, className, style, ...props }, ref) {
+  const resolved = React.useMemo(() => modelId && catalog ? resolveContextPricing(modelId, catalog, { inputTokens: usage?.inputTokens }) : undefined, [modelId, catalog, usage?.inputTokens]);
+  const maxTokens = explicitLimit ?? resolved?.maxTokens;
+  const pricing = explicitPricing ?? resolved?.pricing;
+  const model = explicitModel ?? resolved?.model ?? modelId;
   const known = valid(usedTokens) && valid(maxTokens) && maxTokens > 0;
   const percentage = known ? Math.round(usedTokens / maxTokens * 100) : undefined;
   const cached = usage?.cachedInputTokens;
@@ -38,7 +45,7 @@ export const ContextUsage = React.forwardRef<HTMLDetailsElement, ContextUsagePro
     { count: output, rate: pricing?.outputPerMillion, subset: reasoning, subsetRate: pricing?.reasoningPerMillion },
   ];
   let cost: number | undefined;
-  if (pricing && buckets.every(bucket => valid(bucket.count) && (bucket.rate === undefined || valid(bucket.rate)) && (bucket.subsetRate === undefined || valid(bucket.subsetRate)) && (bucket.count === 0 || valid(bucket.rate)) && (bucket.subset === undefined || (valid(bucket.subset) && bucket.subset <= bucket.count)))) {
+  if (pricing && buckets.every(bucket => valid(bucket.count) && (bucket.rate === undefined || valid(bucket.rate)) && (bucket.subsetRate === undefined || valid(bucket.subsetRate)) && (bucket.count === 0 || valid(bucket.rate)) && (bucket.subset === undefined || (valid(bucket.subset) && bucket.subset <= bucket.count)) && (bucket.count === 0 || bucket.subsetRate === undefined || bucket.subsetRate === bucket.rate || valid(bucket.subset)))) {
     cost = buckets.reduce((sum, bucket) => {
       const count = bucket.count!; const subset = valid(bucket.subset) && valid(bucket.subsetRate) ? bucket.subset : 0;
       return sum + ((count - subset) * (bucket.rate ?? 0) + subset * (bucket.subsetRate ?? 0)) / 1_000_000;

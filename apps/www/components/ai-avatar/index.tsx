@@ -7,6 +7,10 @@ export interface AiAvatarProps {
   size?: number;
   state?: "idle" | "thinking" | "speaking";
   className?: string;
+  /** Pause the shader while retaining its current image. */
+  paused?: boolean;
+  /** Use the same mosaic without allocating a WebGL context for older messages. */
+  static?: boolean;
 }
 
 const monochrome = { lit: "#ffffff", wall: "#343434" };
@@ -34,7 +38,7 @@ const fallbackTiles = Array.from({ length: 64 }, (_, index) => {
  * Monochrome Orbkit Mosaic (shdr-29). Decorative; pair with a named response.
  * Mount one live avatar for the latest assistant turn, not one per history item.
  */
-export function AiAvatar({ size = 28, state = "idle", className }: AiAvatarProps) {
+export function AiAvatar({ size = 28, state = "idle", className, paused = false, static: staticVisual = false }: AiAvatarProps) {
   const [ready, setReady] = useState(false);
   const [forcedColors, setForcedColors] = useState(false);
   const diameter = Number.isFinite(size) ? Math.max(1, size) : 28;
@@ -54,12 +58,12 @@ export function AiAvatar({ size = 28, state = "idle", className }: AiAvatarProps
       data-ai-avatar={state}
       style={{ display: "inline-block", position: "relative", flexShrink: 0, width: diameter, height: diameter, verticalAlign: "middle" }}
     >
-      {(!ready || forcedColors) && (
+      {(!ready || forcedColors || staticVisual) && (
         <svg viewBox="0 0 32 32" width={diameter} height={diameter} focusable="false" style={{ display: "block", position: "absolute", inset: 0 }}>
           {fallbackTiles.map(tile => <rect key={`${tile.x}-${tile.y}`} x={tile.x} y={tile.y} width="3" height="3" fill="currentColor" opacity={forcedColors ? 1 : tile.opacity} />)}
         </svg>
       )}
-      {!forcedColors && <Shdr29 size={diameter} state={state} colors={monochrome} params={params} statePresets={statePresets} stateVolumes={stateVolumes} maxDpr={2} pauseOffscreen onReadyChange={setReady} />}
+      {!forcedColors && !staticVisual && <Shdr29 size={diameter} state={state} colors={monochrome} params={params} statePresets={statePresets} stateVolumes={stateVolumes} paused={paused} maxDpr={2} pauseOffscreen onReadyChange={setReady} />}
     </span>
   );
 }

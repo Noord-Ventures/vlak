@@ -1,6 +1,6 @@
 # Context usage
 
-A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates.
+A native disclosure of context occupancy, token categories and estimated costs from application-supplied rates or model catalogs.
 
 Category: ai  
 Name: `context-usage`  
@@ -11,6 +11,9 @@ Page: https://vlak.dev/ai/context-usage/
 
 - Supply usedTokens and maxTokens for context occupancy; usage supplies separate input, output, reasoning and cached-input counts.
 - pricing accepts inputPerMillion, outputPerMillion, reasoningPerMillion, cacheReadPerMillion and optional currency. No model catalog or prices are fetched.
+- Pass modelId and a supplied Tokenlens or models.dev catalog to resolve a model name, context limit, and rates. Explicit model, maxTokens, and pricing replace their resolved counterparts.
+- resolveContextPricing exposes the same lookup for application composition. Qualified provider/model ids select provider pricing; a providerless id must match exactly one model.
+- Catalog context tiers require the actual input token count through usage.inputTokens, or inputTokens in resolver options. Unknown, ambiguous, or invalid metadata remains unavailable.
 - Cached input is a subset of input; reasoning is a subset of output. Separate rates replace the parent rate for those subsets rather than adding duplicate charges.
 - Missing or invalid data displays Unavailable. Costs are estimates from the supplied rates, not provider billing totals.
 - Use open/onToggle for a controlled native disclosure or defaultOpen for the initial state. CSS-only markup shows supplied values.
@@ -30,7 +33,7 @@ npm install @noorddev/vlak-react
 
 ```tsx
 import "@noorddev/vlak-react/css";
-import { ContextUsage } from "@noorddev/vlak-react";
+import { ContextUsage, resolveContextPricing } from "@noorddev/vlak-react";
 ```
 
 **Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
@@ -54,15 +57,17 @@ npx shadcn add https://vlak.dev/r/context-usage.json
 ## Example
 
 ```tsx
-import { ContextUsage, type TokenPricing } from "@noorddev/vlak-react";
+import { ContextUsage, type ContextPricingCatalog } from "@noorddev/vlak-react";
 
-export function ContextExample({ pricing }: { pricing?: TokenPricing }) {
+export function ContextExample({ modelId, catalog }: {
+  modelId: string;
+  catalog: ContextPricingCatalog;
+}) {
   return <ContextUsage
-    model="Workspace model"
+    modelId={modelId}
+    catalog={catalog}
     usedTokens={1500}
-    maxTokens={32000}
     usage={{ inputTokens: 1000, outputTokens: 500, cachedInputTokens: 200, reasoningTokens: 100 }}
-    pricing={pricing}
   />;
 }
 ```
@@ -80,12 +85,18 @@ Forwards `ref` to the `HTMLDetailsElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `usedTokens` (required) | `number` |  |  |
-| `maxTokens` (required) | `number` |  |  |
+| `maxTokens` | `number` |  |  |
 | `usage` | `TokenUsage` |  |  |
 | `pricing` | `TokenPricing` |  |  |
+| `modelId` | `string` |  | Optional metadata from an application-owned Tokenlens/models.dev catalog. Explicit limits and rates take precedence. |
+| `catalog` | `Readonly<Record<string, { id?: string; models: Readonly<Record<string, ContextModelPricing>>; }>>` |  |  |
 | `model` | `string` |  |  |
 | `label` | `string` | `"Context usage"` |  |
 | `defaultOpen` | `boolean` | `false` |  |
+
+### Functions
+
+- `resolveContextPricing` (function): Resolve cached catalog metadata without fetching, timers, or a bundled pricing snapshot. Qualified provider/model ids select the provider's prices; providerless ids must be unique. Catalogs may be obtained with Tokenlens or models.dev in application/server code.
 
 ## Keyboard
 

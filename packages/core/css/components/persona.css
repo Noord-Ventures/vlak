@@ -1,13 +1,29 @@
 /* ── persona: generated from packages/react/src/components/persona.tsx ── */
-@keyframes rs-anim-breathe{0%, 100%{transform:scaleY(0.35)}50%{transform:scaleY(1)}}
-.rs-persona{display:inline-grid;place-items:center;flex-shrink:0;vertical-align:middle;color:var(--text);overflow:hidden;border-radius:50%;background-color:var(--control-fill)}
+@keyframes rs-anim-breathe{0%, 100%{transform:scaleY(0.4)}50%{transform:scaleY(1)}}
+@keyframes rs-anim-flow{0%, 100%{border-radius:44% 56% 61% 39% / 47% 42% 58% 53%;transform:rotate(-8deg)}50%{border-radius:57% 43% 40% 60% / 42% 58% 42% 58%;transform:rotate(8deg)}}
+@keyframes rs-anim-resonate{0%, 100%{transform:scale(0.88);opacity:0.5}50%{transform:scale(1);opacity:1}}
+.rs-persona{display:inline-grid;place-items:center;flex-shrink:0;vertical-align:middle;color:var(--text);overflow:hidden;border-radius:50%;background-color:var(--control-fill);--rs-persona-play-state:paused;--rs-persona-wave-gap:8%;--rs-persona-ring-stretch:1;--rs-persona-wave-height:58%;--rs-persona-visual-scale:0.88}
 @media (forced-colors: active){.rs-persona{background-color:Canvas}}
-.rs-persona-visual{display:flex;align-items:center;justify-content:center;gap:8%;width:60%;height:50%}
-.rs-persona-bar{width:12%;height:100%;background-color:currentColor;border-radius:var(--radius-sm);transform-origin:center;animation-name:rs-anim-breathe;animation-duration:1.8s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:paused}
-@media (forced-colors: active){.rs-persona-bar{background-color:CanvasText;animation-name:none}}
-@media (prefers-reduced-motion: reduce){.rs-persona-bar{animation-name:none}}
-.rs-persona-running{animation-play-state:running}
-.rs-persona-listening{animation-duration:1s}
-.rs-persona-thinking{animation-duration:1.4s}
-.rs-persona-speaking{animation-duration:0.55s}
-.rs-persona-asleep{height:16%;animation-name:none}
+.rs-persona-running{--rs-persona-play-state:running}
+.rs-persona-listening{--rs-persona-wave-gap:10%}
+.rs-persona-thinking{--rs-persona-wave-gap:4%;--rs-persona-ring-stretch:0.86}
+.rs-persona-speaking{--rs-persona-wave-gap:6%;--rs-persona-ring-stretch:0.96}
+.rs-persona-asleep{--rs-persona-play-state:paused}
+.rs-persona-visual{display:flex;align-items:center;justify-content:center;gap:var(--rs-persona-wave-gap);width:60%;height:50%;transition-property:gap;transition-duration:450ms;transition-timing-function:ease-in-out}
+@media (prefers-reduced-motion: reduce){.rs-persona-visual{transition-duration:0ms}}
+@media (forced-colors: active){.rs-persona-visual{transition-duration:0ms}}
+.rs-persona-bar{width:12%;height:var(--rs-persona-wave-height, 58%);background-color:currentColor;border-radius:var(--radius-sm);transform-origin:center;animation-name:rs-anim-breathe;animation-duration:2.4s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:var(--rs-persona-play-state);transition-property:height;transition-duration:450ms;transition-timing-function:ease-in-out}
+@media (forced-colors: active){.rs-persona-bar{background-color:CanvasText;animation-name:none;transition-duration:0ms}}
+@media (prefers-reduced-motion: reduce){.rs-persona-bar{animation-name:none;transition-duration:0ms}}
+.rs-persona-orb{display:grid;place-items:center;width:74%;height:74%;transform:scale(var(--rs-persona-visual-scale, 0.88));transition-property:transform;transition-duration:600ms;transition-timing-function:ease-in-out}
+@media (prefers-reduced-motion: reduce){.rs-persona-orb{transition-duration:0ms}}
+@media (forced-colors: active){.rs-persona-orb{transition-duration:0ms}}
+.rs-persona-orb-surface{display:block;width:100%;height:100%;border-radius:44% 56% 61% 39% / 47% 42% 58% 53%;background-image:radial-gradient(circle at 32% 26%, var(--bg), var(--text-secondary) 36%, var(--text) 78%);background-color:var(--text);animation-name:rs-anim-flow;animation-duration:7.6s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:var(--rs-persona-play-state)}
+@media (forced-colors: active){.rs-persona-orb-surface{background-image:none;background-color:CanvasText;animation-name:none}}
+@media (prefers-reduced-motion: reduce){.rs-persona-orb-surface{animation-name:none}}
+.rs-persona-rings{display:grid;place-items:center;width:82%;height:82%;transform:scale(var(--rs-persona-visual-scale, 0.88)) scaleY(var(--rs-persona-ring-stretch));transition-property:transform;transition-duration:600ms;transition-timing-function:ease-in-out}
+@media (prefers-reduced-motion: reduce){.rs-persona-rings{transition-duration:0ms}}
+@media (forced-colors: active){.rs-persona-rings{transition-duration:0ms}}
+.rs-persona-ring{display:block;grid-area:1 / 1;box-sizing:border-box;border-width:1px;border-style:solid;border-color:currentColor;border-radius:50%;animation-name:rs-anim-resonate;animation-duration:3.6s;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-play-state:var(--rs-persona-play-state)}
+@media (forced-colors: active){.rs-persona-ring{border-color:CanvasText;animation-name:none}}
+@media (prefers-reduced-motion: reduce){.rs-persona-ring{animation-name:none}}

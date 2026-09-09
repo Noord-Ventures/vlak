@@ -23,7 +23,7 @@ export interface InlineCitationProps extends React.HTMLAttributes<HTMLSpanElemen
 const styles = stylex.create({
   root: { display: "inline", color: vlak.ink },
   trigger: { display: "inline-flex", verticalAlign: "middle", paddingInline: "0.5rem", fontVariantNumeric: "tabular-nums", fontSize: vlak.controlLabel },
-  panel: { position: "fixed", zIndex: vlak.zFloat, inset: "auto", margin: 0, width: "22rem", maxWidth: "calc(100vw - 16px)", boxSizing: "border-box", padding: "0.75rem", display: "grid", gap: "0.75rem", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: { default: vlak.divider, [mq.forcedColors]: "CanvasText" }, borderRadius: vlak.radiusSm, fontFamily: "inherit", fontSize: vlak.controlFs, lineHeight: 1.45, ":focus-visible": { outlineWidth: 2, outlineStyle: "solid", outlineColor: vlak.ink, outlineOffset: 2 } },
+  panel: { position: "fixed", zIndex: vlak.zFloat, inset: "auto", margin: 0, width: "22rem", maxWidth: "calc(100vw - 16px)", boxSizing: "border-box", padding: "0.75rem", display: "grid", gridAutoRows: "min-content", gap: "0.75rem", backgroundColor: vlak.paper, color: vlak.ink, borderWidth: vlak.hairline, borderStyle: "solid", borderColor: { default: vlak.divider, [mq.forcedColors]: "CanvasText" }, borderRadius: vlak.radiusSm, fontFamily: "inherit", fontSize: vlak.controlFs, lineHeight: 1.45, ":focus-visible": { outlineWidth: 2, outlineStyle: "solid", outlineColor: vlak.ink, outlineOffset: 2 } },
   header: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.5rem" },
   navigation: { display: "flex", alignItems: "center", gap: 0 },
   count: { color: vlak.gray, fontSize: vlak.controlLabel, fontVariantNumeric: "tabular-nums" },
