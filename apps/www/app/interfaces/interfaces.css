@@ -104,6 +104,12 @@ body:has(.if-index) {
 .if-study-caption a { flex: none; font-size: .8125rem; line-height: 1.5; color: var(--text); text-underline-offset: 4px; text-decoration-color: var(--divider); }
 .if-study-caption a:hover { text-decoration-color: currentColor; }
 .if-detail-content { container: study-details / inline-size; padding: 40px 0 32px; min-width: 0; }
+.if-film { margin-bottom: 40px; }
+.if-film-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gutter); margin-bottom: 12px; }
+.if-film-head h2 { margin: 0; font-size: .9375rem; font-weight: 600; line-height: 1.4; }
+.if-film-head p, .if-film-note { margin: 0; color: var(--text-secondary); font-size: .75rem; line-height: 1.45; }
+.if-film video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 1px solid var(--divider); border-radius: 0; background: var(--control-fill); }
+.if-film-note { margin-top: 10px; max-width: 66ch; }
 .if-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 184px), 1fr)); gap: 28px var(--gutter); }
 .if-overview > div { grid-column: 1 / -1; min-width: 0; }
 @container study-details (min-width: 592px) {

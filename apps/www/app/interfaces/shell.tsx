@@ -7,6 +7,7 @@ import { interfaces } from "./interfaces.stylex";
 import { InterfacesNav } from "./nav";
 import { StartBuilding } from "./start-building";
 import { InterfacePreviewProvider, InterfacePreview, PreviewButton } from "./preview";
+import { InterfaceFilm } from "./interface-film";
 import { componentForLabel } from "@/lib/catalog-relationships";
 import { StructuredData, breadcrumbData } from "@/components/structured-data";
 import { HOST } from "../specimen";
@@ -54,6 +55,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
           </InterfacePreviewProvider>
         </section>
         <div className="if-detail-content">
+          <InterfaceFilm slug={slug} title={proto.title} />
           <section className="if-overview" aria-labelledby={`${slug}-overview`}>
             <div>
               <h2 id={`${slug}-overview`}>Inside the interface</h2>
