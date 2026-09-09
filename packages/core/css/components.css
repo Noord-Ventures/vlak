@@ -238,7 +238,7 @@
 .rs-rating-clear{width:auto;justify-self:start}
 
 .rs-playback-controls{display:flex;align-items:center;flex-wrap:wrap;gap:0.5rem;color:var(--text)}
-.rs-playback-action{width:var(--hit);min-width:var(--hit);height:var(--hit);padding:0;flex-shrink:0}
+.rs-btn-primary.rs-playback-action,.rs-btn-ghost.rs-playback-action{width:var(--hit);min-width:var(--hit);height:var(--hit);padding:0;flex-shrink:0}
 
 .rs-media-scrubber{display:flex;flex-direction:column;min-width:0;width:100%;color:var(--text)}
 .rs-media-scrubber-times{display:flex;justify-content:space-between;gap:1rem;color:var(--text-secondary);font-size:0.75rem;font-variant-numeric:tabular-nums;line-height:1.45}
@@ -255,7 +255,9 @@
 .rs-media-player-controls{display:flex;flex-wrap:wrap;align-items:center;gap:0.75rem}
 .rs-media-player-action{width:auto;padding-inline:0.75rem;min-width:var(--hit);min-height:var(--hit)}
 @media (max-width: 640px){.rs-media-player-action{width:auto}}
-.rs-media-player-volume{flex:0 1 8rem;min-width:5rem}
+.rs-btn-ghost.rs-media-player-icon-action{width:var(--hit);height:var(--hit);min-width:var(--hit);min-height:var(--hit);padding:0;flex-shrink:0}
+.rs-media-player-volume{flex:0 1 8rem;min-width:5rem;box-sizing:border-box;padding-inline:0.4375rem}
+@media (max-width: 640px){.rs-media-player-volume{padding-inline:0.6875rem}}
 .rs-media-player-select{flex:0 1 auto;width:max-content;min-width:0;max-width:100%}
 .rs-media-player-status{margin:0;font-size:0.875rem;color:var(--text-secondary);line-height:1.45}
 .rs-media-player-transcript{line-height:1.45;max-width:66ch}

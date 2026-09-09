@@ -35,7 +35,9 @@ const styles = stylex.create({
     minWidth: vlak.hit,
     minHeight: vlak.hit,
   },
-  volume: { flex: "0 1 8rem", minWidth: "5rem" },
+  iconAction: { width: vlak.hit, height: vlak.hit, minWidth: vlak.hit, minHeight: vlak.hit, padding: 0, flexShrink: 0 },
+  // Reserve the thumb radius so each endpoint respects the toolbar's gap.
+  volume: { flex: "0 1 8rem", minWidth: "5rem", boxSizing: "border-box", paddingInline: { default: "0.4375rem", [mq.phone]: "0.6875rem" } },
   select: { flex: "0 1 auto", width: "max-content", minWidth: 0, maxWidth: "100%" },
   status: { margin: 0, fontSize: "0.875rem", color: vlak.gray, lineHeight: 1.45 },
   transcript: { lineHeight: 1.45, maxWidth: "66ch" },
@@ -87,6 +89,9 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
   const actionSx = rs(["rs-media-player-action"], styles.action);
   // Composed Button atomics keep their phone width, so preserve this row's intrinsic sizing.
   const action = { ...actionSx, style: { ...actionSx.style, width: "auto" } };
+  const iconActionSx = rs(["rs-btn-ghost", "rs-media-player-icon-action"], styles.iconAction);
+  // Keep composed Button padding and phone width from changing icon-only geometry.
+  const iconAction = { ...iconActionSx, style: { ...iconActionSx.style, width: "var(--hit)", height: "var(--hit)", padding: 0 } };
   const volumeStyle = rs(["rs-media-player-volume"], styles.volume);
   const selectStyle = rs(["rs-media-player-select"], styles.select);
   const message = rs(["rs-media-player-status"], styles.status);
@@ -114,11 +119,11 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
       <MediaScrubber value={position} duration={duration} buffered={buffered} disabled={failed} onValueChange={next => { const element = mediaRef.current; if (element && Number.isFinite(duration)) { element.currentTime = next; setPosition(next); onTimeChange?.(next); } }} />
       <div {...controls}>
         <PlaybackControls playing={playing} disabled={failed} onPlayingChange={next => { void toggle(next); }} />
-        <Button {...action} variant="ghost" aria-label={muted ? "Unmute" : "Mute"} onClick={() => { if (mediaRef.current) { mediaRef.current.muted = !muted; setMuted(!muted); } }}><Icon name={muted ? "volume-off" : "volume"} /></Button>
+        <Button {...iconAction} variant="ghost" aria-label={muted ? "Unmute" : "Mute"} onClick={() => { if (mediaRef.current) { mediaRef.current.muted = !muted; setMuted(!muted); } }}><Icon name={muted ? "volume-off" : "volume"} /></Button>
         <div {...volumeStyle}><Slider aria-label="Volume" min={0} max={1} step={0.05} value={muted ? 0 : volume} onValueChange={next => { if (mediaRef.current) { mediaRef.current.volume = next; mediaRef.current.muted = false; setVolume(next); setMuted(false); } }} /></div>
         <div {...selectStyle}><NativeSelect aria-label="Playback speed" value={String(speed)} onChange={event => { const next = Number(event.target.value); if (mediaRef.current) mediaRef.current.playbackRate = next; setSpeed(next); }}>{[0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => <option key={rate} value={String(rate)}>{rate}× speed</option>)}</NativeSelect></div>
         {kind === "video" && tracks.length > 0 && <div {...selectStyle}><NativeSelect aria-label="Captions" value={captions} onChange={event => { setCaptions(event.target.value); applyCaptions(event.target.value); }}><option value="-1">Captions off</option>{tracks.map((track, index) => <option key={track.src} value={String(index)}>{track.label}</option>)}</NativeSelect></div>}
-        {kind === "video" && canFullscreen && <Button {...action} variant="ghost" aria-label="Full screen" onClick={() => { void containerRef.current?.requestFullscreen().catch(() => setStatus("Full screen is unavailable in this browser.")); }}><Icon name="expand" /></Button>}
+        {kind === "video" && canFullscreen && <Button {...iconAction} variant="ghost" aria-label="Full screen" onClick={() => { void containerRef.current?.requestFullscreen().catch(() => setStatus("Full screen is unavailable in this browser.")); }}><Icon name="expand" /></Button>}
       </div>
     </>}
     <p {...message} role="status">{status}</p>

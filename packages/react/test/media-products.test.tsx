@@ -75,8 +75,8 @@ describe("Playback and seeking", () => {
     vi.spyOn(HTMLMediaElement.prototype, "pause").mockImplementation(function (this: HTMLMediaElement) { this.dispatchEvent(new Event("pause")); });
     const user = userEvent.setup(); const ref = React.createRef<HTMLMediaElement>();
     render(<MediaPlayer ref={ref} src="recording.wav" kind="audio" title="Recording" />);
-    // Composed Button atomics must not make Mute fill the toolbar on phones.
-    expect(screen.getByRole("button", { name: "Mute" }).style.width).toBe("auto");
+    // Composed Button atomics must not stretch or add text padding to icon controls.
+    expect(screen.getByRole("button", { name: "Mute" }).style.width).toBe("var(--hit)");
     const media = ref.current!; Object.defineProperty(media, "duration", { configurable: true, value: 120 });
     fireEvent.loadedMetadata(media);
     await user.click(screen.getByRole("button", { name: "Play" })); expect(screen.getByRole("button", { name: "Pause" })).toBeTruthy();

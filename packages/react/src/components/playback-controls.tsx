@@ -32,11 +32,16 @@ export const PlaybackControls = React.forwardRef<HTMLDivElement, PlaybackControl
   const active = playing ?? inner;
   const change = (next: boolean) => { if (playing === undefined) setInner(next); onPlayingChange?.(next); };
   const root = rs(["rs-playback-controls", className], styles.root);
-  const action = rs(["rs-playback-action"], styles.action);
+  const primaryActionSx = rs(["rs-btn-primary", "rs-playback-action"], styles.action);
+  const ghostActionSx = rs(["rs-btn-ghost", "rs-playback-action"], styles.action);
+  // Button's composed atomics must not add text padding or stretch these icon controls.
+  const actionStyle = { width: "var(--hit)", height: "var(--hit)", padding: 0 };
+  const primaryAction = { ...primaryActionSx, style: { ...primaryActionSx.style, ...actionStyle } };
+  const ghostAction = { ...ghostActionSx, style: { ...ghostActionSx.style, ...actionStyle } };
   return <div ref={ref} role="group" aria-label={label} {...props} className={root.className} style={{ ...root.style, ...style }}>
-    {onPrevious && <Button {...action} variant="ghost" disabled={disabled || previousDisabled} aria-label={previousLabel} onClick={onPrevious}><Icon name="skip-back" /></Button>}
-    <Button {...action} disabled={disabled} aria-label={active ? "Pause" : "Play"} onClick={() => change(!active)}><Icon name={active ? "pause" : "play"} /></Button>
-    {onNext && <Button {...action} variant="ghost" disabled={disabled || nextDisabled} aria-label={nextLabel} onClick={onNext}><Icon name="skip-forward" /></Button>}
-    {onStop && <Button {...action} variant="ghost" disabled={disabled} aria-label="Stop" onClick={() => { change(false); onStop(); }}><Icon name="stop" /></Button>}
+    {onPrevious && <Button {...ghostAction} variant="ghost" disabled={disabled || previousDisabled} aria-label={previousLabel} onClick={onPrevious}><Icon name="skip-back" /></Button>}
+    <Button {...primaryAction} disabled={disabled} aria-label={active ? "Pause" : "Play"} onClick={() => change(!active)}><Icon name={active ? "pause" : "play"} /></Button>
+    {onNext && <Button {...ghostAction} variant="ghost" disabled={disabled || nextDisabled} aria-label={nextLabel} onClick={onNext}><Icon name="skip-forward" /></Button>}
+    {onStop && <Button {...ghostAction} variant="ghost" disabled={disabled} aria-label="Stop" onClick={() => { change(false); onStop(); }}><Icon name="stop" /></Button>}
   </div>;
 });
