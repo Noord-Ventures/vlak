@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 const compact = "@media (min-width: 900px) and (max-width: 1279px)";
 const tablet = "@media (min-width: 641px) and (max-width: 899px)";
 const phone = "@media (max-width: 640px)";
+const touch = "@media (any-pointer: coarse)";
 
 export const footer = stylex.create({
   inner: {
@@ -55,8 +56,8 @@ export const footer = stylex.create({
     display: "flex",
     alignItems: "center",
     minWidth: 44,
-    minHeight: 44,
-    paddingBlock: 8,
+    minHeight: { default: 28, [touch]: 44 },
+    paddingBlock: 4,
     lineHeight: 1.45,
     overflowWrap: "anywhere",
     ":focus-visible": {
