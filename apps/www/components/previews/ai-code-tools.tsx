@@ -29,7 +29,7 @@ export function WebPreviewPreview({ title = "Calendar preview" }: { title?: stri
   const [history, setHistory] = useState(["/widgets/calendar-demo.html"]);
   const [index, setIndex] = useState(0);
   const syncTheme = useCalendarTheme();
-  return <WebPreview title={title} url={history[index]} onUrlChange={url => { setHistory(current => [...current.slice(0, index + 1), url]); setIndex(index + 1); }} onBack={() => setIndex(current => current - 1)} onForward={() => setIndex(current => current + 1)} canGoBack={index > 0} canGoForward={index < history.length - 1} frameProps={{ height: 268, sandbox: "", onLoad: syncTheme }} logs={[{ id: "ready", level: "info", message: "Calendar example loaded. No external calendar is connected.", timestamp: "2026-09-09T10:20:00Z" }]} />;
+  return <WebPreview title={title} url={history[index]} onUrlChange={url => { setHistory(current => [...current.slice(0, index + 1), url]); setIndex(index + 1); }} onBack={() => setIndex(current => current - 1)} onForward={() => setIndex(current => current + 1)} canGoBack={index > 0} canGoForward={index < history.length - 1} frameProps={{ height: 268, sandbox: "", ...syncTheme }} logs={[{ id: "ready", level: "info", message: "Calendar example loaded. No external calendar is connected.", timestamp: "2026-09-09T10:20:00Z" }]} />;
 }
 
 function PreviewNote({ title, children }: { title: string; children?: ReactNode }) {

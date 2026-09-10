@@ -84,7 +84,7 @@ Forwards `ref` to the `HTMLElement`.
 | `onReload` | `() => void` |  |  |
 | `logs` | `WebPreviewLog[]` | `[]` |  |
 | `maxLogEntries` | `number` | `200` |  |
-| `frameProps` | `Omit<IframeHTMLAttributes<HTMLIFrameElement>, "title" \| "children" \| "src" \| "srcDoc">` |  | iframe permissions remain application-controlled; scripts and forms are allowed without same-origin access by default. |
+| `frameProps` | `Omit<DetailedHTMLProps<IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>, "title" \| "children" \| "src" \| "srcDoc">` |  | iframe permissions remain application-controlled; scripts and forms are allowed without same-origin access by default. |
 
 ### Functions
 

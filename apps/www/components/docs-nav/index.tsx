@@ -106,7 +106,9 @@ export function DocsNav() {
   const [openGroup, setOpenGroup] = React.useState<VlakCategory | null>(selected);
   const shown = preview ?? selected;
   const catalog = pathname.startsWith("/components");
+  const rail = React.useRef<HTMLDivElement>(null);
   const submenu = React.useRef<HTMLElement>(null);
+  const previousPath = React.useRef(pathname);
   const shownGroup = React.useRef(shown); shownGroup.current = shown;
   const pointer = React.useRef<{ origin: PointerPoint | null; previous: PointerPoint | null; timer: ReturnType<typeof setTimeout> | null }>({ origin: null, previous: null, timer: null });
   const clearPointer = React.useCallback(() => {
@@ -114,20 +116,29 @@ export function DocsNav() {
     pointer.current = { origin: null, previous: null, timer: null };
   }, []);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: A new page in the same category must also clear pending pointer intent.
-  React.useEffect(() => {
-    clearPointer();
-    setPreview(null);
-    setOpenGroup(selected);
-  }, [pathname, selected, clearPointer]);
-  React.useEffect(() => clearPointer, [clearPointer]);
-
-  const previewGroup = (category: VlakCategory, origin: PointerPoint | null = null) => {
+  const previewGroup = React.useCallback((category: VlakCategory, origin: PointerPoint | null = null) => {
     clearPointer();
     pointer.current.origin = origin;
     shownGroup.current = category;
     setPreview(category);
-  };
+  }, [clearPointer]);
+
+  React.useLayoutEffect(() => {
+    if (previousPath.current !== pathname) {
+      previousPath.current = pathname;
+      clearPointer();
+      shownGroup.current = selected;
+      setPreview(null);
+      setOpenGroup(selected);
+    }
+    // A stationary pointer or focused link can arrive before hydration. Read the
+    // actual target at commit instead of waiting for another movement or focus.
+    const target = rail.current?.querySelector<HTMLElement>("[data-category]:focus")
+      ?? rail.current?.querySelector<HTMLElement>("[data-category]:hover");
+    const category = target?.dataset.category as VlakCategory | undefined;
+    if (category && category !== shownGroup.current) previewGroup(category);
+  }, [pathname, selected, clearPointer, previewGroup]);
+  React.useEffect(() => clearPointer, [clearPointer]);
 
   const followPointer = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
@@ -238,7 +249,7 @@ export function DocsNav() {
 
   return (
     <>
-      <div {...sx("toc-rail", navStyles.rail)} data-rail="catalog" onPointerMove={followPointer} onPointerLeave={leaveRail} onPointerCancel={clearPointer} onBlur={leaveRail}>
+      <div ref={rail} {...sx("toc-rail", navStyles.rail)} data-rail="catalog" onPointerOver={followPointer} onPointerMove={followPointer} onPointerLeave={leaveRail} onPointerCancel={clearPointer} onBlur={leaveRail}>
         <nav {...sx("toc", navStyles.toc)} data-toc="groups" aria-label="Component groups" onScroll={clearPointer}>
           {groups.map((category) => (
             <Link

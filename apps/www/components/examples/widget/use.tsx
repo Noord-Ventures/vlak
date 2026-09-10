@@ -63,7 +63,7 @@ export function Use() {
         {opened && <p className="rs-use-copy" id={summaryId}>The latest brief names the owner and next step. The research notes support each decision.</p>}
       </Widget>
       <Widget title="Available times" provider="Calendar · Embedded example" footer="Selection stays inside this embedded example. No calendar event is created.">
-        <WidgetEmbed title="Calendar time selection example" src="/widgets/calendar-demo.html" height={268} sandbox="" onLoad={syncTheme} />
+        <WidgetEmbed title="Calendar time selection example" src="/widgets/calendar-demo.html" height={268} sandbox="" {...syncTheme} />
       </Widget>
     </div></div>
   </UseField>;

@@ -16,6 +16,12 @@ export function useCalendarTheme() {
     url.hash = `theme-${theme}`;
     element.src = url.href;
   }, []);
+  // A cached server-rendered iframe can finish loading before React attaches
+  // onLoad. Register it when the ref commits, including StrictMode reattachment.
+  const ref = useCallback((element: HTMLIFrameElement | null) => {
+    frame.current = element;
+    update();
+  }, [update]);
   useEffect(() => {
     const root = document.documentElement;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -23,7 +29,8 @@ export function useCalendarTheme() {
     observer.observe(root, { attributes: true, attributeFilter: ["data-theme"] });
     media.addEventListener("change", update);
     update();
-    return () => { observer.disconnect(); media.removeEventListener("change", update); frame.current = null; };
+    return () => { observer.disconnect(); media.removeEventListener("change", update); };
   }, [update]);
-  return useCallback((event: SyntheticEvent<HTMLIFrameElement>) => { frame.current = event.currentTarget; update(); }, [update]);
+  const onLoad = useCallback((event: SyntheticEvent<HTMLIFrameElement>) => { frame.current = event.currentTarget; update(); }, [update]);
+  return { ref, onLoad };
 }

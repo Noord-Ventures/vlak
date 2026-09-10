@@ -532,7 +532,7 @@
             },
             {
               "name": "frameProps",
-              "type": "Omit<IframeHTMLAttributes<HTMLIFrameElement>, \"title\" | \"children\" | \"src\" | \"srcDoc\">",
+              "type": "Omit<DetailedHTMLProps<IframeHTMLAttributes<HTMLIFrameElement>, HTMLIFrameElement>, \"title\" | \"children\" | \"src\" | \"srcDoc\">",
               "required": false,
               "description": "iframe permissions remain application-controlled; scripts and forms are allowed without same-origin access by default."
             }

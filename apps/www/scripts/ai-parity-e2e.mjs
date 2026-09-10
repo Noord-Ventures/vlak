@@ -1,3 +1,78 @@
+// Sandboxed frames can stop delivering animation frames after a fragment navigation.
+// Poll from Node so a correct theme is not mistaken for a stalled requestAnimationFrame.
+async function waitForCalendarColor(iframe, expected) {
+  const deadline = Date.now() + 10_000;
+  let actual;
+  do {
+    actual = await iframe.contentFrame().locator("body").evaluate(element => getComputedStyle(element).backgroundColor);
+    if (actual === expected) return;
+    await new Promise(resolve => setTimeout(resolve, 100));
+  } while (Date.now() < deadline);
+  throw new Error(`calendar background did not match its host: expected ${expected}, received ${actual}`);
+}
+
+/** Load the server-rendered iframe before React can attach any load listeners. */
+export async function checkCalendarEarlyHydration({ browser, base, width, name }) {
+  const page = await browser.newPage({ viewport: { width, height: 900 }, reducedMotion: "reduce" });
+  page.setDefaultTimeout(10_000);
+  const errors = [];
+  const onError = error => errors.push(error.message);
+  page.on("pageerror", onError);
+  let release;
+  let heldScripts = 0;
+  let expired = false;
+  const gate = new Promise(resolve => { release = resolve; });
+  const deadline = setTimeout(() => { expired = true; release(); }, 15_000);
+  const scripts = /\/_next\/.*\.js(?:\?.*)?$/;
+  const holdScript = async route => { heldScripts++; await gate; await route.continue(); };
+  const ensure = (condition, message) => { if (!condition) throw new Error(message); };
+  try {
+    await page.route(scripts, holdScript);
+    await page.goto(`${base}/ai/${name}/`, { waitUntil: "commit" });
+    const iframe = page.locator('iframe[src="/widgets/calendar-demo.html"]').first();
+    await iframe.scrollIntoViewIfNeeded();
+    const frameTitle = await iframe.getAttribute("title");
+    const themedFrame = page.locator("iframe").and(page.getByTitle(frameTitle, { exact: true })).first();
+    const choice = iframe.contentFrame().getByRole("radio").nth(1);
+    await choice.check();
+    ensure(await iframe.contentFrame().locator("body").evaluate(() => document.readyState === "complete"), "calendar did not finish loading before hydration");
+    ensure(heldScripts > 0 && !expired, "Next scripts were not held while the server-rendered calendar loaded");
+    ensure(await choice.isChecked(), "native calendar selection failed before hydration");
+    await page.evaluate(() => {
+      localStorage.setItem("vlak-theme", "dark");
+      document.documentElement.dataset.theme = "dark";
+    });
+    clearTimeout(deadline);
+    release();
+    await page.waitForFunction(() => [...document.querySelectorAll("iframe")].some(frame => frame.src.endsWith("/widgets/calendar-demo.html#theme-dark")), undefined, { polling: 100 });
+    // Hydration must reuse the already selected frame, not replace it or reload its document.
+    const hydrated = page.locator('iframe[src$="/widgets/calendar-demo.html#theme-dark"]').first();
+    const selected = hydrated.contentFrame().getByRole("radio").nth(1);
+    ensure(await selected.isChecked(), "hydration reset the calendar's preselected time");
+    const appearance = page.getByRole("button", { name: "Appearance", exact: true });
+    const desktop = await appearance.isVisible();
+    if (desktop) await appearance.click();
+    else await page.getByRole("button", { name: "Open menu", exact: true }).click();
+    const settings = desktop ? page.getByRole("dialog", { name: "Appearance", exact: true }) : page.getByRole("navigation", { name: "Site menu", exact: true });
+    for (const theme of ["Light", "Dark"]) {
+      await settings.getByRole("button", { name: theme, exact: true }).click();
+      const expected = await page.evaluate(() => {
+        const probe = document.createElement("span"); probe.style.color = "var(--bg)"; document.body.append(probe);
+        const color = getComputedStyle(probe).color; probe.remove(); return color;
+      });
+      await waitForCalendarColor(themedFrame, expected);
+      ensure(await themedFrame.contentFrame().getByRole("radio").nth(1).isChecked(), "changing theme after hydration reset the calendar's preselected time");
+    }
+    ensure(errors.length === 0, `page errors during delayed hydration: ${errors.join("; ")}`);
+  } finally {
+    clearTimeout(deadline);
+    release();
+    await page.unrouteAll({ behavior: "wait" });
+    page.off("pageerror", onError);
+    await page.close();
+  }
+}
+
 /** Focused AI interactions on the built site; the main suite already visits every catalog page. */
 export async function checkAIInteractions({ browser, base, fail }) {
   for (const width of [1280, 390]) {
@@ -163,8 +238,7 @@ export async function checkAIInteractions({ browser, base, fail }) {
             const probe = document.createElement("span"); probe.style.color = "var(--bg)"; document.body.append(probe);
             const color = getComputedStyle(probe).color; probe.remove(); return color;
           });
-          const frame = await (await iframe.elementHandle()).contentFrame();
-          await frame.waitForFunction(color => getComputedStyle(document.body).backgroundColor === color, expected);
+          await waitForCalendarColor(iframe, expected);
           ensure(await choice.isChecked(), "changing the host theme resets the embedded choice");
           ensure(await iframe.contentFrame().locator("label").evaluateAll(labels => labels.every(label => getComputedStyle(label).borderTopWidth === "1px")), "embedded theme changes alter the 1px control borders");
         }
@@ -172,6 +246,10 @@ export async function checkAIInteractions({ browser, base, fail }) {
         else await page.getByRole("button", { name: "Close menu", exact: true }).click();
         ensure(await iframe.getAttribute("sandbox") === "" && await iframe.contentFrame().locator('link[rel="stylesheet"]').count() === 0, "standalone embed depends on external styles or gains sandbox permissions");
       });
+
+      for (const name of ["widgets", "web-preview"]) {
+        await check(`${name} iframe before hydration`, () => checkCalendarEarlyHydration({ browser, base, width, name }));
+      }
 
       await check("audio and transcript", async () => {
         const preview = await visit("audio-player");

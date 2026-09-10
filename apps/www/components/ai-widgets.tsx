@@ -29,6 +29,6 @@ export function CalendarWidget() {
 export function EmbeddedCalendarWidget() {
   const syncTheme = useCalendarTheme();
   return <Widget title="Available times" provider="Calendar · Embedded example" footer="Selection stays inside this embedded example.">
-    <WidgetEmbed title="Calendar time selection example" src="/widgets/calendar-demo.html" height={268} sandbox="" onLoad={syncTheme} style={{ colorScheme: "inherit" }} />
+    <WidgetEmbed title="Calendar time selection example" src="/widgets/calendar-demo.html" height={268} sandbox="" {...syncTheme} style={{ colorScheme: "inherit" }} />
   </Widget>;
 }

@@ -103,6 +103,19 @@ describe("Terminal", () => {
 });
 
 describe("Web preview", () => {
+  it("attaches the supplied iframe ref again on reload and clears it on unmount", async () => {
+    const frameRef = vi.fn();
+    const { unmount } = render(<WebPreview title="Embedded calendar" frameProps={{ ref: frameRef }} />);
+    const initial = screen.getByTitle("Embedded calendar");
+    expect(frameRef).toHaveBeenLastCalledWith(initial);
+    await userEvent.click(screen.getByRole("button", { name: "Reload preview" }));
+    const reloaded = screen.getByTitle("Embedded calendar");
+    expect(reloaded).not.toBe(initial);
+    expect(frameRef.mock.calls.some(([node]) => node === null)).toBe(true);
+    expect(frameRef).toHaveBeenLastCalledWith(reloaded);
+    unmount();
+    expect(frameRef.mock.lastCall?.[0]).toBe(null);
+  });
   it("names repeated page previews without adding duplicate navigation landmarks", async () => {
     const { container } = render(<main><WebPreview title="Calendar preview" /><WebPreview title="Draft preview" /></main>);
     expect(screen.getAllByRole("region").map(region => region.getAttribute("aria-label"))).toEqual(["Calendar preview", "Draft preview"]);

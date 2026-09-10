@@ -24,7 +24,7 @@ export interface WebPreviewProps extends Omit<React.HTMLAttributes<HTMLElement>,
   logs?: WebPreviewLog[];
   maxLogEntries?: number;
   /** iframe permissions remain application-controlled; scripts and forms are allowed without same-origin access by default. */
-  frameProps?: Omit<React.IframeHTMLAttributes<HTMLIFrameElement>, "src" | "srcDoc" | "title" | "children">;
+  frameProps?: Omit<React.ComponentPropsWithRef<"iframe">, "src" | "srcDoc" | "title" | "children">;
 }
 export function isPreviewUrl(value: string): boolean {
   if (value === "about:blank") return true;
