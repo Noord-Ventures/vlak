@@ -32,6 +32,7 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
   Object.assign(stage.style, { width: `${width}px`, height: `${height}px` });
   stage.style.setProperty("--mo-fold-depth", `${depth}px`);
   stage.style.setProperty("--mo-fold-bezel", `${display.bezel}px`);
+  stage.style.setProperty("--mo-fold-cover-radius", `${device.display.radius}px`);
   wrapper.append(stage);
   const shadow = document.createElement("div"); shadow.className = "mo-fold-shadow";
   wrapper.prepend(shadow);
@@ -102,6 +103,9 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
   const render = () => {
     const turn = Math.sin(Math.PI * p);
     const fold = 180 * (1 - p);
+    stage.style.setProperty("--mo-fold-shell-radius", `${mix(device.display.radius + device.display.bezel, display.radius + display.bezel, p)}px`);
+    stage.style.setProperty("--mo-fold-inner-corner", `${(device.display.radius + device.display.bezel) * (1 - clamp(p * 2))}px`);
+    stage.style.setProperty("--mo-fold-inner-glass-corner", `${device.display.radius * (1 - clamp(p * 2))}px`);
     const yaw = -18 * turn, pitch = 11 * turn, roll = -3 * turn;
     // Project the actual articulated corner positions. Framing follows the
     // object, not a fake shrinking rectangle, in either device orientation.
@@ -149,7 +153,9 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
     panels[0]!.reflection.style.transform = `translateX(${(p - .5) * 100}%)`;
     panels[1]!.reflection.style.opacity = String(.07 * turn);
     hinge.style.opacity = "1";
-    hinge.style.transform = rotated ? "translate(-50%, -50%) rotateZ(90deg)" : "translate(-50%, -50%)";
+    // Mechanical hinge lives behind the display. Its facets must never draw
+    // over the continuous inner glass, including at the fully open endpoint.
+    hinge.style.transform = `translate(-50%, -50%) translateZ(${-depth / 2 - 5.1}px)${rotated ? " rotateZ(90deg)" : ""}`;
     shadow.style.width = `${(maxX - minX) * fitScale * .84}px`;
     shadow.style.top = `${fitHeight - 18}px`;
     shadow.style.opacity = String(.12 + turn * .14);

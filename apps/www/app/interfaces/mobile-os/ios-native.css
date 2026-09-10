@@ -1,5 +1,8 @@
 @import "./ios-apps.css";
 @import "./ios-duo.css";
+@import "./ios-calendar.css";
+@import "./ios-clock.css";
+@import "./ios-motion.css";
 
 /* iOS component anatomy is preserved before applying the Vlak material and type
    layer. Logical dimensions are device-dependent; see ios-reference.md. */
@@ -99,7 +102,7 @@
 .mo .mo-device[data-platform="ios"] .mo-ios-editor-actions { display: flex; gap: 8px; z-index: 1; }
 .mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > button { width: auto; min-width: 44px; padding: 0; font-size: 17px; font-weight: 600; }
 .mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > button .rs-icon { display: none; }
-.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-ghost { font-size: 0; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-ghost { font-size: 0; gap: 0; }
 .mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-ghost .rs-icon { display: block; width: 22px; height: 22px; }
 .mo .mo-device[data-platform="ios"] .mo-scroll:not(.mo-home) { padding: 8px 16px 20px; font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; }
 .mo .mo-device[data-platform="ios"] .mo-scroll > * + * { margin-top: 24px; }
@@ -266,6 +269,7 @@
 .mo .mo-device[data-platform="ios"] .mo-phone[data-root-app="true"] .mo-app-header { height: auto; min-height: 105px; grid-template-rows: 54px minmax(41px, auto); padding-block: 0 10px; }
 .mo .mo-device[data-platform="ios"] .mo-app-header > button,
 .mo .mo-device[data-platform="ios"] .mo-ios-navigation-actions > button {
+  gap: 0;
   display: inline-flex; justify-content: center; align-items: center;
   width: 44px; min-width: 44px; height: 44px; padding: 0;
   border: 1px solid var(--mo-ios-material-edge); border-radius: 50%;
@@ -457,3 +461,7 @@
   .mo .mo-device[data-platform="ios"] .mo-app-icon > [data-app-icon],
   .mo .mo-device[data-platform="ios"] .mo-dock button > [data-app-icon]:first-child { --mo-glyph-background: Canvas; --mo-glyph-foreground: CanvasText; outline: 1px solid CanvasText; }
 }
+
+/* Text actions retain a label; icon-only actions use the shared optical center. */
+.mo .mo-device[data-platform="ios"] .mo-ios-navigation-actions > button:not(:has(.rs-icon)) { font-size: 17px; font-weight: 500; width: auto; padding-inline: 14px; }
+.mo .mo-device[data-platform="ios"] .mo-app-header h2.mo-sr-only { position: absolute; width: 1px; height: 1px; min-height: 0; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

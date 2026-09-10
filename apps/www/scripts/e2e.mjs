@@ -4,9 +4,9 @@
 // in the previews meet the 44px phone hit size. Chromium via Playwright.
 //
 //   pnpm --filter www build && node scripts/e2e.mjs
-import { createServer } from "node:http";
-import { readFileSync, existsSync, statSync } from "node:fs";
-import { join, extname } from "node:path";
+import { createExportServer } from "./serve-export.mjs";
+import { readFileSync, existsSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { chromium } from "playwright";
@@ -24,18 +24,9 @@ const axeSource = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const out = fileURLToPath(new URL("../out", import.meta.url));
 const { catalogComponents } = await import("@noorddev/vlak");
 
-const types = { ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".json": "application/json", ".woff2": "font/woff2", ".webp": "image/webp", ".png": "image/png", ".svg": "image/svg+xml", ".txt": "text/plain", ".md": "text/markdown" };
-const server = createServer((req, res) => {
-  const p = decodeURIComponent(new URL(req.url, "http://x").pathname);
-  let file = join(out, p);
-  if (existsSync(file) && statSync(file).isDirectory()) file = join(file, "index.html");
-  if (!existsSync(file)) file = join(out, `${p.replace(/\/$/, "")}.html`);
-  if (!existsSync(file)) file = join(out, "404.html");
-  res.setHeader("content-type", types[extname(file)] ?? "application/octet-stream");
-  res.end(readFileSync(file));
-});
-await new Promise((r) => server.listen(0, r));
-const base = `http://localhost:${server.address().port}`;
+const server = createExportServer({ root: out });
+await new Promise((done, reject) => { server.once("error", reject); server.listen(0, "127.0.0.1", done); });
+const base = `http://127.0.0.1:${server.address().port}`;
 
 const failures = [];
 const fail = (msg) => failures.push(msg);

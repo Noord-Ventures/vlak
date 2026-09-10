@@ -60,7 +60,7 @@
 }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-app-header:has(> button) > .mo-ios-navigation-actions { top: calc(var(--mo-duo-controls-top) + 58px); }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-ios-navigation-actions > button { width: 48px; height: 48px; min-width: 48px; min-height: 48px; padding: 12px; border-radius: 50%; }
-.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-ios-navigation-actions > button:has(.rs-icon) { font-size: 0; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-ios-navigation-actions > button:has(.rs-icon) { font-size: 0; gap: 0; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-ios-navigation-actions > button:has(.rs-icon) .rs-icon { display: block; width: 24px; height: 24px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-ios-navigation-actions > button:not(:has(.rs-icon)) { padding: 0; font-size: 13px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-clock-tabs {
@@ -111,12 +111,12 @@
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="horizontal"] .mo-screen:has(> .mo-clock-tabs) > .mo-scroll { padding-bottom: 84px; }
 
 /* Home's dock has larger app glyphs than the 48pt toolbar rail. */
-.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) { --mo-duo-rail-width: 112px; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) { --mo-duo-rail-width: 100px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) > .mo-screen { display: flex; gap: 0; padding: 0; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-dock {
-  position: absolute; top: 50%; right: -88px; left: auto; transform: translateY(-50%);
-  display: grid; grid-template-columns: 60px; grid-auto-rows: 60px; width: 88px; height: auto;
-  min-height: 0; margin: 0; padding: 14px 13px; gap: 14px; border-radius: 32px;
+  position: absolute; top: calc(50% + 17px); right: -88px; left: auto; transform: translateY(-50%);
+  display: grid; grid-template-columns: 52px; grid-auto-rows: 52px; width: 76px; height: auto;
+  min-height: 0; margin: 0; padding: 12px; gap: 8px; border-radius: 28px;
 }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-duo-display="outer"][data-app="home"]:not([data-overlay]) > .mo-screen > .mo-home { padding: 24px 12px 8px 24px; gap: 20px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-duo-display="inner"][data-app="home"]:not([data-overlay]) > .mo-screen > .mo-home { padding: 20px 24px 0 36px; }
@@ -125,6 +125,19 @@
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-duo-display="outer"][data-duo-orientation="landscape"][data-app="home"]:not([data-overlay]) .mo-ios-widgets { grid-template-columns: 1fr; align-self: center; gap: 12px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-duo-display="outer"][data-duo-orientation="landscape"][data-app="home"]:not([data-overlay]) .mo-ios-widgets > button { min-height: 130px; height: 130px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-duo-display="outer"][data-duo-orientation="landscape"][data-app="home"]:not([data-overlay]) .mo-home-apps { align-self: center; row-gap: 16px; }
+
+/* Home uses its own compact dock, centered on the glass rather than the
+   shorter app-content region. The search control shares the status axis.
+   Both Search placements stay in the DOM so physical fold copies can adopt
+   either native layout; CSS exposes exactly one, outside Home scrolling. */
+.mo .mo-ios-home-search-rail { display: none; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-tools .mo-search-pill { display: none; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-dock button { width: 52px; height: 52px; min-width: 52px; min-height: 52px; padding: 0; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-dock button > [data-app-icon],
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-dock button > [data-app-icon] > svg { width: 52px; height: 52px; border-radius: 13px; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail { display: flex; position: absolute; z-index: 7; right: -76px; bottom: 14px; width: 48px; height: 48px; min-height: 48px; min-width: 48px; padding: 12px; gap: 0; font-size: 0; border-radius: 50%; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail .rs-icon { width: 20px; height: 20px; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-tools { justify-content: center; }
 
 /* Native sheets preserve an 8pt outer gutter. Outer sheets retain a vertical
    action column; the inner display gives sheets their own horizontal bar. */
@@ -148,7 +161,7 @@
 /* A real master column accompanies the same mounted detail on the inner
    landscape display. Header actions and content keep their separate regions. */
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-split="true"] > .mo-screen { display: grid; grid-template-columns: 248px minmax(0, 1fr); grid-template-rows: 82px minmax(0, 1fr) auto; column-gap: 0; }
-.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-split="true"] .mo-app-header { grid-column: 1 / -1; grid-row: 1; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-split="true"] .mo-app-header { grid-column: 2; grid-row: 1; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-split="true"] .mo-ios-master-list { grid-column: 1; grid-row: 2 / 4; min-height: 0; min-width: 0; overflow-y: auto; padding: 12px; border-right: 1px solid var(--divider); overscroll-behavior: contain; scrollbar-width: thin; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-split="true"] .mo-ios-master-list h3 { margin: 0; padding: 8px 12px 16px; font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: -.025em; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-split="true"] .mo-ios-master-list button { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 4px; width: 100%; min-height: 52px; padding: 12px; border: 0; border-radius: 12px; background: transparent; color: var(--text); text-align: start; white-space: normal; }
@@ -165,3 +178,6 @@
 @media (forced-colors: active) {
   .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout] .mo-clock-tabs button[aria-pressed="true"] { outline: 2px solid Highlight; background: Canvas; color: CanvasText; }
 }
+
+/* Inner portrait uses a horizontal status strip above the Home collection. */
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="horizontal"][data-app="home"]:not([data-overlay]) .mo-home { padding-top: 96px; }

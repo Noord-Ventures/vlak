@@ -1,0 +1,46 @@
+/* Spatial hierarchy follows iOS: an app expands from its icon, deeper content
+   enters from the trailing edge, and sheets rise from the bottom. Timing is
+   tuned for this browser implementation, not an undocumented UIKit constant. */
+.mo .mo-device[data-platform="ios"] .mo-phone > .mo-screen { background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="home"], [data-app="settings"], [data-app="notes"][data-root-app="true"], [data-overlay="quick"]) > .mo-screen { background: var(--mo-ios-grouped); }
+.mo .mo-device[data-platform="ios"] .mo-device-fit:not([inert]) .mo-phone > .mo-screen { view-transition-name: mo-ios-app; }
+html[data-ios-motion] { view-transition-name: none; }
+html[data-ios-motion]::view-transition { pointer-events: none; }
+html[data-ios-motion]::view-transition-old(root) { display: none; }
+html[data-ios-motion]::view-transition-new(root) { animation: none; }
+html[data-ios-motion]::view-transition-group(mo-ios-app) { overflow: hidden; isolation: isolate; animation-duration: 400ms; animation-timing-function: cubic-bezier(.22,.82,.22,1); }
+html[data-ios-motion]::view-transition-old(mo-ios-app),
+html[data-ios-motion]::view-transition-new(mo-ios-app) { mix-blend-mode: normal; animation-duration: 400ms; animation-timing-function: cubic-bezier(.22,.82,.22,1); animation-fill-mode: both; }
+html[data-ios-motion="open"]::view-transition-old(mo-ios-app) { animation-name: mo-ios-home-away; }
+html[data-ios-motion="open"]::view-transition-new(mo-ios-app) { transform-origin: var(--ios-launch-origin); animation-name: mo-ios-app-open; }
+html[data-ios-motion="close"]::view-transition-old(mo-ios-app) { transform-origin: var(--ios-launch-origin); animation-name: mo-ios-app-close; z-index: 2; }
+html[data-ios-motion="close"]::view-transition-new(mo-ios-app) { animation-name: mo-ios-home-return; }
+html[data-ios-motion="push"]::view-transition-old(mo-ios-app) { animation-name: mo-ios-push-away; }
+html[data-ios-motion="push"]::view-transition-new(mo-ios-app) { animation-name: mo-ios-push-in; }
+html[data-ios-motion="back"]::view-transition-old(mo-ios-app) { animation-name: mo-ios-back-away; z-index: 2; }
+html[data-ios-motion="back"]::view-transition-new(mo-ios-app) { animation-name: mo-ios-back-in; }
+html[data-ios-motion="sheet"]::view-transition-old(mo-ios-app) { animation-name: mo-ios-sheet-under; }
+html[data-ios-motion="sheet"]::view-transition-new(mo-ios-app) { animation-name: mo-ios-sheet-in; }
+html[data-ios-motion="dismiss"]::view-transition-old(mo-ios-app) { animation-name: mo-ios-sheet-out; z-index: 2; }
+html[data-ios-motion="dismiss"]::view-transition-new(mo-ios-app) { animation-name: mo-ios-sheet-reveal; }
+html[data-ios-motion="overlay-open"]::view-transition-new(mo-ios-app) { transform-origin: var(--ios-launch-origin); animation-name: mo-ios-overlay-in; }
+html[data-ios-motion="overlay-open"]::view-transition-old(mo-ios-app) { animation-name: mo-ios-sheet-under; }
+html[data-ios-motion="overlay-close"]::view-transition-old(mo-ios-app) { transform-origin: var(--ios-launch-origin); animation-name: mo-ios-overlay-out; z-index: 2; }
+html[data-ios-motion="overlay-close"]::view-transition-new(mo-ios-app) { animation-name: mo-ios-sheet-reveal; }
+@keyframes mo-ios-app-open { from { transform: scale(.12); opacity: 0; border-radius: 100px; } 35% { opacity: 1; } to { transform: none; opacity: 1; border-radius: 0; } }
+@keyframes mo-ios-app-close { from { transform: none; opacity: 1; } to { transform: scale(.12); opacity: 0; border-radius: 100px; } }
+@keyframes mo-ios-home-away { to { transform: scale(1.045); opacity: .2; filter: blur(2px); } }
+@keyframes mo-ios-home-return { from { transform: scale(1.045); opacity: .2; filter: blur(2px); } to { transform: none; opacity: 1; filter: none; } }
+@keyframes mo-ios-push-in { from { transform: translateX(100%); } to { transform: none; } }
+@keyframes mo-ios-push-away { to { transform: translateX(-25%); opacity: .55; } }
+@keyframes mo-ios-back-away { to { transform: translateX(100%); } }
+@keyframes mo-ios-back-in { from { transform: translateX(-25%); opacity: .55; } to { transform: none; opacity: 1; } }
+@keyframes mo-ios-sheet-in { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes mo-ios-sheet-out { to { transform: translateY(100%); } }
+@keyframes mo-ios-sheet-under { to { transform: scale(.96); opacity: .65; } }
+@keyframes mo-ios-sheet-reveal { from { transform: scale(.96); opacity: .65; } to { transform: none; opacity: 1; } }
+@keyframes mo-ios-overlay-in { from { transform: translateY(-12px) scale(.94); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes mo-ios-overlay-out { from { transform: none; opacity: 1; } to { transform: translateY(-12px) scale(.94); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .mo .mo-device[data-platform="ios"] .mo-device-fit:not([inert]) .mo-phone > .mo-screen { view-transition-name: none; }
+}

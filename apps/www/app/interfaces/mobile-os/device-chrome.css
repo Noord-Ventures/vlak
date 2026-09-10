@@ -107,42 +107,52 @@ section.mo.mo-single { grid-template-rows: auto auto auto; }
 .mo-fold-stage { position: absolute; top: 0; left: 50%; transform-origin: center; transform-style: preserve-3d; pointer-events: none; }
 .mo-single .mo-fold-stage .mo-fold-context { display: contents; }
 .mo-fold-panel { position: absolute; top: 0; bottom: 0; width: 50%; transform-style: preserve-3d; }
-.mo-fold-panel-left { left: 0; --mo-fold-radius: 36px 0 0 36px; transform-origin: right center calc(var(--mo-fold-depth) / 2); }
-.mo-fold-panel-right { right: 0; --mo-fold-radius: 0 36px 36px 0; transform-origin: left center; }
-.mo-fold-rim { position: absolute; inset: 0; border-radius: var(--mo-fold-radius); border: 1px solid #878787; background: #454545; }
+.mo-fold-panel-left { left: 0; --mo-fold-radius: var(--mo-fold-shell-radius, 36px) var(--mo-fold-inner-corner, 0px) var(--mo-fold-inner-corner, 0px) var(--mo-fold-shell-radius, 36px); transform-origin: right center calc(var(--mo-fold-depth) / 2); }
+.mo-fold-panel-right { right: 0; --mo-fold-radius: var(--mo-fold-inner-corner, 0px) var(--mo-fold-shell-radius, 36px) var(--mo-fold-shell-radius, 36px) var(--mo-fold-inner-corner, 0px); transform-origin: left center; }
+.mo-fold-rim { position: absolute; inset: 0; border-radius: var(--mo-fold-shell-radius, 36px); border: 1px solid #878787; background: #454545; }
+/* Recess the stacked chassis beneath the flexible display at the hinge.
+   Exposed perimeter sections otherwise draw a dark ruled line through the glass. */
+.mo-fold-panel-left .mo-fold-rim { right: 16px; }
+.mo-fold-panel-right .mo-fold-rim { left: 16px; }
 .mo-fold-rim:nth-child(2n) { border-color: #b5b5b5; }
 .mo-fold-front, .mo-fold-back { position: absolute; inset: 0; border-radius: var(--mo-fold-radius); border: 1px solid #999; background: #181818; box-shadow: inset 0 0 0 1px #c0c0c0, inset 0 0 0 3px #282828; backface-visibility: hidden; }
-.mo-fold-front { transform: translateZ(calc(var(--mo-fold-depth) / 2)); }
+.mo-fold-front { box-shadow: none; transform: translateZ(calc(var(--mo-fold-depth) / 2)); }
 .mo-fold-back { transform: rotateY(180deg) translateZ(calc(var(--mo-fold-depth) / 2)); background: linear-gradient(120deg, #515151, #262626 55%, #444); }
-.mo-fold-panel-left .mo-fold-back { border-radius: 0 36px 36px 0; }
+.mo-fold-back { border-radius: var(--mo-fold-shell-radius, 36px); }
+.mo-fold-panel-left .mo-fold-front { border-right: 0; }
+.mo-fold-panel-right .mo-fold-front { border-left: 0; }
 .mo-fold-glass, .mo-fold-cover { position: absolute; inset: var(--mo-fold-bezel); overflow: hidden; background: var(--bg); backface-visibility: hidden; }
-.mo-fold-panel-left .mo-fold-glass { right: 0; border-radius: 24px 0 0 24px; }
-.mo-fold-panel-right .mo-fold-glass { left: 0; border-radius: 0 24px 24px 0; }
-.mo-fold-cover { border-radius: 25px; }
+.mo-fold-panel-left .mo-fold-glass { right: -.75px; border-radius: 24px var(--mo-fold-inner-glass-corner, 0px) var(--mo-fold-inner-glass-corner, 0px) 24px; }
+.mo-fold-panel-right .mo-fold-glass { left: -.75px; border-radius: var(--mo-fold-inner-glass-corner, 0px) 24px 24px var(--mo-fold-inner-glass-corner, 0px); }
+.mo-fold-cover { border-radius: var(--mo-fold-cover-radius, 36px); }
 .mo .mo-fold-texture { position: absolute; top: 0; grid-template-rows: 59px minmax(0, 1fr) 34px; transform-origin: top left; }
 .mo-fold-reflection { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 12%, #fff3 40%, #fff8 50%, transparent 76%); opacity: 0; }
 .mo-fold-edge { position: absolute; display: block; background: linear-gradient(#989898, #ddd 28%, #4e4e4e 60%, #8e8e8e); }
-.mo-fold-edge-top, .mo-fold-edge-bottom { height: var(--mo-fold-depth); left: 32px; right: 0; transform: rotateX(90deg); }
+.mo-fold-edge-hinge { background: var(--bg); }
+.mo-fold-edge-top, .mo-fold-edge-bottom { height: var(--mo-fold-depth); left: 32px; right: 32px; transform: rotateX(90deg); }
 .mo-fold-edge-top { top: calc(var(--mo-fold-depth) / -2); }
 .mo-fold-edge-bottom { bottom: calc(var(--mo-fold-depth) / -2); }
-.mo-fold-panel-right .mo-fold-edge-top, .mo-fold-panel-right .mo-fold-edge-bottom { left: 0; right: 32px; }
+.mo-fold-panel-right .mo-fold-edge-top, .mo-fold-panel-right .mo-fold-edge-bottom { left: 32px; right: 32px; }
 .mo-fold-edge-outside, .mo-fold-edge-hinge { width: var(--mo-fold-depth); top: 32px; bottom: 32px; transform: rotateY(90deg); }
 .mo-fold-panel-left .mo-fold-edge-outside, .mo-fold-panel-right .mo-fold-edge-hinge { left: calc(var(--mo-fold-depth) / -2); }
 .mo-fold-panel-right .mo-fold-edge-outside, .mo-fold-panel-left .mo-fold-edge-hinge { right: calc(var(--mo-fold-depth) / -2); }
-.mo-fold-spine { position: absolute; top: 50%; left: 50%; width: 4px; height: calc(100% - 30px); transform-style: preserve-3d; }
-.mo-fold-spine > i { position: absolute; inset: 0; background: linear-gradient(90deg, #4b4b4b, #b7b7b7, #686868); backface-visibility: hidden; }
+.mo-fold-spine { position: absolute; top: 50%; left: 50%; width: 4px; height: calc(100% - 2 * var(--mo-fold-shell-radius, 36px)); transform-style: preserve-3d; }
+.mo-fold-spine > i { position: absolute; inset: 0; border-radius: 3px; background: linear-gradient(90deg, #4b4b4b, #b7b7b7, #686868); backface-visibility: hidden; }
 .mo-fold-shadow { position: absolute; left: 50%; height: 20px; border-radius: 50%; background: #000; filter: blur(16px); pointer-events: none; }
 .mo-fold-camera-module { position: absolute; top: 32px; left: 28px; display: flex; align-items: center; gap: 18px; padding: 12px; border: 1px solid #777; border-radius: 22px; background: #242424; box-shadow: 0 4px 8px #0004; }
 .mo-fold-camera-module i { width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle, #141414 20%, #303030 22%, #060606 45%, #575757 48%, #111 58%); border: 2px solid #919191; }
 .mo-fold-camera-module b { width: 10px; height: 10px; border-radius: 50%; background: #aaa; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-panel { width: 100%; height: 50%; bottom: auto; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left { top: 0; --mo-fold-radius: 36px 36px 0 0; transform-origin: center bottom calc(var(--mo-fold-depth) / 2); }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right { top: 50%; --mo-fold-radius: 0 0 36px 36px; transform-origin: center top; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-glass { inset: 12px 12px 0; border-radius: 24px 24px 0 0; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right .mo-fold-glass { inset: 0 12px 12px; border-radius: 0 0 24px 24px; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left { top: 0; --mo-fold-radius: var(--mo-fold-shell-radius, 36px) var(--mo-fold-shell-radius, 36px) var(--mo-fold-inner-corner, 0px) var(--mo-fold-inner-corner, 0px); transform-origin: center bottom calc(var(--mo-fold-depth) / 2); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right { top: 50%; --mo-fold-radius: var(--mo-fold-inner-corner, 0px) var(--mo-fold-inner-corner, 0px) var(--mo-fold-shell-radius, 36px) var(--mo-fold-shell-radius, 36px); transform-origin: center top; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-glass { inset: 12px 12px -.75px; border-radius: 24px 24px var(--mo-fold-inner-glass-corner, 0px) var(--mo-fold-inner-glass-corner, 0px); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right .mo-fold-glass { inset: -.75px 12px 12px; border-radius: var(--mo-fold-inner-glass-corner, 0px) var(--mo-fold-inner-glass-corner, 0px) 24px 24px; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-back { transform: rotateX(180deg) translateZ(calc(var(--mo-fold-depth) / 2)); }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-back { border-radius: 0 0 36px 36px; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-spine { height: calc(100% * 669 / 951 - 30px); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-front { border-right: 1px solid #999; border-bottom: 0; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right .mo-fold-front { border-left: 1px solid #999; border-top: 0; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-spine { height: calc(100% * 669 / 951 - 2 * var(--mo-fold-shell-radius, 36px)); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-rim { right: 0; bottom: 16px; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right .mo-fold-rim { left: 0; top: 16px; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-edge-top, .mo-fold-stage[data-axis="horizontal"] .mo-fold-edge-bottom { left: 32px; right: 32px; }
 .mo-fold-tools { display: grid; grid-template-columns: auto minmax(100px, 240px) 44px; justify-content: center; align-items: center; gap: 0 16px; padding: 12px 24px; border-top: 1px solid var(--divider); background: var(--bg); }
 .mo-fold-tools label, .mo-fold-tools output { font-size: 13px; }
@@ -173,3 +183,11 @@ section.mo.mo-single { grid-template-rows: auto auto auto; }
 .mo.mo-single .mo-device[data-platform="android"] .mo-device-fit[data-live="true"] .mo-phone { grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 48px; }
 .mo.mo-single .mo-device[data-platform="android"] .mo-android-gesture-nav,
 .mo.mo-single .mo-device[data-platform="android"] .mo-android-gesture-nav .mo-home-indicator-button { height: 48px; min-height: 48px; }
+
+/* Readable phone mode is the app surface, not a handset nested inside page
+   gutters. Let touch layouts use the browser's real mobile width. */
+@media (max-width: 640px) {
+  .if-specimen:has(.mo-device-fit[data-live="true"]) { width: 100vw; max-width: none; margin-inline: calc((100% - 100vw) / 2); border-inline: 0; border-radius: 0; }
+  .mo.mo-single .mo-stage:has(.mo-device-fit[data-live="true"]) { padding-inline: 0; }
+  .mo.mo-single .mo-device-fit[data-live="true"] .mo-phone { border-inline: 0; border-radius: 0; }
+}

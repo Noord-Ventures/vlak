@@ -214,10 +214,291 @@ export async function checkMobileAppAccessibility({ page, phone, app }) {
   } else if (app === "maps") {
     const map = phone.getByRole("group", { name: "Illustrative neighbourhood map", exact: true });
     const drawing = map.locator("svg > g"), original = await drawing.getAttribute("transform");
+    const target = await drawing.elementHandle();
     await map.getByRole("button", { name: "Zoom in", exact: true }).press("Enter");
-    await page.waitForFunction(original => document.querySelector(".mo-map svg > g").getAttribute("transform") !== original, original);
+    await page.waitForFunction(({ target, original }) => target.getAttribute("transform") !== original, { target, original });
     await map.getByRole("button", { name: "Zoom out", exact: true }).press("Enter");
-    await page.waitForFunction(original => document.querySelector(".mo-map svg > g").getAttribute("transform") === original, original);
+    await page.waitForFunction(({ target, original }) => target.getAttribute("transform") === original, { target, original });
+  }
+}
+
+async function assertMobileIconCentered(button) {
+  const result = await button.evaluate(element => {
+    const rect = element.getBoundingClientRect(), icon = element.querySelector("svg")?.getBoundingClientRect();
+    const phone = element.closest(".mo-phone"), scale = phone.getBoundingClientRect().width / phone.offsetWidth;
+    return icon ? [(icon.x + icon.width / 2 - rect.x - rect.width / 2) / scale, (icon.y + icon.height / 2 - rect.y - rect.height / 2) / scale] : null;
+  });
+  assert(result && result.every(value => Math.abs(value) < .5), `Icon is centered within its actual hit area: ${JSON.stringify(result)}`);
+}
+
+async function assertIOSAppChrome(phone, app) {
+  const result = await phone.evaluate((element, name) => {
+    const bounds = element.getBoundingClientRect(), scale = bounds.width / element.offsetWidth;
+    const host = element.querySelector(name === "calendar" ? ".mo-ios-calendar" : ".mo-ios-clock");
+    const selector = name === "calendar" ? ".mo-cal-primary > button,.mo-cal-bottom button,.mo-cal-period-nav > button" : ".mo-ios-clock-tabs button,.mo-ios-clock-header-actions button";
+    const controls = [...host.querySelectorAll(selector)].filter(button => button.getClientRects().length && !button.closest("[inert]"));
+    const boxes = controls.map(button => ({ name: button.getAttribute("aria-label"), rect: button.getBoundingClientRect() }));
+    const rail = [...host.querySelectorAll(name === "calendar" ? ".mo-cal-primary > button" : ".mo-ios-clock-tabs button")].map(button => button.getBoundingClientRect());
+    return {
+      layout: element.dataset.duoLayout ?? "horizontal",
+      // Duo rail controls intentionally extend outside the content host into
+      // the phone's reserved84px rail; their actual bounds are checked below.
+      overflow: [document.documentElement.scrollWidth - innerWidth, element.scrollWidth - element.clientWidth, element.dataset.duoLayout === "vertical" ? 0 : host.scrollWidth - host.clientWidth],
+      short: boxes.filter(({ rect }) => rect.width / scale < 43.5 || rect.height / scale < 43.5).map(box => box.name),
+      escaped: boxes.filter(({ rect }) => rect.left < bounds.left - 1 || rect.top < bounds.top - 1 || rect.right > bounds.right + 1 || rect.bottom > bounds.bottom + 1).map(box => box.name),
+      overlaps: boxes.flatMap((a, index) => boxes.slice(index + 1).filter(b => Math.min(a.rect.right, b.rect.right) - Math.max(a.rect.left, b.rect.left) > 1 && Math.min(a.rect.bottom, b.rect.bottom) - Math.max(a.rect.top, b.rect.top) > 1).map(b => [a.name, b.name])),
+      rail: rail.map(rect => ({ x: (rect.x + rect.width / 2 - bounds.left) / scale, y: (rect.y + rect.height / 2 - bounds.top) / scale })),
+      phoneWidth: element.offsetWidth,
+    };
+  }, app);
+  assert(result.overflow.every(value => value <= 1), `${app} remains inside its phone: ${JSON.stringify(result)}`);
+  assert.deepEqual(result.short, [], `${app} native controls retain44px targets`);
+  assert.deepEqual(result.escaped, [], `${app} controls remain inside the visible display`);
+  assert.deepEqual(result.overlaps, [], `${app} navigation hit areas do not overlap`);
+  if (result.layout === "vertical") {
+    assert(result.rail.every(point => Math.abs(point.x - (result.phoneWidth - 48)) < 1), `${app} navigation occupies the native trailing rail`);
+    assert(result.rail.every((point, i) => i === 0 || point.y - result.rail[i - 1].y >= 47.5), `${app} rail controls remain separate`);
+  } else assert(result.rail.every(point => Math.abs(point.y - result.rail[0].y) < 1), `${app} uses horizontal navigation in readable/inner portrait layout`);
+  const icons = phone.locator(app === "calendar" ? ".mo-cal-primary > button" : ".mo-ios-clock-header-actions button");
+  for (const button of await icons.all()) await assertMobileIconCentered(button);
+}
+
+export async function checkIOSCalendar({ page, device, activate }) {
+  const root = page.locator(".mo"), phone = device.locator(".mo-device-fit .mo-phone"), calendar = phone.locator(".mo-ios-calendar");
+  await calendar.waitFor();
+  const view = async name => { await activate(calendar.getByRole("button", { name: "Calendar view", exact: true })); await activate(calendar.getByRole("dialog").getByRole("button", { name, exact: true })); await calendar.getByRole("dialog").waitFor({ state: "hidden" }); };
+  await assertIOSAppChrome(phone, "calendar");
+  const originalMonth = await calendar.locator(".mo-cal-month-heading h3").textContent();
+  await activate(calendar.getByRole("button", { name: "Next month", exact: true }));
+  assert.notEqual(await calendar.locator(".mo-cal-month-heading h3").textContent(), originalMonth);
+  await activate(calendar.getByRole("button", { name: "Previous month", exact: true }));
+  assert.equal(await calendar.locator(".mo-cal-month-heading h3").textContent(), originalMonth);
+  await view("Day"); await calendar.getByRole("region", { name: "Daily schedule", exact: true }).waitFor();
+  const selected = await calendar.locator('.mo-cal-day-strip [aria-pressed="true"]').getAttribute("data-date");
+  await activate(calendar.getByRole("button", { name: "Next day", exact: true }));
+  assert.notEqual(await calendar.locator('.mo-cal-day-strip [aria-pressed="true"]').getAttribute("data-date"), selected);
+  await activate(calendar.getByRole("button", { name: "Previous day", exact: true }));
+  await view("List");
+  await activate(calendar.getByRole("button", { name: "New event", exact: true }));
+  const editor = calendar.getByRole("dialog", { name: "New event", exact: true });
+  await editor.getByRole("textbox", { name: "Event title", exact: true }).fill("Local proof review");
+  await editor.getByLabel("Event time", { exact: true }).fill("16:15");
+  await editor.getByRole("textbox", { name: "Event notes", exact: true }).fill("Keep this draft through both displays.");
+  const date = await editor.getByRole("button", { name: "Event date", exact: true }).textContent();
+  const mounted = await calendar.elementHandle();
+  for (const action of ["Open display", "Rotate device", "Rotate device", "Fold display"]) {
+    await activate(root.getByRole("button", { name: action, exact: true }));
+    await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+    assert.equal(await editor.getByRole("textbox", { name: "Event title", exact: true }).inputValue(), "Local proof review");
+    assert.equal(await editor.getByRole("textbox", { name: "Event notes", exact: true }).inputValue(), "Keep this draft through both displays.");
+    assert.equal(await editor.getByRole("button", { name: "Event date", exact: true }).textContent(), date);
+    assert(await mounted.evaluate(element => element.isConnected), "Fold and rotation preserve the live Calendar editor");
+  }
+  await activate(editor.getByRole("button", { name: "Save event", exact: true }));
+  let details = calendar.getByRole("dialog", { name: "Event details", exact: true });
+  assert.match(await details.textContent(), /Local proof review/);
+  assert.match(await details.textContent(), /4:15pm/);
+  await activate(details.getByRole("button", { name: "Edit", exact: true }));
+  await calendar.getByRole("textbox", { name: "Event title", exact: true }).fill("Revised proof review");
+  await activate(calendar.getByRole("button", { name: "Save event", exact: true }));
+  await activate(details.getByRole("button", { name: "Close", exact: true }));
+  await activate(calendar.getByRole("button", { name: "Search events", exact: true }));
+  await calendar.getByRole("searchbox", { name: "Search events", exact: true }).fill("Revised proof");
+  await activate(calendar.getByRole("dialog").locator(".mo-cal-event-row").filter({ hasText: "Revised proof review" }));
+  details = calendar.getByRole("dialog", { name: "Event details", exact: true });
+  await activate(details.getByRole("button", { name: "Delete event", exact: true }));
+  assert.equal(await calendar.getByText("Revised proof review", { exact: true }).count(), 0);
+  await activate(calendar.getByRole("button", { name: "Calendar view", exact: true }));
+  await calendar.getByRole("dialog").getByRole("button", { name: "Close", exact: true }).press("Escape");
+  await page.waitForFunction(() => document.activeElement?.getAttribute("aria-label") === "Calendar view");
+  await checkMobileAppAccessibility({ page, phone, app: "calendar" });
+  // The same root controls use a rail in both Duo landscape contexts and a
+  // horizontal bar in inner portrait and readable phone mode.
+  for (const action of ["Open display", "Rotate device", "Rotate device", "Fold display"]) {
+    await activate(root.getByRole("button", { name: action, exact: true }));
+    await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+    await page.waitForFunction(() => !document.querySelector(".mo-handset").getAnimations().some(animation => animation.playState === "running"));
+    await assertIOSAppChrome(phone, "calendar");
+  }
+  if (page.viewportSize().width <= 640) {
+    await activate(root.getByRole("button", { name: "Use phone", exact: true }));
+    await assertIOSAppChrome(phone, "calendar");
+    await checkMobileAppAccessibility({ page, phone, app: "calendar" });
+    await activate(root.getByRole("button", { name: "View device", exact: true }));
+  }
+}
+
+export async function checkIOSClock({ page, device, activate, launch }) {
+  const phone = device.locator(".mo-device-fit .mo-phone"), clock = phone.locator(".mo-ios-clock");
+  await clock.waitFor(); await assertIOSAppChrome(phone, "clock");
+  const secondsWheel = clock.getByRole("listbox", { name: "Timer seconds", exact: true });
+  await secondsWheel.press("Home");
+  await secondsWheel.getByRole("option", { name: "01", exact: true }).click();
+  assert.equal(await secondsWheel.getByRole("option", { selected: true }).textContent(), "01", "Tapping a wheel row changes the selected duration");
+  await secondsWheel.press("Home"); await secondsWheel.hover(); await page.mouse.wheel(0, 88);
+  await page.waitForFunction(() => document.querySelector('[role="listbox"][aria-label="Timer seconds"] [aria-selected="true"]')?.textContent === "02");
+  assert(await secondsWheel.evaluate(element => Math.abs(element.scrollTop - 88) < 1), "The wheel snaps its selected row to the central band");
+  await clock.getByRole("listbox", { name: "Timer minutes", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Timer minutes", exact: true }).pressSequentially("0");
+  await clock.getByRole("listbox", { name: "Timer seconds", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Timer seconds", exact: true }).pressSequentially("2");
+  await activate(clock.getByRole("button", { name: "Start timer", exact: true }));
+  await launch("Notes"); await page.clock.runFor(2300); await launch("Clock");
+  assert.equal(await clock.getByRole("timer", { name: "Time remaining", exact: true }).textContent(), "00:00", "Timer deadline continues in another app");
+  assert.match(await device.locator(".mo-notice").textContent(), /Timer complete/);
+  await activate(clock.getByRole("button", { name: "Dismiss timer", exact: true }));
+  await clock.getByRole("listbox", { name: "Timer seconds", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Timer seconds", exact: true }).pressSequentially("20");
+  await activate(clock.getByRole("button", { name: "Start timer", exact: true }));
+  await activate(clock.getByRole("button", { name: "Pause timer", exact: true }));
+  const paused = await clock.getByRole("timer", { name: "Time remaining", exact: true }).textContent();
+  await page.clock.runFor(1200); assert.equal(await clock.getByRole("timer", { name: "Time remaining", exact: true }).textContent(), paused);
+  await activate(clock.getByRole("button", { name: "Resume timer", exact: true })); await page.clock.runFor(1200);
+  assert.notEqual(await clock.getByRole("timer", { name: "Time remaining", exact: true }).textContent(), paused);
+  await activate(clock.getByRole("button", { name: "Cancel timer", exact: true }));
+  await activate(clock.getByRole("button", { name: "Stopwatch", exact: true }));
+  await activate(clock.getByRole("button", { name: "Start stopwatch", exact: true })); await page.clock.runFor(1200);
+  await activate(clock.getByRole("button", { name: "Lap", exact: true }));
+  await launch("Notes"); await page.clock.runFor(1200); await launch("Clock");
+  await activate(clock.getByRole("button", { name: "Stop", exact: true }));
+  assert.match(await clock.getByRole("timer", { name: "Stopwatch elapsed", exact: true }).textContent(), /00:0[2-9]/);
+  assert.equal(await clock.getByRole("list", { name: "Recorded laps", exact: true }).locator("li").count(), 1);
+  await activate(clock.getByRole("button", { name: "Reset", exact: true }));
+  assert.equal(await clock.getByRole("timer", { name: "Stopwatch elapsed", exact: true }).textContent(), "00:00.00");
+  await activate(clock.getByRole("button", { name: "Alarm", exact: true }));
+  await assertMobileIconCentered(clock.getByRole("button", { name: "New alarm", exact: true }));
+  await activate(clock.getByRole("button", { name: "New alarm", exact: true }));
+  await clock.getByRole("textbox", { name: "Alarm label", exact: true }).fill("Proof reminder");
+  await clock.getByRole("listbox", { name: "Alarm hours", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Alarm hours", exact: true }).pressSequentially("11");
+  await clock.getByRole("listbox", { name: "Alarm minutes", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Alarm minutes", exact: true }).pressSequentially("45");
+  await clock.getByRole("checkbox", { name: "Friday", exact: true }).check();
+  const mounted = await clock.elementHandle();
+  await activate(page.locator(".mo").getByRole("button", { name: "Open display", exact: true }));
+  await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+  await activate(page.locator(".mo").getByRole("button", { name: "Rotate device", exact: true }));
+  assert.equal(await clock.getByRole("textbox", { name: "Alarm label", exact: true }).inputValue(), "Proof reminder");
+  assert.equal(await clock.getByRole("listbox", { name: "Alarm hours", exact: true }).getByRole("option", { selected: true }).textContent(), "11");
+  assert(await mounted.evaluate(element => element.isConnected), "Clock alarm draft stays mounted through folding and rotation");
+  await activate(page.locator(".mo").getByRole("button", { name: "Rotate device", exact: true }));
+  await activate(page.locator(".mo").getByRole("button", { name: "Fold display", exact: true }));
+  await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+  await activate(clock.getByRole("button", { name: "Save alarm", exact: true }));
+  const alarm = clock.getByRole("switch", { name: "Proof reminder alarm enabled", exact: true });
+  assert.equal(await alarm.isChecked(), true); await alarm.press("Space"); assert.equal(await alarm.isChecked(), false);
+  await activate(clock.getByRole("button", { name: "Edit Proof reminder alarm", exact: true }));
+  assert.equal(await clock.getByRole("listbox", { name: "Alarm hours", exact: true }).getByRole("option", { selected: true }).textContent(), "11");
+  assert.equal(await clock.getByRole("checkbox", { name: "Friday", exact: true }).isChecked(), true);
+  await activate(clock.getByRole("button", { name: "Delete alarm", exact: true }));
+  assert.equal(await clock.getByRole("button", { name: "Edit Proof reminder alarm", exact: true }).count(), 0);
+  await activate(clock.getByRole("button", { name: "World Clock", exact: true }));
+  await activate(clock.getByRole("button", { name: "Add city", exact: true }));
+  await clock.getByRole("searchbox", { name: "Search cities", exact: true }).fill("London");
+  await activate(clock.getByRole("button", { name: "London", exact: true }));
+  assert.match(await clock.locator(".mo-ios-clock-world article").filter({ hasText: "London" }).locator("time").textContent(), /^\d{2}:\d{2}$/);
+  await activate(clock.getByRole("button", { name: "Remove London", exact: true }));
+  await checkMobileAppAccessibility({ page, phone, app: "clock" });
+  for (const action of ["Open display", "Rotate device", "Rotate device", "Fold display"]) {
+    await activate(page.locator(".mo").getByRole("button", { name: action, exact: true }));
+    await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+    await page.waitForFunction(() => !document.querySelector(".mo-handset").getAnimations().some(animation => animation.playState === "running"));
+    await assertIOSAppChrome(phone, "clock");
+  }
+}
+
+/** Observe the browser's real View Transition animations, including queued
+ * update races. This deliberately does not seek animation clocks or snapshots. */
+export async function checkIOSNavigationMotion({ page, base }) {
+  await page.goto(`${base}/interfaces/ios/`, { waitUntil: "networkidle" });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const device = page.locator("section.mo-device"), phone = device.locator(".mo-device-fit .mo-phone");
+  await phone.getByRole("button", { name: "App Library", exact: true }).waitFor();
+  await page.evaluate(() => {
+    window.__iosMotionRecords = [];
+    window.__iosNativeTransition = document.startViewTransition;
+    document.startViewTransition = function (update) {
+      const record = { kind: document.documentElement.dataset.iosMotion, origin: document.documentElement.style.getPropertyValue("--ios-launch-origin") };
+      window.__iosMotionRecords.push(record);
+      const transition = window.__iosNativeTransition.call(document, update);
+      transition.ready.then(() => {
+        record.ready = true;
+        record.clip = getComputedStyle(document.documentElement, "::view-transition-group(mo-ios-app)").overflow;
+        record.rootName = getComputedStyle(document.documentElement).viewTransitionName;
+        record.animations = document.getAnimations().filter(animation => animation.effect?.pseudoElement?.includes("mo-ios-app")).map(animation => ({ name: animation.animationName, duration: animation.effect.getTiming().duration, frames: animation.effect.getKeyframes().map(frame => ({ transform: frame.transform, opacity: frame.opacity })) }));
+      }, error => { record.error = error.message; });
+      transition.finished.then(() => { record.done = true; }, () => { record.done = true; });
+      return transition;
+    };
+  });
+  const settle = async () => page.waitForFunction(() => !document.documentElement.dataset.iosMotion);
+  const motion = async (button, kind, expectedAnimation) => {
+    const count = await page.evaluate(() => window.__iosMotionRecords.length);
+    await button.focus(); await button.press("Enter");
+    await page.waitForFunction(count => window.__iosMotionRecords.length > count && (window.__iosMotionRecords.at(-1).ready || window.__iosMotionRecords.at(-1).error), count);
+    const record = await page.evaluate(() => window.__iosMotionRecords.at(-1));
+    assert.equal(record.kind, kind);
+    assert.equal(record.error, undefined, `The live phone has a unique snapshot name: ${JSON.stringify(record)}`);
+    assert.equal(record.clip, "hidden", "Translated app snapshots stay clipped inside their captured surface");
+    assert.equal(record.rootName, "none", "System and site chrome remain live outside the captured app");
+    assert(record.animations.some(animation => animation.name === expectedAnimation && animation.duration > 0 && animation.frames.some(frame => frame.transform && frame.transform !== "none")), `${kind} has a real spatial animation`);
+    await settle();
+    return record;
+  };
+  try {
+    await phone.getByRole("button", { name: "App Library", exact: true }).press("Enter"); await settle();
+    const opened = await motion(phone.getByRole("button", { name: "Open Contacts", exact: true }), "open", "mo-ios-app-open");
+    await motion(phone.locator(".mo-contact-row").filter({ hasText: "Mara Vos" }).locator(".mo-list-row"), "push", "mo-ios-push-in");
+    await motion(phone.locator(".mo-app-header").getByRole("button", { name: "Back", exact: true }), "back", "mo-ios-back-in");
+    await motion(phone.getByRole("button", { name: "New contact", exact: true }), "sheet", "mo-ios-sheet-in");
+    await phone.getByRole("textbox", { name: "Full name", exact: true }).fill("Motion proof");
+    await phone.getByRole("textbox", { name: "Phone number", exact: true }).fill("+31 20 555 0110");
+    await motion(phone.getByRole("button", { name: "Save contact", exact: true }), "dismiss", "mo-ios-sheet-out");
+    assert.equal(await phone.locator(".mo-contact-row").filter({ hasText: "Motion proof" }).count(), 1);
+    await motion(phone.getByRole("button", { name: "New contact", exact: true }), "sheet", "mo-ios-sheet-in");
+    await motion(phone.locator(".mo-app-header").getByRole("button", { name: "Back", exact: true }), "dismiss", "mo-ios-sheet-out");
+    const closed = await motion(phone.locator(".mo-system-nav").getByRole("button", { name: "Home", exact: true }), "close", "mo-ios-app-close");
+    assert.equal(closed.origin, opened.origin, "Home reverses toward the app's launch icon");
+    await motion(phone.getByRole("button", { name: "Open Control Center", exact: true }), "overlay-open", "mo-ios-overlay-in");
+    await motion(phone.locator(".mo-system-nav").getByRole("button", { name: "Home", exact: true }), "overlay-close", "mo-ios-overlay-out");
+    await phone.getByRole("button", { name: "App Library", exact: true }).press("Enter"); await settle();
+    await page.evaluate(() => {
+      const phone = document.querySelector(".mo-device-fit .mo-phone");
+      [...phone.querySelectorAll("button")].find(button => button.getAttribute("aria-label") === "Open Notes").click();
+      phone.querySelector(".mo-system-nav button").click();
+    });
+    await settle();
+    await page.waitForFunction(() => window.__iosMotionRecords.every(record => record.done));
+    assert.equal(await phone.getAttribute("data-app"), "home", "A queued app-open update must not overwrite a later Home action");
+    assert.equal(await phone.getAttribute("data-overlay"), null);
+    // Interrupt a visible launch with a real pointer on the live Home gesture.
+    await phone.getByRole("button", { name: "App Library", exact: true }).press("Enter"); await settle();
+    const before = await page.evaluate(() => window.__iosMotionRecords.length);
+    await phone.getByRole("button", { name: "Open Notes", exact: true }).press("Enter");
+    await page.waitForFunction(before => window.__iosMotionRecords.length > before && window.__iosMotionRecords.at(-1).ready, before);
+    assert.equal(await page.evaluate(() => window.__iosMotionRecords.at(-1).done === true), false, "The launch is still visibly animating before interruption");
+    const home = await phone.locator(".mo-system-nav button").boundingBox();
+    await page.mouse.click(home.x + home.width / 2, home.y + home.height / 2);
+    await page.waitForFunction(() => document.querySelector(".mo-device-fit .mo-phone").dataset.app === "home"); await settle();
+    await page.getByRole("button", { name: "Inspect fold", exact: true }).press("Enter");
+    await page.waitForFunction(() => document.querySelector(".mo-fold-stage")?.dataset.hingeAngle === "110.00");
+    assert.deepEqual(await device.locator(".mo-fold-presentation .mo-screen").evaluateAll(elements => elements.map(element => getComputedStyle(element).viewTransitionName)), ["none", "none", "none"], "Physical fold copies never create duplicate animation snapshots");
+    assert.equal(await phone.locator(".mo-screen").evaluate(element => getComputedStyle(element).viewTransitionName), "none", "The inert live app is excluded during physical inspection");
+    await page.getByRole("button", { name: "Return to app", exact: true }).press("Enter");
+    await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+    assert.equal(await phone.locator(".mo-screen").evaluate(element => getComputedStyle(element).viewTransitionName), "mo-ios-app");
+    const viewport = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: viewport.height });
+    await page.getByRole("button", { name: "Use phone", exact: true }).press("Enter");
+    await device.locator('.mo-device-fit[data-live="true"]').waitFor();
+    assert.equal(await page.locator(".mo-screen").evaluateAll(elements => elements.filter(element => getComputedStyle(element).viewTransitionName === "mo-ios-app").length), 1, "Readable mode has exactly one live app snapshot");
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const reducedCount = await page.evaluate(() => window.__iosMotionRecords.length);
+    await phone.getByRole("button", { name: "App Library", exact: true }).press("Enter");
+    await phone.getByRole("button", { name: "Open Contacts", exact: true }).press("Enter");
+    await phone.getByRole("button", { name: "New contact", exact: true }).press("Enter");
+    await phone.getByRole("textbox", { name: "Full name", exact: true }).waitFor();
+    assert.equal(await page.evaluate(() => window.__iosMotionRecords.length), reducedCount, "Reduced motion commits navigation without snapshot animations");
+    assert.equal(await phone.locator(".mo-screen").evaluate(element => getComputedStyle(element).viewTransitionName), "none");
+  } finally {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.evaluate(() => { document.startViewTransition = window.__iosNativeTransition; delete window.__iosNativeTransition; delete window.__iosMotionRecords; });
   }
 }
 
@@ -365,20 +646,48 @@ export async function checkMobileOS({ page, base, fail }) {
         assert.deepEqual(result.short, [], `${platform} controls below their logical native hit area`);
         assert.deepEqual(result.escaped, [], `${platform} pinned regions escaped`);
       };
+      stage = `${platform} hardware Home layout`;
       await fit();
-      await library();
+      if (platform === "ios") {
+        const search = phone.getByRole("button", { name: "Search", exact: true });
+        assert.equal(await search.count(), 1, "Home exposes exactly one Search control in each native layout");
+        await activate(search);
+      } else await library();
       await device.getByRole("searchbox", { name: "Search apps", exact: true }).fill("notes"); await page.waitForTimeout(40);
       assert.equal(await device.locator(".mo-app-grid button").count(), 1);
       await device.getByRole("searchbox", { name: "Search apps", exact: true }).fill(""); await page.waitForTimeout(40);
       assert.equal(await device.locator(".mo-app-grid button").count(), 16);
       await launch("Contacts");
       assert.equal(await device.locator(".mo-app-header").getByRole("button", { name: "Back", exact: true }).count(), 0, "Root app navigation has no fabricated Back to Home control");
+      if (platform === "ios") {
+        await assertMobileIconCentered(device.getByRole("button", { name: "New contact", exact: true }));
+        for (const action of ["Open display", "Rotate device", "Rotate device", "Fold display"]) {
+          await activate(root.getByRole("button", { name: action, exact: true }));
+          await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+          await assertMobileIconCentered(device.getByRole("button", { name: "New contact", exact: true }));
+        }
+        if (page.viewportSize().width <= 640) {
+          await activate(root.getByRole("button", { name: "Use phone", exact: true }));
+          await assertMobileIconCentered(device.getByRole("button", { name: "New contact", exact: true }));
+          await activate(root.getByRole("button", { name: "View device", exact: true }));
+        }
+      }
       await activate(device.getByRole("button", { name: "New contact", exact: true }));
       await device.getByRole("textbox", { name: "Full name", exact: true }).fill("Avery Test"); await page.waitForTimeout(40);
       await device.getByRole("textbox", { name: "Phone number", exact: true }).fill("+31 20 555 0103"); await page.waitForTimeout(40);
       await saveEditor("Save contact");
       assert.match(await device.locator(".mo-scroll").textContent(), /Avery Test/);
       await activate(device.locator(".mo-contact-row").filter({ hasText: "Avery Test" }).locator(".mo-list-row"));
+      if (platform === "ios") {
+        await activate(device.getByRole("button", { name: "Edit", exact: true }));
+        assert.equal(await phone.getAttribute("data-screen"), "edit-contact", "Keyboard Edit opens the contact editor without submitting it");
+        assert.equal(await device.getByRole("textbox", { name: "Full name", exact: true }).inputValue(), "Avery Test");
+        assert.equal(await device.getByRole("textbox", { name: "Phone number", exact: true }).inputValue(), "+31 20 555 0103");
+        await device.getByRole("textbox", { name: "Phone number", exact: true }).fill("+31 20 555 0104");
+        await saveEditor("Save contact");
+        assert.match(await device.locator(".mo-contact-card").textContent(), /\+31 20 555 0104/);
+        await activate(device.getByRole("button", { name: "Call Avery Test", exact: true }));
+      }
       assert.equal(await device.getByText("Simulated call", { exact: true }).isVisible(), true);
       await activate(device.getByRole("button", { name: "End call", exact: true }));
       await launch("Phone");
@@ -397,7 +706,7 @@ export async function checkMobileOS({ page, base, fail }) {
       assert.equal(await phone.getAttribute("data-screen"), "recipients");
       assert.equal(await device.locator(".mo-app-header h2").textContent(), "New message");
       assert.equal(await device.getByRole("textbox", { name: "Message", exact: true }).count(), 0, "Choose a recipient before showing the message composer");
-      await device.getByRole("searchbox", { name: "Search recipients", exact: true }).fill("0103"); await page.waitForTimeout(40);
+      await device.getByRole("searchbox", { name: "Search recipients", exact: true }).fill(platform === "ios" ? "0104" : "0103"); await page.waitForTimeout(40);
       assert.equal(await device.locator(".mo-list-row").count(), 1, "Recipient search matches the newly created contact’s phone number");
       await activate(device.locator(".mo-list-row").filter({ hasText: "Avery Test" }));
       assert.equal(await phone.getAttribute("data-screen"), "thread");
@@ -415,11 +724,14 @@ export async function checkMobileOS({ page, base, fail }) {
       await saveEditor("Save to local Sent");
       assert.match(await device.locator(".mo-list-row").textContent(), /Local studio mail/);
       await launch("Calendar");
+      if (platform === "ios") await checkIOSCalendar({ page, device, activate });
+      else {
       await activate(device.getByRole("button", { name: "New event", exact: true }));
       await device.getByRole("textbox", { name: "Event title", exact: true }).fill("Local proof review"); await page.waitForTimeout(40);
       await device.getByLabel("Event time", { exact: true }).fill("16:15"); await page.waitForTimeout(40);
       await saveEditor("Save event");
       assert.match(await device.locator(".mo-event").last().textContent(), /16:15Local proof review/);
+      }
       await launch("Notes");
       await activate(device.getByRole("button", { name: "New note", exact: true }));
       await device.getByRole("textbox", { name: "Note title", exact: true }).fill("Local test note"); await page.waitForTimeout(40);
@@ -441,9 +753,9 @@ export async function checkMobileOS({ page, base, fail }) {
       const download = await downloadPromise; assert.equal(download.suggestedFilename(), "local-test.txt"); assert.equal(await download.failure(), null);
       await launch("Camera");
       await checkMobileAppAccessibility({ page, phone, app: "camera" });
-      await activate(device.getByRole("button", { name: "Capture", exact: true }));
+      await activate(device.getByRole("button", { name: platform === "ios" ? "Capture sample photo" : "Capture", exact: true }));
       assert.match(await device.locator(".mo-notice").textContent(), /Sample capture saved to Photos/);
-      await activate(device.getByRole("button", { name: "Library", exact: true }));
+      await activate(device.getByRole("button", { name: platform === "ios" ? "Open Photos" : "Library", exact: true }));
       assert.equal(await device.locator(".mo-photo-grid button").count(), 4);
       await activate(device.getByRole("button", { name: "Open Studio capture 1", exact: true }));
       await activate(device.getByRole("button", { name: "Favorite", exact: true }));
@@ -454,15 +766,18 @@ export async function checkMobileOS({ page, base, fail }) {
       for (const value of ["Clear", "0", "−", "5", "Equals", "+", "2", "Equals"]) await activate(device.locator(".mo-calculator").getByRole("button", { name: value, exact: true }));
       assert.equal(await device.locator(".mo-calculator-display").textContent(), "-3");
       await launch("Weather");
-      await activate(device.getByRole("button", { name: "Fahrenheit", exact: true }));
+      await activate(device.getByRole("button", { name: platform === "ios" ? "Use Fahrenheit" : "Fahrenheit", exact: true }));
       assert.equal(await device.locator(".mo-weather strong").textContent(), "64°");
       await launch("Maps");
       await checkMobileAppAccessibility({ page, phone, app: "maps" });
-      await choose(device.getByRole("combobox", { name: "Destination", exact: true }), 1);
+      if (platform === "ios") await device.getByRole("combobox", { name: "Destination", exact: true }).selectOption("park");
+      else await choose(device.getByRole("combobox", { name: "Destination", exact: true }), 1);
       await activate(device.getByRole("button", { name: "Start local route", exact: true }));
       await activate(device.getByRole("button", { name: "Next step", exact: true }));
-      assert.match(await device.locator(".mo-route-step").textContent(), /Follow the canal path/);
+      assert.match(await device.locator(platform === "ios" ? ".mo-ios-map-instruction" : ".mo-route-step").textContent(), /Follow the canal path/);
       await launch("Clock");
+      if (platform === "ios") await checkIOSClock({ page, device, activate, launch });
+      else {
       await device.getByRole("spinbutton", { name: "Timer seconds", exact: true }).fill("2"); await page.waitForTimeout(40);
       await activate(device.getByRole("button", { name: "Start timer", exact: true }));
       await page.clock.runFor(2300);
@@ -475,6 +790,7 @@ export async function checkMobileOS({ page, base, fail }) {
       assert.match(await device.getByRole("timer", { name: "Stopwatch elapsed", exact: true }).textContent(), /00:01/);
       await activate(device.getByRole("button", { name: "Alarm", exact: true }));
       const alarm = device.getByRole("switch", { name: "Alarm enabled", exact: true }); await alarm.focus(); await alarm.press("Space"); assert.equal(await alarm.isChecked(), true);
+      }
       await launch("Music");
       await activate(device.getByRole("button", { name: "Play music", exact: true }));
       await page.clock.runFor(500);
@@ -685,6 +1001,10 @@ export async function checkMobileOS({ page, base, fail }) {
       assert.match(standalone.font, /^"?Inter"?(?:,|$)/, "Standalone CSS order preserves the Vlak type layer");
       assert.equal(standalone.wallpaper, "none", "Standalone route does not restore the legacy gradient");
       assert(standalone.overflow <= 1, "Standalone preview fits the viewport");
+    }
+    if (page.viewportSize().width === 1440) {
+      stage = "iOS native navigation motion";
+      await checkIOSNavigationMotion({ page, base });
     }
     stage = "legacy platform chooser";
     for (const route of ["interfaces/mobile-os", "i/mobile-os"]) {

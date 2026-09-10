@@ -81,7 +81,7 @@ jobs:
       - name: Every catalogue entry has an isolated example
         run: node apps/www/scripts/check-examples.mjs
       - name: Site state and planning integrity
-        run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs apps/www/scripts/desktop-os.test.mjs apps/www/scripts/calendar-model.test.mjs
+        run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs apps/www/scripts/desktop-os.test.mjs apps/www/scripts/calendar-model.test.mjs apps/www/scripts/serve-export.test.mjs
       - name: Build the site
         run: pnpm --filter www build
       - name: AI demo and global search behavior
@@ -97,7 +97,7 @@ jobs:
         run: pnpm check:agents
       - name: Mobile navigation and interactive workspaces
         run: |
-          python3 -m http.server 3016 --directory apps/www/out > /tmp/vlak-interface-server.log 2>&1 &
+          node apps/www/scripts/serve-export.mjs --port 3016 > /tmp/vlak-interface-server.log 2>&1 &
           INTERFACE_SERVER_PID=$!
           trap 'kill "$INTERFACE_SERVER_PID"' EXIT
           curl --retry 10 --retry-connrefused --retry-delay 1 -fsS http://localhost:3016/interfaces/ > /dev/null

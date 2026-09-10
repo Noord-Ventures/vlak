@@ -22,7 +22,7 @@ Apple's material renderer.
 | --- | --- | --- |
 | Navigation | Leading Back symbol, centered compact title, trailing actions; root screens have a separate large title. | Real buttons with 44 px hit areas; a neutral material circle around back and icon actions. Done has ink fill. No visible Back label. |
 | Search | Leading search symbol, editable field, trailing clear action when there is text. | `IOSSearchField` composes a real search input and a 44 px clear button. Clearing restores input focus. A single focus outline surrounds the field. |
-| Tab navigation | Persistent peer destinations, icon and label, distinct selected state; a floating capsule above content. | Clock and Phone use 62 px containers with 54 px targets and a full selected fill. The content reserves space for the final row. Wider layouts place icon and label together; the open Duo uses the kit's 48 px vertical rail. |
+| Tab navigation | Persistent peer destinations, icon and label, distinct selected state; a floating capsule above content. | Clock and Phone use floating containers with at least 44 px targets and a full selected fill. The content reserves space for the final row. Wider layouts place icon and label together; the open Duo uses the kit's 48 px vertical rail. |
 | Grouped lists | Inset related rows, leading icon or avatar, primary label, optional value and disclosure. Separators begin at the content baseline. | Opaque paper groups, 1 px separators, 22 px group corners, and rows that grow beyond their 52 px resting height. |
 | Switch | A list-row control with opposing checked states, translated thumb, and an independently generous hit area. | Real checkbox with switch semantics. A 64 × 28 px track, 38 × 24 px pill thumb, 22 px travel, and 44 px hit height. Ink fill and thumb position both communicate state. |
 | Control Center | Connectivity group, media group, two vertical level controls, circular shortcuts, and a wider Focus control. | Functional browser controls, neutral material panels, and full ink selection. No decorative glass on the content beneath them. |
@@ -153,3 +153,42 @@ and [Lists and tables guidance](https://developer.apple.com/design/human-interfa
 Where Apple Support currently serves iOS 26 app screenshots, those are treated
 as app-content references; the downloaded iOS 27 kit remains the source for the
 current shared system components and Duo geometry.
+
+
+## Native app polish and continuity
+
+Calendar owns month, week, day, year and list views, event search, calendar
+visibility and local event editing. Its toolbar follows the Duo outer/inner
+orientation rules. Clock owns world clocks, alarms, a stopwatch with laps, and
+independent timers. Duration and alarm wheels use five visible rows with native
+scroll snap, keyboard selection and 44 px rows. Both applications remain mounted
+when another app is open, so timers, selections and unfinished edits survive
+Home, rotation and a device change.
+
+Contacts uses surname-ordered name rows and a separate detail/edit flow. Mail
+separates sender, subject and preview. Notes uses a wrapping document title.
+Camera, Maps and Photos each have their own content layout and functional local
+controls. Weather has a location collection and unit control; Music separates
+the player from its queue; Safari uses a bottom address field. These examples
+retain the local data and capability boundaries stated in the UI.
+
+The Home dock alignment was checked against the outer and inner Home screens
+in Apple's film. Its 52 px glyphs, 76 px width and spacing are visual tuning
+choices for this implementation, distinct from the kit's 48 px in-app tab rail.
+
+Navigation uses the View Transition API to preserve the outgoing frame while
+React changes content. App launch expands from the selected icon, Home reverses
+that movement, detail navigation enters from the trailing edge, and editing
+sheets rise from below. The physical device and surrounding page remain still.
+A reduced-motion preference applies the destination immediately. The animation
+curves are browser implementation choices; the project does not claim to embed
+UIKit or Apple's compositor.
+
+The fold spine and rim stop beneath the flexible inner display. Closed cover
+corners remain rounded through the 3D-to-live handoff. Neither fix clips a 3D
+ancestor, so the articulated depth and uninterrupted motion remain intact.
+
+Additional content references: [Calendar](https://support.apple.com/en-lamr/guide/iphone/iphfd1054569/26/ios/26),
+[Contacts](https://support.apple.com/en-ae/guide/iphone/iph3e0ca2db/ios),
+[Mail](https://support.apple.com/en-gb/guide/iphone/iph461684497/ios), and
+[Timers](https://support.apple.com/en-euro/guide/iphone/iph8241d6b2a/ios).
