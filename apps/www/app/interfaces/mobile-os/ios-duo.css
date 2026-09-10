@@ -136,6 +136,7 @@
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-dock button > [data-app-icon],
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-dock button > [data-app-icon] > svg { width: 52px; height: 52px; border-radius: 13px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail { display: flex; position: absolute; z-index: 7; right: -76px; bottom: 14px; width: 48px; height: 48px; min-height: 48px; min-width: 48px; padding: 12px; gap: 0; font-size: 0; border-radius: 50%; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail::before { inset: 0; border-radius: inherit; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail .rs-icon { width: 20px; height: 20px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-tools { justify-content: center; }
 
