@@ -1,0 +1,6 @@
+:root { background: var(--bg); color: var(--text); }
+body { margin: 0; }
+main { display: grid; min-height: 100vh; place-items: center; padding: 24px; }
+form { display: grid; gap: 20px; width: min(100%, 440px); }
+header p, header h1 { margin: 0; }
+header p { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; }

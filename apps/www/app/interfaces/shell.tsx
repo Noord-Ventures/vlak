@@ -8,6 +8,7 @@ import { InterfacesNav } from "./nav";
 import { StartBuilding } from "./start-building";
 import { InterfacePreviewProvider, InterfacePreview, PreviewButton } from "./preview";
 import { InterfaceFilm } from "./interface-film";
+import { hasInterfaceFilm, INTERFACE_FILM_DURATION, INTERFACE_FILM_UPLOAD_DATE } from "./films";
 import { componentForLabel } from "@/lib/catalog-relationships";
 import { StructuredData, breadcrumbData } from "@/components/structured-data";
 import { HOST } from "../specimen";
@@ -24,6 +25,20 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
   const ordered = orderedInterfaces;
   const next = ordered[(ordered.findIndex((item) => item.slug === slug) + 1) % ordered.length]!;
   const source = sourceFor(slug);
+  const pageUrl = `${HOST}/interfaces/${slug}/`;
+  const filmData = hasInterfaceFilm(slug) ? {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: `${proto.title} interface film`,
+    description: proto.law,
+    thumbnailUrl: `${HOST}/interfaces/films/posters/${slug}.jpg`,
+    contentUrl: `${HOST}/interfaces/films/${slug}.mp4`,
+    embedUrl: pageUrl,
+    uploadDate: INTERFACE_FILM_UPLOAD_DATE,
+    duration: INTERFACE_FILM_DURATION,
+    inLanguage: "en",
+    isFamilyFriendly: true,
+  } : null;
   return (
     <div {...sx("if-index", interfaces.index)}>
       <InterfacesNav />
@@ -32,17 +47,18 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
           breadcrumbData([
             { name: "Vlak", url: `${HOST}/` },
             { name: "Interfaces", url: `${HOST}/interfaces/` },
-            { name: proto.title, url: `${HOST}/interfaces/${slug}/` },
+            { name: proto.title, url: pageUrl },
           ]),
           {
             "@context": "https://schema.org",
             "@type": "TechArticle",
             headline: `${proto.title} interface study`,
             description: proto.law,
-            url: `${HOST}/interfaces/${slug}/`,
+            url: pageUrl,
             isPartOf: { "@id": `${HOST}/#website` },
             about: proto.components,
           },
+          ...(filmData ? [filmData] : []),
         ]} />
         <section className="if-study" aria-labelledby={`${slug}-name`}>
           <InterfacePreviewProvider slug={slug} title={proto.title}>

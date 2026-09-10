@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="132" height="24" viewBox="0 0 132 24" role="img" aria-labelledby="title desc">
+  <title id="title">Built with Vlak</title>
+  <desc id="desc">A black and paper badge with a modular grid mark.</desc>
+  <rect width="132" height="24" fill="#f4f2ec"/>
+  <rect x="0.5" y="0.5" width="131" height="23" fill="none" stroke="#1a1a1a"/>
+  <path d="M8 7h4v4H8zm5 0h4v4h-4zM8 12h4v4H8zm5 0h4v4h-4z" fill="#1a1a1a"/>
+  <text x="24" y="16" fill="#1a1a1a" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="600">Built with Vlak</text>
+</svg>
+

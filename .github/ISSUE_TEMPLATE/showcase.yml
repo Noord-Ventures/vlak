@@ -1,0 +1,48 @@
+name: Built with Vlak submission
+description: Submit a public product, prototype, or substantial experiment for the showcase.
+title: "Showcase: "
+labels: [showcase]
+body:
+  - type: input
+    id: project
+    attributes:
+      label: Project
+      description: The public name of the work.
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Project URL
+      description: A public product, demo, case study, or repository URL.
+    validations:
+      required: true
+  - type: textarea
+    id: use
+    attributes:
+      label: How Vlak is used
+      description: Which install path and components you used, and what you changed.
+    validations:
+      required: true
+  - type: textarea
+    id: constraint
+    attributes:
+      label: One useful constraint
+      description: What helped, got in the way, or was deliberately refused.
+    validations:
+      required: true
+  - type: textarea
+    id: image
+    attributes:
+      label: Image
+      description: Drag in one representative screenshot. Remove private or identifying data first.
+    validations:
+      required: true
+  - type: checkboxes
+    id: permission
+    attributes:
+      label: Permission
+      options:
+        - label: Vlak may reproduce the submitted image and project link on vlak.dev and its social accounts with attribution.
+          required: true
+

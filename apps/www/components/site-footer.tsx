@@ -26,6 +26,8 @@ const groups = [
       { href: "/ai/", title: "AI" },
       { href: "/interfaces/", title: "Interfaces" },
       { href: "/use-cases/", title: "Use cases" },
+      { href: "/starters/", title: "Starters" },
+      { href: "/showcase/", title: "Built with Vlak" },
       { href: "/docs/", title: "Docs" },
       { href: person.repo, title: "GitHub" },
     ],

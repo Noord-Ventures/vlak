@@ -4,7 +4,7 @@
 
 A constraint-first design system for product exploration. 215 accessible components ship as React, CSS, vendored StyleX source, a shadcn-compatible registry, CLI tooling, and machine-readable context for coding agents.
 
-[Browse components](https://vlak.dev/components/) · [Try the interfaces](https://vlak.dev/interfaces/) · [Install Vlak](https://vlak.dev/docs/) · [Use with coding agents](https://vlak.dev/docs/agents/)
+[Browse components](https://vlak.dev/components/) · [Try the interfaces](https://vlak.dev/interfaces/) · [Open a starter](https://vlak.dev/starters/) · [Use with coding agents](https://vlak.dev/docs/agents/)
 
 <p align="center">
   <a href="https://vlak.dev/review/vlak-openai-plugin-demo.mp4">
@@ -52,6 +52,8 @@ npx shadcn add https://vlak.dev/r/button.json
 ```
 
 Dark scheme: `data-theme="dark"` on the root element. Without it the system preference applies.
+
+Want a working project before choosing the rest of the stack? Open the [Vite and Next.js starters](https://vlak.dev/starters/) in StackBlitz or run them from [`examples/`](examples/).
 
 ## Why Vlak
 

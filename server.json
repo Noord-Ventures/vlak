@@ -1,0 +1,25 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Noord-Ventures/vlak",
+  "title": "Vlak",
+  "description": "Accessible React components, tokens, usage guidance, and install commands for product interfaces.",
+  "repository": {
+    "url": "https://github.com/Noord-Ventures/vlak",
+    "source": "github"
+  },
+  "version": "0.4.0",
+  "websiteUrl": "https://vlak.dev/docs/agents/",
+  "icons": [
+    {
+      "src": "https://vlak.dev/favicon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://vlak.dev/mcp"
+    }
+  ]
+}

@@ -4,4 +4,5 @@ Disallow: /swag
 Disallow: /swag/
 
 Sitemap: https://vlak.dev/sitemap.xml
+Sitemap: https://vlak.dev/video-sitemap.xml
 Host: vlak.dev

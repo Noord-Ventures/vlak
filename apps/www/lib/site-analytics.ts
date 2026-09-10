@@ -12,7 +12,7 @@ export const publicSitePaths = [
   "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
   "/interfaces/calendar", "/interfaces/desktop-os", "/interfaces/documentation",
   "/interfaces/microscopy", "/interfaces/mobile-os", "/interfaces/music-player", "/interfaces/video-player",
-  "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
+  "/showcase", "/starters", "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
   "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",
   "/use-cases/enterprise-software", "/use-cases/consumer-software",
 ];

@@ -3,18 +3,11 @@
 import { useRef } from "react";
 import { trackSiteEvent } from "@/lib/site-analytics";
 import type { InterfaceSlug } from "./catalog";
-
-const filmed = new Set<InterfaceSlug>([
-  "agents", "circuitry", "desktop-os", "documentation", "drive", "evening",
-  "frontier", "genome", "graphics", "identity", "line", "microbiology",
-  "microscopy", "mobile-os", "music", "music-player", "night", "orbit",
-  "patient", "platforms", "press", "protein", "render", "robotics", "room",
-  "video-player", "wall",
-]);
+import { hasInterfaceFilm } from "./films";
 
 export function InterfaceFilm({ slug, title }: { slug: InterfaceSlug; title: string }) {
   const tracked = useRef(false);
-  if (!filmed.has(slug)) return null;
+  if (!hasInterfaceFilm(slug)) return null;
   function recordPlay() {
     if (tracked.current) return;
     tracked.current = true;
