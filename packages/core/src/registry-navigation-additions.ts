@@ -43,7 +43,10 @@ export const navigationAdditions: VlakComponent[] = [
       "One tree item is in the Tab sequence. Level, position, selected, expanded, and disabled state are explicit."
     ],
     "aliases": [
-      "TreeView"
+      "TreeView",
+      "File tree",
+      "AI Elements File Tree",
+      "Directory tree"
     ]
   },
   {

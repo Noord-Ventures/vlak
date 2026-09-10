@@ -55,8 +55,12 @@ try {
     const panel = page.locator("body > .toc-mobile-open");
     const trigger = page.locator(".toc-mobile:not(.toc-mobile-open) > .toc-mobile-trigger");
     const open = async () => {
+      // The server-rendered trigger becomes enabled when hydration commits.
+      await page.locator(".toc-mobile:not(.toc-mobile-open) > .toc-mobile-trigger:enabled").waitFor({ state: "visible" });
       const box = await trigger.boundingBox();
       assert(box && box.y >= 0 && box.y + box.height <= 844, "Section trigger is visible without scrolling");
+      // Touch the visible sticky target directly; locator.tap scrolls its
+      // original document position into view and changes the scroll fixture.
       await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
       await panel.waitFor({ state: "visible" });
       await settle(page);
@@ -128,8 +132,14 @@ try {
       await closed();
       console.log(`${theme} ${width}px: full-screen navigation, scroll, keyboard, and route dismissal passed`);
     }
+    // The full catalog must not swallow the first touch while its previews
+    // hydrate on a slower device. Keep real input rather than retrying a click.
+    const slowDevice = width === 320 ? await context.newCDPSession(page) : null;
+    await slowDevice?.send("Emulation.setCPUThrottlingRate", { rate: 6 });
     await page.goto(`${base}/components/`, { waitUntil: "networkidle" });
     await open();
+    await slowDevice?.send("Emulation.setCPUThrottlingRate", { rate: 1 });
+    await slowDevice?.detach();
     const categoryToggle = panel.locator(".toc-mobile-more").first();
     if (await categoryToggle.getAttribute("aria-expanded") === "true") await categoryToggle.tap();
     await panel.getByRole("button", { name: "Show Actions", exact: true }).tap();

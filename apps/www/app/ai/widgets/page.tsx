@@ -3,6 +3,8 @@ import { AiShell } from "@/components/ai-shell";
 import { CodeBlock } from "@/components/code-block";
 import { CalendarWidget, EmbeddedCalendarWidget, ProjectWidget } from "@/components/ai-widgets";
 import { pageMetadata } from "@/lib/page-metadata";
+import { StructuredData, breadcrumbData } from "@/components/structured-data";
+import { HOST } from "@/app/specimen";
 
 export const metadata = pageMetadata("/ai/widgets", {
   title: "Widgets",
@@ -26,6 +28,21 @@ const example = `import { Widget, Toggle } from "@noorddev/vlak-react";
 
 export default function WidgetsPage() {
   return <AiShell title="Widgets" summary="One shared surface for structured content, inside a conversation or anywhere in your product.">
+    <StructuredData value={[
+      breadcrumbData([
+        { name: "Vlak", url: `${HOST}/` },
+        { name: "AI", url: `${HOST}/ai/` },
+        { name: "Widget patterns", url: `${HOST}/ai/widgets/` },
+      ]),
+      {
+        "@context": "https://schema.org", "@type": "TechArticle",
+        "@id": `${HOST}/ai/widgets/#documentation`,
+        headline: "Widget patterns for AI interfaces", description: metadata.description,
+        url: `${HOST}/ai/widgets/`, mainEntityOfPage: `${HOST}/ai/widgets/`,
+        isPartOf: { "@id": `${HOST}/ai/#collection` },
+        about: ["React widgets", "third-party integrations", "embedded content"],
+      },
+    ]} />
     <p className="rs-t-body">Use the same frame for your own features and third-party integrations. Use React content when your application renders the interface, or WidgetEmbed when the provider supplies an embedded page. The shared frame gives both a consistent title, source, and supporting context.</p>
     <section aria-labelledby="internal-widget" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 24 }}>
       <h2 className="section-label" id="internal-widget" style={{ margin: 0 }}>Application content</h2>
@@ -64,7 +81,7 @@ export default function WidgetsPage() {
       <h2 className="section-label" id="widget-integration">Connect a provider</h2>
       <CodeBlock code={example} />
       <p className="rs-t-body">In this example, record, integration, status, reload, selected, setSelected, and ProviderContent come from your application. Pass a trusted React component through the content slot, and translate provider states into the widget states. Tokens are CSS custom properties, so provider components can use the same type, colors, spacing, and focus styles.</p>
-      <p className="rs-t-body">Widget accepts React content; WidgetEmbed hosts an application-selected iframe. Connection, authentication, and provider permissions belong to your application. See the <Link className="rs-link" href="/ai/widget/">Widget reference</Link> for props and interactive state examples.</p>
+      <p className="rs-t-body">Widget accepts React content; WidgetEmbed hosts an application-selected iframe. Connection, authentication, and provider permissions belong to your application. See the <Link className="rs-link" href="/ai/widget/">Widget reference</Link> for props and interactive state examples, or read the <a className="rs-link" href="/docs/ai.md">AI integration guide</a> for a complete conversation.</p>
     </section>
   </AiShell>;
 }

@@ -7,6 +7,8 @@ Name: `open-in-chat`
 Also known as: AI Elements Open in Chat, OpenIn, ChatGPT handoff, Claude handoff, Provider prompt links  
 Page: https://vlak.dev/ai/open-in-chat/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Offer an explicit handoff of supplied text to another application.

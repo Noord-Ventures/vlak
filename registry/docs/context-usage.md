@@ -7,6 +7,8 @@ Name: `context-usage`
 Also known as: AI Elements Context, Token usage, Context window, Token cost, ContextUsage  
 Page: https://vlak.dev/ai/context-usage/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Supply usedTokens and maxTokens for context occupancy; usage supplies separate input, output, reasoning and cached-input counts.

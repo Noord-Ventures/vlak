@@ -32,7 +32,9 @@ export const aiWorkPatterns: VlakComponent[] = [
       "Text remains available to assistive technology; use an application status region for meaningful progress changes."
     ],
     "aliases": [
-      "Shimmer"
+      "Shimmer",
+      "AI Elements Shimmer",
+      "Streaming progress text"
     ]
   },
   {
@@ -80,7 +82,9 @@ export const aiWorkPatterns: VlakComponent[] = [
       "Interactive content requires accessible names; progress text is not announced for every streamed token."
     ],
     "aliases": [
-      "Plan"
+      "Plan",
+      "AI Elements Plan",
+      "Agent plan"
     ]
   },
   {
@@ -128,7 +132,9 @@ export const aiWorkPatterns: VlakComponent[] = [
       "Interactive content requires accessible names; progress text is not announced for every streamed token."
     ],
     "aliases": [
-      "Task"
+      "Task",
+      "AI Elements Task",
+      "Task disclosure"
     ]
   },
   {
@@ -227,7 +233,9 @@ export const aiWorkPatterns: VlakComponent[] = [
       "Interactive content requires accessible names; progress text is not announced for every streamed token."
     ],
     "aliases": [
-      "Checkpoint"
+      "Checkpoint",
+      "AI Elements Checkpoint",
+      "Restore checkpoint"
     ]
   },
   {
@@ -458,7 +466,9 @@ export const aiWorkPatterns: VlakComponent[] = [
       "Interactive content requires accessible names; progress text is not announced for every streamed token."
     ],
     "aliases": [
-      "Response editor"
+      "Response editor",
+      "Edit message",
+      "Regenerate response"
     ]
   }
 ];

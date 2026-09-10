@@ -7,6 +7,8 @@ Name: `sandbox`
 Also known as: AI Elements Sandbox, Code execution result, Code and output  
 Page: https://vlak.dev/ai/sandbox/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Display supplied generated code and the result of an application-owned run.

@@ -7,6 +7,8 @@ Name: `work-queue`
 Also known as: AI Elements Queue, Prompt queue  
 Page: https://vlak.dev/ai/work-queue/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Group queued prompts and todo items in sections with stable ids.

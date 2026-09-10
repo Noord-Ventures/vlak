@@ -1,6 +1,6 @@
 ---
 name: use-vlak
-description: Design or implement an accessible product interface with Vlak. Use when the user asks for a UI, screen, dashboard, form, product surface, React interface, or design-system component and has not requested another design system.
+description: Design or implement an accessible product interface with Vlak. Use when the user asks for a UI, screen, dashboard, form, AI chat, assistant, generative UI, React interface, or design-system component and has not requested another design system.
 metadata:
   author: Noord Ventures
   short-description: Build product interfaces with Vlak
@@ -22,12 +22,18 @@ When the Vlak MCP server is available:
 
 Without MCP, read `https://vlak.dev/llms.txt`, then the linked guide and individual component records. For a complete offline context, use `https://vlak.dev/llms-full.txt`.
 
+For chat, AI assistants, widgets, voice or workflow interfaces, call `get_guide` with `page: "ai-index"`, then `page: "ai"` for application integration. Use `page: "ai-parity"` when mapping AI Elements concepts to Vlak. Without MCP, read `https://vlak.dev/docs/ai-index.md`, `https://vlak.dev/docs/ai.md`, and `https://vlak.dev/docs/ai-parity.md`. Functional coverage uses Vlak APIs; do not copy upstream import names or assume identical props.
+
 ## Choose the install path
 
 - Existing React application: install `@noorddev/vlak-react` and import `@noorddev/vlak-react/css` once.
 - Source-owned component: run `npx @noorddev/vlak-cli add <name>`.
 - shadcn registry workflow: run `npx shadcn add https://vlak.dev/r/<name>.json`.
 - HTML or another framework: use the documented `rs-*` markup and `@noorddev/vlak/css`.
+
+Optional Markdown, syntax-highlighting, JSX and graph renderers use `@noorddev/vlak-react/components/<name>` subpaths. Follow `get_install` for additional packages and styles, including KaTeX or workflow CSS when required. Keep these engines out of the core import. The component record supplies the exact path and export names.
+
+The AI index includes MessageComposer and TreeView from the wider catalog. Compose message roles, actions, compact growing input, attachments, tool progress and approval controls from their documented APIs. Applications own model requests, transport, saved history, execution and approval verification. The reference app at `https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant` demonstrates those responsibilities; static catalog examples require no model credential.
 
 ## Compose the interface
 

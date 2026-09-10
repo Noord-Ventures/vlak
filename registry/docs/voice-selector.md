@@ -7,6 +7,8 @@ Name: `voice-selector`
 Also known as: AI Elements Voice Selector, Voice picker, Voice preview, TTS voice  
 Page: https://vlak.dev/ai/voice-selector/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Supply provider voice records; name, provider, language, description and attributes all participate in search.

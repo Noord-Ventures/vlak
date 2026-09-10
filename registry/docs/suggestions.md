@@ -7,6 +7,8 @@ Name: `suggestions`
 Also known as: AI Elements Suggestion, Suggested prompts  
 Page: https://vlak.dev/ai/suggestions/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Offer short suggested prompts using value and onSelect. Display text may be shorter than the submitted value.

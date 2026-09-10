@@ -7,6 +7,8 @@ Name: `package-info`
 Also known as: AI Elements Package Info, Dependency change, Package version  
 Page: https://vlak.dev/ai/package-info/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Review package additions, removals or version changes before an application performs them.

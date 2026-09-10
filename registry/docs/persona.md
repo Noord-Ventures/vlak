@@ -7,6 +7,8 @@ Name: `persona`
 Also known as: AI Elements Persona, AI avatar, Assistant visual, Voice state, Orb  
 Page: https://vlak.dev/ai/persona/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Drive state from actual application recording, generation and playback events.

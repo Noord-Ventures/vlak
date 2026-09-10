@@ -7,6 +7,8 @@ Name: `web-preview`
 Also known as: AI Elements Web Preview, Generated page preview, Iframe console  
 Page: https://vlak.dev/ai/web-preview/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Preview a supplied http/https URL, local path or about:blank.

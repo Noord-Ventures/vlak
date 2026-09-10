@@ -3,6 +3,7 @@
 import { useEffect, useState, type ComponentType, type ReactNode } from "react";
 import { Button, CodeBlock, Sandbox, StackTrace, Terminal, WebPreview, Widget } from "@noorddev/vlak-react";
 import dynamic from "next/dynamic";
+import { useCalendarTheme } from "../widgets/use-calendar-theme";
 const JSXPreview = dynamic(() => import("@noorddev/vlak-react/components/jsx-preview").then(module => module.JSXPreview));
 
 const terminalChunks = ["$ pnpm test\n", "\u001b[1mRunning composer tests\u001b[0m\n", "\u001b[32mPASS\u001b[0m sends a complete prompt\n", "\u001b[32mPASS\u001b[0m retains the draft on failure\n", "\n2 tests passed in 428 ms\n"];
@@ -27,7 +28,8 @@ export function SandboxPreview() {
 export function WebPreviewPreview({ title = "Calendar preview" }: { title?: string } = {}) {
   const [history, setHistory] = useState(["/widgets/calendar-demo.html"]);
   const [index, setIndex] = useState(0);
-  return <WebPreview title={title} url={history[index]} onUrlChange={url => { setHistory(current => [...current.slice(0, index + 1), url]); setIndex(index + 1); }} onBack={() => setIndex(current => current - 1)} onForward={() => setIndex(current => current + 1)} canGoBack={index > 0} canGoForward={index < history.length - 1} frameProps={{ height: 268, sandbox: "" }} logs={[{ id: "ready", level: "info", message: "Calendar example loaded. No external calendar is connected.", timestamp: "2026-09-09T10:20:00Z" }]} />;
+  const syncTheme = useCalendarTheme();
+  return <WebPreview title={title} url={history[index]} onUrlChange={url => { setHistory(current => [...current.slice(0, index + 1), url]); setIndex(index + 1); }} onBack={() => setIndex(current => current - 1)} onForward={() => setIndex(current => current + 1)} canGoBack={index > 0} canGoForward={index < history.length - 1} frameProps={{ height: 268, sandbox: "", onLoad: syncTheme }} logs={[{ id: "ready", level: "info", message: "Calendar example loaded. No external calendar is connected.", timestamp: "2026-09-09T10:20:00Z" }]} />;
 }
 
 function PreviewNote({ title, children }: { title: string; children?: ReactNode }) {

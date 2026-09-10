@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import * as stylex from "@stylexjs/stylex";
 import { Button, ButtonGroup, DescriptionList, Widget, WidgetEmbed, type WidgetStatus } from "@noorddev/vlak-react";
 import { UseField } from "../use-frame";
+import { useCalendarTheme } from "../../widgets/use-calendar-theme";
 
 const states: { value: WidgetStatus; label: string }[] = [
   { value: "ready", label: "Ready" },
@@ -22,6 +23,7 @@ const styles = stylex.create({
 });
 
 export function Use() {
+  const syncTheme = useCalendarTheme();
   const [status, setStatus] = useState<WidgetStatus>("ready");
   const [opened, setOpened] = useState(false);
   const summaryId = useId();
@@ -61,7 +63,7 @@ export function Use() {
         {opened && <p className="rs-use-copy" id={summaryId}>The latest brief names the owner and next step. The research notes support each decision.</p>}
       </Widget>
       <Widget title="Available times" provider="Calendar · Embedded example" footer="Selection stays inside this embedded example. No calendar event is created.">
-        <WidgetEmbed title="Calendar time selection example" src="/widgets/calendar-demo.html" height={268} sandbox="" />
+        <WidgetEmbed title="Calendar time selection example" src="/widgets/calendar-demo.html" height={268} sandbox="" onLoad={syncTheme} />
       </Widget>
     </div></div>
   </UseField>;

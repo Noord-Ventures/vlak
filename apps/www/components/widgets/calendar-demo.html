@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="light dark">
+    <title>Calendar time selection example</title>
+    <style>/* VLAK_TOKENS */</style>
+    <style>
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 8px; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
+      fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
+      legend { padding: 0; margin-bottom: 12px; font-weight: 600; }
+      label { display: flex; align-items: center; gap: 12px; min-height: 44px; margin-block: 8px; padding-inline: 12px; border: 1px solid var(--control-border); cursor: pointer; }
+      label:has(:checked) { background: var(--table-alt); font-weight: 600; }
+      input { width: 18px; height: 18px; margin: 0; accent-color: var(--text); }
+      label:focus-within { outline: 2px solid var(--text); outline-offset: 2px; }
+      p { margin: 12px 0 0; font-size: 12px; color: var(--text-secondary); }
+      @media (forced-colors: active) { label:has(:checked) { background: Highlight; color: HighlightText; } }
+    </style>
+  </head>
+  <body>
+    <span id="theme-light" hidden></span><span id="theme-dark" hidden></span>
+    <fieldset>
+      <legend>Thursday · 30 minute meeting</legend>
+      <label><input type="radio" name="time" value="10:00">10:00–10:30</label>
+      <label><input type="radio" name="time" value="11:00">11:00–11:30</label>
+      <label><input type="radio" name="time" value="14:00">14:00–14:30</label>
+    </fieldset>
+    <p>Sample availability. No calendar event is created.</p>
+  </body>
+</html>

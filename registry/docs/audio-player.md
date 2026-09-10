@@ -7,6 +7,8 @@ Name: `audio-player`
 Also known as: AI Elements Audio Player, Generated speech, AudioPlayerControls, Speech playback  
 Page: https://vlak.dev/ai/audio-player/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Supply src for a file or data with base64 and an audio mediaType for generated speech.

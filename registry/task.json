@@ -48,7 +48,9 @@
         "vlak-lib"
       ],
       "aliases": [
-        "Task"
+        "Task",
+        "AI Elements Task",
+        "Task disclosure"
       ],
       "example": "import { Task } from \"@noorddev/vlak-react\";\n\n<Task title=\"Read sources\" items={[{ id: \"brief\", content: \"Read the launch brief\", state: \"complete\", file: \"launch-brief.md\" }]} />",
       "usage": {

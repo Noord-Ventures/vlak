@@ -7,6 +7,8 @@ Name: `response-actions`
 Also known as: AI response actions, Message toolbar, Read aloud, Message feedback, Thumbs up, Thumbs down  
 Page: https://vlak.dev/ai/response-actions/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Place in the actions slot of Response and supply the same plain text the reader sees.

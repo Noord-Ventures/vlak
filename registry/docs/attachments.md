@@ -7,6 +7,8 @@ Name: `attachments`
 Also known as: AI Elements Attachments, File attachments, Attachment preview, Message files  
 Page: https://vlak.dev/ai/attachments/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Compose Attachment items inside Attachments for files in a message, a draft, or a tool result.

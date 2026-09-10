@@ -7,6 +7,8 @@ Name: `snippet`
 Also known as: AI Elements Snippet, Command line, Copy command  
 Page: https://vlak.dev/ai/snippet/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - A short command or source reference where the copy value should preserve whitespace.

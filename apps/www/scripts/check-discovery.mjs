@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { catalogComponents } from "@noorddev/vlak";
 
 const out = resolve(process.env.SITE_EXPORT || fileURLToPath(new URL("../out", import.meta.url)));
 const origin = "https://vlak.dev";
@@ -16,6 +17,7 @@ const urls = new Set();
 const titles = new Map();
 const images = new Set();
 let checked = 0;
+const aiComponents = catalogComponents.filter(component => component.category === "ai");
 
 for (const file of readdirSync(out, { recursive: true, encoding: "utf8" })) {
   if (file !== "index.html" && !file.endsWith("/index.html")) continue;
@@ -51,9 +53,28 @@ for (const file of readdirSync(out, { recursive: true, encoding: "utf8" })) {
     }
   }
   assert.equal([...html.matchAll(/<h1(?:\s|>)/gi)].length, 1, `${path}: one main heading`);
-const structured = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].map(([, json]) => JSON.parse(json));
+  const structured = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].map(([, json]) => JSON.parse(json));
   const structuredItems = structured.flat();
   assert(structuredItems.some(item => item["@type"] === "WebSite" && item.url === `${origin}/` && item.name === "Vlak"), `${path}: truthful site identity`);
+  if (path.startsWith("/ai/")) {
+    assert(structuredItems.some(item => item["@type"] === "BreadcrumbList" && item.itemListElement?.at(-1)?.item === expected), `${path}: AI breadcrumb ends at this page`);
+    const article = structuredItems.find(item => item["@type"] === "TechArticle");
+    if (path !== "/ai/") {
+      assert.equal(article?.url, expected, `${path}: article identifies the current AI page`);
+      assert.equal(article?.mainEntityOfPage, expected, `${path}: article main page`);
+      assert.equal(article?.isPartOf?.["@id"], `${origin}/ai/#collection`, `${path}: article belongs to the AI catalogue`);
+    }
+    if (path !== "/ai/widgets/") {
+      const name = path.split("/")[2];
+      const markdown = `/docs/${name || "ai-index"}.md`;
+      const alternatives = tags(head, "link").filter(item => item.rel === "alternate" && item.type === "text/markdown");
+      assert.deepEqual(alternatives.map(item => new URL(item.href, origin).href), [`${origin}${markdown}`], `${path}: matching Markdown alternate`);
+      assert(existsSync(join(out, markdown)), `${path}: Markdown alternate exists`);
+      assert(tags(html, "a").some(item => item.href === markdown), `${path}: Markdown is also linked for readers`);
+      if (name) assert(tags(html, "a").some(item => item.href === `/r/${name}.json`), `${path}: source registry is linked`);
+    }
+    assert(tags(html, "a").some(item => item.href === "/docs/ai.md"), `${path}: complete integration guide is linked`);
+  }
   urls.add(expected);
   checked++;
 }
@@ -72,18 +93,37 @@ for (const entry of readdirSync(join(out, "interfaces"), { withFileTypes: true }
   previews++;
 }
 for (const path of images) assert(existsSync(join(out, path)), `Missing social image: ${path}`);
+
+// Every AI entry must be visible in the initial linked catalogue, without hydration.
+const aiHtml = read("ai/index.html");
+const aiCatalog = aiHtml.match(/<section\b[^>]*aria-labelledby="components"[^>]*>([\s\S]*?)<\/section>/i)?.[1];
+assert(aiCatalog, "AI overview has a component catalogue");
+const aiLinks = tags(aiCatalog, "a").map(item => new URL(item.href, origin)).filter(url => url.pathname.startsWith("/ai/") || url.pathname.startsWith("/components/"));
+const expectedAiLinks = [...aiComponents.map(component => `${origin}/ai/${component.name}/`), `${origin}/ai/widgets/`, `${origin}/components/message-composer/`, `${origin}/components/tree-view/`];
+assert.deepEqual(aiLinks.map(url => url.href).sort(), expectedAiLinks.toSorted(), "AI catalogue links every component and companion exactly once before JavaScript");
+assert(tags(aiCatalog, "input").some(item => item.type === "search"), "AI catalogue has a named component filter");
+const aiStructured = [...aiHtml.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].flatMap(([, json]) => JSON.parse(json));
+const aiCollection = aiStructured.find(item => item["@type"] === "CollectionPage");
+assert.equal(aiCollection?.["@id"], `${origin}/ai/#collection`, "AI catalogue structured identity");
+assert.deepEqual(aiCollection?.mainEntity?.itemListElement?.map(item => item.url).sort(), expectedAiLinks.toSorted(), "AI structured catalogue matches its visible links");
+assert(tags(aiHtml, "a").some(item => item.href === "https://assistant.vlak.dev" || item.href === "https://assistant.vlak.dev/"), "Indexed AI page exposes the live assistant");
+for (const component of aiComponents) {
+  assert(urls.has(`${origin}/ai/${component.name}/`), `${component.name}: AI reference is indexed`);
+  assert(!urls.has(`${origin}/components/${component.name}/`), `${component.name}: legacy component route is not a duplicate indexable page`);
+}
 const sitemap = [...read("sitemap.xml").matchAll(/<loc>(.*?)<\/loc>/g)].map(([, url]) => decode(url));
 assert.equal(new Set(sitemap).size, sitemap.length, "Sitemap URLs are unique");
 assert.deepEqual([...sitemap].sort(), [...urls].sort(), "Sitemap contains exactly the indexable exported pages");
 assert(tags(read("starter/index.html"), "meta").some(item => item.name === "robots" && /noindex/.test(item.content)), "Hosted starter is excluded from indexing");
+assert(tags(read("widgets/calendar-demo.html"), "meta").some(item => item.name === "robots" && /noindex/.test(item.content)), "Standalone widget fixture is excluded from indexing");
 const robots = read("robots.txt");
 assert.match(robots, /User-agent:\s*\*[\s\S]*Allow:\s*\//i, "Ordinary search crawling stays allowed");
 assert.match(robots, /Sitemap: https:\/\/vlak\.dev\/sitemap\.xml/);
 const llms = read("llms.txt");
-for (const path of ["/design.md", "/interfaces.md"]) assert(llms.includes(`${origin}${path}`), `Agent index includes ${path}`);
+for (const path of ["/design.md", "/interfaces.md", "/docs/ai.md", "/docs/ai-index.md"]) assert(llms.includes(`${origin}${path}`), `Agent index includes ${path}`);
 for (const [, url] of llms.matchAll(/\]\((https:\/\/vlak\.dev[^\s)]*)\)/g)) {
   const { pathname } = new URL(url);
   assert(existsSync(join(out, pathname)) || existsSync(join(out, pathname, "index.html")), `Broken agent-index link: ${url}`);
 }
 for (const path of ["docs/agents.md", "docs/button.md", "docs/props.json"]) assert(existsSync(join(out, path)), `Missing machine-readable surface: ${path}`);
-console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, ${previews} direct preview links, site identity and agent links.`);
+console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, ${previews} direct preview links, ${aiComponents.length} linked AI references with Markdown alternatives, site identity and agent links.`);

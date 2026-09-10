@@ -7,6 +7,8 @@ Name: `terminal`
 Also known as: AI Elements Terminal, ANSI output, Console output  
 Page: https://vlak.dev/ai/terminal/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Pass the growing output string to retain partial terminal escape sequences across updates.

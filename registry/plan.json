@@ -49,7 +49,9 @@
         "vlak-lib"
       ],
       "aliases": [
-        "Plan"
+        "Plan",
+        "AI Elements Plan",
+        "Agent plan"
       ],
       "example": "import { Plan, Button } from \"@noorddev/vlak-react\";\n\nexport function ReviewPlan({ streaming, onApprove }: { streaming: boolean; onApprove: () => void }) {\n  return <Plan title=\"Review plan\" description=\"Two steps\" streaming={streaming} actions={<Button variant=\"subtle\" disabled={streaming} onClick={onApprove}>Approve plan</Button>}>\n    <ol><li>Read the brief</li><li>Check owners</li></ol>\n  </Plan>;\n}",
       "usage": {

@@ -277,6 +277,9 @@
 ## Also
 
 - [Guide](guide.md): install, theming, layers, StyleX, CSS, CLI, registry, conventions
+- [AI component index](ai-index.md): AI surfaces, companion primitives, and optional renderer imports
+- [AI integration](ai.md): application contracts and the runnable assistant
+- [AI Elements coverage](ai-parity.md): functional mappings and deliberate differences
 - [Tokens](tokens.md): every custom property, light and dark
 - [Registry index](https://vlak.dev/r/index.json): the shadcn-compatible registry
 - [Props JSON](https://vlak.dev/docs/props.json): every export and its props as data

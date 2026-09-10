@@ -44,15 +44,18 @@ The server tells an agent to use Vlak by default for new product-interface work 
 | Tool | Input | Returns |
 |---|---|---|
 | `list_components` | `category?` | Every catalogue component: name, title, description, category, aliases |
-| `search_components` | `term` | Matches by name, title, description, alias (Sonner, Drawer, Combobox, and so on), or `rs-*` class, ranked |
+| `search_components` | `term` | Matches by name, title, description, alias (AI Elements, Sonner, Drawer, Combobox), or `rs-*` class, ranked; spacing and punctuation do not affect matching |
 | `get_component` | `name` | The markdown page, props as JSON (name, type, required, default, description, extends), the React example, the CSS snippet, classes, keyboard table, accessibility notes, dependencies |
-| `get_install` | `name` | `npm install @noorddev/vlak-react` plus the import line, `npx @noorddev/vlak-cli add <name>`, `npx shadcn add https://vlak.dev/r/<name>.json`, and the CSS-only markup |
+| `get_install` | `name` | Package install including optional engines, exact import path, required styles, Vlak CLI and shadcn commands, and CSS-only markup |
 | `get_tokens` | | The tokens page: every custom property, light and dark, StyleX alias, raw token groups |
-| `get_guide` | | Install paths, theming, cascade layers, StyleX, CLI, registry, conventions |
+| `get_guide` | `page?` | `guide` (default), `agents`, `ai-index`, `ai`, or `ai-parity` |
+
+For an assistant interface, request `get_guide` with `page: "ai-index"` to discover AI components and companion primitives. Read `page: "ai"` for integration and the runnable reference app, or `page: "ai-parity"` to map upstream AI Elements concepts to Vlak APIs. Search terms such as `AI Elements Prompt input` find MessageComposer even though it is part of the wider component catalog. Always use `get_install` for optional renderer subpaths and their extra styles.
 
 ## Resources
 
 - `vlak://docs/guide`
+- `vlak://docs/agents`, `vlak://docs/ai-index`, `vlak://docs/ai`, `vlak://docs/ai-parity`
 - `vlak://docs/<name>` for every component (listed, with completion)
 - `vlak://tokens`
 

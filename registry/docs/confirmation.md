@@ -7,6 +7,8 @@ Name: `confirmation`
 Also known as: Confirmation, AI Elements Confirmation, Tool approval, Action approval, Human in the loop  
 Page: https://vlak.dev/ai/confirmation/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Reviewing a proposed action before the application proceeds.

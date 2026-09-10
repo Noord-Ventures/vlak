@@ -48,7 +48,9 @@
         "vlak-lib"
       ],
       "aliases": [
-        "Response editor"
+        "Response editor",
+        "Edit message",
+        "Regenerate response"
       ],
       "example": "import { ResponseEditor } from \"@noorddev/vlak-react\";\n\nexport function EditMessage({ text, onSave, onCancel }: {\n  text: string;\n  onSave: (text: string) => void | Promise<void>;\n  onCancel: () => void;\n}) {\n  return <ResponseEditor text={text} onSave={onSave} onCancel={onCancel} />;\n}",
       "usage": {

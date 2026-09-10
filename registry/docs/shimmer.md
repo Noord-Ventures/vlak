@@ -4,8 +4,10 @@ A monochrome moving highlight over progress text, with reduced-motion and forced
 
 Category: ai  
 Name: `shimmer`  
-Also known as: Shimmer  
+Also known as: Shimmer, AI Elements Shimmer, Streaming progress text  
 Page: https://vlak.dev/ai/shimmer/
+
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
 
 ## When to use
 

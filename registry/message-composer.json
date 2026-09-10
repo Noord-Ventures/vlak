@@ -78,7 +78,9 @@
         "MessageComposer",
         "Chat input",
         "Comment composer",
-        "AI Elements PromptInput"
+        "AI Elements PromptInput",
+        "Prompt input",
+        "AI chat composer"
       ],
       "example": "\"use client\";\nimport { Button, MessageComposer, useMessageComposer, type ComposedMessage } from \"@noorddev/vlak-react\";\n\nfunction ClearDraft() {\n  const draft = useMessageComposer();\n  return <Button variant=\"subtle\" size=\"sm\" disabled={draft.disabled || !draft.value}\n    onClick={() => { draft.setValue(\"\"); draft.focus(); }}>Clear draft</Button>;\n}\n\nexport function ProjectComposer({ onSend, generating = false, onStop }: {\n  onSend: (message: ComposedMessage) => void | Promise<void>;\n  generating?: boolean;\n  onStop?: () => void;\n}) {\n  return <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend}\n    generating={generating} onStop={onStop} tools={<ClearDraft />}\n    textareaProps={{ \"aria-label\": \"Ask about the project\", autoComplete: \"off\" }}\n    allowAttachments accept=\"image/*,.pdf\" maxFiles={4}\n    maxFileSize={10 * 1024 * 1024} allowScreenshot />;\n}",
       "usage": {

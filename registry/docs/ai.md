@@ -8,7 +8,7 @@ Core components use React and StyleX. They work with any provider and do not req
 
 ## Runnable reference app
 
-The [assistant reference app](https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant) is a complete Next.js application using AI SDK 7, the OpenAI Responses provider, and the published Vlak components. The static documentation examples remain usable without credentials.
+The [assistant reference app](https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant) is a complete Next.js application using AI SDK 7, the OpenAI Responses provider, and Vlak components. Try the [live assistant](https://assistant.vlak.dev). The static documentation examples remain usable without credentials.
 
 From this repository:
 
@@ -20,9 +20,9 @@ cp apps/assistant/.env.example apps/assistant/.env.local
 pnpm --filter @noorddev/vlak-assistant-reference dev
 ```
 
-Open `http://localhost:3211`. Choose a Responses API model available to your OpenAI project with `AI_MODEL`. The key stays on the server. The app demonstrates streamed Markdown, file uploads, saved conversations, edits, regeneration, previous versions, read-only tool results, and an approved task-writing tool. The same widget surface hosts a React result and a sandboxed iframe example.
+Open `http://localhost:3211`. Choose a Responses API model available to your OpenAI project with `AI_REFERENCE_MODEL` (`AI_MODEL` remains a fallback). The key stays on the server. The app demonstrates streamed Markdown, file uploads, saved conversations, edits, regeneration, previous versions, read-only tool results, and an approved task-writing tool. The same widget surface hosts a React result and a sandboxed iframe example.
 
-This app sends explicit request intents to the server. The server loads canonical history, resolves only session-owned uploads, and verifies a pending approval before executing a write. The browser cannot authorize a tool by inventing an assistant message. Local storage and an anonymous private session keep this reference runnable; deployments need persistent storage and the product's authentication and retention policy. The app README documents those boundaries and the separate deterministic fixture mode used for protocol tests.
+This app sends explicit request intents to the server. The server loads canonical history, resolves only session-owned uploads, and verifies a pending approval before executing a write. The browser cannot authorize a tool by inventing an assistant message. Local runs use files; the hosted configuration uses private Vercel Blob with conditional writes, shared cancellation, and bounded demo usage. Each browser has a private anonymous session. The app README documents hosting setup, ownership and retention boundaries, and the separate deterministic fixture mode used for protocol tests.
 
 ## Customize composition
 

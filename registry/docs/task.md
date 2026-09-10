@@ -4,8 +4,10 @@ A default-open task disclosure with supplied item states and file references.
 
 Category: ai  
 Name: `task`  
-Also known as: Task  
+Also known as: Task, AI Elements Task, Task disclosure  
 Page: https://vlak.dev/ai/task/
+
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
 
 ## When to use
 

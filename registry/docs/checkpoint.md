@@ -4,8 +4,10 @@ A conversation marker with an async restore action, retry feedback, and stable c
 
 Category: ai  
 Name: `checkpoint`  
-Also known as: Checkpoint  
+Also known as: Checkpoint, AI Elements Checkpoint, Restore checkpoint  
 Page: https://vlak.dev/ai/checkpoint/
+
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
 
 ## When to use
 

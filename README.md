@@ -69,9 +69,9 @@ Vlak treats an interface as a field rather than a stack of cards. Paper, ink, gr
 
 ## For agents
 
-For assistant interfaces, use [the AI interface guide](docs/ai.md) and [AI Elements feature coverage](docs/ai-parity.md). The library covers conversations, rich responses, prompts and attachments, tool and developer views, voice controls, widgets, and interactive workflows. Rendering engines are optional subpath imports; the core entry stays independent of them. The application supplies its model, data, persistence, and execution.
+For assistant interfaces, explore the [AI component catalog](https://vlak.dev/ai/) or its [Markdown index](https://vlak.dev/docs/ai-index.md), then read [the AI interface guide](docs/ai.md) and [AI Elements feature coverage](docs/ai-parity.md). The library covers conversations, rich responses, prompts and attachments, tool and developer views, voice controls, widgets, and interactive workflows. Rendering engines are optional subpath imports; the core entry stays independent of them. The application supplies its model, data, persistence, and execution.
 
-The [assistant reference app](apps/assistant) connects the library to AI SDK 7 and OpenAI with saved conversations, uploads, server-verified tool approvals, and editable response history. Run it locally on port 3211 with a server-side key; the component documentation needs no credentials.
+The [assistant reference app](apps/assistant) connects the library to AI SDK 7 and OpenAI with saved conversations, uploads, server-verified tool approvals, and editable response history. [Try the live assistant](https://assistant.vlak.dev) or run it locally on port 3211 with a server-side key; the component documentation needs no credentials.
 
 Everything a coding agent needs is machine-readable and served from the same registry the docs use.
 

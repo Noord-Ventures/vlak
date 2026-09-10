@@ -7,6 +7,8 @@ Name: `reasoning`
 Also known as: AI Elements Reasoning, Work summary, AI progress disclosure, Task summary  
 Page: https://vlak.dev/ai/reasoning/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Optional task progress, tool activity summaries, or explanatory text supplied by your application.

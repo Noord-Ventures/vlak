@@ -4,8 +4,10 @@ Navigates a hierarchy with expansion, single selection, and roving focus.
 
 Category: navigation  
 Name: `tree-view`  
-Also known as: TreeView  
+Also known as: TreeView, File tree, AI Elements File Tree, Directory tree  
 Page: https://vlak.dev/components/tree-view/
+
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
 
 ## When to use
 

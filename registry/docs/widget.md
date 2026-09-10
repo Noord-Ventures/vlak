@@ -7,6 +7,8 @@ Name: `widget`
 Also known as: AI widget, Tool result card, Connected service widget, Integration widget, Generative UI, WidgetEmbed, Embedded widget, iframe  
 Page: https://vlak.dev/ai/widget/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Present application data and third-party results with the same title, provider, content, action, and footer slots.

@@ -68,6 +68,44 @@ describe("vlak-mcp", () => {
     expect(cls.hits.map((h: { name: string }) => h.name)).toContain("dialog");
   });
 
+  it("matches upstream AI names across spacing, punctuation and capitalization", async () => {
+    for (const [term, name] of [
+      ["AI Elements Prompt input", "message-composer"], ["AI Elements Code block", "highlighted-code"],
+      ["AI Elements Chain of thought", "thought-steps"], ["AI Elements File tree", "tree-view"],
+      ["AI Elements Plan", "plan"], ["AI Elements Shimmer", "shimmer"], ["AI Elements Checkpoint", "checkpoint"],
+    ]) {
+      const found = JSON.parse(textOf(await client.callTool({ name: "search_components", arguments: { term } })));
+      expect(found.hits.map((hit: { name: string }) => hit.name), term).toContain(name);
+    }
+  });
+
+  it("returns canonical AI pages and explicit optional installation metadata", async () => {
+    const response = JSON.parse(textOf(await client.callTool({ name: "get_component", arguments: { name: "response-markdown" } })));
+    expect(response.page).toBe("https://vlak.dev/ai/response-markdown/");
+    expect(response.reactImport).toBe("@noorddev/vlak-react/components/response-markdown");
+    expect(response.dependencies).toContain("streamdown@^2.6.0");
+    expect(response.styles).toContain("katex/dist/katex.min.css");
+    const composer = JSON.parse(textOf(await client.callTool({ name: "get_component", arguments: { name: "message-composer" } })));
+    expect(composer.page).toBe("https://vlak.dev/components/message-composer/");
+    expect(composer.reactImport).toBe("@noorddev/vlak-react");
+  });
+
+  it("exposes AI discovery, integration and coverage guides through tools and resources", async () => {
+    const resources = (await client.listResources()).resources.map(resource => resource.uri);
+    for (const page of ["ai-index", "ai", "ai-parity", "agents"]) {
+      const result = await client.callTool({ name: "get_guide", arguments: { page } });
+      expect(result.isError).not.toBe(true);
+      expect(result.structuredContent).toMatchObject({ page, markdown: expect.any(String) });
+      expect(resources).toContain(`vlak://docs/${page}`);
+      expect(resourceText(await client.readResource({ uri: `vlak://docs/${page}` }))).toBe(textOf(result));
+    }
+    const index = textOf(await client.callTool({ name: "get_guide", arguments: { page: "ai-index" } }));
+    expect(index).toContain("/docs/message-composer.md");
+    expect(index).toContain("/docs/tree-view.md");
+    expect(index).toContain("/ai/widgets/");
+    expect(index).toContain("/components/workflow-canvas");
+  });
+
   it("gives install commands and the guide and tokens pages", async () => {
     const install = JSON.parse(textOf(await client.callTool({ name: "get_install", arguments: { name: "dialog" } })));
     expect(install.cli).toBe("npx @noorddev/vlak-cli add dialog");

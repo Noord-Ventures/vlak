@@ -36,6 +36,7 @@ export async function generateMetadata({
   return pageMetadata(`/ai/${name}`, {
     title: component.title,
     description: component.description,
+    alternates: { types: { "text/markdown": `/docs/${name}.md` } },
   });
 }
 
@@ -124,10 +125,13 @@ export default async function AiComponentPage({
         {
           "@context": "https://schema.org",
           "@type": "TechArticle",
+          "@id": `${HOST}/ai/${name}/#documentation`,
           headline: `${component.title} React component`,
           description: component.description,
           url: `${HOST}/ai/${name}/`,
-          isPartOf: { "@id": `${HOST}/#website` },
+          mainEntityOfPage: `${HOST}/ai/${name}/`,
+          isPartOf: { "@id": `${HOST}/ai/#collection` },
+          encoding: { "@type": "MediaObject", encodingFormat: "text/markdown", contentUrl: `${HOST}/docs/${name}.md` },
           about: ["React", "accessibility", "AI interfaces"],
         },
       ]} />
@@ -262,9 +266,10 @@ export default async function AiComponentPage({
       <section aria-labelledby="resources">
         <h2 id="resources" className="section-label">Use elsewhere</h2>
         <div className="class-list">
-          <a className="rs-chip" href={`/docs/${name}.md`}>Markdown</a>
-          <a className="rs-chip" href={`/r/${name}.json`}>Registry item</a>
+          <a className="rs-chip" href={`/docs/${name}.md`}>Markdown reference</a>
+          <a className="rs-chip" href={`/r/${name}.json`}>Registry JSON</a>
           <a className="rs-chip" href={`https://github.com/Noord-Ventures/vlak/tree/main/packages/react/src/${component.react ?? `components/${name}.tsx`}`}>Source</a>
+          <a className="rs-chip" href="/docs/ai.md">AI integration guide</a>
         </div>
       </section>
 

@@ -7,6 +7,8 @@ Name: `commit`
 Also known as: AI Elements Commit, Git commit, Changed files  
 Page: https://vlak.dev/ai/commit/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Inspect a supplied commit and its changed files.

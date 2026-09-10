@@ -7,6 +7,8 @@ Name: `chat`
 Also known as: AI chat, Chat interface, Chat panel, Assistant chat, Chat shell  
 Page: https://vlak.dev/ai/chat/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - A complete chat surface with a stable header and composer around scrolling messages.

@@ -16,6 +16,27 @@ export async function checkAIInteractions({ browser, base, fail }) {
       return page.locator(".preview-box");
     };
     try {
+      await check("catalog discovery", async () => {
+        await page.goto(`${base}/ai/`, { waitUntil: "networkidle" });
+        const catalog = page.locator("[data-ai-catalog]");
+        const search = catalog.getByRole("searchbox", { name: "Find a component", exact: true });
+        const count = await catalog.locator(".ai-component-list a").count();
+        ensure(count > 40, "initial catalogue omits component links");
+        await search.fill("PromptInput");
+        const result = catalog.getByRole("link", { name: /^Message composer/ });
+        await result.waitFor({ state: "visible" });
+        ensure(await catalog.locator(".ai-component-list a").count() === 1, "familiar prompt alias does not find its component");
+        await search.press("Tab");
+        ensure(await result.evaluate(element => element === document.activeElement), "filtered result cannot be reached from the search field by keyboard");
+        await search.fill("no-such-feature-12345");
+        await catalog.getByText("No matching components. Try a different name or feature.", { exact: true }).waitFor({ state: "visible" });
+        ensure(await catalog.locator(".ai-component-list a").count() === 0, "empty search retains unrelated results");
+        await search.press("Escape");
+        ensure(await search.inputValue() === "" && await catalog.locator(".ai-component-list a").count() === count, "Escape does not restore the full catalogue");
+        const bounds = await search.boundingBox();
+        ensure(bounds && bounds.height >= 44 && bounds.x >= -1 && bounds.x + bounds.width <= width + 1, "catalogue search does not fit its accessible mobile bounds");
+      });
+
       await check("workflow", async () => {
         const preview = await visit("workflow-canvas");
         const edge = preview.locator(".react-flow__edge").first();
@@ -131,6 +152,25 @@ export async function checkAIInteractions({ browser, base, fail }) {
         ensure(size && Math.abs(size.height - 268) < 1 && size.width > 0 && size.x >= -1 && size.x + size.width <= width + 1, `iframe escaped its explicit bounds: ${JSON.stringify(size)}`);
         const choice = iframe.contentFrame().getByRole("radio").nth(1);
         await choice.check(); ensure(await choice.isChecked(), "native embedded choice does not work inside the sandbox");
+        const appearance = page.getByRole("button", { name: "Appearance", exact: true });
+        const desktopAppearance = await appearance.isVisible();
+        if (desktopAppearance) await appearance.click();
+        else await page.getByRole("button", { name: "Open menu", exact: true }).click();
+        const settings = desktopAppearance ? page.getByRole("dialog", { name: "Appearance", exact: true }) : page.getByRole("navigation", { name: "Site menu", exact: true });
+        for (const theme of ["Dark", "Light"]) {
+          await settings.getByRole("button", { name: theme, exact: true }).click();
+          const expected = await page.evaluate(() => {
+            const probe = document.createElement("span"); probe.style.color = "var(--bg)"; document.body.append(probe);
+            const color = getComputedStyle(probe).color; probe.remove(); return color;
+          });
+          const frame = await (await iframe.elementHandle()).contentFrame();
+          await frame.waitForFunction(color => getComputedStyle(document.body).backgroundColor === color, expected);
+          ensure(await choice.isChecked(), "changing the host theme resets the embedded choice");
+          ensure(await iframe.contentFrame().locator("label").evaluateAll(labels => labels.every(label => getComputedStyle(label).borderTopWidth === "1px")), "embedded theme changes alter the 1px control borders");
+        }
+        if (desktopAppearance) await appearance.click();
+        else await page.getByRole("button", { name: "Close menu", exact: true }).click();
+        ensure(await iframe.getAttribute("sandbox") === "" && await iframe.contentFrame().locator('link[rel="stylesheet"]').count() === 0, "standalone embed depends on external styles or gains sandbox permissions");
       });
 
       await check("audio and transcript", async () => {

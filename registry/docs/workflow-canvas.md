@@ -7,6 +7,8 @@ Name: `workflow-canvas`
 Also known as: AI Elements Canvas, AI Elements Connection, AI Elements Controls, AI Elements Edge, AI Elements Node, AI Elements Panel, AI Elements Toolbar, React Flow, WorkflowCanvas, WorkflowNode, WorkflowEdge, WorkflowConnection, WorkflowControls, WorkflowPanel, WorkflowToolbar, Interactive graph  
 Page: https://vlak.dev/ai/workflow-canvas/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Import this optional entry and its stylesheet only where a graph is needed. React Flow is an optional peer dependency.

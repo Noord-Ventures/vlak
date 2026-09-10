@@ -60,6 +60,19 @@ if (!existsSync(cssSrc)) {
 writeFileSync(cssDest, readFileSync(cssSrc));
 console.log("copied vlak.css → public/vlak.css");
 
+// Sandboxed frames on protected previews cannot authenticate asset requests.
+// Inline the canonical token sheet so the native example needs no subresources.
+const calendarSrc = fileURLToPath(new URL("../components/widgets/calendar-demo.html", import.meta.url));
+const tokenCssSrc = fileURLToPath(new URL("../../../packages/core/css/tokens.css", import.meta.url));
+const widgetDest = fileURLToPath(new URL("../public/widgets", import.meta.url));
+const calendarTokens = readFileSync(tokenCssSrc, "utf8")
+  .replace('[data-theme="dark"]', ':root:has(#theme-dark:target)')
+  .replace(':root:not([data-theme="light"])', ':root:not(:has(#theme-light:target))');
+mkdirSync(widgetDest, { recursive: true });
+writeFileSync(`${widgetDest}/calendar-demo.html`, "<!-- Generated from components/widgets/calendar-demo.html and Vlak tokens. Do not edit. -->\n"
+  + readFileSync(calendarSrc, "utf8").replace("/* VLAK_TOKENS */", calendarTokens));
+console.log("wrote self-contained calendar example → public/widgets/calendar-demo.html");
+
 const starterSrc = fileURLToPath(new URL("../../../packages/cli/src/starter.html", import.meta.url));
 const starterDest = fileURLToPath(new URL("../public/starter/index.html", import.meta.url));
 if (!existsSync(starterSrc)) {

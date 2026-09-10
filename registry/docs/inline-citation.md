@@ -7,6 +7,8 @@ Name: `inline-citation`
 Also known as: AI Elements Inline Citation, Citation card, Source preview, Citation carousel  
 Page: https://vlak.dev/ai/inline-citation/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Attach one or more application-supplied sources to a specific claim.

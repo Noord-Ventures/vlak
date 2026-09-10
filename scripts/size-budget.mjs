@@ -26,14 +26,17 @@ const budgets = [
   // The 215-component catalog adds 39 AI entries: native chat, code and voice
   // controls plus four isolated optional-engine adapters. Engine code remains
   // external and is not imported by the root entry (verified by tarball smoke).
-  // Measured: 34.7 KiB core CSS, 18.5 KiB atomic CSS, 275.8 KiB aggregate
-  // component JS, and 138.5 KiB CLI metadata. Keep existing leaf caps intact.
+  // The composition follow-up adds composer/response render slots, Persona
+  // variants, cached model-pricing resolution, and responsive media controls.
+  // Measured after that work: 35.3 KiB core CSS, 18.9 KiB atomic CSS,
+  // 280.1 KiB aggregate component JS, and 140.4 KiB CLI metadata. The aggregate
+  // allowances cover those additions; all individual component caps stay intact.
   // Graph variables provide monochrome light/dark and forced-color engine paint.
-  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 35 * 1024],
-  ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 18 * 1024 + 768],
+  ["@noorddev/vlak css/vlak.css", "packages/core/css/vlak.css", 35 * 1024 + 512],
+  ["@noorddev/vlak-react dist/vlak-react.css", "packages/react/dist/vlak-react.css", 19 * 1024 + 256],
   // Optional graph structure, including the upstream MIT license, is a separate import.
   ["@noorddev/vlak-react dist/workflow.css", "packages/react/dist/workflow.css", 3 * 1024 + 512],
-  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 277 * 1024],
+  ["@noorddev/vlak-react dist/**/*.js (every component, bundled)", ["packages/react/dist", /\.js$/], 282 * 1024],
   ...["response-branch", "context-usage", "model-selector", "inline-citation", "sources", "open-in-chat", "mic-selector", "voice-selector", "transcription", "persona", "agent", "artifact", "commit", "environment-variables", "package-info", "schema-display", "snippet", "test-results", "terminal", "stack-trace", "sandbox", "web-preview", "jsx-preview", "shimmer", "plan", "task", "thought-steps", "checkpoint", "suggestions", "work-queue", "generated-image", "conversation-export", "response-editor"].map(name =>
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
   // Native audio hydration samples metadata that can load before React attaches listeners: 3,117 bytes gz.
@@ -70,7 +73,7 @@ const budgets = [
   ["@noorddev/vlak-react components/stage-position-list.js", "packages/react/dist/components/stage-position-list.js", 4 * 1024],
   ...["joint-panel", "robot-pose", "robot-mission-queue", "pad-inspector", "colony-plate", "culture-log"].map(name =>
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
-  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 139 * 1024],
+  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 142 * 1024],
 ];
 
 let failed = false;

@@ -814,6 +814,7 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 }
 .toc-mobile-mark { display: flex; align-items: center; color: var(--text-secondary); }
 .toc-mobile-trigger:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+.toc-mobile-trigger:disabled { color: var(--text-secondary); cursor: wait; }
 .toc-mobile-sheet {
   min-height: 0; flex: 1; overflow-y: auto; overscroll-behavior-y: contain;
   padding-bottom: env(safe-area-inset-bottom, 0px);

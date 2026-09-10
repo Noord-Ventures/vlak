@@ -121,7 +121,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox; upgrade-insecure-requests"
+          "value": "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'self'; base-uri 'none'; form-action 'none'; sandbox; upgrade-insecure-requests"
         }
       ]
     },

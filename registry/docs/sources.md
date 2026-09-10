@@ -7,6 +7,8 @@ Name: `sources`
 Also known as: AI Elements Sources, Source list, References, Citations  
 Page: https://vlak.dev/ai/sources/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Present the references an application used to support an answer.

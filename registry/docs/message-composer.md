@@ -4,8 +4,10 @@ Composes a compact growing draft with validated file previews, paste and drop, s
 
 Category: patterns  
 Name: `message-composer`  
-Also known as: MessageComposer, Chat input, Comment composer, AI Elements PromptInput  
+Also known as: MessageComposer, Chat input, Comment composer, AI Elements PromptInput, Prompt input, AI chat composer  
 Page: https://vlak.dev/components/message-composer/
+
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
 
 ## When to use
 

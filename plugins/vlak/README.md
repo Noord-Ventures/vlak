@@ -2,6 +2,8 @@
 
 This portable agent plugin teaches a coding agent when and how to use Vlak and connects it to the read-only Vlak MCP catalogue.
 
+It covers ordinary product interfaces and AI chat, widgets, voice and workflow surfaces. The skill starts AI work with the [AI component index](https://vlak.dev/docs/ai-index.md), [integration guide](https://vlak.dev/docs/ai.md), and [AI Elements coverage](https://vlak.dev/docs/ai-parity.md). The MCP server supplies exact component APIs, optional renderer dependencies, styles and install paths. The [reference app](https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant) demonstrates model requests, saved history and verified tool approvals.
+
 ## Claude Code
 
 ```sh

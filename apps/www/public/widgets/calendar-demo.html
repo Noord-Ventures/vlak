@@ -1,12 +1,113 @@
+<!-- Generated from components/widgets/calendar-demo.html and Vlak tokens. Do not edit. -->
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
+    <meta name="color-scheme" content="light dark">
     <title>Calendar time selection example</title>
-    <link rel="stylesheet" href="/vlak.css">
+    <style>/* ── Tokens ── GENERATED from src/tokens.ts. Do not edit by hand. */
+:root {
+  --bg: #FAF8F2;                        /* paper */
+  --text: #1A1A1A;                      /* ink */
+  --text-secondary: #6B6B6B;            /* gray */
+  --accent: #1A1A1A;                   /* the "accent" is ink; monochrome */
+  --divider: rgba(0,0,0,0.08);
+  --divider-subtle: rgba(0,0,0,0.06);
+  --table-alt: rgba(0,0,0,0.02);
+  --grid-line: rgba(0,0,0,0.04);
+  --control-border: rgba(0,0,0,0.42);
+  --control-fill: #E4E2DC;
+  color-scheme: light;
+  --radius-sm: 4px;           /* slight Vlak radius; standalone buttons */
+  --radius: var(--radius-sm);              /* alias — buttons, boxes, dialogs share it; cards stay 0 */
+  --radius-chrome: 0px;
+  --gutter: 20px;
+  --pad: 20px;
+  /* Concentric: Steve Ruiz innerRadius result. Closed form of the circular-corner fit. Default radius vs --pad is 0. */
+  --radius-in: max(0px, calc(var(--radius) - var(--pad)));
+  --ease: cubic-bezier(0.3, 0, 0.2, 1);
+  --duration-snap: 0.1s;
+  --duration: 0.2s;
+  --duration-deliberate: 0.4s;
+  --duration-confirm: 0.3s;
+  /* The hover transition every control shares: fill, edge, ink, opacity. */
+  --transition: background-color var(--duration) var(--ease), border-color var(--duration) var(--ease), color var(--duration) var(--ease), opacity var(--duration) var(--ease);
+  /* Background column grid: 204px modules (184 column + 20 gutter). */
+  --grid-image: linear-gradient(to right,var(--grid-line) 0,var(--grid-line) 1px,transparent 1px,transparent 184px,var(--grid-line) 184px,var(--grid-line) 185px,transparent 185px,transparent 204px);
+  --grid-size: 204px;
+  --grid-pos: 20px 0;
+  --text-scale: 1;
+  /* Stacking scale. Native dialog and popover use the top layer instead. */
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-float: 200;
+  --z-overlay: 300;
+  --z-toast: 400;
+  /* Contract variables a component may set inline: concentric radius and the chart spot color. */
+  --rs-out: var(--radius);
+  --rs-gap: var(--pad);
+  --rs-in: var(--radius-in);
+  --rs-chart-spot: var(--text);
+  /* Control scale. Every interactive target is at least 44px; phone fields use 16px type. */
+  --hit: 2.75rem;
+  --control-h: 2.75rem;
+  --control-fs: 0.875rem;
+  --control-label: 0.75rem;
+}
+:root:has(#theme-dark:target) {
+  --bg: #0E0C0A;
+  --text: #E8E8E8;
+  --text-secondary: #949494;
+  --accent: #E8E8E8;
+  --divider: rgba(255,255,255,0.10);
+  --divider-subtle: rgba(255,255,255,0.07);
+  --table-alt: rgba(255,255,255,0.03);
+  --grid-line: rgba(255,255,255,0.05);
+  --control-border: rgba(255,255,255,0.38);
+  --control-fill: #242220;
+  color-scheme: dark;
+}
+/* System dark scheme applies until the page decides with data-theme. */
+@media (prefers-color-scheme: dark) {
+:root:not(:has(#theme-light:target)) {
+  --bg: #0E0C0A;
+  --text: #E8E8E8;
+  --text-secondary: #949494;
+  --accent: #E8E8E8;
+  --divider: rgba(255,255,255,0.10);
+  --divider-subtle: rgba(255,255,255,0.07);
+  --table-alt: rgba(255,255,255,0.03);
+  --grid-line: rgba(255,255,255,0.05);
+  --control-border: rgba(255,255,255,0.38);
+  --control-fill: #242220;
+  color-scheme: dark;
+}
+}
+/* Mobile grid (≤480): two fluid columns, three 25px gutters
+   (edge · middle · edge). Column width = 50vw − 37.5px; the background
+   draws all four column-edge lines and content lives between the outer pair. */
+@media(max-width:480px){
+  :root{
+    --pad:25px;
+    --grid-image:linear-gradient(to right,transparent 0,transparent 25px,var(--grid-line) 25px,var(--grid-line) 26px,transparent 26px,transparent calc(50vw - 12.5px),var(--grid-line) calc(50vw - 12.5px),var(--grid-line) calc(50vw - 11.5px),transparent calc(50vw - 11.5px),transparent calc(50vw + 12.5px),var(--grid-line) calc(50vw + 12.5px),var(--grid-line) calc(50vw + 13.5px),transparent calc(50vw + 13.5px),transparent calc(100vw - 26px),var(--grid-line) calc(100vw - 26px),var(--grid-line) calc(100vw - 25px),transparent calc(100vw - 25px));
+    --grid-size:100vw;
+    --grid-pos:0 0;
+  }
+}
+/* Phone control scale (≤640): keep 44px hits and use 16px type on fields. */
+@media(max-width:640px){
+  :root{
+    --hit:2.75rem;
+    --control-h:2.75rem;
+    --control-fs:1rem;
+    --control-label:0.9375rem;
+  }
+}
+</style>
     <style>
+      * { box-sizing: border-box; }
       body { margin: 0; padding: 8px; background: var(--bg); color: var(--text); font: 14px/1.45 system-ui, sans-serif; }
       fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }
       legend { padding: 0; margin-bottom: 12px; font-weight: 600; }
@@ -19,6 +120,7 @@
     </style>
   </head>
   <body>
+    <span id="theme-light" hidden></span><span id="theme-dark" hidden></span>
     <fieldset>
       <legend>Thursday · 30 minute meeting</legend>
       <label><input type="radio" name="time" value="10:00">10:00–10:30</label>

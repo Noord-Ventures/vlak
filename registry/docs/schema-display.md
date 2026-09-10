@@ -7,6 +7,8 @@ Name: `schema-display`
 Also known as: AI Elements Schema Display, API endpoint, Request schema  
 Page: https://vlak.dev/ai/schema-display/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Endpoint documentation with parameter locations, required fields, nested objects and array item schemas.

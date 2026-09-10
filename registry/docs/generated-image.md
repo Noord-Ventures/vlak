@@ -7,6 +7,8 @@ Name: `generated-image`
 Also known as: AI Elements Image, Generated image result  
 Page: https://vlak.dev/ai/generated-image/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Adapt a provider result containing base64 image bytes and a supported image media type.

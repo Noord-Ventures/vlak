@@ -364,29 +364,30 @@ export interface SearchHit extends ListEntry {
  * contain the term (case-insensitive). Name and title hits sort first.
  */
 export function search(term: string): SearchHit[] {
-  const q = term.trim().toLowerCase();
+  const searchKey = (value: string) => value.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, "");
+  const q = searchKey(term);
   if (!q) return [];
   const hits: Array<SearchHit & { score: number }> = [];
   for (const c of catalogComponents) {
     const matched: string[] = [];
     let score = 0;
-    if (c.name.includes(q)) {
+    if (searchKey(c.name).includes(q)) {
       matched.push("name");
-      score += c.name === q ? 100 : 40;
+      score += searchKey(c.name) === q ? 100 : 40;
     }
-    if (c.title.toLowerCase().includes(q)) {
+    if (searchKey(c.title).includes(q)) {
       matched.push("title");
       score += 30;
     }
-    if ((c.aliases ?? []).some((a) => a.toLowerCase().includes(q))) {
+    if ((c.aliases ?? []).some((a) => searchKey(a).includes(q))) {
       matched.push("alias");
       score += 20;
     }
-    if (c.description.toLowerCase().includes(q)) {
+    if (searchKey(c.description).includes(q)) {
       matched.push("description");
       score += 10;
     }
-    if (c.classes.some((cls) => cls.includes(q))) {
+    if (c.classes.some((cls) => searchKey(cls).includes(q))) {
       matched.push("class");
       score += 5;
     }

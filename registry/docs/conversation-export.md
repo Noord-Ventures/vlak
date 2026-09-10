@@ -7,6 +7,8 @@ Name: `conversation-export`
 Also known as: Conversation download, Markdown export  
 Page: https://vlak.dev/ai/conversation-export/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Pass explicit message data to serializeConversation or ConversationDownload. No rendered DOM is scraped.

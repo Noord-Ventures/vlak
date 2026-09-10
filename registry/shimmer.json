@@ -43,7 +43,9 @@
         "vlak-lib"
       ],
       "aliases": [
-        "Shimmer"
+        "Shimmer",
+        "AI Elements Shimmer",
+        "Streaming progress text"
       ],
       "example": "import { Shimmer } from \"@noorddev/vlak-react\";\n\nexport function ReadingStatus({ streaming }: { streaming: boolean }) {\n  return <Shimmer active={streaming}>Reading the brief</Shimmer>;\n}",
       "usage": {

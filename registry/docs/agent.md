@@ -7,6 +7,8 @@ Name: `agent`
 Also known as: AI Elements Agent, Agent configuration, Tool definitions  
 Page: https://vlak.dev/ai/agent/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Inspect supplied model configuration, instructions and named tools before starting work.

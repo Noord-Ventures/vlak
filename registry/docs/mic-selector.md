@@ -7,6 +7,8 @@ Name: `mic-selector`
 Also known as: AI Elements Mic Selector, Microphone picker, Audio input, useAudioDevices  
 Page: https://vlak.dev/ai/mic-selector/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Select a device before application-owned recording.

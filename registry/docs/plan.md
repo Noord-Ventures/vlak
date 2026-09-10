@@ -4,8 +4,10 @@ A collapsible proposed plan with streaming title treatment, actions, and support
 
 Category: ai  
 Name: `plan`  
-Also known as: Plan  
+Also known as: Plan, AI Elements Plan, Agent plan  
 Page: https://vlak.dev/ai/plan/
+
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
 
 ## When to use
 

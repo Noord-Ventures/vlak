@@ -7,6 +7,8 @@ Name: `response`
 Also known as: AI response, Chat message, Assistant message, AI Elements Message, Streaming response  
 Page: https://vlak.dev/ai/response/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - A user or assistant message whose content and response status come from the application.

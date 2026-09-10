@@ -7,6 +7,8 @@ Name: `stack-trace`
 Also known as: AI Elements Stack Trace, JavaScript error, Error frames  
 Page: https://vlak.dev/ai/stack-trace/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Inspect supplied V8, Node, Firefox or Safari stack frames, preserving Windows drive names and URL paths.

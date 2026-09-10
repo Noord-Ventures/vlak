@@ -7,6 +7,8 @@ Name: `highlighted-code`
 Also known as: AI Elements CodeBlock, Shiki code block, Syntax highlighting  
 Page: https://vlak.dev/ai/highlighted-code/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Source returned by an assistant or supplied by an application that benefits from syntax structure.

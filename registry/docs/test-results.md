@@ -7,6 +7,8 @@ Name: `test-results`
 Also known as: AI Elements Test Results, Test runner output, Suite results  
 Page: https://vlak.dev/ai/test-results/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Render supplied test suites, durations in milliseconds and per-test failures.

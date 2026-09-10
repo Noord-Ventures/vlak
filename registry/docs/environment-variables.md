@@ -7,6 +7,8 @@ Name: `environment-variables`
 Also known as: AI Elements Environment Variables, Environment settings, Secret values  
 Page: https://vlak.dev/ai/environment-variables/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Review supplied settings with masked initial values and explicit reveal controls.

@@ -7,6 +7,8 @@ Name: `thought-steps`
 Also known as: Chain of thought, AI Elements ChainOfThought  
 Page: https://vlak.dev/ai/thought-steps/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Present application-supplied work summaries and the evidence supporting each step.

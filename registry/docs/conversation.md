@@ -7,6 +7,8 @@ Name: `conversation`
 Also known as: AI Elements Conversation, Chat history, Message log, Auto scroll, Chatbot  
 Page: https://vlak.dev/ai/conversation/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - A message history whose contents grow during a streamed response.

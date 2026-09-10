@@ -7,6 +7,8 @@ Name: `transcription`
 Also known as: AI Elements Transcription, Timed transcript, Speech segments, Transcript seek  
 Page: https://vlak.dev/ai/transcription/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Supply stable segment ids, text and finite non-negative timestamps in seconds.

@@ -394,7 +394,9 @@ export const mediaAdditions: VlakComponent[] = [
       "MessageComposer",
       "Chat input",
       "Comment composer",
-      "AI Elements PromptInput"
+      "AI Elements PromptInput",
+      "Prompt input",
+      "AI chat composer"
     ],
     "classes": [
       "rs-message-composer",

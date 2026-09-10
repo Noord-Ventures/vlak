@@ -20,11 +20,16 @@ export function MobileToc({
   inset?: boolean;
 }) {
   const pathname = usePathname();
+  const [ready, setReady] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const triggerRef = React.useRef<HTMLButtonElement>(null);
   const panelRef = React.useRef<HTMLElement>(null);
   const restoreFocusFrame = React.useRef<number | null>(null);
   const sheetId = React.useId();
+
+  // React can discard a discrete event while the large catalog is hydrating.
+  // Expose the trigger as interactive only after its handlers have committed.
+  useIsoLayoutEffect(() => setReady(true), []);
 
   const cancelRestoreFocus = React.useCallback(() => {
     if (restoreFocusFrame.current !== null) {
@@ -44,6 +49,7 @@ export function MobileToc({
 
   React.useEffect(() => cancelRestoreFocus, [cancelRestoreFocus]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Route changes dismiss the section even when its label stays the same.
   React.useEffect(() => close(), [pathname, close]);
 
   React.useEffect(() => {
@@ -117,6 +123,8 @@ export function MobileToc({
       type="button"
       ref={expanded ? undefined : triggerRef}
       className="toc-mobile-trigger"
+      disabled={!ready}
+      aria-busy={!ready || undefined}
       aria-expanded={expanded}
       aria-controls={sheetId}
       onClick={() => {

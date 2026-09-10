@@ -7,6 +7,8 @@ Name: `jsx-preview`
 Also known as: AI Elements JSX Preview, Generated React preview, JSX widgets  
 Page: https://vlak.dev/ai/jsx-preview/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Install the optional react-jsx-parser, acorn and acorn-jsx dependencies and import the component subpath.

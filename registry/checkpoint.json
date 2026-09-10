@@ -46,7 +46,9 @@
         "vlak-lib"
       ],
       "aliases": [
-        "Checkpoint"
+        "Checkpoint",
+        "AI Elements Checkpoint",
+        "Restore checkpoint"
       ],
       "example": "import { Checkpoint } from \"@noorddev/vlak-react\";\n\nexport function SavedCheckpoint({ onRestore }: { onRestore: () => void | Promise<void> }) {\n  return <Checkpoint label=\"Before editing\" onRestore={onRestore} />;\n}",
       "usage": {

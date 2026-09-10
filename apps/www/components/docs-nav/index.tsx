@@ -50,6 +50,7 @@ function groupLinks(category: VlakCategory) {
 export const docsPages = [
   { href: "/docs", title: "Getting started" },
   { href: "/docs/frameworks", title: "Frameworks" },
+  { href: "/ai", title: "AI components" },
   { href: "/docs/theming", title: "Theming" },
   { href: "/docs/tokens", title: "Tokens" },
   { href: "/docs/layers", title: "Layers" },

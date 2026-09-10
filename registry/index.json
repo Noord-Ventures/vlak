@@ -1208,7 +1208,9 @@
             "vlak-lib"
           ],
           "aliases": [
-            "Shimmer"
+            "Shimmer",
+            "AI Elements Shimmer",
+            "Streaming progress text"
           ],
           "example": "import { Shimmer } from \"@noorddev/vlak-react\";\n\nexport function ReadingStatus({ streaming }: { streaming: boolean }) {\n  return <Shimmer active={streaming}>Reading the brief</Shimmer>;\n}",
           "usage": {
@@ -1277,7 +1279,9 @@
             "vlak-lib"
           ],
           "aliases": [
-            "Plan"
+            "Plan",
+            "AI Elements Plan",
+            "Agent plan"
           ],
           "example": "import { Plan, Button } from \"@noorddev/vlak-react\";\n\nexport function ReviewPlan({ streaming, onApprove }: { streaming: boolean; onApprove: () => void }) {\n  return <Plan title=\"Review plan\" description=\"Two steps\" streaming={streaming} actions={<Button variant=\"subtle\" disabled={streaming} onClick={onApprove}>Approve plan</Button>}>\n    <ol><li>Read the brief</li><li>Check owners</li></ol>\n  </Plan>;\n}",
           "usage": {
@@ -1354,7 +1358,9 @@
             "vlak-lib"
           ],
           "aliases": [
-            "Task"
+            "Task",
+            "AI Elements Task",
+            "Task disclosure"
           ],
           "example": "import { Task } from \"@noorddev/vlak-react\";\n\n<Task title=\"Read sources\" items={[{ id: \"brief\", content: \"Read the launch brief\", state: \"complete\", file: \"launch-brief.md\" }]} />",
           "usage": {
@@ -1511,7 +1517,9 @@
             "vlak-lib"
           ],
           "aliases": [
-            "Checkpoint"
+            "Checkpoint",
+            "AI Elements Checkpoint",
+            "Restore checkpoint"
           ],
           "example": "import { Checkpoint } from \"@noorddev/vlak-react\";\n\nexport function SavedCheckpoint({ onRestore }: { onRestore: () => void | Promise<void> }) {\n  return <Checkpoint label=\"Before editing\" onRestore={onRestore} />;\n}",
           "usage": {
@@ -1886,7 +1894,9 @@
             "vlak-lib"
           ],
           "aliases": [
-            "Response editor"
+            "Response editor",
+            "Edit message",
+            "Regenerate response"
           ],
           "example": "import { ResponseEditor } from \"@noorddev/vlak-react\";\n\nexport function EditMessage({ text, onSave, onCancel }: {\n  text: string;\n  onSave: (text: string) => void | Promise<void>;\n  onCancel: () => void;\n}) {\n  return <ResponseEditor text={text} onSave={onSave} onCancel={onCancel} />;\n}",
           "usage": {
@@ -5201,7 +5211,10 @@
             "vlak-lib"
           ],
           "aliases": [
-            "TreeView"
+            "TreeView",
+            "File tree",
+            "AI Elements File Tree",
+            "Directory tree"
           ],
           "example": "import { TreeView } from \"@noorddev/vlak-react\";\n\n<TreeView label=\"Studies\" defaultExpanded={[\"studies\"]} defaultValue=\"drive\" nodes={[{ id: \"studies\", label: \"Studies\", children: [{ id: \"drive\", label: \"Drive\" }, { id: \"orbit\", label: \"Orbit\" }] }, { id: \"archive\", label: \"Archive\" }]} />",
           "usage": {
@@ -7415,7 +7428,9 @@
             "MessageComposer",
             "Chat input",
             "Comment composer",
-            "AI Elements PromptInput"
+            "AI Elements PromptInput",
+            "Prompt input",
+            "AI chat composer"
           ],
           "example": "\"use client\";\nimport { Button, MessageComposer, useMessageComposer, type ComposedMessage } from \"@noorddev/vlak-react\";\n\nfunction ClearDraft() {\n  const draft = useMessageComposer();\n  return <Button variant=\"subtle\" size=\"sm\" disabled={draft.disabled || !draft.value}\n    onClick={() => { draft.setValue(\"\"); draft.focus(); }}>Clear draft</Button>;\n}\n\nexport function ProjectComposer({ onSend, generating = false, onStop }: {\n  onSend: (message: ComposedMessage) => void | Promise<void>;\n  generating?: boolean;\n  onStop?: () => void;\n}) {\n  return <MessageComposer compact maxRows={6} sendOnEnter onSend={onSend}\n    generating={generating} onStop={onStop} tools={<ClearDraft />}\n    textareaProps={{ \"aria-label\": \"Ask about the project\", autoComplete: \"off\" }}\n    allowAttachments accept=\"image/*,.pdf\" maxFiles={4}\n    maxFileSize={10 * 1024 * 1024} allowScreenshot />;\n}",
           "usage": {

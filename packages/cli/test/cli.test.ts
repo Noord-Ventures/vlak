@@ -279,6 +279,14 @@ describe("docs", () => {
 });
 
 describe("search", () => {
+  it("finds upstream AI terms with spaced or compact component names", () => {
+    for (const [term, component] of [
+      ["AI Elements Prompt input", "message-composer"], ["AI Elements Code block", "highlighted-code"],
+      ["AI Elements Chain of thought", "thought-steps"], ["AI Elements File tree", "tree-view"],
+      ["AI Elements Plan", "plan"], ["AI Elements Task", "task"], ["AI Elements Checkpoint", "checkpoint"],
+    ] as const) expect(search(term).map(hit => hit.name), term).toContain(component);
+    expect(search("---")).toEqual([]);
+  });
   it("matches names, titles, aliases, descriptions, and classes", () => {
     expect(search("menu").map((h) => h.name)).toContain("dropdown-menu");
     expect(search("sonner")[0]?.name).toBe("toast");

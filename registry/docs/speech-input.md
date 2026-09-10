@@ -7,6 +7,8 @@ Name: `speech-input`
 Also known as: AI Elements Speech Input, Voice input, Dictation, MediaRecorder, Speech recognition  
 Page: https://vlak.dev/ai/speech-input/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Capture speech only after the user activates the button. Stop processes the recording; Cancel discards pending capture or transcription.

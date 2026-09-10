@@ -7,6 +7,8 @@ Name: `response-branch`
 Also known as: AI Elements MessageBranch, Response alternatives, Message versions, Response pagination  
 Page: https://vlak.dev/ai/response-branch/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Compare existing assistant responses or application-supplied alternatives without losing their identity.

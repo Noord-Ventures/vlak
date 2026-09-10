@@ -52,7 +52,10 @@
         "vlak-lib"
       ],
       "aliases": [
-        "TreeView"
+        "TreeView",
+        "File tree",
+        "AI Elements File Tree",
+        "Directory tree"
       ],
       "example": "import { TreeView } from \"@noorddev/vlak-react\";\n\n<TreeView label=\"Studies\" defaultExpanded={[\"studies\"]} defaultValue=\"drive\" nodes={[{ id: \"studies\", label: \"Studies\", children: [{ id: \"drive\", label: \"Drive\" }, { id: \"orbit\", label: \"Orbit\" }] }, { id: \"archive\", label: \"Archive\" }]} />",
       "usage": {

@@ -7,6 +7,8 @@ Name: `tool-call`
 Also known as: ToolCall, AI Elements Tool, Tool invocation, Tool result, Function call  
 Page: https://vlak.dev/ai/tool-call/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Showing application-supplied tool activity within a conversation.

@@ -7,6 +7,8 @@ Name: `artifact`
 Also known as: AI Elements Artifact, Generated document, Artifact panel  
 Page: https://vlak.dev/ai/artifact/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Generated documents, code or previews with actions placed in their header.

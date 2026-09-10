@@ -14,8 +14,9 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Agent guide](https://vlak.dev/docs/agents.md): machine-readable surfaces, CLI commands, and MCP setup
 - [Component index](https://vlak.dev/docs/index.md): the catalogue by category
 - [Health guide](https://vlak.dev/docs/health.md): health, wellness, and care components with data and action contracts
-- [AI interfaces](https://vlak.dev/docs/ai.md): conversations, responses, tool calls, approvals, and an optional AI SDK recipe
-- [AI Elements coverage](https://vlak.dev/docs/ai-parity.md): the current 48-component reference mapped to Vlak APIs and optional engines
+- [AI component index](https://vlak.dev/docs/ai-index.md): 47 AI components, companion primitives, optional engine imports and widget patterns
+- [AI interfaces](https://vlak.dev/docs/ai.md): integration recipes, application boundaries and the runnable assistant with durable history and verified approvals
+- [AI Elements coverage](https://vlak.dev/docs/ai-parity.md): the audited upstream reference mapped to Vlak APIs, optional engines and deliberate differences
 - [Civic guide](https://vlak.dev/docs/civic.md): Components for public services, identity records, tax summaries, benefits, and applications.
 - [Science guide](https://vlak.dev/docs/science.md): Components for measurements, physical quantities, microscopy acquisition, sequence inspection, experimental procedures, and spectra.
 - [Creative tools guide](https://vlak.dev/docs/creative.md): Controls for professional audio, video, and design workspaces.

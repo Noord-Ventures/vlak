@@ -7,6 +7,8 @@ Name: `model-selector`
 Also known as: AI Elements Model Selector, Model picker, Provider models, LLM selector  
 Page: https://vlak.dev/ai/model-selector/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Supply stable model ids and current provider metadata. Search includes names, descriptions, providers and capabilities.

@@ -7,6 +7,8 @@ Name: `response-markdown`
 Also known as: AI Elements MessageResponse, Streamdown, Markdown response, Streaming markdown, Math response, Mermaid response  
 Page: https://vlak.dev/ai/response-markdown/
 
+[AI component index](https://vlak.dev/docs/ai-index.md) · [Integration guide](https://vlak.dev/docs/ai.md) · [AI Elements feature coverage](https://vlak.dev/docs/ai-parity.md)
+
 ## When to use
 
 - Pass the current response text and streaming=true while receiving it. Completed content uses static parsing.
