@@ -1,0 +1,225 @@
+/* Native app content anatomy, with Vlak's Inter and neutral surfaces.
+   Reference: Apple's iPhone User Guide (Calculator, Photos, Notes, Weather)
+   and HIG Lists and tables / Collections. Hardware, navigation and sheets live
+   in ios-duo.css; these rules apply equally to every iPhone profile. */
+
+/* Calculator and Weather name their content in the display/condition hero.
+   Retain the route heading for assistive technology without an extra title bar. */
+.mo.mo-single .mo-device[data-platform="ios"] .mo-phone:is([data-app="calculator"], [data-app="weather"]):not([data-overlay]) > .mo-screen > .mo-app-header { position: absolute; width: 1px; height: 1px; min-height: 0; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* Contacts and conversations: the separator follows the text, not the avatar. */
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="contacts"], [data-app="phone"]):not([data-overlay]) .mo-contact-row { margin-top: 0; min-height: 64px; }
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="contacts"], [data-app="phone"]):not([data-overlay]) .mo-contact-row .mo-list-row { min-height: 64px; gap: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="contacts"], [data-app="phone"]):not([data-overlay]) .mo-contact-row .mo-list-row > .rs-icon:last-child { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="contacts"], [data-app="phone"]):not([data-overlay]) .mo-contact-row > button:last-child { width: 44px; height: 44px; min-width: 44px; border-radius: 50%; padding: 10px; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"][data-screen="dial"]:not([data-overlay]) .mo-scroll input[aria-label="Dial number"] { min-height: 64px; padding: 8px 0; border: 0; border-radius: 0; background: transparent; text-align: center; font-size: 30px; letter-spacing: -.025em; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"]:not([data-overlay]) .mo-keypad { margin-inline: auto; width: min(100%, 288px); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"]:not([data-overlay]) .mo-keypad button { display: flex; flex-direction: column; width: 100%; height: auto; min-height: 64px; aspect-ratio: 1; gap: 0; justify-content: center; }
+.mo .mo-device[data-platform="ios"] .mo-keypad .mo-dial-digit { font-size: 32px; line-height: 36px; font-weight: 400; }
+.mo .mo-device[data-platform="ios"] .mo-keypad small { min-height: 12px; font-size: 10px; line-height: 12px; font-weight: 600; letter-spacing: .16em; }
+.mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="phone"], [data-app="contacts"]):not([data-overlay]) .mo-call { padding-block: 48px 24px; gap: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-call-avatar { width: 112px; height: 112px; margin-bottom: 16px; border: 0; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-call-avatar .rs-icon { width: 56px; height: 56px; stroke-width: 1.2; }
+.mo .mo-device[data-platform="ios"] .mo-call h3 { font-size: 30px; line-height: 36px; font-weight: 500; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"]:not([data-overlay]) .mo-thread-recipient { display: grid; justify-items: center; gap: 8px; padding-block: 4px 16px; }
+.mo .mo-device[data-platform="ios"] .mo-thread-recipient > span:last-child { font-size: 11px; line-height: 16px; font-weight: 600; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"]:not([data-overlay]) .mo-messages { gap: 7px; margin-top: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"]:not([data-overlay]) .mo-message { padding: 9px 13px; max-width: min(84%, 380px); }
+
+/* Mail keeps the subject, sender and message body distinct. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"][data-root-app="true"]:not([data-overlay]) .mo-list-row { align-items: start; min-height: 88px; padding-block: 14px; padding-inline: 16px; gap: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"][data-root-app="true"]:not([data-overlay]) .mo-list-row > .rs-icon:first-child { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"]:not([data-overlay]) .mo-list-row::after { inset-inline-start: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"]:not([data-overlay]) .mo-list-row > span > span { white-space: normal; overflow-wrap: anywhere; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"]:not([data-overlay]) .mo-mail-read { gap: 14px; padding: 8px 4px; }
+.mo .mo-device[data-platform="ios"] .mo-mail-read h3 { font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -.025em; }
+.mo .mo-device[data-platform="ios"] .mo-mail-read > span:first-of-type { font-size: 15px; line-height: 21px; color: var(--text-secondary); padding-bottom: 14px; border-bottom: 1px solid var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-mail-read p { font-size: calc(17px * var(--mo-text-scale)); line-height: 1.55; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"][data-screen="compose"]:not([data-overlay]) .mo-form > .mo-field > span { flex-basis: 68px; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="mail"][data-screen="compose"]:not([data-overlay]) .mo-form > .mo-field:has(textarea) { border: 0; padding-top: 16px; }
+
+/* A note is an editable document, without form boxes around its title/body. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"]:not([data-overlay]) .mo-list-row > .rs-icon:first-child { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"]:not([data-overlay]) .mo-list-row { min-height: 80px; padding: 14px 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"]:not([data-overlay]) .mo-list-row::after { inset-inline-start: 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"]:not([data-overlay]) .mo-list-row > span > span { color: var(--text-secondary); font-size: 15px; line-height: 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="false"]:not([data-overlay]) .mo-scroll { padding: 12px 24px 28px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"]:not([data-overlay]) .mo-form { width: 100%; max-width: 680px; margin-inline: auto; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"]:not([data-overlay]) .mo-form > .mo-field { padding: 0; border: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"]:not([data-overlay]) .mo-form input { min-height: 50px; height: auto; padding: 0 0 8px; border: 0; border-radius: 0; background: transparent; font-size: calc(28px * var(--mo-text-scale)); line-height: 35px; font-weight: 700; letter-spacing: -.02em; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"]:not([data-overlay]) .mo-form textarea { min-height: 330px; padding: 4px 0 16px; border: 0; border-radius: 0; background: transparent; font-size: calc(17px * var(--mo-text-scale)); line-height: 1.5; resize: vertical; }
+
+/* Files uses a document thumbnail and filename/metadata baseline. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"][data-root-app="true"]:not([data-overlay]) .mo-section-intro { padding: 6px 0 18px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"][data-root-app="true"]:not([data-overlay]) .mo-section-intro h3 { font-size: 22px; line-height: 28px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"][data-root-app="true"]:not([data-overlay]) .mo-list-row { min-height: 86px; gap: 16px; padding-block: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"][data-root-app="true"]:not([data-overlay]) .mo-list-row > .rs-icon:first-child,
+.mo .mo-device[data-platform="ios"] .mo-file-preview { display: grid; place-items: center; flex: 0 0 44px; width: 44px; height: 56px; padding: 8px; border: 1px solid var(--divider); border-radius: 3px; background: var(--mo-ios-tertiary-fill); color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-file-preview > .rs-icon { width: 24px; height: 30px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"]:not([data-overlay]) .mo-list-row::after { inset-inline-start: 76px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"]:not([data-overlay]) .mo-form .rs-textarea { font-family: ui-monospace, "SFMono-Regular", monospace; font-size: 15px; line-height: 1.6; }
+.mo .mo-device[data-platform="ios"] .mo-file-list { margin-top: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="files"]:not([data-overlay]) .mo-file-list .mo-list-row { width: 100%; margin-inline: 0; padding-inline: 0; }
+
+/* Photos: square thumbnails sit edge to edge; the opened image gets the field. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-scroll { padding-inline: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-scroll > :not(.mo-photo-grid, .mo-photo-detail) { margin-inline: 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-section-intro { padding: 0 0 10px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 2px; margin: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-photo-grid button { height: auto; min-height: 44px; aspect-ratio: 1; border-radius: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-photo-grid button > .rs-icon { width: 14px; height: 14px; right: 6px; bottom: 6px; filter: drop-shadow(0 1px 2px #0009); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-photo-detail { width: 100%; margin: 0; height: auto; min-height: 280px; max-height: 500px; object-fit: contain; background: var(--mo-ios-grouped); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-photo-detail + h3 { font-size: 17px; line-height: 22px; font-weight: 600; }
+
+/* Camera preserves the four-to-three viewfinder, thirds and centered framing. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="camera"]:not([data-overlay]) .mo-scroll { padding-inline: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="camera"]:not([data-overlay]) .mo-camera { width: 100%; height: auto; aspect-ratio: 3 / 4; max-height: 490px; margin: 0; background: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="camera"]:not([data-overlay]) .mo-camera > img { display: block; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="camera"]:not([data-overlay]) .mo-camera > span { inset: 12px auto auto 12px; border-radius: 5px; font-size: 11px; font-weight: 600; padding: 4px 6px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="camera"]:not([data-overlay]) .mo-scroll > .mo-caption { margin: 18px 24px 12px; line-height: 18px; }
+
+/* Calculator's main display and four equal columns follow the native keypad. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-scroll { display: flex; flex-direction: column; padding: 12px 16px 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator-display { width: 100%; min-height: 128px; margin-top: auto; padding: 36px 10px 20px; font-size: clamp(40px, 13cqw, 68px); font-weight: 300; line-height: 1.05; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator { width: 100%; max-width: 430px; margin: 0 auto; gap: 10px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator button { grid-column: auto; min-width: 44px; min-height: 44px; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; background: var(--mo-ios-secondary-fill); font-size: clamp(24px, 8cqw, 36px); line-height: 1; font-weight: 400; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator button:is([aria-label="Clear"], [aria-label="All clear"], [aria-label="±"], [aria-label="%"]) { background: var(--mo-ios-selected); font-size: 25px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator button:is([aria-label="÷"], [aria-label="×"], [aria-label="−"], [aria-label="+"], [aria-label="Equals"]) { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator button:active { opacity: .65; }
+
+/* Calendar is a date strip and a timed agenda, with a narrow event marker. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-section-intro { margin-top: 20px; padding-bottom: 4px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-section-intro h3 { font-size: 28px; line-height: 34px; font-weight: 700; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-ios-calendar-week { margin-top: 8px; padding-block: 4px 16px; border-bottom: 1px solid var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-ios-calendar-week > div { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-ios-calendar-week button { position: relative; min-width: 0; min-height: 68px; padding: 4px 0; gap: 6px; display: grid; justify-items: center; border: 0; border-radius: 0; background: transparent; }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-week button > span { font-size: 11px; line-height: 14px; font-weight: 500; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-week button > strong { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font-size: 21px; line-height: 26px; font-weight: 400; }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-week button[aria-pressed="true"] > strong { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-event { width: 100%; min-height: 76px; margin: 0; padding: 12px 0; grid-template-columns: 52px minmax(0, 1fr) 44px; gap: 10px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-event time { align-self: start; padding-top: 4px; font-size: 13px; line-height: 18px; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-event h3 { align-self: stretch; display: flex; align-items: center; padding-inline-start: 12px; border-inline-start: 3px solid var(--text); font-size: 17px; line-height: 23px; font-weight: 500; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="clock"]:not([data-overlay]) .mo-clock-face { padding-block: 40px 32px; font-size: clamp(48px, 19cqw, 82px); line-height: 1.15; font-weight: 200; letter-spacing: -.045em; }
+.mo .mo-device[data-platform="ios"] .mo-clock-face small { font-size: .55em; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="clock"]:not([data-overlay]) .mo-data-row { min-height: 52px; padding-block: 14px; font-size: 17px; font-variant-numeric: tabular-nums; }
+
+/* Weather pairs the condition hero with a contained, aligned forecast. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather { padding: 12px 0 24px; gap: 6px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather > h3 { order: -2; font-size: 30px; line-height: 36px; font-weight: 400; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather > strong { order: -1; font-size: 86px; line-height: 94px; font-weight: 200; letter-spacing: -.07em; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather > .rs-icon { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather > span:not(.mo-caption) { font-size: 19px; line-height: 25px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather > .mo-caption { margin-top: 3px; font-size: 11px; line-height: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-weather-forecast { margin-top: 20px; padding: 0 16px; border: 1px solid var(--divider); border-radius: 22px; background: var(--mo-ios-tertiary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-weather-forecast > h3 { display: flex; align-items: center; gap: 7px; padding-block: 14px 10px; font-size: 12px; line-height: 16px; font-weight: 600; color: var(--text-secondary); }
+.mo .mo-device[data-platform="ios"] .mo-weather-forecast > .mo-data-row { display: grid; grid-template-columns: minmax(84px, 1fr) 22px 29px minmax(20px, 1fr) 29px; gap: 8px; width: 100%; min-height: 56px; margin: 0; padding: 12px 0; border-top: 1px solid var(--divider); border-bottom: 0; font-size: 16px; font-variant-numeric: tabular-nums; }
+.mo .mo-device[data-platform="ios"] .mo-weather-forecast > .mo-data-row > .rs-icon { width: 22px; height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-weather-forecast > h3 > .rs-icon { width: 14px; height: 14px; }
+.mo .mo-device[data-platform="ios"] .mo-weather-low { color: var(--text-secondary); text-align: end; }
+.mo .mo-device[data-platform="ios"] .mo-weather-high { text-align: end; }
+.mo .mo-device[data-platform="ios"] .mo-weather-range { display: block; height: 4px; border-radius: 2px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-weather-range > i { display: block; height: 4px; border-radius: 2px; background: linear-gradient(90deg, var(--text-secondary), var(--text)); }
+
+/* Maps uses a quiet map field and an anchored route card. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map { height: 330px; margin-top: 20px; background-color: var(--mo-ios-grouped); background-image: none; border: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map-roads { stroke: var(--bg); stroke-width: 9px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map-route { stroke-width: 4px; stroke-linecap: round; stroke-linejoin: round; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map > div { flex-direction: column-reverse; gap: 0; border: 1px solid var(--divider); border-radius: 16px; box-shadow: 0 3px 16px #0001; overflow: hidden; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map > div > button { border: 0; border-radius: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map > div > button + button { border-bottom: 1px solid var(--divider); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-route-step { position: relative; margin-top: -20px; padding: 20px; border: 1px solid var(--divider); border-radius: 22px; background: var(--bg); box-shadow: 0 4px 20px #0001; }
+.mo .mo-device[data-platform="ios"] .mo-route-step h3 { margin-top: 8px; font-size: 21px; line-height: 27px; font-weight: 600; }
+
+/* Music's playing surface has square artwork, large transport and a quiet queue. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-scroll { padding: 14px 28px 28px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-album { width: min(100%, 340px); height: auto; aspect-ratio: 1; margin-inline: auto; border-radius: 10px; padding: 24px; box-shadow: 0 8px 24px #0002; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-album > .rs-icon { width: 40px; height: 40px; stroke-width: 1.2; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-track { margin-top: 24px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-track h3 { font-size: 23px; line-height: 29px; font-weight: 600; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-track p { margin-top: 3px; font-size: 16px; line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-beats { height: 15px; gap: 3px; margin-top: 20px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-beats i { height: 3px; border-radius: 2px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-beats i[data-active="true"] { height: 15px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-controls { justify-content: space-evenly; align-items: center; gap: 16px; margin-top: 18px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-controls button { width: 64px; height: 64px; border: 0; border-radius: 50%; background: transparent; color: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-controls button > .rs-icon { width: 30px; height: 30px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-controls button:nth-child(2) > .rs-icon { width: 40px; height: 40px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-list-row { width: 100%; margin-inline: 0; min-height: 66px; padding-inline: 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-list-row::after { inset-inline-start: 32px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-list-row[aria-pressed="true"] { background: transparent; color: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-list-row[aria-pressed="true"] strong { font-weight: 700; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-track-number { width: 20px; flex: 0 0 20px; font-size: 13px; }
+
+/* Safari favorites are a collection, separate from the open page document. */
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="browser"]:not([data-overlay]) .mo-browser-page { margin-block: 24px; padding: 24px; border: 1px solid var(--divider); border-radius: 18px; background: var(--mo-ios-tertiary-fill); gap: 14px; }
+.mo .mo-device[data-platform="ios"] .mo-browser-page h3 { max-width: 14ch; font-size: 30px; line-height: 1.15; letter-spacing: -.03em; }
+.mo .mo-device[data-platform="ios"] .mo-browser-page p { font-size: 16px; line-height: 1.5; }
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 10px; margin-top: 12px; }
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks .mo-list-row { display: flex; flex-direction: column; width: 100%; margin: 0; padding: 0; border: 0; gap: 8px; text-align: center; }
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks .mo-list-row::after,
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks .mo-list-row > .rs-icon:last-child,
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks .mo-list-row > span > span { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks .mo-list-row > .rs-icon:first-child { display: block; width: 60px; height: 60px; padding: 17px; border-radius: 14px; background: var(--mo-ios-secondary-fill); }
+.mo .mo-device[data-platform="ios"] .mo-browser-bookmarks .mo-list-row strong { font-size: 12px; line-height: 16px; font-weight: 400; white-space: normal; }
+
+/* Compact live apps preserve readable text and touch targets. */
+@container (max-width: 360px) {
+  .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="notes"], [data-app="files"])[data-root-app="false"]:not([data-overlay]) .mo-app-header { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; justify-content: space-between; gap: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="notes"], [data-app="files"])[data-root-app="false"]:not([data-overlay]) .mo-app-header h2 { position: absolute; inset: auto; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="notes"], [data-app="files"])[data-root-app="false"]:not([data-overlay]) .mo-ios-navigation-actions { position: static; grid-column: 2; grid-row: 1; justify-self: end; }
+
+  .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="mail"], [data-app="messages"], [data-app="phone"]):not([data-overlay]) .mo-scroll > .mo-list-row { width: calc(100% + 24px); margin-inline: -12px; padding-inline: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="phone"], [data-app="contacts"]):not([data-overlay]) .mo-contact-row { width: calc(100% + 24px); margin-inline: -12px; padding-inline: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="maps"]:not([data-overlay]) .mo-map,
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-ios-calendar-week { width: calc(100% + 24px); margin-inline: -12px; }
+
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-scroll { padding-inline: 10px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator { gap: 6px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator button { font-size: 25px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"]:not([data-overlay]) .mo-keypad { gap: 10px 14px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"]:not([data-overlay]) .mo-keypad button { min-height: 52px; }
+  .mo .mo-device[data-platform="ios"] .mo-keypad .mo-dial-digit { font-size: 28px; line-height: 32px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="false"]:not([data-overlay]) .mo-scroll { padding-inline: 16px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"]:not([data-overlay]) .mo-form input { font-size: 25px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-scroll { padding-inline: 16px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-controls { gap: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-controls button { width: 56px; height: 56px; }
+  .mo .mo-device[data-platform="ios"] .mo-weather-forecast { padding-inline: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-weather-forecast > .mo-data-row { grid-template-columns: minmax(0, 1fr) 20px 28px 28px; gap: 6px; font-size: 14px; }
+  .mo .mo-device[data-platform="ios"] .mo-weather-range { display: none; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-ios-calendar-week > div { display: flex; overflow-x: auto; scroll-snap-type: x proximity; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-ios-calendar-week button { flex: 0 0 44px; scroll-snap-align: center; }
+}
+
+/* Wide content adapts instead of stretching controls across the inner display. */
+@container (min-width: 720px) {
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="photos"]:not([data-overlay]) .mo-photo-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-scroll { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 340px); gap: 28px; align-items: end; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator-display { align-self: center; margin: 0; padding: 24px 8px; font-size: 64px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator { gap: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calculator"]:not([data-overlay]) .mo-calculator button { max-height: 62px; aspect-ratio: auto; min-height: 52px; font-size: 28px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="camera"]:not([data-overlay]) .mo-camera { aspect-ratio: 4 / 3; width: min(100%, 580px); max-height: 390px; margin-inline: auto; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-scroll { display: grid; grid-template-columns: minmax(240px, .9fr) minmax(260px, 1fr); align-content: start; column-gap: 40px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-album { grid-column: 1; grid-row: 1 / 6; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-scroll > :not(.mo-album) { grid-column: 2; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-track { margin-top: 4px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-scroll { display: grid; grid-template-columns: minmax(220px, 1fr) minmax(280px, 1.3fr); gap: 20px 36px; align-content: start; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-scroll > .mo-field { grid-column: 1; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather { grid-column: 1; margin: 0; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-weather-forecast { grid-column: 2; grid-row: 1 / 4; margin: 0; align-self: start; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="weather"]:not([data-overlay]) .mo-scroll > .mo-native-toggle { grid-column: 1; margin: 0; }
+  .mo .mo-device[data-platform="ios"] .mo-browser-bookmarks { grid-template-columns: repeat(3, minmax(0, 120px)); justify-content: start; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="calendar"]:not([data-overlay]) .mo-event { max-width: 700px; margin-inline: auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="music"]:not([data-overlay]) .mo-music-beats i[data-active="true"] { height: 3px; }
+}
+@media (forced-colors: active) {
+  .mo .mo-device[data-platform="ios"] .mo-calculator button { border: 1px solid ButtonText; }
+  .mo .mo-device[data-platform="ios"] .mo-calculator button:is([aria-label="Equals"], [aria-label="+"], [aria-label="−"], [aria-label="×"], [aria-label="÷"]) { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  .mo .mo-device[data-platform="ios"] .mo-weather-forecast,
+  .mo .mo-device[data-platform="ios"] .mo-route-step { border-color: CanvasText; box-shadow: none; }
+}
+
+/* These content wrappers introduce no extra layout in the shared Android app. */
+.mo .mo-device[data-platform="android"] :is(.mo-file-list, .mo-browser-bookmarks, .mo-weather-forecast) { display: contents; }

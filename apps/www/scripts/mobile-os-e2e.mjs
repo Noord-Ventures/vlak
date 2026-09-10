@@ -1,77 +1,224 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { deviceProfiles } from "../app/interfaces/mobile-os/device-profiles.ts";
 
-/** Observe painted frames on the real animation timeline without seeking or pausing it. */
-export async function assertMobileFoldAnimation({ page, device, opening }) {
-  await page.waitForFunction(() => {
-    const panel = document.querySelector(".mo-fold-panel-left");
-    return panel && getComputedStyle(panel).transform.startsWith("matrix3d(");
-  });
-  const motion = await device.locator(".mo-fold-stage").evaluate(async element => {
-    const moving = element.querySelector(".mo-fold-panel-left .mo-fold-texture");
-    const settled = element.querySelector(".mo-fold-panel-right .mo-fold-texture");
-    const diffusion = element.querySelector(".mo-fold-panel-left .mo-fold-diffusion");
-    const live = element.closest("section.mo-device").querySelector(".mo-device-fit .mo-phone");
-    const handset = live.closest(".mo-handset");
-    const blur = target => Number.parseFloat(getComputedStyle(target).filter.match(/blur\(([\d.]+)px\)/)?.[1] ?? "0");
-    const result = {
-      panels: element.querySelectorAll(".mo-fold-panel").length,
-      posture: element.querySelector(".mo-fold-context")?.dataset.posture,
-      expectedTop: element.dataset.axis === "horizontal" ? 44 : 59,
-      layouts: [moving, settled].map(texture => ({
-        rows: getComputedStyle(texture).gridTemplateRows.split(" ").map(Number.parseFloat),
-        height: texture.clientHeight,
-        contentTop: texture.querySelector(".mo-screen").offsetTop,
-        gestureTop: texture.querySelector(".mo-system-nav").offsetTop,
-      })),
-      inert: element.inert, hidden: element.getAttribute("aria-hidden"),
-      duplicateIds: element.querySelectorAll("[id]").length,
-      mask: getComputedStyle(diffusion).maskImage,
-      backdrop: getComputedStyle(diffusion).backdropFilter,
-      samples: [],
+/** Read real geometry, including the chassis faces that remain solid edge-on. */
+async function readMobileFoldScene(device) {
+  return device.locator(".mo-fold-presentation").evaluate(wrapper => {
+    const stage = wrapper.querySelector(".mo-fold-stage");
+    const body = element => { const style = getComputedStyle(element); return { preserve: style.transformStyle, overflow: style.overflow, filter: style.filter, opacity: style.opacity, mask: style.maskImage, clip: style.clipPath }; };
+    const matrix = element => new DOMMatrixReadOnly(getComputedStyle(element).transform);
+    const texture = element => {
+      const content = element.querySelector(".mo-screen"), gesture = element.querySelector(".mo-system-nav");
+      return { posture: element.closest(".mo-fold-context").dataset.posture, display: element.dataset.duoDisplay,
+        width: element.clientWidth, height: element.clientHeight,
+        contentTop: content.offsetTop, contentHeight: content.offsetHeight,
+        gestureTop: gesture.offsetTop, gestureHeight: gesture.offsetHeight,
+      };
     };
+    return {
+      inert: wrapper.inert, hidden: wrapper.getAttribute("aria-hidden"), duplicateIds: wrapper.querySelectorAll("[id],[name],[popover]").length,
+      body: body(stage),
+      panels: [...stage.querySelectorAll(".mo-fold-panel")].map(panel => {
+        const front = panel.querySelector(".mo-fold-front"), back = panel.querySelector(".mo-fold-back");
+        const frontMatrix = matrix(front), backMatrix = matrix(back);
+        return { body: body(panel), frontBackface: getComputedStyle(front).backfaceVisibility, rearBackface: getComputedStyle(back).backfaceVisibility,
+          depth: Math.abs(frontMatrix.m43 - backMatrix.m43), opposing: frontMatrix.m33 * backMatrix.m33,
+          edges: panel.querySelectorAll(".mo-fold-edge").length,
+          rimDepths: [...panel.querySelectorAll(".mo-fold-rim")].map(element => matrix(element).m43),
+          inner: texture(front.querySelector(".mo-fold-texture")),
+        };
+      }),
+      cover: texture(stage.querySelector(".mo-fold-cover-texture")),
+      hingeFacets: stage.querySelectorAll(".mo-fold-spine > i").length,
+      liveInert: wrapper.closest("section.mo-device").querySelector(".mo-device-fit").inert,
+    };
+  });
+}
+
+function assertPhysicalFoldScene(scene) {
+  assert.equal(scene.panels.length, 2, "The fold consists of two solid articulated bodies");
+  assert.equal(scene.inert, true, "Visual textures cannot receive input");
+  assert.equal(scene.hidden, "true", "Screen readers ignore duplicate display textures");
+  assert.equal(scene.duplicateIds, 0, "Textures have no duplicate form identities or native popovers");
+  assert.equal(scene.liveInert, true, "The hidden live app cannot receive keyboard input during inspection");
+  for (const body of [scene.body, ...scene.panels.map(panel => panel.body)]) {
+    assert.equal(body.preserve, "preserve-3d");
+    assert(["visible", "clip"].includes(body.overflow), "The chassis does not flatten its depth by clipping");
+    assert.deepEqual([body.filter, body.opacity, body.mask, body.clip], ["none", "1", "none", "none"], "Optical paint never flattens the physical scene");
+  }
+  for (const panel of scene.panels) {
+    assert.deepEqual([panel.frontBackface, panel.rearBackface], ["hidden", "hidden"], "Rear casing replaces mirrored front-screen content");
+    assert(panel.depth > 3 && panel.opposing < -.9, "Front and rear faces occupy opposite sides of a solid body");
+    assert(panel.edges >= 4, "Physical perimeter faces remain visible when the screen turns edge-on");
+    assert(panel.rimDepths.length >= 3 && Math.max(...panel.rimDepths) - Math.min(...panel.rimDepths) > 3, "Rounded chassis sections span real depth");
+    assert.equal(panel.inner.posture, "expanded", "Inner displays retain their expanded app arrangement");
+  }
+  assert.equal(scene.cover.posture, "compact", "The rear outer display retains its compact app arrangement");
+  assert(scene.hingeFacets >= 6, "The hinge has a curved physical perimeter");
+  for (const layout of scene.panels.map(panel => panel.inner)) assert.equal(layout.display, "inner");
+  assert.equal(scene.cover.display, "outer", "The cover uses actual outer-display chrome");
+  for (const layout of [...scene.panels.map(panel => panel.inner), scene.cover]) {
+    assert(layout.width > 0 && layout.height > 0 && layout.contentHeight > 0, "Every physical display carries a laid-out app surface");
+    assert(layout.contentTop >= 0 && layout.contentTop < layout.height, "App content remains inside its captured display");
+    assert.equal(layout.gestureHeight, 34, "The Home gesture keeps its native reserved height");
+    assert.equal(layout.gestureTop + layout.gestureHeight, layout.height, "Snapshot Home gesture stays pinned at the bottom");
+  }
+}
+
+/** Include real clipping ancestors, not just the model's own reserved rectangle. */
+async function assertMobileFoldBounds(device) {
+  const overflow = await device.locator(".mo-fold-presentation").evaluate(wrapper => {
+    const viewport = wrapper.parentElement.getBoundingClientRect(), own = wrapper.getBoundingClientRect();
+    const clips = [];
+    for (let element = wrapper.parentElement; element && !element.matches(".if-study"); element = element.parentElement) {
+      const style = getComputedStyle(element);
+      if ([style.overflowX, style.overflowY].some(value => ["hidden", "clip"].includes(value))) clips.push(element.getBoundingClientRect());
+    }
+    const faces = [...wrapper.querySelectorAll(".mo-fold-front,.mo-fold-back,.mo-fold-edge,.mo-fold-rim")].map(element => element.getBoundingClientRect());
+    return Math.max(Math.max(viewport.left, ...clips.map(rect => rect.left)) - Math.min(...faces.map(rect => rect.left)),
+      Math.max(...faces.map(rect => rect.right)) - Math.min(viewport.right, ...clips.map(rect => rect.right)),
+      Math.max(own.top, ...clips.map(rect => rect.top)) - Math.min(...faces.map(rect => rect.top)),
+      Math.max(...faces.map(rect => rect.bottom)) - Math.min(own.bottom, ...clips.map(rect => rect.bottom)));
+  });
+  assert(overflow <= 2, `Physical scene is not clipped by its real ancestors: ${overflow.toFixed(2)}px`);
+}
+
+/** Observe the spring's painted frames. No seeking, pausing, or synthetic clock advance. */
+export async function assertMobileFoldAnimation({ device, opening, reversed = false }) {
+  await device.locator(".mo-fold-stage").waitFor();
+  assertPhysicalFoldScene(await readMobileFoldScene(device));
+  const samples = await device.locator(".mo-fold-stage").evaluate(async stage => {
+    const wrapper = stage.closest(".mo-fold-presentation"), viewport = wrapper.parentElement;
+    const moving = stage.querySelector(".mo-fold-panel-left .mo-fold-front .mo-fold-texture");
+    const settled = stage.querySelector(".mo-fold-panel-right .mo-fold-front .mo-fold-texture");
+    const cover = stage.querySelector(".mo-fold-cover-texture");
+    const left = stage.querySelector(".mo-fold-panel-left");
+    const rows = [];
     await new Promise((resolve, reject) => {
-      const deadline = setTimeout(() => reject(new Error("Fold animation did not remove its transient surfaces")), 7000);
-      const sample = () => {
-        if (!element.isConnected) { clearTimeout(deadline); resolve(); return; }
-        result.samples.push({
-          moving: blur(moving), settled: getComputedStyle(settled).filter,
-          hardware: [...element.querySelectorAll(".mo-fold-panel"), handset, handset.querySelector(".mo-hardware"), element].map(target => getComputedStyle(target).filter),
-          live: blur(live), opacity: Number.parseFloat(getComputedStyle(handset).opacity),
+      const deadline = setTimeout(() => reject(new Error("Physical fold did not settle and remove its presentation")), 10000);
+      const sample = time => {
+        if (!stage.isConnected) { clearTimeout(deadline); resolve(); return; }
+        const angle = Number(stage.dataset.hingeAngle), transform = new DOMMatrixReadOnly(getComputedStyle(left).transform);
+        const physicalAngle = 180 - Math.acos(Math.max(-1, Math.min(1, stage.dataset.axis === "horizontal" ? transform.m22 : transform.m11))) * 180 / Math.PI;
+        const bounds = wrapper.getBoundingClientRect(), horizontal = viewport.getBoundingClientRect();
+        const faces = [...stage.querySelectorAll(".mo-fold-front,.mo-fold-back,.mo-fold-edge,.mo-fold-rim")].map(face => face.getBoundingClientRect());
+        const clips = [stage.closest(".mo-stage"), stage.closest("section.mo"), stage.closest(".if-specimen")].filter(Boolean).map(element => element.getBoundingClientRect());
+        rows.push({ time, angle, physicalAngle, blur: Number.parseFloat(getComputedStyle(moving).filter.match(/blur\(([\d.]+)px\)/)?.[1] ?? "0"),
+          crisp: [settled, cover, stage, ...stage.querySelectorAll(".mo-fold-panel")].every(element => getComputedStyle(element).filter === "none"),
+          overflow: Math.max(Math.max(horizontal.left, ...clips.map(rect => rect.left)) - Math.min(...faces.map(face => face.left)), Math.max(...faces.map(face => face.right)) - Math.min(horizontal.right, ...clips.map(rect => rect.right)), Math.max(bounds.top, ...clips.map(rect => rect.top)) - Math.min(...faces.map(face => face.top)), Math.max(...faces.map(face => face.bottom)) - Math.min(bounds.bottom, ...clips.map(rect => rect.bottom))),
         });
         requestAnimationFrame(sample);
       };
-      sample();
+      requestAnimationFrame(sample);
     });
-    return result;
+    return rows;
   });
-  assert.equal(motion.posture, "expanded", "Both directions retain the expanded screen arrangement on transient surfaces");
-  for (const layout of motion.layouts) {
-    assert.equal(layout.rows.length, 3, "Fold textures retain status, app, and Home-gesture rows");
-    assert.equal(layout.rows[0], motion.expectedTop, "The captured status safe area matches the native orientation");
-    assert.equal(layout.rows[2], 34, "The captured Home gesture keeps its reserved row");
-    assert.equal(layout.contentTop, motion.expectedTop, "The app does not jump upward in the fold snapshot");
-    assert.equal(layout.gestureTop, layout.height - 34, "The Home gesture stays at the bottom of the snapshot");
+  assert(samples.length >= 3, "The real hinge is observed over several rendered frames");
+  const direction = opening ? 1 : -1;
+  assert(direction * (samples.at(-1).angle - samples[0].angle) > (reversed ? 5 : 90), "The physical hinge travels toward the requested posture");
+  if (!reversed) assert(samples.slice(1).every((sample, index) => direction * (sample.angle - samples[index].angle) >= -.05), "An uninterrupted fold progresses smoothly toward its target");
+  assert(samples.every(sample => Math.abs(sample.physicalAngle - sample.angle) < .1), "Actual 3D articulation follows the reported hinge pose");
+  assert(samples.every(sample => sample.crisp), "Rear cover, settled screen, and physical frame stay sharp");
+  assert(samples.every(sample => sample.overflow <= 2), `Projected chassis remains inside its reserved frame: ${Math.max(...samples.map(sample => sample.overflow)).toFixed(2)}px`);
+  const optical = samples.filter(sample => sample.angle > 15 && sample.angle < 165);
+  assert(optical.length >= 3 && new Set(optical.map(sample => Math.round(sample.blur))).size >= (reversed ? 2 : 3), "Moving inner-display diffusion follows several intermediate hinge poses");
+  assert.equal(await device.locator(".mo-fold-presentation,.mo-fold-stage,.mo-folding").count(), 0);
+  const final = await device.locator(".mo-device-fit").evaluate(frame => ({ inert: frame.inert, filter: getComputedStyle(frame.querySelector(".mo-phone")).filter, opacity: getComputedStyle(frame.querySelector(".mo-handset")).opacity }));
+  assert.deepEqual(final, { inert: false, filter: "none", opacity: "1" }, "The same live app becomes interactive and sharp after settling");
+}
+
+/** Reverse a moving body in the same frame, preserving its actual current pose. */
+export async function assertMobileFoldReversal({ page, device }) {
+  await page.waitForFunction(() => {
+    const angle = Number(document.querySelector(".mo-fold-stage")?.dataset.hingeAngle);
+    return angle > 60 && angle < 125;
+  });
+  const reversal = await device.locator(".mo-fold-stage").evaluate(async stage => {
+    const before = Number(stage.dataset.hingeAngle), now = performance.now();
+    const button = [...stage.closest("section.mo").querySelectorAll(".mo-device-controls button")].find(element => element.textContent === "Fold display");
+    button.click();
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    return { same: stage.isConnected && stage === document.querySelector(".mo-fold-stage"), before, after: Number(stage.dataset.hingeAngle), elapsed: performance.now() - now };
+  });
+  assert.equal(reversal.same, true, "Reversing retargets the same articulated scene");
+  assert(Math.abs(reversal.after - reversal.before) <= 20, `Reversal preserves hinge position instead of snapping to an endpoint: ${JSON.stringify(reversal)}`);
+  assert.equal(await device.locator(".mo-fold-presentation").count(), 1, "Reversal leaves one physical scene");
+  await assertMobileFoldAnimation({ page, device, opening: false, reversed: true });
+}
+
+/** The native range can hold real intermediate 3D poses without moving the live app. */
+export async function assertMobileFoldInspection({ page, device }) {
+  const root = page.locator("section.mo");
+  const activate = async target => { await target.focus(); await target.press("Enter"); };
+  await activate(root.getByRole("button", { name: "Inspect fold", exact: true }));
+  const range = root.getByRole("slider", { name: "Hinge angle", exact: true });
+  await range.waitFor();
+  const scene = await device.locator(".mo-fold-stage").elementHandle();
+  if (await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+    assert.equal(Number(await device.locator(".mo-fold-stage").getAttribute("data-hinge-angle")), Number(await range.inputValue()), "Reduced-motion inspection opens directly at its requested static pose");
   }
-  assert.equal(motion.panels, 2, "Fold animation has two independently hinged screen surfaces");
-  assert.equal(motion.inert, true, "Transient fold surfaces cannot receive input");
-  assert.equal(motion.hidden, "true", "Screen readers ignore transient duplicate content");
-  assert.equal(motion.duplicateIds, 0);
-  assert.match(motion.mask, /linear-gradient/, "Diffusion varies across the turning display");
-  assert.match(motion.backdrop, /blur\(/, "The edge diffusion uses a real backdrop blur");
-  assert(motion.samples.length >= 3, "Fold paint is observed across multiple actual frames");
-  const blur = motion.samples.map(sample => sample.moving);
-  const direction = opening ? -1 : 1;
-  assert(direction * (blur.at(-1) - blur[0]) > 8, `${opening ? "Opening resolves" : "Closing increases"} the moving display blur`);
-  assert(new Set(blur.filter(value => value > 1 && value < 23).map(value => Math.round(value))).size >= 3, "Blur changes gradually through several intermediate strengths");
-  assert(blur.slice(1).every((value, index) => direction * (value - blur[index]) >= -.05), "Moving-display diffusion progresses without a jump in the opposite direction");
-  assert(motion.samples.every(sample => sample.settled === "none" && sample.hardware.every(filter => filter === "none")), "The settled screen and physical frame remain crisp throughout the fold");
-  assert(motion.samples.some(sample => sample.opacity > .05 && sample.live > .05), "The live app gradually resolves during the final handoff");
-  assert(motion.samples.at(-1).live < .5, "The live app becomes sharp before animation cleanup");
-  assert.equal(await device.locator(".mo-fold-stage,.mo-folding").count(), 0);
-  const final = await device.locator(".mo-device-fit .mo-phone").evaluate(element => ({ filter: getComputedStyle(element).filter, opticalAnimations: element.getAnimations().filter(animation => animation.effect?.getKeyframes().some(frame => "filter" in frame)).length }));
-  assert.equal(final.filter, "none", "The final live app has no residual blur");
-  assert.equal(final.opticalAnimations, 0, "Completed optical effects are canceled rather than retained");
+  for (const angle of [45, 90, 135]) {
+    await range.fill(String(angle));
+    await page.waitForFunction(angle => Math.abs(Number(document.querySelector(".mo-fold-stage")?.dataset.hingeAngle) - angle) < .1, angle);
+    assertPhysicalFoldScene(await readMobileFoldScene(device));
+    await assertMobileFoldBounds(device);
+    assert(await scene.evaluate(element => element.isConnected), "Manual inspection keeps the same physical scene");
+    const stable = await device.locator(".mo-fold-stage").evaluate(async element => { const before = element.dataset.hingeAngle; await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))); return before === element.dataset.hingeAngle; });
+    assert.equal(stable, true, "A manually selected hinge pose stays still");
+  }
+  const viewport = page.viewportSize();
+  if (viewport.width === 1440) {
+    try {
+      await page.setViewportSize({ ...viewport, width: 390 });
+      await page.waitForFunction(() => {
+        const wrapper = document.querySelector(".mo-fold-presentation"), bounds = wrapper?.parentElement.getBoundingClientRect();
+        const faces = [...document.querySelectorAll(".mo-fold-front,.mo-fold-back")].map(element => element.getBoundingClientRect());
+        return bounds && bounds.width < 390 && faces.every(rect => rect.left >= bounds.left - 2 && rect.right <= bounds.right + 2);
+      });
+      await assertMobileFoldBounds(device);
+      assert.equal(await device.locator(".mo-fold-stage").getAttribute("data-hinge-angle"), "135.00", "Resize preserves the selected physical pose");
+    } finally { await page.setViewportSize(viewport); }
+    await page.waitForFunction(() => document.querySelector(".mo-device-viewport").clientWidth > 390);
+    await assertMobileFoldBounds(device);
+  }
+  await range.focus(); await range.press("Home"); assert.equal(await range.inputValue(), "0");
+  await range.press("End"); assert.equal(await range.inputValue(), "180");
+  await range.press("ArrowLeft"); assert.equal(await range.inputValue(), "179");
+  await page.keyboard.press("Tab");
+  assert.equal(await page.evaluate(() => !!document.activeElement.closest(".mo-device-fit")), false, "Tab skips the hidden live app during inspection");
+  await activate(root.getByRole("button", { name: "Return to app", exact: true }));
+  await device.locator(".mo-fold-presentation").waitFor({ state: "detached" });
+  assert.equal(await range.count(), 0);
+  assert.equal(await device.locator(".mo-device-fit").evaluate(element => element.inert), false);
+}
+
+/** App-level semantics and keyboard scrolling are not covered by the Home audit. */
+export async function checkMobileAppAccessibility({ page, phone, app }) {
+  if (!await page.evaluate(() => typeof window.axe?.run === "function")) {
+    await page.addScriptTag({ content: readFileSync(createRequire(import.meta.url).resolve("axe-core/axe.min.js"), "utf8") });
+  }
+  const violations = await phone.evaluate(async element => (await window.axe.run(element, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] } })).violations.map(violation => ({ id: violation.id, targets: violation.nodes.map(node => node.target) })));
+  assert.deepEqual(violations, [], `${app} keeps its active app surface accessible`);
+  if (app === "camera") {
+    const scroll = phone.locator(".mo-scroll");
+    if (await scroll.evaluate(element => element.scrollHeight - element.clientHeight > 1)) {
+      await scroll.evaluate(element => element.scrollTo({ top: 0, behavior: "instant" }));
+      await scroll.focus();
+      assert.equal(await scroll.evaluate(element => element === document.activeElement), true, "Keyboard users can focus the overflowing Camera scene");
+      await scroll.press("PageDown");
+      await page.waitForFunction(() => document.querySelector(".mo-device-fit .mo-phone .mo-scroll").scrollTop > 0);
+      await scroll.evaluate(element => element.scrollTo({ top: 0, behavior: "instant" }));
+    }
+  } else if (app === "maps") {
+    const map = phone.getByRole("group", { name: "Illustrative neighbourhood map", exact: true });
+    const drawing = map.locator("svg > g"), original = await drawing.getAttribute("transform");
+    await map.getByRole("button", { name: "Zoom in", exact: true }).press("Enter");
+    await page.waitForFunction(original => document.querySelector(".mo-map svg > g").getAttribute("transform") !== original, original);
+    await map.getByRole("button", { name: "Zoom out", exact: true }).press("Enter");
+    await page.waitForFunction(original => document.querySelector(".mo-map svg > g").getAttribute("transform") === original, original);
+  }
 }
 
 /** Native component geometry and keyboard journeys through the separate phone studies. */
@@ -180,8 +327,13 @@ export async function checkMobileOS({ page, base, fail }) {
         const expectedHandset = expectedPhone.map(size => size + display.bezel * 2);
         await page.waitForFunction(({ width, height }) => {
           const handset = document.querySelector(".mo-handset");
-          const drawn = handset.getBoundingClientRect(), frame = document.querySelector(".mo-device-fit").getBoundingClientRect();
-          return Math.abs(handset.offsetWidth - width) < 1 && Math.abs(handset.offsetHeight - height) < 1 && Math.abs(drawn.width - frame.width) < 1 && Math.abs(drawn.height - frame.height) < 1;
+          const fitted = document.querySelector(".mo-device-fit"), phone = fitted.querySelector(".mo-phone");
+          const drawn = handset.getBoundingClientRect(), frame = fitted.getBoundingClientRect();
+          // Rounded offset sizes can already equal the target while the last
+          // subpixel of a CSS transition is still changing the apparent scale.
+          const moving = [handset, fitted, phone].some(element => element.getAnimations().some(animation => animation.pending || animation.playState === "running"));
+          const style = getComputedStyle(handset);
+          return !moving && Math.abs(Number.parseFloat(style.width) - width) < .01 && Math.abs(Number.parseFloat(style.height) - height) < .01 && Math.abs(drawn.width - frame.width) < .1 && Math.abs(drawn.height - frame.height) < .1;
         }, { width: expectedHandset[0], height: expectedHandset[1] });
         const result = await device.evaluate(element => {
           const phone = element.querySelector(".mo-phone"); const bounds = phone.getBoundingClientRect();
@@ -288,6 +440,7 @@ export async function checkMobileOS({ page, base, fail }) {
       await activate(device.getByRole("button", { name: "Download", exact: true }));
       const download = await downloadPromise; assert.equal(download.suggestedFilename(), "local-test.txt"); assert.equal(await download.failure(), null);
       await launch("Camera");
+      await checkMobileAppAccessibility({ page, phone, app: "camera" });
       await activate(device.getByRole("button", { name: "Capture", exact: true }));
       assert.match(await device.locator(".mo-notice").textContent(), /Sample capture saved to Photos/);
       await activate(device.getByRole("button", { name: "Library", exact: true }));
@@ -304,6 +457,7 @@ export async function checkMobileOS({ page, base, fail }) {
       await activate(device.getByRole("button", { name: "Fahrenheit", exact: true }));
       assert.equal(await device.locator(".mo-weather strong").textContent(), "64°");
       await launch("Maps");
+      await checkMobileAppAccessibility({ page, phone, app: "maps" });
       await choose(device.getByRole("combobox", { name: "Destination", exact: true }), 1);
       await activate(device.getByRole("button", { name: "Start local route", exact: true }));
       await activate(device.getByRole("button", { name: "Next step", exact: true }));
@@ -432,12 +586,7 @@ export async function checkMobileOS({ page, base, fail }) {
             await retained();
             if (inspectMotion) {
               await activate(root.getByRole("button", { name: "Open display", exact: true }));
-              await device.locator(".mo-fold-stage").waitFor();
-              const interruptedStage = await device.locator(".mo-fold-stage").elementHandle();
-              await activate(root.getByRole("button", { name: "Fold display", exact: true }));
-              assert.equal(await interruptedStage.evaluate(element => element.isConnected), false, "Rapid reversal removes the interrupted fold surfaces");
-              assert.equal(await device.locator(".mo-fold-stage").count(), 1, "Rapid reversal leaves only the current optical layer");
-              await assertFoldMotion(false);
+              await assertMobileFoldReversal({ page, device });
               assert.equal(await device.getAttribute("data-posture"), "compact");
               await retained();
               await activate(root.getByRole("button", { name: "Rotate device", exact: true }));
@@ -448,11 +597,19 @@ export async function checkMobileOS({ page, base, fail }) {
               }
               await activate(root.getByRole("button", { name: "Rotate device", exact: true }));
               await retained();
+              await assertMobileFoldInspection({ page, device });
+              await retained();
             }
           } finally { if (inspectMotion) await page.emulateMedia({ reducedMotion: "reduce" }); }
+          if (!inspectMotion) {
+            await assertMobileFoldInspection({ page, device });
+            await retained();
+            await activate(root.getByRole("button", { name: "Fold display", exact: true }));
+            await retained();
+          }
           // The reduced-motion path changes posture directly, with no blurred clone.
           if (inspectMotion) {
-            for (const [label, posture] of [["Open display", "expanded"], ["Fold display", "compact"]]) {
+            for (const [label, posture] of [["Fold display", "compact"], ["Open display", "expanded"], ["Fold display", "compact"]]) {
               await activate(root.getByRole("button", { name: label, exact: true }));
               assert.equal(await device.getAttribute("data-posture"), posture);
               assert.equal(await device.locator(".mo-fold-stage,.mo-folding").count(), 0, "Reduced motion bypasses transient optical surfaces");
@@ -561,9 +718,15 @@ export async function checkIOSHomeTouch(page) {
     const rect = element.getBoundingClientRect();
     const top = Math.max(rect.top + 40, 30), bottom = Math.min(rect.bottom - 20, innerHeight - 30);
     for (let y = fromBottom ? bottom : top; fromBottom ? y > top : y < bottom; y += fromBottom ? -6 : 6) {
-      const x = rect.right - 3;
-      const target = document.elementFromPoint(x, y);
-      if (target && element.contains(target) && !target.closest("button,input")) return { x, y };
+      const x = rect.right - 16;
+      // Chromium expands nearby touch targets. A single blank pixel beside a
+      // widget can still dispatch pointerdown on that button, so require a
+      // genuinely clear touch-sized patch within the Home gesture surface.
+      const clear = [-10, 0, 10].every(dx => [-10, 0, 10].every(dy => {
+        const target = document.elementFromPoint(x + dx, y + dy);
+        return target && element.contains(target) && !target.closest("button,input");
+      }));
+      if (clear) return { x, y };
     }
     throw new Error("No reachable home-screen gesture surface");
   }, fromBottom);
@@ -582,11 +745,31 @@ export async function checkIOSHomeTouch(page) {
     assert.equal(await ios.locator(".mo-phone").getAttribute("data-overlay"), "library", "A horizontal iOS home swipe opens App Library");
     assert(Math.abs(await stage.evaluate(element => element.scrollLeft) - originalPosition) < 1, "App Library gesture does not shift the single-phone stage");
     await ios.locator(".mo-system-nav").getByRole("button", { name: "Home", exact: true }).click();
+    const widget = ios.locator(".mo-ios-calendar-widget");
+    await widget.scrollIntoViewIfNeeded();
+    const widgetBounds = await widget.boundingBox();
+    const widgetStart = { x: widgetBounds.x + widgetBounds.width - 24, y: widgetBounds.y + widgetBounds.height / 2 };
+    await swipe(widgetStart, { x: widgetStart.x - 100, y: widgetStart.y });
+    assert.equal(await ios.locator(".mo-device-fit .mo-phone").getAttribute("data-overlay"), "library", "A Home page swipe may begin over an interactive widget");
+    assert.equal(await ios.locator(".mo-device-fit .mo-phone").getAttribute("data-app"), "home", "Swiping suppresses the widget's generated click");
+    await ios.locator(".mo-system-nav").getByRole("button", { name: "Home", exact: true }).click();
+    await widget.scrollIntoViewIfNeeded();
+    const tapBounds = await widget.boundingBox();
+    await session.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: tapBounds.x + tapBounds.width / 2, y: tapBounds.y + tapBounds.height / 2, radiusX: 1, radiusY: 1, force: 1 }] });
+    await session.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+    await page.waitForFunction(() => document.querySelector(".mo-device-fit .mo-phone").dataset.app === "calendar");
+    await ios.locator(".mo-system-nav").getByRole("button", { name: "Home", exact: true }).click();
     await ios.locator(".mo-status-bar").scrollIntoViewIfNeeded();
     const status = await ios.locator(".mo-status-bar").boundingBox();
-    await swipe({ x: status.x + status.width - 20, y: status.y + status.height / 2 }, { x: status.x + 20, y: status.y + status.height / 2 });
+    const phoneBounds = await ios.locator(".mo-device-fit .mo-phone").boundingBox();
+    const statusStart = { x: status.x + status.width - 20, y: status.y + status.height / 2 };
+    await swipe(statusStart, { x: Math.max(phoneBounds.x + 20, statusStart.x - 100), y: statusStart.y });
     assert(Math.abs(await stage.evaluate(element => element.scrollLeft) - originalPosition) < 1, "A status-bar swipe does not reveal a second platform");
     assert.equal(await page.locator("section.mo-device").count(), 1);
+    // A compact native status rail may open its own system panel; restore Home
+    // before the next independent journey without changing the stage assertion.
+    await ios.locator(".mo-system-nav").getByRole("button", { name: "Home", exact: true }).click();
+    await page.waitForFunction(() => { const phone = document.querySelector(".mo-device-fit .mo-phone"); return phone.dataset.app === "home" && !phone.dataset.overlay; });
     await ios.scrollIntoViewIfNeeded();
     await page.waitForTimeout(150);
   } finally {

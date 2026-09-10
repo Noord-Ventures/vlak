@@ -1,0 +1,983 @@
+{
+  "source": {
+    "title": "Apple iOS 27 and iPadOS 27 UI Kit",
+    "share": "https://www.sketch.com/s/04c24d8b-38fb-4afb-8836-36617e022f02",
+    "version": "5l0J2p",
+    "sha256": "0efe167fb1c0174a3bd03de533535d1c185963b38145720c54357013f89a8f6f",
+    "inspected": "2026-09-10",
+    "units": "Sketch points",
+    "scope": "Duo system and navigation geometry only; no artwork or font data."
+  },
+  "components": [
+    {
+      "name": "Examples/Sheet/Light/iPhone Duo/Landscape/Inner/Large Detent",
+      "id": "C7F7C49E-22F9-4F4A-9792-10F1D51268E3",
+      "frame": {
+        "x": 1000,
+        "y": 3420,
+        "width": 951,
+        "height": 669
+      },
+      "parts": [
+        {
+          "name": "Vertical Bar",
+          "id": "EA4DC231-92A2-42C7-B64C-E6568495A3A7",
+          "frame": {
+            "x": 867,
+            "y": 0,
+            "width": 84,
+            "height": 669
+          },
+          "parts": [
+            {
+              "name": "Top",
+              "id": "9A336D10-5F6C-48D4-AB68-6708581AE49F",
+              "frame": {
+                "x": 12,
+                "y": 24,
+                "width": 48,
+                "height": 146
+              },
+              "parts": [
+                {
+                  "name": "Stack",
+                  "id": "2CD509C4-5DC3-490C-89C2-F6682518CE3D",
+                  "frame": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 48,
+                    "height": 146
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Toolbar",
+          "id": "9067C047-ACD3-4211-9E0D-6E5B6AEE3674",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 951,
+            "height": 82
+          }
+        },
+        {
+          "name": "Overlay",
+          "id": "18C11AE9-8A9F-4572-9106-CA0CBDBEB95D",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 951,
+            "height": 669
+          }
+        },
+        {
+          "name": "Sheet",
+          "id": "3051DDDC-C157-4223-AE10-614F08B41DCB",
+          "frame": {
+            "x": 149,
+            "y": 8,
+            "width": 653,
+            "height": 661
+          },
+          "parts": [
+            {
+              "name": "Toolbar Top",
+              "id": "12D82452-0691-4A37-ACBF-E4A7463B7614",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 653,
+                "height": 70
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Examples/Sheet/Light/iPhone Duo/Portrait/Outer/Large Detent",
+      "id": "40F990A7-C490-43B7-BCA0-895C5786AF64",
+      "frame": {
+        "x": 1000,
+        "y": 2000,
+        "width": 466,
+        "height": 678
+      },
+      "parts": [
+        {
+          "name": "Vertical Bar",
+          "id": "845E5A26-9C32-47A0-99BF-14CE1F83AB93",
+          "frame": {
+            "x": 382,
+            "y": 0,
+            "width": 84,
+            "height": 678
+          },
+          "parts": [
+            {
+              "name": "Top",
+              "id": "3465455A-3ABF-4A58-9D41-0A8C916696D5",
+              "frame": {
+                "x": 12,
+                "y": 24,
+                "width": 48,
+                "height": 194
+              },
+              "parts": [
+                {
+                  "name": "Stack",
+                  "id": "312689EF-5F17-4523-B8D3-2F664A710C6E",
+                  "frame": {
+                    "x": 0,
+                    "y": 48,
+                    "width": 48,
+                    "height": 146
+                  }
+                },
+                {
+                  "name": "Camera Punchout",
+                  "id": "AC229C91-3439-4389-921D-4D0692354E05",
+                  "frame": {
+                    "x": 2.5,
+                    "y": 0,
+                    "width": 43,
+                    "height": 42
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Overlay",
+          "id": "2664DFFD-6809-422D-B546-52CF7945E7B0",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 466,
+            "height": 678
+          }
+        },
+        {
+          "name": "Sheet",
+          "id": "FD4A222A-EE95-48AA-8415-CA01A8395ACA",
+          "frame": {
+            "x": 8,
+            "y": 8,
+            "width": 450,
+            "height": 670
+          },
+          "parts": [
+            {
+              "name": "Vertical Bar",
+              "id": "0F357D31-1A3C-444E-9D81-18E6F6A95D8A",
+              "frame": {
+                "x": 374,
+                "y": 0,
+                "width": 76,
+                "height": 661
+              },
+              "parts": [
+                {
+                  "name": "Top",
+                  "id": "A8204869-6856-4FCF-A3CC-CBBC86D220E9",
+                  "frame": {
+                    "x": 12,
+                    "y": 24,
+                    "width": 48,
+                    "height": 254
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Toolbar Top",
+              "id": "55BF5A10-0B4F-47A6-8961-3F2BEABEA173",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 450,
+                "height": 70
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lens",
+          "id": "A2C7C8A8-6B26-43C1-8286-29559A28BB53",
+          "frame": {
+            "x": 370,
+            "y": 0.0,
+            "width": 95.67,
+            "height": 95.67
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tab Bars/\udbc3\udec3/Light/iPhone Duo/Vertical/Tabs - No Search/3 Tabs",
+      "id": "47C960EC-04C7-4F65-A67D-F40494C4CE41",
+      "frame": {
+        "x": 70,
+        "y": 1700,
+        "width": 48,
+        "height": 160
+      },
+      "parts": [
+        {
+          "name": "Tab 3",
+          "id": "2D40E960-A75B-4E83-90BF-72A728D26208",
+          "frame": {
+            "x": 0,
+            "y": 106,
+            "width": 48,
+            "height": 48
+          }
+        },
+        {
+          "name": "Tab 2",
+          "id": "61C8CC6A-6A76-48FA-AED7-6174ACBB7031",
+          "frame": {
+            "x": 0,
+            "y": 56,
+            "width": 48,
+            "height": 48
+          }
+        },
+        {
+          "name": "Tab 1",
+          "id": "46B72E8C-990D-4A74-9300-0158F51B6D1C",
+          "frame": {
+            "x": 0,
+            "y": 6,
+            "width": 48,
+            "height": 48
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examples/Tab Bar/Light/iPhone Duo/Portrait/Outer",
+      "id": "75EB5600-587C-4568-AF54-F195CE6CFCCF",
+      "frame": {
+        "x": 2000,
+        "y": 1700,
+        "width": 466,
+        "height": 678
+      },
+      "parts": [
+        {
+          "name": "Vertical Bar",
+          "id": "F491F958-07BF-4D39-84F4-9350011C9E60",
+          "frame": {
+            "x": 382,
+            "y": 0,
+            "width": 84,
+            "height": 678
+          },
+          "parts": [
+            {
+              "name": "Tab Bar",
+              "id": "8C8C8511-164F-4467-9F52-6275DBA2B820",
+              "frame": {
+                "x": 12,
+                "y": 364,
+                "width": 48,
+                "height": 290
+              }
+            },
+            {
+              "name": "Top",
+              "id": "1AC002A3-39B4-4CF8-85E8-4704D434328B",
+              "frame": {
+                "x": 12,
+                "y": 24,
+                "width": 48,
+                "height": 194
+              },
+              "parts": [
+                {
+                  "name": "Stack",
+                  "id": "C11C9ED2-4A85-41EE-BD29-203B52B21464",
+                  "frame": {
+                    "x": 0,
+                    "y": 48,
+                    "width": 48,
+                    "height": 146
+                  }
+                },
+                {
+                  "name": "Camera Punchout",
+                  "id": "7ED5A69B-257F-41B6-9925-004FB66E1E93",
+                  "frame": {
+                    "x": 2.5,
+                    "y": 0,
+                    "width": 43,
+                    "height": 42
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lens",
+          "id": "1608DFA0-4DFE-4CC9-878B-CE13ADC73E41",
+          "frame": {
+            "x": 370,
+            "y": 0.0,
+            "width": 95.67,
+            "height": 95.67
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examples/Tab Bar/Light/iPhone Duo/Landscape/Outer",
+      "id": "CD5A3F85-85E7-42F0-85A9-71D7149A9470",
+      "frame": {
+        "x": 2710,
+        "y": 1700,
+        "width": 678,
+        "height": 466
+      },
+      "parts": [
+        {
+          "name": "Vertical Bar",
+          "id": "9CBE45B6-00EB-483F-8856-F0E717261796",
+          "frame": {
+            "x": 594,
+            "y": 0,
+            "width": 84,
+            "height": 466
+          },
+          "parts": [
+            {
+              "name": "Bottom",
+              "id": "50DBDE28-23AC-47CD-A249-6A15E19FB953",
+              "frame": {
+                "x": 12,
+                "y": 101,
+                "width": 48,
+                "height": 341
+              },
+              "parts": [
+                {
+                  "name": "Camera Punchout",
+                  "id": "07098D70-6B0D-487B-9AC2-4265B3CE3D80",
+                  "frame": {
+                    "x": 2.5,
+                    "y": 296,
+                    "width": 43,
+                    "height": 42
+                  }
+                },
+                {
+                  "name": "Tab Bar",
+                  "id": "AB255F0E-B549-4278-9C05-1810F20B0575",
+                  "frame": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 48,
+                    "height": 290
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Toolbar - Button",
+              "id": "67E6EDCA-F0BE-40A0-9E5D-23D6E170C028",
+              "frame": {
+                "x": 12,
+                "y": 24,
+                "width": 48,
+                "height": 48
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lens",
+          "id": "711F0301-C0A3-4E41-A6B5-4D2F7D9BD699",
+          "frame": {
+            "x": 582,
+            "y": 370,
+            "width": 95.67,
+            "height": 95.67
+          }
+        }
+      ]
+    },
+    {
+      "name": "Examples/Tab Bar/Light/iPhone Duo/Portrait/Inner",
+      "id": "A551FF26-1726-421C-8AC5-65F453918B0C",
+      "frame": {
+        "x": 2000,
+        "y": 2500,
+        "width": 669,
+        "height": 951
+      },
+      "parts": [
+        {
+          "name": "Toolbar",
+          "id": "F501D847-C3E2-4E9C-9BE5-D9CB8650D2DE",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "width": 669,
+            "height": 82
+          }
+        },
+        {
+          "name": "Tab Bar",
+          "id": "E2CCBEAE-541E-4188-A9A6-8FB9112DDC8A",
+          "frame": {
+            "x": 130,
+            "y": 852,
+            "width": 409,
+            "height": 99
+          },
+          "parts": [
+            {
+              "name": "Tabs",
+              "id": "2E7BA5C3-7CF9-481D-AF12-237551809E0C",
+              "frame": {
+                "x": 21,
+                "y": 16,
+                "width": 367,
+                "height": 62
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Examples/Tab Bar/Light/iPhone Duo/Landscape/Inner",
+      "id": "DAFF0407-5E10-4E02-A984-D4ADB0FEC8A3",
+      "frame": {
+        "x": 2710,
+        "y": 2500,
+        "width": 951,
+        "height": 669
+      },
+      "parts": [
+        {
+          "name": "Vertical Bar",
+          "id": "C5C9BC80-64CF-4DD0-ABE3-9E3D0B046335",
+          "frame": {
+            "x": 867,
+            "y": 0,
+            "width": 84,
+            "height": 669
+          },
+          "parts": [
+            {
+              "name": "Tab Bar",
+              "id": "85C2ECB5-EA65-4E50-A2D4-69491F4ABB92",
+              "frame": {
+                "x": 12,
+                "y": 355,
+                "width": 48,
+                "height": 290
+              }
+            },
+            {
+              "name": "Top",
+              "id": "95AB1992-BDF2-410C-9110-524340B5011D",
+              "frame": {
+                "x": 12,
+                "y": 24,
+                "width": 48,
+                "height": 146
+              },
+              "parts": [
+                {
+                  "name": "Stack",
+                  "id": "D370FCE8-AEB1-4827-B5D7-14032FC734B9",
+                  "frame": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 48,
+                    "height": 146
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Examples/Toolbar/Light/iPhone Duo/Portrait/Outer",
+      "id": "ADEB0373-527C-4B9A-B39A-37B00B960AEB",
+      "frame": {
+        "x": 6000,
+        "y": 1000,
+        "width": 466,
+        "height": 678
+      },
+      "parts": [
+        {
+          "name": "Vertical Bar",
+          "id": "8AEEEBBF-BB18-4FBF-968A-A2B571AA300F",
+          "frame": {
+            "x": 382,
+            "y": 0,
+            "width": 84,
+            "height": 678
+          },
+          "parts": [
+            {
+              "name": "Top",
+              "id": "6751F305-20D4-4452-B17F-74B78F3F2134",
+              "frame": {
+                "x": 12,
+                "y": 24,
+                "width": 48,
+                "height": 310
+              },
+              "parts": [
+                {
+                  "name": "Stack",
+                  "id": "1F5EBC84-6CAC-4D45-BB87-0AB2852F413B",
+                  "frame": {
+                    "x": 0,
+                    "y": 48,
+                    "width": 48,
+                    "height": 262
+                  }
+                },
+                {
+                  "name": "Camera Punchout",
+                  "id": "7FA05241-49BA-4E6C-857C-4189A2E742F8",
+                  "frame": {
+                    "x": 2.5,
+                    "y": 0,
+                    "width": 43,
+                    "height": 42
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lens",
+          "id": "57F38C02-8AA1-4B6A-AF61-DD09855B4ECD",
+          "frame": {
+            "x": 370,
+            "y": 0.0,
+            "width": 95.67,
+            "height": 95.67
+          }
+        }
+      ]
+    },
+    {
+      "name": "Toolbars/Light/iPhone Duo/Top - Standard/Large Title",
+      "id": "DE2D661E-9280-4441-9B38-D8A9E8319E97",
+      "frame": {
+        "x": 0,
+        "y": 1230,
+        "width": 600,
+        "height": 126
+      },
+      "parts": [
+        {
+          "name": "Row 2",
+          "id": "E57874BF-B0BD-428C-966E-8F09D49B307B",
+          "frame": {
+            "x": 20,
+            "y": 82,
+            "width": 58,
+            "height": 34
+          },
+          "parts": [
+            {
+              "name": "Title",
+              "id": "44794644-58EB-44E3-9B5B-A9AE5BD86D5B",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 58,
+                "height": 34
+              },
+              "font": {
+                "name": "SFPro-Bold",
+                "size": 28
+              },
+              "lineHeight": 34
+            }
+          ]
+        },
+        {
+          "name": "Row 1",
+          "id": "26DF9F11-6599-4439-B0DE-BAF8F6870162",
+          "frame": {
+            "x": 20,
+            "y": 24,
+            "width": 556,
+            "height": 58
+          },
+          "parts": [
+            {
+              "name": "Trailing Actions",
+              "id": "62CF4BBA-DC96-4A94-BF51-E7CB1828ED3A",
+              "frame": {
+                "x": 220,
+                "y": 0,
+                "width": 336,
+                "height": 48
+              },
+              "parts": [
+                {
+                  "name": "Reserved Region - Camera - Right",
+                  "id": "D1468CF6-9C56-4CFA-B50F-9FE24FA1F558",
+                  "frame": {
+                    "x": 292,
+                    "y": 0,
+                    "width": 44,
+                    "height": 48
+                  }
+                },
+                {
+                  "name": "Status Bar",
+                  "id": "4859374B-A55C-4B58-8244-4C3B6443B340",
+                  "frame": {
+                    "x": 176,
+                    "y": 0,
+                    "width": 104,
+                    "height": 48
+                  }
+                },
+                {
+                  "name": "Toolbar Button Group (48pt)",
+                  "id": "7BE7A20F-E50F-4F1A-BBC4-54A5E9FF13A7",
+                  "frame": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 164,
+                    "height": 48
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Leading Actions",
+              "id": "0ACD9DEB-6C9D-4023-A6B8-CB349AF25954",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 48,
+                "height": 48
+              },
+              "parts": [
+                {
+                  "name": "Back Button",
+                  "id": "D3934BB7-AE4D-4833-A759-56E9AC3A6EF7",
+                  "frame": {
+                    "x": 0,
+                    "y": 0,
+                    "width": 48,
+                    "height": 48
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Toolbars/Light/iPhone Duo/Top - Standard/Title",
+      "id": "2693F743-582D-457F-ABCC-5A50FEC74F2E",
+      "frame": {
+        "x": 0,
+        "y": 1100,
+        "width": 600,
+        "height": 82
+      },
+      "parts": [
+        {
+          "name": "Trailing Actions",
+          "id": "C8F27A7C-3817-4A04-B7FD-A0454A8AC6B9",
+          "frame": {
+            "x": 240,
+            "y": 24,
+            "width": 336,
+            "height": 48
+          },
+          "parts": [
+            {
+              "name": "Reserved Region - Camera - Right",
+              "id": "B1E5BBD7-6F1B-481E-A13E-0E499F5A2FC5",
+              "frame": {
+                "x": 292,
+                "y": 0,
+                "width": 44,
+                "height": 48
+              }
+            },
+            {
+              "name": "Status Bar",
+              "id": "51F0EE3F-ECE7-4369-B8D7-D383DE690834",
+              "frame": {
+                "x": 176,
+                "y": 0,
+                "width": 104,
+                "height": 48
+              }
+            },
+            {
+              "name": "Toolbar Button Group (48pt)",
+              "id": "A022AA04-B432-49F8-B4AA-E6333143FE30",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 164,
+                "height": 48
+              }
+            }
+          ]
+        },
+        {
+          "name": "Title",
+          "id": "BD4B383E-4EB7-45CB-8285-CA726C246D1C",
+          "frame": {
+            "x": 80,
+            "y": 37,
+            "width": 148,
+            "height": 22
+          },
+          "parts": [
+            {
+              "name": "Title",
+              "id": "5B477445-102E-4608-B1C8-C3BA84F15E15",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 148,
+                "height": 22
+              },
+              "font": {
+                "name": "SFPro-Semibold",
+                "size": 17
+              },
+              "lineHeight": 22
+            }
+          ]
+        },
+        {
+          "name": "Leading Actions",
+          "id": "EE5601D4-FA74-41EA-9DEE-971F8625903E",
+          "frame": {
+            "x": 20,
+            "y": 24,
+            "width": 48,
+            "height": 48
+          },
+          "parts": [
+            {
+              "name": "Back Button",
+              "id": "0EC55094-4486-436F-AC1F-86FA33F8EB6C",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 48,
+                "height": 48
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "iPhone Duo/Outer Display Lens",
+      "id": "311CD9A7-F5A8-4B40-936E-E37A8B9D8521",
+      "frame": {
+        "x": 23001,
+        "y": 45.0,
+        "width": 95.67,
+        "height": 95.67
+      },
+      "parts": [
+        {
+          "name": "Lens",
+          "id": "8E4ACD82-7D9B-4E58-BF1B-471A396A8ECF",
+          "frame": {
+            "x": 29.333,
+            "y": 29.333,
+            "width": 37,
+            "height": 36.999
+          }
+        }
+      ]
+    },
+    {
+      "name": "Status Bars/iPhone Duo/Light Background/Vertical",
+      "id": "737274C9-92E3-4562-81F4-5CF3C27A90C5",
+      "frame": {
+        "x": 17300,
+        "y": 200,
+        "width": 50,
+        "height": 86
+      },
+      "parts": [
+        {
+          "name": "Ring",
+          "id": "797F969B-F5DB-4087-92DE-CE2DC1EE0EBE",
+          "frame": {
+            "x": 2,
+            "y": 35,
+            "width": 46,
+            "height": 46
+          },
+          "parts": [
+            {
+              "name": "Network Type",
+              "id": "A3EA267F-71EA-4300-91CF-221DB8846E6F",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 46,
+                "height": 46
+              },
+              "parts": [
+                {
+                  "name": "Cell",
+                  "id": "A7E6CDA7-DC84-4225-87EB-9F3E44214331",
+                  "frame": {
+                    "x": 11.482,
+                    "y": 36.454,
+                    "width": 23.036,
+                    "height": 6.416
+                  }
+                },
+                {
+                  "name": "Wifi",
+                  "id": "8AEC773C-A6F0-43F2-98B9-C842885817A5",
+                  "frame": {
+                    "x": 14.5,
+                    "y": 14.67,
+                    "width": 17,
+                    "height": 12.333
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Battery",
+              "id": "03F5ABB2-610D-436E-94CF-0A8042672632",
+              "frame": {
+                "x": 2.5,
+                "y": 3.0,
+                "width": 41,
+                "height": 31.666
+              }
+            }
+          ]
+        },
+        {
+          "name": "Time",
+          "id": "919B947A-3534-4932-8E98-AAF320B53023",
+          "frame": {
+            "x": 1,
+            "y": 11,
+            "width": 48,
+            "height": 19
+          },
+          "font": {
+            "name": "SFProRounded-Bold",
+            "size": 16
+          },
+          "lineHeight": null
+        }
+      ]
+    },
+    {
+      "name": "Status Bars/iPhone Duo/Light Background/Horizontal",
+      "id": "3E2A5E44-DD1A-4E1C-8688-5DFD536D2494",
+      "frame": {
+        "x": 17366,
+        "y": 200,
+        "width": 104,
+        "height": 48
+      },
+      "parts": [
+        {
+          "name": "Ring",
+          "id": "B1FFDF36-53CC-425D-995B-8FC72C8DF3DB",
+          "frame": {
+            "x": 57,
+            "y": 1,
+            "width": 46,
+            "height": 46
+          },
+          "parts": [
+            {
+              "name": "Network Type",
+              "id": "8B1D3379-2619-4D13-9AE9-50A5B9AB1BF0",
+              "frame": {
+                "x": 0,
+                "y": 0,
+                "width": 46,
+                "height": 46
+              },
+              "parts": [
+                {
+                  "name": "Cell",
+                  "id": "F190E594-870F-488E-BA62-AAAEA9536EF6",
+                  "frame": {
+                    "x": 11.482,
+                    "y": 36.454,
+                    "width": 23.036,
+                    "height": 6.416
+                  }
+                },
+                {
+                  "name": "Wifi",
+                  "id": "38E36BEC-C3F3-49F7-858A-F8862FF65A39",
+                  "frame": {
+                    "x": 14.647,
+                    "y": 17.421,
+                    "width": 16.706,
+                    "height": 12.353
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Battery",
+              "id": "3BC1BC0A-E268-4FE5-B4B3-D1E41D52EBDA",
+              "frame": {
+                "x": 3.165,
+                "y": 3.165,
+                "width": 39.67,
+                "height": 30.753
+              }
+            }
+          ]
+        },
+        {
+          "name": "Time",
+          "id": "79A5C3D6-8EA5-4804-A70E-AA49C6E704BC",
+          "frame": {
+            "x": 8,
+            "y": 15,
+            "width": 46,
+            "height": 19
+          },
+          "font": {
+            "name": "SFProRounded-Bold",
+            "size": 16
+          },
+          "lineHeight": null
+        }
+      ]
+    }
+  ]
+}

@@ -69,8 +69,35 @@ layouts respond to actual container width, including rotation, rather than
 stretching a portrait screenshot.
 
 Apple lists the Duo's open enclosure as 164.6 × 117.8 mm and its folded enclosure
-as 84.1 × 117.8 mm. Its displays both support Dynamic Island. The model-specific
-frame is illustrative and uses the published proportions.
+as 84.1 × 117.8 mm. The outer camera occupies a corner and can expand into
+Dynamic Island. The inner camera is under the display and appears only while
+active. The model-specific frame uses the published proportions.
+
+## Duo system anatomy
+
+`ios-duo-reference.json` measures thirteen further native components and example
+artboards from the same downloaded kit. `ios-duo.css` applies this geometry only
+in hardware preview; readable phone mode retains the compact, unscaled layout.
+
+| Native Duo component | Measured geometry and browser mapping |
+| --- | --- |
+| Vertical reserved region | An 84 pt strip at the trailing edge; 48 pt controls sit 24 pt from the display edge. It applies to both outer orientations and the inner display in landscape. |
+| Outer camera | A 37 pt circular lens within the kit's 95.67 pt reserved region. Its origin is 29.33 pt from the top and right in portrait; rotation carries it to the bottom-right. |
+| Status | Native vertical component 50 × 86 pt, or horizontal 104 × 48 pt. A 46 pt ring combines charge, Wi-Fi and cellular. Browser time and Control Center targets occupy 44 and 48 pt, extending the vertical group to 92 pt for interaction. |
+| Vertical tabs | 48 pt symbols with a 2 pt gap, plus 6 pt block padding; three tabs occupy 48 × 160 pt. Text remains available to assistive technology. |
+| Inner portrait toolbar | Standard height 82 pt with controls at y=24; large-title version 126 pt with its title at y=82. Duo's large title is 28/34 bold, distinct from the other iPhone models' 34/41 hierarchy. |
+| Sheets | 8 pt outer gutter. The example inner landscape sheet is 653 pt wide with a 70 pt horizontal toolbar; outer sheets retain vertical actions. |
+
+The inner portrait display restores horizontal navigation. The outer landscape
+examples compress status out of the toolbar column; the browser retains a
+keyboard-accessible Control Center target in the corner. The inactive inner
+camera stays hidden. Application state is owned above the device frame and
+persists when the layout changes.
+
+Apple's guidance recommends keeping controls and hierarchy consistent while
+adapting around the hinge. It does not publish a blur radius or timing curve for
+the transition between displays. The fold effect follows observed footage;
+it is not presented as a documented UIKit animation parameter.
 
 ## Primary sources
 
@@ -83,6 +110,8 @@ frame is illustrative and uses the published proportions.
 - [Toggles](https://developer.apple.com/design/human-interface-guidelines/toggles), switch placement and redundant state indicators.
 - [Typography](https://developer.apple.com/design/human-interface-guidelines/typography) and [Layout](https://developer.apple.com/design/human-interface-guidelines/layout), text hierarchy, safe areas and adaptive composition.
 - [iPhone Duo specifications](https://www.apple.com/iphone-duo/specs/) and [iPhone 18 Pro specifications](https://www.apple.com/iphone-18-pro/specs/), hardware and display dimensions.
+- [Designing for iPhone Duo](https://developer.apple.com/design/human-interface-guidelines/designing-for-iphone-duo) and [Design for iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111466/), vertical controls, reserved regions, and the inner portrait exception.
+- [Leverage multiple displays and scenes on iPhone Duo](https://developer.apple.com/videos/play/tech-talks/111464/), continuous hinge-driven effects versus layout APIs.
 
 `ios-app-glyph.tsx` contains original SVG interpretations of familiar app
 categories. They are not SF Symbols or official Apple artwork. App content is a
@@ -107,8 +136,20 @@ settled half, with a spatial gradient toward its outer edge. Screen detail
 returns gradually while the physical frame remains crisp. These are observations
 from the footage, not blur or timing values published by Apple.
 
-The browser study uses a 1,240 ms shared hinge and optical timeline, a temporary
-24 px maximum content blur, an additional masked edge diffusion layer, and a
-short final focus transition into the live app. Closing reverses the optical
-progression. Reduced motion skips the effect; interruption removes every visual
-copy and animation while keeping the live app mounted.
+The browser study uses articulated CSS 3D bodies with a front and rear cover
+display, 9 px logical thickness, rounded rims and edge planes, and a nine-facet
+hinge. A continuous, critically damped angular spring preserves position and
+velocity when retargeted. Moving inner-display content uses
+`12 * (1 - p) ** 1.7` blur, where `p` is normalized opening; there is no backdrop
+blur. Inspect fold exposes the complete 0–180 degree range. Reduced motion
+skips the effect. These constants are implementation choices, not dimensions or
+animation parameters measured from Apple hardware.
+
+## App-specific references
+
+App interiors also reference Apple's [Calculator guide](https://support.apple.com/guide/iphone/use-the-basic-calculator-iph1ac0b5cc/ios),
+[Photos guide](https://support.apple.com/guide/iphone/view-photos-and-videos-iph3d267610/ios),
+and [Lists and tables guidance](https://developer.apple.com/design/human-interface-guidelines/lists-and-tables).
+Where Apple Support currently serves iOS 26 app screenshots, those are treated
+as app-content references; the downloaded iOS 27 kit remains the source for the
+current shared system components and Duo geometry.

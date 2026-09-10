@@ -99,27 +99,57 @@ section.mo.mo-single { grid-template-rows: auto auto auto; }
   .mo-single .mo-device-fit, .mo-single .mo-handset, .mo-single .mo-hardware, .mo-single .mo-phone, .mo-single .mo-camera-cutout, .mo-single .mo-hinge { transition: none; }
 }
 
-/* Real perspective and two hinged screen surfaces; snapshots are inert and transient. */
-.mo-device-viewport { position: relative; perspective: 1600px; }
+/* The chassis keeps its 3D context. Only individual display faces clip content. */
+.mo-device-viewport { position: relative; }
+.mo-single .mo-device-fit.mo-folding { transition: none; }
 .mo-folding .mo-handset { opacity: 0; pointer-events: none; }
-.mo-fold-stage { position: absolute; top: 0; left: 50%; z-index: 12; transform-origin: center top; perspective: 1600px; transform-style: preserve-3d; pointer-events: none; }
+.mo-fold-presentation { position: absolute; inset: 0 0 auto; z-index: 12; pointer-events: none; }
+.mo-fold-stage { position: absolute; top: 0; left: 50%; transform-origin: center; transform-style: preserve-3d; pointer-events: none; }
 .mo-single .mo-fold-stage .mo-fold-context { display: contents; }
-.mo-fold-panel { position: absolute; top: 0; bottom: 0; width: 50%; overflow: hidden; background: #202020; border: 1px solid #676767; box-shadow: inset 0 0 0 2px #a0a0a0, 0 16px 32px #0002; transform-style: preserve-3d; backface-visibility: visible; }
-.mo-fold-panel-left { left: 0; border-radius: 36px 0 0 36px; transform-origin: right center; }
-.mo-fold-panel-right { right: 0; border-radius: 0 36px 36px 0; transform-origin: left center; }
-.mo-fold-glass { position: absolute; inset: 12px; overflow: hidden; background: var(--bg); }
+.mo-fold-panel { position: absolute; top: 0; bottom: 0; width: 50%; transform-style: preserve-3d; }
+.mo-fold-panel-left { left: 0; --mo-fold-radius: 36px 0 0 36px; transform-origin: right center calc(var(--mo-fold-depth) / 2); }
+.mo-fold-panel-right { right: 0; --mo-fold-radius: 0 36px 36px 0; transform-origin: left center; }
+.mo-fold-rim { position: absolute; inset: 0; border-radius: var(--mo-fold-radius); border: 1px solid #878787; background: #454545; }
+.mo-fold-rim:nth-child(2n) { border-color: #b5b5b5; }
+.mo-fold-front, .mo-fold-back { position: absolute; inset: 0; border-radius: var(--mo-fold-radius); border: 1px solid #999; background: #181818; box-shadow: inset 0 0 0 1px #c0c0c0, inset 0 0 0 3px #282828; backface-visibility: hidden; }
+.mo-fold-front { transform: translateZ(calc(var(--mo-fold-depth) / 2)); }
+.mo-fold-back { transform: rotateY(180deg) translateZ(calc(var(--mo-fold-depth) / 2)); background: linear-gradient(120deg, #515151, #262626 55%, #444); }
+.mo-fold-panel-left .mo-fold-back { border-radius: 0 36px 36px 0; }
+.mo-fold-glass, .mo-fold-cover { position: absolute; inset: var(--mo-fold-bezel); overflow: hidden; background: var(--bg); backface-visibility: hidden; }
 .mo-fold-panel-left .mo-fold-glass { right: 0; border-radius: 24px 0 0 24px; }
 .mo-fold-panel-right .mo-fold-glass { left: 0; border-radius: 0 24px 24px 0; }
-.mo .mo-fold-texture { position: absolute; top: 0; grid-template-rows: 59px minmax(0, 1fr) 34px; }
-.mo-fold-diffusion { position: absolute; inset: 0; pointer-events: none; opacity: 0; backdrop-filter: blur(20px); background: color-mix(in srgb, var(--bg) 16%, transparent); mask-image: linear-gradient(90deg, #000, #000b 40%, transparent); }
-.mo-fold-panel-left::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #fff1, transparent 8%, transparent 92%, #0002); pointer-events: none; }
-@media (forced-colors: active) { .mo-fold-panel { background: Canvas; border-color: CanvasText; box-shadow: none; } }
+.mo-fold-cover { border-radius: 25px; }
+.mo .mo-fold-texture { position: absolute; top: 0; grid-template-rows: 59px minmax(0, 1fr) 34px; transform-origin: top left; }
+.mo-fold-reflection { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 12%, #fff3 40%, #fff8 50%, transparent 76%); opacity: 0; }
+.mo-fold-edge { position: absolute; display: block; background: linear-gradient(#989898, #ddd 28%, #4e4e4e 60%, #8e8e8e); }
+.mo-fold-edge-top, .mo-fold-edge-bottom { height: var(--mo-fold-depth); left: 32px; right: 0; transform: rotateX(90deg); }
+.mo-fold-edge-top { top: calc(var(--mo-fold-depth) / -2); }
+.mo-fold-edge-bottom { bottom: calc(var(--mo-fold-depth) / -2); }
+.mo-fold-panel-right .mo-fold-edge-top, .mo-fold-panel-right .mo-fold-edge-bottom { left: 0; right: 32px; }
+.mo-fold-edge-outside, .mo-fold-edge-hinge { width: var(--mo-fold-depth); top: 32px; bottom: 32px; transform: rotateY(90deg); }
+.mo-fold-panel-left .mo-fold-edge-outside, .mo-fold-panel-right .mo-fold-edge-hinge { left: calc(var(--mo-fold-depth) / -2); }
+.mo-fold-panel-right .mo-fold-edge-outside, .mo-fold-panel-left .mo-fold-edge-hinge { right: calc(var(--mo-fold-depth) / -2); }
+.mo-fold-spine { position: absolute; top: 50%; left: 50%; width: 4px; height: calc(100% - 30px); transform-style: preserve-3d; }
+.mo-fold-spine > i { position: absolute; inset: 0; background: linear-gradient(90deg, #4b4b4b, #b7b7b7, #686868); backface-visibility: hidden; }
+.mo-fold-shadow { position: absolute; left: 50%; height: 20px; border-radius: 50%; background: #000; filter: blur(16px); pointer-events: none; }
+.mo-fold-camera-module { position: absolute; top: 32px; left: 28px; display: flex; align-items: center; gap: 18px; padding: 12px; border: 1px solid #777; border-radius: 22px; background: #242424; box-shadow: 0 4px 8px #0004; }
+.mo-fold-camera-module i { width: 38px; height: 38px; border-radius: 50%; background: radial-gradient(circle, #141414 20%, #303030 22%, #060606 45%, #575757 48%, #111 58%); border: 2px solid #919191; }
+.mo-fold-camera-module b { width: 10px; height: 10px; border-radius: 50%; background: #aaa; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-panel { width: 100%; height: 50%; bottom: auto; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left { top: 0; border-radius: 36px 36px 0 0; transform-origin: center bottom; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right { top: 50%; border-radius: 0 0 36px 36px; transform-origin: center top; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left { top: 0; --mo-fold-radius: 36px 36px 0 0; transform-origin: center bottom calc(var(--mo-fold-depth) / 2); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right { top: 50%; --mo-fold-radius: 0 0 36px 36px; transform-origin: center top; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-glass { inset: 12px 12px 0; border-radius: 24px 24px 0 0; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right .mo-fold-glass { inset: 0 12px 12px; border-radius: 0 0 24px 24px; }
-.mo-fold-stage[data-axis="horizontal"] .mo-fold-diffusion { mask-image: linear-gradient(#000, #000b 40%, transparent); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-back { transform: rotateX(180deg) translateZ(calc(var(--mo-fold-depth) / 2)); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-back { border-radius: 0 0 36px 36px; }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-spine { height: calc(100% * 669 / 951 - 30px); }
+.mo-fold-stage[data-axis="horizontal"] .mo-fold-edge-top, .mo-fold-stage[data-axis="horizontal"] .mo-fold-edge-bottom { left: 32px; right: 32px; }
+.mo-fold-tools { display: grid; grid-template-columns: auto minmax(100px, 240px) 44px; justify-content: center; align-items: center; gap: 0 16px; padding: 12px 24px; border-top: 1px solid var(--divider); background: var(--bg); }
+.mo-fold-tools label, .mo-fold-tools output { font-size: 13px; }
+.mo-fold-tools output { text-align: end; font-variant-numeric: tabular-nums; }
+.mo-fold-tools input { width: 100%; min-width: 44px; height: 44px; accent-color: var(--text); }
+.mo-fold-tools > span { grid-column: 1 / -1; color: var(--text-secondary); font-size: 12px; }
+@media (forced-colors: active) { .mo-fold-front, .mo-fold-back, .mo-fold-rim { background: Canvas; border-color: CanvasText; box-shadow: none; } }
 
 /* Profile geometry wins over the retained platform defaults above. */
 .mo.mo-single .mo-device[data-platform] .mo-phone { width: 100%; height: 100%; border-radius: var(--mo-device-radius); grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 34px; }

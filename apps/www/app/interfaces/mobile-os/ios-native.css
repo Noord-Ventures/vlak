@@ -1,3 +1,6 @@
+@import "./ios-apps.css";
+@import "./ios-duo.css";
+
 /* iOS component anatomy is preserved before applying the Vlak material and type
    layer. Logical dimensions are device-dependent; see ios-reference.md. */
 .mo .mo-device[data-platform="ios"] .mo-phone {
