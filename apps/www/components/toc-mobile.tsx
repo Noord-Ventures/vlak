@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { Icon } from "@noorddev/vlak-react";
 
-const chromeSelector = ".logo-wrap, .corner-nav, .settings, .nav-toggle, .site-crumb-bar";
+const chromeSelector = ".logo-wrap, .corner-nav, .global-search, .settings, .nav-toggle, .site-crumb-bar";
 const focusableSelector = 'a[href], button:not(:disabled), [tabindex]:not([tabindex="-1"])';
 const useIsoLayoutEffect = typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
 

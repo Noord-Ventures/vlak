@@ -84,6 +84,8 @@ jobs:
         run: node --test apps/www/scripts/analytics.test.mjs apps/www/scripts/test-inspiration-dynamics.mjs apps/www/scripts/microscopy-plan.test.mjs apps/www/scripts/desktop-os.test.mjs apps/www/scripts/calendar-model.test.mjs
       - name: Build the site
         run: pnpm --filter www build
+      - name: AI demo and global search behavior
+        run: pnpm --filter www test
       - name: Build the reference app
         env:
           AI_REFERENCE_MODE: fixture
@@ -100,6 +102,7 @@ jobs:
           trap 'kill "$INTERFACE_SERVER_PID"' EXIT
           curl --retry 10 --retry-connrefused --retry-delay 1 -fsS http://localhost:3016/interfaces/ > /dev/null
           SITE_URL=http://localhost:3016 node apps/www/scripts/mobile-navigation-e2e.mjs
+          SITE_URL=http://localhost:3016 node apps/www/scripts/site-search-e2e.mjs
           INTERFACES=drive,documentation,video-player,desktop-os,calendar SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
           SITE_URL=http://localhost:3016 node apps/www/scripts/interface-preview-e2e.mjs
       - name: axe, keyboard, and phone checks over the export

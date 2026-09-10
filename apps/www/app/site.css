@@ -171,6 +171,88 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
 }
 .corner-nav a:hover, .corner-nav a[aria-current="page"] { color: var(--text); }
 
+/* Global launcher. The index loads on intent; the native dialog owns modality. */
+.global-search {
+  position: fixed; top: 14px; right: calc(var(--pad) + 40px); z-index: 200;
+}
+.global-search-trigger {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 44px; min-width: 44px; padding: 0 8px;
+  border: 0; border-radius: var(--radius-sm); background: transparent;
+  color: var(--text-secondary); font: inherit; font-size: .8125rem; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 0 12px var(--bg)) drop-shadow(0 0 20px var(--bg));
+  transition: color var(--duration-snap) var(--ease);
+}
+.global-search-trigger:hover { color: var(--text); }
+.global-search-trigger:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.global-search-trigger:disabled { cursor: wait; opacity: .6; }
+.global-search-shortcut, .global-search-help kbd {
+  font: inherit; font-size: .6875rem; line-height: 1.4;
+  padding: 2px 5px; border: 1px solid var(--divider-subtle); border-radius: var(--radius-sm);
+}
+html:has(.global-search-dialog[open]) { overflow: hidden; }
+.global-search-dialog {
+  --search-offset: min(140px, calc(var(--search-viewport-height, 100dvh) * .16));
+  position: fixed; inset: 0 0 auto; width: 640px; max-width: calc(100vw - 40px);
+  max-height: calc(var(--search-viewport-height, 100dvh) - var(--search-offset) - 20px);
+  margin: calc(var(--search-viewport-top, 0px) + var(--search-offset)) auto 0; padding: 0;
+  overflow: hidden; border: 1px solid var(--divider); border-radius: var(--radius-sm);
+  background: var(--bg); color: var(--text); box-shadow: 0 24px 80px rgb(0 0 0 / .12);
+}
+.global-search-dialog[open] { display: flex; flex-direction: column; }
+.global-search-dialog::backdrop {
+  background: color-mix(in srgb, var(--bg) 60%, transparent); backdrop-filter: blur(6px);
+}
+.global-search-field { position: relative; min-height: 0; display: flex; flex-direction: column; }
+.global-search-mark { position: absolute; top: 20px; left: 20px; display: flex; color: var(--text-secondary); pointer-events: none; }
+.global-search-close.rs-btn-subtle { position: absolute; top: 10px; right: 8px; z-index: 1; width: 44px; height: 44px; padding: 0; -webkit-tap-highlight-color: transparent; }
+.global-search-command { min-height: 0; }
+.global-search-command .rs-command-input {
+  flex-shrink: 0; min-height: 64px; padding: 16px 64px 16px 56px;
+  font-size: 1.125rem; line-height: 1.5;
+}
+.global-search-command .rs-command-list { max-height: 26rem; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 8px; scroll-padding: 8px; }
+.global-search-command .rs-command-item { min-height: 60px; padding: 10px 12px; gap: 20px; font-size: .9375rem; }
+.global-search-command .rs-command-hint { flex-shrink: 0; font-size: .75rem; }
+.global-search-command .rs-command-description { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+.global-search-command .rs-command-group { padding: 8px 12px; font-size: .75rem; }
+.global-search-command .rs-command-empty { padding: 32px 20px; }
+.global-search-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  flex-shrink: 0; min-height: 48px; padding: 8px 20px;
+  border-top: 1px solid var(--divider-subtle); color: var(--text-secondary); font-size: .6875rem;
+}
+.global-search-footer .rs-btn-subtle { flex-shrink: 0; width: auto; }
+.global-search-help, .global-search-help > span { display: flex; align-items: center; gap: 4px; }
+.global-search-help { gap: 12px; flex-shrink: 0; }
+@media (min-width: 641px) and (max-width: 899px) { body { --nav-left: 76px; } }
+@media (min-width: 641px) and (max-width: 1099px) {
+  .global-search-trigger-label, .global-search-shortcut { display: none; }
+}
+@media (max-width: 640px) {
+  .global-search { top: calc(8px + env(safe-area-inset-top, 0px)); right: calc(56px + env(safe-area-inset-right, 0px)); }
+  .global-search-trigger { width: 44px; padding: 0; }
+  .global-search-trigger-label, .global-search-shortcut { display: none; }
+  .global-search-dialog {
+    --search-offset: max(12px, env(safe-area-inset-top, 0px));
+    width: calc(100vw - 24px); max-width: calc(100vw - 24px);
+    max-height: calc(var(--search-viewport-height, 100dvh) - var(--search-offset) - 12px);
+  }
+  .global-search-command .rs-command-item { gap: 12px; font-size: 1rem; }
+  .global-search-command .rs-command-hint { max-width: 72px; overflow-wrap: anywhere; text-align: right; }
+  .global-search-help { display: none; }
+  .global-search-footer { font-size: .75rem; }
+}
+@media (prefers-reduced-motion: reduce) { .global-search-trigger { transition: none; } }
+@media (forced-colors: active) {
+  .global-search-trigger, .global-search-dialog { filter: none; box-shadow: none; }
+  .global-search-dialog::backdrop { backdrop-filter: none; background: Canvas; opacity: .75; }
+  .global-search-command .rs-command-item-active { background: Highlight; color: HighlightText; forced-color-adjust: none; }
+  .global-search-command .rs-command-item-active .rs-command-description,
+  .global-search-command .rs-command-item-active .rs-command-hint { color: HighlightText; }
+}
+
 .settings {
   /* 14px target inset + 2px SVG bearing puts the ink on the page gutter. */
   position: fixed; top: 14px; right: calc(var(--pad) - 16px); z-index: 200;
@@ -384,7 +466,7 @@ body:has(.catalog-page) .site-crumb-bar.rs-crumb-bar-scrolled .rs-crumbs {
     height: 44px;
     margin-top: 8px;
     overflow: hidden;
-    padding: 0 calc(60px + env(safe-area-inset-right, 0px)) 0 calc(60px + env(safe-area-inset-left, 0px));
+    padding: 0 calc(108px + env(safe-area-inset-right, 0px)) 0 calc(60px + env(safe-area-inset-left, 0px));
   }
   .site-crumb-bar .rs-crumb-root,
   .site-crumb-bar .site-crumb-root {

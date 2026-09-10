@@ -2097,13 +2097,13 @@ const [city, setCity] = useState("");
   {
     name: "command",
     title: "Command",
-    description: "Finds and runs commands in a native dialog. Filter by typing; navigate with arrows and Enter.",
+    description: "Finds and runs commands inline or in a native dialog. Filter by typing or supply ranked results; navigate with arrows and Enter.",
     category: "actions",
-    classes: ["rs-command", "rs-command-input", "rs-command-list", "rs-command-group", "rs-command-item", "rs-command-item-active", "rs-command-hint", "rs-command-empty"],
+    classes: ["rs-command", "rs-command-input", "rs-command-list", "rs-command-group", "rs-command-item", "rs-command-item-active", "rs-command-content", "rs-command-description", "rs-command-description-active", "rs-command-hint", "rs-command-hint-active", "rs-command-empty"],
     css: ["components/command.css"],
     react: "components/command.tsx",
     registryDependencies: ["dialog"],
-    snippet: `<div class="rs-command" style="border:1px solid var(--divider);border-radius:var(--radius)"><input class="rs-command-input" placeholder="Type a command or search…" /><div class="rs-command-list" role="listbox"><div class="rs-command-group">Go to</div><div class="rs-command-item rs-command-item-active" role="option" aria-selected="true"><span>Components</span><span class="rs-command-hint">⌘1</span></div><div class="rs-command-item" role="option" aria-selected="false"><span>Tokens</span><span class="rs-command-hint">⌘2</span></div></div></div>`,
+    snippet: `<div class="rs-command" style="border:1px solid var(--divider);border-radius:var(--radius)"><input class="rs-command-input" placeholder="Type a command or search…" /><div class="rs-command-list" role="listbox"><div class="rs-command-group">Go to</div><div class="rs-command-item rs-command-item-active" role="option" aria-selected="true"><span>Components</span><span class="rs-command-hint rs-command-hint-active">⌘1</span></div><div class="rs-command-item" role="option" aria-selected="false"><span>Tokens</span><span class="rs-command-hint">⌘2</span></div></div></div>`,
     example: `import { useEffect, useState } from "react";
 import { CommandDialog } from "@noorddev/vlak-react";
 
@@ -2125,24 +2125,25 @@ useEffect(() => {
   open={open}
   onClose={() => setOpen(false)}
   groups={[
-    { label: "Go to", items: [{ label: "Components", hint: "⌘1", onSelect: () => go("/components") }] },
+    { label: "Go to", items: [{ label: "Components", description: "Browse components and usage", hint: "⌘1", onSelect: () => go("/components") }] },
     { label: "Actions", items: [{ label: "New project", keywords: "create add", onSelect: create }] },
   ]}
 />`,
     usage: {
-      use: ["A palette of commands and destinations behind one shortcut.", "keywords on an item to widen the match; hint for the shortcut label."],
+      use: ["A palette of commands and destinations behind one shortcut.", "keywords on an item to widen the match; hint for the shortcut label and description for one concise secondary line.", "Supply a stable item id when commands share a visible label; it identifies rows and changes in result order.", "Control the query with value and onValueChange, or initialize it with defaultValue. Set inputLabel to name the search field.", "Set shouldFilter={false} when the application supplies ranked groups. Their order is preserved; query and result changes reset the active option."],
       avoid: ["Picking a value for a field; use Combobox.", "Fewer than ten commands; use DropdownMenu."],
     },
     keyboard: [
-      { keys: "Type", does: "Filters the items by label and keywords" },
+      { keys: "Type", does: "Updates the search; filters labels and keywords unless shouldFilter is false" },
       { keys: "Arrow down, Arrow up", does: "Moves the active item" },
       { keys: "Home, End", does: "First or last item" },
       { keys: "Page up, Page down", does: "Moves ten items" },
-      { keys: "Enter", does: "Runs the active item and closes" },
+      { keys: "Enter", does: "Runs the active item and closes, except while composing text with an IME" },
       { keys: "Escape", does: "Closes" },
     ],
     a11y: [
-      "The input is role=\"combobox\" named \"Command\" with aria-autocomplete=\"list\" and aria-activedescendant; the list is role=\"listbox\" with labelled role=\"group\" sections.",
+      "The input is role=\"combobox\" named by inputLabel (default \"Command\") with aria-autocomplete=\"list\" and aria-activedescendant; the list is role=\"listbox\" with labelled role=\"group\" sections.",
+      "Item descriptions use aria-describedby, keeping the option label as its accessible name. Descriptions are visually limited to one line; their full text remains available to assistive technology.",
       "CommandDialog places it in a native modal <dialog>; Command alone renders inline. The input takes focus on mount.",
     ],
     aliases: ["Command", "Command palette", "cmdk", "Command menu", "Spotlight"],

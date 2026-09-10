@@ -8,7 +8,10 @@ import { rs } from "../rs";
 import { Dialog } from "./dialog";
 
 export interface CommandItem {
+  /** Stable identity when different commands share a visible label. */
+  id?: string;
   label: string;
+  description?: React.ReactNode;
   hint?: React.ReactNode;
   keywords?: string;
   onSelect?: () => void;
@@ -19,9 +22,15 @@ export interface CommandGroup {
   items: CommandItem[];
 }
 
-export interface CommandProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CommandProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue"> {
   groups: CommandGroup[];
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
   placeholder?: string;
+  inputLabel?: string;
+  /** Disable built-in filtering when the application supplies ranked results. */
+  shouldFilter?: boolean;
   emptyLabel?: React.ReactNode;
   onDone?: () => void;
 }
@@ -154,9 +163,31 @@ const styles = stylex.create({
   itemActive: {
     backgroundColor: vlak.dividerSubtle,
   },
+  content: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.25rem",
+    minWidth: 0,
+    flex: "1 1 auto",
+  },
+  description: {
+    display: "block",
+    fontSize: "0.75rem",
+    lineHeight: 1.4,
+    color: vlak.gray,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  descriptionActive: {
+    color: vlak.ink,
+  },
   hint: {
     fontSize: "0.6875rem",
     color: vlak.gray,
+  },
+  hintActive: {
+    color: vlak.ink,
   },
   empty: {
     padding: {
@@ -174,10 +205,15 @@ const styles = stylex.create({
 
 const PAGE = 10;
 
-/** Filter, arrows, enter. The input keeps focus; the list is aria-activedescendant. */
+/** Search, arrows, enter. The input keeps focus; the list is aria-activedescendant. */
 export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function Command({
   groups,
+  value,
+  defaultValue = "",
+  onValueChange,
   placeholder = "Type a command or search…",
+  inputLabel = "Command",
+  shouldFilter = true,
   emptyLabel = "Nothing found.",
   onDone,
   className,
@@ -189,28 +225,39 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
   const listboxId = `${idBase}-listbox`;
   const optionId = (index: number) => `${idBase}-opt-${index}`;
   const activeRef = React.useRef<HTMLDivElement>(null);
-  const [query, setQuery] = React.useState("");
-  const [activeIndex, setActiveIndex] = React.useState(0);
+  const composing = React.useRef(false);
+  const [inner, setInner] = React.useState(defaultValue);
+  const query = value ?? inner;
 
   const q = query.trim().toLowerCase();
   const filtered = groups
     .map((group) => ({
       ...group,
-      items: group.items.filter(
+      items: shouldFilter ? group.items.filter(
         (item) => item.label.toLowerCase().includes(q) || item.keywords?.toLowerCase().includes(q),
-      ),
+      ) : group.items,
     }))
     .filter((group) => group.items.length > 0);
   const flat = filtered.flatMap((group) => group.items);
   const hasList = flat.length > 0;
+  // Compare displayed identities, not array references: callers may recreate
+  // their groups on every render while keyboard selection should stay put.
+  const selectionKey = JSON.stringify([query, filtered.map(group => [group.label, group.items.map(item => item.id ?? item.label)])]);
+  const [selection, setSelection] = React.useState({ key: selectionKey, index: 0 });
+  if (selection.key !== selectionKey) {
+    // Persist the reset so returning to an earlier query cannot revive its selection.
+    setSelection({ key: selectionKey, index: 0 });
+  }
+  const activeIndex = selection.key === selectionKey ? Math.max(0, Math.min(flat.length - 1, selection.index)) : 0;
+  const setActiveIndex = (next: React.SetStateAction<number>) => setSelection(current => {
+    const index = current.key === selectionKey ? Math.max(0, Math.min(flat.length - 1, current.index)) : 0;
+    return { key: selectionKey, index: typeof next === "function" ? next(index) : next };
+  });
 
-  React.useEffect(() => {
-    setActiveIndex((i) => Math.max(0, Math.min(flat.length - 1, i)));
-  }, [flat.length]);
-
+  // biome-ignore lint/correctness/useExhaustiveDependencies: Scroll the current option after selection or displayed results change.
   React.useEffect(() => {
     activeRef.current?.scrollIntoView?.({ block: "nearest" });
-  }, [activeIndex, q]);
+  }, [activeIndex, selectionKey]);
 
   const run = (item: CommandItem) => {
     onDone?.();
@@ -218,15 +265,16 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (composing.current || e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) return;
     const last = Math.max(0, flat.length - 1);
     switch (e.key) {
       case "ArrowDown":
         e.preventDefault();
-        setActiveIndex((i) => Math.min(last, i + 1));
+        setActiveIndex(index => Math.min(last, index + 1));
         return;
       case "ArrowUp":
         e.preventDefault();
-        setActiveIndex((i) => Math.max(0, i - 1));
+        setActiveIndex(index => Math.max(0, index - 1));
         return;
       case "Home":
         e.preventDefault();
@@ -238,11 +286,11 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
         return;
       case "PageUp":
         e.preventDefault();
-        setActiveIndex((i) => Math.max(0, i - PAGE));
+        setActiveIndex(index => Math.max(0, index - PAGE));
         return;
       case "PageDown":
         e.preventDefault();
-        setActiveIndex((i) => Math.min(last, i + PAGE));
+        setActiveIndex(index => Math.min(last, index + PAGE));
         return;
       case "Enter": {
         e.preventDefault();
@@ -264,7 +312,7 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
   const list = rs(["rs-command-list"], styles.list);
   const empty = rs(["rs-command-empty"], styles.empty);
   const groupSx = rs(["rs-command-group"], styles.group);
-  const hint = rs(["rs-command-hint"], styles.hint);
+  const content = rs(["rs-command-content"], styles.content);
 
   let cursor = -1;
   return (
@@ -282,12 +330,14 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
         aria-controls={hasList ? listboxId : undefined}
         aria-activedescendant={hasList && flat[activeIndex] ? optionId(activeIndex) : undefined}
         aria-autocomplete="list"
-        aria-label="Command"
+        aria-label={inputLabel}
         value={query}
         onChange={(e) => {
-          setQuery(e.target.value);
-          setActiveIndex(0);
+          if (value === undefined) setInner(e.target.value);
+          onValueChange?.(e.target.value);
         }}
+        onCompositionStart={() => { composing.current = true; }}
+        onCompositionEnd={() => { composing.current = false; }}
         onKeyDown={onKeyDown}
       />
       <div
@@ -317,27 +367,46 @@ export const Command = React.forwardRef<HTMLDivElement, CommandProps>(function C
                 cursor++;
                 const index = cursor;
                 const active = index === activeIndex;
+                const labelId = `${optionId(index)}-label`;
+                const descriptionId = `${optionId(index)}-description`;
+                const hintId = `${optionId(index)}-hint`;
+                const hasDescription = item.description != null;
                 const row = rs(
                   ["rs-command-item", active && "rs-command-item-active"],
                   styles.item,
                   active && styles.itemActive,
                 );
+                const description = rs(
+                  ["rs-command-description", active && "rs-command-description-active"],
+                  styles.description,
+                  active && styles.descriptionActive,
+                );
+                const hint = rs(
+                  ["rs-command-hint", active && "rs-command-hint-active"],
+                  styles.hint,
+                  active && styles.hintActive,
+                );
                 return (
                   <div
-                    key={`${gi}-${item.label}`}
+                    key={item.id ?? `${gi}-${item.label}`}
                     id={optionId(index)}
                     ref={active ? activeRef : undefined}
                     role="option"
                     tabIndex={-1}
                     aria-selected={active}
+                    aria-labelledby={hasDescription ? labelId : undefined}
+                    aria-describedby={hasDescription ? [descriptionId, item.hint != null && hintId].filter(Boolean).join(" ") : undefined}
                     className={row.className}
                     style={row.style}
                     onPointerEnter={() => setActiveIndex(index)}
                     onClick={() => run(item)}
                   >
-                    <span>{item.label}</span>
+                    <span className={content.className} style={content.style}>
+                      <span id={labelId}>{item.label}</span>
+                      {hasDescription && <span id={descriptionId} className={description.className} style={description.style}>{item.description}</span>}
+                    </span>
                     {item.hint != null && (
-                      <span className={hint.className} style={hint.style}>
+                      <span id={hintId} className={hint.className} style={hint.style}>
                         {item.hint}
                       </span>
                     )}

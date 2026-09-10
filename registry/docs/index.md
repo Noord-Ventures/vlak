@@ -16,7 +16,7 @@
 - [Toggle group](toggle-group.md): Selects one visible option. Default joins toggles with an ink active state; subtle uses a gray rail, 3px gaps, and a soft active fill.
 - [Context menu](context-menu.md): Opens actions at the pointer or with Shift+F10. Escape and outside click close the menu.
 - [Menubar](menubar.md): Groups application menus in a compact 1px frame. Text-only triggers keep 44px targets and wrap to fit.
-- [Command](command.md): Finds and runs commands in a native dialog. Filter by typing; navigate with arrows and Enter.
+- [Command](command.md): Finds and runs commands inline or in a native dialog. Filter by typing or supply ranked results; navigate with arrows and Enter.
 - [Theme toggle](theme-toggle.md): Switches between light and dark schemes. The icon changes and the choice persists locally.
 
 ## Forms

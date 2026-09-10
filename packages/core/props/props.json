@@ -10887,8 +10887,8 @@
         {
           "name": "Command",
           "kind": "component",
-          "description": "Filter, arrows, enter. The input keeps focus; the list is aria-activedescendant.",
-          "extends": "HTMLAttributes<HTMLDivElement>",
+          "description": "Search, arrows, enter. The input keeps focus; the list is aria-activedescendant.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
           "ref": "HTMLDivElement",
           "props": [
             {
@@ -10897,10 +10897,39 @@
               "required": true
             },
             {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
               "name": "placeholder",
               "type": "string",
               "required": false,
               "default": "\"Type a command or search…\""
+            },
+            {
+              "name": "inputLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Command\""
+            },
+            {
+              "name": "shouldFilter",
+              "type": "boolean",
+              "required": false,
+              "default": "true",
+              "description": "Disable built-in filtering when the application supplies ranked results."
             },
             {
               "name": "emptyLabel",
@@ -10919,7 +10948,7 @@
           "name": "CommandDialog",
           "kind": "component",
           "description": "The palette in a native <dialog>. Wire ⌘K in your app to setOpen(true).",
-          "extends": "HTMLAttributes<HTMLDivElement>",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\">",
           "ref": "HTMLDialogElement",
           "props": [
             {
@@ -10928,9 +10957,35 @@
               "required": true
             },
             {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
               "name": "placeholder",
               "type": "string",
               "required": false
+            },
+            {
+              "name": "inputLabel",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "shouldFilter",
+              "type": "boolean",
+              "required": false,
+              "description": "Disable built-in filtering when the application supplies ranked results."
             },
             {
               "name": "emptyLabel",

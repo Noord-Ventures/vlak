@@ -11,7 +11,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
-    "test": "node --experimental-strip-types --test scripts/ai-demo.test.mjs",
+    "test": "node --experimental-strip-types --test scripts/ai-demo.test.mjs scripts/site-search.test.mjs",
     "e2e": "node scripts/e2e.mjs"
   },
   "dependencies": {

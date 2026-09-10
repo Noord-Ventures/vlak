@@ -119,7 +119,7 @@ try {
       const last = panel.getByRole("link").last();
       await last.focus();
       await page.keyboard.press("Tab");
-      assert(await page.evaluate(() => !!document.activeElement.closest(".toc-mobile-open, .logo-wrap, .corner-nav, .settings, .nav-toggle, .site-crumb-bar")), "Keyboard focus stays in the menu and visible chrome");
+      assert(await page.evaluate(() => !!document.activeElement.closest(".toc-mobile-open, .logo-wrap, .corner-nav, .settings, .global-search, .nav-toggle, .site-crumb-bar")), "Keyboard focus stays in the menu and visible chrome");
       await page.keyboard.press("Escape");
       await closed();
       await settle(page);

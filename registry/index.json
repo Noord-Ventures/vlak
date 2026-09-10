@@ -18067,7 +18067,7 @@
       "name": "command",
       "type": "registry:component",
       "title": "Command",
-      "description": "Finds and runs commands in a native dialog. Filter by typing; navigate with arrows and Enter.",
+      "description": "Finds and runs commands inline or in a native dialog. Filter by typing or supply ranked results; navigate with arrows and Enter.",
       "registryDependencies": [
         "https://vlak.dev/r/vlak-base.json",
         "https://vlak.dev/r/inter.json",
@@ -18091,10 +18091,14 @@
             "rs-command-group",
             "rs-command-item",
             "rs-command-item-active",
+            "rs-command-content",
+            "rs-command-description",
+            "rs-command-description-active",
             "rs-command-hint",
+            "rs-command-hint-active",
             "rs-command-empty"
           ],
-          "snippet": "<div class=\"rs-command\" style=\"border:1px solid var(--divider);border-radius:var(--radius)\"><input class=\"rs-command-input\" placeholder=\"Type a command or search…\" /><div class=\"rs-command-list\" role=\"listbox\"><div class=\"rs-command-group\">Go to</div><div class=\"rs-command-item rs-command-item-active\" role=\"option\" aria-selected=\"true\"><span>Components</span><span class=\"rs-command-hint\">⌘1</span></div><div class=\"rs-command-item\" role=\"option\" aria-selected=\"false\"><span>Tokens</span><span class=\"rs-command-hint\">⌘2</span></div></div></div>",
+          "snippet": "<div class=\"rs-command\" style=\"border:1px solid var(--divider);border-radius:var(--radius)\"><input class=\"rs-command-input\" placeholder=\"Type a command or search…\" /><div class=\"rs-command-list\" role=\"listbox\"><div class=\"rs-command-group\">Go to</div><div class=\"rs-command-item rs-command-item-active\" role=\"option\" aria-selected=\"true\"><span>Components</span><span class=\"rs-command-hint rs-command-hint-active\">⌘1</span></div><div class=\"rs-command-item\" role=\"option\" aria-selected=\"false\"><span>Tokens</span><span class=\"rs-command-hint\">⌘2</span></div></div></div>",
           "cssOnly": false,
           "registryDependencies": [
             "dialog",
@@ -18107,11 +18111,14 @@
             "Command menu",
             "Spotlight"
           ],
-          "example": "import { useEffect, useState } from \"react\";\nimport { CommandDialog } from \"@noorddev/vlak-react\";\n\nconst [open, setOpen] = useState(false);\n\n// wire the shortcut once in your app\nuseEffect(() => {\n  const onKey = (e: KeyboardEvent) => {\n    if (e.key === \"k\" && (e.metaKey || e.ctrlKey)) {\n      e.preventDefault();\n      setOpen(true);\n    }\n  };\n  window.addEventListener(\"keydown\", onKey);\n  return () => window.removeEventListener(\"keydown\", onKey);\n}, []);\n\n<CommandDialog\n  open={open}\n  onClose={() => setOpen(false)}\n  groups={[\n    { label: \"Go to\", items: [{ label: \"Components\", hint: \"⌘1\", onSelect: () => go(\"/components\") }] },\n    { label: \"Actions\", items: [{ label: \"New project\", keywords: \"create add\", onSelect: create }] },\n  ]}\n/>",
+          "example": "import { useEffect, useState } from \"react\";\nimport { CommandDialog } from \"@noorddev/vlak-react\";\n\nconst [open, setOpen] = useState(false);\n\n// wire the shortcut once in your app\nuseEffect(() => {\n  const onKey = (e: KeyboardEvent) => {\n    if (e.key === \"k\" && (e.metaKey || e.ctrlKey)) {\n      e.preventDefault();\n      setOpen(true);\n    }\n  };\n  window.addEventListener(\"keydown\", onKey);\n  return () => window.removeEventListener(\"keydown\", onKey);\n}, []);\n\n<CommandDialog\n  open={open}\n  onClose={() => setOpen(false)}\n  groups={[\n    { label: \"Go to\", items: [{ label: \"Components\", description: \"Browse components and usage\", hint: \"⌘1\", onSelect: () => go(\"/components\") }] },\n    { label: \"Actions\", items: [{ label: \"New project\", keywords: \"create add\", onSelect: create }] },\n  ]}\n/>",
           "usage": {
             "use": [
               "A palette of commands and destinations behind one shortcut.",
-              "keywords on an item to widen the match; hint for the shortcut label."
+              "keywords on an item to widen the match; hint for the shortcut label and description for one concise secondary line.",
+              "Supply a stable item id when commands share a visible label; it identifies rows and changes in result order.",
+              "Control the query with value and onValueChange, or initialize it with defaultValue. Set inputLabel to name the search field.",
+              "Set shouldFilter={false} when the application supplies ranked groups. Their order is preserved; query and result changes reset the active option."
             ],
             "avoid": [
               "Picking a value for a field; use Combobox.",
@@ -18121,7 +18128,7 @@
           "keyboard": [
             {
               "keys": "Type",
-              "does": "Filters the items by label and keywords"
+              "does": "Updates the search; filters labels and keywords unless shouldFilter is false"
             },
             {
               "keys": "Arrow down, Arrow up",
@@ -18137,7 +18144,7 @@
             },
             {
               "keys": "Enter",
-              "does": "Runs the active item and closes"
+              "does": "Runs the active item and closes, except while composing text with an IME"
             },
             {
               "keys": "Escape",
@@ -18145,7 +18152,8 @@
             }
           ],
           "a11y": [
-            "The input is role=\"combobox\" named \"Command\" with aria-autocomplete=\"list\" and aria-activedescendant; the list is role=\"listbox\" with labelled role=\"group\" sections.",
+            "The input is role=\"combobox\" named by inputLabel (default \"Command\") with aria-autocomplete=\"list\" and aria-activedescendant; the list is role=\"listbox\" with labelled role=\"group\" sections.",
+            "Item descriptions use aria-describedby, keeping the option label as its accessible name. Descriptions are visually limited to one line; their full text remains available to assistive technology.",
             "CommandDialog places it in a native modal <dialog>; Command alone renders inline. The input takes focus on mount."
           ]
         }

@@ -1,6 +1,7 @@
 /* Layout and the WebGL surface only. Vlak components own the interface paint. */
 body:has(.inspiration-page) .logo-wrap,
 body:has(.inspiration-page) .corner-nav,
+body:has(.inspiration-page) .global-search,
 body:has(.inspiration-page) .site-crumb-bar,
 body:has(.inspiration-page) .site-footer,
 body:has(.inspiration-page) .settings,

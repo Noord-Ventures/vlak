@@ -6,6 +6,8 @@ A constraint-first design system for product exploration. 215 accessible compone
 
 [Browse components](https://vlak.dev/components/) · [Try the interfaces](https://vlak.dev/interfaces/) · [Open a starter](https://vlak.dev/starters/) · [Use with coding agents](https://vlak.dev/docs/agents/)
 
+Use the navbar search or press **⌘K / Ctrl+K** to find components, AI references, guides, and interfaces. Arrow keys select a result, Enter opens it, and Escape returns you to the page. Search runs locally and recognizes familiar API aliases.
+
 <p align="center">
   <a href="https://vlak.dev/review/vlak-openai-plugin-demo.mp4">
     <img src="assets/vlak-chatgpt-demo.png" alt="ChatGPT discovering Vlak's component tools through its hosted MCP server" width="960" />

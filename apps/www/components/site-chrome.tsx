@@ -8,6 +8,7 @@ import { chrome } from "@/app/site.stylex";
 import { sx } from "@/lib/sx";
 import { SettingsMark } from "./settings-mark";
 import { VlakMark } from "./vlak-mark";
+import { GlobalSearch } from "./global-search";
 
 type Scheme = "light" | "dark" | "auto";
 type GridPref = "on" | "off";
@@ -352,6 +353,8 @@ export function SiteChrome() {
         ))}
         <a href="https://github.com/Noord-Ventures/vlak">GitHub</a>
       </nav>
+
+      <GlobalSearch />
 
       <div className="settings" ref={settingsRef}>
         <button
