@@ -198,15 +198,19 @@ try {
       await page.keyboard.press(key);
       const focus = await dialog.evaluate(element => ({
         inside: element.contains(document.activeElement),
-        // Chromium may move focus into browser chrome at a native modal's boundary.
-        // BODY is acceptable only while the page itself has lost focus.
-        browserChrome: !document.hasFocus() && document.activeElement === document.body,
+        // Chromium may expose unfocused BODY while tabbing into browser chrome.
+        // hasFocus() differs by browsing context; no page element may match :focus.
+        browserChrome: document.activeElement === document.body && document.querySelector(":focus") === null,
+        modal: element.matches(":modal"),
         label: document.activeElement?.getAttribute("aria-label"),
       }));
       assert(focus.inside || focus.browserChrome, "Native Tab navigation must never focus background page controls");
+      assert(focus.modal, "Search remains a native modal throughout the Tab sequence");
       if (focus.inside) tabStops.add(focus.label);
     }
     assert(tabStops.has("Search Vlak") && tabStops.has("Close search"), "Forward and reverse Tab reach both search controls");
+    await searchTrigger(page).evaluate(element => element.focus());
+    assert(await dialog.evaluate(element => element.contains(document.activeElement)), "The native modal blocks programmatic focus on its background trigger");
     await input.fill("no-such-vlak-result-349281");
     await dialog.locator(".rs-command-empty").waitFor({ state: "visible" });
     assert.equal(await dialog.getByRole("option").count(), 0);
@@ -290,7 +294,9 @@ try {
     await dialogGeometry(page, "dark");
     await closeSearch(page, "button");
 
-    await page.goto(`${base}/components/dialog/`, { waitUntil: "domcontentloaded" });
+    // These existing demos are fixtures for shortcut isolation; wait for their
+    // independently loaded example chunks before activating their controls.
+    await page.goto(`${base}/components/dialog/`, { waitUntil: "networkidle" });
     await page.getByRole("article").getByRole("button", { name: "Remove item…", exact: true }).click();
     const other = page.getByRole("dialog", { name: "Remove this item?", exact: true });
     await other.waitFor({ state: "visible" });
@@ -303,7 +309,7 @@ try {
     await page.keyboard.press("Escape");
     await other.waitFor({ state: "hidden" });
 
-    await page.goto(`${base}/interfaces/documentation/`, { waitUntil: "domcontentloaded" });
+    await page.goto(`${base}/interfaces/documentation/`, { waitUntil: "networkidle" });
     await page.getByRole("button", { name: "Preview fullscreen", exact: true }).click();
     const preview = page.locator('.if-preview-frame[data-preview-open="true"]');
     await preview.waitFor({ state: "visible" });
