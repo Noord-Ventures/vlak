@@ -50,6 +50,12 @@ test("all query words must match, including queries combining names and features
   assert.deepEqual(searchSite([item("details", "Details")], "AI"), []);
 });
 
+test("phone platforms have separate canonical search destinations", () => {
+  assert.equal(searchSite(siteSearchEntries, "ios")[0]?.href, "/interfaces/ios/");
+  assert.equal(searchSite(siteSearchEntries, "android")[0]?.href, "/interfaces/android/");
+  assert.ok(!siteSearchEntries.some(entry => entry.href === "/interfaces/mobile-os/"));
+});
+
 test("empty searches suggest useful canonical destinations and limits remain bounded", () => {
   const suggestions = searchSite(siteSearchEntries, "   ");
   assert.deepEqual(suggestions.slice(0, 4).map(entry => entry.href), ["/docs/", "/components/", "/ai/", "/interfaces/"]);
@@ -67,7 +73,7 @@ test("every public canonical page is indexed once, including dynamic catalog and
   for (const file of await readdir(new URL("../app/", import.meta.url), { recursive: true })) {
     if (file !== "page.tsx" && !file.endsWith("/page.tsx")) continue;
     const route = file === "page.tsx" ? "" : file.slice(0, -"/page.tsx".length);
-    if (["swag", "i/[slug]", "docs/ai"].includes(route)) continue;
+    if (["swag", "i/[slug]", "docs/ai", "interfaces/mobile-os"].includes(route)) continue;
     if (route === "components/[name]") {
       for (const component of catalogComponents.filter(component => component.category !== "ai")) expected.add(`/components/${component.name}/`);
     } else if (route === "ai/[name]") {

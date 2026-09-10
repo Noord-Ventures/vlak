@@ -9,7 +9,7 @@ import { DesktopOSCrop } from "./desktop-os/crop";
 import { VideoPlayerCrop } from "./video-player/crop";
 import { MusicPlayerCrop } from "./music-player/crop";
 import { MicroscopyCrop } from "./microscopy/crop";
-import { ChatCrop, DashboardCrop, SocialCrop, FleetCrop, FoodCrop, TeamCrop, WallpaperCrop, MobileOSCrop, TransitCrop } from "./workflow-crops";
+import { ChatCrop, DashboardCrop, SocialCrop, FleetCrop, FoodCrop, TeamCrop, WallpaperCrop, IOSCrop, AndroidCrop, TransitCrop } from "./workflow-crops";
 import "./agents/crop.css";
 import "./concepts/render-crop.css";
 import { MicrobiologyCrop, GenomeCrop, ProteinCrop, RoboticsCrop, CircuitryCrop, IdentityCrop, PatientCrop, MusicCrop } from "./specialist-crops";
@@ -100,7 +100,8 @@ const CROPS: Record<InterfaceSlug, () => ReactNode> = {
   orbit: OrbitCrop,
   frontier: FrontierCrop,
   platforms: TransitCrop,
-  "mobile-os": MobileOSCrop,
+  android: AndroidCrop,
+  ios: IOSCrop,
   microbiology: MicrobiologyCrop,
   genome: GenomeCrop,
   protein: ProteinCrop,

@@ -1,6 +1,6 @@
 # Interfaces
 
-The catalogue contains 28 working interface studies. Their definitions live in `app/interfaces/catalog.ts`; each study has its own route and source folder. Interfaces is a first-class site destination alongside Components, Docs and About. The component expansion adds 52 specialist controls, taking the public component catalogue from 114 to 166.
+The catalogue contains 29 working interface studies. Their definitions live in `app/interfaces/catalog.ts`; each study has its own route, with shared source where platforms overlap. Interfaces is a first-class site destination alongside Components, Docs and About. The component expansion adds 52 specialist controls, taking the public component catalogue from 114 to 166.
 
 ## Catalogue and shared shell
 
@@ -50,7 +50,8 @@ State transitions are restrained. Focus and a user-triggered change can move del
 | Satellite operations | `/interfaces/orbit` | Map → asset → pass | Select assets and layers, change zoom, and manage a local capture queue around a monochrome map and scanning reticle. |
 | Website / Athena Labs | `/interfaces/frontier` | Proposition → model → system card | A large cropped hairline Athena bust turns slowly beside local model information. Reduced motion holds it still. |
 | Transit app | `/interfaces/platforms` | Plan → route → saved day | Search sample stations, choose departure time, inspect stops, save a trip and edit traveler preferences. No timetable or booking service is connected. |
-| Mobile OS | `/interfaces/mobile-os` | Home → app → system controls | Two independent phones each provide 16 apps, local editing, settings, notifications, recents, timers and synthesized audio. |
+| Android | `/interfaces/android` | Home → app → Back, Home or Recents | One Android phone provides 16 local apps, Material navigation, Quick Settings, timers and synthesized audio. |
+| iOS | `/interfaces/ios` | Home → app → Home indicator or system centers | One iPhone provides 16 local apps, contextual navigation, App Library, timers and synthesized audio. |
 | Music player | `/interfaces/music-player` | Library or Queue → recording → Sound | Play individual official previews or attached local files. Sound adds a measured spectrum and five-band equalizer when processing is available. |
 | Video player | `/interfaces/video-player` | Music video playlist → official embed → playback | Loathe, Foals and Woodkid official YouTube and Vimeo music videos with actual player controls, native captions, and mobile Watching / Playlist screens. |
 | Documentation | `/interfaces/documentation` | Index → article → heading outline | A bounded Inter reader with metadata, reading preferences, section navigation, pinning and index-position restoration. |
@@ -72,7 +73,8 @@ Use the specimen's width, not only the browser width. At 640px and below, deskto
 - Satellite operations separates Map, Assets and Pass details. Telemetry remains available at every size.
 - The Website header uses Vlak paper, ink and hairlines with its active underline on the divider. Mobile navigation uses a disclosure menu and one-column reading flow, with Escape and focus return.
 - Transit has one responsive planner, itinerary, saved-day and profile state, without a platform switch.
-- Mobile OS shows both phones side by side on desktop and in a horizontal scroll-snap track on compact screens. There is no study-level switch. iPhone navigation keeps the Home gesture, App Library, contextual back, grouped Settings and separate Control and Notification Centers. Android retains its All Apps drawer, three-button navigation, app bars, floating actions and Quick Settings. The iOS visual language uses paper surfaces, Vlak glyphs and restrained type without replacing its platform structure. Vertical Home scrolling remains native, an App Library swipe does not move the phone track, and a status-bar swipe keeps the other phone reachable.
+- iOS and Android are separate gallery entries and routes, each rendering one phone. iPhone navigation keeps the Home indicator, App Library, contextual back, grouped Settings and separate Control and Notification Centers. Android retains its All Apps drawer, gesture navigation, app bars, floating actions and Quick Settings, with explicit Back and Recents controls below the device. Both use paper surfaces, Inter and Vlak glyphs while preserving platform structure. On phones, the app starts at readable size; View device switches to its proportional hardware drawing and Use phone returns to the unscaled workspace. A device selector changes hardware, Rotate changes orientation and a foldable profile can open its display without remounting the app. App content scrolls inside its device, and entering or leaving full-screen preview keeps the app mounted.
+- `/interfaces/mobile-os/` and `/i/mobile-os/` remain static platform choosers with ordinary links to both current studies. They require no JavaScript or host-specific redirect and are excluded from search indexing, the sitemap and the active catalog. The iOS and Android pages share their implementation in `mobile-os/`; their independent `/i/ios/` and `/i/android/` links open the matching preview. The earlier combined phone film stays available as an asset but is not assigned to either new study.
 - Music player exposes Library, Playing and Queue on mobile. The selected recording, transport, Sound settings and queue survive navigation.
 - Documentation uses a readable contents disclosure below 840px. On desktop, heading marks reveal labels on approach or focus. Clicking a heading or the Contents control pins it; Escape dismisses it. Paragraphs and lists use Inter at weight 350. Reading controls have no hover fill; the outline keeps its proximity reveal. Reader settings reuse the site chrome’s SettingsMark and canonical Vlak Popover, Field, ToggleGroup and Button components. Explicit Light and Dark use the exact token palettes; Auto inherits the site without changing its theme. There is no layout-grid preference.
 
@@ -86,7 +88,7 @@ Calendar stores events and calendar preferences in this browser. Its recurrence 
 
 Food ordering uses verified restaurant references for Joe's Kitchen, Neder, La Dune and Jacky's. Restaurant and dish photographs are generated illustrations. Prices and service details distinguish sourced snapshots from samples; delivery and checkout remain illustrative.
 
-Mobile OS music uses real local oscillators and keeps its app and system controls synchronized with actual audio suspension, unsuccessful resume and recovery.
+iOS and Android music use real local oscillators and keep their app and system controls synchronized with actual audio suspension, unsuccessful resume and recovery.
 
 The Music Player has 23 verified recordings. Official previews are individually initiated promotional streams with direct store links, the approved badge and courtesy credit. They do not auto-advance or become downloadable full tracks. User-attached files stay local and support full queue playback.
 
@@ -113,6 +115,6 @@ For the fresh export, set `SITE_URL` and optionally `PLAYWRIGHT_EXECUTABLE_PATH`
 - `scripts/e2e-specialist-interfaces.mjs`: the eight specialist application layouts in both themes, with local persistence, exact data, downloads and synthesized-audio workflows in light mode at each width.
 - `scripts/e2e-render-controls.mjs` and `scripts/e2e-vehicle.mjs`: actual geometry, line treatments, mesh, camera fit, turntable, failure/retry and context cleanup.
 - `scripts/e2e-interface-chrome.mjs`, `scripts/e2e-interfaces.mjs` and `scripts/e2e-mobile-interfaces.mjs`: shared navigation, gallery behavior, flush dividers, target sizes and established responsive journeys.
-- The domain and application helpers remain callable separately for focused regression checks, including Mobile OS, Documentation, Music Player, robotics and Mapbox.
+- The domain and application helpers remain callable separately for focused regression checks, including the shared iOS and Android helper, Documentation, Music Player, robotics and Mapbox.
 
 Before recording a final pass, test the current production export at phone and desktop widths, including a narrow desktop specimen. Check one main landmark and page heading, page and specimen overflow, 44px reach, keyboard navigation, state changes, failures, clipboard/download feedback, source and component links, the Build anchor and light/dark/reduced-motion behavior. Review actual screenshots. Run the site typecheck and production build; record exact results after integration.

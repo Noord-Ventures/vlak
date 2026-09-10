@@ -103,7 +103,7 @@ jobs:
           curl --retry 10 --retry-connrefused --retry-delay 1 -fsS http://localhost:3016/interfaces/ > /dev/null
           SITE_URL=http://localhost:3016 node apps/www/scripts/mobile-navigation-e2e.mjs
           SITE_URL=http://localhost:3016 node apps/www/scripts/site-search-e2e.mjs
-          INTERFACES=drive,documentation,video-player,desktop-os,calendar SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
+          INTERFACES=drive,documentation,video-player,desktop-os,calendar,android,ios SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
           SITE_URL=http://localhost:3016 node apps/www/scripts/interface-preview-e2e.mjs
       - name: axe, keyboard, and phone checks over the export
         run: pnpm --filter www e2e

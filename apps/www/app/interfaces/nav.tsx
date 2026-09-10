@@ -13,6 +13,7 @@ function here(pathname: string, href: string) {
 
 function navigationLabel(label: string) {
   const labels: Record<string, string> = {
+    iOS: "iOS",
     "Genome mapping workspace": "Genome Mapping",
     "Protein sequence workbench": "Protein Sequence",
   };

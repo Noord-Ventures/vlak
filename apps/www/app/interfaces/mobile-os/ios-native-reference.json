@@ -1,0 +1,882 @@
+{
+  "source": {
+    "title": "Apple iOS 27 UI Kit",
+    "url": "https://www.sketch.com/s/04c24d8b-38fb-4afb-8836-36617e022f02",
+    "version": "5l0J2p",
+    "sketchVersion": "2026.3",
+    "sha256": "0efe167fb1c0174a3bd03de533535d1c185963b38145720c54357013f89a8f6f",
+    "inspectedAt": "2026-09-10",
+    "pagesParsed": 34
+  },
+  "scope": "Measured component frames and visible layer anatomy. Original artwork, materials, fonts and full kit remain with Apple.",
+  "components": [
+    {
+      "id": "E0D5B734-FA3E-495D-AA69-E8AE1BA44815",
+      "name": "Lists/Light/Grouped Table View",
+      "width": 370,
+      "height": 520,
+      "parts": [
+        {
+          "id": "93E46D58-6DF7-45F2-964D-3C61C9C03D47",
+          "name": "Row 10",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 468
+        },
+        {
+          "id": "1F6B6076-EF50-4D0C-8C99-CBEA566310FB",
+          "name": "Row 9",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 416
+        },
+        {
+          "id": "45D7B4DC-06B4-4CD0-A2A7-93685CD378D2",
+          "name": "Row 8",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 364
+        },
+        {
+          "id": "1EB66887-D842-4F83-B0C8-D3D73A7F1DBC",
+          "name": "Row 7",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 312
+        },
+        {
+          "id": "54EC9B22-4521-449A-90B9-1FB180EAEDFF",
+          "name": "Row 6",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 260
+        },
+        {
+          "id": "B72D39CD-E4F9-4E5B-AF1A-0C76522F7122",
+          "name": "Row 5",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 208
+        },
+        {
+          "id": "F13BD60E-9CF0-4BCA-AFD1-6A6273463D9B",
+          "name": "Row 4",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 156
+        },
+        {
+          "id": "AC14FC20-223C-490D-BEDF-49D521CCA75B",
+          "name": "Row 3",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 104
+        },
+        {
+          "id": "35B2F233-759C-41B9-9DE2-D384E122F6E3",
+          "name": "Row 2",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 52
+        },
+        {
+          "id": "65DD3AD3-3978-46FC-8E9B-EE1393B9D774",
+          "name": "Row 1",
+          "width": 370,
+          "height": 52,
+          "x": 0,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "id": "3B6E0BA0-E073-4B74-988A-B36E8EF2F5FE",
+      "name": "Lists/Light/Rows/Large",
+      "width": 402,
+      "height": 68,
+      "parts": [
+        {
+          "id": "40D0558F-E4A6-4CED-8F40-CF67562D7E8A",
+          "name": "Stack",
+          "width": 257,
+          "height": 68,
+          "x": 129,
+          "y": 0,
+          "parts": [
+            {
+              "id": "B6249493-5985-4639-A25B-FAC3605DEB8A",
+              "name": "Trailing",
+              "width": 70,
+              "height": 68,
+              "x": 187,
+              "y": 0
+            },
+            {
+              "id": "850B0F0F-A657-4806-B931-8A4AEEEAF82F",
+              "name": "Stack",
+              "width": 187,
+              "height": 68,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "id": "889FB2C3-C55A-4529-8EED-2DD95BC36AB6",
+          "name": "Accessories",
+          "width": 97,
+          "height": 68,
+          "x": 16,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "id": "627FDBA6-CA66-42E1-9423-E76D8DB1EB7D",
+      "name": "Lists/Light/Rows/Default",
+      "width": 402,
+      "height": 52,
+      "parts": [
+        {
+          "id": "90F3A3A0-F647-486D-B41C-B3A02C089F51",
+          "name": "Stack",
+          "width": 273,
+          "height": 52,
+          "x": 113,
+          "y": 0,
+          "parts": [
+            {
+              "id": "E542C57C-584A-488A-BD8A-09C8BF596693",
+              "name": "Trailing",
+              "width": 70,
+              "height": 52,
+              "x": 203,
+              "y": 0
+            },
+            {
+              "id": "94786D60-6912-4218-BF59-C0C269FE069D",
+              "name": "Title",
+              "width": 203,
+              "height": 22,
+              "x": 0,
+              "y": 15,
+              "type": {
+                "name": "SFPro-Regular",
+                "size": 17
+              },
+              "lineHeight": 22
+            }
+          ]
+        },
+        {
+          "id": "D2174AE0-458E-42D9-AA12-1D6CDCC682B6",
+          "name": "Accessories",
+          "width": 81,
+          "height": 52,
+          "x": 16,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "id": "ABFCE9E4-5A17-4E97-9E79-5F574F0BFA60",
+      "name": "Toggles/Light/Off/3 - Pressed",
+      "width": 64,
+      "height": 28,
+      "parts": [
+        {
+          "id": "7D57CFFB-2F1D-4AC8-AB53-3C84F8F3AC80",
+          "name": "AX Label",
+          "width": 22,
+          "height": 10,
+          "x": 40,
+          "y": 9,
+          "parts": [
+            {
+              "id": "001DFCFF-6C59-43A8-B065-8B6E80E50738",
+              "name": "AX Label",
+              "width": 10,
+              "height": 10,
+              "x": 6,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "id": "B82234D3-BBC8-421E-83A1-FFCD501CA935",
+          "name": "Knob",
+          "width": 38,
+          "height": 24,
+          "x": 2,
+          "y": 2,
+          "radius": 13
+        },
+        {
+          "id": "4C0A2C9E-824C-4BED-B1C3-A4A26975B878",
+          "name": "Knob",
+          "width": 58,
+          "height": 38,
+          "x": -8,
+          "y": -5
+        }
+      ]
+    },
+    {
+      "id": "EC841EE1-18F1-4285-854E-0D6C8B4FEFDE",
+      "name": "Toggles/Light/Off/1 - Idle",
+      "width": 64,
+      "height": 28,
+      "parts": [
+        {
+          "id": "3AAD3811-6BAA-4557-8171-59E807589086",
+          "name": "AX Label",
+          "width": 22,
+          "height": 10,
+          "x": 40,
+          "y": 9,
+          "parts": [
+            {
+              "id": "84F06B12-2660-4825-9902-BD5F99610F31",
+              "name": "AX Label",
+              "width": 10,
+              "height": 10,
+              "x": 6,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "id": "8E4331AB-53B7-4BFC-BD2A-E49EA620154F",
+          "name": "Knob",
+          "width": 38,
+          "height": 24,
+          "x": 2,
+          "y": 2,
+          "radius": 13
+        }
+      ]
+    },
+    {
+      "id": "2637E1F2-0B94-437F-8970-32446A4EBEFF",
+      "name": "Toggles/Light/On/3 - Pressed",
+      "width": 64,
+      "height": 28,
+      "parts": [
+        {
+          "id": "422D50D1-D476-4E84-AC52-368DB22FCC3E",
+          "name": "Knob",
+          "width": 38,
+          "height": 24,
+          "x": 24,
+          "y": 2,
+          "radius": 13
+        },
+        {
+          "id": "12D5ADCF-0526-42A7-B295-818C47588F18",
+          "name": "AX Label",
+          "width": 22,
+          "height": 10,
+          "x": 2,
+          "y": 9,
+          "parts": [
+            {
+              "id": "F4027528-E34C-4A44-BB6A-35430BB97771",
+              "name": "AX Label",
+              "width": 1,
+              "height": 10,
+              "x": 10.5,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "id": "84183E90-0F96-49C5-A258-651D69EE8838",
+          "name": "Knob",
+          "width": 58,
+          "height": 38,
+          "x": 14,
+          "y": -5
+        }
+      ]
+    },
+    {
+      "id": "C9E2DB96-FF45-4D0A-B39D-0BD026C86DD0",
+      "name": "Toggles/Light/On/1 - Idle",
+      "width": 64,
+      "height": 28,
+      "parts": [
+        {
+          "id": "D603DA02-4D29-456F-AAB2-EFF08736B6B2",
+          "name": "Knob",
+          "width": 38,
+          "height": 24,
+          "x": 24,
+          "y": 2,
+          "radius": 13
+        },
+        {
+          "id": "1DF42367-6D2E-44DF-A5FC-08888B033FF4",
+          "name": "AX Label",
+          "width": 22,
+          "height": 10,
+          "x": 2,
+          "y": 9,
+          "parts": [
+            {
+              "id": "104DE224-9B51-4BEA-B221-5D94B2E3DA54",
+              "name": "AX Label",
+              "width": 1,
+              "height": 10,
+              "x": 10.5,
+              "y": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "18157939-AB96-437B-969C-A4B4A8F5CF3F",
+      "name": "Tab Bars/􀻃/Light/iPhone/Tab - Default/Default",
+      "width": 72,
+      "height": 54,
+      "parts": [
+        {
+          "id": "2CAD4618-C664-476C-AE8F-C98C99802ADF",
+          "name": "Label",
+          "width": 54,
+          "height": 12,
+          "x": 9,
+          "y": 35.9990303955078,
+          "type": {
+            "name": "SFPro-Semibold",
+            "size": 10
+          },
+          "lineHeight": 12
+        },
+        {
+          "id": "5E941A80-10DF-4419-96A4-1C2B16E880C7",
+          "name": "Symbol",
+          "width": 54,
+          "height": 28,
+          "x": 9,
+          "y": 7,
+          "type": {
+            "name": "SFPro-Semibold",
+            "size": 18
+          },
+          "lineHeight": 22
+        }
+      ]
+    },
+    {
+      "id": "E8F7F5B9-C7D9-4B4F-AAFF-7F1F2AB6E806",
+      "name": "Tab Bars/􀻃/Light/iPhone/Tab - Default/Selected",
+      "width": 200,
+      "height": 54,
+      "parts": [
+        {
+          "id": "24635C9D-9954-4CAD-8CA9-23931AF826FF",
+          "name": "Selection",
+          "width": 208,
+          "height": 54,
+          "x": -4,
+          "y": 0,
+          "radius": 27
+        },
+        {
+          "id": "8FC139B0-D84E-43E9-BE23-F10EDA176890",
+          "name": "Combined Shape",
+          "width": 26.0261234854779,
+          "height": 38.4681463268851,
+          "x": 87.5990324532214,
+          "y": 7.63754300416964,
+          "parts": [
+            {
+              "id": "050552BD-E223-480C-A396-F42AAE213C09",
+              "name": "Label",
+              "width": 54,
+              "height": 12,
+              "x": -14.2072921678068,
+              "y": 28.3614873913382,
+              "type": {
+                "name": "SFPro-Semibold",
+                "size": 10
+              },
+              "lineHeight": 12
+            },
+            {
+              "id": "A6937DBD-C37E-4C8B-8A8C-CF0890D290D6",
+              "name": "Symbol",
+              "width": 54,
+              "height": 28,
+              "x": -14.2072921678068,
+              "y": -0.637543004169629,
+              "type": {
+                "name": "SFPro-Semibold",
+                "size": 18
+              },
+              "lineHeight": 22
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DD5CFDC3-0678-4720-825E-5D21E1B4C102",
+      "name": "Tab Bars/􀻃/Light/iPhone/Horizontal/Tabs - No Search/3 Tabs",
+      "width": 346,
+      "height": 62,
+      "parts": [
+        {
+          "id": "53F03931-4F2B-4895-9630-2EA150B0CA12",
+          "name": "Stack",
+          "width": 276,
+          "height": 62,
+          "x": 35,
+          "y": 0,
+          "parts": [
+            {
+              "id": "55168B70-30CB-4519-9785-3785FFBC7290",
+              "name": "Tab 3",
+              "width": 86.667,
+              "height": 54,
+              "x": 181.33332824707,
+              "y": 4
+            },
+            {
+              "id": "37F2438D-995C-4BFB-B15C-7F593DCDED59",
+              "name": "Tab 2",
+              "width": 86.667,
+              "height": 54,
+              "x": 94.6666641235352,
+              "y": 4
+            },
+            {
+              "id": "74E126AD-7DF0-4F88-B9E3-8EA2D9CAD24F",
+              "name": "Tab 1",
+              "width": 86.667,
+              "height": 54,
+              "x": 8,
+              "y": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D3AA7B7F-2924-4473-9E84-63D693459852",
+      "name": "Tab Bars/􀻃/Light/iPhone Duo/Vertical/Tab - Default/Selected",
+      "width": 48,
+      "height": 48,
+      "parts": [
+        {
+          "id": "232FA476-53A9-453B-B589-B446F7A8875C",
+          "name": "Selection",
+          "width": 44,
+          "height": 58,
+          "x": 2,
+          "y": -5,
+          "radius": 27
+        },
+        {
+          "id": "B626955F-FDBF-4847-89D1-1B2651B1671E",
+          "name": "Combined Shape",
+          "width": 26.0261234854779,
+          "height": 26.0277677875513,
+          "x": 10.9956460857536,
+          "y": 10.6651240118027,
+          "parts": [
+            {
+              "id": "33860797-2F0D-480D-9868-A8683D628DA0",
+              "name": "Symbol",
+              "width": 48,
+              "height": 48,
+              "x": -10.9956460857536,
+              "y": -10.6651240118026,
+              "type": {
+                "name": "SFPro-Semibold",
+                "size": 18
+              },
+              "lineHeight": 22
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "47C960EC-04C7-4F65-A67D-F40494C4CE41",
+      "name": "Tab Bars/􀻃/Light/iPhone Duo/Vertical/Tabs - No Search/3 Tabs",
+      "width": 48,
+      "height": 160,
+      "parts": [
+        {
+          "id": "2D40E960-A75B-4E83-90BF-72A728D26208",
+          "name": "Tab 3",
+          "width": 48,
+          "height": 48,
+          "x": 0,
+          "y": 106
+        },
+        {
+          "id": "61C8CC6A-6A76-48FA-AED7-6174ACBB7031",
+          "name": "Tab 2",
+          "width": 48,
+          "height": 48,
+          "x": 0,
+          "y": 56
+        },
+        {
+          "id": "46B72E8C-990D-4A74-9300-0158F51B6D1C",
+          "name": "Tab 1",
+          "width": 48,
+          "height": 48,
+          "x": 0,
+          "y": 6
+        }
+      ]
+    },
+    {
+      "id": "75EB5600-587C-4568-AF54-F195CE6CFCCF",
+      "name": "Examples/Tab Bar/Light/iPhone Duo/Portrait/Outer",
+      "width": 466,
+      "height": 678,
+      "parts": [
+        {
+          "id": "F491F958-07BF-4D39-84F4-9350011C9E60",
+          "name": "Vertical Bar",
+          "width": 84,
+          "height": 678,
+          "x": 382,
+          "y": 0,
+          "parts": [
+            {
+              "id": "8C8C8511-164F-4467-9F52-6275DBA2B820",
+              "name": "Tab Bar",
+              "width": 48,
+              "height": 290,
+              "x": 12,
+              "y": 364
+            },
+            {
+              "id": "1AC002A3-39B4-4CF8-85E8-4704D434328B",
+              "name": "Top",
+              "width": 48,
+              "height": 194,
+              "x": 12,
+              "y": 24
+            }
+          ]
+        },
+        {
+          "id": "1608DFA0-4DFE-4CC9-878B-CE13ADC73E41",
+          "name": "Lens",
+          "width": 95.67,
+          "height": 95.67,
+          "x": 370,
+          "y": 3.552713678800501e-14
+        }
+      ]
+    },
+    {
+      "id": "DAFF0407-5E10-4E02-A984-D4ADB0FEC8A3",
+      "name": "Examples/Tab Bar/Light/iPhone Duo/Landscape/Inner",
+      "width": 951,
+      "height": 669,
+      "parts": [
+        {
+          "id": "C5C9BC80-64CF-4DD0-ABE3-9E3D0B046335",
+          "name": "Vertical Bar",
+          "width": 84,
+          "height": 669,
+          "x": 867,
+          "y": 0,
+          "parts": [
+            {
+              "id": "85C2ECB5-EA65-4E50-A2D4-69491F4ABB92",
+              "name": "Tab Bar",
+              "width": 48,
+              "height": 290,
+              "x": 12,
+              "y": 355
+            },
+            {
+              "id": "95AB1992-BDF2-410C-9110-524340B5011D",
+              "name": "Top",
+              "width": 48,
+              "height": 146,
+              "x": 12,
+              "y": 24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "0E48874D-FCAE-47BC-8DE2-3F33ECC936ED",
+      "name": "Toolbars/Light/iPhone/Top - Standard/Large",
+      "width": 402,
+      "height": 105,
+      "parts": [
+        {
+          "id": "2C8D1539-475F-4AAD-895E-09F5F6ECA1DF",
+          "name": "Title",
+          "width": 69,
+          "height": 41,
+          "x": 16,
+          "y": 54
+        },
+        {
+          "id": "AA17CFD3-4148-4BEB-85AD-17D777DAEED5",
+          "name": "Trailing",
+          "width": 44,
+          "height": 44,
+          "x": 342,
+          "y": 0,
+          "parts": [
+            {
+              "id": "132B4E6D-562D-4DD6-B5C0-75BEA247C633",
+              "name": "Trailing - Button 3",
+              "width": 44,
+              "height": 44,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "id": "FA7C207D-6ECB-40FD-B54B-8875E138B7A4",
+          "name": "Leading",
+          "width": 44,
+          "height": 44,
+          "x": 16,
+          "y": 0,
+          "parts": [
+            {
+              "id": "BA27C218-62E2-4C0B-97C2-B053FE63558A",
+              "name": "Back Button",
+              "width": 44,
+              "height": 44,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "50E31F7A-5C7C-4D9B-870E-FCB141048A44",
+      "name": "Toolbars/Light/iPhone/Top - Standard/Title",
+      "width": 402,
+      "height": 54,
+      "parts": [
+        {
+          "id": "1DDCEBE1-9A84-468C-82EB-C838077860DC",
+          "name": "Trailing",
+          "width": 44,
+          "height": 44,
+          "x": 342,
+          "y": 0,
+          "parts": [
+            {
+              "id": "F7603C0A-EE3C-4385-A077-764316A88249",
+              "name": "Trailing - Button 3",
+              "width": 44,
+              "height": 44,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        },
+        {
+          "id": "5541FBE7-A28D-40E5-9FBF-EE9DC8DDDE14",
+          "name": "Title",
+          "width": 35,
+          "height": 22,
+          "x": 184,
+          "y": 13
+        },
+        {
+          "id": "1DA708CC-3094-40A0-BF5E-F470AA5296CA",
+          "name": "Leading",
+          "width": 44,
+          "height": 44,
+          "x": 16,
+          "y": 0,
+          "parts": [
+            {
+              "id": "942CF26B-2870-4DE9-942A-BAE1E0C900D2",
+              "name": "Back Button",
+              "width": 44,
+              "height": 44,
+              "x": 0,
+              "y": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "DC565306-6A43-48A2-A3D4-B3B98C3019E6",
+      "name": "Toolbars/􀻃/Light/Titles - iPhone/Large Title",
+      "width": 69,
+      "height": 41,
+      "parts": [
+        {
+          "id": "1C9946B2-5285-42C3-B671-7BC5F6059D1A",
+          "name": "Title",
+          "width": 69,
+          "height": 41,
+          "x": 0,
+          "y": 0,
+          "type": {
+            "name": "SFPro-Bold",
+            "size": 34
+          },
+          "lineHeight": 41
+        }
+      ]
+    },
+    {
+      "id": "A19EFB45-CE81-418D-8C11-64B73EA69DD3",
+      "name": "Toolbars/􀻃/Light/Titles - iPhone/Title",
+      "width": 35,
+      "height": 22,
+      "parts": [
+        {
+          "id": "85C9C1CC-A4C7-43BC-8D5B-075EB6BC9332",
+          "name": "Title",
+          "width": 35,
+          "height": 22,
+          "x": 0,
+          "y": 0,
+          "type": {
+            "name": "SFPro-Semibold",
+            "size": 17
+          },
+          "lineHeight": 22
+        }
+      ]
+    },
+    {
+      "id": "F506BB21-0559-4AC1-9130-0E25FD0CE6F1",
+      "name": "Toolbars/􀻃/Light/Search - Bottom/Search - Value",
+      "width": 180,
+      "height": 48,
+      "parts": [
+        {
+          "id": "50CAE2DB-B8A0-4464-B657-FBBA5C58743A",
+          "name": "􀁡",
+          "width": 20,
+          "height": 22,
+          "x": 150,
+          "y": 13,
+          "type": {
+            "name": "SFPro-Medium",
+            "size": 17
+          },
+          "lineHeight": 22
+        },
+        {
+          "id": "EC0252ED-DEB0-4E91-830C-25D4F28CACB9",
+          "name": "Text and Cursor",
+          "width": 58,
+          "height": 22,
+          "x": 41,
+          "y": 13,
+          "parts": [
+            {
+              "id": "60645D4A-FF80-4674-B787-50C42E472410",
+              "name": "Cursor",
+              "width": 4,
+              "height": 22,
+              "x": 54,
+              "y": 0
+            },
+            {
+              "id": "C54775B1-A67A-4AA8-912D-D23FB762F3AE",
+              "name": "Search",
+              "width": 54,
+              "height": 22,
+              "x": 0,
+              "y": 0,
+              "type": {
+                "name": "SFPro-Regular",
+                "size": 17
+              },
+              "lineHeight": 22
+            }
+          ]
+        },
+        {
+          "id": "8768BAAF-F234-4083-85B4-00AFAF058C9E",
+          "name": "􀊫",
+          "width": 26,
+          "height": 22,
+          "x": 11,
+          "y": 13,
+          "type": {
+            "name": "SFPro-Medium",
+            "size": 17
+          },
+          "lineHeight": 22
+        }
+      ]
+    },
+    {
+      "id": "3667B4FF-8BD8-4559-8663-AEE7DFB72A62",
+      "name": "Toolbars/􀻃/Light/Search - Bottom/Search - Placeholder",
+      "width": 180,
+      "height": 48,
+      "parts": [
+        {
+          "id": "955AF0DF-A2A8-4EFA-8FB0-4960CA2AA03A",
+          "name": "􀊰",
+          "width": 18,
+          "height": 22,
+          "x": 151,
+          "y": 13,
+          "type": {
+            "name": "SFPro-Medium",
+            "size": 17
+          },
+          "lineHeight": 22
+        },
+        {
+          "id": "EE4C68D5-2814-4007-AAE7-6A46171AA635",
+          "name": "Search",
+          "width": 106,
+          "height": 22,
+          "x": 41,
+          "y": 13,
+          "type": {
+            "name": "SFPro-Regular",
+            "size": 17
+          },
+          "lineHeight": 22
+        },
+        {
+          "id": "67615906-C6E4-484E-AA86-EF00CA76E832",
+          "name": "􀊫",
+          "width": 26,
+          "height": 22,
+          "x": 11,
+          "y": 13,
+          "type": {
+            "name": "SFPro-Medium",
+            "size": 17
+          },
+          "lineHeight": 22
+        }
+      ]
+    }
+  ]
+}

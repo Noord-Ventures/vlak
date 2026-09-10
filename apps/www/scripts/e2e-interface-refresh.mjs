@@ -9,7 +9,7 @@ import { checkWallpaper } from "./wallpaper-rebuild-e2e.mjs";
 const require = createRequire(import.meta.url);
 const axe = readFileSync(require.resolve("axe-core/axe.min.js"), "utf8");
 const base = process.env.SITE_URL || "http://localhost:3016";
-const slugs = (process.env.INTERFACES || "render,drive,orbit,graphics,line,room,wall,evening,press,night,platforms,mobile-os,documentation,music-player,video-player,patient,identity,music,agents,microbiology,genome,protein,robotics,circuitry,frontier,microscopy,desktop-os,calendar").split(",");
+const slugs = (process.env.INTERFACES || "render,drive,orbit,graphics,line,room,wall,evening,press,night,platforms,android,ios,documentation,music-player,video-player,patient,identity,music,agents,microbiology,genome,protein,robotics,circuitry,frontier,microscopy,desktop-os,calendar").split(",");
 const failures = [];
 const fail = message => { failures.push(message); console.error(message); };
 const browser = await chromium.launch({ ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}), args: ["--enable-unsafe-swiftshader"] });
@@ -25,13 +25,21 @@ try {
         const layout = await page.locator('.if-specimen').evaluate(frame => {
           const visible = el => el.getClientRects().length && getComputedStyle(el).visibility !== "hidden" && !el.closest('[aria-hidden="true"]');
           const target = el => (el.matches('input[type="checkbox"],input[type="radio"]') ? el.closest('label') : el) || el;
+          const tooSmall = el => {
+            const rect = el.getBoundingClientRect();
+            const handset = el.closest('.mo-device[data-platform] .mo-phone')?.closest('.mo-handset');
+            // Phone studies are complete scaled drawings. Check logical hit areas
+            // inside their handset; the Device/Rotate/Back tools stay physical44px.
+            const scale = handset ? handset.getBoundingClientRect().width / handset.offsetWidth : 1;
+            return rect.width / scale < 43.5 || rect.height / scale < 43.5;
+          };
           return {
             overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
             frameOverflow: frame.scrollWidth - frame.clientWidth,
             heightOverflow: frame.scrollHeight - frame.clientHeight,
             main: document.querySelectorAll("main").length,
             h1: document.querySelectorAll("h1").length,
-            short: [...frame.querySelectorAll('button, a[href], input:not([type="hidden"]), select, textarea')].filter(visible).map(target).filter(el => { const rect = el.getBoundingClientRect(); return rect.width < 43.5 || rect.height < 43.5; }).map(el => el.getAttribute('aria-label') || el.textContent?.trim().slice(0, 50) || el.tagName),
+            short: [...frame.querySelectorAll('button, a[href], input:not([type="hidden"]), select, textarea')].filter(visible).map(target).filter(tooSmall).map(el => el.getAttribute('aria-label') || el.textContent?.trim().slice(0, 50) || el.tagName),
           };
         });
         if (layout.overflow > 1 || layout.frameOverflow > 1 || layout.heightOverflow > 1) fail(`${theme} ${width}px ${slug}: overflow ${JSON.stringify(layout)}`);
@@ -54,7 +62,7 @@ try {
         [["wall", "evening"], "./social-food-rebuild-e2e.mjs", "checkSocialFood"],
         [["press", "night"], "./dashboard-fleet-rebuild-e2e.mjs", "checkDashboardFleet"],
         [["platforms"], "./transit-e2e.mjs", "checkTransit"],
-        [["mobile-os"], "./mobile-os-e2e.mjs", "checkMobileOS"],
+        [["android", "ios"], "./mobile-os-e2e.mjs", "checkMobileOS"],
         [["robotics"], "./robotics-three-e2e.mjs", "checkRoboticsThree"],
         [["frontier"], "./athena-e2e.mjs", "checkAthena"],
         [["microscopy"], "./microscopy-interface-e2e.mjs", "checkMicroscopyInterface"],

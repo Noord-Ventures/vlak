@@ -3,7 +3,7 @@ import type { InterfaceSlug } from "./catalog";
 export const FILMED_INTERFACE_SLUGS = [
   "agents", "circuitry", "desktop-os", "documentation", "drive", "evening",
   "frontier", "genome", "graphics", "identity", "line", "microbiology",
-  "microscopy", "mobile-os", "music", "music-player", "night", "orbit",
+  "microscopy", "music", "music-player", "night", "orbit",
   "patient", "platforms", "press", "protein", "render", "robotics", "room",
   "video-player", "wall",
 ] as const satisfies readonly InterfaceSlug[];

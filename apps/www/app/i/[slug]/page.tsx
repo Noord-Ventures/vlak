@@ -22,7 +22,8 @@ const pages = {
   "orbit": () => import("../../interfaces/orbit/page"),
   "frontier": () => import("../../interfaces/frontier/page"),
   "platforms": () => import("../../interfaces/platforms/page"),
-  "mobile-os": () => import("../../interfaces/mobile-os/page"),
+  "android": () => import("../../interfaces/android/page"),
+  "ios": () => import("../../interfaces/ios/page"),
   "documentation": () => import("../../interfaces/documentation/page"),
   "video-player": () => import("../../interfaces/video-player/page"),
   "music-player": () => import("../../interfaces/music-player/page"),
@@ -38,9 +39,13 @@ const pages = {
   "desktop-os": () => import("../../interfaces/desktop-os/page"),
 } satisfies Record<InterfaceSlug, () => Promise<{ default: ComponentType }>>;
 export const dynamicParams = false;
-export function generateStaticParams() { return INTERFACE_SLUGS.map(slug => ({ slug })); }
+export function generateStaticParams() { return [...INTERFACE_SLUGS, "mobile-os"].map(slug => ({ slug })); }
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
+  if (slug === "mobile-os") {
+    const { metadata } = await import("../../interfaces/mobile-os/page");
+    return { ...metadata, openGraph: { ...metadata.openGraph, url: `${HOST}/i/mobile-os/` } };
+  }
   const item = interfaceBySlug(slug);
   if (!item) notFound();
   const metadata = pageMetadata(`/interfaces/${slug}`, { title: item.title, description: item.voice, robots: { index: false, follow: true } });
@@ -48,6 +53,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
+  if (slug === "mobile-os") {
+    const { default: MobileOSPage } = await import("../../interfaces/mobile-os/page");
+    return <MobileOSPage />;
+  }
   if (!interfaceBySlug(slug)) notFound();
   const { default: InterfacePage } = await pages[slug as InterfaceSlug]();
   return <PreviewRouteProvider><InterfacePage /></PreviewRouteProvider>;

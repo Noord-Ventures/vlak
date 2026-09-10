@@ -14,8 +14,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   for (const file of pages) {
     if (file !== "page.tsx" && !file.endsWith("/page.tsx")) continue;
     const path = file === "page.tsx" ? "" : file.slice(0, -"/page.tsx".length);
-    // This retired route deliberately returns notFound and is disallowed in robots.txt.
-    if (path === "swag" || path === "i/[slug]" || path === "docs/ai") continue;
+    // Retired pages, compatibility choosers and share-only previews are not indexed.
+    if (path === "swag" || path === "i/[slug]" || path === "docs/ai" || path === "interfaces/mobile-os") continue;
     if (path === "components/[name]") {
       for (const component of catalogComponents) {
         if (component.category !== "ai") paths.add(`/components/${component.name}/`);

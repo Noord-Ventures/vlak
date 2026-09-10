@@ -1,10 +1,15 @@
-/* UIKit / pre-glass study. Logical CSS pixels correspond to points in the
-   393 × 852 display; device-chrome.css scales the complete phone. See ios-reference.md. */
+/* iOS component anatomy is preserved before applying the Vlak material and type
+   layer. Logical dimensions are device-dependent; see ios-reference.md. */
 .mo .mo-device[data-platform="ios"] .mo-phone {
   --mo-ios-grouped: color-mix(in srgb, var(--bg) 93%, var(--text));
   --mo-ios-secondary-fill: color-mix(in srgb, var(--bg) 88%, var(--text));
   --mo-ios-tertiary-fill: color-mix(in srgb, var(--bg) 94%, var(--text));
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  --mo-ios-material: color-mix(in srgb, var(--bg) 92%, transparent);
+  --mo-ios-material-edge: color-mix(in srgb, var(--text) 20%, transparent);
+  --mo-ios-selected: color-mix(in srgb, var(--bg) 83%, var(--text));
+  --mo-ios-section-radius: 22px;
+  --mo-ios-motion: cubic-bezier(.2, .8, .2, 1);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: calc(17px * var(--mo-text-scale));
   line-height: 1.29412;
   letter-spacing: -.022em;
@@ -119,20 +124,20 @@
 .mo .mo-device[data-platform="ios"] .mo-phone[data-app="messages"] .mo-list-row::after { inset-inline-start: 76px; }
 .mo .mo-device[data-platform="ios"] .mo-caption { font-size: calc(13px * var(--mo-text-scale)); line-height: 18px; letter-spacing: -.006em; }
 .mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row { width: 100%; margin-inline: 0; padding-inline: 16px; min-height: 72px; background: var(--bg); }
-.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:first-of-type { border-radius: 10px 10px 0 0; }
-.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:last-of-type { border-radius: 0 0 10px 10px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:first-of-type { border-radius: var(--mo-ios-section-radius) var(--mo-ios-section-radius) 0 0; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:last-of-type { border-radius: 0 0 var(--mo-ios-section-radius) var(--mo-ios-section-radius); }
 .mo .mo-device[data-platform="ios"] .mo-phone[data-app="notes"][data-root-app="true"] .mo-list-row:last-of-type::after { display: none; }
 
 /* Inset-grouped Settings. Background groups carry the hierarchy; rows do not
-   add card outlines or extra spacing to the system's 44pt cell height. */
+   add card outlines. Rows grow with text; 44pt remains the minimum hit area. */
 .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="settings"], [data-app="notes"][data-root-app="true"]),
 .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="settings"], [data-app="notes"][data-root-app="true"]) :is(.mo-status-bar, .mo-app-header, .mo-scroll, .mo-ios-gesture-nav) { background: var(--mo-ios-grouped); }
 .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"] .mo-scroll { padding-inline: 16px; }
 .mo .mo-device[data-platform="ios"] .mo-phone:is([data-app="settings"], [data-app="notes"]) .mo-ios-search { border-color: var(--mo-ios-grouped); }
-.mo .mo-device[data-platform="ios"] .mo-ios-settings-group { margin-top: 28px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--bg); overflow: hidden; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group { margin-top: 28px; padding: 0 16px; border: 0; border-radius: var(--mo-ios-section-radius); background: var(--bg); overflow: hidden; }
 .mo .mo-device[data-platform="ios"] .mo-ios-settings-group > * + * { margin-top: 0; }
 .mo .mo-device[data-platform="ios"] .mo-ios-settings-group.mo-ios-settings-rows { padding: 0; }
-.mo .mo-device[data-platform="ios"] .mo-ios-setting-row { position: relative; min-height: 44px; padding: 0 16px; gap: 12px; border: 0; border-radius: 0; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row { position: relative; min-height: 52px; padding: 4px 16px; gap: 12px; border: 0; border-radius: 0; background: var(--bg); }
 .mo .mo-device[data-platform="ios"] .mo-ios-settings-rows > .mo-ios-setting-row + .mo-ios-setting-row { margin-top: 0; border: 0; }
 .mo .mo-device[data-platform="ios"] .mo-ios-setting-row:not(:last-child)::after { content: ""; position: absolute; bottom: 0; inset-inline: 16px 0; height: 1px; background: var(--divider); }
 .mo .mo-device[data-platform="ios"] .mo-ios-setting-row:has(.mo-ios-setting-glyph):not(:last-child)::after { inset-inline-start: 57px; }
@@ -142,8 +147,8 @@
 .mo .mo-device[data-platform="ios"] .mo-ios-setting-glyph { width: 29px; height: 29px; border: 0; border-radius: 6px; background: var(--text); color: var(--bg); }
 .mo .mo-device[data-platform="ios"] .mo-ios-setting-glyph > .rs-icon { width: 20px; height: 20px; stroke-width: 1.7; }
 .mo .mo-device[data-platform="ios"] .mo-ios-setting-row[aria-pressed="true"] { background: var(--mo-ios-secondary-fill); }
-.mo .mo-device[data-platform="ios"] .mo-setting-switch { min-height: 44px; gap: 12px; font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; }
-.mo .mo-device[data-platform="ios"] .mo-ios-profile-row { min-height: 88px; padding: 12px 16px; gap: 16px; border: 0; border-radius: 10px; background: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-setting-switch { min-height: 52px; gap: 12px; font-size: calc(17px * var(--mo-text-scale)); line-height: 22px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-profile-row { min-height: 88px; padding: 12px 16px; gap: 16px; border: 0; border-radius: var(--mo-ios-section-radius); background: var(--bg); }
 .mo .mo-device[data-platform="ios"] .mo-ios-profile-row > .mo-initials { width: 60px; height: 60px; font-size: 27px; }
 .mo .mo-device[data-platform="ios"] .mo-ios-profile-row strong { font-size: 22px; line-height: 28px; font-weight: 400; letter-spacing: -.026em; }
 .mo .mo-device[data-platform="ios"] .mo-ios-profile-row > span > span { margin-top: 2px; font-size: 13px; line-height: 18px; }
@@ -153,7 +158,7 @@
 .mo .mo-device[data-platform="ios"] .mo-ios-settings-group .mo-data-row:last-child { border: 0; }
 .mo .mo-device[data-platform="ios"] .mo-ios-settings-group > .mo-field { padding-block: 12px; }
 .mo .mo-device[data-platform="ios"] .mo-ios-settings-group > .mo-field + .mo-field { border-top: 1px solid var(--divider); }
-.mo .mo-device[data-platform="ios"] .mo-ios-restore { min-height: 44px; border: 0; border-radius: 10px; background: var(--bg); font-size: 17px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-restore { min-height: 44px; border: 0; border-radius: var(--mo-ios-section-radius); background: var(--bg); font-size: 17px; }
 .mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards { padding: 16px 30px 10px; gap: 32px; }
 .mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards > label { position: relative; display: grid; justify-items: center; gap: 12px; min-width: 44px; min-height: 44px; padding: 4px; font-size: 15px; line-height: 20px; cursor: pointer; }
 .mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards > label > input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
@@ -162,13 +167,14 @@
 .mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards input:checked ~ .mo-appearance-check { border-color: var(--text); background: var(--text); color: var(--bg); }
 .mo .mo-device[data-platform="ios"] .mo-ios-appearance-cards input:focus-visible + i { outline: 2px solid var(--text); outline-offset: 4px; }
 
-/* The native adapter keeps a 44pt hit area around the 51 × 31 switch. */
-.mo .mo-device[data-platform="ios"] .mo-native-switch { position: relative; display: inline-grid; place-items: center; flex: 0 0 51px; width: 51px; height: 44px; overflow: visible; }
-.mo .mo-device[data-platform="ios"] .mo-native-switch > input { position: absolute; inset: 0; z-index: 1; width: 51px; height: 44px; margin: 0; opacity: 0; cursor: pointer; }
-.mo .mo-device[data-platform="ios"] .mo-native-switch-track { position: relative; display: block; width: 51px; height: 31px; border: 1px solid var(--control-border); border-radius: 16px; background: var(--mo-ios-secondary-fill); transition: background-color 200ms ease, border-color 200ms ease; }
-.mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { position: absolute; top: 1px; left: 1px; display: block; width: 27px; height: 27px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px #0003; transition: transform 200ms ease; }
+/* iOS 27 kit: 64 × 28 track, 38 × 24 pill knob, 22pt travel.
+   The browser input independently preserves a 44pt hit area. */
+.mo .mo-device[data-platform="ios"] .mo-native-switch { position: relative; display: inline-grid; place-items: center; flex: 0 0 64px; width: 64px; min-width: 64px; height: 44px; overflow: visible; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input { position: absolute; inset: 0; z-index: 1; width: 64px; height: 44px; margin: 0; opacity: 0; cursor: pointer; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-track { position: relative; display: block; width: 64px; height: 28px; border: 1px solid var(--control-border); border-radius: 16px; background: var(--mo-ios-secondary-fill); transition: background-color 200ms ease, border-color 200ms ease; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { position: absolute; top: 1px; left: 1px; display: block; width: 38px; height: 24px; border-radius: 13px; background: var(--bg); box-shadow: 0 1px 3px #0003; transition: transform 200ms ease; }
 .mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track { background: var(--text); border-color: var(--text); }
-.mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track .mo-native-switch-thumb { transform: translateX(20px); }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track .mo-native-switch-thumb { transform: translateX(22px); }
 .mo .mo-device[data-platform="ios"] .mo-native-switch > input:focus-visible + .mo-native-switch-track { outline: 2px solid var(--text); outline-offset: 3px; }
 .mo .mo-device[data-platform="ios"] .mo-native-switch > input:disabled { cursor: default; }
 .mo .mo-device[data-platform="ios"] .mo-native-switch > input:disabled + .mo-native-switch-track { opacity: .45; }
@@ -200,11 +206,11 @@
 .mo .mo-device[data-platform="ios"] .mo-message-compose .rs-input { height: 44px; min-height: 44px; border: 1px solid var(--control-border); border-radius: 22px; padding: 0 14px; background: transparent; font-size: 17px; }
 .mo .mo-device[data-platform="ios"] .mo-message-compose .rs-btn-primary { width: 44px; height: 44px; padding: 10px; border: 0; border-radius: 50%; background: var(--text); color: var(--bg); }
 
-/* A native tab bar has 49pt content above the device's separate safe area. */
-.mo .mo-device[data-platform="ios"] .mo-clock-tabs { min-height: 49px; height: 49px; padding: 0 8px; gap: 0; border-top: 1px solid var(--divider); background: var(--bg); }
-.mo .mo-device[data-platform="ios"] .mo-clock-tabs button { min-height: 48px; height: 48px; padding: 4px 0 2px; gap: 1px; border: 0; background: transparent; color: var(--text-secondary); font-size: 10px; line-height: 12px; font-weight: 400; letter-spacing: .01em; }
-.mo .mo-device[data-platform="ios"] .mo-clock-tabs button > .rs-icon { width: 26px; height: 26px; }
-.mo .mo-device[data-platform="ios"] .mo-clock-tabs button[aria-pressed="true"] { color: var(--text); font-weight: 600; }
+/* Current tab navigation floats above content, independent of the safe area. */
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs { position: absolute; inset: auto 16px 6px; z-index: 2; min-height: 62px; height: auto; padding: 3px; gap: 2px; border: 1px solid var(--mo-ios-material-edge); border-radius: 34px; background: var(--mo-ios-material); backdrop-filter: blur(12px); }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button { min-height: 54px; height: auto; padding: 5px 8px; gap: 2px; border: 0; border-radius: 27px; background: transparent; color: var(--text-secondary); font-size: 11px; line-height: 14px; font-weight: 500; letter-spacing: 0; transition: background-color 220ms var(--mo-ios-motion), color 220ms var(--mo-ios-motion); }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button > .rs-icon { width: 24px; height: 24px; }
+.mo .mo-device[data-platform="ios"] .mo-clock-tabs button[aria-pressed="true"] { color: var(--text); background: var(--mo-ios-selected); font-weight: 600; }
 .mo .mo-device[data-platform="ios"] .mo-clock-tabs button[aria-pressed="true"] > .rs-icon { stroke-width: 2; }
 .mo .mo-device[data-platform="ios"] .mo-phone[data-app="phone"] .mo-keypad { max-width: 286px; gap: 16px 19px; }
 .mo .mo-device[data-platform="ios"] .mo-keypad button { width: 76px; height: 76px; min-height: 76px; padding: 0; border-radius: 50%; background: var(--mo-ios-secondary-fill); font-size: 34px; line-height: 41px; font-weight: 400; }
@@ -250,12 +256,195 @@
 .mo .mo-device[data-platform="ios"] .mo-library-groups .mo-app-icon > [data-app-icon] > svg { width: 52px; height: 52px; }
 .mo .mo-device[data-platform="ios"] .mo-library-groups h3 { margin-top: 8px; font-size: 13px; line-height: 18px; }
 
+/* The native functional layer becomes a restrained Vlak material. Content
+   stays opaque; only navigation, the dock and transient controls float. */
+.mo .mo-device[data-platform="ios"] .mo-screen { position: relative; }
+.mo .mo-device[data-platform="ios"] .mo-app-header { position: relative; height: 54px; min-height: 54px; padding-block: 0 10px; }
+.mo .mo-device[data-platform="ios"] .mo-phone[data-root-app="true"] .mo-app-header { height: auto; min-height: 105px; grid-template-rows: 54px minmax(41px, auto); padding-block: 0 10px; }
+.mo .mo-device[data-platform="ios"] .mo-app-header > button,
+.mo .mo-device[data-platform="ios"] .mo-ios-navigation-actions > button {
+  display: inline-flex; justify-content: center; align-items: center;
+  width: 44px; min-width: 44px; height: 44px; padding: 0;
+  border: 1px solid var(--mo-ios-material-edge); border-radius: 50%;
+  background: var(--mo-ios-material); backdrop-filter: blur(12px);
+}
+.mo .mo-device[data-platform="ios"] .mo-app-header > button > span:not(.rs-icon) { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions { gap: 8px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > button { width: auto; padding-inline: 16px; border-radius: 24px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+.mo .mo-device[data-platform="ios"] .mo-ios-editor-actions > .rs-btn-ghost { width: 44px; padding: 0; }
+.mo .mo-device[data-platform="ios"] .mo-dock {
+  width: calc(100% - 32px); max-width: 440px; margin-inline: auto;
+  min-height: 88px; padding: 13px 12px; border: 1px solid var(--mo-ios-material-edge);
+  border-radius: 32px; background: var(--mo-ios-material); backdrop-filter: blur(12px);
+}
+.mo .mo-device[data-platform="ios"] .mo-screen:has(> .mo-clock-tabs) > .mo-scroll { padding-bottom: 84px; }
+.mo .mo-device[data-platform="ios"] .mo-screen:has(> .mo-clock-tabs) > .mo-app-actions { margin-bottom: 76px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search-field {
+  position: relative; display: flex; align-items: center; gap: 8px;
+  min-width: 0; min-height: 48px; margin-block: 0 16px; padding-inline: 14px 0;
+  border: 1px solid var(--mo-ios-material-edge); border-radius: 26px;
+  background: var(--mo-ios-tertiary-fill); color: var(--text-secondary);
+}
+.mo .mo-device[data-platform="ios"] .mo-ios-search-field > .rs-icon { flex: 0 0 20px; pointer-events: none; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search-field > .rs-input-field { flex: 1; min-width: 0; width: auto; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search-field .mo-ios-search {
+  flex: 1; width: 100%; min-width: 0; min-height: 46px; height: 46px;
+  margin: 0; padding: 0 12px 0 0; border: 0; border-radius: 0;
+  background: transparent; font-size: calc(17px * var(--mo-text-scale));
+}
+.mo .mo-device[data-platform="ios"] .mo-ios-search-field:focus-within { outline: 2px solid var(--text); outline-offset: 2px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search-field .mo-ios-search:focus-visible { outline: none; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search::-webkit-search-cancel-button { appearance: none; }
+.mo .mo-device[data-platform="ios"] .mo-ios-search-clear {
+  flex: 0 0 44px; width: 44px; min-width: 44px; min-height: 44px; height: 44px;
+  margin-inline-end: 1px; padding: 0; border: 0; border-radius: 50%;
+  background: transparent; color: var(--text-secondary);
+}
+.mo .mo-device[data-platform="ios"] .mo-ios-search-clear > .rs-icon { width: 16px; height: 16px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row { flex-wrap: wrap; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row > strong { min-width: 90px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-setting-row > span:not(.mo-ios-setting-glyph, .mo-native-switch) { font-size: calc(17px * var(--mo-text-scale)); line-height: 1.3; }
+.mo .mo-device[data-platform="ios"] .mo-ios-settings-group:empty { display: none; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { border-color: var(--divider); box-shadow: none; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch > input:active + .mo-native-switch-track .mo-native-switch-thumb { scale: 1.08; }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-track,
+.mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { transition-duration: 220ms; transition-timing-function: var(--mo-ios-motion); }
+.mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { transition-property: transform, scale; }
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout :is(.mo-ios-connectivity, .mo-ios-media-control, .mo-ios-focus-control),
+.mo .mo-device[data-platform="ios"] .mo-ios-control-pair > button,
+.mo .mo-device[data-platform="ios"] .mo-ios-control-shortcuts > button {
+  border: 1px solid var(--mo-ios-material-edge); background: var(--mo-ios-material);
+  transition: background-color 220ms var(--mo-ios-motion), color 220ms var(--mo-ios-motion);
+}
+.mo .mo-device[data-platform="ios"] .mo-ios-control-pair > button[aria-pressed="true"],
+.mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-ios-focus-control[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="ios"] .mo-notification { border: 1px solid var(--mo-ios-material-edge); border-radius: 24px; padding: 16px; background: var(--mo-ios-material); }
+.mo .mo-device[data-platform="ios"] .mo-recent-task { border-radius: 26px; }
+.mo .mo-device[data-platform="ios"] .mo-ios-calendar-week span { font-size: 11px; }
+
+/* The short Duo outer display fits the same launcher with compact widgets. */
+.mo .mo-device[data-device="iphone-duo"][data-posture="compact"][data-orientation="portrait"] .mo-home { padding-top: 8px; gap: 16px; }
+.mo .mo-device[data-device="iphone-duo"][data-posture="compact"][data-orientation="portrait"] .mo-ios-widgets > button { aspect-ratio: auto; height: 142px; min-height: 142px; }
+.mo .mo-device[data-device="iphone-duo"][data-posture="compact"][data-orientation="portrait"] .mo-home-apps { row-gap: 16px; }
+.mo .mo-device[data-device="iphone-duo"][data-posture="compact"][data-orientation="portrait"] .mo-ios-home-tools { min-height: 44px; height: 44px; padding-bottom: 0; }
+
+@container (min-width: 560px) {
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-scroll { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-content: start; padding-inline: 24px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-scroll > * { margin-block: 0; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-scroll > .mo-ios-search-field { grid-column: 1 / -1; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-ios-profile-row { grid-column: 1; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-ios-settings-group { grid-column: 2; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-ios-profile-row + .mo-ios-settings-group { grid-row: 2; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="settings"][data-root-app="true"] .mo-ios-restore { grid-column: 1; grid-row: 3; align-self: start; }
+}
+
+/* A wider display gets a new composition, without enlarging native controls. */
+@container (min-width: 600px) {
+  .mo .mo-device[data-platform="ios"] .mo-home { display: grid; grid-template-columns: 260px minmax(0, 1fr); grid-template-rows: minmax(min-content, 1fr) auto; align-content: start; gap: 24px 36px; padding: 22px 36px 0; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-widgets { grid-column: 1; grid-row: 1; grid-template-columns: 1fr 1fr; gap: 12px; align-self: start; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-widgets > button { padding: 12px; border-radius: 22px; min-height: 156px; aspect-ratio: auto; }
+  .mo .mo-device[data-platform="ios"] .mo-home-apps { grid-column: 2; grid-row: 1; align-self: start; margin: 0; width: 100%; grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 22px; }
+  .mo .mo-device[data-platform="ios"] .mo-home > .mo-ios-home-tools { grid-column: 1 / -1; grid-row: 2; margin: 0; min-height: 44px; padding: 0; }
+  .mo .mo-device[data-platform="ios"] .mo-dock { max-width: 360px; margin-top: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-overlay="quick"] .mo-scroll { padding: 28px 36px; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-layout { grid-template-columns: repeat(8, minmax(0, 1fr)); grid-template-rows: 150px 72px; gap: 16px; max-width: 760px; margin-inline: auto; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-ios-connectivity { grid-column: 1 / 3; grid-row: 1; aspect-ratio: auto; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-media-control { grid-column: 3 / 5; grid-row: 1; aspect-ratio: auto; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-control-sliders { grid-column: 5 / 7; grid-row: 1; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-layout .mo-vertical-slider { height: 150px; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-pair { grid-column: 7 / 9; grid-row: 1; align-self: center; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-focus-control { grid-column: 1 / 3; grid-row: 2; }
+  .mo .mo-device[data-platform="ios"] .mo-ios-control-shortcuts { grid-column: 3 / 7; grid-row: 2; }
+  .mo .mo-device[data-platform="ios"] .mo-clock-tabs { inset-inline: 24px; width: min(440px, calc(100% - 48px)); margin-inline: auto; min-height: 56px; }
+  .mo .mo-device[data-platform="ios"] .mo-clock-tabs button { flex-direction: row; gap: 8px; min-height: 44px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app="clock"] .mo-clock-face { padding-block: 16px; }
+  /* The Duo kit changes tab navigation to a 48pt vertical rail when open. */
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-screen:has(> .mo-clock-tabs) { padding-inline-start: 80px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-clock-tabs { inset: 18px auto auto 16px; display: flex; flex-direction: column; width: 48px; min-height: 160px; height: auto; margin: 0; padding: 0; gap: 8px; border: 0; border-radius: 0; background: transparent; backdrop-filter: none; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-clock-tabs button { flex: none; position: relative; width: 48px; height: 48px; min-height: 48px; padding: 12px; border: 1px solid var(--mo-ios-material-edge); border-radius: 24px; background: var(--mo-ios-material); }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-clock-tabs button[aria-pressed="true"] { background: var(--mo-ios-selected); }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-clock-tabs button > span:not(.rs-icon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-screen:has(> .mo-clock-tabs) > .mo-scroll { padding-bottom: 20px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-screen:has(> .mo-clock-tabs) > .mo-app-actions { margin-bottom: 0; }
+
+}
+/* Duo's inner landscape Home keeps a trailing dock, as in Apple's product
+   film and HIG. The camera under this display stays invisible while inactive. */
+@container (min-width: 800px) {
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-screen { display: grid; grid-template-columns: minmax(0, 1fr) 88px; gap: 24px; padding-inline-end: 20px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-home { grid-template-columns: 200px minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 44px; gap: 20px 32px; padding: 20px 24px 0 36px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-ios-widgets { grid-template-columns: 1fr; gap: 16px; align-self: center; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-ios-widgets > button { height: 176px; min-height: 176px; padding: 16px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-home-apps { align-self: center; row-gap: 32px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-dock { grid-template-columns: 1fr; grid-auto-rows: 60px; align-self: center; width: 88px; min-height: 0; height: auto; margin: 0; padding: 14px 13px; gap: 14px; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-camera-cutout { display: none; }
+  .mo .mo-device[data-device="iphone-duo"][data-posture="expanded"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-status-bar { justify-content: flex-end; gap: 12px; padding-inline: 36px; }
+}
+/* The readable phone mode uses the available browser width at 1:1, so its
+   launcher and controls recompose instead of shrinking an entire handset. */
+@container (max-width: 360px) {
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-home { padding: 12px 16px 0; gap: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-widgets { gap: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-widgets > button { min-height: 126px; height: 126px; aspect-ratio: auto; padding: 10px; grid-template-rows: 18px 40px 1fr 16px; border-radius: 18px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-widgets > button > strong { font-size: 34px; line-height: 40px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-widgets > button > span { font-size: 12px; line-height: 16px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-home-apps { width: 100%; margin-inline: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-app-icon { min-height: 72px; gap: 5px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-app-icon > [data-app-icon],
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-app-icon > [data-app-icon] > svg { width: 52px; height: 52px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-app-icon strong { max-width: 100%; font-size: 11px; line-height: 14px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-dock { width: calc(100% - 16px); min-height: 64px; padding: 9px 8px; border-radius: 24px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-dock button { min-width: 44px; min-height: 44px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-dock button > [data-app-icon]:first-child,
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-dock button > [data-app-icon] > svg { width: 44px; height: 44px; border-radius: 11px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-scroll:not(.mo-home) { padding-inline: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-app-header { padding-inline: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-app-header h2 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-profile-row { gap: 10px; padding: 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-profile-row > .mo-initials { width: 44px; height: 44px; font-size: 20px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-profile-row strong { font-size: 20px; line-height: 24px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-setting-row { gap: 8px; padding-inline: 10px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-setting-row > strong { min-width: 0; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-setting-glyph { width: 24px; height: 24px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-setting-row:has(.mo-ios-setting-glyph):not(:last-child)::after { inset-inline-start: 42px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-form > .mo-field { flex-direction: column; align-items: stretch; gap: 4px; padding-block: 10px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-form > .mo-field > span { flex-basis: auto; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-appearance-cards { gap: 12px; padding-inline: 0; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-clock-tabs { inset-inline: 8px; padding: 3px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-clock-tabs button { min-width: 44px; padding-inline: 2px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-keypad { grid-template-columns: repeat(3, minmax(44px, 1fr)); max-width: 100%; gap: 12px 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-keypad button { width: 100%; min-width: 44px; height: 56px; min-height: 56px; font-size: 28px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-clock-face { font-size: 52px; line-height: 64px; padding-block: 28px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-overlay="quick"] .mo-scroll { padding: 16px 12px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-layout { grid-template-columns: repeat(4, minmax(44px, 1fr)); grid-template-rows: auto 56px 56px auto; gap: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-layout .mo-ios-connectivity { padding: 0; gap: 6px; aspect-ratio: auto; min-height: 140px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-media-control { aspect-ratio: auto; min-height: 140px; padding: 8px 4px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-media-control > strong { font-size: 12px; line-height: 16px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-media-control > span { font-size: 11px; line-height: 14px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-pair,
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-shortcuts,
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-control-sliders { gap: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-pair > button,
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-shortcuts > button { min-height: 44px; padding: 8px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-focus-control { min-height: 56px; padding: 8px; gap: 6px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-focus-control > strong { min-width: 0; font-size: 12px; line-height: 16px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-focus-control > .rs-icon:first-child { width: 18px; height: 18px; }
+  .mo .mo-device[data-platform="ios"] .mo-phone[data-app] .mo-ios-control-layout .mo-vertical-slider { height: 120px; border-radius: 24px; }
+}
+
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .mo .mo-device[data-platform="ios"] .mo-phone { --mo-ios-material: var(--bg); --mo-ios-material-edge: var(--control-border); }
+  .mo .mo-device[data-platform="ios"] :is(.mo-clock-tabs, .mo-dock, .mo-app-header > button, .mo-ios-navigation-actions > button) { backdrop-filter: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .mo .mo-device[data-platform="ios"] :is(.mo-native-switch-track, .mo-native-switch-thumb) { transition: none; }
+  .mo .mo-device[data-platform="ios"] :is(.mo-native-switch-track, .mo-native-switch-thumb, .mo-clock-tabs button, .mo-ios-control-layout button) { transition: none; }
 }
 @media (forced-colors: active) {
-  .mo .mo-device[data-platform="ios"] .mo-phone { --mo-ios-grouped: Canvas; --mo-ios-secondary-fill: Canvas; --mo-ios-tertiary-fill: Canvas; }
+  .mo .mo-device[data-platform="ios"] .mo-phone { --mo-ios-grouped: Canvas; --mo-ios-secondary-fill: Canvas; --mo-ios-tertiary-fill: Canvas; --mo-ios-material: Canvas; --mo-ios-material-edge: CanvasText; --mo-ios-selected: Highlight; }
   .mo .mo-device[data-platform="ios"] :is(.mo-ios-settings-group, .mo-ios-profile-row, .mo-ios-widgets > button, .mo-dock, .mo-ios-connectivity, .mo-ios-media-control) { outline: 1px solid CanvasText; }
+  .mo .mo-device[data-platform="ios"] .mo-clock-tabs button[aria-pressed="true"] { background: Highlight; color: HighlightText; forced-color-adjust: none; }
   .mo .mo-device[data-platform="ios"] .mo-native-switch-track { background: Canvas; border-color: CanvasText; forced-color-adjust: none; }
   .mo .mo-device[data-platform="ios"] .mo-native-switch-thumb { background: CanvasText; }
   .mo .mo-device[data-platform="ios"] .mo-native-switch > input:checked + .mo-native-switch-track { background: Highlight; border-color: Highlight; }

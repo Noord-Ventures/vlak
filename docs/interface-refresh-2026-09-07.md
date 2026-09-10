@@ -22,6 +22,8 @@ The embedded About reference cards keep their descriptions and selection control
 
 ## Mobile OS
 
+Route update: the current gallery exposes independent [iOS](/interfaces/ios/) and [Android](/interfaces/android/) studies. The earlier `/interfaces/mobile-os/` and `/i/mobile-os/` links now open a static platform chooser. The paired-device notes and results below describe the earlier refresh checkpoint.
+
 Each phone owns 16 core apps and its own records, settings, timers and playback state. Both phones appear side by side where space allows; compact specimens use native horizontal scroll snap without a study-level platform switch.
 
 The iPhone keeps its Dynamic Island, status and safe areas, Home gesture, App Library, contextual back navigation, app toolbars and tabs, grouped Settings, Mailboxes hierarchy, and separate Control and Notification Centers. Its revised presentation uses flat paper surfaces, Vlak hairline icons, restrained fills and calmer type weights. Familiar Calendar, Clock, Photos and Safari faces remain distinct. Android retains its separate launcher, All Apps drawer, three-button system navigation, app bars, floating actions, note grid and Quick Settings shade.

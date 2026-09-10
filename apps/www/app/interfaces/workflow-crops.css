@@ -59,6 +59,14 @@
 .wf-crop-apps > div { display: grid; justify-items: center; gap: 5px; }
 .wf-crop-apps > div > span { width: 36px; height: 36px; border: 1px solid var(--control-border); border-radius: 8px; display: grid; place-items: center; }
 .wf-crop-apps small { font-size: 9px; }
+.wf-crop-os-android { gap: 12px; }
+.wf-crop-os-android .wf-crop-apps > div > span { border-radius: 50%; background: var(--control-fill); }
+.wf-crop-os-search { display: flex; align-items: center; gap: 8px; min-height: 32px; padding-inline: 12px; border: 1px solid var(--divider); border-radius: 24px; font-size: 10px; }
+.wf-crop-os-search > .rs-icon:last-child { margin-left: auto; }
+.wf-crop-home-indicator { display: block; width: 86px; height: 4px; border-radius: 4px; background: currentColor; margin-inline: auto; }
+.wf-crop-system-navigation { display: flex; align-items: center; justify-content: space-between; width: 130px; margin-inline: auto; }
+.wf-crop-system-navigation > i { width: 10px; height: 10px; border: 1px solid currentColor; border-radius: 50%; }
+.wf-crop-system-navigation > b { width: 9px; height: 9px; border: 1px solid currentColor; }
 .wf-crop-transit { display: grid; align-content: center; height: 100%; gap: 12px; padding: 16px; }
 .wf-crop-transit > span { font-size: 10px; color: var(--text-secondary); }
 .wf-crop-transit > strong { font-size: 22px; line-height: 1.15; letter-spacing: -.035em; }

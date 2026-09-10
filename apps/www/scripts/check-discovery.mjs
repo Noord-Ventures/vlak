@@ -89,10 +89,26 @@ for (const entry of readdirSync(join(out, "interfaces"), { withFileTypes: true }
   assert(tags(head, "meta").some(item => item.name === "robots" && /noindex/.test(item.content)), `${file}: preview excludes duplicate indexing`);
   assert.deepEqual(tags(head, "link").filter(item => item.rel === "canonical").map(item => item.href), [`${origin}/interfaces/${entry.name}/`], `${file}: canonical study`);
   assert.deepEqual(tags(head, "meta").filter(item => item.property === "og:url").map(item => item.content), [`${origin}/i/${entry.name}/`], `${file}: direct sharing URL`);
+  if (entry.name === "mobile-os") {
+    const study = read("interfaces/mobile-os/index.html");
+    for (const [path, content] of [["interfaces/mobile-os/index.html", study], [file, html]]) {
+      assert(tags(content, "meta").some(item => item.name === "robots" && /noindex/.test(item.content)), `${path}: legacy chooser excludes duplicate indexing`);
+      for (const platform of ["android", "ios"]) assert(tags(content, "a").some(item => item.href === `/interfaces/${platform}/`), `${path}: legacy chooser links ${platform} without JavaScript`);
+    }
+    continue;
+  }
   assert.match(html, /data-preview-open="true"/, `${file}: preview is present on first paint`);
   previews++;
 }
 for (const path of images) assert(existsSync(join(out, path)), `Missing social image: ${path}`);
+const interfaceIndex = read("interfaces/index.html");
+const interfaceLinks = tags(interfaceIndex, "a").map(item => item.href?.replace(/\/$/, ""));
+for (const platform of ["android", "ios"]) {
+  assert(interfaceLinks.includes(`/interfaces/${platform}`), `Interface gallery includes ${platform}`);
+  assert(read("interfaces.md").includes(`${origin}/interfaces/${platform}/`), `Agent interface catalogue includes ${platform}`);
+}
+assert(!interfaceLinks.includes("/interfaces/mobile-os"), "Legacy chooser is absent from the active gallery and sidebar");
+assert(!read("interfaces.md").includes(`${origin}/interfaces/mobile-os/`), "Agent interface catalogue uses the separate platform routes");
 
 // Every AI entry must be visible in the initial linked catalogue, without hydration.
 const aiHtml = read("ai/index.html");

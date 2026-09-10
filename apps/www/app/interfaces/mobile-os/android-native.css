@@ -1,13 +1,14 @@
-/* Android 15 / Material 3. Values are logical dp, rendered at 1 CSS px per dp.
-   Hardware scales the complete display; component geometry does not reflow.
-   See android-reference.md for the pinned component and SystemUI sources.
+/* Material 3 Expressive anatomy, translated into Vlak paper, ink and Inter.
+   Values are logical dp. Device changes reflow the same application instance.
+   See android-reference.md for the native token baseline and explicit adaptations.
    The .mo scope also wins legacy scene rules when standalone routes reorder CSS. */
 .mo .mo-device[data-platform="android"] .mo-phone {
   --mo-android-surface: var(--bg);
   --mo-android-container: color-mix(in srgb, var(--text) 7%, var(--bg));
   --mo-android-container-high: color-mix(in srgb, var(--text) 11%, var(--bg));
   --mo-android-outline: color-mix(in srgb, var(--text) 55%, var(--bg));
-  font-family: Roboto, Arial, sans-serif;
+  --mo-android-motion: 260ms cubic-bezier(.2, 0, 0, 1);
+  font-family: Inter, Arial, sans-serif;
   font-size: calc(16px * var(--mo-text-scale, 1));
   line-height: 1.5;
   letter-spacing: 0;
@@ -28,6 +29,7 @@
   line-height: 20px;
   letter-spacing: .1px;
   box-shadow: none;
+  transition: border-radius var(--mo-android-motion), background-color var(--mo-android-motion), color var(--mo-android-motion);
 }
 
 .mo .mo-device[data-platform="android"] .mo-phone :is(button, input, textarea):focus-visible {
@@ -243,7 +245,7 @@
   font-size: 12px;
 }
 
-/* M3 small top app bar and type scale. */
+/* Expressive small app bar remains 64dp; root screens use the 112dp flexible bar. */
 .mo .mo-device[data-platform="android"] .mo-app-header {
   min-height: 64px;
   height: 64px;
@@ -301,6 +303,19 @@
   font-size: 14px;
   line-height: 20px;
   letter-spacing: .25px;
+}
+
+/* Root titles align to the same 16dp rail as the app content. */
+.mo .mo-device[data-platform="android"] .mo-phone[data-root-app="true"] .mo-app-header {
+  align-items: flex-end;
+  height: 112px;
+  min-height: 112px;
+  padding: 16px;
+}
+
+.mo .mo-device[data-platform="android"] .mo-phone[data-root-app="true"] .mo-app-header h2 {
+  font-size: calc(28px * var(--mo-text-scale));
+  line-height: 36px;
 }
 
 /* Outlined fields retain native input semantics and the 56dp M3 container. */
@@ -378,10 +393,13 @@
   padding-top: 8px;
 }
 
-/* 40dp visible segments in a 48dp interactive row. */
+/* Connected expressive segments: 40dp paint, 48dp target, 2dp separation.
+   Selected segments become fully rounded and retain the ToggleGroup keyboard model. */
 .mo .mo-device[data-platform="android"] .rs-toggle-group {
+  display: flex;
+  gap: 2px;
   min-height: 48px;
-  padding-block: 0;
+  padding: 0;
   border: 0;
   border-radius: 0;
   overflow: visible;
@@ -394,16 +412,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 1 1 0;
+  min-width: 0;
   min-height: 48px;
   height: 48px;
   padding: 0 16px;
   border: 0;
-  border-radius: 0;
+  border-radius: 8px;
   background: transparent;
   font-size: calc(14px * var(--mo-text-scale));
   line-height: 20px;
   font-weight: 500;
   letter-spacing: .1px;
+  transition: border-radius var(--mo-android-motion), color var(--mo-android-motion);
 }
 
 .mo .mo-device[data-platform="android"] .rs-toggle::after {
@@ -411,30 +432,24 @@
   position: absolute;
   z-index: -1;
   inset: 4px 0;
-  border: 1px solid var(--mo-android-outline);
+  border: 1px solid transparent;
   border-radius: inherit;
+  background: var(--mo-android-container-high);
   pointer-events: none;
+  transition: background-color var(--mo-android-motion), border-radius var(--mo-android-motion);
 }
 
-.mo .mo-device[data-platform="android"] .rs-toggle:first-child { border-radius: 20px 0 0 20px; }
-.mo .mo-device[data-platform="android"] .rs-toggle:last-child { border-radius: 0 20px 20px 0; }
-.mo .mo-device[data-platform="android"] .rs-toggle + .rs-toggle { margin-inline-start: -1px; border-inline-start: 0; }
+.mo .mo-device[data-platform="android"] .rs-toggle:first-child { border-radius: 20px 8px 8px 20px; }
+.mo .mo-device[data-platform="android"] .rs-toggle:last-child { border-radius: 8px 20px 20px 8px; }
+.mo .mo-device[data-platform="android"] .rs-toggle + .rs-toggle { margin-inline-start: 0; border-inline-start: 0; }
 .mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"] {
   z-index: 1;
+  border-radius: 20px;
   background: transparent;
-  color: var(--text);
+  color: var(--bg);
 }
-.mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::after { background: var(--mo-android-container-high); }
-.mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::before {
-  content: "";
-  width: 12px;
-  height: 7px;
-  flex-shrink: 0;
-  margin-inline-end: 8px;
-  border-bottom: 2px solid currentColor;
-  border-left: 2px solid currentColor;
-  transform: translateY(-2px) rotate(-45deg);
-}
+.mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::after { background: var(--text); }
+.mo .mo-device[data-platform="android"] .rs-toggle:active { border-radius: 4px; }
 
 /* A switch has a 52 × 32 track, 16dp off thumb and 24dp on thumb. */
 .mo .mo-device[data-platform="android"] .mo-native-switch {
@@ -511,39 +526,41 @@
   box-shadow: none;
 }
 
+/* Expressive slider: 16dp track, 4 × 44dp handle and a separated track gap.
+   The native range retains browser keyboard and touch behavior. */
 .mo .mo-device[data-platform="android"] .mo-native-range::-webkit-slider-runnable-track {
-  height: 4px;
-  border-radius: 2px;
-  background: linear-gradient(to right, var(--text) var(--mo-range-fill), var(--mo-android-container-high) var(--mo-range-fill));
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(to right, var(--text) 0 calc(var(--mo-range-fill) - 8px), var(--mo-android-surface) calc(var(--mo-range-fill) - 8px) calc(var(--mo-range-fill) + 8px), var(--mo-android-container-high) calc(var(--mo-range-fill) + 8px));
 }
 
 .mo .mo-device[data-platform="android"] .mo-native-range::-webkit-slider-thumb {
-  width: 20px;
-  height: 20px;
-  margin-top: -8px;
+  width: 4px;
+  height: 44px;
+  margin-top: -14px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 2px;
   background: var(--text);
   box-shadow: none;
 }
 
 .mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-track {
-  height: 4px;
-  border-radius: 2px;
+  height: 16px;
+  border-radius: 8px;
   background: var(--mo-android-container-high);
 }
 
-.mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--text); }
+.mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-progress { height: 16px; border-radius: 8px; background: var(--text); }
 .mo .mo-device[data-platform="android"] .mo-native-range::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 4px;
+  height: 44px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 2px;
   background: var(--text);
-  box-shadow: none;
+  box-shadow: -6px 0 0 0 var(--mo-android-surface), 6px 0 0 0 var(--mo-android-surface);
 }
 
-/* Material lists use 56dp one-line and 72dp two-line rows. */
+/* Expressive lists retain 56/72/88dp line heights with 16dp side insets. */
 .mo .mo-device[data-platform="android"] .mo-phone .mo-list-row {
   min-height: 72px;
   gap: 16px;
@@ -617,7 +634,11 @@
 .mo .mo-device[data-platform="android"] .mo-settings-profile .mo-initials { width: 56px; height: 56px; font-size: 22px; }
 
 .mo .mo-device[data-platform="android"] .mo-phone .mo-android-settings-search {
+  width: 100%;
+  min-width: 0;
   min-height: 56px;
+  font-size: calc(16px * var(--mo-text-scale));
+  line-height: 24px;
   padding-inline: 24px;
   border: 0;
   border-radius: 28px;
@@ -625,31 +646,33 @@
 }
 
 .mo .mo-device[data-platform="android"] .mo-android-settings-list {
-  margin: 16px -16px 0;
+  display: grid;
+  gap: 2px;
+  margin: 20px 0 0;
 }
 
 .mo .mo-device[data-platform="android"] .mo-phone .mo-android-setting-row {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 24px;
+  gap: 12px;
   width: 100%;
-  min-height: 88px;
+  min-height: 72px;
   margin: 0;
-  padding: 16px 24px;
+  padding: 10px 16px;
   border: 0;
-  border-radius: 0;
-  background: transparent;
+  border-radius: 4px;
+  background: var(--mo-android-container);
   text-align: start;
 }
 
 .mo .mo-device[data-platform="android"] .mo-android-setting-row > span { display: block; min-width: 0; }
 .mo .mo-device[data-platform="android"] .mo-android-setting-row strong {
   display: block;
-  font-size: calc(20px * var(--mo-text-scale));
-  line-height: 28px;
+  font-size: calc(16px * var(--mo-text-scale));
+  line-height: 24px;
   letter-spacing: 0;
-  font-weight: 400;
+  font-weight: 500;
 }
 .mo .mo-device[data-platform="android"] .mo-android-setting-row small {
   display: block;
@@ -660,7 +683,17 @@
   color: var(--text-secondary);
 }
 
-/* Flat M3 action containers, FAB and navigation bar. */
+.mo .mo-device[data-platform="android"] .mo-android-setting-row:first-child { border-start-start-radius: 16px; border-start-end-radius: 16px; }
+.mo .mo-device[data-platform="android"] .mo-android-setting-row:last-child { border-end-start-radius: 16px; border-end-end-radius: 16px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-setting-row:is(:hover, :focus-visible) { background: var(--mo-android-container-high); border-radius: 12px; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-setting-row:active { border-radius: 16px; }
+.mo .mo-device[data-platform="android"] .mo-android-setting-row > :is(.rs-icon, .mo-platform-glyph) { flex-shrink: 0; width: 20px; height: 20px; }
+.mo .mo-device[data-platform="android"] .mo-android-setting-row > .rs-icon:last-child { margin-inline-start: auto; color: var(--text-secondary); }
+.mo .mo-device[data-platform="android"] .mo-android-search-field { position: relative; }
+.mo .mo-device[data-platform="android"] .mo-android-search-field > .rs-icon { position: absolute; top: 16px; left: 16px; pointer-events: none; }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-android-search-field > input { padding-inline-start: 52px; }
+
+/* Flat expressive action containers, FAB and 64dp short navigation bar. */
 .mo .mo-device[data-platform="android"] .mo-app-actions {
   min-height: 72px;
   padding: 12px 16px;
@@ -688,8 +721,8 @@
 }
 
 .mo .mo-device[data-platform="android"] .mo-clock-tabs {
-  min-height: 80px;
-  padding: 12px 8px 16px;
+  min-height: 64px;
+  padding: 6px 8px;
   border: 0;
   background: var(--mo-android-container);
 }
@@ -711,7 +744,7 @@
   box-sizing: content-box;
   width: 24px;
   height: 24px;
-  padding: 4px 20px;
+  padding: 4px 16px;
   border-radius: 16px;
 }
 
@@ -729,7 +762,7 @@
 .mo .mo-device[data-platform="android"] .mo-phone .mo-calculator .rs-btn-primary { background: var(--text); color: var(--bg); }
 .mo .mo-device[data-platform="android"] .mo-calculator-display { min-height: 148px; padding: 24px 8px; font-size: 56px; line-height: 72px; letter-spacing: 0; }
 
-/* Android 15 SystemUI: 80dp tiles, 8dp gaps, 20dp icons and 16dp start inset. */
+/* Pixel-style expressive Quick Settings; local tiles, not a One UI reproduction. */
 .mo .mo-device[data-platform="android"] .mo-phone:is([data-overlay="quick"], [data-overlay="notifications"]) {
   background: var(--mo-android-container);
 }
@@ -753,17 +786,17 @@
   grid-template-rows: 20px 20px;
   align-content: center;
   align-items: center;
-  min-height: 80px;
-  height: 80px;
+  min-height: 72px;
+  height: auto;
   gap: 0 10px;
   padding: 16px;
   border: 0;
-  border-radius: 40px;
+  border-radius: 36px;
   background: var(--mo-android-container-high);
   color: var(--text);
 }
 
-.mo .mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button[aria-pressed="true"] { background: var(--text); color: var(--bg); }
+.mo .mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button[aria-pressed="true"] { border-radius: 16px; background: var(--text); color: var(--bg); }
 .mo .mo-device[data-platform="android"] .mo-quick-grid > button > .rs-icon { width: 20px; height: 20px; }
 .mo .mo-device[data-platform="android"] .mo-quick-grid strong { font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: .1px; }
 .mo .mo-device[data-platform="android"] .mo-quick-grid span { font-size: 12px; line-height: 16px; }
@@ -781,32 +814,6 @@
   clip-path: inset(50%);
 }
 
-.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-webkit-slider-runnable-track {
-  height: 48px;
-  border-radius: 24px;
-}
-
-.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-webkit-slider-thumb {
-  width: 4px;
-  height: 24px;
-  margin-top: 12px;
-  border-radius: 2px;
-  background: var(--bg);
-}
-.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-track {
-  height: 48px;
-  border-radius: 24px;
-}
-.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-progress {
-  height: 48px;
-  border-radius: 24px;
-}
-.mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] :is(.mo-field, .mo-android-brightness) .mo-native-range::-moz-range-thumb {
-  width: 4px;
-  height: 24px;
-  border-radius: 2px;
-  background: var(--bg);
-}
 .mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-quick-grid { margin-top: 16px; }
 
 .mo .mo-device[data-platform="android"] .mo-now-playing {
@@ -884,8 +891,140 @@
 .mo .mo-device[data-platform="android"] .mo-recent-task header > strong { font-size: 16px; line-height: 24px; font-weight: 400; }
 .mo .mo-device[data-platform="android"] .mo-recent-task .mo-mini-icon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--mo-android-container-high); }
 
+/* The live mobile view uses real CSS pixels, not a scaled handset screenshot. */
+@container (max-width: 360px) {
+  .mo .mo-device[data-platform="android"] .mo-home { padding: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-at-a-glance { min-height: 56px; padding: 0; }
+  .mo .mo-device[data-platform="android"] .mo-at-a-glance > span:first-child { font-size: 18px; line-height: 26px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-android-clock-widget { align-self: flex-start; width: 160px; height: 160px; min-height: 160px; margin: 20px 0; padding: 12px 20px; border-radius: 40px; }
+  .mo .mo-device[data-platform="android"] .mo-android-clock-widget > span { font-size: 64px; line-height: 68px; }
+  .mo .mo-device[data-platform="android"] .mo-home-apps { gap: 12px 4px; padding-top: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-app-icon { min-width: 44px; min-height: 76px; gap: 6px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-app-icon > [data-app-icon],
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-dock button > [data-app-icon]:first-child { width: 44px; height: 44px; }
+  .mo .mo-device[data-platform="android"] .mo-app-icon strong { max-width: 100%; font-size: 12px; line-height: 16px; }
+  .mo .mo-device[data-platform="android"] .mo-phone [data-app-icon] > :is(.rs-icon, .mo-android-app-glyph) { width: 24px; height: 24px; }
+  .mo .mo-device[data-platform="android"] .mo-dock { min-height: 64px; padding: 4px 12px 12px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-dock > button { min-width: 44px; min-height: 48px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-android-search { width: calc(100% - 24px); margin-inline: 12px; padding-inline: 12px; gap: 8px; }
+  .mo .mo-device[data-platform="android"] .mo-android-search > .rs-icon { width: 20px; height: 20px; }
+  .mo .mo-device[data-platform="android"] .mo-android-search > .rs-icon:last-child { display: none; }
+  .mo .mo-device[data-platform="android"] .mo-android-search > span { min-width: 0; text-align: start; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-overlay="library"] .mo-scroll { padding: 12px 16px 20px; }
+  .mo .mo-device[data-platform="android"] .mo-all-apps { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-auto-rows: 88px; gap: 0 4px; margin-top: 16px; }
+  .mo .mo-device[data-platform="android"] .mo-all-apps .mo-app-icon strong { white-space: nowrap; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-root-app="true"] .mo-app-header { height: 88px; min-height: 88px; }
+  .mo .mo-device[data-platform="android"] .mo-app-header { gap: 8px; }
+  .mo .mo-device[data-platform="android"] .mo-app-header h2 { font-size: calc(20px * var(--mo-text-scale)); line-height: 26px; overflow-wrap: anywhere; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-root-app="true"] .mo-app-header h2 { font-size: calc(26px * var(--mo-text-scale)); line-height: 34px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-android-setting-row { gap: 8px; padding-inline: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-android-setting-row strong,
+  .mo .mo-device[data-platform="android"] .mo-android-setting-row small { white-space: normal; overflow-wrap: anywhere; }
+  .mo .mo-device[data-platform="android"] .mo-setting-switch { gap: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-setting-switch > span { min-width: 0; overflow-wrap: anywhere; }
+  .mo .mo-device[data-platform="android"] .mo-data-row { flex-wrap: wrap; gap: 4px 12px; font-size: calc(16px * var(--mo-text-scale)); }
+  .mo .mo-device[data-platform="android"] .mo-data-row > * { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-list-row { gap: 12px; padding-inline: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-list-row > span { min-width: 0; overflow-wrap: anywhere; }
+  .mo .mo-device[data-platform="android"] .mo-contact-row .mo-list-row { gap: 8px; padding-inline: 0; }
+  .mo .mo-device[data-platform="android"] .mo-contact-row .mo-list-row > .rs-icon:last-child { display: none; }
+  .mo .mo-device[data-platform="android"] .mo-contact-row .mo-initials { width: 32px; height: 32px; flex-shrink: 0; }
+  .mo .mo-device[data-platform="android"] .mo-calculator { gap: 2px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-calculator button { min-width: 44px; min-height: 52px; padding: 4px; font-size: 24px; }
+  .mo .mo-device[data-platform="android"] .mo-calculator-display { min-height: 100px; padding: 12px 8px; font-size: 40px; line-height: 48px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button { padding: 12px; gap: 0 8px; }
+  .mo .mo-device[data-platform="android"] .mo-now-playing { gap: 8px; padding: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-now-playing > .rs-icon { display: none; }
+  .mo .mo-device[data-platform="android"] .mo-notification { grid-template-columns: minmax(0, 1fr) 48px; gap: 8px; padding: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-notification > .rs-icon { display: none; }
+  .mo .mo-device[data-platform="android"] .mo-notification p { overflow-wrap: anywhere; }
+  .mo .mo-device[data-platform="android"] .mo-app-actions { flex-wrap: wrap; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-app-actions > button { max-width: 100%; }
+}
+
+@container (max-width: 300px) {
+  .mo .mo-device[data-platform="android"] .mo-quick-grid { grid-template-columns: minmax(0, 1fr); }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-quick-grid > button { min-height: 64px; }
+  .mo .mo-device[data-platform="android"] .mo-shade-clock { flex-wrap: wrap; gap: 4px; }
+  .mo .mo-device[data-platform="android"] .mo-shade-clock strong { font-size: 32px; line-height: 40px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-shade-compact > button { min-height: 64px; padding: 12px; flex-direction: column; gap: 4px; border-radius: 24px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-shade-compact > button[aria-label="Expand Quick Settings"] { min-height: 48px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-keypad button { min-height: 56px; padding: 8px; font-size: 28px; }
+}
+
+/* A wider handset is a new composition, with the same live controls and state. */
+@container (min-width: 600px) {
+  .mo .mo-device[data-platform="android"] .mo-phone[data-app="home"]:not([data-overlay]) .mo-screen {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 80px;
+    grid-template-rows: minmax(0, 1fr) 60px;
+    padding-inline: 16px;
+  }
+  .mo .mo-device[data-platform="android"] .mo-home {
+    display: grid;
+    grid-template-columns: 152px minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    align-content: center;
+    gap: 8px 24px;
+    padding: 8px 16px;
+  }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-at-a-glance { grid-column: 2; min-height: 48px; padding: 0; }
+  .mo .mo-device[data-platform="android"] .mo-at-a-glance > span:first-child { font-size: 16px; line-height: 24px; }
+  .mo .mo-device[data-platform="android"] .mo-at-a-glance > span:last-child { font-size: 14px; line-height: 20px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-android-clock-widget {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    align-self: center;
+    width: 152px;
+    height: 152px;
+    min-height: 152px;
+    margin: 0;
+    padding: 12px 20px;
+    border-radius: 36px;
+  }
+  .mo .mo-device[data-platform="android"] .mo-android-clock-widget > span { font-size: 60px; line-height: 64px; }
+  .mo .mo-device[data-platform="android"] .mo-home-apps { grid-column: 2; margin: 0; padding: 0; align-self: center; gap: 8px; }
+  .mo .mo-device[data-platform="android"] .mo-dock {
+    grid-column: 2;
+    grid-row: 1 / 3;
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(4, minmax(56px, 1fr));
+    min-height: 0;
+    padding: 0 12px 0 8px;
+    gap: 0;
+    overflow-y: auto;
+  }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-android-search { grid-column: 1; width: calc(100% - 32px); margin: 0 16px 4px; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-root-app="true"] .mo-app-header { min-height: 64px; height: 64px; padding: 12px 24px; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-root-app="true"] .mo-app-header h2 { font-size: calc(24px * var(--mo-text-scale)); line-height: 32px; }
+  .mo .mo-device[data-platform="android"] .mo-scroll:not(.mo-home) { padding: 12px 24px; }
+  .mo .mo-device[data-platform="android"] .mo-all-apps { grid-template-columns: repeat(8, minmax(0, 1fr)); grid-auto-rows: 96px; margin-top: 16px; }
+  .mo .mo-device[data-platform="android"] .mo-android-settings-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-android-setting-row { border-radius: 12px; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-scroll {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    align-content: start;
+    gap: 8px 24px;
+  }
+  .mo .mo-device[data-platform="android"] .mo-shade-clock { grid-column: 1; min-height: 44px; margin: 0; }
+  .mo .mo-device[data-platform="android"] .mo-shade-clock strong { font-size: 32px; line-height: 40px; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-android-brightness { grid-column: 1; margin: 0; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-quick-grid { grid-column: 2; grid-row: 1 / 4; align-content: center; margin: 0; }
+  .mo .mo-device[data-platform="android"] .mo-phone[data-overlay="quick"] .mo-now-playing { grid-column: 1; min-height: 80px; margin: 0; padding: 12px; border-radius: 16px; }
+  .mo .mo-device[data-platform="android"] .mo-shade-actions { grid-column: 1 / -1; min-height: 48px; margin: 0; }
+  .mo .mo-device[data-platform="android"] .mo-form { max-width: 640px; margin-inline: auto; }
+  .mo .mo-device[data-platform="android"] .mo-clock-face { padding-block: 8px; font-size: 56px; line-height: 64px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-calculator button { min-height: 48px; font-size: 24px; }
+  .mo .mo-device[data-platform="android"] .mo-calculator-display { min-height: 72px; padding: 8px; font-size: 40px; line-height: 48px; }
+  .mo .mo-device[data-platform="android"] .mo-phone .mo-recent-preview { min-height: 180px; }
+  .mo .mo-device[data-platform="android"] .mo-recents { padding-top: 8px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .mo .mo-device[data-platform="android"] :is(.mo-native-switch-track, .mo-native-switch-thumb) { transition: none; }
+  .mo .mo-device[data-platform="android"] :is(button, .mo-native-switch-track, .mo-native-switch-thumb),
+  .mo .mo-device[data-platform="android"] .rs-toggle::after { transition: none; }
 }
 
 @media (forced-colors: active) {
@@ -900,5 +1039,8 @@
   .mo .mo-device[data-platform="android"] .mo-native-switch-thumb { background: CanvasText; }
   .mo .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track { background: Highlight; border-color: Highlight; }
   .mo .mo-device[data-platform="android"] .mo-native-switch > input:checked + .mo-native-switch-track > .mo-native-switch-thumb { background: HighlightText; }
+  .mo .mo-device[data-platform="android"] .rs-toggle::after { border-color: ButtonText; }
+  .mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"]::after { background: Highlight; }
+  .mo .mo-device[data-platform="android"] .rs-toggle[aria-pressed="true"] { color: HighlightText; }
   .mo .mo-device[data-platform="android"] .mo-native-range { appearance: auto; }
 }

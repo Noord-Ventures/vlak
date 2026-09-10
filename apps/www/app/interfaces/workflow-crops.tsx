@@ -27,9 +27,20 @@ export function TeamCrop() {
 export function WallpaperCrop() {
   return <Frame icon="image" title="Field studies" context="Collection 01" footer={<><span>Primary field</span><strong>6,144 × 3,456</strong></>}><div className="wf-crop-wallpaper"><svg viewBox="0 0 340 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="340" height="200" fill="#e7e5dd" /><path d="M0 30H340M0 70H340M0 110H340M0 150H340M40 0V200M100 0V200M160 0V200M220 0V200M280 0V200" stroke="#b9b3a5" strokeWidth=".5"/><rect x="50" y="35" width="100" height="120" fill="#2142c7" /><circle cx="255" cy="55" r="24" fill="#2142c7" /><path d="M0 200L340 115V200Z" fill="#171717"/><path d="M0 135H340" stroke="#171717" strokeWidth="7"/></svg></div></Frame>;
 }
-export function MobileOSCrop() {
-  return <Frame icon="smartphone" title="Everyday apps" context="iOS / Android" footer={<><span>Home</span><span>16 core apps</span></>}><div className="wf-crop-os"><div><strong>9:41</strong><span>Tuesday, 8 September</span></div><div className="wf-crop-apps">{([['message', 'Messages'], ['calendar', 'Calendar'], ['image', 'Photos'], ['settings', 'Settings'], ['music', 'Music'], ['map', 'Maps'], ['file', 'Files'], ['edit', 'Notes']] as const).map(([icon, label]) => <div key={label}><span><Icon name={icon} size={24} /></span><small>{label}</small></div>)}</div></div></Frame>;
+function MobilePlatformCrop({ platform }: { platform: "ios" | "android" }) {
+  const apps = platform === "android"
+    ? [['camera', 'Camera'], ['image', 'Photos'], ['mail', 'Mail'], ['settings', 'Settings']] as const
+    : [['message', 'Messages'], ['calendar', 'Calendar'], ['image', 'Photos'], ['settings', 'Settings'], ['music', 'Music'], ['map', 'Maps'], ['file', 'Files'], ['edit', 'Notes']] as const;
+  return <Frame icon="smartphone" title="Everyday apps" context={platform === "ios" ? "iOS" : "Android"} footer={platform === "ios" ? <span className="wf-crop-home-indicator" /> : <span className="wf-crop-system-navigation"><Icon name="chevron-left" size={16} /><i /><b /></span>}>
+    <div className={`wf-crop-os wf-crop-os-${platform}`}>
+      <div><strong>{platform === "ios" ? "9:41" : "09:41"}</strong><span>Tuesday, 8 September</span></div>
+      {platform === "android" && <div className="wf-crop-os-search"><Icon name="search" size={16} /><span>Search apps</span><Icon name="mic" size={16} /></div>}
+      <div className="wf-crop-apps">{apps.map(([icon, label]) => <div key={label}><span><Icon name={icon} size={24} /></span><small>{label}</small></div>)}</div>
+    </div>
+  </Frame>;
 }
+export function IOSCrop() { return <MobilePlatformCrop platform="ios" />; }
+export function AndroidCrop() { return <MobilePlatformCrop platform="android" />; }
 export function TransitCrop() {
   return <Frame icon="map" title="Your next stop" context="Travel planner" footer={<><span>Plan</span><span>Today</span><span>Profile</span></>}><div className="wf-crop-transit"><span>Saturday, 12 September</span><strong>Amsterdam<br />to Rotterdam</strong><div><b>10:24</b><span>Sample intercity<small>Direct · 44 min</small></span><Icon name="arrow-right" size={16} /></div><p><Icon name="check" size={12} />Sample trip saved for today</p></div></Frame>;
 }

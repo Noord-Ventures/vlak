@@ -40,7 +40,7 @@ function trailFor(pathname: string): Crumb[] {
     trail.push({ label: "Interfaces", href: "/interfaces" });
     if (parts[1]) {
       const proto = interfaceBySlug(parts[1]);
-      trail.push({ label: proto?.title ?? parts[1] });
+      trail.push({ label: proto?.title ?? (parts[1] === "mobile-os" ? "Mobile OS" : parts[1]) });
     }
   }
   return trail;
