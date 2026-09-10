@@ -26,6 +26,8 @@ export interface DropdownMenuItem {
 export interface DropdownMenuProps extends React.HTMLAttributes<HTMLDivElement> {
   label: React.ReactNode;
   items: DropdownMenuItem[];
+  /** Preferred opening side. The menu still flips when needed to remain visible. */
+  side?: "auto" | "top" | "bottom";
 }
 
 export const menuStyles = stylex.create({
@@ -463,7 +465,7 @@ function NestedMenu({ anchor, ...props }: Omit<MenuPanelProps, "panelRef" | "sty
 
 /** Action menu with menu semantics and keyboard navigation. */
 export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(function DropdownMenu(
-  { label, items, className, style, ...props },
+  { label, items, side = "auto", className, style, ...props },
   ref,
 ) {
   const idBase = React.useId();
@@ -475,7 +477,7 @@ export const DropdownMenu = React.forwardRef<HTMLDivElement, DropdownMenuProps>(
   const [open, setOpen] = React.useState(false);
   const [initial, setInitial] = React.useState<"first" | "last">("first");
   const panelRef = React.useRef<HTMLDivElement>(null);
-  const placement = useOverlayPosition(open, panelRef, triggerRef);
+  const placement = useOverlayPosition(open, panelRef, triggerRef, undefined, "bottom", { side });
 
   React.useEffect(() => {
     if (!open) return;

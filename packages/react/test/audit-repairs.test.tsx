@@ -288,3 +288,25 @@ it("clamps a context overlay into the viewport and flips it above the pointer", 
   expect(Number.parseFloat(overlay.style.left)).toBeLessThanOrEqual(202);
   expect(Number.parseFloat(overlay.style.top)).toBeLessThanOrEqual(475);
 });
+
+it("honours an overlay's preferred top side when both sides fit", () => {
+  Object.defineProperty(window, "innerWidth", { configurable: true, value: 800 });
+  Object.defineProperty(window, "innerHeight", { configurable: true, value: 700 });
+  function Overlay() {
+    const panel = React.useRef<HTMLDivElement>(null);
+    const anchor = React.useRef<HTMLDivElement>(null);
+    const style = useOverlayPosition(true, panel, anchor, undefined, "bottom", { side: "top" });
+    return <><div ref={(element) => {
+      anchor.current = element;
+      if (element) element.getBoundingClientRect = () => ({ x: 200, y: 300, left: 200, right: 300, top: 300, bottom: 340, width: 100, height: 40, toJSON: () => ({}) });
+    }} /><div ref={(element) => {
+      panel.current = element;
+      if (element) {
+        Object.defineProperty(element, "scrollWidth", { configurable: true, value: 160 });
+        Object.defineProperty(element, "scrollHeight", { configurable: true, value: 120 });
+      }
+    }} data-testid="overlay-top" style={style} /></>;
+  }
+  render(<Overlay />);
+  expect(screen.getByTestId("overlay-top").style.top).toBe("174px");
+});

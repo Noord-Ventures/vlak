@@ -11,6 +11,7 @@ Page: https://vlak.dev/components/dropdown-menu/
 
 - Three or more actions on one object behind a single trigger.
 - Separators to group destructive actions at the end.
+- Use side="top" for controls anchored to a persistent footer or viewport edge. Placement remains collision-aware.
 
 ## When not to
 
@@ -55,6 +56,7 @@ import { DropdownMenu } from "@noorddev/vlak-react";
 
 <DropdownMenu
   label="Actions"
+  side="top"
   items={[
     { label: "Rename", onSelect: rename },
     { label: "Duplicate", onSelect: duplicate },
@@ -79,6 +81,7 @@ Forwards `ref` to the `HTMLDivElement`.
 | --- | --- | --- | --- |
 | `label` (required) | `ReactNode` |  |  |
 | `items` (required) | `DropdownMenuItem[]` |  |  |
+| `side` | `"auto" \| "top" \| "bottom"` | `"auto"` | Preferred opening side. The menu still flips when needed to remain visible. |
 
 ## Keyboard
 

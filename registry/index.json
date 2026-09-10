@@ -15938,11 +15938,12 @@
             "Action menu",
             "Overflow menu"
           ],
-          "example": "import { DropdownMenu } from \"@noorddev/vlak-react\";\n\n<DropdownMenu\n  label=\"Actions\"\n  items={[\n    { label: \"Rename\", onSelect: rename },\n    { label: \"Duplicate\", onSelect: duplicate },\n    { separator: true },\n    { label: \"Delete\", onSelect: remove },\n    { label: \"Archive\", disabled: true },\n  ]}\n/>",
+          "example": "import { DropdownMenu } from \"@noorddev/vlak-react\";\n\n<DropdownMenu\n  label=\"Actions\"\n  side=\"top\"\n  items={[\n    { label: \"Rename\", onSelect: rename },\n    { label: \"Duplicate\", onSelect: duplicate },\n    { separator: true },\n    { label: \"Delete\", onSelect: remove },\n    { label: \"Archive\", disabled: true },\n  ]}\n/>",
           "usage": {
             "use": [
               "Three or more actions on one object behind a single trigger.",
-              "Separators to group destructive actions at the end."
+              "Separators to group destructive actions at the end.",
+              "Use side=\"top\" for controls anchored to a persistent footer or viewport edge. Placement remains collision-aware."
             ],
             "avoid": [
               "Choosing a value; use Select.",

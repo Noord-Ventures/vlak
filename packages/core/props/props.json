@@ -9573,6 +9573,13 @@
               "name": "items",
               "type": "DropdownMenuItem[]",
               "required": true
+            },
+            {
+              "name": "side",
+              "type": "\"auto\" | \"top\" | \"bottom\"",
+              "required": false,
+              "default": "\"auto\"",
+              "description": "Preferred opening side. The menu still flips when needed to remain visible."
             }
           ]
         }

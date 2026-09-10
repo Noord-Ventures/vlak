@@ -9,7 +9,13 @@ export function useOverlayPosition(
   anchor: React.RefObject<HTMLElement | null>,
   point?: { x: number; y: number } | null,
   placement: "bottom" | "inline-end" = "bottom",
-  options?: { popover?: "auto" | "manual"; edge?: number; matchAnchorWidth?: boolean },
+  options?: {
+    popover?: "auto" | "manual";
+    edge?: number;
+    matchAnchorWidth?: boolean;
+    /** Preferred block side. Collision handling may use the opposite side. */
+    side?: "auto" | "top" | "bottom";
+  },
 ) {
   const [position, setPosition] = React.useState<React.CSSProperties>({ visibility: "hidden" });
   React.useLayoutEffect(() => {
@@ -55,9 +61,17 @@ export function useOverlayPosition(
         if (left + width > rightEdge) left = target.left - width - 4;
         if (left < leftEdge) left = target.right + 4;
         top = target.top;
-      }
-      if (top + height > bottomEdge) {
-        top = placement === "inline-end" ? bottomEdge - height : point?.y !== undefined ? point.y - height : target ? target.top - height - 6 : bottomEdge - height;
+        if (top + height > bottomEdge) top = bottomEdge - height;
+      } else if (target && point?.y === undefined) {
+        const below = target.bottom + 6;
+        const above = target.top - height - 6;
+        if (options?.side === "top") {
+          top = above >= topEdge || below + height > bottomEdge ? above : below;
+        } else {
+          top = below + height <= bottomEdge || above < topEdge ? below : above;
+        }
+      } else if (top + height > bottomEdge) {
+        top = point?.y !== undefined ? point.y - height : bottomEdge - height;
       }
       left = Math.max(leftEdge, Math.min(left, rightEdge - width));
       top = Math.max(topEdge, Math.min(top, bottomEdge - height));
@@ -84,6 +98,6 @@ export function useOverlayPosition(
       window.visualViewport?.removeEventListener("resize", place);
       window.visualViewport?.removeEventListener("scroll", place);
     };
-  }, [open, panel, anchor, point?.x, point?.y, placement, options?.popover, options?.edge, options?.matchAnchorWidth]);
+  }, [open, panel, anchor, point?.x, point?.y, placement, options?.popover, options?.edge, options?.matchAnchorWidth, options?.side]);
   return position;
 }

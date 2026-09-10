@@ -1246,6 +1246,7 @@ toast("Saved", { description: "Your changes are live." });`,
 
 <DropdownMenu
   label="Actions"
+  side="top"
   items={[
     { label: "Rename", onSelect: rename },
     { label: "Duplicate", onSelect: duplicate },
@@ -1255,7 +1256,7 @@ toast("Saved", { description: "Your changes are live." });`,
   ]}
 />`,
     usage: {
-      use: ["Three or more actions on one object behind a single trigger.", "Separators to group destructive actions at the end."],
+      use: ["Three or more actions on one object behind a single trigger.", "Separators to group destructive actions at the end.", "Use side=\"top\" for controls anchored to a persistent footer or viewport edge. Placement remains collision-aware."],
       avoid: ["Choosing a value; use Select.", "Navigation links; use NavigationMenu."],
     },
     keyboard: [
