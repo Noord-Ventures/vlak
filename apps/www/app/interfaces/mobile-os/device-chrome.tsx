@@ -3,7 +3,7 @@
 import * as React from "react";
 
 import type { DeviceProfile } from "./device-profiles";
-import { createFoldScene, type FoldCapture, type FoldScene } from "./fold-scene";
+import { captureFold, createFoldScene, type FoldCapture, type FoldScene } from "./fold-scene";
 import { IOSDuoSignals } from "./ios-duo-signals";
 
 /** Keep one mounted app while its hardware, display and safe areas resize. */
@@ -25,8 +25,7 @@ export function DeviceFrame({ device, expanded, rotated, live, prepareFold, insp
   React.useLayoutEffect(() => {
     prepareFold.current = () => {
       const screen = fit.current?.querySelector<HTMLElement>(".mo-phone");
-      const context = screen?.closest<HTMLElement>(".mo-device");
-      if (screen && context) beforeFold.current = { screen: screen.cloneNode(true) as HTMLElement, context: { ...context.dataset }, scrollTop: screen.querySelector(".mo-scroll")?.scrollTop ?? 0 };
+      if (screen) beforeFold.current = captureFold(screen, true);
     };
     return () => { prepareFold.current = null; };
   }, [prepareFold]);
@@ -55,7 +54,7 @@ export function DeviceFrame({ device, expanded, rotated, live, prepareFold, insp
     }
     if (!viewport || !frame || !screen || !device.expanded) return;
     if (!scene.current && (old.expanded !== expanded || inspectionAngle !== null)) {
-      const current: FoldCapture = { screen, context: { ...screen.closest<HTMLElement>(".mo-device")?.dataset }, scrollTop: screen.querySelector(".mo-scroll")?.scrollTop ?? 0 };
+      const current = captureFold(screen);
       scene.current = createFoldScene({ viewport, frame, device, rotated,
         inner: !expanded && captured ? captured : current,
         outer: expanded && captured ? captured : current,

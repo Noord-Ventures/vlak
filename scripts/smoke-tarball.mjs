@@ -18,7 +18,7 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const work = mkdtempSync(join(tmpdir(), "vlak-smoke-"));
 const run = (cmd, cwd = work) => execSync(cmd, { cwd, stdio: "pipe", encoding: "utf8" });
 const log = (msg) => console.log(`[smoke] ${msg}`);
-const expectedCatalogueSize = 215;
+const expectedCatalogueSize = 231;
 const parityCore = [
   ["attachments", "Attachments"], ["response-branch", "ResponseBranch"],
   ["shimmer", "Shimmer"], ["plan", "Plan"], ["task", "Task"], ["thought-steps", "ThoughtSteps"],
@@ -31,6 +31,17 @@ const parityCore = [
   ["audio-player", "AudioPlayer"], ["mic-selector", "MicSelector"], ["speech-input", "SpeechInput"],
   ["voice-selector", "VoiceSelector"], ["transcription", "Transcription"], ["persona", "Persona"],
 ];
+const nativeCore = [
+  ["ios-navigation-bar", "IOSNavigationBar"], ["ios-tab-bar", "IOSTabBar"],
+  ["ios-search-field", "IOSSearchField"], ["ios-switch", "IOSSwitch"],
+  ["ios-list", "IOSList"], ["ios-segmented-control", "IOSSegmentedControl"],
+  ["ios-slider", "IOSSlider"], ["ios-sheet", "IOSSheet"],
+  ["android-app-bar", "AndroidAppBar"], ["android-navigation", "AndroidNavigation"],
+  ["android-search-bar", "AndroidSearchBar"], ["android-switch", "AndroidSwitch"],
+  ["android-list", "AndroidList"], ["android-chip", "AndroidChip"],
+  ["android-fab", "AndroidFab"], ["android-sheet", "AndroidSheet"],
+];
+if (new Set(nativeCore.map(([name]) => name)).size !== 16) throw new Error("Expected 16 native catalogue entries");
 const optionalAdditions = [
   ["response-markdown", "ResponseMarkdown"], ["highlighted-code", "HighlightedCode"],
   ["jsx-preview", "JSXPreview"], ["workflow-canvas", "WorkflowCanvas"],
@@ -48,6 +59,9 @@ console.log("  ✓ core install/import works without any optional rendering engi
 `;
 const additions = [
   ...parityCore,
+  ...nativeCore,
+  ["ios-list", "IOSListRow"], ["android-app-bar", "AndroidAppBarAction"],
+  ["android-list", "AndroidListRow"], ["android-sheet", "AndroidSheetTitle"], ["android-sheet", "AndroidSheetBody"],
   ["attachments", "Attachment"], ["suggestions", "Suggestion"], ["snippet", "SnippetCopy"], ["audio-player", "AudioPlayerControls"],
   ["chat", "Chat"],
   ["conversation", "Conversation"],
@@ -102,6 +116,27 @@ const additions = [
 const renderAdditions = `
 const additions = ${JSON.stringify(additions)};
 const fixtureProps = {
+  IOSNavigationBar: { title: "Notes", largeTitle: true, onBack() {}, backLabel: "Folders", actions: [{ id: "compose", label: "New note", icon: h(R.Icon, { name: "plus", size: 24 }), onClick() {} }] },
+  IOSTabBar: { label: "Notebook views", defaultValue: "notes", items: [{ id: "notes", label: "Notes", panelId: "notes-panel", icon: h(R.Icon, { name: "file-text", size: 24 }) }, { id: "search", label: "Search", panelId: "search-panel", icon: h(R.Icon, { name: "search", size: 24 }) }] },
+  IOSSearchField: { "aria-label": "Search notes", name: "note-query", defaultValue: "Project", onValueChange() {} },
+  IOSSwitch: { "aria-label": "Background sync", name: "ios-sync", defaultChecked: true, onCheckedChange() {} },
+  IOSList: { title: "Connections", footer: "Settings apply to this device.", children: h(R.IOSListRow, { label: "Wi-Fi", description: "Studio network", trailing: h(R.IOSSwitch, { "aria-label": "Wi-Fi enabled", defaultChecked: true }) }) },
+  IOSListRow: { label: "Network details", description: "Studio network", disclosure: true, onClick() {} },
+  IOSSegmentedControl: { label: "Messages", name: "message-filter", defaultValue: "all", items: [{ id: "all", label: "All" }, { id: "unread", label: "Unread" }], onValueChange() {} },
+  IOSSlider: { "aria-label": "Volume", name: "volume", defaultValue: 40, min: 0, max: 100, onValueChange() {} },
+  IOSSheet: { open: false, title: "Connection settings", description: "Choose how this device connects.", onOpenChange() {}, children: h(R.IOSSwitch, { "aria-label": "Background sync", defaultChecked: true }) },
+  AndroidAppBar: { title: "Documents", variant: "medium", navigation: h(R.AndroidAppBarAction, { "aria-label": "Go back", onClick() {} }, h(R.Icon, { name: "arrow-left", size: 24 })), actions: h(R.AndroidAppBarAction, { "aria-label": "Search documents", onClick() {} }, h(R.Icon, { name: "search", size: 24 })) },
+  AndroidAppBarAction: { "aria-label": "Go back", onClick() {}, children: h(R.Icon, { name: "arrow-left", size: 24 }) },
+  AndroidNavigation: { "aria-label": "Workspace", orientation: "vertical", defaultValue: "home", onValueChange() {}, items: [{ value: "home", label: "Home", icon: h(R.Icon, { name: "home", size: 24 }) }, { value: "files", label: "Files", icon: h(R.Icon, { name: "folder", size: 24 }) }] },
+  AndroidSearchBar: { "aria-label": "Search documents", name: "document-query", defaultValue: "Project", onValueChange() {} },
+  AndroidSwitch: { "aria-label": "Background sync", name: "android-sync", defaultChecked: true, onCheckedChange() {} },
+  AndroidList: { "aria-label": "Connections", children: h(R.AndroidListRow, { headline: "Wi-Fi", supportingText: "Studio network", onAction() {}, trailing: h(R.AndroidSwitch, { "aria-label": "Wi-Fi enabled", defaultChecked: true }) }) },
+  AndroidListRow: { headline: "Network details", supportingText: "Studio network", onAction() {} },
+  AndroidChip: { defaultSelected: true, onSelectedChange() {}, children: "Unread" },
+  AndroidFab: { icon: h(R.Icon, { name: "plus", size: 24 }), onClick() {}, children: "New document" },
+  AndroidSheet: { open: false, onOpenChange() {}, children: [h(R.AndroidSheetTitle, { key: "title" }, "Connection settings"), h(R.AndroidSheetBody, { key: "body" }, "Choose how this device connects."), h(R.AndroidSwitch, { key: "sync", "aria-label": "Background sync", defaultChecked: true })] },
+  AndroidSheetTitle: { children: "Connection settings" },
+  AndroidSheetBody: { children: "Choose how this device connects." },
   Attachments: { variant: "inline", children: h(R.Attachment, { data: { id: "brief", name: "Project brief.txt", mediaType: "text/plain", size: 342 }, onRemove() {} }) },
   Attachment: { data: { id: "drawing", name: "drawing.svg", mediaType: "image/svg+xml", url: "blob:https://example.com/drawing" }, onRemove() {} },
   ResponseBranch: { branches: [{ id: "first", content: "First recorded response" }, { id: "second", content: "Revised recorded response" }], defaultValue: "second" },
@@ -220,14 +255,28 @@ const fixtureProps = {
   ColorInspector: { label: "Fill", defaultValue: { hex: "#808080", alpha: 1 } },
   SpacingControl: { label: "Padding", defaultValue: { top: 8, right: 12, bottom: 8, left: 12 }, unit: "px" },
 };
+function withOwner(exported, element) {
+  if (exported === "AudioPlayerControls") return h(R.AudioPlayer, { title: "Spoken brief", src: "/brief.wav" }, element);
+  if (exported === "Attachment") return h(R.Attachments, null, element);
+  if (exported === "IOSListRow") return h(R.IOSList, { title: "Connections" }, element);
+  if (exported === "AndroidListRow") return h(R.AndroidList, { "aria-label": "Connections" }, element);
+  if (exported === "AndroidSheetTitle") return h(R.AndroidSheet, { open: false, onOpenChange() {} }, element);
+  if (exported === "AndroidSheetBody") return h(R.AndroidSheet, { open: false, onOpenChange() {} }, h(R.AndroidSheetTitle, null, "Connection settings"), element);
+  return element;
+}
 let additionHtml = "";
 for (const [name, exported] of additions) {
   if (!R[exported]) throw new Error("Missing root export: " + exported);
   const leaf = await import("@noorddev/vlak-react/components/" + name);
   if (leaf[exported] !== R[exported]) throw new Error("Mismatched leaf export: " + exported);
   const element = h(R[exported], fixtureProps[exported] ?? {});
-  const markup = renderToString(exported === "AudioPlayerControls" ? h(R.AudioPlayer, { title: "Spoken brief", src: "/brief.wav" }, element) : exported === "Attachment" ? h(R.Attachments, null, element) : element);
+  const markup = renderToString(withOwner(exported, element));
   if (!markup.includes("rs-")) throw new Error("Empty or unstyled SSR: " + exported);
+  if (["IOSSwitch", "AndroidSwitch"].includes(exported) && !(markup.includes('type="checkbox"') && markup.includes('role="switch"') && markup.includes('checked=""'))) throw new Error("Native switch lost its input or supplied checked state: " + exported);
+  if (["IOSSearchField", "AndroidSearchBar"].includes(exported) && !(markup.includes('type="search"') && markup.includes('value="Project"'))) throw new Error("Native search lost its input or supplied query: " + exported);
+  if (exported === "IOSSlider" && !(markup.includes('type="range"') && markup.includes('value="40"'))) throw new Error("IOSSlider lost its native range input or supplied value");
+  if (exported === "AndroidChip" && !markup.includes('aria-pressed="true"')) throw new Error("AndroidChip lost its supplied selection");
+  if (["IOSSheet", "AndroidSheet", "AndroidSheetTitle", "AndroidSheetBody"].includes(exported) && !(markup.startsWith("<dialog") && markup.includes("Connection settings"))) throw new Error("Native sheet compound lost its owning dialog or title: " + exported);
   if (exported === "StagePositionList" && !(markup.startsWith("<fieldset") && markup.includes("Supplied frame (stage-smoke)") && markup.includes(">0.0001<") && markup.includes(">0<") && markup.includes("Not supplied") && markup.includes("field-01") && markup.includes("Move down"))) throw new Error("Stage position fixture lost its native root, coordinate context or supplied values");
   if (exported === "Attachment" && (!markup.includes('download="drawing.svg"') || markup.includes('target="_blank"'))) throw new Error("Local attachments must download instead of opening an active document");
   if (exported === "ResponseBranch" && (!markup.includes("Revised recorded response") || markup.includes("First recorded response"))) throw new Error("ResponseBranch must render only the selected alternative");

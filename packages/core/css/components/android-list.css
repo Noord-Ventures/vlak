@@ -1,0 +1,18 @@
+/* ── android-list: generated from packages/react/src/components/android-list.tsx ── */
+.rs-android-list{box-sizing:border-box;display:flex;flex-direction:column;gap:2px;padding:0;margin:0;list-style-type:none;font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;color:var(--text)}
+.rs-android-list-row{box-sizing:border-box;display:flex;align-items:center;gap:8px;min-height:56px;min-width:0;background-color:var(--control-fill);border-radius:4px}
+.rs-android-list-row:first-child{border-radius:16px 16px 4px 4px}
+.rs-android-list-row:last-child{border-radius:4px 4px 16px 16px}
+.rs-android-list-row:only-child{border-radius:16px}
+.rs-android-list-body{box-sizing:border-box;display:flex;align-items:center;gap:16px;flex:1 1 0%;min-width:0;min-height:56px;padding:10px 16px;border-width:0;border-radius:inherit;background-color:transparent;color:inherit;font-family:inherit;font-size:16px;line-height:1.5;text-align:start}
+.rs-android-list-action{appearance:none;cursor:pointer;background-color:transparent;opacity:1;outline-offset:-2px}
+.rs-android-list-action:disabled{cursor:not-allowed;opacity:0.45}
+.rs-android-list-action:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}
+@media (hover: hover) and (pointer: fine){.rs-android-list-action:hover{background-color:var(--control-fill)}}
+.rs-android-list-two-line{min-height:72px}
+.rs-android-list-three-line{min-height:88px}
+.rs-android-list-leading{display:flex;align-items:center;justify-content:center;flex-shrink:0;min-width:24px;min-height:24px}
+.rs-android-list-copy{display:flex;flex-direction:column;min-width:0;gap:2px;overflow-wrap:anywhere}
+.rs-android-list-headline{font-size:16px;font-weight:500;line-height:1.5}
+.rs-android-list-secondary{font-size:14px;font-weight:400;line-height:1.4;color:var(--text)}
+.rs-android-list-trailing{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-inline-end:16px;font-size:14px;color:var(--text)}

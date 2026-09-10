@@ -1,0 +1,16 @@
+/* ── ios-switch: generated from packages/react/src/components/ios-switch.tsx ── */
+.rs-ios-switch{display:inline-flex;position:relative;align-items:center;width:64px;min-width:64px;height:44px;min-height:44px;vertical-align:middle;flex-shrink:0;border-radius:22px;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+.rs-ios-switch:focus-within{outline-width:2px}
+.rs-ios-switch-disabled{opacity:0.45}
+.rs-ios-switch-track{position:absolute;inset-inline:0;top:8px;height:28px;border-radius:14px;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--control-fill);pointer-events:none;transition:background-color 220ms ease}
+@media (forced-colors: active){.rs-ios-switch-track{border-color:ButtonText;background-color:Canvas}}
+@media (prefers-reduced-motion: reduce){.rs-ios-switch-track{transition:none}}
+.rs-ios-switch-on{background-color:var(--text);border-color:var(--text);forced-color-adjust:none}
+@media (forced-colors: active){.rs-ios-switch-on{background-color:Highlight;border-color:Highlight}}
+.rs-ios-switch-thumb{position:absolute;top:10px;inset-inline-start:2px;height:24px;width:38px;border-radius:12px;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--bg);pointer-events:none;transition:inset-inline-start 220ms cubic-bezier(.2,.8,.2,1)}
+@media (forced-colors: active){.rs-ios-switch-thumb{border-color:ButtonText;background-color:Canvas}}
+@media (prefers-reduced-motion: reduce){.rs-ios-switch-thumb{transition:none}}
+.rs-ios-switch-thumb-on{inset-inline-start:24px;border-color:transparent;background-color:var(--bg);forced-color-adjust:none}
+@media (forced-colors: active){.rs-ios-switch-thumb-on{background-color:HighlightText}}
+.rs-ios-switch-input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.rs-ios-switch-input:disabled{cursor:not-allowed}

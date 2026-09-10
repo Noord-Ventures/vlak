@@ -3,6 +3,8 @@
 import dynamic from "next/dynamic";
 
 import type { ComponentType } from "react";
+import { iosPreviews } from "./ios";
+import { androidPreviews } from "./android";
 import { aiAttachmentPreviews } from "./ai-attachments";
 import { aiCodeToolsPreviews } from "./ai-code-tools";
 import { aiChatControlPreviews } from "./ai-chat-controls";
@@ -30,6 +32,8 @@ import { microbiologyPreviews } from "./microbiology";
 
 /** Raw, interactive specimens. Editorial compositions belong only in In action. */
 export const additionPreviews: Record<string, ComponentType> = {
+  ...iosPreviews,
+  ...androidPreviews,
   ...aiAttachmentPreviews,
   ...aiCodeToolsPreviews,
   ...aiChatControlPreviews,

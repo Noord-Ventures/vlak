@@ -1,10 +1,18 @@
 import type { DeviceProfile } from "./device-profiles";
 
-export type FoldCapture = { screen: HTMLElement; context: DOMStringMap; scrollTop: number };
+type ScrollPosition = { index: number; top: number; left: number };
+export type FoldCapture = { screen: HTMLElement; context: DOMStringMap; scroll: ScrollPosition[] };
 export type FoldScene = { move: (target: number) => void; seek: (progress: number) => void; resize: () => void; destroy: () => void; readonly progress: number };
 const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 const radians = (degrees: number) => degrees * Math.PI / 180;
+
+/** cloneNode does not retain scroll offsets. Record every scrolled descendant,
+ * including native pickers and timelines, before the display changes size. */
+export function captureFold(screen: HTMLElement, clone = false): FoldCapture {
+  const scroll = [screen, ...screen.querySelectorAll<HTMLElement>("*")].flatMap((node, index) => node.scrollTop || node.scrollLeft ? [{ index, top: node.scrollTop, left: node.scrollLeft }] : []);
+  return { screen: clone ? screen.cloneNode(true) as HTMLElement : screen, context: { ...screen.closest<HTMLElement>(".mo-device")?.dataset }, scroll };
+}
 
 /** Two articulated solid bodies. Only their screen planes clip or diffuse.
  * The live DOM remains mounted; the disposable textures have no interaction. */
@@ -36,7 +44,7 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
   wrapper.append(stage);
   const shadow = document.createElement("div"); shadow.className = "mo-fold-shadow";
   wrapper.prepend(shadow);
-  const copies: { copy: HTMLElement; scrollTop: number }[] = [];
+  const scrollCopies: { node: HTMLElement; top: number; left: number }[] = [];
   const texture = (source: FoldCapture, w: number, h: number, side?: string) => {
     const context = document.createElement("div");
     context.className = "mo-device mo-fold-context";
@@ -44,6 +52,11 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
     context.style.setProperty("--mo-safe-top", `${rotated ? 44 : display.safeTop}px`);
     context.style.setProperty("--mo-device-radius", "0px");
     const copy = source.screen.cloneNode(true) as HTMLElement;
+    const descendants = [copy, ...copy.querySelectorAll<HTMLElement>("*")];
+    for (const { index, top, left } of source.scroll) {
+      const node = descendants[index];
+      if (node) scrollCopies.push({ node, top, left });
+    }
     copy.classList.add("mo-fold-texture");
     if (!side) { delete copy.dataset.split; copy.querySelector(".mo-ios-master-list")?.remove(); }
     copy.dataset.duoDisplay = side ? "inner" : "outer";
@@ -55,7 +68,7 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
       // Native popovers in a visual texture must not participate in top-layer UI.
       node.removeAttribute("popover");
     }
-    context.append(copy); copies.push({ copy, scrollTop: source.scrollTop });
+    context.append(copy);
     return { context, copy };
   };
   const panels = ["left", "right"].map(side => {
@@ -96,7 +109,7 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
   }
   stage.append(hinge);
   viewport.append(wrapper);
-  copies.forEach(({ copy, scrollTop }) => { const scroll = copy.querySelector(".mo-scroll"); if (scroll) scroll.scrollTop = scrollTop; });
+  scrollCopies.forEach(({ node, top, left }) => { if (node.isConnected) { node.scrollTop = top; node.scrollLeft = left; } });
   frame.classList.add("mo-folding");
   frame.inert = true;
   let p = clamp(initial), velocity = 0, target = p, raf = 0, last = 0, disposed = false;

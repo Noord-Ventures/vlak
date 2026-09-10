@@ -1,0 +1,80 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-slider",
+  "type": "registry:component",
+  "title": "iOS slider",
+  "description": "A native range input with a quiet track, pill thumb and synchronized stepped values.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-slider.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface IOSSliderProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"min\" | \"max\" | \"step\" | \"children\"> {\n  value?: number;\n  defaultValue?: number;\n  min?: number;\n  max?: number;\n  step?: number | \"any\";\n  onValueChange?: (value: number) => void;\n}\nconst styles = stylex.create({\n  root: { position: \"relative\", display: \"block\", minWidth: 44, width: \"100%\", height: 44, borderRadius: 22, outlineWidth: { default: 0, \":focus-within\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 },\n  disabled: { opacity: 0.45 },\n  track: { position: \"absolute\", top: 19, insetInline: 14, height: 6, borderRadius: 3, backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: \"Canvas\" }, boxShadow: `inset 0 0 0 1px ${vlak.controlBorder}`, pointerEvents: \"none\" },\n  fill: { position: \"absolute\", insetInlineStart: 0, top: 0, height: \"100%\", borderRadius: 3, backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, forcedColorAdjust: \"none\" },\n  thumb: { position: \"absolute\", top: -9, marginInlineStart: -14, width: 28, height: 24, borderRadius: 12, boxSizing: \"border-box\", borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, backgroundColor: { default: vlak.paper, [mq.forcedColors]: \"Canvas\" } },\n  input: { position: \"absolute\", inset: 0, width: \"100%\", height: \"100%\", margin: 0, opacity: 0, cursor: { default: \"pointer\", \":disabled\": \"not-allowed\" } },\n});\n\nfunction normalize(value: number, min: number, max: number, step: number | \"any\") {\n  const upper = Math.max(min, max);\n  const bounded = Math.max(min, Math.min(upper, Number.isFinite(value) ? value : min));\n  if (step === \"any\") return bounded;\n  const interval = Number.isFinite(step) && step > 0 ? step : 1;\n  const steps = Math.min(Math.floor((upper - min) / interval + 1e-10), Math.round((bounded - min) / interval));\n  return Number((min + Math.max(0, steps) * interval).toPrecision(12));\n}\n\n/** Native range keyboard and form behavior beneath the iOS pill thumb. */\nexport const IOSSlider = React.forwardRef<HTMLInputElement, IOSSliderProps>(function IOSSlider({ value, defaultValue = 50, min = 0, max = 100, step = 1, onValueChange, onChange, disabled, className, style, ...props }, forwardedRef) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const input = React.useRef<HTMLInputElement>(null);\n  const ref = useMergedRefs(input, forwardedRef);\n  const controlled = value !== undefined;\n  const raw = controlled ? value : inner;\n  const current = normalize(raw, min, max, step);\n  const progress = max > min ? (current - min) / (max - min) * 100 : 0;\n  React.useEffect(() => {\n    const form = props.form ? document.getElementById(props.form) : input.current?.form;\n    let mounted = true;\n    const reset = (event: Event) => queueMicrotask(() => { if (mounted && !controlled && !event.defaultPrevented) { if (input.current) input.current.value = String(normalize(defaultValue, min, max, step)); setInner(defaultValue); } });\n    form?.addEventListener(\"reset\", reset);\n    return () => { mounted = false; form?.removeEventListener(\"reset\", reset); };\n  }, [controlled, defaultValue, props.form, min, max, step]);\n  const root = rs([\"rs-ios-slider\", disabled && \"rs-ios-slider-disabled\", className], styles.root, disabled && styles.disabled);\n  const track = rs([\"rs-ios-slider-track\"], styles.track);\n  const fill = rs([\"rs-ios-slider-fill\"], styles.fill);\n  const thumb = rs([\"rs-ios-slider-thumb\"], styles.thumb);\n  const field = rs([\"rs-ios-slider-input\"], styles.input);\n  return <div className={root.className} style={{ ...root.style, ...style }}><span {...track} aria-hidden=\"true\"><span className={fill.className} style={{ ...fill.style, width: `${progress}%` }} /><span className={thumb.className} style={{ ...thumb.style, insetInlineStart: `${progress}%` }} /></span><input {...props} {...field} ref={ref} type=\"range\" min={min} max={max} step={step} value={current} disabled={disabled} onChange={(event) => { onChange?.(event); if (event.defaultPrevented) return; const next = event.currentTarget.valueAsNumber; if (!controlled) setInner(next); onValueChange?.(next); }} /></div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-slider.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-slider.css",
+      "content": "/* ── ios-slider: generated from packages/react/src/components/ios-slider.tsx ── */\n.rs-ios-slider{position:relative;display:block;min-width:44px;width:100%;height:44px;border-radius:22px;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-ios-slider:focus-within{outline-width:2px}\n.rs-ios-slider-disabled{opacity:0.45}\n.rs-ios-slider-track{position:absolute;top:19px;inset-inline:14px;height:6px;border-radius:3px;background-color:var(--control-fill);box-shadow:inset 0 0 0 1px var(--control-border);pointer-events:none}\n@media (forced-colors: active){.rs-ios-slider-track{background-color:Canvas}}\n.rs-ios-slider-fill{position:absolute;inset-inline-start:0;top:0;height:100%;border-radius:3px;background-color:var(--text);forced-color-adjust:none}\n@media (forced-colors: active){.rs-ios-slider-fill{background-color:Highlight}}\n.rs-ios-slider-thumb{position:absolute;top:-9px;margin-inline-start:-14px;width:28px;height:24px;border-radius:12px;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--bg)}\n@media (forced-colors: active){.rs-ios-slider-thumb{border-color:ButtonText;background-color:Canvas}}\n.rs-ios-slider-input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}\n.rs-ios-slider-input:disabled{cursor:not-allowed}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-slider.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-slider",
+        "rs-ios-slider-disabled",
+        "rs-ios-slider-track",
+        "rs-ios-slider-fill",
+        "rs-ios-slider-thumb",
+        "rs-ios-slider-input"
+      ],
+      "snippet": "<div class=\"rs-ios-slider\"><span class=\"rs-ios-slider-track\" aria-hidden=\"true\"><span class=\"rs-ios-slider-fill\" style=\"width:50%\"></span><span class=\"rs-ios-slider-thumb\" style=\"inset-inline-start:50%\"></span></span><input class=\"rs-ios-slider-input\" type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-label=\"Volume\" /></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UISlider",
+        "iOS volume slider"
+      ],
+      "example": "import { IOSSlider } from \"@noorddev/vlak-react\";\n\n<IOSSlider name=\"volume\" aria-label=\"Volume\" min={0} max={100} defaultValue={40} onValueChange={value => console.log(value)} />",
+      "usage": {
+        "use": [
+          "A bounded numeric level such as volume, brightness or playback intensity.",
+          "Provide min, max and step when the range is discrete."
+        ],
+        "avoid": [
+          "Values that need precise text entry without an accompanying numeric field.",
+          "Multiple independent values; use separate labeled sliders."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves focus to or away from the native range input."
+        },
+        {
+          "keys": "Arrows, Home, End",
+          "does": "Uses the browser’s native range stepping and boundary behavior."
+        }
+      ],
+      "a11y": [
+        "The ref reaches the native range input, with min, max, step, name and disabled attributes.",
+        "Value and fill are normalized to the same valid step. The invisible native input keeps a 44px target."
+      ]
+    }
+  }
+}

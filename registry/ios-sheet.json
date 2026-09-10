@@ -1,0 +1,89 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-sheet",
+  "type": "registry:component",
+  "title": "iOS sheet",
+  "description": "A native modal bottom sheet with a centered title, grabber and deliberate entrance.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-sheet.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Icon } from \"./icons\";\n\nexport interface IOSSheetProps extends Omit<React.DialogHTMLAttributes<HTMLDialogElement>, \"open\" | \"onClose\" | \"title\"> {\n  open?: boolean;\n  defaultOpen?: boolean;\n  onOpenChange?: (open: boolean) => void;\n  onClose?: () => void;\n  title: React.ReactNode;\n  description?: React.ReactNode;\n  closeLabel?: string;\n  dismissable?: boolean;\n  lightDismiss?: boolean;\n}\nconst enter = stylex.keyframes({ from: { transform: \"translateY(24px)\", opacity: 0 }, to: { transform: \"translateY(0)\", opacity: 1 } });\nconst styles = stylex.create({\n  root: { position: \"fixed\", insetBlockStart: \"auto\", insetBlockEnd: 0, insetInline: 0, boxSizing: \"border-box\", width: \"min(653px, calc(100vw - 16px))\", maxWidth: \"calc(100vw - 16px)\", maxHeight: \"calc(100dvh - 32px)\", marginBlock: 0, marginInline: \"auto\", padding: 0, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, borderStartStartRadius: 28, borderStartEndRadius: 28, borderEndStartRadius: 0, borderEndEndRadius: 0, backgroundColor: vlak.paper, color: vlak.ink, fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\", fontSize: 17, lineHeight: \"22px\", overflowY: \"auto\", overscrollBehavior: \"contain\", \"::backdrop\": { backgroundColor: \"rgba(0,0,0,0.3)\" } },\n  open: { animationName: { default: enter, [mq.reduce]: \"none\" }, animationDuration: \"350ms\", animationTimingFunction: \"cubic-bezier(.2,.8,.2,1)\" },\n  handle: { width: 36, height: 5, borderRadius: 3, marginBlock: \"8px 0\", marginInline: \"auto\", backgroundColor: vlak.controlBorder },\n  header: { display: \"grid\", gridTemplateColumns: \"44px minmax(0,1fr) 44px\", alignItems: \"center\", gap: 8, minHeight: 62, boxSizing: \"border-box\", paddingBlock: 8, paddingInline: 12, borderBlockEndWidth: 1, borderBlockEndStyle: \"solid\", borderBlockEndColor: vlak.divider },\n  title: { margin: 0, textAlign: \"center\", fontSize: 17, lineHeight: \"22px\", fontWeight: 600, overflowWrap: \"anywhere\" },\n  close: { display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", width: 44, minWidth: 44, height: 44, minHeight: 44, padding: 0, appearance: \"none\", borderRadius: 22, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, backgroundColor: { default: vlak.controlFill, \":hover\": { default: null, [mq.hover]: vlak.paper } }, color: vlak.ink, cursor: \"pointer\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 },\n  body: { paddingBlockStart: 20, paddingBlockEnd: \"max(24px, env(safe-area-inset-bottom, 0px))\", paddingInline: 20 },\n  description: { marginBlock: \"0 16px\", marginInline: 0, fontSize: 15, lineHeight: \"20px\", color: vlak.gray },\n});\n\n/** A modal bottom sheet. The platform owns the focus trap and top layer. */\nexport const IOSSheet = React.forwardRef<HTMLDialogElement, IOSSheetProps>(function IOSSheet({ open, defaultOpen = false, onOpenChange, onClose, title, description, closeLabel = \"Close sheet\", dismissable = true, lightDismiss = true, className, style, children, onCancel, onClick, ...props }, forwardedRef) {\n  const [inner, setInner] = React.useState(defaultOpen);\n  const controlled = open !== undefined;\n  const shown = controlled ? open : inner;\n  const dialog = React.useRef<HTMLDialogElement>(null);\n  const ref = useMergedRefs(dialog, forwardedRef);\n  const origin = React.useRef<HTMLElement | null>(null);\n  const shownRef = React.useRef(shown);\n  const pendingCloses = React.useRef(0);\n  shownRef.current = shown;\n  const id = React.useId();\n  const requestClose = () => { if (!controlled) setInner(false); onOpenChange?.(false); onClose?.(); };\n  const restore = React.useCallback((node: HTMLDialogElement) => { const previous = origin.current; origin.current = null; if (previous?.isConnected && (document.activeElement === document.body || node.contains(document.activeElement))) previous.focus(); }, []);\n  React.useLayoutEffect(() => {\n    shownRef.current = shown;\n    const node = dialog.current; if (!node) return;\n    if (shown && !node.open) {\n      origin.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;\n      if (typeof node.showModal === \"function\") node.showModal(); else node.open = true;\n      if (!node.contains(document.activeElement)) (node.querySelector<HTMLElement>(\"[autofocus],button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),[tabindex='0']\") ?? node).focus();\n    } else if (!shown) { if (node.open) { if (typeof node.close === \"function\") { pendingCloses.current++; node.close(); } else node.open = false; } restore(node); }\n  }, [shown, restore]);\n  React.useEffect(() => { const node = dialog.current; return () => { shownRef.current = false; if (node) { if (node.open && typeof node.close === \"function\") { pendingCloses.current++; node.close(); } restore(node); } }; }, [restore]);\n  const root = rs([\"rs-ios-sheet\", shown && \"rs-ios-sheet-open\", className], styles.root, shown && styles.open);\n  const handle = rs([\"rs-ios-sheet-handle\"], styles.handle);\n  const header = rs([\"rs-ios-sheet-header\"], styles.header);\n  const heading = rs([\"rs-ios-sheet-title\"], styles.title);\n  const close = rs([\"rs-ios-sheet-close\"], styles.close);\n  const body = rs([\"rs-ios-sheet-body\"], styles.body);\n  const detail = rs([\"rs-ios-sheet-description\"], styles.description);\n  return <dialog {...props} ref={ref} aria-labelledby={props[\"aria-label\"] ? undefined : (props[\"aria-labelledby\"] ?? `${id}-title`)} aria-describedby={props[\"aria-describedby\"] ?? (description ? `${id}-description` : undefined)} className={root.className} style={{ ...root.style, ...style }} onCancel={event => { onCancel?.(event); if (event.defaultPrevented) return; event.preventDefault(); if (dismissable) requestClose(); }} onClose={() => { if (pendingCloses.current) pendingCloses.current--; else if (shownRef.current) requestClose(); }} onClick={event => {\n    onClick?.(event); if (event.defaultPrevented || !lightDismiss || !dismissable || event.target !== event.currentTarget) return;\n    const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) requestClose();\n  }}><div {...handle} aria-hidden=\"true\" /><header {...header}><span /><h2 {...heading} id={`${id}-title`}>{title}</h2>{dismissable ? <button {...close} type=\"button\" aria-label={closeLabel} onClick={requestClose}><Icon name=\"close\" size={24} /></button> : <span />}</header><div {...body}>{description && <p {...detail} id={`${id}-description`}>{description}</p>}{children}</div></dialog>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-sheet.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-sheet.css",
+      "content": "/* ── ios-sheet: generated from packages/react/src/components/ios-sheet.tsx ── */\n@keyframes rs-anim-enter{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}\n.rs-ios-sheet{position:fixed;inset-block-start:auto;inset-block-end:0;inset-inline:0;box-sizing:border-box;width:min(653px, calc(100vw - 16px));max-width:calc(100vw - 16px);max-height:calc(100dvh - 32px);margin-block:0;margin-inline:auto;padding:0;border-width:1px;border-style:solid;border-color:var(--control-border);border-start-start-radius:28px;border-start-end-radius:28px;border-end-start-radius:0;border-end-end-radius:0;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;overflow-y:auto;overscroll-behavior:contain}\n.rs-ios-sheet::backdrop{background-color:rgba(0,0,0,0.3)}\n@media (forced-colors: active){.rs-ios-sheet{border-color:ButtonText}}\n.rs-ios-sheet-open{animation-name:rs-anim-enter;animation-duration:350ms;animation-timing-function:cubic-bezier(.2,.8,.2,1)}\n@media (prefers-reduced-motion: reduce){.rs-ios-sheet-open{animation-name:none}}\n.rs-ios-sheet-handle{width:36px;height:5px;border-radius:3px;margin-block:8px 0;margin-inline:auto;background-color:var(--control-border)}\n.rs-ios-sheet-header{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;min-height:62px;box-sizing:border-box;padding-block:8px;padding-inline:12px;border-block-end-width:1px;border-block-end-style:solid;border-block-end-color:var(--divider)}\n.rs-ios-sheet-title{margin:0;text-align:center;font-size:17px;line-height:22px;font-weight:600;overflow-wrap:anywhere}\n.rs-ios-sheet-close{display:inline-flex;align-items:center;justify-content:center;width:44px;min-width:44px;height:44px;min-height:44px;padding:0;appearance:none;border-radius:22px;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--control-fill);color:var(--text);cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-ios-sheet-close:focus-visible{outline-width:2px}\n@media (forced-colors: active){.rs-ios-sheet-close{border-color:ButtonText}}\n@media (hover: hover) and (pointer: fine){.rs-ios-sheet-close:hover{background-color:var(--bg)}}\n.rs-ios-sheet-body{padding-block-start:20px;padding-block-end:max(24px, env(safe-area-inset-bottom, 0px));padding-inline:20px}\n.rs-ios-sheet-description{margin-block:0 16px;margin-inline:0;font-size:15px;line-height:20px;color:var(--text-secondary)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-sheet.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-sheet",
+        "rs-ios-sheet-open",
+        "rs-ios-sheet-handle",
+        "rs-ios-sheet-header",
+        "rs-ios-sheet-title",
+        "rs-ios-sheet-close",
+        "rs-ios-sheet-body",
+        "rs-ios-sheet-description"
+      ],
+      "snippet": "<dialog class=\"rs-ios-sheet\" aria-labelledby=\"sheet-title\"><div class=\"rs-ios-sheet-handle\" aria-hidden=\"true\"></div><header class=\"rs-ios-sheet-header\"><span></span><h2 class=\"rs-ios-sheet-title\" id=\"sheet-title\">Edit note</h2><button class=\"rs-ios-sheet-close\" type=\"button\" aria-label=\"Close sheet\">×</button></header><div class=\"rs-ios-sheet-body\">Note content</div></dialog>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UISheetPresentationController",
+        "iOS bottom sheet",
+        "iOS modal sheet"
+      ],
+      "example": "import { IOSSheet } from \"@noorddev/vlak-react\";\n\n<IOSSheet title=\"Edit note\" open={open} onOpenChange={setOpen} description=\"Changes stay on this device.\"><form id=\"note-editor\">…</form></IOSSheet>",
+      "usage": {
+        "use": [
+          "A focused modal task presented from the bottom edge.",
+          "Keep the sheet mounted to preserve form drafts while closed."
+        ],
+        "avoid": [
+          "Claiming the grabber is draggable; it is a visual indicator.",
+          "Using a modal for ordinary page navigation or passive status."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Uses the native modal focus trap."
+        },
+        {
+          "keys": "Escape",
+          "does": "Requests closing unless dismissable is false or onCancel prevents it."
+        },
+        {
+          "keys": "Enter, Space on Close",
+          "does": "Closes a dismissable sheet and restores its trigger when still available."
+        }
+      ],
+      "a11y": [
+        "The native dialog is named by its title and optionally described by its description.",
+        "Focus restores on close and unmount; reduced motion removes the entrance animation. Nondismissable sheets omit the close control."
+      ]
+    }
+  }
+}

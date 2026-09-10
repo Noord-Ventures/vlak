@@ -14,6 +14,8 @@ export const vlakCategories = [
   "icons",
   "charts",
   "patterns",
+  "ios",
+  "android",
   "ai",
   "health",
   "civic",
@@ -108,7 +110,8 @@ export function validateRegistry(components: readonly VlakComponent[]): string[]
     if (names.has(c.name)) problems.push(`${c.name}: duplicate name`);
     names.add(c.name);
     if (!c.title) problems.push(`${c.name}: missing title`);
-    if (c.title !== c.title.charAt(0).toUpperCase() + c.title.slice(1) || /[A-Z]{2,}/.test(c.title))
+    const sentenceTitle = c.title.replace(/^iOS(?= )/, "Ios");
+    if (sentenceTitle !== sentenceTitle.charAt(0).toUpperCase() + sentenceTitle.slice(1) || /[A-Z]{2,}/.test(sentenceTitle))
       problems.push(`${c.name}: title must be sentence case`);
     if (!c.description) problems.push(`${c.name}: missing description`);
     if (!(vlakCategories as readonly string[]).includes(c.category))

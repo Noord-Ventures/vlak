@@ -1,0 +1,11 @@
+/* ── android-chip: generated from packages/react/src/components/android-chip.tsx ── */
+.rs-android-chip{appearance:none;box-sizing:border-box;position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:48px;min-height:48px;padding:8px 16px;border-width:0;border-radius:8px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer;opacity:1;outline-offset:0}
+.rs-android-chip:disabled{cursor:not-allowed;opacity:0.45}
+.rs-android-chip:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}
+.rs-android-chip::before{content:"";position:absolute;z-index:-1;inset:8px 0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:8px;background-color:var(--bg);transition:background-color 240ms cubic-bezier(.2,0,0,1)}
+@media (hover: hover) and (pointer: fine){.rs-android-chip::before:hover{background-color:var(--control-fill)}}
+@media (prefers-reduced-motion: reduce){.rs-android-chip::before{transition:none}}
+.rs-android-chip-selected{color:var(--bg);font-weight:600}
+.rs-android-chip-selected::before{background-color:var(--text);border-color:var(--text)}
+@media (forced-colors: active){.rs-android-chip-selected{color:HighlightText}.rs-android-chip-selected::before{background-color:Highlight;border-color:Highlight}}
+.rs-android-chip-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:20px;height:20px}

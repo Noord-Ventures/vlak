@@ -1,0 +1,17 @@
+/* ── ios-list: generated from packages/react/src/components/ios-list.tsx ── */
+.rs-ios-list{font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;color:var(--text);min-width:0}
+.rs-ios-list-title{margin-block:0 8px;margin-inline:16px;font-size:15px;line-height:20px;font-weight:400;color:var(--text-secondary)}
+.rs-ios-list-group{border-radius:22px;background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);overflow:hidden}
+@media (forced-colors: active){.rs-ios-list-group{border-color:ButtonText}}
+.rs-ios-list-footer{margin-block:8px 0;margin-inline:16px;font-size:13px;line-height:18px;color:var(--text-secondary)}
+.rs-ios-list-row{appearance:none;display:flex;align-items:center;box-sizing:border-box;gap:12px;width:100%;min-width:44px;min-height:52px;border-width:0;border-style:solid;border-block-end-width:1px;border-color:var(--divider);background-color:transparent;color:var(--text);padding-block:8px;padding-inline:16px;text-align:start;font-family:inherit;font-size:inherit;line-height:inherit}
+.rs-ios-list-row:last-child{border-block-end-width:0}
+.rs-ios-list-row-action{cursor:pointer;background-color:transparent;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-3px;transition:background-color 200ms ease}
+.rs-ios-list-row-action:focus-visible{outline-width:2px}
+@media (hover: hover) and (pointer: fine){.rs-ios-list-row-action:hover{background-color:var(--table-alt)}}
+@media (prefers-reduced-motion: reduce){.rs-ios-list-row-action{transition:none}}
+.rs-ios-list-row-disabled{opacity:0.45;cursor:not-allowed}
+.rs-ios-list-row-leading{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;min-height:28px}
+.rs-ios-list-row-copy{display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0;overflow-wrap:anywhere}
+.rs-ios-list-row-description{font-size:15px;line-height:20px;color:var(--text-secondary)}
+.rs-ios-list-row-trailing{display:inline-flex;align-items:center;gap:8px;color:var(--text-secondary);font-size:15px;line-height:20px;flex-shrink:0}

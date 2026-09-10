@@ -40,9 +40,13 @@ jobs:
           pnpm --filter @noorddev/vlak-assistant-reference test
       - name: Generated files are committed and current
         run: |
-          git status --porcelain -- packages/core/css packages/core/tokens packages/core/props registry
-          git diff --exit-code -- packages/core/css packages/core/tokens packages/core/props registry \
-            || { echo "::error::Generated files are stale. Run pnpm build and commit packages/core/css, tokens, props, and registry/."; exit 1; }
+          GENERATED_STATUS="$(git status --porcelain --untracked-files=all -- packages/core/css packages/core/tokens packages/core/props registry)"
+          if [ -n "$GENERATED_STATUS" ]; then
+            printf '%s\n' "$GENERATED_STATUS"
+            git diff -- packages/core/css packages/core/tokens packages/core/props registry
+            echo "::error::Generated files are stale or untracked. Run pnpm build and commit packages/core/css, tokens, props, and registry/."
+            exit 1
+          fi
       - name: Unit and integrity tests
         run: pnpm test
       - name: Size budget
@@ -103,6 +107,7 @@ jobs:
           curl --retry 10 --retry-connrefused --retry-delay 1 -fsS http://localhost:3016/interfaces/ > /dev/null
           SITE_URL=http://localhost:3016 node apps/www/scripts/mobile-navigation-e2e.mjs
           SITE_URL=http://localhost:3016 node apps/www/scripts/site-search-e2e.mjs
+          SITE_URL=http://localhost:3016 node apps/www/scripts/mobile-components-e2e.mjs
           INTERFACES=drive,documentation,video-player,desktop-os,calendar,android,ios SITE_URL=http://localhost:3016 node apps/www/scripts/e2e-interface-refresh.mjs
           SITE_URL=http://localhost:3016 node apps/www/scripts/interface-preview-e2e.mjs
       - name: axe, keyboard, and phone checks over the export

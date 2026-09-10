@@ -116,7 +116,7 @@ export function createServer(): McpServer {
     "list_components",
     {
       title: "List Vlak components",
-      description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, ai, health, civic, science, creative, engineering, geospatial, robotics, electronics, microbiology.",
+      description: "Every component in the catalogue with name, title, description, category, and aliases. Filter by category: actions, forms, navigation, feedback, surfaces, content, icons, charts, patterns, ios, android, ai, health, civic, science, creative, engineering, geospatial, robotics, electronics, microbiology.",
       inputSchema: { category: z.string().optional().describe("Only this category") },
       outputSchema: { version: z.string(), count: z.number(), components: z.array(z.object(componentSummaryShape)) },
       annotations: READ_ONLY,

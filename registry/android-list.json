@@ -1,0 +1,89 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-list",
+  "type": "registry:component",
+  "title": "Android list",
+  "description": "Segmented Material list rows with leading content, supporting text and independent trailing controls.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/android-switch.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-list.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nconst styles = stylex.create({\n\tlist: {\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"flex\",\n\t\tflexDirection: \"column\",\n\t\tgap: 2,\n\t\tpadding: 0,\n\t\tmargin: 0,\n\t\tlistStyleType: \"none\",\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t\tcolor: vlak.ink,\n\t},\n\trow: {\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tgap: 8,\n\t\tminHeight: 56,\n\t\tminWidth: 0,\n\t\tbackgroundColor: vlak.controlFill,\n\t\tborderRadius: {\n\t\t\tdefault: 4,\n\t\t\t\":first-child\": \"16px 16px 4px 4px\",\n\t\t\t\":last-child\": \"4px 4px 16px 16px\",\n\t\t\t\":only-child\": 16,\n\t\t},\n\t},\n\tbody: {\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tgap: 16,\n\t\tflex: \"1 1 0%\",\n\t\tminWidth: 0,\n\t\tminHeight: 56,\n\t\tpadding: \"10px 16px\",\n\t\tborderWidth: 0,\n\t\tborderRadius: \"inherit\",\n\t\tbackgroundColor: \"transparent\",\n\t\tcolor: \"inherit\",\n\t\tfontFamily: \"inherit\",\n\t\tfontSize: 16,\n\t\tlineHeight: 1.5,\n\t\ttextAlign: \"start\",\n\t},\n\taction: {\n\t\tappearance: \"none\",\n\t\tcursor: { default: \"pointer\", \":disabled\": \"not-allowed\" },\n\t\tbackgroundColor: {\n\t\t\tdefault: \"transparent\",\n\t\t\t\":hover\": { default: null, [mq.hover]: vlak.controlFill },\n\t\t},\n\t\topacity: { default: 1, \":disabled\": 0.45 },\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: -2,\n\t},\n\ttwoLine: { minHeight: 72 },\n\tthreeLine: { minHeight: 88 },\n\tleading: {\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tflexShrink: 0,\n\t\tminWidth: 24,\n\t\tminHeight: 24,\n\t},\n\tcopy: {\n\t\tdisplay: \"flex\",\n\t\tflexDirection: \"column\",\n\t\tminWidth: 0,\n\t\tgap: 2,\n\t\toverflowWrap: \"anywhere\",\n\t},\n\theadline: { fontSize: 16, fontWeight: 500, lineHeight: 1.5 },\n\tsecondary: {\n\t\tfontSize: 14,\n\t\tfontWeight: 400,\n\t\tlineHeight: 1.4,\n\t\tcolor: vlak.ink,\n\t},\n\ttrailing: {\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tgap: 8,\n\t\tflexShrink: 0,\n\t\tpaddingInlineEnd: 16,\n\t\tfontSize: 14,\n\t\tcolor: vlak.ink,\n\t},\n});\nexport interface AndroidListProps\n\textends React.HTMLAttributes<HTMLUListElement> {}\n\nexport const AndroidList = React.forwardRef<HTMLUListElement, AndroidListProps>(\n\tfunction AndroidList({ className, style, ...props }, ref) {\n\t\tconst sx = rs([\"rs-android-list\", className], styles.list);\n\t\treturn (\n\t\t\t<ul\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t\tclassName={sx.className}\n\t\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t\t/>\n\t\t);\n\t},\n);\nexport interface AndroidListRowProps\n\textends Omit<React.LiHTMLAttributes<HTMLLIElement>, \"children\"> {\n\theadline: React.ReactNode;\n\tsupportingText?: React.ReactNode;\n\toverline?: React.ReactNode;\n\tleading?: React.ReactNode;\n\ttrailing?: React.ReactNode;\n\tonAction?: React.MouseEventHandler<HTMLButtonElement>;\n\tdisabled?: boolean;\n\t/** Native attributes for the row's optional button. Trailing controls remain siblings. */\n\tactionProps?: Omit<\n\t\tReact.ButtonHTMLAttributes<HTMLButtonElement>,\n\t\t\"children\" | \"onClick\" | \"disabled\" | \"className\" | \"style\"\n\t>;\n}\nexport const AndroidListRow = React.forwardRef<\n\tHTMLLIElement,\n\tAndroidListRowProps\n>(function AndroidListRow(\n\t{\n\t\theadline,\n\t\tsupportingText,\n\t\toverline,\n\t\tleading,\n\t\ttrailing,\n\t\tonAction,\n\t\tdisabled,\n\t\tactionProps,\n\t\tclassName,\n\t\tstyle,\n\t\t...props\n\t},\n\tref,\n) {\n\tconst sx = rs([\"rs-android-list-row\", className], styles.row);\n\tconst body = rs(\n\t\t[\n\t\t\t\"rs-android-list-body\",\n\t\t\t!!onAction && \"rs-android-list-action\",\n\t\t\tsupportingText != null && \"rs-android-list-two-line\",\n\t\t\toverline != null && \"rs-android-list-three-line\",\n\t\t],\n\t\tstyles.body,\n\t\t!!onAction && styles.action,\n\t\tsupportingText != null && styles.twoLine,\n\t\toverline != null && styles.threeLine,\n\t);\n\tconst lead = rs([\"rs-android-list-leading\"], styles.leading);\n\tconst copy = rs([\"rs-android-list-copy\"], styles.copy);\n\tconst title = rs([\"rs-android-list-headline\"], styles.headline);\n\tconst secondary = rs([\"rs-android-list-secondary\"], styles.secondary);\n\tconst trail = rs([\"rs-android-list-trailing\"], styles.trailing);\n\tconst content = (\n\t\t<>\n\t\t\t{leading != null && (\n\t\t\t\t<span {...lead} aria-hidden=\"true\">\n\t\t\t\t\t{leading}\n\t\t\t\t</span>\n\t\t\t)}\n\t\t\t<span {...copy}>\n\t\t\t\t{overline != null && <span {...secondary}>{overline}</span>}\n\t\t\t\t<span {...title}>{headline}</span>\n\t\t\t\t{supportingText != null && <span {...secondary}>{supportingText}</span>}\n\t\t\t</span>\n\t\t</>\n\t);\n\treturn (\n\t\t<li\n\t\t\tref={ref}\n\t\t\t{...props}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t>\n\t\t\t{onAction ? (\n\t\t\t\t<button\n\t\t\t\t\ttype=\"button\"\n\t\t\t\t\t{...actionProps}\n\t\t\t\t\t{...body}\n\t\t\t\t\tdisabled={disabled}\n\t\t\t\t\tonClick={onAction}\n\t\t\t\t>\n\t\t\t\t\t{content}\n\t\t\t\t</button>\n\t\t\t) : (\n\t\t\t\t<div {...body}>{content}</div>\n\t\t\t)}\n\t\t\t{trailing != null && <span {...trail}>{trailing}</span>}\n\t\t</li>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-list.tsx"
+    },
+    {
+      "path": "vlak/styles/android-list.css",
+      "content": "/* ── android-list: generated from packages/react/src/components/android-list.tsx ── */\n.rs-android-list{box-sizing:border-box;display:flex;flex-direction:column;gap:2px;padding:0;margin:0;list-style-type:none;font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;color:var(--text)}\n.rs-android-list-row{box-sizing:border-box;display:flex;align-items:center;gap:8px;min-height:56px;min-width:0;background-color:var(--control-fill);border-radius:4px}\n.rs-android-list-row:first-child{border-radius:16px 16px 4px 4px}\n.rs-android-list-row:last-child{border-radius:4px 4px 16px 16px}\n.rs-android-list-row:only-child{border-radius:16px}\n.rs-android-list-body{box-sizing:border-box;display:flex;align-items:center;gap:16px;flex:1 1 0%;min-width:0;min-height:56px;padding:10px 16px;border-width:0;border-radius:inherit;background-color:transparent;color:inherit;font-family:inherit;font-size:16px;line-height:1.5;text-align:start}\n.rs-android-list-action{appearance:none;cursor:pointer;background-color:transparent;opacity:1;outline-offset:-2px}\n.rs-android-list-action:disabled{cursor:not-allowed;opacity:0.45}\n.rs-android-list-action:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n@media (hover: hover) and (pointer: fine){.rs-android-list-action:hover{background-color:var(--control-fill)}}\n.rs-android-list-two-line{min-height:72px}\n.rs-android-list-three-line{min-height:88px}\n.rs-android-list-leading{display:flex;align-items:center;justify-content:center;flex-shrink:0;min-width:24px;min-height:24px}\n.rs-android-list-copy{display:flex;flex-direction:column;min-width:0;gap:2px;overflow-wrap:anywhere}\n.rs-android-list-headline{font-size:16px;font-weight:500;line-height:1.5}\n.rs-android-list-secondary{font-size:14px;font-weight:400;line-height:1.4;color:var(--text)}\n.rs-android-list-trailing{display:flex;align-items:center;gap:8px;flex-shrink:0;padding-inline-end:16px;font-size:14px;color:var(--text)}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-list",
+        "rs-android-list-row",
+        "rs-android-list-body",
+        "rs-android-list-action",
+        "rs-android-list-two-line",
+        "rs-android-list-three-line",
+        "rs-android-list-leading",
+        "rs-android-list-copy",
+        "rs-android-list-headline",
+        "rs-android-list-secondary",
+        "rs-android-list-trailing"
+      ],
+      "snippet": "<ul class=\"rs-android-list\" aria-label=\"Connections\"><li class=\"rs-android-list-row\"><button class=\"rs-android-list-body rs-android-list-action rs-android-list-two-line\" type=\"button\"><span class=\"rs-android-list-copy\"><span class=\"rs-android-list-headline\">Wi-Fi</span><span class=\"rs-android-list-secondary\">Studio network</span></span></button><span class=\"rs-android-list-trailing\">Connected</span></li><li class=\"rs-android-list-row\"><div class=\"rs-android-list-body\"><span class=\"rs-android-list-copy\"><span class=\"rs-android-list-headline\">Device name</span></span></div><span class=\"rs-android-list-trailing\">Pixel</span></li></ul>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "android-switch",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material list item",
+        "Android settings row",
+        "Expressive segmented list"
+      ],
+      "example": "import { AndroidList, AndroidListRow, AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<AndroidList aria-label=\"Connections\">\n  <AndroidListRow headline=\"Wi-Fi\" supportingText=\"Studio network\" onAction={openNetworks} trailing={<AndroidSwitch aria-label=\"Wi-Fi enabled\" defaultChecked />} />\n  <AndroidListRow headline=\"Device name\" supportingText=\"Pixel\" />\n</AndroidList>",
+      "usage": {
+        "use": [
+          "Grouped Android settings and one-, two- or three-line content rows.",
+          "A row action beside an independent trailing switch."
+        ],
+        "avoid": [
+          "Tabular data where users compare aligned columns."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between row actions and independent trailing controls."
+        },
+        {
+          "keys": "Enter or Space",
+          "does": "Activates a focused row button."
+        }
+      ],
+      "a11y": [
+        "Native ul and li preserve list structure.",
+        "Only rows with onAction become buttons; static rows add no tab stop.",
+        "Trailing controls are siblings of the row button, so interactive elements are never nested.",
+        "Decorative leading content is hidden from assistive technology."
+      ]
+    }
+  }
+}

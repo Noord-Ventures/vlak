@@ -43,6 +43,13 @@ describe("registry structure", () => {
     expect(validateRegistry(vlakComponents)).toEqual([]);
   });
 
+  it("preserves iOS branding while requiring sentence case for the rest of a title", () => {
+    const entry = vlakComponents.find(component => component.name === "button")!;
+    expect(validateRegistry([{ ...entry, title: "iOS navigation bar" }])).toEqual([]);
+    expect(validateRegistry([{ ...entry, title: "iOS NAVIGATION" }])).toContain("button: title must be sentence case");
+    expect(validateRegistry([{ ...entry, title: "ios navigation bar" }])).toContain("button: title must be sentence case");
+  });
+
   it("hides concentric-radius from the public catalog and keeps the nest rule", () => {
     const nest = vlakComponents.find((c) => c.name === "concentric-radius");
     expect(nest?.hidden).toBe(true);

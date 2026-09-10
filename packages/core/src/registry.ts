@@ -7,6 +7,8 @@
  */
 
 import type { VlakComponent } from "./schema";
+import { iosComponents } from "./registry-ios.ts";
+import { androidComponents } from "./registry-android.ts";
 import { aiChatControlComponents } from "./registry-ai-chat-controls.ts";
 import { aiCodeTools } from "./registry-ai-code-tools.ts";
 import { aiAttachments } from "./registry-ai-attachments.ts";
@@ -43,6 +45,8 @@ import { microbiologyComponents } from "./registry-microbiology.ts";
 export type { VlakComponent } from "./schema";
 
 export const vlakComponents: VlakComponent[] = [
+  ...iosComponents,
+  ...androidComponents,
   ...aiChatControlComponents,
   ...aiCodeTools,
   ...aiAttachments,

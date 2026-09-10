@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-tab-bar",
+  "type": "registry:component",
+  "title": "iOS tab bar",
+  "description": "Floating peer tabs with icon labels, roving focus and horizontal or vertical placement.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-tab-bar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nexport interface IOSTabBarItem extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, \"children\" | \"value\"> {\n  id: string;\n  label: string;\n  icon?: React.ReactNode;\n  panelId?: string;\n  /** Optional stable DOM ID for a panel's aria-labelledby. */\n  buttonId?: string;\n}\nexport interface IOSTabBarProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\" | \"onChange\" | \"children\"> {\n  items: IOSTabBarItem[];\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  orientation?: \"horizontal\" | \"vertical\";\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"inline-flex\", boxSizing: \"border-box\", alignItems: \"stretch\", gap: 2, padding: 6, maxWidth: \"100%\", minHeight: 62, overflowX: \"auto\", borderRadius: 31, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, backgroundColor: vlak.controlFill, color: vlak.ink, fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\" },\n  vertical: { flexDirection: \"column\", width: 62, minWidth: 62, maxHeight: \"100%\", overflowY: \"auto\", overflowX: \"hidden\", minHeight: 0 },\n  tab: { appearance: \"none\", display: \"flex\", flexDirection: \"column\", alignItems: \"center\", justifyContent: \"center\", flex: \"1 0 48px\", gap: 2, minWidth: 48, minHeight: 48, boxSizing: \"border-box\", paddingBlock: 4, paddingInline: 12, borderRadius: 24, borderWidth: 0, backgroundColor: { default: \"transparent\", \":hover\": { default: null, [mq.hover]: vlak.paper } }, color: vlak.ink, fontFamily: \"inherit\", fontSize: 11, lineHeight: \"14px\", fontWeight: 500, cursor: \"pointer\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -2, transition: { default: \"background-color 200ms ease, color 200ms ease\", [mq.reduce]: \"none\" } },\n  active: { color: { default: vlak.ink, [mq.forcedColors]: \"HighlightText\" }, backgroundColor: { default: vlak.paper, [mq.forcedColors]: \"Highlight\" }, fontWeight: 600, forcedColorAdjust: \"none\" },\n  disabled: { opacity: 0.45, cursor: \"not-allowed\" },\n  symbol: { display: \"inline-flex\", width: 24, height: 24, alignItems: \"center\", justifyContent: \"center\" },\n  verticalTab: { padding: 0, flex: \"0 0 48px\" },\n  verticalLabel: { position: \"absolute\", width: 1, height: 1, overflow: \"hidden\", clipPath: \"inset(50%)\", whiteSpace: \"nowrap\" },\n});\n\n/** Automatically activated peer tabs. Supply panelId for the associated content. */\nexport const IOSTabBar = React.forwardRef<HTMLDivElement, IOSTabBarProps>(function IOSTabBar({ items, value, defaultValue, onValueChange, orientation = \"horizontal\", label = \"App navigation\", className, style, onKeyDown, ...props }, ref) {\n  const [inner, setInner] = React.useState(defaultValue ?? items.find(item => !item.disabled)?.id);\n  const base = React.useId();\n  const controlled = value !== undefined;\n  const current = controlled ? value : inner;\n  const selected = items.find(item => item.id === current && !item.disabled)?.id ?? items.find(item => !item.disabled)?.id;\n  const vertical = orientation === \"vertical\";\n  const root = rs([\"rs-ios-tab-bar\", vertical && \"rs-ios-tab-bar-vertical\", className], styles.root, vertical && styles.vertical);\n  const symbol = rs([\"rs-ios-tab-bar-symbol\"], styles.symbol);\n  const hidden = rs([\"rs-ios-tab-bar-vertical-label\"], styles.verticalLabel);\n  const change = (next: string) => { if (!controlled) setInner(next); if (next !== selected) onValueChange?.(next); };\n  return <div {...props} ref={ref} role=\"tablist\" aria-label={label} aria-orientation={orientation} className={root.className} style={{ ...root.style, ...style }} onKeyDown={event => {\n    onKeyDown?.(event); if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) return;\n    const tabs = [...event.currentTarget.querySelectorAll<HTMLButtonElement>('[role=\"tab\"]:not(:disabled)')];\n    const index = tabs.indexOf(event.target as HTMLButtonElement); if (index < 0) return;\n    const rtl = getComputedStyle(event.currentTarget).direction === \"rtl\";\n    const previous = vertical ? \"ArrowUp\" : rtl ? \"ArrowRight\" : \"ArrowLeft\";\n    const next = vertical ? \"ArrowDown\" : rtl ? \"ArrowLeft\" : \"ArrowRight\";\n    const target = event.key === \"Home\" ? 0 : event.key === \"End\" ? tabs.length - 1 : event.key === next ? (index + 1) % tabs.length : event.key === previous ? (index - 1 + tabs.length) % tabs.length : -1;\n    if (target < 0) return; event.preventDefault(); const tab = tabs[target]!; tab.focus(); change(tab.dataset.value!);\n  }}>{items.map(({ id, label: itemLabel, icon, panelId, buttonId, disabled, className: itemClass, style: itemStyle, onClick, ...buttonProps }) => {\n    const active = id === selected;\n    const tab = rs([\"rs-ios-tab-bar-tab\", active && \"rs-ios-tab-bar-active\", vertical && \"rs-ios-tab-bar-tab-vertical\", disabled && \"rs-ios-tab-bar-disabled\", itemClass], styles.tab, active && styles.active, vertical && styles.verticalTab, disabled && styles.disabled);\n    return <button {...buttonProps} key={id} id={buttonId ?? `${base}-${id}`} type=\"button\" role=\"tab\" data-value={id} disabled={disabled} aria-selected={active} aria-controls={panelId} tabIndex={active ? 0 : -1} className={tab.className} style={{ ...tab.style, ...itemStyle }} onClick={event => { onClick?.(event); if (!event.defaultPrevented) change(id); }}>{icon && <span {...symbol} aria-hidden=\"true\">{icon}</span>}<span {...(vertical && icon ? hidden : {})}>{itemLabel}</span></button>;\n  })}</div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-tab-bar.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-tab-bar.css",
+      "content": "/* ── ios-tab-bar: generated from packages/react/src/components/ios-tab-bar.tsx ── */\n.rs-ios-tab-bar{display:inline-flex;box-sizing:border-box;align-items:stretch;gap:2px;padding:6px;max-width:100%;min-height:62px;overflow-x:auto;border-radius:31px;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--control-fill);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif}\n@media (forced-colors: active){.rs-ios-tab-bar{border-color:ButtonText}}\n.rs-ios-tab-bar-vertical{flex-direction:column;width:62px;min-width:62px;max-height:100%;overflow-y:auto;overflow-x:hidden;min-height:0}\n.rs-ios-tab-bar-tab{appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1 0 48px;gap:2px;min-width:48px;min-height:48px;box-sizing:border-box;padding-block:4px;padding-inline:12px;border-radius:24px;border-width:0;background-color:transparent;color:var(--text);font-family:inherit;font-size:11px;line-height:14px;font-weight:500;cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px;transition:background-color 200ms ease, color 200ms ease}\n.rs-ios-tab-bar-tab:focus-visible{outline-width:2px}\n@media (hover: hover) and (pointer: fine){.rs-ios-tab-bar-tab:hover{background-color:var(--bg)}}\n@media (prefers-reduced-motion: reduce){.rs-ios-tab-bar-tab{transition:none}}\n.rs-ios-tab-bar-active{color:var(--text);background-color:var(--bg);font-weight:600;forced-color-adjust:none}\n@media (forced-colors: active){.rs-ios-tab-bar-active{color:HighlightText;background-color:Highlight}}\n.rs-ios-tab-bar-disabled{opacity:0.45;cursor:not-allowed}\n.rs-ios-tab-bar-symbol{display:inline-flex;width:24px;height:24px;align-items:center;justify-content:center}\n.rs-ios-tab-bar-tab-vertical{padding:0;flex:0 0 48px}\n.rs-ios-tab-bar-vertical-label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-tab-bar.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-tab-bar",
+        "rs-ios-tab-bar-vertical",
+        "rs-ios-tab-bar-symbol",
+        "rs-ios-tab-bar-vertical-label",
+        "rs-ios-tab-bar-tab",
+        "rs-ios-tab-bar-active",
+        "rs-ios-tab-bar-tab-vertical",
+        "rs-ios-tab-bar-disabled"
+      ],
+      "snippet": "<div class=\"rs-ios-tab-bar\" role=\"tablist\" aria-label=\"Music\"><button class=\"rs-ios-tab-bar-tab rs-ios-tab-bar-active\" role=\"tab\" aria-selected=\"true\" tabindex=\"0\">Library</button><button class=\"rs-ios-tab-bar-tab\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Search</button></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UITabBar",
+        "iOS bottom navigation",
+        "Duo tab rail"
+      ],
+      "example": "import { IOSTabBar } from \"@noorddev/vlak-react\";\n\n<IOSTabBar defaultValue=\"library\" label=\"Music\" items={[{ id: \"library\", label: \"Library\", panelId: \"library-panel\" }, { id: \"search\", label: \"Search\", panelId: \"search-panel\" }]} />",
+      "usage": {
+        "use": [
+          "A small set of peer views in an app, with content managed by the parent.",
+          "Provide panelId and optional buttonId to associate tabs with tabpanels."
+        ],
+        "avoid": [
+          "Unrelated commands; use iOS navigation bar actions.",
+          "Hiding labels on a vertical rail without recognizable icons."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Enters or leaves the tab bar through its selected tab."
+        },
+        {
+          "keys": "Arrows, Home, End",
+          "does": "Moves and selects enabled tabs, wrapping at the ends; horizontal arrows respect text direction."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Selects the focused tab."
+        }
+      ],
+      "a11y": [
+        "Exposes tablist, tab and selected state. Disabled tabs are skipped.",
+        "Vertical icon tabs retain their labels for assistive technology. IDs are unique per instance."
+      ]
+    }
+  }
+}

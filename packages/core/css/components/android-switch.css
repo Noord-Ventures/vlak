@@ -1,0 +1,11 @@
+/* ── android-switch: generated from packages/react/src/components/android-switch.tsx ── */
+.rs-android-switch{appearance:none;box-sizing:border-box;position:relative;display:inline-block;vertical-align:middle;flex-shrink:0;width:52px;height:48px;margin:0;padding:0;border-width:0;background-color:transparent;cursor:pointer;opacity:1;border-radius:24px;outline-offset:2px}
+.rs-android-switch:disabled{cursor:not-allowed;opacity:0.45}
+.rs-android-switch:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}
+.rs-android-switch::before{content:"";position:absolute;inset:8px 0;border-width:2px;border-style:solid;border-color:var(--control-border);border-radius:16px;background-color:var(--control-fill)}
+.rs-android-switch::after{content:"";position:absolute;inset-inline-start:8px;top:16px;width:16px;height:16px;border-radius:50%;background-color:var(--text-secondary);transition:width 240ms cubic-bezier(.2,0,0,1), height 240ms cubic-bezier(.2,0,0,1), inset-inline-start 240ms cubic-bezier(.2,0,0,1), top 240ms cubic-bezier(.2,0,0,1)}
+@media (forced-colors: active){.rs-android-switch::before{border-color:ButtonText}.rs-android-switch::after{background-color:ButtonText}}
+@media (prefers-reduced-motion: reduce){.rs-android-switch::after{transition:none}}
+.rs-android-switch-checked::before{border-color:var(--text);background-color:var(--text)}
+.rs-android-switch-checked::after{inset-inline-start:24px;top:12px;width:24px;height:24px;background-color:var(--bg)}
+@media (forced-colors: active){.rs-android-switch-checked::before{border-color:Highlight;background-color:Highlight}.rs-android-switch-checked::after{background-color:HighlightText}}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-navigation",
+  "type": "registry:component",
+  "title": "Android navigation",
+  "description": "Material destination indicators for a bottom navigation bar or vertical rail.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-navigation.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nconst styles = stylex.create({\n\tnav: {\n\t\tboxSizing: \"border-box\",\n\t\tbackgroundColor: vlak.paper,\n\t\tcolor: vlak.ink,\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t},\n\tlist: {\n\t\tdisplay: \"flex\",\n\t\tflexDirection: \"row\",\n\t\talignItems: \"stretch\",\n\t\tjustifyContent: \"space-around\",\n\t\tgap: 4,\n\t\tlistStyleType: \"none\",\n\t\tpadding: \"8px 4px\",\n\t\tmargin: 0,\n\t},\n\trail: {\n\t\tflexDirection: \"column\",\n\t\talignItems: \"stretch\",\n\t\tjustifyContent: \"start\",\n\t\twidth: 88,\n\t\tpadding: \"12px 4px\",\n\t\tgap: 12,\n\t},\n\titem: { minWidth: 0, flexGrow: 1, display: \"flex\", justifyContent: \"center\" },\n\tcontrol: {\n\t\tappearance: \"none\",\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"flex\",\n\t\tflexDirection: \"column\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tgap: 4,\n\t\twidth: \"100%\",\n\t\tminWidth: 48,\n\t\tminHeight: 64,\n\t\tpadding: \"4px 2px\",\n\t\tborderWidth: 0,\n\t\tborderRadius: 16,\n\t\tfontFamily: \"inherit\",\n\t\tfontSize: 12,\n\t\tfontWeight: 500,\n\t\tlineHeight: 1.3,\n\t\ttextAlign: \"center\",\n\t\ttextDecoration: \"none\",\n\t\tcolor: vlak.gray,\n\t\tbackgroundColor: {\n\t\t\tdefault: \"transparent\",\n\t\t\t\":hover\": { default: null, [mq.hover]: vlak.controlFill },\n\t\t},\n\t\tcursor: \"pointer\",\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: -2,\n\t},\n\tcurrent: { color: vlak.ink, fontWeight: 600 },\n\tdisabled: { opacity: 0.45, cursor: \"not-allowed\" },\n\tindicator: {\n\t\tdisplay: \"flex\",\n\t\tjustifyContent: \"center\",\n\t\talignItems: \"center\",\n\t\twidth: 56,\n\t\theight: 32,\n\t\tborderRadius: 16,\n\t\ttransition: {\n\t\t\tdefault: \"background-color 240ms cubic-bezier(.2,0,0,1)\",\n\t\t\t[mq.reduce]: \"none\",\n\t\t},\n\t},\n\tactiveIndicator: {\n\t\tbackgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" },\n\t\tcolor: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" },\n\t},\n\tlabel: { overflowWrap: \"anywhere\", paddingInline: 2 },\n});\nexport interface AndroidNavigationItem {\n\tvalue: string;\n\tlabel: string;\n\ticon?: React.ReactNode;\n\thref?: string;\n\tdisabled?: boolean;\n\ttarget?: React.HTMLAttributeAnchorTarget;\n\trel?: string;\n}\nexport interface AndroidNavigationProps\n\textends Omit<React.HTMLAttributes<HTMLElement>, \"defaultValue\" | \"onChange\"> {\n\titems: AndroidNavigationItem[];\n\tvalue?: string;\n\tdefaultValue?: string;\n\tonValueChange?: (value: string) => void;\n\torientation?: \"horizontal\" | \"vertical\";\n}\nexport const AndroidNavigation = React.forwardRef<\n\tHTMLElement,\n\tAndroidNavigationProps\n>(function AndroidNavigation(\n\t{\n\t\titems,\n\t\tvalue,\n\t\tdefaultValue,\n\t\tonValueChange,\n\t\torientation = \"horizontal\",\n\t\tclassName,\n\t\tstyle,\n\t\tonKeyDown,\n\t\t...props\n\t},\n\tref,\n) {\n\tconst [inner, setInner] = React.useState(\n\t\tdefaultValue ?? items.find((item) => !item.disabled)?.value,\n\t);\n\tconst current = value ?? inner;\n\tconst sx = rs([\"rs-android-navigation\", className], styles.nav);\n\tconst list = rs(\n\t\t[\n\t\t\t\"rs-android-navigation-list\",\n\t\t\torientation === \"vertical\" && \"rs-android-navigation-rail\",\n\t\t],\n\t\tstyles.list,\n\t\torientation === \"vertical\" && styles.rail,\n\t);\n\tfunction handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {\n\t\tonKeyDown?.(event);\n\t\tif (\n\t\t\tevent.defaultPrevented ||\n\t\t\tevent.altKey ||\n\t\t\tevent.ctrlKey ||\n\t\t\tevent.metaKey\n\t\t)\n\t\t\treturn;\n\t\tconst nextKey = orientation === \"vertical\" ? \"ArrowDown\" : \"ArrowRight\";\n\t\tconst previousKey = orientation === \"vertical\" ? \"ArrowUp\" : \"ArrowLeft\";\n\t\tif (![nextKey, previousKey, \"Home\", \"End\"].includes(event.key)) return;\n\t\tconst controls = Array.from(\n\t\t\tevent.currentTarget.querySelectorAll<HTMLElement>(\n\t\t\t\t\"[data-android-destination]:not([aria-disabled='true'])\",\n\t\t\t),\n\t\t);\n\t\tconst index = controls.indexOf(document.activeElement as HTMLElement);\n\t\tif (index < 0 || !controls.length) return;\n\t\tevent.preventDefault();\n\t\tconst rtl =\n\t\t\torientation === \"horizontal\" &&\n\t\t\tgetComputedStyle(event.currentTarget).direction === \"rtl\";\n\t\tconst direction = (event.key === nextKey ? 1 : -1) * (rtl ? -1 : 1);\n\t\tcontrols[\n\t\t\tevent.key === \"Home\"\n\t\t\t\t? 0\n\t\t\t\t: event.key === \"End\"\n\t\t\t\t\t? controls.length - 1\n\t\t\t\t\t: (index + direction + controls.length) % controls.length\n\t\t]?.focus();\n\t}\n\treturn (\n\t\t<nav\n\t\t\tref={ref}\n\t\t\taria-label=\"Main navigation\"\n\t\t\t{...props}\n\t\t\tonKeyDown={handleKeyDown}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t>\n\t\t\t<ul {...list}>\n\t\t\t\t{items.map((item) => {\n\t\t\t\t\tconst active = item.value === current;\n\t\t\t\t\tconst row = rs([\"rs-android-navigation-item\"], styles.item);\n\t\t\t\t\tconst control = rs(\n\t\t\t\t\t\t[\n\t\t\t\t\t\t\t\"rs-android-navigation-control\",\n\t\t\t\t\t\t\tactive && \"rs-android-navigation-current\",\n\t\t\t\t\t\t\titem.disabled && \"rs-android-navigation-disabled\",\n\t\t\t\t\t\t],\n\t\t\t\t\t\tstyles.control,\n\t\t\t\t\t\tactive && styles.current,\n\t\t\t\t\t\titem.disabled && styles.disabled,\n\t\t\t\t\t);\n\t\t\t\t\tconst indicator = rs(\n\t\t\t\t\t\t[\n\t\t\t\t\t\t\t\"rs-android-navigation-indicator\",\n\t\t\t\t\t\t\tactive && \"rs-android-navigation-active-indicator\",\n\t\t\t\t\t\t],\n\t\t\t\t\t\tstyles.indicator,\n\t\t\t\t\t\tactive && styles.activeIndicator,\n\t\t\t\t\t);\n\t\t\t\t\tconst label = rs([\"rs-android-navigation-label\"], styles.label);\n\t\t\t\t\tconst content = (\n\t\t\t\t\t\t<>\n\t\t\t\t\t\t\t<span {...indicator} aria-hidden=\"true\">\n\t\t\t\t\t\t\t\t{item.icon ?? item.label.slice(0, 1)}\n\t\t\t\t\t\t\t</span>\n\t\t\t\t\t\t\t<span {...label}>{item.label}</span>\n\t\t\t\t\t\t</>\n\t\t\t\t\t);\n\t\t\t\t\tconst shared = {\n\t\t\t\t\t\t...control,\n\t\t\t\t\t\t\"data-android-destination\": \"\",\n\t\t\t\t\t\t\"aria-current\": active ? (\"page\" as const) : undefined,\n\t\t\t\t\t\t\"aria-disabled\": item.disabled || undefined,\n\t\t\t\t\t\tonClick: () => {\n\t\t\t\t\t\t\tif (!item.disabled) {\n\t\t\t\t\t\t\t\tif (value === undefined) setInner(item.value);\n\t\t\t\t\t\t\t\tonValueChange?.(item.value);\n\t\t\t\t\t\t\t}\n\t\t\t\t\t\t},\n\t\t\t\t\t};\n\t\t\t\t\treturn (\n\t\t\t\t\t\t<li key={item.value} {...row}>\n\t\t\t\t\t\t\t{item.href ? (\n\t\t\t\t\t\t\t\t<a\n\t\t\t\t\t\t\t\t\t{...shared}\n\t\t\t\t\t\t\t\t\thref={item.disabled ? undefined : item.href}\n\t\t\t\t\t\t\t\t\ttarget={item.target}\n\t\t\t\t\t\t\t\t\trel={item.rel}\n\t\t\t\t\t\t\t\t\ttabIndex={item.disabled ? -1 : undefined}\n\t\t\t\t\t\t\t\t>\n\t\t\t\t\t\t\t\t\t{content}\n\t\t\t\t\t\t\t\t</a>\n\t\t\t\t\t\t\t) : (\n\t\t\t\t\t\t\t\t<button {...shared} type=\"button\" disabled={item.disabled}>\n\t\t\t\t\t\t\t\t\t{content}\n\t\t\t\t\t\t\t\t</button>\n\t\t\t\t\t\t\t)}\n\t\t\t\t\t\t</li>\n\t\t\t\t\t);\n\t\t\t\t})}\n\t\t\t</ul>\n\t\t</nav>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-navigation.tsx"
+    },
+    {
+      "path": "vlak/styles/android-navigation.css",
+      "content": "/* ── android-navigation: generated from packages/react/src/components/android-navigation.tsx ── */\n.rs-android-navigation{box-sizing:border-box;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif}\n.rs-android-navigation-list{display:flex;flex-direction:row;align-items:stretch;justify-content:space-around;gap:4px;list-style-type:none;padding:8px 4px;margin:0}\n.rs-android-navigation-rail{flex-direction:column;align-items:stretch;justify-content:start;width:88px;padding:12px 4px;gap:12px}\n.rs-android-navigation-item{min-width:0;flex-grow:1;display:flex;justify-content:center}\n.rs-android-navigation-control{appearance:none;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:100%;min-width:48px;min-height:64px;padding:4px 2px;border-width:0;border-radius:16px;font-family:inherit;font-size:12px;font-weight:500;line-height:1.3;text-align:center;text-decoration:none;color:var(--text-secondary);background-color:transparent;cursor:pointer;outline-offset:-2px}\n.rs-android-navigation-control:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n@media (hover: hover) and (pointer: fine){.rs-android-navigation-control:hover{background-color:var(--control-fill)}}\n.rs-android-navigation-current{color:var(--text);font-weight:600}\n.rs-android-navigation-disabled{opacity:0.45;cursor:not-allowed}\n.rs-android-navigation-indicator{display:flex;justify-content:center;align-items:center;width:56px;height:32px;border-radius:16px;transition:background-color 240ms cubic-bezier(.2,0,0,1)}\n@media (prefers-reduced-motion: reduce){.rs-android-navigation-indicator{transition:none}}\n.rs-android-navigation-active-indicator{background-color:var(--text);color:var(--bg)}\n@media (forced-colors: active){.rs-android-navigation-active-indicator{background-color:Highlight;color:HighlightText}}\n.rs-android-navigation-label{overflow-wrap:anywhere;padding-inline:2px}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-navigation.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-navigation",
+        "rs-android-navigation-list",
+        "rs-android-navigation-rail",
+        "rs-android-navigation-item",
+        "rs-android-navigation-control",
+        "rs-android-navigation-current",
+        "rs-android-navigation-disabled",
+        "rs-android-navigation-indicator",
+        "rs-android-navigation-active-indicator",
+        "rs-android-navigation-label"
+      ],
+      "snippet": "<nav class=\"rs-android-navigation\" aria-label=\"Workspace\"><ul class=\"rs-android-navigation-list\"><li class=\"rs-android-navigation-item\"><button class=\"rs-android-navigation-control rs-android-navigation-current\" type=\"button\" aria-current=\"page\"><span class=\"rs-android-navigation-indicator rs-android-navigation-active-indicator\" aria-hidden=\"true\">⌂</span><span class=\"rs-android-navigation-label\">Home</span></button></li><li class=\"rs-android-navigation-item\"><button class=\"rs-android-navigation-control\" type=\"button\"><span class=\"rs-android-navigation-indicator\" aria-hidden=\"true\">□</span><span class=\"rs-android-navigation-label\">Files</span></button></li></ul></nav>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material navigation bar",
+        "Android navigation rail",
+        "bottom navigation"
+      ],
+      "example": "import { AndroidNavigation } from \"@noorddev/vlak-react\";\n\n<AndroidNavigation aria-label=\"Workspace\" items={[{ value: \"home\", label: \"Home\" }, { value: \"files\", label: \"Files\" }, { value: \"settings\", label: \"Settings\" }]} defaultValue=\"home\" onValueChange={setScreen} />",
+      "usage": {
+        "use": [
+          "Three to five destinations at the bottom of a compact Android layout.",
+          "A vertical destination rail beside a wider workspace."
+        ],
+        "avoid": [
+          "Tabs that switch between panels within the same page."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between enabled destinations."
+        },
+        {
+          "keys": "Left or Right arrow",
+          "does": "Moves focus in a horizontal bar, respecting text direction."
+        },
+        {
+          "keys": "Up or Down arrow",
+          "does": "Moves focus in a vertical rail."
+        },
+        {
+          "keys": "Home or End",
+          "does": "Focuses the first or last enabled destination."
+        },
+        {
+          "keys": "Enter or Space",
+          "does": "Activates a button destination; native links use Enter."
+        }
+      ],
+      "a11y": [
+        "A labelled nav contains native buttons or links in a list.",
+        "aria-current marks the active destination; arrow keys only move focus.",
+        "Disabled destinations cannot activate and are skipped by arrow keys."
+      ]
+    }
+  }
+}

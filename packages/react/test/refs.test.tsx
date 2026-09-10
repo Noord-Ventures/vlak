@@ -194,7 +194,33 @@ const aiCases: Record<string, Case> = {
   Persona: { tag: "div", props: { state: "idle", label: "Assistant" } },
 };
 
+/** Native platform wrappers expose the input or dialog consumers need, not their decorative frame. */
+const platformCases: Record<string, Case> = {
+  IOSNavigationBar: { props: { title: "Notes", onBack: noop }, tag: "header" },
+  IOSTabBar: { props: { items: [{ id: "notes", label: "Notes" }], defaultValue: "notes" }, tag: "div" },
+  IOSSearchField: { props: { "aria-label": "Search notes", defaultValue: "Project" }, tag: "input" },
+  IOSSwitch: { props: { "aria-label": "Background sync", defaultChecked: true }, tag: "input" },
+  IOSList: { props: { title: "Connections" }, tag: "section" },
+  IOSListRow: { props: { label: "Wi-Fi", description: "Studio network" }, tag: "div", wrap: el => <Vlak.IOSList title="Connections">{el}</Vlak.IOSList> },
+  IOSSegmentedControl: { props: { items: [{ id: "all", label: "All" }, { id: "unread", label: "Unread" }], label: "Messages", defaultValue: "all" }, tag: "div" },
+  IOSSlider: { props: { "aria-label": "Volume", defaultValue: 40 }, tag: "input" },
+  IOSSheet: { props: { ...dialog, title: "Connection settings" }, tag: "dialog" },
+  AndroidAppBar: { props: { title: "Documents" }, tag: "header" },
+  AndroidAppBarAction: { props: { "aria-label": "Go back", onClick: noop, children: "Back" }, tag: "button" },
+  AndroidNavigation: { props: { "aria-label": "Workspace", items: [{ value: "home", label: "Home" }, { value: "files", label: "Files" }] }, tag: "nav" },
+  AndroidSearchBar: { props: { "aria-label": "Search documents", defaultValue: "Project" }, tag: "input" },
+  AndroidSwitch: { props: { "aria-label": "Background sync", defaultChecked: true }, tag: "input" },
+  AndroidList: { props: { "aria-label": "Connections" }, tag: "ul" },
+  AndroidListRow: { props: { headline: "Wi-Fi", supportingText: "Studio network", onAction: noop }, tag: "li", wrap: el => <Vlak.AndroidList aria-label="Connections">{el}</Vlak.AndroidList> },
+  AndroidChip: { props: { children: "Unread", defaultSelected: true }, tag: "button" },
+  AndroidFab: { props: { icon: <Vlak.Icon name="plus" />, children: "New document", onClick: noop }, tag: "button" },
+  AndroidSheet: { props: { ...dialog, "aria-label": "Connection settings" }, tag: "dialog" },
+  AndroidSheetTitle: { props: { children: "Connection settings" }, tag: "h2", wrap: el => <Vlak.AndroidSheet {...dialog}>{el}</Vlak.AndroidSheet> },
+  AndroidSheetBody: { props: { children: "Choose how this device connects." }, tag: "p", wrap: el => <Vlak.AndroidSheet {...dialog}><Vlak.AndroidSheetTitle>Connection settings</Vlak.AndroidSheetTitle>{el}</Vlak.AndroidSheet> },
+};
+
 const cases: Record<string, Case> = {
+  ...platformCases,
   ...healthCases,
   ...domainCases,
   ...aiCases,
@@ -442,6 +468,27 @@ describe("ref forwarding", () => {
       expect(ref.current?.tagName.toLowerCase()).toBe(tag);
     });
   }
+
+  for (const [name, { props = {}, wrap = (el: React.ReactElement) => el }] of Object.entries(platformCases)) {
+    it(`${name} clears its DOM ref when unmounted`, () => {
+      const Component = exportsByName[name] as React.ComponentType<AnyProps & React.RefAttributes<Element>>;
+      const ref = React.createRef<Element>();
+      const { unmount } = render(wrap(<Component ref={ref} {...props} />));
+      expect(ref.current?.isConnected).toBe(true);
+      unmount();
+      expect(ref.current).toBeNull();
+    });
+  }
+
+  it("IOSListRow forwards to its button when actionable and updates the ref when its role changes", () => {
+    const ref = React.createRef<HTMLElement>();
+    const { rerender } = render(<Vlak.IOSListRow ref={ref} label="Wi-Fi" onClick={noop} />);
+    expect(ref.current).toBeInstanceOf(HTMLButtonElement);
+    ref.current?.focus();
+    expect(document.activeElement).toBe(ref.current);
+    rerender(<Vlak.IOSListRow ref={ref} label="Wi-Fi" />);
+    expect(ref.current).toBeInstanceOf(HTMLDivElement);
+  });
 
   for (const [name, { props = {} }] of Object.entries({ ...healthCases, ...domainCases })) {
     it(`${name} preserves native root attributes and merges consumer styles`, () => {

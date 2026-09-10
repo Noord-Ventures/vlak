@@ -78,6 +78,7 @@ export default function ComponentsPage() {
               )}
               {collection && <p className="rs-t-body">{collection.description} <Link href={`/docs/${category}`} className="rs-link">Read the collection guide</Link></p>}
               {category === "ai" && <p className="rs-t-body">Conversations, responses, tool activity, and approvals. <Link href="/ai/" className="rs-link">Explore AI components</Link></p>}
+              {(category === "ios" || category === "android") && <p className="rs-t-body">Navigation, forms, lists, and sheets for {categoryTitle(category)} interfaces. <Link href={`/interfaces/${category}/`} className="rs-link">Explore the {categoryTitle(category)} interface</Link></p>}
               <div {...sx("gallery", chrome.gallery)}>
                 {items.map((c) => (
                   <div key={c.name} {...sx("gallery-item", chrome.galleryItem)}>

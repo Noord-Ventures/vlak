@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 215 components in 19 categories: actions (14), forms (28), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), ai (47), health (13), civic (5), science (10), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 231 components in 21 categories: actions (14), forms (28), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), ios (8), android (8), ai (47), health (13), civic (5), science (10), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 
@@ -89,7 +89,7 @@ Conventions that hold across the catalogue:
 - Reading: body copy stays between 45 and 90 characters per line, with 66 characters as the default measure. Body line-height stays between 1.2 and 1.45 times its font size; Vlak defaults to 1.45.
 - Controlled and uncontrolled: `value` / `defaultValue` / `onValueChange` (Select, Combobox, Tabs, RadioGroup, ToggleGroup, Slider, Calendar, DatePicker); `checked` / `defaultChecked` / `onCheckedChange` (Switch); `pressed` / `defaultPressed` / `onPressedChange` (Toggle); `open` / `onClose` (Dialog, AlertDialog, Sheet, Drawer, CommandDialog). Checkbox and Radio are native inputs and use `checked` / `onChange`.
 - `className` and `style` merge with the component's own; native attributes and event handlers pass through to the root element (the props tables say which attribute set each component extends).
-- Refs: 293 of 300 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
+- Refs: 314 of 321 exported components forward `ref` to their root element; each props table names the element (`ref` in props.json). The rest render a plain element and take no ref.
 - Names: components that render no visible label take `aria-label` or `aria-labelledby` (Select, Combobox, Switch, Slider, ButtonGroup, ToggleGroup, RadioGroup, ScrollArea, Carousel, Split). Dialogs are named by their Title part.
 - Platform first: `<dialog>`, `<details>`, the Popover API, scroll snap, and native inputs do the work. Where the platform has nothing, the APG pattern applies (listbox, menu, grid, tabs) with full keyboard support, listed on each page.
 - Sentence case everywhere. No all caps. Copy is short and matter-of-fact.
@@ -523,7 +523,7 @@ npx shadcn add https://vlak.dev/r/check-in.json
 
 # Vlak AI components
 
-47 AI components and 2 existing companion primitives, generated from the 215-component registry. Each linked record includes the exact exports, props, install commands, keyboard behavior, and accessibility contract. Version 0.4.0.
+47 AI components and 2 existing companion primitives, generated from the 231-component registry. Each linked record includes the exact exports, props, install commands, keyboard behavior, and accessibility contract. Version 0.4.0.
 
 ## Start here
 
@@ -1610,6 +1610,1673 @@ npm install @noorddev/vlak-react
 # Or vendor an individual component
 npx @noorddev/vlak-cli add well-plate
 ```
+
+
+---
+
+# iOS navigation bar
+
+Compact or large-title navigation with circular actions and an optional vertical rail.
+
+Category: ios  
+Name: `ios-navigation-bar`  
+Also known as: UIKit navigation bar, UINavigationBar, iOS toolbar, Duo vertical toolbar  
+Page: https://vlak.dev/components/ios-navigation-bar/
+
+## When to use
+
+- A compact app title, a large root-screen title, or a trailing vertical action rail.
+- Pass native button properties to actions, including disabled, form and type.
+
+## When not to
+
+- Primary destination switching; use the iOS tab bar.
+- More actions than fit comfortably in the available width.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSNavigationBar } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-navigation-bar
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-navigation-bar.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<header class="rs-ios-navigation-bar"><div class="rs-ios-navigation-bar-row"><button class="rs-ios-navigation-bar-button rs-ios-navigation-bar-back" type="button" aria-label="Back">←</button><h2 class="rs-ios-navigation-bar-title">Notes</h2><div class="rs-ios-navigation-bar-actions"><button class="rs-ios-navigation-bar-button" type="button">Done</button></div></div></header>
+```
+
+## Example
+
+```tsx
+import { IOSNavigationBar } from "@noorddev/vlak-react";
+
+<IOSNavigationBar title="Notes" onBack={() => history.back()} actions={[{ id: "done", label: "Done", type: "submit", form: "note-editor" }]} />
+```
+
+## Props
+
+### IOSNavigationBar
+
+Compact and large-title navigation, with an optional trailing Duo action rail.
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "title" | "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` (required) | `ReactNode` |  |  |
+| `onBack` | `() => void` |  |  |
+| `backLabel` | `string` | `"Back"` |  |
+| `actions` | `IOSNavigationBarAction[]` | `[]` |  |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` |  |
+| `largeTitle` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves through enabled Back and action buttons. |
+| Enter, Space | Activates a focused action with native button behavior. |
+
+## Accessibility
+
+- Back and icon actions have accessible labels. Each target is at least 44px.
+- Instance-scoped action IDs avoid collisions; buttonId permits explicit references.
+
+## Classes
+
+`rs-ios-navigation-bar`, `rs-ios-navigation-bar-vertical`, `rs-ios-navigation-bar-row`, `rs-ios-navigation-bar-leading`, `rs-ios-navigation-bar-rail`, `rs-ios-navigation-bar-actions`, `rs-ios-navigation-bar-actions-vertical`, `rs-ios-navigation-bar-title`, `rs-ios-navigation-bar-large-title`, `rs-ios-navigation-bar-vertical-title`, `rs-ios-navigation-bar-button`, `rs-ios-navigation-bar-back`, `rs-ios-navigation-bar-icon-button`, `rs-ios-navigation-bar-disabled`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/ios-navigation-bar.tsx`  
+CSS: `packages/core/css/components/ios-navigation-bar.css`
+
+
+---
+
+# iOS tab bar
+
+Floating peer tabs with icon labels, roving focus and horizontal or vertical placement.
+
+Category: ios  
+Name: `ios-tab-bar`  
+Also known as: UITabBar, iOS bottom navigation, Duo tab rail  
+Page: https://vlak.dev/components/ios-tab-bar/
+
+## When to use
+
+- A small set of peer views in an app, with content managed by the parent.
+- Provide panelId and optional buttonId to associate tabs with tabpanels.
+
+## When not to
+
+- Unrelated commands; use iOS navigation bar actions.
+- Hiding labels on a vertical rail without recognizable icons.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSTabBar } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-tab-bar
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-tab-bar.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-ios-tab-bar" role="tablist" aria-label="Music"><button class="rs-ios-tab-bar-tab rs-ios-tab-bar-active" role="tab" aria-selected="true" tabindex="0">Library</button><button class="rs-ios-tab-bar-tab" role="tab" aria-selected="false" tabindex="-1">Search</button></div>
+```
+
+## Example
+
+```tsx
+import { IOSTabBar } from "@noorddev/vlak-react";
+
+<IOSTabBar defaultValue="library" label="Music" items={[{ id: "library", label: "Library", panelId: "library-panel" }, { id: "search", label: "Search", panelId: "search-panel" }]} />
+```
+
+## Props
+
+### IOSTabBar
+
+Automatically activated peer tabs. Supply panelId for the associated content.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange" | "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `IOSTabBarItem[]` |  |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` |  |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` |  |
+| `label` | `string` | `"App navigation"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Enters or leaves the tab bar through its selected tab. |
+| Arrows, Home, End | Moves and selects enabled tabs, wrapping at the ends; horizontal arrows respect text direction. |
+| Enter, Space | Selects the focused tab. |
+
+## Accessibility
+
+- Exposes tablist, tab and selected state. Disabled tabs are skipped.
+- Vertical icon tabs retain their labels for assistive technology. IDs are unique per instance.
+
+## Classes
+
+`rs-ios-tab-bar`, `rs-ios-tab-bar-vertical`, `rs-ios-tab-bar-symbol`, `rs-ios-tab-bar-vertical-label`, `rs-ios-tab-bar-tab`, `rs-ios-tab-bar-active`, `rs-ios-tab-bar-tab-vertical`, `rs-ios-tab-bar-disabled`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/ios-tab-bar.tsx`  
+CSS: `packages/core/css/components/ios-tab-bar.css`
+
+
+---
+
+# iOS search field
+
+A 48px search capsule with a native input and a separate clear action.
+
+Category: ios  
+Name: `ios-search-field`  
+Also known as: UISearchBar, UISearchTextField, iOS search input  
+Page: https://vlak.dev/components/ios-search-field/
+
+## When to use
+
+- Search within a list, app or document.
+- Use onValueChange to respond to both typing and the clear button.
+
+## When not to
+
+- Treating a placeholder as the only accessible label.
+- A noneditable search launcher; use a button.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSSearchField } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-search-field
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-search-field.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-ios-search-field"><input class="rs-ios-search-field-input" type="search" aria-label="Search notes" placeholder="Search" /></div>
+```
+
+## Example
+
+```tsx
+import { IOSSearchField } from "@noorddev/vlak-react";
+
+<IOSSearchField name="q" aria-label="Search notes" placeholder="Search" onValueChange={query => console.log(query)} />
+```
+
+## Props
+
+### IOSSearchField
+
+A 48px search capsule with a native input and an explicit clear target.
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "defaultValue" | "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(value: string) => void` |  | Fires when typing or using the clear action. |
+| `clearLabel` | `string` | `"Clear search"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves between the native search input and the clear button when text is present. |
+| Enter, Space on Clear | Clears the text and returns focus to the input. |
+| Enter in the input | Uses the enclosing form’s native submit behavior. |
+
+## Accessibility
+
+- A native search input accepts labels, form attributes, required, disabled and readOnly.
+- Clearing is a 44px action; native form reset is supported and canceled reset is respected.
+
+## Classes
+
+`rs-ios-search-field`, `rs-ios-search-field-disabled`, `rs-ios-search-field-symbol`, `rs-ios-search-field-input`, `rs-ios-search-field-clear`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/ios-search-field.tsx`  
+CSS: `packages/core/css/components/ios-search-field.css`
+
+
+---
+
+# iOS switch
+
+A native checkbox with a 64px pill track, translating thumb and a 44px hit height.
+
+Category: ios  
+Name: `ios-switch`  
+Also known as: UISwitch, iOS toggle  
+Page: https://vlak.dev/components/ios-switch/
+
+## When to use
+
+- An immediately applied on/off preference.
+- Associate it with a visible label or an aria-label.
+
+## When not to
+
+- A choice among several alternatives; use the iOS segmented control.
+- A submit command that needs a button.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSSwitch } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-switch
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-switch.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<span class="rs-ios-switch"><span class="rs-ios-switch-track" aria-hidden="true"></span><span class="rs-ios-switch-thumb" aria-hidden="true"></span><input class="rs-ios-switch-input" type="checkbox" role="switch" aria-label="Wi-Fi" /></span>
+```
+
+## Example
+
+```tsx
+import { IOSSwitch } from "@noorddev/vlak-react";
+
+<IOSSwitch name="wifi" aria-label="Wi-Fi" defaultChecked onCheckedChange={checked => console.log(checked)} />
+```
+
+## Props
+
+### IOSSwitch
+
+The native checkbox owns focus, form submission and Space activation.
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "checked" | "defaultChecked" | "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `checked` | `boolean` |  |  |
+| `defaultChecked` | `boolean` | `false` |  |
+| `onCheckedChange` | `(checked: boolean) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves focus to or away from an enabled switch. |
+| Space | Toggles the native checkbox. |
+
+## Accessibility
+
+- A native checkbox with switch semantics retains form submission, required and disabled behavior.
+- Fill and thumb position both communicate state. Reduced motion removes thumb travel; forced colors keeps the boundary visible.
+
+## Classes
+
+`rs-ios-switch`, `rs-ios-switch-disabled`, `rs-ios-switch-track`, `rs-ios-switch-on`, `rs-ios-switch-thumb`, `rs-ios-switch-thumb-on`, `rs-ios-switch-input`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/ios-switch.tsx`  
+CSS: `packages/core/css/components/ios-switch.css`
+
+
+---
+
+# iOS list
+
+Inset list groups with labels, descriptions, leading symbols and independent trailing controls.
+
+Category: ios  
+Name: `ios-list`  
+Also known as: UITableView grouped, iOS settings list, Inset grouped list  
+Page: https://vlak.dev/components/ios-list/
+
+## When to use
+
+- Grouped settings, preferences and navigation rows.
+- Omit onClick for rows containing an interactive trailing input.
+
+## When not to
+
+- Nesting a switch or another interactive element inside an action row.
+- Using a clickable row for plain informational content.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSList, IOSListRow } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<section class="rs-ios-list" aria-labelledby="settings-heading"><h3 class="rs-ios-list-title" id="settings-heading">Settings</h3><div class="rs-ios-list-group"><button class="rs-ios-list-row rs-ios-list-row-action" type="button"><span class="rs-ios-list-row-copy">General</span></button></div></section>
+```
+
+## Example
+
+```tsx
+import { IOSList, IOSListRow, IOSSwitch } from "@noorddev/vlak-react";
+
+<IOSList title="Connections"><IOSListRow label={<label htmlFor="wifi">Wi-Fi</label>} trailing={<IOSSwitch id="wifi" defaultChecked />} /><IOSListRow label="Network details" disclosure onClick={() => console.log("Open network")} /></IOSList>
+```
+
+## Props
+
+### IOSList
+
+An inset group of rows; controls remain separate focus targets.
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "title">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `ReactNode` |  |  |
+| `footer` | `ReactNode` |  |  |
+
+### IOSListRow
+
+Supply onClick for a native button, or omit it to hold a switch or other input.
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` (required) | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `leading` | `ReactNode` |  |  |
+| `trailing` | `ReactNode` |  |  |
+| `disabled` | `boolean` |  |  |
+| `disclosure` | `boolean` | `false` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves through action rows and the controls inside static rows. |
+| Enter, Space | Activates a focused action row as a native button. |
+
+## Accessibility
+
+- Group headings label their sections. Static rows are not unnecessary focus stops.
+- Action rows use native buttons with disabled behavior and at least a 52px height.
+
+## Classes
+
+`rs-ios-list`, `rs-ios-list-title`, `rs-ios-list-group`, `rs-ios-list-footer`, `rs-ios-list-row`, `rs-ios-list-row-action`, `rs-ios-list-row-disabled`, `rs-ios-list-row-leading`, `rs-ios-list-row-copy`, `rs-ios-list-row-description`, `rs-ios-list-row-trailing`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/ios-list.tsx`  
+CSS: `packages/core/css/components/ios-list.css`
+
+
+---
+
+# iOS segmented control
+
+A pill-shaped single choice with a full selected fill, radio semantics and arrow-key selection.
+
+Category: ios  
+Name: `ios-segmented-control`  
+Also known as: UISegmentedControl, iOS segmented picker  
+Page: https://vlak.dev/components/ios-segmented-control/
+
+## When to use
+
+- A small set of mutually exclusive modes or filters.
+- Use name to include the selected value in form data.
+
+## When not to
+
+- Navigation among independent application destinations; use the iOS tab bar.
+- Many options that require a long horizontal scroll.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSSegmentedControl } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-segmented-control
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-segmented-control.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-ios-segmented-control" role="radiogroup" aria-label="Calendar view"><button class="rs-ios-segmented-control-item rs-ios-segmented-control-selected" role="radio" aria-checked="true" tabindex="0">Day</button><button class="rs-ios-segmented-control-item" role="radio" aria-checked="false" tabindex="-1">Month</button></div>
+```
+
+## Example
+
+```tsx
+import { IOSSegmentedControl } from "@noorddev/vlak-react";
+
+<IOSSegmentedControl name="view" label="Calendar view" defaultValue="day" items={[{ id: "day", label: "Day" }, { id: "week", label: "Week" }, { id: "month", label: "Month" }]} />
+```
+
+## Props
+
+### IOSSegmentedControl
+
+A mutually exclusive choice with one Tab stop and arrow-key selection.
+
+Extends `Omit<HTMLAttributes<HTMLDivElement>, "defaultValue" | "onChange" | "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDivElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `IOSSegmentedControlItem[]` |  |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` |  |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `name` | `string` |  |  |
+| `form` | `string` |  |  |
+| `disabled` | `boolean` |  |  |
+| `label` | `string` | `"View"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Enters or leaves the group through its selected option. |
+| Arrows, Home, End | Moves and selects enabled options; horizontal arrows respect text direction. |
+| Enter, Space | Selects the focused option. |
+
+## Accessibility
+
+- Named radiogroup with one tab stop, explicit checked state and disabled options.
+- Native form reset is supported; reduced motion and forced colors retain readable selection.
+
+## Classes
+
+`rs-ios-segmented-control`, `rs-ios-segmented-control-item`, `rs-ios-segmented-control-selected`, `rs-ios-segmented-control-disabled`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/ios-segmented-control.tsx`  
+CSS: `packages/core/css/components/ios-segmented-control.css`
+
+
+---
+
+# iOS slider
+
+A native range input with a quiet track, pill thumb and synchronized stepped values.
+
+Category: ios  
+Name: `ios-slider`  
+Also known as: UISlider, iOS volume slider  
+Page: https://vlak.dev/components/ios-slider/
+
+## When to use
+
+- A bounded numeric level such as volume, brightness or playback intensity.
+- Provide min, max and step when the range is discrete.
+
+## When not to
+
+- Values that need precise text entry without an accompanying numeric field.
+- Multiple independent values; use separate labeled sliders.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSSlider } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-slider
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-slider.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-ios-slider"><span class="rs-ios-slider-track" aria-hidden="true"><span class="rs-ios-slider-fill" style="width:50%"></span><span class="rs-ios-slider-thumb" style="inset-inline-start:50%"></span></span><input class="rs-ios-slider-input" type="range" min="0" max="100" value="50" aria-label="Volume" /></div>
+```
+
+## Example
+
+```tsx
+import { IOSSlider } from "@noorddev/vlak-react";
+
+<IOSSlider name="volume" aria-label="Volume" min={0} max={100} defaultValue={40} onValueChange={value => console.log(value)} />
+```
+
+## Props
+
+### IOSSlider
+
+Native range keyboard and form behavior beneath the iOS pill thumb.
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "defaultValue" | "min" | "max" | "step" | "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` |  |  |
+| `defaultValue` | `number` | `50` |  |
+| `min` | `number` | `0` |  |
+| `max` | `number` | `100` |  |
+| `step` | `number \| "any"` | `1` |  |
+| `onValueChange` | `(value: number) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Moves focus to or away from the native range input. |
+| Arrows, Home, End | Uses the browser’s native range stepping and boundary behavior. |
+
+## Accessibility
+
+- The ref reaches the native range input, with min, max, step, name and disabled attributes.
+- Value and fill are normalized to the same valid step. The invisible native input keeps a 44px target.
+
+## Classes
+
+`rs-ios-slider`, `rs-ios-slider-disabled`, `rs-ios-slider-track`, `rs-ios-slider-fill`, `rs-ios-slider-thumb`, `rs-ios-slider-input`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/ios-slider.tsx`  
+CSS: `packages/core/css/components/ios-slider.css`
+
+
+---
+
+# iOS sheet
+
+A native modal bottom sheet with a centered title, grabber and deliberate entrance.
+
+Category: ios  
+Name: `ios-sheet`  
+Also known as: UISheetPresentationController, iOS bottom sheet, iOS modal sheet  
+Page: https://vlak.dev/components/ios-sheet/
+
+## When to use
+
+- A focused modal task presented from the bottom edge.
+- Keep the sheet mounted to preserve form drafts while closed.
+
+## When not to
+
+- Claiming the grabber is draggable; it is a visual indicator.
+- Using a modal for ordinary page navigation or passive status.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSSheet } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add ios-sheet
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/ios-sheet.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<dialog class="rs-ios-sheet" aria-labelledby="sheet-title"><div class="rs-ios-sheet-handle" aria-hidden="true"></div><header class="rs-ios-sheet-header"><span></span><h2 class="rs-ios-sheet-title" id="sheet-title">Edit note</h2><button class="rs-ios-sheet-close" type="button" aria-label="Close sheet">×</button></header><div class="rs-ios-sheet-body">Note content</div></dialog>
+```
+
+## Example
+
+```tsx
+import { IOSSheet } from "@noorddev/vlak-react";
+
+<IOSSheet title="Edit note" open={open} onOpenChange={setOpen} description="Changes stay on this device."><form id="note-editor">…</form></IOSSheet>
+```
+
+## Props
+
+### IOSSheet
+
+A modal bottom sheet. The platform owns the focus trap and top layer.
+
+Extends `Omit<DialogHTMLAttributes<HTMLDialogElement>, "open" | "onClose" | "title">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDialogElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | `boolean` |  |  |
+| `defaultOpen` | `boolean` | `false` |  |
+| `onOpenChange` | `(open: boolean) => void` |  |  |
+| `onClose` | `() => void` |  |  |
+| `title` (required) | `ReactNode` |  |  |
+| `description` | `ReactNode` |  |  |
+| `closeLabel` | `string` | `"Close sheet"` |  |
+| `dismissable` | `boolean` | `true` |  |
+| `lightDismiss` | `boolean` | `true` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab, Shift+Tab | Uses the native modal focus trap. |
+| Escape | Requests closing unless dismissable is false or onCancel prevents it. |
+| Enter, Space on Close | Closes a dismissable sheet and restores its trigger when still available. |
+
+## Accessibility
+
+- The native dialog is named by its title and optionally described by its description.
+- Focus restores on close and unmount; reduced motion removes the entrance animation. Nondismissable sheets omit the close control.
+
+## Classes
+
+`rs-ios-sheet`, `rs-ios-sheet-open`, `rs-ios-sheet-handle`, `rs-ios-sheet-header`, `rs-ios-sheet-title`, `rs-ios-sheet-close`, `rs-ios-sheet-body`, `rs-ios-sheet-description`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/ios-sheet.tsx`  
+CSS: `packages/core/css/components/ios-sheet.css`
+
+
+---
+
+# Android app bar
+
+A Material app bar with a title, navigation action and trailing actions in Vlak tones.
+
+Category: android  
+Name: `android-app-bar`  
+Also known as: Material top app bar, Android toolbar, center-aligned top app bar  
+Page: https://vlak.dev/components/android-app-bar/
+
+## When to use
+
+- Top-level Android screens with a title and a small set of actions.
+- A medium app bar when the screen needs a larger title.
+
+## When not to
+
+- Page navigation with more destinations than fit in an app bar.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidAppBar, AndroidAppBarAction } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-app-bar
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-app-bar.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<header class="rs-android-app-bar"><div class="rs-android-app-bar-navigation"><button class="rs-android-app-bar-action" type="button" aria-label="Go back">←</button></div><h2 class="rs-android-app-bar-title">Documents</h2><div class="rs-android-app-bar-actions"><button class="rs-android-app-bar-action" type="button" aria-label="More actions">⋯</button></div></header>
+```
+
+## Example
+
+```tsx
+import { AndroidAppBar, AndroidAppBarAction, Icon } from "@noorddev/vlak-react";
+
+<AndroidAppBar title="Documents" navigation={<AndroidAppBarAction aria-label="Go back" onClick={goBack}><Icon name="arrow-left" /></AndroidAppBarAction>} />
+```
+
+## Props
+
+### AndroidAppBar
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "title">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` (required) | `ReactNode` |  |  |
+| `navigation` | `ReactNode` |  |  |
+| `actions` | `ReactNode` |  |  |
+| `variant` | `"small" \| "medium"` | `"small"` |  |
+
+### AndroidAppBarAction
+
+Extends `ButtonHTMLAttributes<HTMLButtonElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLButtonElement`.
+
+No props of its own.
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between enabled actions. |
+| Enter or Space | Activates the focused action. |
+
+## Accessibility
+
+- Uses a native header and a level-two heading.
+- Label icon-only actions with aria-label.
+- Action buttons keep a 48-pixel target and a visible keyboard focus indicator.
+
+## Classes
+
+`rs-android-app-bar`, `rs-android-app-bar-medium`, `rs-android-app-bar-navigation`, `rs-android-app-bar-title`, `rs-android-app-bar-leading-title`, `rs-android-app-bar-medium-title`, `rs-android-app-bar-actions`, `rs-android-app-bar-action`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/android-app-bar.tsx`  
+CSS: `packages/core/css/components/android-app-bar.css`
+
+
+---
+
+# Android navigation
+
+Material destination indicators for a bottom navigation bar or vertical rail.
+
+Category: android  
+Name: `android-navigation`  
+Also known as: Material navigation bar, Android navigation rail, bottom navigation  
+Page: https://vlak.dev/components/android-navigation/
+
+## When to use
+
+- Three to five destinations at the bottom of a compact Android layout.
+- A vertical destination rail beside a wider workspace.
+
+## When not to
+
+- Tabs that switch between panels within the same page.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidNavigation } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-navigation
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-navigation.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<nav class="rs-android-navigation" aria-label="Workspace"><ul class="rs-android-navigation-list"><li class="rs-android-navigation-item"><button class="rs-android-navigation-control rs-android-navigation-current" type="button" aria-current="page"><span class="rs-android-navigation-indicator rs-android-navigation-active-indicator" aria-hidden="true">⌂</span><span class="rs-android-navigation-label">Home</span></button></li><li class="rs-android-navigation-item"><button class="rs-android-navigation-control" type="button"><span class="rs-android-navigation-indicator" aria-hidden="true">□</span><span class="rs-android-navigation-label">Files</span></button></li></ul></nav>
+```
+
+## Example
+
+```tsx
+import { AndroidNavigation } from "@noorddev/vlak-react";
+
+<AndroidNavigation aria-label="Workspace" items={[{ value: "home", label: "Home" }, { value: "files", label: "Files" }, { value: "settings", label: "Settings" }]} defaultValue="home" onValueChange={setScreen} />
+```
+
+## Props
+
+### AndroidNavigation
+
+Extends `Omit<HTMLAttributes<HTMLElement>, "defaultValue" | "onChange">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` (required) | `AndroidNavigationItem[]` |  |  |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` |  |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `orientation` | `"horizontal" \| "vertical"` | `"horizontal"` |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between enabled destinations. |
+| Left or Right arrow | Moves focus in a horizontal bar, respecting text direction. |
+| Up or Down arrow | Moves focus in a vertical rail. |
+| Home or End | Focuses the first or last enabled destination. |
+| Enter or Space | Activates a button destination; native links use Enter. |
+
+## Accessibility
+
+- A labelled nav contains native buttons or links in a list.
+- aria-current marks the active destination; arrow keys only move focus.
+- Disabled destinations cannot activate and are skipped by arrow keys.
+
+## Classes
+
+`rs-android-navigation`, `rs-android-navigation-list`, `rs-android-navigation-rail`, `rs-android-navigation-item`, `rs-android-navigation-control`, `rs-android-navigation-current`, `rs-android-navigation-disabled`, `rs-android-navigation-indicator`, `rs-android-navigation-active-indicator`, `rs-android-navigation-label`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/android-navigation.tsx`  
+CSS: `packages/core/css/components/android-navigation.css`
+
+
+---
+
+# Android search bar
+
+A rounded Material search field with a leading icon and a clear action.
+
+Category: android  
+Name: `android-search-bar`  
+Also known as: Material search bar, Android search field, search input  
+Page: https://vlak.dev/components/android-search-bar/
+
+## When to use
+
+- Searching a collection within an Android screen.
+- A 56-pixel search surface with a clear action.
+
+## When not to
+
+- Selecting an option from autocomplete suggestions; use a combobox for that behavior.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidSearchBar } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-search-bar
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-search-bar.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<div class="rs-android-search-bar"><span class="rs-android-search-icon" aria-hidden="true">⌕</span><input class="rs-android-search-input" type="search" aria-label="Search documents" placeholder="Search documents" /></div>
+```
+
+## Example
+
+```tsx
+import { AndroidSearchBar } from "@noorddev/vlak-react";
+
+<AndroidSearchBar aria-label="Search documents" placeholder="Search documents" value={query} onValueChange={setQuery} />
+```
+
+## Props
+
+### AndroidSearchBar
+
+Extends `Omit< InputHTMLAttributes<HTMLInputElement>, "type" | "value" | "defaultValue" | "size" >`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` |  |  |
+| `defaultValue` | `string` | `""` |  |
+| `onValueChange` | `(value: string) => void` |  |  |
+| `clearLabel` | `string` | `"Clear search"` |  |
+| `containerClassName` | `string` |  |  |
+| `containerStyle` | `CSSProperties` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the search field and its clear action when present. |
+| Escape | Clears an editable query and keeps focus in the field. |
+| Enter | Uses the enclosing form's native submit behavior. |
+
+## Accessibility
+
+- Uses input type search with native input attributes and ref.
+- Provide a visible label or aria-label; a placeholder is not a label.
+- The clear action follows the input onChange path, also calls onValueChange and returns focus to the field.
+- Uncontrolled values follow native form reset.
+
+## Classes
+
+`rs-android-search-bar`, `rs-android-search-bar-disabled`, `rs-android-search-input`, `rs-android-search-icon`, `rs-android-search-clear`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/android-search-bar.tsx`  
+CSS: `packages/core/css/components/android-search-bar.css`
+
+
+---
+
+# Android switch
+
+A Material switch with a 52-by-32 track and an expanding thumb, built on a native checkbox.
+
+Category: android  
+Name: `android-switch`  
+Also known as: Material switch, Android toggle, Expressive switch  
+Page: https://vlak.dev/components/android-switch/
+
+## When to use
+
+- A binary Android preference that takes effect immediately.
+
+## When not to
+
+- Selecting one option from a mutually exclusive group.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidSwitch } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-switch
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-switch.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<label for="android-sync">Background sync</label> <input class="rs-android-switch rs-android-switch-checked" id="android-sync" name="sync" type="checkbox" role="switch" checked aria-checked="true" />
+```
+
+## Example
+
+```tsx
+import { AndroidSwitch } from "@noorddev/vlak-react";
+
+<label htmlFor="sync">Background sync</label>
+<AndroidSwitch id="sync" name="sync" checked={enabled} onCheckedChange={setEnabled} />
+```
+
+## Props
+
+### AndroidSwitch
+
+Extends `Omit<InputHTMLAttributes<HTMLInputElement>, "type" | "size">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLInputElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `onCheckedChange` | `(checked: boolean) => void` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the switch when enabled. |
+| Space | Toggles the switch. |
+
+## Accessibility
+
+- Uses a native checkbox with role switch and a 52-by-48 target.
+- Associate a visible label using htmlFor, or provide aria-label.
+- Supports native names, values, required state, disabled state and form reset.
+- The thumb changes position and size in addition to the filled track.
+
+## Classes
+
+`rs-android-switch`, `rs-android-switch-checked`
+
+## Dependencies
+
+Registry dependencies: none.  
+React: `packages/react/src/components/android-switch.tsx`  
+CSS: `packages/core/css/components/android-switch.css`
+
+
+---
+
+# Android list
+
+Segmented Material list rows with leading content, supporting text and independent trailing controls.
+
+Category: android  
+Name: `android-list`  
+Also known as: Material list item, Android settings row, Expressive segmented list  
+Page: https://vlak.dev/components/android-list/
+
+## When to use
+
+- Grouped Android settings and one-, two- or three-line content rows.
+- A row action beside an independent trailing switch.
+
+## When not to
+
+- Tabular data where users compare aligned columns.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidList, AndroidListRow } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-list
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-list.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<ul class="rs-android-list" aria-label="Connections"><li class="rs-android-list-row"><button class="rs-android-list-body rs-android-list-action rs-android-list-two-line" type="button"><span class="rs-android-list-copy"><span class="rs-android-list-headline">Wi-Fi</span><span class="rs-android-list-secondary">Studio network</span></span></button><span class="rs-android-list-trailing">Connected</span></li><li class="rs-android-list-row"><div class="rs-android-list-body"><span class="rs-android-list-copy"><span class="rs-android-list-headline">Device name</span></span></div><span class="rs-android-list-trailing">Pixel</span></li></ul>
+```
+
+## Example
+
+```tsx
+import { AndroidList, AndroidListRow, AndroidSwitch } from "@noorddev/vlak-react";
+
+<AndroidList aria-label="Connections">
+  <AndroidListRow headline="Wi-Fi" supportingText="Studio network" onAction={openNetworks} trailing={<AndroidSwitch aria-label="Wi-Fi enabled" defaultChecked />} />
+  <AndroidListRow headline="Device name" supportingText="Pixel" />
+</AndroidList>
+```
+
+## Props
+
+### AndroidList
+
+Extends `HTMLAttributes<HTMLUListElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLUListElement`.
+
+No props of its own.
+
+### AndroidListRow
+
+Extends `Omit<LiHTMLAttributes<HTMLLIElement>, "children">`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLLIElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `headline` (required) | `ReactNode` |  |  |
+| `supportingText` | `ReactNode` |  |  |
+| `overline` | `ReactNode` |  |  |
+| `leading` | `ReactNode` |  |  |
+| `trailing` | `ReactNode` |  |  |
+| `onAction` | `MouseEventHandler<HTMLButtonElement>` |  |  |
+| `disabled` | `boolean` |  |  |
+| `actionProps` | `Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" \| "className" \| "style" \| "onClick" \| "disabled">` |  | Native attributes for the row's optional button. Trailing controls remain siblings. |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Moves between row actions and independent trailing controls. |
+| Enter or Space | Activates a focused row button. |
+
+## Accessibility
+
+- Native ul and li preserve list structure.
+- Only rows with onAction become buttons; static rows add no tab stop.
+- Trailing controls are siblings of the row button, so interactive elements are never nested.
+- Decorative leading content is hidden from assistive technology.
+
+## Classes
+
+`rs-android-list`, `rs-android-list-row`, `rs-android-list-body`, `rs-android-list-action`, `rs-android-list-two-line`, `rs-android-list-three-line`, `rs-android-list-leading`, `rs-android-list-copy`, `rs-android-list-headline`, `rs-android-list-secondary`, `rs-android-list-trailing`
+
+## Dependencies
+
+Registry dependencies: [android-switch](android-switch.md).  
+React: `packages/react/src/components/android-list.tsx`  
+CSS: `packages/core/css/components/android-list.css`
+
+
+---
+
+# Android chip
+
+A Material filter chip with a filled selection state and a checkmark.
+
+Category: android  
+Name: `android-chip`  
+Also known as: Material filter chip, Android filter chip, selectable chip  
+Page: https://vlak.dev/components/android-chip/
+
+## When to use
+
+- Independent filters that users can select and clear.
+
+## When not to
+
+- Mutually exclusive navigation or status labels with no action.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidChip } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-chip
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-chip.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<button class="rs-android-chip rs-android-chip-selected" type="button" aria-pressed="true"><span class="rs-android-chip-icon" aria-hidden="true">✓</span>Unread</button>
+```
+
+## Example
+
+```tsx
+import { AndroidChip } from "@noorddev/vlak-react";
+
+<AndroidChip selected={unread} onSelectedChange={setUnread}>Unread</AndroidChip>
+```
+
+## Props
+
+### AndroidChip
+
+Extends `ButtonHTMLAttributes<HTMLButtonElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLButtonElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `selected` | `boolean` |  |  |
+| `defaultSelected` | `boolean` | `false` |  |
+| `onSelectedChange` | `(selected: boolean) => void` |  |  |
+| `icon` | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses each enabled filter. |
+| Enter or Space | Toggles the focused filter. |
+
+## Accessibility
+
+- A native button exposes selection through aria-pressed.
+- The checkmark and filled surface distinguish selection without hue.
+- The compact chip keeps a 48-pixel hit area.
+
+## Classes
+
+`rs-android-chip`, `rs-android-chip-selected`, `rs-android-chip-icon`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/android-chip.tsx`  
+CSS: `packages/core/css/components/android-chip.css`
+
+
+---
+
+# Android floating action button
+
+A Material floating action button with an optional extended text label.
+
+Category: android  
+Name: `android-fab`  
+Also known as: Material FAB, Android extended FAB, floating action button  
+Page: https://vlak.dev/components/android-fab/
+
+## When to use
+
+- The principal creation action on an Android screen.
+
+## When not to
+
+- Several equally prominent actions on one screen.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidFab } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-fab
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-fab.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<button class="rs-android-fab rs-android-fab-extended" type="button"><span class="rs-android-fab-icon" aria-hidden="true">+</span>New document</button>
+```
+
+## Example
+
+```tsx
+import { AndroidFab, Icon } from "@noorddev/vlak-react";
+
+<AndroidFab icon={<Icon name="plus" size={24} />} onClick={createDocument}>New document</AndroidFab>
+```
+
+## Props
+
+### AndroidFab
+
+Extends `ButtonHTMLAttributes<HTMLButtonElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLButtonElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` (required) | `ReactNode` |  |  |
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab | Focuses the enabled action. |
+| Enter or Space | Activates the action. |
+
+## Accessibility
+
+- Uses a native button with a target of at least 56 pixels.
+- Provide aria-label when omitting the visible text label.
+- Does not submit a form unless type submit is explicit.
+
+## Classes
+
+`rs-android-fab`, `rs-android-fab-extended`, `rs-android-fab-icon`
+
+## Dependencies
+
+Registry dependencies: [icons](icons.md).  
+React: `packages/react/src/components/android-fab.tsx`  
+CSS: `packages/core/css/components/android-fab.css`
+
+
+---
+
+# Android bottom sheet
+
+A native modal bottom sheet with Material geometry, accessible naming and focus restoration.
+
+Category: android  
+Name: `android-sheet`  
+Also known as: Material modal bottom sheet, Android bottom sheet, modal sheet  
+Page: https://vlak.dev/components/android-sheet/
+
+## When to use
+
+- Contextual Android controls that temporarily cover the lower screen.
+- A focused choice or short task with a clear way to dismiss it.
+
+## When not to
+
+- Permanent side navigation or long documents.
+
+## Install
+
+**React package.** Precompiled; no compiler to configure.
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidSheet, AndroidSheetBody, AndroidSheetTitle } from "@noorddev/vlak-react";
+```
+
+**Vendor the source.** The StyleX leaf lands in `components/vlak/` for your compiler to own.
+
+```sh
+npx @noorddev/vlak-cli add android-sheet
+```
+
+**shadcn registry.** Same files, through the shadcn CLI.
+
+```sh
+npx shadcn add https://vlak.dev/r/android-sheet.json
+```
+
+**CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
+
+```html
+<dialog class="rs-android-sheet" aria-labelledby="android-sheet-title"><span class="rs-android-sheet-handle" aria-hidden="true"></span><button class="rs-android-sheet-close" type="button" aria-label="Close">×</button><h2 class="rs-android-sheet-title" id="android-sheet-title">Connection settings</h2><p class="rs-android-sheet-body">Choose how this device connects.</p></dialog>
+```
+
+## Example
+
+```tsx
+import { AndroidSheet, AndroidSheetTitle, AndroidSheetBody } from "@noorddev/vlak-react";
+
+<AndroidSheet open={open} onOpenChange={setOpen}>
+  <AndroidSheetTitle>Connection settings</AndroidSheetTitle>
+  <AndroidSheetBody>Choose how this device connects.</AndroidSheetBody>
+</AndroidSheet>
+```
+
+## Props
+
+### AndroidSheet
+
+Extends `Omit< DialogHTMLAttributes<HTMLDialogElement>, "open" | "onClose" >`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLDialogElement`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `open` | `boolean` |  |  |
+| `defaultOpen` | `boolean` | `false` |  |
+| `onOpenChange` | `(open: boolean) => void` |  |  |
+| `onClose` | `() => void` |  |  |
+| `dismissable` | `boolean` | `true` |  |
+| `lightDismiss` | `boolean` | `true` |  |
+| `closeLabel` | `string` | `"Close"` |  |
+
+### AndroidSheetBody
+
+Extends `HTMLAttributes<HTMLParagraphElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLParagraphElement`.
+
+No props of its own.
+
+### AndroidSheetTitle
+
+Extends `HTMLAttributes<HTMLHeadingElement>`: every native attribute, `className`, `style`, and event handler passes through.
+
+Forwards `ref` to the `HTMLHeadingElement`.
+
+No props of its own.
+
+## Keyboard
+
+| Keys | Does |
+| --- | --- |
+| Tab or Shift+Tab | Moves through the modal's controls using native dialog focus containment. |
+| Escape | Requests dismissal when dismissable is enabled. |
+| Enter or Space | Activates the focused control. |
+
+## Accessibility
+
+- Native dialog showModal supplies the top layer, inert background and focus containment.
+- Title and body parts connect aria-labelledby and aria-describedby automatically.
+- Closing returns focus to the connected opener.
+- The handle is decorative; this sheet does not promise a drag gesture.
+- Supports controlled open state or defaultOpen; onOpenChange reports dismissal.
+
+## Classes
+
+`rs-android-sheet`, `rs-android-sheet-open`, `rs-android-sheet-handle`, `rs-android-sheet-close`, `rs-android-sheet-title`, `rs-android-sheet-body`
+
+## Dependencies
+
+Registry dependencies: [dialog](dialog.md), [icons](icons.md).  
+React: `packages/react/src/components/android-sheet.tsx`  
+CSS: `packages/core/css/components/android-sheet.css`
 
 
 ---

@@ -1,0 +1,86 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-search-field",
+  "type": "registry:component",
+  "title": "iOS search field",
+  "description": "A 48px search capsule with a native input and a separate clear action.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-search-field.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\nimport { Icon } from \"./icons\";\n\nexport interface IOSSearchFieldProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"children\"> {\n  value?: string;\n  defaultValue?: string;\n  /** Fires when typing or using the clear action. */\n  onValueChange?: (value: string) => void;\n  clearLabel?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"flex\", alignItems: \"center\", gap: 8, boxSizing: \"border-box\", minWidth: 0, minHeight: 48, width: \"100%\", paddingInlineStart: 16, paddingInlineEnd: 2, borderRadius: 24, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, backgroundColor: vlak.controlFill, color: vlak.gray, outlineWidth: { default: 0, \":focus-within\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 },\n  disabled: { opacity: 0.45 },\n  symbol: { display: \"inline-flex\", flexShrink: 0, pointerEvents: \"none\" },\n  input: { appearance: \"none\", fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\", fontSize: 17, lineHeight: \"22px\", color: vlak.ink, width: \"100%\", minWidth: 0, minHeight: 44, flexGrow: 1, borderWidth: 0, backgroundColor: \"transparent\", paddingBlock: 10, paddingInline: 0, margin: 0, outlineWidth: 0, \"::placeholder\": { color: vlak.ink, opacity: 1 }, \"::-webkit-search-cancel-button\": { appearance: \"none\" } },\n  clear: { appearance: \"none\", display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", flexShrink: 0, minWidth: 44, minHeight: 44, borderRadius: 22, borderWidth: 0, padding: 0, backgroundColor: { default: \"transparent\", \":hover\": { default: null, [mq.hover]: vlak.paper } }, color: vlak.gray, cursor: \"pointer\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -3, transition: { default: \"background-color 200ms ease\", [mq.reduce]: \"none\" } },\n});\n\n/** A 48px search capsule with a native input and an explicit clear target. */\nexport const IOSSearchField = React.forwardRef<HTMLInputElement, IOSSearchFieldProps>(function IOSSearchField({ value, defaultValue = \"\", onValueChange, onChange, clearLabel = \"Clear search\", disabled, readOnly, className, style, ...props }, forwardedRef) {\n  const [inner, setInner] = React.useState(defaultValue);\n  const input = React.useRef<HTMLInputElement>(null);\n  const ref = useMergedRefs(input, forwardedRef);\n  const controlled = value !== undefined;\n  const current = controlled ? value : inner;\n  const clearValue = () => {\n    const node = input.current;\n    if (!node) return;\n    // Keep native onChange handlers and form libraries on the same path as typing.\n    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, \"value\")?.set?.call(node, \"\");\n    node.dispatchEvent(new Event(\"input\", { bubbles: true }));\n    node.focus();\n  };\n  React.useEffect(() => {\n    const form = props.form ? document.getElementById(props.form) : input.current?.form;\n    let mounted = true;\n    const reset = (event: Event) => queueMicrotask(() => { if (mounted && !controlled && !event.defaultPrevented) { if (input.current) input.current.value = defaultValue; setInner(defaultValue); } });\n    form?.addEventListener(\"reset\", reset);\n    return () => { mounted = false; form?.removeEventListener(\"reset\", reset); };\n  }, [controlled, defaultValue, props.form]);\n  const root = rs([\"rs-ios-search-field\", disabled && \"rs-ios-search-field-disabled\", className], styles.root, disabled && styles.disabled);\n  const symbol = rs([\"rs-ios-search-field-symbol\"], styles.symbol);\n  const field = rs([\"rs-ios-search-field-input\"], styles.input);\n  const clear = rs([\"rs-ios-search-field-clear\"], styles.clear);\n  return <div className={root.className} style={{ ...root.style, ...style }}><span {...symbol} aria-hidden=\"true\"><Icon name=\"search\" size={24} /></span><input {...props} {...field} ref={ref} type=\"search\" value={current} disabled={disabled} readOnly={readOnly} onChange={(event) => { onChange?.(event); if (event.defaultPrevented) return; if (!controlled) setInner(event.currentTarget.value); onValueChange?.(event.currentTarget.value); }} />{current && !disabled && !readOnly && <button {...clear} type=\"button\" aria-label={clearLabel} onClick={clearValue}><Icon name=\"close\" size={16} /></button>}</div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-search-field.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-search-field.css",
+      "content": "/* ── ios-search-field: generated from packages/react/src/components/ios-search-field.tsx ── */\n.rs-ios-search-field{display:flex;align-items:center;gap:8px;box-sizing:border-box;min-width:0;min-height:48px;width:100%;padding-inline-start:16px;padding-inline-end:2px;border-radius:24px;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--control-fill);color:var(--text-secondary);outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-ios-search-field:focus-within{outline-width:2px}\n@media (forced-colors: active){.rs-ios-search-field{border-color:ButtonText}}\n.rs-ios-search-field-disabled{opacity:0.45}\n.rs-ios-search-field-symbol{display:inline-flex;flex-shrink:0;pointer-events:none}\n.rs-ios-search-field-input{appearance:none;font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;color:var(--text);width:100%;min-width:0;min-height:44px;flex-grow:1;border-width:0;background-color:transparent;padding-block:10px;padding-inline:0;margin:0;outline-width:0}\n.rs-ios-search-field-input::placeholder{color:var(--text);opacity:1}\n.rs-ios-search-field-input::-webkit-search-cancel-button{appearance:none}\n.rs-ios-search-field-clear{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:44px;min-height:44px;border-radius:22px;border-width:0;padding:0;background-color:transparent;color:var(--text-secondary);cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-3px;transition:background-color 200ms ease}\n.rs-ios-search-field-clear:focus-visible{outline-width:2px}\n@media (hover: hover) and (pointer: fine){.rs-ios-search-field-clear:hover{background-color:var(--bg)}}\n@media (prefers-reduced-motion: reduce){.rs-ios-search-field-clear{transition:none}}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-search-field.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-search-field",
+        "rs-ios-search-field-disabled",
+        "rs-ios-search-field-symbol",
+        "rs-ios-search-field-input",
+        "rs-ios-search-field-clear"
+      ],
+      "snippet": "<div class=\"rs-ios-search-field\"><input class=\"rs-ios-search-field-input\" type=\"search\" aria-label=\"Search notes\" placeholder=\"Search\" /></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UISearchBar",
+        "UISearchTextField",
+        "iOS search input"
+      ],
+      "example": "import { IOSSearchField } from \"@noorddev/vlak-react\";\n\n<IOSSearchField name=\"q\" aria-label=\"Search notes\" placeholder=\"Search\" onValueChange={query => console.log(query)} />",
+      "usage": {
+        "use": [
+          "Search within a list, app or document.",
+          "Use onValueChange to respond to both typing and the clear button."
+        ],
+        "avoid": [
+          "Treating a placeholder as the only accessible label.",
+          "A noneditable search launcher; use a button."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves between the native search input and the clear button when text is present."
+        },
+        {
+          "keys": "Enter, Space on Clear",
+          "does": "Clears the text and returns focus to the input."
+        },
+        {
+          "keys": "Enter in the input",
+          "does": "Uses the enclosing form’s native submit behavior."
+        }
+      ],
+      "a11y": [
+        "A native search input accepts labels, form attributes, required, disabled and readOnly.",
+        "Clearing is a 44px action; native form reset is supported and canceled reset is respected."
+      ]
+    }
+  }
+}

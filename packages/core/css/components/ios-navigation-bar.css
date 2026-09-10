@@ -1,0 +1,20 @@
+/* ── ios-navigation-bar: generated from packages/react/src/components/ios-navigation-bar.tsx ── */
+.rs-ios-navigation-bar{box-sizing:border-box;font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;color:var(--text);min-width:0;padding:8px}
+.rs-ios-navigation-bar-vertical{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:0}
+.rs-ios-navigation-bar-row{display:grid;grid-template-columns:minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr);gap:8px;align-items:center;min-height:54px}
+.rs-ios-navigation-bar-leading{justify-self:start}
+.rs-ios-navigation-bar-actions{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:27px;justify-self:end;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--control-border)}
+@media (forced-colors: active){.rs-ios-navigation-bar-actions{border-color:ButtonText}}
+.rs-ios-navigation-bar-rail{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0}
+.rs-ios-navigation-bar-actions-vertical{flex-direction:column}
+.rs-ios-navigation-bar-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;min-width:44px;min-height:44px;padding-block:10px;padding-inline:12px;border-width:0;border-radius:22px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px;transition:background-color 200ms ease}
+.rs-ios-navigation-bar-button:focus-visible{outline-width:2px}
+@media (hover: hover) and (pointer: fine){.rs-ios-navigation-bar-button:hover{background-color:var(--bg)}}
+@media (prefers-reduced-motion: reduce){.rs-ios-navigation-bar-button{transition:none}}
+.rs-ios-navigation-bar-icon-button{width:44px;padding:0}
+.rs-ios-navigation-bar-back{min-width:48px;min-height:48px;width:48px;border-radius:24px;padding:0;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--control-border)}
+@media (forced-colors: active){.rs-ios-navigation-bar-back{border-color:ButtonText}}
+.rs-ios-navigation-bar-disabled{opacity:0.45;cursor:not-allowed}
+.rs-ios-navigation-bar-title{margin:0;text-align:center;font-size:17px;line-height:22px;font-weight:600;overflow-wrap:anywhere}
+.rs-ios-navigation-bar-large-title{margin-block:10px 4px;margin-inline:8px;font-size:34px;line-height:41px;letter-spacing:-0.035em;text-align:start;font-weight:700}
+.rs-ios-navigation-bar-vertical-title{text-align:start;font-size:28px;line-height:34px;font-weight:700;margin-block:8px;margin-inline:0}

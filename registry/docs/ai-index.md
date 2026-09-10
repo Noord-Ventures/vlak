@@ -1,6 +1,6 @@
 # Vlak AI components
 
-47 AI components and 2 existing companion primitives, generated from the 215-component registry. Each linked record includes the exact exports, props, install commands, keyboard behavior, and accessibility contract. Version 0.4.0.
+47 AI components and 2 existing companion primitives, generated from the 231-component registry. Each linked record includes the exact exports, props, install commands, keyboard behavior, and accessibility contract. Version 0.4.0.
 
 ## Start here
 

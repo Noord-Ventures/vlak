@@ -1,6 +1,703 @@
 {
   "version": "0.4.0",
   "components": {
+    "ios-navigation-bar": {
+      "exports": [
+        {
+          "name": "IOSNavigationBar",
+          "kind": "component",
+          "description": "Compact and large-title navigation, with an optional trailing Duo action rail.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\" | \"children\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "onBack",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "backLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Back\""
+            },
+            {
+              "name": "actions",
+              "type": "IOSNavigationBarAction[]",
+              "required": false,
+              "default": "[]"
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\"",
+              "required": false,
+              "default": "\"horizontal\""
+            },
+            {
+              "name": "largeTitle",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "ios-tab-bar": {
+      "exports": [
+        {
+          "name": "IOSTabBar",
+          "kind": "component",
+          "description": "Automatically activated peer tabs. Supply panelId for the associated content.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\" | \"onChange\" | \"children\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "IOSTabBarItem[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\"",
+              "required": false,
+              "default": "\"horizontal\""
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"App navigation\""
+            }
+          ]
+        }
+      ]
+    },
+    "ios-search-field": {
+      "exports": [
+        {
+          "name": "IOSSearchField",
+          "kind": "component",
+          "description": "A 48px search capsule with a native input and an explicit clear target.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"children\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false,
+              "description": "Fires when typing or using the clear action."
+            },
+            {
+              "name": "clearLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Clear search\""
+            }
+          ]
+        }
+      ]
+    },
+    "ios-switch": {
+      "exports": [
+        {
+          "name": "IOSSwitch",
+          "kind": "component",
+          "description": "The native checkbox owns focus, form submission and Space activation.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"checked\" | \"defaultChecked\" | \"children\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "checked",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultChecked",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onCheckedChange",
+              "type": "(checked: boolean) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "ios-list": {
+      "exports": [
+        {
+          "name": "IOSList",
+          "kind": "component",
+          "description": "An inset group of rows; controls remain separate focus targets.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "footer",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        },
+        {
+          "name": "IOSListRow",
+          "kind": "component",
+          "description": "Supply onClick for a native button, or omit it to hold a switch or other input.",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"children\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "label",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "leading",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "trailing",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "disclosure",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            }
+          ]
+        }
+      ]
+    },
+    "ios-segmented-control": {
+      "exports": [
+        {
+          "name": "IOSSegmentedControl",
+          "kind": "component",
+          "description": "A mutually exclusive choice with one Tab stop and arrow-key selection.",
+          "extends": "Omit<HTMLAttributes<HTMLDivElement>, \"defaultValue\" | \"onChange\" | \"children\">",
+          "ref": "HTMLDivElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "IOSSegmentedControlItem[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "name",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "form",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": "\"View\""
+            }
+          ]
+        }
+      ]
+    },
+    "ios-slider": {
+      "exports": [
+        {
+          "name": "IOSSlider",
+          "kind": "component",
+          "description": "Native range keyboard and form behavior beneath the iOS pill thumb.",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"min\" | \"max\" | \"step\" | \"children\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "number",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "number",
+              "required": false,
+              "default": "50"
+            },
+            {
+              "name": "min",
+              "type": "number",
+              "required": false,
+              "default": "0"
+            },
+            {
+              "name": "max",
+              "type": "number",
+              "required": false,
+              "default": "100"
+            },
+            {
+              "name": "step",
+              "type": "number | \"any\"",
+              "required": false,
+              "default": "1"
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: number) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "ios-sheet": {
+      "exports": [
+        {
+          "name": "IOSSheet",
+          "kind": "component",
+          "description": "A modal bottom sheet. The platform owns the focus trap and top layer.",
+          "extends": "Omit<DialogHTMLAttributes<HTMLDialogElement>, \"open\" | \"onClose\" | \"title\">",
+          "ref": "HTMLDialogElement",
+          "props": [
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onClose",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "description",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "closeLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Close sheet\""
+            },
+            {
+              "name": "dismissable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "lightDismiss",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            }
+          ]
+        }
+      ]
+    },
+    "android-app-bar": {
+      "exports": [
+        {
+          "name": "AndroidAppBar",
+          "kind": "component",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"title\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "title",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "navigation",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "actions",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "variant",
+              "type": "\"small\" | \"medium\"",
+              "required": false,
+              "default": "\"small\""
+            }
+          ]
+        },
+        {
+          "name": "AndroidAppBarAction",
+          "kind": "component",
+          "extends": "ButtonHTMLAttributes<HTMLButtonElement>",
+          "ref": "HTMLButtonElement",
+          "props": []
+        }
+      ]
+    },
+    "android-navigation": {
+      "exports": [
+        {
+          "name": "AndroidNavigation",
+          "kind": "component",
+          "extends": "Omit<HTMLAttributes<HTMLElement>, \"defaultValue\" | \"onChange\">",
+          "ref": "HTMLElement",
+          "props": [
+            {
+              "name": "items",
+              "type": "AndroidNavigationItem[]",
+              "required": true
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "orientation",
+              "type": "\"horizontal\" | \"vertical\"",
+              "required": false,
+              "default": "\"horizontal\""
+            }
+          ]
+        }
+      ]
+    },
+    "android-search-bar": {
+      "exports": [
+        {
+          "name": "AndroidSearchBar",
+          "kind": "component",
+          "extends": "Omit< InputHTMLAttributes<HTMLInputElement>, \"type\" | \"value\" | \"defaultValue\" | \"size\" >",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "value",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "defaultValue",
+              "type": "string",
+              "required": false,
+              "default": "\"\""
+            },
+            {
+              "name": "onValueChange",
+              "type": "(value: string) => void",
+              "required": false
+            },
+            {
+              "name": "clearLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Clear search\""
+            },
+            {
+              "name": "containerClassName",
+              "type": "string",
+              "required": false
+            },
+            {
+              "name": "containerStyle",
+              "type": "CSSProperties",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "android-switch": {
+      "exports": [
+        {
+          "name": "AndroidSwitch",
+          "kind": "component",
+          "extends": "Omit<InputHTMLAttributes<HTMLInputElement>, \"type\" | \"size\">",
+          "ref": "HTMLInputElement",
+          "props": [
+            {
+              "name": "onCheckedChange",
+              "type": "(checked: boolean) => void",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "android-list": {
+      "exports": [
+        {
+          "name": "AndroidList",
+          "kind": "component",
+          "extends": "HTMLAttributes<HTMLUListElement>",
+          "ref": "HTMLUListElement",
+          "props": []
+        },
+        {
+          "name": "AndroidListRow",
+          "kind": "component",
+          "extends": "Omit<LiHTMLAttributes<HTMLLIElement>, \"children\">",
+          "ref": "HTMLLIElement",
+          "props": [
+            {
+              "name": "headline",
+              "type": "ReactNode",
+              "required": true
+            },
+            {
+              "name": "supportingText",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "overline",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "leading",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "trailing",
+              "type": "ReactNode",
+              "required": false
+            },
+            {
+              "name": "onAction",
+              "type": "MouseEventHandler<HTMLButtonElement>",
+              "required": false
+            },
+            {
+              "name": "disabled",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "actionProps",
+              "type": "Omit<ButtonHTMLAttributes<HTMLButtonElement>, \"children\" | \"className\" | \"style\" | \"onClick\" | \"disabled\">",
+              "required": false,
+              "description": "Native attributes for the row's optional button. Trailing controls remain siblings."
+            }
+          ]
+        }
+      ]
+    },
+    "android-chip": {
+      "exports": [
+        {
+          "name": "AndroidChip",
+          "kind": "component",
+          "extends": "ButtonHTMLAttributes<HTMLButtonElement>",
+          "ref": "HTMLButtonElement",
+          "props": [
+            {
+              "name": "selected",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultSelected",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onSelectedChange",
+              "type": "(selected: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": false
+            }
+          ]
+        }
+      ]
+    },
+    "android-fab": {
+      "exports": [
+        {
+          "name": "AndroidFab",
+          "kind": "component",
+          "extends": "ButtonHTMLAttributes<HTMLButtonElement>",
+          "ref": "HTMLButtonElement",
+          "props": [
+            {
+              "name": "icon",
+              "type": "ReactNode",
+              "required": true
+            }
+          ]
+        }
+      ]
+    },
+    "android-sheet": {
+      "exports": [
+        {
+          "name": "AndroidSheet",
+          "kind": "component",
+          "extends": "Omit< DialogHTMLAttributes<HTMLDialogElement>, \"open\" | \"onClose\" >",
+          "ref": "HTMLDialogElement",
+          "props": [
+            {
+              "name": "open",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "name": "defaultOpen",
+              "type": "boolean",
+              "required": false,
+              "default": "false"
+            },
+            {
+              "name": "onOpenChange",
+              "type": "(open: boolean) => void",
+              "required": false
+            },
+            {
+              "name": "onClose",
+              "type": "() => void",
+              "required": false
+            },
+            {
+              "name": "dismissable",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "lightDismiss",
+              "type": "boolean",
+              "required": false,
+              "default": "true"
+            },
+            {
+              "name": "closeLabel",
+              "type": "string",
+              "required": false,
+              "default": "\"Close\""
+            }
+          ]
+        },
+        {
+          "name": "AndroidSheetBody",
+          "kind": "component",
+          "extends": "HTMLAttributes<HTMLParagraphElement>",
+          "ref": "HTMLParagraphElement",
+          "props": []
+        },
+        {
+          "name": "AndroidSheetTitle",
+          "kind": "component",
+          "extends": "HTMLAttributes<HTMLHeadingElement>",
+          "ref": "HTMLHeadingElement",
+          "props": []
+        }
+      ]
+    },
     "context-usage": {
       "exports": [
         {

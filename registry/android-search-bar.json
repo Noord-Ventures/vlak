@@ -1,0 +1,87 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-search-bar",
+  "type": "registry:component",
+  "title": "Android search bar",
+  "description": "A rounded Material search field with a leading icon and a clear action.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-search-bar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { setRef } from \"./merge-refs\";\nimport { Icon } from \"./icons\";\n\nconst styles = stylex.create({\n\tbar: {\n\t\twidth: \"100%\",\n\t\tmaxWidth: \"100%\",\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tgap: 8,\n\t\tminHeight: 56,\n\t\tminWidth: 0,\n\t\tpaddingInline: 12,\n\t\tborderWidth: 1,\n\t\tborderStyle: \"solid\",\n\t\tborderColor: vlak.controlBorder,\n\t\tborderRadius: 28,\n\t\tbackgroundColor: vlak.controlFill,\n\t\tcolor: vlak.ink,\n\t},\n\ticon: {\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tflexShrink: 0,\n\t\twidth: 24,\n\t\theight: 24,\n\t\tmarginInline: 4,\n\t},\n\tinput: {\n\t\tappearance: \"none\",\n\t\tboxSizing: \"border-box\",\n\t\tflex: \"1 1 0%\",\n\t\twidth: 0,\n\t\tminWidth: 44,\n\t\tminHeight: 48,\n\t\tpadding: \"8px 0\",\n\t\tmargin: 0,\n\t\tborderWidth: 0,\n\t\tborderRadius: 4,\n\t\tbackgroundColor: \"transparent\",\n\t\tcolor: vlak.ink,\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t\tfontSize: 16,\n\t\tlineHeight: 1.5,\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 0,\n\t\t\"::placeholder\": { color: vlak.ink, opacity: 1 },\n\t\t\"::-webkit-search-cancel-button\": { appearance: \"none\" },\n\t},\n\tclear: {\n\t\tappearance: \"none\",\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tflexShrink: 0,\n\t\twidth: 44,\n\t\theight: 44,\n\t\tmarginInlineEnd: -6,\n\t\tpadding: 0,\n\t\tborderWidth: 0,\n\t\tborderRadius: \"50%\",\n\t\tbackgroundColor: {\n\t\t\tdefault: \"transparent\",\n\t\t\t\":hover\": { default: null, [mq.hover]: vlak.controlFill },\n\t\t},\n\t\tcolor: vlak.ink,\n\t\tcursor: \"pointer\",\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 0,\n\t},\n\tdisabled: { opacity: 0.45 },\n});\nexport interface AndroidSearchBarProps\n\textends Omit<\n\t\tReact.InputHTMLAttributes<HTMLInputElement>,\n\t\t\"type\" | \"value\" | \"defaultValue\" | \"size\"\n\t> {\n\tvalue?: string;\n\tdefaultValue?: string;\n\tonValueChange?: (value: string) => void;\n\tclearLabel?: string;\n\tcontainerClassName?: string;\n\tcontainerStyle?: React.CSSProperties;\n}\nexport const AndroidSearchBar = React.forwardRef<\n\tHTMLInputElement,\n\tAndroidSearchBarProps\n>(function AndroidSearchBar(\n\t{\n\t\tvalue,\n\t\tdefaultValue = \"\",\n\t\tonValueChange,\n\t\tonChange,\n\t\tonKeyDown,\n\t\tdisabled,\n\t\treadOnly,\n\t\tclearLabel = \"Clear search\",\n\t\tclassName,\n\t\tstyle,\n\t\tcontainerClassName,\n\t\tcontainerStyle,\n\t\t...props\n\t},\n\tforwardedRef,\n) {\n\tconst [inner, setInner] = React.useState(defaultValue);\n\tconst input = React.useRef<HTMLInputElement | null>(null);\n\tconst current = value ?? inner;\n\tconst update = (next: string) => {\n\t\tif (value === undefined) setInner(next);\n\t\tonValueChange?.(next);\n\t};\n\tconst clearValue = () => {\n\t\tconst node = input.current;\n\t\tif (!node) return;\n\t\t// Use the input's native event path so onChange and form libraries also see clears.\n\t\tObject.getOwnPropertyDescriptor(\n\t\t\tHTMLInputElement.prototype,\n\t\t\t\"value\",\n\t\t)?.set?.call(node, \"\");\n\t\tnode.dispatchEvent(new Event(\"input\", { bubbles: true }));\n\t};\n\tReact.useEffect(() => {\n\t\tconst form = props.form\n\t\t\t? input.current?.ownerDocument.getElementById(props.form)\n\t\t\t: input.current?.form;\n\t\tif (!(form instanceof HTMLFormElement) || value !== undefined) return;\n\t\tconst reset = (event: Event) =>\n\t\t\tqueueMicrotask(() => {\n\t\t\t\tif (!event.defaultPrevented) setInner(defaultValue);\n\t\t\t});\n\t\tform.addEventListener(\"reset\", reset);\n\t\treturn () => form.removeEventListener(\"reset\", reset);\n\t}, [value, defaultValue, props.form]);\n\tconst bar = rs(\n\t\t[\n\t\t\t\"rs-android-search-bar\",\n\t\t\tdisabled && \"rs-android-search-bar-disabled\",\n\t\t\tcontainerClassName,\n\t\t],\n\t\tstyles.bar,\n\t\tdisabled && styles.disabled,\n\t);\n\tconst sx = rs([\"rs-android-search-input\", className], styles.input);\n\tconst icon = rs([\"rs-android-search-icon\"], styles.icon);\n\tconst clear = rs([\"rs-android-search-clear\"], styles.clear);\n\treturn (\n\t\t<div className={bar.className} style={{ ...bar.style, ...containerStyle }}>\n\t\t\t<span {...icon} aria-hidden=\"true\">\n\t\t\t\t<Icon name=\"search\" size={24} />\n\t\t\t</span>\n\t\t\t<input\n\t\t\t\t{...props}\n\t\t\t\tref={(node) => {\n\t\t\t\t\tinput.current = node;\n\t\t\t\t\tsetRef(forwardedRef, node);\n\t\t\t\t}}\n\t\t\t\ttype=\"search\"\n\t\t\t\tdisabled={disabled}\n\t\t\t\treadOnly={readOnly}\n\t\t\t\tvalue={current}\n\t\t\t\tonChange={(event) => {\n\t\t\t\t\tonChange?.(event);\n\t\t\t\t\tif (!event.defaultPrevented) update(event.target.value);\n\t\t\t\t}}\n\t\t\t\tonKeyDown={(event) => {\n\t\t\t\t\tonKeyDown?.(event);\n\t\t\t\t\tif (\n\t\t\t\t\t\t!event.defaultPrevented &&\n\t\t\t\t\t\tevent.key === \"Escape\" &&\n\t\t\t\t\t\tcurrent &&\n\t\t\t\t\t\t!readOnly\n\t\t\t\t\t) {\n\t\t\t\t\t\tevent.preventDefault();\n\t\t\t\t\t\tevent.stopPropagation();\n\t\t\t\t\t\tclearValue();\n\t\t\t\t\t}\n\t\t\t\t}}\n\t\t\t\tclassName={sx.className}\n\t\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t\t/>\n\t\t\t{current && !disabled && !readOnly ? (\n\t\t\t\t<button\n\t\t\t\t\ttype=\"button\"\n\t\t\t\t\t{...clear}\n\t\t\t\t\taria-label={clearLabel}\n\t\t\t\t\tonClick={() => {\n\t\t\t\t\t\tclearValue();\n\t\t\t\t\t\tinput.current?.focus();\n\t\t\t\t\t}}\n\t\t\t\t>\n\t\t\t\t\t<Icon name=\"close\" size={24} />\n\t\t\t\t</button>\n\t\t\t) : null}\n\t\t</div>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-search-bar.tsx"
+    },
+    {
+      "path": "vlak/styles/android-search-bar.css",
+      "content": "/* ── android-search-bar: generated from packages/react/src/components/android-search-bar.tsx ── */\n.rs-android-search-bar{width:100%;max-width:100%;box-sizing:border-box;display:flex;align-items:center;gap:8px;min-height:56px;min-width:0;padding-inline:12px;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:28px;background-color:var(--control-fill);color:var(--text)}\n.rs-android-search-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:24px;height:24px;margin-inline:4px}\n.rs-android-search-input{appearance:none;box-sizing:border-box;flex:1 1 0%;width:0;min-width:44px;min-height:48px;padding:8px 0;margin:0;border-width:0;border-radius:4px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:16px;line-height:1.5;outline-offset:0}\n.rs-android-search-input:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n.rs-android-search-input::placeholder{color:var(--text);opacity:1}\n.rs-android-search-input::-webkit-search-cancel-button{appearance:none}\n.rs-android-search-clear{appearance:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;margin-inline-end:-6px;padding:0;border-width:0;border-radius:50%;background-color:transparent;color:var(--text);cursor:pointer;outline-offset:0}\n.rs-android-search-clear:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n@media (hover: hover) and (pointer: fine){.rs-android-search-clear:hover{background-color:var(--control-fill)}}\n.rs-android-search-bar-disabled{opacity:0.45}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-search-bar.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-search-bar",
+        "rs-android-search-bar-disabled",
+        "rs-android-search-input",
+        "rs-android-search-icon",
+        "rs-android-search-clear"
+      ],
+      "snippet": "<div class=\"rs-android-search-bar\"><span class=\"rs-android-search-icon\" aria-hidden=\"true\">⌕</span><input class=\"rs-android-search-input\" type=\"search\" aria-label=\"Search documents\" placeholder=\"Search documents\" /></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material search bar",
+        "Android search field",
+        "search input"
+      ],
+      "example": "import { AndroidSearchBar } from \"@noorddev/vlak-react\";\n\n<AndroidSearchBar aria-label=\"Search documents\" placeholder=\"Search documents\" value={query} onValueChange={setQuery} />",
+      "usage": {
+        "use": [
+          "Searching a collection within an Android screen.",
+          "A 56-pixel search surface with a clear action."
+        ],
+        "avoid": [
+          "Selecting an option from autocomplete suggestions; use a combobox for that behavior."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the search field and its clear action when present."
+        },
+        {
+          "keys": "Escape",
+          "does": "Clears an editable query and keeps focus in the field."
+        },
+        {
+          "keys": "Enter",
+          "does": "Uses the enclosing form's native submit behavior."
+        }
+      ],
+      "a11y": [
+        "Uses input type search with native input attributes and ref.",
+        "Provide a visible label or aria-label; a placeholder is not a label.",
+        "The clear action follows the input onChange path, also calls onValueChange and returns focus to the field.",
+        "Uncontrolled values follow native form reset."
+      ]
+    }
+  }
+}

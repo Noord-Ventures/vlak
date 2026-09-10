@@ -1,6 +1,6 @@
 # Vlak components
 
-215 components in 19 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+231 components in 21 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
 
 ## Actions
 
@@ -143,6 +143,28 @@
 - [Inline form](inline-form.md): Pairs one field with an embedded submit action. The button appears after validation.
 - [Workflow card](workflow.md): Frames an ordered pipeline. 1px dashed frame, chips, and a ghost add action. Reordering is supplied by SortableList.
 - [Assistant panel](assistant.md): Frames an assistant exchange with a user message, reply, suggestion, and input row.
+
+## iOS
+
+- [iOS navigation bar](ios-navigation-bar.md): Compact or large-title navigation with circular actions and an optional vertical rail.
+- [iOS tab bar](ios-tab-bar.md): Floating peer tabs with icon labels, roving focus and horizontal or vertical placement.
+- [iOS search field](ios-search-field.md): A 48px search capsule with a native input and a separate clear action.
+- [iOS switch](ios-switch.md): A native checkbox with a 64px pill track, translating thumb and a 44px hit height.
+- [iOS list](ios-list.md): Inset list groups with labels, descriptions, leading symbols and independent trailing controls.
+- [iOS segmented control](ios-segmented-control.md): A pill-shaped single choice with a full selected fill, radio semantics and arrow-key selection.
+- [iOS slider](ios-slider.md): A native range input with a quiet track, pill thumb and synchronized stepped values.
+- [iOS sheet](ios-sheet.md): A native modal bottom sheet with a centered title, grabber and deliberate entrance.
+
+## Android
+
+- [Android app bar](android-app-bar.md): A Material app bar with a title, navigation action and trailing actions in Vlak tones.
+- [Android navigation](android-navigation.md): Material destination indicators for a bottom navigation bar or vertical rail.
+- [Android search bar](android-search-bar.md): A rounded Material search field with a leading icon and a clear action.
+- [Android switch](android-switch.md): A Material switch with a 52-by-32 track and an expanding thumb, built on a native checkbox.
+- [Android list](android-list.md): Segmented Material list rows with leading content, supporting text and independent trailing controls.
+- [Android chip](android-chip.md): A Material filter chip with a filled selection state and a checkmark.
+- [Android floating action button](android-fab.md): A Material floating action button with an optional extended text label.
+- [Android bottom sheet](android-sheet.md): A native modal bottom sheet with Material geometry, accessible naming and focus restoration.
 
 ## AI
 

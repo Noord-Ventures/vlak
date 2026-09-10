@@ -1,0 +1,88 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-list",
+  "type": "registry:component",
+  "title": "iOS list",
+  "description": "Inset list groups with labels, descriptions, leading symbols and independent trailing controls.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-list.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Icon } from \"./icons\";\n\nexport interface IOSListProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n  title?: React.ReactNode;\n  footer?: React.ReactNode;\n}\nexport interface IOSListRowProps extends Omit<React.HTMLAttributes<HTMLElement>, \"children\"> {\n  label: React.ReactNode;\n  description?: React.ReactNode;\n  leading?: React.ReactNode;\n  trailing?: React.ReactNode;\n  disabled?: boolean;\n  disclosure?: boolean;\n}\nconst styles = stylex.create({\n  root: { fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\", fontSize: 17, lineHeight: \"22px\", color: vlak.ink, minWidth: 0 },\n  title: { marginBlock: \"0 8px\", marginInline: 16, fontSize: 15, lineHeight: \"20px\", fontWeight: 400, color: vlak.gray },\n  group: { borderRadius: 22, backgroundColor: vlak.paper, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.divider, [mq.forcedColors]: \"ButtonText\" }, overflow: \"hidden\" },\n  footer: { marginBlock: \"8px 0\", marginInline: 16, fontSize: 13, lineHeight: \"18px\", color: vlak.gray },\n  row: { appearance: \"none\", display: \"flex\", alignItems: \"center\", boxSizing: \"border-box\", gap: 12, width: \"100%\", minWidth: 44, minHeight: 52, borderWidth: 0, borderStyle: \"solid\", borderBlockEndWidth: 1, borderColor: vlak.divider, backgroundColor: \"transparent\", color: vlak.ink, paddingBlock: 8, paddingInline: 16, textAlign: \"start\", fontFamily: \"inherit\", fontSize: \"inherit\", lineHeight: \"inherit\", \":last-child\": { borderBlockEndWidth: 0 } },\n  action: { cursor: \"pointer\", backgroundColor: { default: \"transparent\", \":hover\": { default: null, [mq.hover]: vlak.tableAlt } }, outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -3, transition: { default: \"background-color 200ms ease\", [mq.reduce]: \"none\" } },\n  disabled: { opacity: 0.45, cursor: \"not-allowed\" },\n  leading: { display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", flexShrink: 0, width: 28, minHeight: 28 },\n  copy: { display: \"flex\", flexDirection: \"column\", gap: 2, flexGrow: 1, minWidth: 0, overflowWrap: \"anywhere\" },\n  description: { fontSize: 15, lineHeight: \"20px\", color: vlak.gray },\n  trailing: { display: \"inline-flex\", alignItems: \"center\", gap: 8, color: vlak.gray, fontSize: 15, lineHeight: \"20px\", flexShrink: 0 },\n});\n\n/** An inset group of rows; controls remain separate focus targets. */\nexport const IOSList = React.forwardRef<HTMLElement, IOSListProps>(function IOSList({ title, footer, className, style, children, ...props }, ref) {\n  const id = React.useId();\n  const root = rs([\"rs-ios-list\", className], styles.root);\n  const heading = rs([\"rs-ios-list-title\"], styles.title);\n  const group = rs([\"rs-ios-list-group\"], styles.group);\n  const note = rs([\"rs-ios-list-footer\"], styles.footer);\n  return <section ref={ref} aria-labelledby={title ? id : undefined} {...props} className={root.className} style={{ ...root.style, ...style }}>{title && <h3 {...heading} id={id}>{title}</h3>}<div {...group}>{children}</div>{footer && <p {...note}>{footer}</p>}</section>;\n});\n\n/** Supply onClick for a native button, or omit it to hold a switch or other input. */\nexport const IOSListRow = React.forwardRef<HTMLElement, IOSListRowProps>(function IOSListRow({ label, description, leading, trailing, disclosure = false, onClick, disabled, className, style, ...props }, ref) {\n  const root = rs([\"rs-ios-list-row\", !!onClick && \"rs-ios-list-row-action\", disabled && \"rs-ios-list-row-disabled\", className], styles.row, !!onClick && styles.action, disabled && styles.disabled);\n  const mark = rs([\"rs-ios-list-row-leading\"], styles.leading);\n  const copy = rs([\"rs-ios-list-row-copy\"], styles.copy);\n  const detail = rs([\"rs-ios-list-row-description\"], styles.description);\n  const end = rs([\"rs-ios-list-row-trailing\"], styles.trailing);\n  const content = <>{leading && <span {...mark} aria-hidden=\"true\">{leading}</span>}<span {...copy}><span>{label}</span>{description && <span {...detail}>{description}</span>}</span>{(trailing || disclosure) && <span {...end}>{trailing}{disclosure && <Icon name=\"chevron-right\" size={16} />}</span>}</>;\n  return onClick ? <button {...props} ref={ref as React.Ref<HTMLButtonElement>} type=\"button\" disabled={disabled} onClick={onClick} className={root.className} style={{ ...root.style, ...style }}>{content}</button> : <div {...props} ref={ref as React.Ref<HTMLDivElement>} className={root.className} style={{ ...root.style, ...style }}>{content}</div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-list.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-list.css",
+      "content": "/* ── ios-list: generated from packages/react/src/components/ios-list.tsx ── */\n.rs-ios-list{font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;color:var(--text);min-width:0}\n.rs-ios-list-title{margin-block:0 8px;margin-inline:16px;font-size:15px;line-height:20px;font-weight:400;color:var(--text-secondary)}\n.rs-ios-list-group{border-radius:22px;background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);overflow:hidden}\n@media (forced-colors: active){.rs-ios-list-group{border-color:ButtonText}}\n.rs-ios-list-footer{margin-block:8px 0;margin-inline:16px;font-size:13px;line-height:18px;color:var(--text-secondary)}\n.rs-ios-list-row{appearance:none;display:flex;align-items:center;box-sizing:border-box;gap:12px;width:100%;min-width:44px;min-height:52px;border-width:0;border-style:solid;border-block-end-width:1px;border-color:var(--divider);background-color:transparent;color:var(--text);padding-block:8px;padding-inline:16px;text-align:start;font-family:inherit;font-size:inherit;line-height:inherit}\n.rs-ios-list-row:last-child{border-block-end-width:0}\n.rs-ios-list-row-action{cursor:pointer;background-color:transparent;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-3px;transition:background-color 200ms ease}\n.rs-ios-list-row-action:focus-visible{outline-width:2px}\n@media (hover: hover) and (pointer: fine){.rs-ios-list-row-action:hover{background-color:var(--table-alt)}}\n@media (prefers-reduced-motion: reduce){.rs-ios-list-row-action{transition:none}}\n.rs-ios-list-row-disabled{opacity:0.45;cursor:not-allowed}\n.rs-ios-list-row-leading{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:28px;min-height:28px}\n.rs-ios-list-row-copy{display:flex;flex-direction:column;gap:2px;flex-grow:1;min-width:0;overflow-wrap:anywhere}\n.rs-ios-list-row-description{font-size:15px;line-height:20px;color:var(--text-secondary)}\n.rs-ios-list-row-trailing{display:inline-flex;align-items:center;gap:8px;color:var(--text-secondary);font-size:15px;line-height:20px;flex-shrink:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-list.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-list",
+        "rs-ios-list-title",
+        "rs-ios-list-group",
+        "rs-ios-list-footer",
+        "rs-ios-list-row",
+        "rs-ios-list-row-action",
+        "rs-ios-list-row-disabled",
+        "rs-ios-list-row-leading",
+        "rs-ios-list-row-copy",
+        "rs-ios-list-row-description",
+        "rs-ios-list-row-trailing"
+      ],
+      "snippet": "<section class=\"rs-ios-list\" aria-labelledby=\"settings-heading\"><h3 class=\"rs-ios-list-title\" id=\"settings-heading\">Settings</h3><div class=\"rs-ios-list-group\"><button class=\"rs-ios-list-row rs-ios-list-row-action\" type=\"button\"><span class=\"rs-ios-list-row-copy\">General</span></button></div></section>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UITableView grouped",
+        "iOS settings list",
+        "Inset grouped list"
+      ],
+      "example": "import { IOSList, IOSListRow, IOSSwitch } from \"@noorddev/vlak-react\";\n\n<IOSList title=\"Connections\"><IOSListRow label={<label htmlFor=\"wifi\">Wi-Fi</label>} trailing={<IOSSwitch id=\"wifi\" defaultChecked />} /><IOSListRow label=\"Network details\" disclosure onClick={() => console.log(\"Open network\")} /></IOSList>",
+      "usage": {
+        "use": [
+          "Grouped settings, preferences and navigation rows.",
+          "Omit onClick for rows containing an interactive trailing input."
+        ],
+        "avoid": [
+          "Nesting a switch or another interactive element inside an action row.",
+          "Using a clickable row for plain informational content."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves through action rows and the controls inside static rows."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates a focused action row as a native button."
+        }
+      ],
+      "a11y": [
+        "Group headings label their sections. Static rows are not unnecessary focus stops.",
+        "Action rows use native buttons with disabled behavior and at least a 52px height."
+      ]
+    }
+  }
+}

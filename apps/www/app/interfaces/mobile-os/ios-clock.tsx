@@ -54,8 +54,9 @@ export function IOSClock({ active, onAnnounce, onTimerComplete }: { active: bool
   const [laps, setLaps] = React.useState<number[]>([]);
   const [alarms, setAlarms] = React.useState<Alarm[]>([{ id: 0, hour: 7, minute: 30, label: "Wake up", days: [1, 2, 3, 4, 5], enabled: false, snooze: true }]);
   const [alarmDraft, setAlarmDraft] = React.useState<AlarmDraft | null>(null);
-  const [ringing, setRinging] = React.useState<Alarm | null>(null);
-  const snoozed = React.useRef<{ alarm: Alarm; deadline: number } | null>(null);
+  const [alarmQueue, setAlarmQueue] = React.useState<Alarm[]>([]);
+  const ringing = alarmQueue[0] ?? null;
+  const snoozed = React.useRef<{ alarm: Alarm; deadline: number }[]>([]);
   const alarmMinute = React.useRef("");
   const [world, setWorld] = React.useState(["Amsterdam", "New York", "Tokyo"]);
   const [cityPicker, setCityPicker] = React.useState(false), [citySearch, setCitySearch] = React.useState("");
@@ -74,7 +75,7 @@ export function IOSClock({ active, onAnnounce, onTimerComplete }: { active: bool
   }, [active]);
   const editingAlarm = alarmDraft !== null;
   React.useLayoutEffect(() => { scroll.current?.scrollTo({ top: 0, behavior: "instant" }); }, [tab, editingAlarm, cityPicker]);
-  const ticking = timers.some(timer => timer.deadline !== null) || stopwatch.started !== null || alarms.some(alarm => alarm.enabled) || ringing !== null || snoozed.current !== null;
+  const ticking = timers.some(timer => timer.deadline !== null) || stopwatch.started !== null || alarms.some(alarm => alarm.enabled) || ringing !== null || snoozed.current.length > 0;
   React.useEffect(() => {
     setNow(Date.now());
     if (!active && !ticking) return;
@@ -88,17 +89,20 @@ export function IOSClock({ active, onAnnounce, onTimerComplete }: { active: bool
       announce.current(`Timer complete${expired[0]?.label ? `: ${expired[0].label}` : ""}`);
       for (const timer of expired) complete.current?.(timer.label);
     }
-    if (snoozed.current && snoozed.current.deadline <= now) {
-      setRinging(snoozed.current.alarm); announce.current(`Alarm: ${snoozed.current.alarm.label}`); snoozed.current = null;
-    }
     if (!now) return;
+    const pending = snoozed.current.filter(item => item.deadline <= now).map(item => item.alarm);
+    snoozed.current = snoozed.current.filter(item => item.deadline > now);
     const date = new Date(now), minute = `${date.toDateString()} ${date.getHours()}:${date.getMinutes()}`;
-    if (minute === alarmMinute.current) return;
-    alarmMinute.current = minute;
-    const due = alarms.find(alarm => alarm.enabled && alarm.hour === date.getHours() && alarm.minute === date.getMinutes() && (!alarm.days.length || alarm.days.includes(date.getDay())));
-    if (due) {
-      setRinging(due); announce.current(`Alarm: ${due.label}`);
-      if (!due.days.length) setAlarms(current => current.map(alarm => alarm.id === due.id ? { ...alarm, enabled: false } : alarm));
+    if (minute !== alarmMinute.current) {
+      alarmMinute.current = minute;
+      const due = alarms.filter(alarm => alarm.enabled && alarm.hour === date.getHours() && alarm.minute === date.getMinutes() && (!alarm.days.length || alarm.days.includes(date.getDay())));
+      pending.push(...due);
+      const oneShot = new Set(due.filter(alarm => !alarm.days.length).map(alarm => alarm.id));
+      if (oneShot.size) setAlarms(current => current.map(alarm => oneShot.has(alarm.id) ? { ...alarm, enabled: false } : alarm));
+    }
+    if (pending.length) {
+      setAlarmQueue(current => [...current, ...pending]);
+      announce.current(`${pending.length === 1 ? "Alarm" : "Alarms"}: ${pending.map(alarm => alarm.label).join(", ")}`);
     }
   }, [now, timers, alarms]);
   function changeTab(next: ClockTab) { setTab(next); setAlarmDraft(null); setCityPicker(false); }
@@ -131,7 +135,7 @@ export function IOSClock({ active, onAnnounce, onTimerComplete }: { active: bool
       {alarmDraft ? <><button type="button" aria-label="Cancel alarm" onClick={() => { setAlarmDraft(null); heading.current?.focus({ preventScroll: true }); }}><Icon name="x" size={24} /></button><button type="submit" form={alarmFormId} aria-label="Save alarm"><Icon name="check" size={24} /></button></> : cityPicker ? <button type="button" aria-label="Cancel city search" onClick={() => setCityPicker(false)}><Icon name="x" size={24} /></button> : tab === "alarm" || tab === "world" ? <button type="button" aria-label={tab === "alarm" ? "New alarm" : "Add city"} onClick={() => tab === "alarm" ? openAlarm() : (setCitySearch(""), setCityPicker(true))}><Icon name="plus" size={24} /></button> : null}
     </div></header>
     <div className="mo-ios-clock-scroll" ref={scroll} tabIndex={0}>
-      {ringing && <div className="mo-ios-clock-alert" role="status"><Icon name="bell" size={24} /><strong>{ringing.label}</strong><span>{pad(ringing.hour)}:{pad(ringing.minute)}</span><div>{ringing.snooze && <button type="button" onClick={() => { snoozed.current = { alarm: ringing, deadline: Date.now() + 540000 }; setRinging(null); }}>Snooze 9 minutes</button>}<button type="button" onClick={() => setRinging(null)}>Dismiss alarm</button></div></div>}
+      {ringing && <div className="mo-ios-clock-alert" role="status"><Icon name="bell" size={24} /><strong>{ringing.label}</strong><span>{pad(ringing.hour)}:{pad(ringing.minute)}</span><div>{ringing.snooze && <button type="button" onClick={() => { snoozed.current.push({ alarm: ringing, deadline: Date.now() + 540000 }); setAlarmQueue(current => current.slice(1)); }}>Snooze 9 minutes</button>}<button type="button" onClick={() => setAlarmQueue(current => current.slice(1))}>Dismiss alarm</button></div></div>}
       {alarmDraft ? <form id={alarmFormId} className="mo-ios-clock-alarm-form" onSubmit={saveAlarm}>
         <div className="mo-ios-clock-picker"><TimeColumn label="Alarm hours" value={alarmDraft.hour} maximum={23} onChange={hour => setAlarmDraft({ ...alarmDraft, hour })} /><TimeColumn label="Alarm minutes" value={alarmDraft.minute} maximum={59} onChange={minute => setAlarmDraft({ ...alarmDraft, minute })} /></div>
         <label className="mo-ios-clock-field"><span>Label</span><input aria-label="Alarm label" value={alarmDraft.label} maxLength={80} onChange={event => setAlarmDraft({ ...alarmDraft, label: event.target.value })} /></label>

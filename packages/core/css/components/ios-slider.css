@@ -1,0 +1,12 @@
+/* ── ios-slider: generated from packages/react/src/components/ios-slider.tsx ── */
+.rs-ios-slider{position:relative;display:block;min-width:44px;width:100%;height:44px;border-radius:22px;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+.rs-ios-slider:focus-within{outline-width:2px}
+.rs-ios-slider-disabled{opacity:0.45}
+.rs-ios-slider-track{position:absolute;top:19px;inset-inline:14px;height:6px;border-radius:3px;background-color:var(--control-fill);box-shadow:inset 0 0 0 1px var(--control-border);pointer-events:none}
+@media (forced-colors: active){.rs-ios-slider-track{background-color:Canvas}}
+.rs-ios-slider-fill{position:absolute;inset-inline-start:0;top:0;height:100%;border-radius:3px;background-color:var(--text);forced-color-adjust:none}
+@media (forced-colors: active){.rs-ios-slider-fill{background-color:Highlight}}
+.rs-ios-slider-thumb{position:absolute;top:-9px;margin-inline-start:-14px;width:28px;height:24px;border-radius:12px;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--bg)}
+@media (forced-colors: active){.rs-ios-slider-thumb{border-color:ButtonText;background-color:Canvas}}
+.rs-ios-slider-input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.rs-ios-slider-input:disabled{cursor:not-allowed}

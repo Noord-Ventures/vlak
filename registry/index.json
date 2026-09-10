@@ -108,6 +108,1343 @@
     },
     {
       "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-navigation-bar",
+      "type": "registry:component",
+      "title": "iOS navigation bar",
+      "description": "Compact or large-title navigation with circular actions and an optional vertical rail.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-navigation-bar",
+            "rs-ios-navigation-bar-vertical",
+            "rs-ios-navigation-bar-row",
+            "rs-ios-navigation-bar-leading",
+            "rs-ios-navigation-bar-rail",
+            "rs-ios-navigation-bar-actions",
+            "rs-ios-navigation-bar-actions-vertical",
+            "rs-ios-navigation-bar-title",
+            "rs-ios-navigation-bar-large-title",
+            "rs-ios-navigation-bar-vertical-title",
+            "rs-ios-navigation-bar-button",
+            "rs-ios-navigation-bar-back",
+            "rs-ios-navigation-bar-icon-button",
+            "rs-ios-navigation-bar-disabled"
+          ],
+          "snippet": "<header class=\"rs-ios-navigation-bar\"><div class=\"rs-ios-navigation-bar-row\"><button class=\"rs-ios-navigation-bar-button rs-ios-navigation-bar-back\" type=\"button\" aria-label=\"Back\">←</button><h2 class=\"rs-ios-navigation-bar-title\">Notes</h2><div class=\"rs-ios-navigation-bar-actions\"><button class=\"rs-ios-navigation-bar-button\" type=\"button\">Done</button></div></div></header>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UIKit navigation bar",
+            "UINavigationBar",
+            "iOS toolbar",
+            "Duo vertical toolbar"
+          ],
+          "example": "import { IOSNavigationBar } from \"@noorddev/vlak-react\";\n\n<IOSNavigationBar title=\"Notes\" onBack={() => history.back()} actions={[{ id: \"done\", label: \"Done\", type: \"submit\", form: \"note-editor\" }]} />",
+          "usage": {
+            "use": [
+              "A compact app title, a large root-screen title, or a trailing vertical action rail.",
+              "Pass native button properties to actions, including disabled, form and type."
+            ],
+            "avoid": [
+              "Primary destination switching; use the iOS tab bar.",
+              "More actions than fit comfortably in the available width."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Moves through enabled Back and action buttons."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Activates a focused action with native button behavior."
+            }
+          ],
+          "a11y": [
+            "Back and icon actions have accessible labels. Each target is at least 44px.",
+            "Instance-scoped action IDs avoid collisions; buttonId permits explicit references."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-navigation-bar.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-navigation-bar.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-navigation-bar.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-navigation-bar.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-tab-bar",
+      "type": "registry:component",
+      "title": "iOS tab bar",
+      "description": "Floating peer tabs with icon labels, roving focus and horizontal or vertical placement.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-tab-bar",
+            "rs-ios-tab-bar-vertical",
+            "rs-ios-tab-bar-symbol",
+            "rs-ios-tab-bar-vertical-label",
+            "rs-ios-tab-bar-tab",
+            "rs-ios-tab-bar-active",
+            "rs-ios-tab-bar-tab-vertical",
+            "rs-ios-tab-bar-disabled"
+          ],
+          "snippet": "<div class=\"rs-ios-tab-bar\" role=\"tablist\" aria-label=\"Music\"><button class=\"rs-ios-tab-bar-tab rs-ios-tab-bar-active\" role=\"tab\" aria-selected=\"true\" tabindex=\"0\">Library</button><button class=\"rs-ios-tab-bar-tab\" role=\"tab\" aria-selected=\"false\" tabindex=\"-1\">Search</button></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UITabBar",
+            "iOS bottom navigation",
+            "Duo tab rail"
+          ],
+          "example": "import { IOSTabBar } from \"@noorddev/vlak-react\";\n\n<IOSTabBar defaultValue=\"library\" label=\"Music\" items={[{ id: \"library\", label: \"Library\", panelId: \"library-panel\" }, { id: \"search\", label: \"Search\", panelId: \"search-panel\" }]} />",
+          "usage": {
+            "use": [
+              "A small set of peer views in an app, with content managed by the parent.",
+              "Provide panelId and optional buttonId to associate tabs with tabpanels."
+            ],
+            "avoid": [
+              "Unrelated commands; use iOS navigation bar actions.",
+              "Hiding labels on a vertical rail without recognizable icons."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Enters or leaves the tab bar through its selected tab."
+            },
+            {
+              "keys": "Arrows, Home, End",
+              "does": "Moves and selects enabled tabs, wrapping at the ends; horizontal arrows respect text direction."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Selects the focused tab."
+            }
+          ],
+          "a11y": [
+            "Exposes tablist, tab and selected state. Disabled tabs are skipped.",
+            "Vertical icon tabs retain their labels for assistive technology. IDs are unique per instance."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-tab-bar.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-tab-bar.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-tab-bar.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-tab-bar.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-search-field",
+      "type": "registry:component",
+      "title": "iOS search field",
+      "description": "A 48px search capsule with a native input and a separate clear action.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-search-field",
+            "rs-ios-search-field-disabled",
+            "rs-ios-search-field-symbol",
+            "rs-ios-search-field-input",
+            "rs-ios-search-field-clear"
+          ],
+          "snippet": "<div class=\"rs-ios-search-field\"><input class=\"rs-ios-search-field-input\" type=\"search\" aria-label=\"Search notes\" placeholder=\"Search\" /></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UISearchBar",
+            "UISearchTextField",
+            "iOS search input"
+          ],
+          "example": "import { IOSSearchField } from \"@noorddev/vlak-react\";\n\n<IOSSearchField name=\"q\" aria-label=\"Search notes\" placeholder=\"Search\" onValueChange={query => console.log(query)} />",
+          "usage": {
+            "use": [
+              "Search within a list, app or document.",
+              "Use onValueChange to respond to both typing and the clear button."
+            ],
+            "avoid": [
+              "Treating a placeholder as the only accessible label.",
+              "A noneditable search launcher; use a button."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Moves between the native search input and the clear button when text is present."
+            },
+            {
+              "keys": "Enter, Space on Clear",
+              "does": "Clears the text and returns focus to the input."
+            },
+            {
+              "keys": "Enter in the input",
+              "does": "Uses the enclosing form’s native submit behavior."
+            }
+          ],
+          "a11y": [
+            "A native search input accepts labels, form attributes, required, disabled and readOnly.",
+            "Clearing is a 44px action; native form reset is supported and canceled reset is respected."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-search-field.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-search-field.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-search-field.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-search-field.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-switch",
+      "type": "registry:component",
+      "title": "iOS switch",
+      "description": "A native checkbox with a 64px pill track, translating thumb and a 44px hit height.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-switch",
+            "rs-ios-switch-disabled",
+            "rs-ios-switch-track",
+            "rs-ios-switch-on",
+            "rs-ios-switch-thumb",
+            "rs-ios-switch-thumb-on",
+            "rs-ios-switch-input"
+          ],
+          "snippet": "<span class=\"rs-ios-switch\"><span class=\"rs-ios-switch-track\" aria-hidden=\"true\"></span><span class=\"rs-ios-switch-thumb\" aria-hidden=\"true\"></span><input class=\"rs-ios-switch-input\" type=\"checkbox\" role=\"switch\" aria-label=\"Wi-Fi\" /></span>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UISwitch",
+            "iOS toggle"
+          ],
+          "example": "import { IOSSwitch } from \"@noorddev/vlak-react\";\n\n<IOSSwitch name=\"wifi\" aria-label=\"Wi-Fi\" defaultChecked onCheckedChange={checked => console.log(checked)} />",
+          "usage": {
+            "use": [
+              "An immediately applied on/off preference.",
+              "Associate it with a visible label or an aria-label."
+            ],
+            "avoid": [
+              "A choice among several alternatives; use the iOS segmented control.",
+              "A submit command that needs a button."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Moves focus to or away from an enabled switch."
+            },
+            {
+              "keys": "Space",
+              "does": "Toggles the native checkbox."
+            }
+          ],
+          "a11y": [
+            "A native checkbox with switch semantics retains form submission, required and disabled behavior.",
+            "Fill and thumb position both communicate state. Reduced motion removes thumb travel; forced colors keeps the boundary visible."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-switch.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-switch.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-switch.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-switch.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-list",
+      "type": "registry:component",
+      "title": "iOS list",
+      "description": "Inset list groups with labels, descriptions, leading symbols and independent trailing controls.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-list",
+            "rs-ios-list-title",
+            "rs-ios-list-group",
+            "rs-ios-list-footer",
+            "rs-ios-list-row",
+            "rs-ios-list-row-action",
+            "rs-ios-list-row-disabled",
+            "rs-ios-list-row-leading",
+            "rs-ios-list-row-copy",
+            "rs-ios-list-row-description",
+            "rs-ios-list-row-trailing"
+          ],
+          "snippet": "<section class=\"rs-ios-list\" aria-labelledby=\"settings-heading\"><h3 class=\"rs-ios-list-title\" id=\"settings-heading\">Settings</h3><div class=\"rs-ios-list-group\"><button class=\"rs-ios-list-row rs-ios-list-row-action\" type=\"button\"><span class=\"rs-ios-list-row-copy\">General</span></button></div></section>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UITableView grouped",
+            "iOS settings list",
+            "Inset grouped list"
+          ],
+          "example": "import { IOSList, IOSListRow, IOSSwitch } from \"@noorddev/vlak-react\";\n\n<IOSList title=\"Connections\"><IOSListRow label={<label htmlFor=\"wifi\">Wi-Fi</label>} trailing={<IOSSwitch id=\"wifi\" defaultChecked />} /><IOSListRow label=\"Network details\" disclosure onClick={() => console.log(\"Open network\")} /></IOSList>",
+          "usage": {
+            "use": [
+              "Grouped settings, preferences and navigation rows.",
+              "Omit onClick for rows containing an interactive trailing input."
+            ],
+            "avoid": [
+              "Nesting a switch or another interactive element inside an action row.",
+              "Using a clickable row for plain informational content."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Moves through action rows and the controls inside static rows."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Activates a focused action row as a native button."
+            }
+          ],
+          "a11y": [
+            "Group headings label their sections. Static rows are not unnecessary focus stops.",
+            "Action rows use native buttons with disabled behavior and at least a 52px height."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-list.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-list.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-list.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-list.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-segmented-control",
+      "type": "registry:component",
+      "title": "iOS segmented control",
+      "description": "A pill-shaped single choice with a full selected fill, radio semantics and arrow-key selection.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-segmented-control",
+            "rs-ios-segmented-control-item",
+            "rs-ios-segmented-control-selected",
+            "rs-ios-segmented-control-disabled"
+          ],
+          "snippet": "<div class=\"rs-ios-segmented-control\" role=\"radiogroup\" aria-label=\"Calendar view\"><button class=\"rs-ios-segmented-control-item rs-ios-segmented-control-selected\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\">Day</button><button class=\"rs-ios-segmented-control-item\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\">Month</button></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UISegmentedControl",
+            "iOS segmented picker"
+          ],
+          "example": "import { IOSSegmentedControl } from \"@noorddev/vlak-react\";\n\n<IOSSegmentedControl name=\"view\" label=\"Calendar view\" defaultValue=\"day\" items={[{ id: \"day\", label: \"Day\" }, { id: \"week\", label: \"Week\" }, { id: \"month\", label: \"Month\" }]} />",
+          "usage": {
+            "use": [
+              "A small set of mutually exclusive modes or filters.",
+              "Use name to include the selected value in form data."
+            ],
+            "avoid": [
+              "Navigation among independent application destinations; use the iOS tab bar.",
+              "Many options that require a long horizontal scroll."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Enters or leaves the group through its selected option."
+            },
+            {
+              "keys": "Arrows, Home, End",
+              "does": "Moves and selects enabled options; horizontal arrows respect text direction."
+            },
+            {
+              "keys": "Enter, Space",
+              "does": "Selects the focused option."
+            }
+          ],
+          "a11y": [
+            "Named radiogroup with one tab stop, explicit checked state and disabled options.",
+            "Native form reset is supported; reduced motion and forced colors retain readable selection."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-segmented-control.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-segmented-control.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-segmented-control.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-segmented-control.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-slider",
+      "type": "registry:component",
+      "title": "iOS slider",
+      "description": "A native range input with a quiet track, pill thumb and synchronized stepped values.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-slider",
+            "rs-ios-slider-disabled",
+            "rs-ios-slider-track",
+            "rs-ios-slider-fill",
+            "rs-ios-slider-thumb",
+            "rs-ios-slider-input"
+          ],
+          "snippet": "<div class=\"rs-ios-slider\"><span class=\"rs-ios-slider-track\" aria-hidden=\"true\"><span class=\"rs-ios-slider-fill\" style=\"width:50%\"></span><span class=\"rs-ios-slider-thumb\" style=\"inset-inline-start:50%\"></span></span><input class=\"rs-ios-slider-input\" type=\"range\" min=\"0\" max=\"100\" value=\"50\" aria-label=\"Volume\" /></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UISlider",
+            "iOS volume slider"
+          ],
+          "example": "import { IOSSlider } from \"@noorddev/vlak-react\";\n\n<IOSSlider name=\"volume\" aria-label=\"Volume\" min={0} max={100} defaultValue={40} onValueChange={value => console.log(value)} />",
+          "usage": {
+            "use": [
+              "A bounded numeric level such as volume, brightness or playback intensity.",
+              "Provide min, max and step when the range is discrete."
+            ],
+            "avoid": [
+              "Values that need precise text entry without an accompanying numeric field.",
+              "Multiple independent values; use separate labeled sliders."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Moves focus to or away from the native range input."
+            },
+            {
+              "keys": "Arrows, Home, End",
+              "does": "Uses the browser’s native range stepping and boundary behavior."
+            }
+          ],
+          "a11y": [
+            "The ref reaches the native range input, with min, max, step, name and disabled attributes.",
+            "Value and fill are normalized to the same valid step. The invisible native input keeps a 44px target."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-slider.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-slider.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-slider.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-slider.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "ios-sheet",
+      "type": "registry:component",
+      "title": "iOS sheet",
+      "description": "A native modal bottom sheet with a centered title, grabber and deliberate entrance.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "ios",
+          "classes": [
+            "rs-ios-sheet",
+            "rs-ios-sheet-open",
+            "rs-ios-sheet-handle",
+            "rs-ios-sheet-header",
+            "rs-ios-sheet-title",
+            "rs-ios-sheet-close",
+            "rs-ios-sheet-body",
+            "rs-ios-sheet-description"
+          ],
+          "snippet": "<dialog class=\"rs-ios-sheet\" aria-labelledby=\"sheet-title\"><div class=\"rs-ios-sheet-handle\" aria-hidden=\"true\"></div><header class=\"rs-ios-sheet-header\"><span></span><h2 class=\"rs-ios-sheet-title\" id=\"sheet-title\">Edit note</h2><button class=\"rs-ios-sheet-close\" type=\"button\" aria-label=\"Close sheet\">×</button></header><div class=\"rs-ios-sheet-body\">Note content</div></dialog>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "UISheetPresentationController",
+            "iOS bottom sheet",
+            "iOS modal sheet"
+          ],
+          "example": "import { IOSSheet } from \"@noorddev/vlak-react\";\n\n<IOSSheet title=\"Edit note\" open={open} onOpenChange={setOpen} description=\"Changes stay on this device.\"><form id=\"note-editor\">…</form></IOSSheet>",
+          "usage": {
+            "use": [
+              "A focused modal task presented from the bottom edge.",
+              "Keep the sheet mounted to preserve form drafts while closed."
+            ],
+            "avoid": [
+              "Claiming the grabber is draggable; it is a visual indicator.",
+              "Using a modal for ordinary page navigation or passive status."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab, Shift+Tab",
+              "does": "Uses the native modal focus trap."
+            },
+            {
+              "keys": "Escape",
+              "does": "Requests closing unless dismissable is false or onCancel prevents it."
+            },
+            {
+              "keys": "Enter, Space on Close",
+              "does": "Closes a dismissable sheet and restores its trigger when still available."
+            }
+          ],
+          "a11y": [
+            "The native dialog is named by its title and optionally described by its description.",
+            "Focus restores on close and unmount; reduced motion removes the entrance animation. Nondismissable sheets omit the close control."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/ios-sheet.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/ios-sheet.tsx"
+        },
+        {
+          "path": "vlak/styles/ios-sheet.css",
+          "type": "registry:file",
+          "target": "styles/vlak/ios-sheet.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-app-bar",
+      "type": "registry:component",
+      "title": "Android app bar",
+      "description": "A Material app bar with a title, navigation action and trailing actions in Vlak tones.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-app-bar",
+            "rs-android-app-bar-medium",
+            "rs-android-app-bar-navigation",
+            "rs-android-app-bar-title",
+            "rs-android-app-bar-leading-title",
+            "rs-android-app-bar-medium-title",
+            "rs-android-app-bar-actions",
+            "rs-android-app-bar-action"
+          ],
+          "snippet": "<header class=\"rs-android-app-bar\"><div class=\"rs-android-app-bar-navigation\"><button class=\"rs-android-app-bar-action\" type=\"button\" aria-label=\"Go back\">←</button></div><h2 class=\"rs-android-app-bar-title\">Documents</h2><div class=\"rs-android-app-bar-actions\"><button class=\"rs-android-app-bar-action\" type=\"button\" aria-label=\"More actions\">⋯</button></div></header>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material top app bar",
+            "Android toolbar",
+            "center-aligned top app bar"
+          ],
+          "example": "import { AndroidAppBar, AndroidAppBarAction, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidAppBar title=\"Documents\" navigation={<AndroidAppBarAction aria-label=\"Go back\" onClick={goBack}><Icon name=\"arrow-left\" /></AndroidAppBarAction>} />",
+          "usage": {
+            "use": [
+              "Top-level Android screens with a title and a small set of actions.",
+              "A medium app bar when the screen needs a larger title."
+            ],
+            "avoid": [
+              "Page navigation with more destinations than fit in an app bar."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves between enabled actions."
+            },
+            {
+              "keys": "Enter or Space",
+              "does": "Activates the focused action."
+            }
+          ],
+          "a11y": [
+            "Uses a native header and a level-two heading.",
+            "Label icon-only actions with aria-label.",
+            "Action buttons keep a 48-pixel target and a visible keyboard focus indicator."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-app-bar.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-app-bar.tsx"
+        },
+        {
+          "path": "vlak/styles/android-app-bar.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-app-bar.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-navigation",
+      "type": "registry:component",
+      "title": "Android navigation",
+      "description": "Material destination indicators for a bottom navigation bar or vertical rail.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-navigation",
+            "rs-android-navigation-list",
+            "rs-android-navigation-rail",
+            "rs-android-navigation-item",
+            "rs-android-navigation-control",
+            "rs-android-navigation-current",
+            "rs-android-navigation-disabled",
+            "rs-android-navigation-indicator",
+            "rs-android-navigation-active-indicator",
+            "rs-android-navigation-label"
+          ],
+          "snippet": "<nav class=\"rs-android-navigation\" aria-label=\"Workspace\"><ul class=\"rs-android-navigation-list\"><li class=\"rs-android-navigation-item\"><button class=\"rs-android-navigation-control rs-android-navigation-current\" type=\"button\" aria-current=\"page\"><span class=\"rs-android-navigation-indicator rs-android-navigation-active-indicator\" aria-hidden=\"true\">⌂</span><span class=\"rs-android-navigation-label\">Home</span></button></li><li class=\"rs-android-navigation-item\"><button class=\"rs-android-navigation-control\" type=\"button\"><span class=\"rs-android-navigation-indicator\" aria-hidden=\"true\">□</span><span class=\"rs-android-navigation-label\">Files</span></button></li></ul></nav>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material navigation bar",
+            "Android navigation rail",
+            "bottom navigation"
+          ],
+          "example": "import { AndroidNavigation } from \"@noorddev/vlak-react\";\n\n<AndroidNavigation aria-label=\"Workspace\" items={[{ value: \"home\", label: \"Home\" }, { value: \"files\", label: \"Files\" }, { value: \"settings\", label: \"Settings\" }]} defaultValue=\"home\" onValueChange={setScreen} />",
+          "usage": {
+            "use": [
+              "Three to five destinations at the bottom of a compact Android layout.",
+              "A vertical destination rail beside a wider workspace."
+            ],
+            "avoid": [
+              "Tabs that switch between panels within the same page."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves between enabled destinations."
+            },
+            {
+              "keys": "Left or Right arrow",
+              "does": "Moves focus in a horizontal bar, respecting text direction."
+            },
+            {
+              "keys": "Up or Down arrow",
+              "does": "Moves focus in a vertical rail."
+            },
+            {
+              "keys": "Home or End",
+              "does": "Focuses the first or last enabled destination."
+            },
+            {
+              "keys": "Enter or Space",
+              "does": "Activates a button destination; native links use Enter."
+            }
+          ],
+          "a11y": [
+            "A labelled nav contains native buttons or links in a list.",
+            "aria-current marks the active destination; arrow keys only move focus.",
+            "Disabled destinations cannot activate and are skipped by arrow keys."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-navigation.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-navigation.tsx"
+        },
+        {
+          "path": "vlak/styles/android-navigation.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-navigation.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-search-bar",
+      "type": "registry:component",
+      "title": "Android search bar",
+      "description": "A rounded Material search field with a leading icon and a clear action.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-search-bar",
+            "rs-android-search-bar-disabled",
+            "rs-android-search-input",
+            "rs-android-search-icon",
+            "rs-android-search-clear"
+          ],
+          "snippet": "<div class=\"rs-android-search-bar\"><span class=\"rs-android-search-icon\" aria-hidden=\"true\">⌕</span><input class=\"rs-android-search-input\" type=\"search\" aria-label=\"Search documents\" placeholder=\"Search documents\" /></div>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material search bar",
+            "Android search field",
+            "search input"
+          ],
+          "example": "import { AndroidSearchBar } from \"@noorddev/vlak-react\";\n\n<AndroidSearchBar aria-label=\"Search documents\" placeholder=\"Search documents\" value={query} onValueChange={setQuery} />",
+          "usage": {
+            "use": [
+              "Searching a collection within an Android screen.",
+              "A 56-pixel search surface with a clear action."
+            ],
+            "avoid": [
+              "Selecting an option from autocomplete suggestions; use a combobox for that behavior."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Focuses the search field and its clear action when present."
+            },
+            {
+              "keys": "Escape",
+              "does": "Clears an editable query and keeps focus in the field."
+            },
+            {
+              "keys": "Enter",
+              "does": "Uses the enclosing form's native submit behavior."
+            }
+          ],
+          "a11y": [
+            "Uses input type search with native input attributes and ref.",
+            "Provide a visible label or aria-label; a placeholder is not a label.",
+            "The clear action follows the input onChange path, also calls onValueChange and returns focus to the field.",
+            "Uncontrolled values follow native form reset."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-search-bar.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-search-bar.tsx"
+        },
+        {
+          "path": "vlak/styles/android-search-bar.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-search-bar.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-switch",
+      "type": "registry:component",
+      "title": "Android switch",
+      "description": "A Material switch with a 52-by-32 track and an expanding thumb, built on a native checkbox.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-switch",
+            "rs-android-switch-checked"
+          ],
+          "snippet": "<label for=\"android-sync\">Background sync</label> <input class=\"rs-android-switch rs-android-switch-checked\" id=\"android-sync\" name=\"sync\" type=\"checkbox\" role=\"switch\" checked aria-checked=\"true\" />",
+          "cssOnly": false,
+          "registryDependencies": [
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material switch",
+            "Android toggle",
+            "Expressive switch"
+          ],
+          "example": "import { AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<label htmlFor=\"sync\">Background sync</label>\n<AndroidSwitch id=\"sync\" name=\"sync\" checked={enabled} onCheckedChange={setEnabled} />",
+          "usage": {
+            "use": [
+              "A binary Android preference that takes effect immediately."
+            ],
+            "avoid": [
+              "Selecting one option from a mutually exclusive group."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Focuses the switch when enabled."
+            },
+            {
+              "keys": "Space",
+              "does": "Toggles the switch."
+            }
+          ],
+          "a11y": [
+            "Uses a native checkbox with role switch and a 52-by-48 target.",
+            "Associate a visible label using htmlFor, or provide aria-label.",
+            "Supports native names, values, required state, disabled state and form reset.",
+            "The thumb changes position and size in addition to the filled track."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-switch.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-switch.tsx"
+        },
+        {
+          "path": "vlak/styles/android-switch.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-switch.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-list",
+      "type": "registry:component",
+      "title": "Android list",
+      "description": "Segmented Material list rows with leading content, supporting text and independent trailing controls.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/android-switch.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-list",
+            "rs-android-list-row",
+            "rs-android-list-body",
+            "rs-android-list-action",
+            "rs-android-list-two-line",
+            "rs-android-list-three-line",
+            "rs-android-list-leading",
+            "rs-android-list-copy",
+            "rs-android-list-headline",
+            "rs-android-list-secondary",
+            "rs-android-list-trailing"
+          ],
+          "snippet": "<ul class=\"rs-android-list\" aria-label=\"Connections\"><li class=\"rs-android-list-row\"><button class=\"rs-android-list-body rs-android-list-action rs-android-list-two-line\" type=\"button\"><span class=\"rs-android-list-copy\"><span class=\"rs-android-list-headline\">Wi-Fi</span><span class=\"rs-android-list-secondary\">Studio network</span></span></button><span class=\"rs-android-list-trailing\">Connected</span></li><li class=\"rs-android-list-row\"><div class=\"rs-android-list-body\"><span class=\"rs-android-list-copy\"><span class=\"rs-android-list-headline\">Device name</span></span></div><span class=\"rs-android-list-trailing\">Pixel</span></li></ul>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "android-switch",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material list item",
+            "Android settings row",
+            "Expressive segmented list"
+          ],
+          "example": "import { AndroidList, AndroidListRow, AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<AndroidList aria-label=\"Connections\">\n  <AndroidListRow headline=\"Wi-Fi\" supportingText=\"Studio network\" onAction={openNetworks} trailing={<AndroidSwitch aria-label=\"Wi-Fi enabled\" defaultChecked />} />\n  <AndroidListRow headline=\"Device name\" supportingText=\"Pixel\" />\n</AndroidList>",
+          "usage": {
+            "use": [
+              "Grouped Android settings and one-, two- or three-line content rows.",
+              "A row action beside an independent trailing switch."
+            ],
+            "avoid": [
+              "Tabular data where users compare aligned columns."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Moves between row actions and independent trailing controls."
+            },
+            {
+              "keys": "Enter or Space",
+              "does": "Activates a focused row button."
+            }
+          ],
+          "a11y": [
+            "Native ul and li preserve list structure.",
+            "Only rows with onAction become buttons; static rows add no tab stop.",
+            "Trailing controls are siblings of the row button, so interactive elements are never nested.",
+            "Decorative leading content is hidden from assistive technology."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-list.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-list.tsx"
+        },
+        {
+          "path": "vlak/styles/android-list.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-list.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-chip",
+      "type": "registry:component",
+      "title": "Android chip",
+      "description": "A Material filter chip with a filled selection state and a checkmark.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-chip",
+            "rs-android-chip-selected",
+            "rs-android-chip-icon"
+          ],
+          "snippet": "<button class=\"rs-android-chip rs-android-chip-selected\" type=\"button\" aria-pressed=\"true\"><span class=\"rs-android-chip-icon\" aria-hidden=\"true\">✓</span>Unread</button>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material filter chip",
+            "Android filter chip",
+            "selectable chip"
+          ],
+          "example": "import { AndroidChip } from \"@noorddev/vlak-react\";\n\n<AndroidChip selected={unread} onSelectedChange={setUnread}>Unread</AndroidChip>",
+          "usage": {
+            "use": [
+              "Independent filters that users can select and clear."
+            ],
+            "avoid": [
+              "Mutually exclusive navigation or status labels with no action."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Focuses each enabled filter."
+            },
+            {
+              "keys": "Enter or Space",
+              "does": "Toggles the focused filter."
+            }
+          ],
+          "a11y": [
+            "A native button exposes selection through aria-pressed.",
+            "The checkmark and filled surface distinguish selection without hue.",
+            "The compact chip keeps a 48-pixel hit area."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-chip.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-chip.tsx"
+        },
+        {
+          "path": "vlak/styles/android-chip.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-chip.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-fab",
+      "type": "registry:component",
+      "title": "Android floating action button",
+      "description": "A Material floating action button with an optional extended text label.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-fab",
+            "rs-android-fab-extended",
+            "rs-android-fab-icon"
+          ],
+          "snippet": "<button class=\"rs-android-fab rs-android-fab-extended\" type=\"button\"><span class=\"rs-android-fab-icon\" aria-hidden=\"true\">+</span>New document</button>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material FAB",
+            "Android extended FAB",
+            "floating action button"
+          ],
+          "example": "import { AndroidFab, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidFab icon={<Icon name=\"plus\" size={24} />} onClick={createDocument}>New document</AndroidFab>",
+          "usage": {
+            "use": [
+              "The principal creation action on an Android screen."
+            ],
+            "avoid": [
+              "Several equally prominent actions on one screen."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab",
+              "does": "Focuses the enabled action."
+            },
+            {
+              "keys": "Enter or Space",
+              "does": "Activates the action."
+            }
+          ],
+          "a11y": [
+            "Uses a native button with a target of at least 56 pixels.",
+            "Provide aria-label when omitting the visible text label.",
+            "Does not submit a form unless type submit is explicit."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-fab.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-fab.tsx"
+        },
+        {
+          "path": "vlak/styles/android-fab.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-fab.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+      "name": "android-sheet",
+      "type": "registry:component",
+      "title": "Android bottom sheet",
+      "description": "A native modal bottom sheet with Material geometry, accessible naming and focus restoration.",
+      "registryDependencies": [
+        "https://vlak.dev/r/vlak-base.json",
+        "https://vlak.dev/r/inter.json",
+        "https://vlak.dev/r/dialog.json",
+        "https://vlak.dev/r/icons.json",
+        "https://vlak.dev/r/vlak-lib.json"
+      ],
+      "dependencies": [
+        "@stylexjs/stylex"
+      ],
+      "devDependencies": [
+        "@stylexjs/babel-plugin"
+      ],
+      "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+      "meta": {
+        "vlak": {
+          "category": "android",
+          "classes": [
+            "rs-android-sheet",
+            "rs-android-sheet-open",
+            "rs-android-sheet-handle",
+            "rs-android-sheet-close",
+            "rs-android-sheet-title",
+            "rs-android-sheet-body"
+          ],
+          "snippet": "<dialog class=\"rs-android-sheet\" aria-labelledby=\"android-sheet-title\"><span class=\"rs-android-sheet-handle\" aria-hidden=\"true\"></span><button class=\"rs-android-sheet-close\" type=\"button\" aria-label=\"Close\">×</button><h2 class=\"rs-android-sheet-title\" id=\"android-sheet-title\">Connection settings</h2><p class=\"rs-android-sheet-body\">Choose how this device connects.</p></dialog>",
+          "cssOnly": false,
+          "registryDependencies": [
+            "dialog",
+            "icons",
+            "vlak-lib"
+          ],
+          "aliases": [
+            "Material modal bottom sheet",
+            "Android bottom sheet",
+            "modal sheet"
+          ],
+          "example": "import { AndroidSheet, AndroidSheetTitle, AndroidSheetBody } from \"@noorddev/vlak-react\";\n\n<AndroidSheet open={open} onOpenChange={setOpen}>\n  <AndroidSheetTitle>Connection settings</AndroidSheetTitle>\n  <AndroidSheetBody>Choose how this device connects.</AndroidSheetBody>\n</AndroidSheet>",
+          "usage": {
+            "use": [
+              "Contextual Android controls that temporarily cover the lower screen.",
+              "A focused choice or short task with a clear way to dismiss it."
+            ],
+            "avoid": [
+              "Permanent side navigation or long documents."
+            ]
+          },
+          "keyboard": [
+            {
+              "keys": "Tab or Shift+Tab",
+              "does": "Moves through the modal's controls using native dialog focus containment."
+            },
+            {
+              "keys": "Escape",
+              "does": "Requests dismissal when dismissable is enabled."
+            },
+            {
+              "keys": "Enter or Space",
+              "does": "Activates the focused control."
+            }
+          ],
+          "a11y": [
+            "Native dialog showModal supplies the top layer, inert background and focus containment.",
+            "Title and body parts connect aria-labelledby and aria-describedby automatically.",
+            "Closing returns focus to the connected opener.",
+            "The handle is decorative; this sheet does not promise a drag gesture.",
+            "Supports controlled open state or defaultOpen; onOpenChange reports dismissal."
+          ]
+        }
+      },
+      "files": [
+        {
+          "path": "vlak/android-sheet.tsx",
+          "type": "registry:component",
+          "target": "components/vlak/android-sheet.tsx"
+        },
+        {
+          "path": "vlak/styles/android-sheet.css",
+          "type": "registry:file",
+          "target": "styles/vlak/android-sheet.css"
+        }
+      ]
+    },
+    {
+      "$schema": "https://ui.shadcn.com/schema/registry-item.json",
       "name": "context-usage",
       "type": "registry:component",
       "title": "Context usage",

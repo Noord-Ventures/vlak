@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-fab",
+  "type": "registry:component",
+  "title": "Android floating action button",
+  "description": "A Material floating action button with an optional extended text label.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-fab.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nconst styles = stylex.create({\n\tfab: {\n\t\tappearance: \"none\",\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"inline-flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tgap: 12,\n\t\tminWidth: 56,\n\t\tminHeight: 56,\n\t\tpadding: 15,\n\t\tborderWidth: 1,\n\t\tborderStyle: \"solid\",\n\t\tborderColor: { default: vlak.ink, [mq.forcedColors]: \"ButtonText\" },\n\t\tborderRadius: 16,\n\t\tbackgroundColor: {\n\t\t\tdefault: vlak.ink,\n\t\t\t\":hover\": { default: null, [mq.hover]: vlak.gray },\n\t\t\t[mq.forcedColors]: \"ButtonFace\",\n\t\t},\n\t\tcolor: { default: vlak.paper, [mq.forcedColors]: \"ButtonText\" },\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t\tfontSize: 16,\n\t\tfontWeight: 500,\n\t\tlineHeight: 1.5,\n\t\tcursor: { default: \"pointer\", \":disabled\": \"not-allowed\" },\n\t\topacity: { default: 1, \":disabled\": 0.45 },\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 3,\n\t\ttransition: {\n\t\t\tdefault: \"background-color 240ms cubic-bezier(.2,0,0,1)\",\n\t\t\t[mq.reduce]: \"none\",\n\t\t},\n\t},\n\textended: { paddingInline: 20 },\n\ticon: {\n\t\tdisplay: \"inline-flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tflexShrink: 0,\n\t\twidth: 24,\n\t\theight: 24,\n\t},\n});\nexport interface AndroidFabProps\n\textends React.ButtonHTMLAttributes<HTMLButtonElement> {\n\ticon: React.ReactNode;\n}\nexport const AndroidFab = React.forwardRef<HTMLButtonElement, AndroidFabProps>(\n\tfunction AndroidFab(\n\t\t{ icon, children, className, style, type = \"button\", ...props },\n\t\tref,\n\t) {\n\t\tconst sx = rs(\n\t\t\t[\n\t\t\t\t\"rs-android-fab\",\n\t\t\t\tchildren != null && \"rs-android-fab-extended\",\n\t\t\t\tclassName,\n\t\t\t],\n\t\t\tstyles.fab,\n\t\t\tchildren != null && styles.extended,\n\t\t);\n\t\tconst glyph = rs([\"rs-android-fab-icon\"], styles.icon);\n\t\treturn (\n\t\t\t<button\n\t\t\t\tref={ref}\n\t\t\t\ttype={type}\n\t\t\t\t{...props}\n\t\t\t\tclassName={sx.className}\n\t\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t\t>\n\t\t\t\t<span {...glyph} aria-hidden=\"true\">\n\t\t\t\t\t{icon}\n\t\t\t\t</span>\n\t\t\t\t{children}\n\t\t\t</button>\n\t\t);\n\t},\n);\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-fab.tsx"
+    },
+    {
+      "path": "vlak/styles/android-fab.css",
+      "content": "/* ── android-fab: generated from packages/react/src/components/android-fab.tsx ── */\n.rs-android-fab{appearance:none;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:12px;min-width:56px;min-height:56px;padding:15px;border-width:1px;border-style:solid;border-color:var(--text);border-radius:16px;background-color:var(--text);color:var(--bg);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:16px;font-weight:500;line-height:1.5;cursor:pointer;opacity:1;outline-offset:3px;transition:background-color 240ms cubic-bezier(.2,0,0,1)}\n.rs-android-fab:disabled{cursor:not-allowed;opacity:0.45}\n.rs-android-fab:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n@media (forced-colors: active){.rs-android-fab{border-color:ButtonText;background-color:ButtonFace;color:ButtonText}}\n@media (hover: hover) and (pointer: fine){.rs-android-fab:hover{background-color:var(--text-secondary)}}\n@media (prefers-reduced-motion: reduce){.rs-android-fab{transition:none}}\n.rs-android-fab-extended{padding-inline:20px}\n.rs-android-fab-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:24px;height:24px}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-fab.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-fab",
+        "rs-android-fab-extended",
+        "rs-android-fab-icon"
+      ],
+      "snippet": "<button class=\"rs-android-fab rs-android-fab-extended\" type=\"button\"><span class=\"rs-android-fab-icon\" aria-hidden=\"true\">+</span>New document</button>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material FAB",
+        "Android extended FAB",
+        "floating action button"
+      ],
+      "example": "import { AndroidFab, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidFab icon={<Icon name=\"plus\" size={24} />} onClick={createDocument}>New document</AndroidFab>",
+      "usage": {
+        "use": [
+          "The principal creation action on an Android screen."
+        ],
+        "avoid": [
+          "Several equally prominent actions on one screen."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the enabled action."
+        },
+        {
+          "keys": "Enter or Space",
+          "does": "Activates the action."
+        }
+      ],
+      "a11y": [
+        "Uses a native button with a target of at least 56 pixels.",
+        "Provide aria-label when omitting the visible text label.",
+        "Does not submit a form unless type submit is explicit."
+      ]
+    }
+  }
+}

@@ -33,6 +33,7 @@ export function IOSCalendar({ date, events, onDateChange, onEventsChange, onAnno
   const dialog = React.useRef<HTMLDivElement>(null);
   const returnFocus = React.useRef<HTMLElement | null>(null);
   const restoreFrame = React.useRef(0);
+  const dateFocusFrame = React.useRef(0);
   const activeRef = React.useRef(active);
   activeRef.current = active;
   const timeline = React.useRef<HTMLDivElement>(null);
@@ -63,9 +64,25 @@ export function IOSCalendar({ date, events, onDateChange, onEventsChange, onAnno
   function changeView(next: View) { setView(next); close(); }
   function advance(delta: number) { const d = dateObject(date); if (view === "month") { d.setDate(1); d.setMonth(d.getMonth() + delta); } else d.setDate(d.getDate() + delta * (view === "week" ? 7 : 1)); onDateChange(dateValue(d)); }
   function save(event: React.FormEvent) { event.preventDefault(); if (!draft?.title.trim() || !draft.date || !draft.time) return; const updated = { ...draft, title: draft.title.trim() }; onEventsChange(events.some(item => item.id === draft.id) ? events.map(item => item.id === draft.id ? updated : item) : [...events, updated]); onDateChange(draft.date); setSelectedId(draft.id); onAnnounce("Calendar event saved locally"); setPanel("detail"); }
-  function keyDate(event: React.KeyboardEvent, value: string, onChange = onDateChange) { const steps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7, Home: -dateObject(value).getDay(), End: 6 - dateObject(value).getDay() }; if (!(event.key in steps)) return; event.preventDefault(); const next = moveDays(value, steps[event.key]!); onChange(next); requestAnimationFrame(() => root.current?.querySelector<HTMLButtonElement>(`button[data-date="${next}"]`)?.focus()); }
+  function keyDate(event: React.KeyboardEvent, value: string, onChange = onDateChange) {
+    const steps: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -7, ArrowDown: 7, Home: -dateObject(value).getDay(), End: 6 - dateObject(value).getDay() };
+    if (!(event.key in steps)) return;
+    event.preventDefault();
+    const next = moveDays(value, steps[event.key]!);
+    const scope = event.currentTarget.closest<HTMLElement>(".mo-cal-picker-grid,.mo-cal-month-scroll,.mo-cal-day-strip");
+    const selector = scope?.classList.contains("mo-cal-picker-grid") ? ".mo-cal-picker-grid" : scope?.classList.contains("mo-cal-day-strip") ? ".mo-cal-day-strip" : ".mo-cal-month-scroll";
+    onChange(next);
+    cancelAnimationFrame(dateFocusFrame.current);
+    dateFocusFrame.current = requestAnimationFrame(() => {
+      dateFocusFrame.current = 0;
+      const currentScope = scope?.isConnected ? scope : root.current?.querySelector<HTMLElement>(selector);
+      if (activeRef.current && currentScope?.getClientRects().length && !currentScope.closest("[inert],[hidden]")) currentScope.querySelector<HTMLButtonElement>(`button[data-date="${next}"]`)?.focus();
+    });
+  }
   React.useEffect(() => { if (!active || !panel) return; const frame = requestAnimationFrame(() => (dialog.current?.querySelector<HTMLElement>("[data-initial-focus]") ?? dialog.current?.querySelector<HTMLElement>("button,input,select,textarea"))?.focus()); return () => cancelAnimationFrame(frame); }, [panel, active]);
   React.useEffect(() => { if (!active) cancelAnimationFrame(restoreFrame.current); return () => cancelAnimationFrame(restoreFrame.current); }, [active]);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: changing the panel or picker cancels focus queued for its previous DOM.
+  React.useEffect(() => { if (!active) cancelAnimationFrame(dateFocusFrame.current); return () => cancelAnimationFrame(dateFocusFrame.current); }, [active, panel, datePicker]);
   React.useEffect(() => { if (active && (view === "day" || view === "week")) timeline.current?.scrollTo({ top: 7 * 60 }); }, [view, active]);
   const trapKeys = (event: React.KeyboardEvent) => { if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); close(); } if (event.key === "Tab") { const nodes = [...(dialog.current?.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select,textarea,[tabindex="0"]') ?? [])].filter(node => node.getClientRects().length); const first = nodes[0], last = nodes.at(-1); if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); } else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); } } };
   const sheetTitle = panel === "views" ? "View" : panel === "year" ? String(year) : panel === "search" ? "Search" : panel === "calendars" ? "Calendars" : panel === "inbox" ? "Inbox" : panel === "edit" ? selectedId ? "Edit event" : "New event" : "Event details";

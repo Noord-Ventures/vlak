@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-switch",
+  "type": "registry:component",
+  "title": "Android switch",
+  "description": "A Material switch with a 52-by-32 track and an expanding thumb, built on a native checkbox.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-switch.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { setRef } from \"./merge-refs\";\n\nconst styles = stylex.create({\n\tinput: {\n\t\tappearance: \"none\",\n\t\tboxSizing: \"border-box\",\n\t\tposition: \"relative\",\n\t\tdisplay: \"inline-block\",\n\t\tverticalAlign: \"middle\",\n\t\tflexShrink: 0,\n\t\twidth: 52,\n\t\theight: 48,\n\t\tmargin: 0,\n\t\tpadding: 0,\n\t\tborderWidth: 0,\n\t\tbackgroundColor: \"transparent\",\n\t\tcursor: { default: \"pointer\", \":disabled\": \"not-allowed\" },\n\t\topacity: { default: 1, \":disabled\": 0.45 },\n\t\tborderRadius: 24,\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 2,\n\t\t\"::before\": {\n\t\t\tcontent: '\"\"',\n\t\t\tposition: \"absolute\",\n\t\t\tinset: \"8px 0\",\n\t\t\tborderWidth: 2,\n\t\t\tborderStyle: \"solid\",\n\t\t\tborderColor: {\n\t\t\t\tdefault: vlak.controlBorder,\n\t\t\t\t[mq.forcedColors]: \"ButtonText\",\n\t\t\t},\n\t\t\tborderRadius: 16,\n\t\t\tbackgroundColor: vlak.controlFill,\n\t\t},\n\t\t\"::after\": {\n\t\t\tcontent: '\"\"',\n\t\t\tposition: \"absolute\",\n\t\t\tinsetInlineStart: 8,\n\t\t\ttop: 16,\n\t\t\twidth: 16,\n\t\t\theight: 16,\n\t\t\tborderRadius: \"50%\",\n\t\t\tbackgroundColor: { default: vlak.gray, [mq.forcedColors]: \"ButtonText\" },\n\t\t\ttransition: {\n\t\t\t\tdefault:\n\t\t\t\t\t\"width 240ms cubic-bezier(.2,0,0,1), height 240ms cubic-bezier(.2,0,0,1), inset-inline-start 240ms cubic-bezier(.2,0,0,1), top 240ms cubic-bezier(.2,0,0,1)\",\n\t\t\t\t[mq.reduce]: \"none\",\n\t\t\t},\n\t\t},\n\t},\n\tchecked: {\n\t\t\"::before\": {\n\t\t\tborderColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" },\n\t\t\tbackgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" },\n\t\t},\n\t\t\"::after\": {\n\t\t\tinsetInlineStart: 24,\n\t\t\ttop: 12,\n\t\t\twidth: 24,\n\t\t\theight: 24,\n\t\t\tbackgroundColor: {\n\t\t\t\tdefault: vlak.paper,\n\t\t\t\t[mq.forcedColors]: \"HighlightText\",\n\t\t\t},\n\t\t},\n\t},\n});\nexport interface AndroidSwitchProps\n\textends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"size\"> {\n\tonCheckedChange?: (checked: boolean) => void;\n}\nexport const AndroidSwitch = React.forwardRef<\n\tHTMLInputElement,\n\tAndroidSwitchProps\n>(function AndroidSwitch(\n\t{\n\t\tchecked,\n\t\tdefaultChecked = false,\n\t\tonCheckedChange,\n\t\tonChange,\n\t\tclassName,\n\t\tstyle,\n\t\t...props\n\t},\n\tforwardedRef,\n) {\n\tconst [inner, setInner] = React.useState(defaultChecked);\n\tconst input = React.useRef<HTMLInputElement | null>(null);\n\tconst current = checked ?? inner;\n\tReact.useEffect(() => {\n\t\tconst form = props.form\n\t\t\t? input.current?.ownerDocument.getElementById(props.form)\n\t\t\t: input.current?.form;\n\t\tif (!(form instanceof HTMLFormElement) || checked !== undefined) return;\n\t\tconst reset = (event: Event) =>\n\t\t\tqueueMicrotask(() => {\n\t\t\t\tif (!event.defaultPrevented) setInner(defaultChecked);\n\t\t\t});\n\t\tform.addEventListener(\"reset\", reset);\n\t\treturn () => form.removeEventListener(\"reset\", reset);\n\t}, [checked, defaultChecked, props.form]);\n\tconst sx = rs(\n\t\t[\"rs-android-switch\", current && \"rs-android-switch-checked\", className],\n\t\tstyles.input,\n\t\tcurrent && styles.checked,\n\t);\n\treturn (\n\t\t<input\n\t\t\t{...props}\n\t\t\tref={(node) => {\n\t\t\t\tinput.current = node;\n\t\t\t\tsetRef(forwardedRef, node);\n\t\t\t}}\n\t\t\ttype=\"checkbox\"\n\t\t\trole=\"switch\"\n\t\t\tchecked={current}\n\t\t\taria-checked={current}\n\t\t\tonChange={(event) => {\n\t\t\t\tonChange?.(event);\n\t\t\t\tif (!event.defaultPrevented) {\n\t\t\t\t\tif (checked === undefined) setInner(event.target.checked);\n\t\t\t\t\tonCheckedChange?.(event.target.checked);\n\t\t\t\t}\n\t\t\t}}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t/>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-switch.tsx"
+    },
+    {
+      "path": "vlak/styles/android-switch.css",
+      "content": "/* ── android-switch: generated from packages/react/src/components/android-switch.tsx ── */\n.rs-android-switch{appearance:none;box-sizing:border-box;position:relative;display:inline-block;vertical-align:middle;flex-shrink:0;width:52px;height:48px;margin:0;padding:0;border-width:0;background-color:transparent;cursor:pointer;opacity:1;border-radius:24px;outline-offset:2px}\n.rs-android-switch:disabled{cursor:not-allowed;opacity:0.45}\n.rs-android-switch:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n.rs-android-switch::before{content:\"\";position:absolute;inset:8px 0;border-width:2px;border-style:solid;border-color:var(--control-border);border-radius:16px;background-color:var(--control-fill)}\n.rs-android-switch::after{content:\"\";position:absolute;inset-inline-start:8px;top:16px;width:16px;height:16px;border-radius:50%;background-color:var(--text-secondary);transition:width 240ms cubic-bezier(.2,0,0,1), height 240ms cubic-bezier(.2,0,0,1), inset-inline-start 240ms cubic-bezier(.2,0,0,1), top 240ms cubic-bezier(.2,0,0,1)}\n@media (forced-colors: active){.rs-android-switch::before{border-color:ButtonText}.rs-android-switch::after{background-color:ButtonText}}\n@media (prefers-reduced-motion: reduce){.rs-android-switch::after{transition:none}}\n.rs-android-switch-checked::before{border-color:var(--text);background-color:var(--text)}\n.rs-android-switch-checked::after{inset-inline-start:24px;top:12px;width:24px;height:24px;background-color:var(--bg)}\n@media (forced-colors: active){.rs-android-switch-checked::before{border-color:Highlight;background-color:Highlight}.rs-android-switch-checked::after{background-color:HighlightText}}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-switch.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-switch",
+        "rs-android-switch-checked"
+      ],
+      "snippet": "<label for=\"android-sync\">Background sync</label> <input class=\"rs-android-switch rs-android-switch-checked\" id=\"android-sync\" name=\"sync\" type=\"checkbox\" role=\"switch\" checked aria-checked=\"true\" />",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material switch",
+        "Android toggle",
+        "Expressive switch"
+      ],
+      "example": "import { AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<label htmlFor=\"sync\">Background sync</label>\n<AndroidSwitch id=\"sync\" name=\"sync\" checked={enabled} onCheckedChange={setEnabled} />",
+      "usage": {
+        "use": [
+          "A binary Android preference that takes effect immediately."
+        ],
+        "avoid": [
+          "Selecting one option from a mutually exclusive group."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses the switch when enabled."
+        },
+        {
+          "keys": "Space",
+          "does": "Toggles the switch."
+        }
+      ],
+      "a11y": [
+        "Uses a native checkbox with role switch and a 52-by-48 target.",
+        "Associate a visible label using htmlFor, or provide aria-label.",
+        "Supports native names, values, required state, disabled state and form reset.",
+        "The thumb changes position and size in addition to the filled track."
+      ]
+    }
+  }
+}

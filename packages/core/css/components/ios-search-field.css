@@ -1,0 +1,13 @@
+/* ── ios-search-field: generated from packages/react/src/components/ios-search-field.tsx ── */
+.rs-ios-search-field{display:flex;align-items:center;gap:8px;box-sizing:border-box;min-width:0;min-height:48px;width:100%;padding-inline-start:16px;padding-inline-end:2px;border-radius:24px;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--control-fill);color:var(--text-secondary);outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}
+.rs-ios-search-field:focus-within{outline-width:2px}
+@media (forced-colors: active){.rs-ios-search-field{border-color:ButtonText}}
+.rs-ios-search-field-disabled{opacity:0.45}
+.rs-ios-search-field-symbol{display:inline-flex;flex-shrink:0;pointer-events:none}
+.rs-ios-search-field-input{appearance:none;font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;color:var(--text);width:100%;min-width:0;min-height:44px;flex-grow:1;border-width:0;background-color:transparent;padding-block:10px;padding-inline:0;margin:0;outline-width:0}
+.rs-ios-search-field-input::placeholder{color:var(--text);opacity:1}
+.rs-ios-search-field-input::-webkit-search-cancel-button{appearance:none}
+.rs-ios-search-field-clear{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:44px;min-height:44px;border-radius:22px;border-width:0;padding:0;background-color:transparent;color:var(--text-secondary);cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-3px;transition:background-color 200ms ease}
+.rs-ios-search-field-clear:focus-visible{outline-width:2px}
+@media (hover: hover) and (pointer: fine){.rs-ios-search-field-clear:hover{background-color:var(--bg)}}
+@media (prefers-reduced-motion: reduce){.rs-ios-search-field-clear{transition:none}}

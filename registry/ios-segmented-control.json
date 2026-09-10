@@ -1,0 +1,82 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-segmented-control",
+  "type": "registry:component",
+  "title": "iOS segmented control",
+  "description": "A pill-shaped single choice with a full selected fill, radio semantics and arrow-key selection.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-segmented-control.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface IOSSegmentedControlItem { id: string; label: string; disabled?: boolean }\nexport interface IOSSegmentedControlProps extends Omit<React.HTMLAttributes<HTMLDivElement>, \"defaultValue\" | \"onChange\" | \"children\"> {\n  items: IOSSegmentedControlItem[];\n  value?: string;\n  defaultValue?: string;\n  onValueChange?: (value: string) => void;\n  name?: string;\n  form?: string;\n  disabled?: boolean;\n  label?: string;\n}\nconst styles = stylex.create({\n  root: { display: \"inline-flex\", alignItems: \"stretch\", boxSizing: \"border-box\", gap: 2, padding: 3, minHeight: 50, maxWidth: \"100%\", overflowX: \"auto\", fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\", borderRadius: 25, backgroundColor: vlak.controlFill, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" } },\n  item: { appearance: \"none\", display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", flex: \"1 0 auto\", minWidth: 44, minHeight: 44, boxSizing: \"border-box\", paddingBlock: 10, paddingInline: 16, borderWidth: 0, borderRadius: 22, backgroundColor: { default: \"transparent\", \":hover\": { default: null, [mq.hover]: vlak.paper } }, color: vlak.ink, fontFamily: \"inherit\", fontSize: 15, lineHeight: \"20px\", fontWeight: 500, cursor: \"pointer\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -2, transition: { default: \"background-color 220ms ease, color 220ms ease\", [mq.reduce]: \"none\" } },\n  selected: { color: { default: vlak.ink, [mq.forcedColors]: \"HighlightText\" }, backgroundColor: { default: vlak.paper, [mq.forcedColors]: \"Highlight\" }, fontWeight: 600, forcedColorAdjust: \"none\" },\n  disabled: { opacity: 0.45, cursor: \"not-allowed\" },\n});\n\n/** A mutually exclusive choice with one Tab stop and arrow-key selection. */\nexport const IOSSegmentedControl = React.forwardRef<HTMLDivElement, IOSSegmentedControlProps>(function IOSSegmentedControl({ items, value, defaultValue, onValueChange, name, form, disabled, label = \"View\", className, style, onKeyDown, ...props }, forwardedRef) {\n  const initial = defaultValue ?? items.find(item => !item.disabled)?.id;\n  const [inner, setInner] = React.useState(initial);\n  const rootRef = React.useRef<HTMLDivElement>(null);\n  const ref = useMergedRefs(rootRef, forwardedRef);\n  const controlled = value !== undefined;\n  const current = controlled ? value : inner;\n  const selected = items.find(item => item.id === current && !item.disabled)?.id ?? items.find(item => !item.disabled)?.id;\n  React.useEffect(() => {\n    const owner = form ? document.getElementById(form) : rootRef.current?.closest(\"form\");\n    let mounted = true;\n    const reset = (event: Event) => queueMicrotask(() => { if (mounted && !controlled && !event.defaultPrevented) setInner(initial); });\n    owner?.addEventListener(\"reset\", reset); return () => { mounted = false; owner?.removeEventListener(\"reset\", reset); };\n  }, [controlled, initial, form]);\n  const root = rs([\"rs-ios-segmented-control\", className], styles.root);\n  const change = (next: string) => { if (!controlled) setInner(next); if (next !== selected) onValueChange?.(next); };\n  return <div {...props} ref={ref} role=\"radiogroup\" aria-label={label} aria-disabled={disabled || undefined} className={root.className} style={{ ...root.style, ...style }} onKeyDown={event => {\n    onKeyDown?.(event); if (event.defaultPrevented || disabled || event.altKey || event.ctrlKey || event.metaKey) return;\n    const buttons = [...event.currentTarget.querySelectorAll<HTMLButtonElement>('[role=\"radio\"]:not(:disabled)')];\n    const index = buttons.indexOf(event.target as HTMLButtonElement); if (index < 0) return;\n    const rtl = getComputedStyle(event.currentTarget).direction === \"rtl\";\n    const delta = event.key === \"ArrowDown\" || event.key === (rtl ? \"ArrowLeft\" : \"ArrowRight\") ? 1 : event.key === \"ArrowUp\" || event.key === (rtl ? \"ArrowRight\" : \"ArrowLeft\") ? -1 : 0;\n    const target = event.key === \"Home\" ? 0 : event.key === \"End\" ? buttons.length - 1 : delta ? (index + delta + buttons.length) % buttons.length : -1;\n    if (target < 0) return; event.preventDefault(); const button = buttons[target]!; button.focus(); change(button.dataset.value!);\n  }}>{items.map(item => {\n    const active = item.id === selected;\n    const off = disabled || item.disabled;\n    const segment = rs([\"rs-ios-segmented-control-item\", active && \"rs-ios-segmented-control-selected\", off && \"rs-ios-segmented-control-disabled\"], styles.item, active && styles.selected, off && styles.disabled);\n    return <button {...segment} key={item.id} type=\"button\" role=\"radio\" aria-checked={active} data-value={item.id} disabled={off} tabIndex={active && !off ? 0 : -1} onClick={() => change(item.id)}>{item.label}</button>;\n  })}{name && <input type=\"hidden\" name={name} form={form} value={selected ?? \"\"} disabled={disabled || !selected} />}</div>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-segmented-control.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-segmented-control.css",
+      "content": "/* ── ios-segmented-control: generated from packages/react/src/components/ios-segmented-control.tsx ── */\n.rs-ios-segmented-control{display:inline-flex;align-items:stretch;box-sizing:border-box;gap:2px;padding:3px;min-height:50px;max-width:100%;overflow-x:auto;font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;border-radius:25px;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--control-border)}\n@media (forced-colors: active){.rs-ios-segmented-control{border-color:ButtonText}}\n.rs-ios-segmented-control-item{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex:1 0 auto;min-width:44px;min-height:44px;box-sizing:border-box;padding-block:10px;padding-inline:16px;border-width:0;border-radius:22px;background-color:transparent;color:var(--text);font-family:inherit;font-size:15px;line-height:20px;font-weight:500;cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px;transition:background-color 220ms ease, color 220ms ease}\n.rs-ios-segmented-control-item:focus-visible{outline-width:2px}\n@media (hover: hover) and (pointer: fine){.rs-ios-segmented-control-item:hover{background-color:var(--bg)}}\n@media (prefers-reduced-motion: reduce){.rs-ios-segmented-control-item{transition:none}}\n.rs-ios-segmented-control-selected{color:var(--text);background-color:var(--bg);font-weight:600;forced-color-adjust:none}\n@media (forced-colors: active){.rs-ios-segmented-control-selected{color:HighlightText;background-color:Highlight}}\n.rs-ios-segmented-control-disabled{opacity:0.45;cursor:not-allowed}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-segmented-control.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-segmented-control",
+        "rs-ios-segmented-control-item",
+        "rs-ios-segmented-control-selected",
+        "rs-ios-segmented-control-disabled"
+      ],
+      "snippet": "<div class=\"rs-ios-segmented-control\" role=\"radiogroup\" aria-label=\"Calendar view\"><button class=\"rs-ios-segmented-control-item rs-ios-segmented-control-selected\" role=\"radio\" aria-checked=\"true\" tabindex=\"0\">Day</button><button class=\"rs-ios-segmented-control-item\" role=\"radio\" aria-checked=\"false\" tabindex=\"-1\">Month</button></div>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UISegmentedControl",
+        "iOS segmented picker"
+      ],
+      "example": "import { IOSSegmentedControl } from \"@noorddev/vlak-react\";\n\n<IOSSegmentedControl name=\"view\" label=\"Calendar view\" defaultValue=\"day\" items={[{ id: \"day\", label: \"Day\" }, { id: \"week\", label: \"Week\" }, { id: \"month\", label: \"Month\" }]} />",
+      "usage": {
+        "use": [
+          "A small set of mutually exclusive modes or filters.",
+          "Use name to include the selected value in form data."
+        ],
+        "avoid": [
+          "Navigation among independent application destinations; use the iOS tab bar.",
+          "Many options that require a long horizontal scroll."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Enters or leaves the group through its selected option."
+        },
+        {
+          "keys": "Arrows, Home, End",
+          "does": "Moves and selects enabled options; horizontal arrows respect text direction."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Selects the focused option."
+        }
+      ],
+      "a11y": [
+        "Named radiogroup with one tab stop, explicit checked state and disabled options.",
+        "Native form reset is supported; reduced motion and forced colors retain readable selection."
+      ]
+    }
+  }
+}

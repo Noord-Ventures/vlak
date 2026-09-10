@@ -263,6 +263,33 @@ async function assertIOSAppChrome(phone, app) {
   for (const button of await icons.all()) await assertMobileIconCentered(button);
 }
 
+/** Scrolled app surfaces must retain their visible content on physical leaves. */
+export async function assertMobileFoldScroll({ page, device, selector, activate }) {
+  const root = page.locator(".mo"), target = device.locator(`.mo-device-fit .mo-phone ${selector}`);
+  const original = await target.evaluate(element => ({ top: element.scrollTop, left: element.scrollLeft }));
+  assert(original.top > 0 || original.left > 0, "The snapshot regression exercises a scrolled surface");
+  const expanded = await device.getAttribute("data-posture") === "expanded";
+  await activate(root.getByRole("button", { name: "Inspect fold", exact: true }));
+  await device.locator(".mo-fold-stage").waitFor();
+  const copies = await device.locator(`.mo-fold-presentation .mo-fold-texture ${selector}`).evaluateAll(elements => elements.map(element => ({
+    top: element.scrollTop, left: element.scrollLeft,
+    maxTop: Math.max(0, element.scrollHeight - element.clientHeight), maxLeft: Math.max(0, element.scrollWidth - element.clientWidth),
+  })));
+  assert.equal(copies.length, 3, "Both inner screens and the outer screen include the app surface");
+  for (const copy of copies) {
+    assert(Math.abs(copy.top - Math.min(original.top, copy.maxTop)) < 1, `Fold snapshot retains vertical scroll: ${JSON.stringify({ selector, original, copy })}`);
+    assert(Math.abs(copy.left - Math.min(original.left, copy.maxLeft)) < 1, `Fold snapshot retains horizontal scroll: ${JSON.stringify({ selector, original, copy })}`);
+  }
+  await activate(root.getByRole("button", { name: "Return to app", exact: true }));
+  await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+  if (!expanded) {
+    await activate(root.getByRole("button", { name: "Fold display", exact: true }));
+    await device.locator(".mo-fold-stage").waitFor({ state: "detached" });
+  }
+  const restored = await target.evaluate(element => ({ top: element.scrollTop, left: element.scrollLeft }));
+  assert.deepEqual(restored, original, "Inspection leaves the live app at its original scroll position");
+}
+
 export async function checkIOSCalendar({ page, device, activate }) {
   const root = page.locator(".mo"), phone = device.locator(".mo-device-fit .mo-phone"), calendar = phone.locator(".mo-ios-calendar");
   await calendar.waitFor();
@@ -278,12 +305,27 @@ export async function checkIOSCalendar({ page, device, activate }) {
   await activate(calendar.getByRole("button", { name: "Next day", exact: true }));
   assert.notEqual(await calendar.locator('.mo-cal-day-strip [aria-pressed="true"]').getAttribute("data-date"), selected);
   await activate(calendar.getByRole("button", { name: "Previous day", exact: true }));
+  await calendar.locator(".mo-cal-timeline").evaluate(element => element.scrollTo({ top: 600, behavior: "instant" }));
+  await assertMobileFoldScroll({ page, device, selector: ".mo-cal-timeline", activate });
   await view("List");
+  await view("Month");
   await activate(calendar.getByRole("button", { name: "New event", exact: true }));
   const editor = calendar.getByRole("dialog", { name: "New event", exact: true });
   await editor.getByRole("textbox", { name: "Event title", exact: true }).fill("Local proof review");
   await editor.getByLabel("Event time", { exact: true }).fill("16:15");
   await editor.getByRole("textbox", { name: "Event notes", exact: true }).fill("Keep this draft through both displays.");
+  await activate(editor.getByRole("button", { name: "Event date", exact: true }));
+  const picker = editor.locator(".mo-cal-inline-picker");
+  const initialDate = await picker.locator('button[aria-pressed="true"]').getAttribute("data-date");
+  await picker.locator('button[aria-pressed="true"]').focus();
+  for (let day = 1; day <= 2; day++) {
+    await page.keyboard.press("ArrowRight");
+    const next = new Date(`${initialDate}T12:00:00Z`); next.setUTCDate(next.getUTCDate() + day);
+    const expected = next.toISOString().slice(0, 10);
+    await page.waitForFunction(expected => document.activeElement?.closest(".mo-cal-inline-picker") && document.activeElement.getAttribute("data-date") === expected, expected);
+    assert.equal(await picker.locator('button[aria-pressed="true"]').getAttribute("data-date"), expected, "Each arrow advances the editor date as well as focus");
+  }
+  await activate(editor.getByRole("button", { name: "Event date", exact: true }));
   const date = await editor.getByRole("button", { name: "Event date", exact: true }).textContent();
   const mounted = await calendar.elementHandle();
   for (const action of ["Open display", "Rotate device", "Rotate device", "Fold display"]) {
@@ -328,6 +370,46 @@ export async function checkIOSCalendar({ page, device, activate }) {
   }
 }
 
+/** Due alarms and independent snoozes must never replace another alert. */
+export async function checkIOSAlarmQueue({ page, clock, activate }) {
+  const scheduled = await page.evaluate(() => {
+    const timestamp = Math.floor(Date.now() / 60000) * 60000 + 120000, date = new Date(timestamp);
+    return { timestamp, hour: date.getHours(), minute: date.getMinutes(), day: date.toLocaleDateString("en-US", { weekday: "long" }) };
+  });
+  const labels = ["First simultaneous alarm", "Second simultaneous alarm"];
+  for (const [index, label] of labels.entries()) {
+    await activate(clock.getByRole("button", { name: "New alarm", exact: true }));
+    await clock.getByRole("textbox", { name: "Alarm label", exact: true }).fill(label);
+    for (const [name, value] of [["Alarm hours", scheduled.hour], ["Alarm minutes", scheduled.minute]]) {
+      const wheel = clock.getByRole("listbox", { name, exact: true });
+      await wheel.press("Home"); await wheel.pressSequentially(String(value));
+    }
+    if (index === 1) await clock.getByRole("checkbox", { name: scheduled.day, exact: true }).check();
+    await activate(clock.getByRole("button", { name: "Save alarm", exact: true }));
+  }
+  await page.clock.fastForward(await page.evaluate(timestamp => Math.max(0, timestamp - Date.now()) + 200, scheduled.timestamp));
+  const alert = clock.locator(".mo-ios-clock-alert");
+  await alert.waitFor();
+  assert.equal(await clock.getByRole("switch", { name: `${labels[0]} alarm enabled`, exact: true }).isChecked(), false, "A due one-shot alarm is disabled");
+  assert.equal(await clock.getByRole("switch", { name: `${labels[1]} alarm enabled`, exact: true }).isChecked(), true, "A recurring alarm remains enabled");
+  for (const label of labels) {
+    assert.equal(await alert.locator("strong").textContent(), label, "Every same-minute alarm is presented in order");
+    await activate(alert.getByRole("button", { name: "Snooze 9 minutes", exact: true }));
+  }
+  assert.equal(await alert.count(), 0);
+  await page.clock.fastForward(540200);
+  for (const label of labels) {
+    assert.equal(await alert.locator("strong").textContent(), label, "Each snoozed alarm returns without overwriting another");
+    await activate(alert.getByRole("button", { name: "Dismiss alarm", exact: true }));
+  }
+  await page.clock.fastForward(60200);
+  assert.equal(await alert.count(), 0, "Dismissed alerts are not queued again in a later tick");
+  for (const label of labels) {
+    await activate(clock.getByRole("button", { name: `Edit ${label} alarm`, exact: true }));
+    await activate(clock.getByRole("button", { name: "Delete alarm", exact: true }));
+  }
+}
+
 export async function checkIOSClock({ page, device, activate, launch }) {
   const phone = device.locator(".mo-device-fit .mo-phone"), clock = phone.locator(".mo-ios-clock");
   await clock.waitFor(); await assertIOSAppChrome(phone, "clock");
@@ -338,6 +420,7 @@ export async function checkIOSClock({ page, device, activate, launch }) {
   await secondsWheel.press("Home"); await secondsWheel.hover(); await page.mouse.wheel(0, 88);
   await page.waitForFunction(() => document.querySelector('[role="listbox"][aria-label="Timer seconds"] [aria-selected="true"]')?.textContent === "02");
   assert(await secondsWheel.evaluate(element => Math.abs(element.scrollTop - 88) < 1), "The wheel snaps its selected row to the central band");
+  await assertMobileFoldScroll({ page, device, selector: '.mo-ios-clock-wheel[aria-label="Timer seconds"]', activate });
   await clock.getByRole("listbox", { name: "Timer minutes", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Timer minutes", exact: true }).pressSequentially("0");
   await clock.getByRole("listbox", { name: "Timer seconds", exact: true }).press("Home"); await clock.getByRole("listbox", { name: "Timer seconds", exact: true }).pressSequentially("2");
   await activate(clock.getByRole("button", { name: "Start timer", exact: true }));
@@ -387,6 +470,7 @@ export async function checkIOSClock({ page, device, activate, launch }) {
   assert.equal(await clock.getByRole("checkbox", { name: "Friday", exact: true }).isChecked(), true);
   await activate(clock.getByRole("button", { name: "Delete alarm", exact: true }));
   assert.equal(await clock.getByRole("button", { name: "Edit Proof reminder alarm", exact: true }).count(), 0);
+  await checkIOSAlarmQueue({ page, clock, activate });
   await activate(clock.getByRole("button", { name: "World Clock", exact: true }));
   await activate(clock.getByRole("button", { name: "Add city", exact: true }));
   await clock.getByRole("searchbox", { name: "Search cities", exact: true }).fill("London");

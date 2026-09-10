@@ -1,0 +1,81 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-switch",
+  "type": "registry:component",
+  "title": "iOS switch",
+  "description": "A native checkbox with a 64px pill track, translating thumb and a 44px hit height.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-switch.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { useMergedRefs } from \"./merge-refs\";\n\nexport interface IOSSwitchProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, \"type\" | \"checked\" | \"defaultChecked\" | \"children\"> {\n  checked?: boolean;\n  defaultChecked?: boolean;\n  onCheckedChange?: (checked: boolean) => void;\n}\n\nconst styles = stylex.create({\n  root: { display: \"inline-flex\", position: \"relative\", alignItems: \"center\", width: 64, minWidth: 64, height: 44, minHeight: 44, verticalAlign: \"middle\", flexShrink: 0, borderRadius: 22, outlineWidth: { default: 0, \":focus-within\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: 2 },\n  disabled: { opacity: 0.45 },\n  track: { position: \"absolute\", insetInline: 0, top: 8, height: 28, borderRadius: 14, boxSizing: \"border-box\", borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, backgroundColor: { default: vlak.controlFill, [mq.forcedColors]: \"Canvas\" }, pointerEvents: \"none\", transition: { default: \"background-color 220ms ease\", [mq.reduce]: \"none\" } },\n  on: { backgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, borderColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" }, forcedColorAdjust: \"none\" },\n  thumb: { position: \"absolute\", top: 10, insetInlineStart: 2, height: 24, width: 38, borderRadius: 12, boxSizing: \"border-box\", borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" }, backgroundColor: { default: vlak.paper, [mq.forcedColors]: \"Canvas\" }, pointerEvents: \"none\", transition: { default: \"inset-inline-start 220ms cubic-bezier(.2,.8,.2,1)\", [mq.reduce]: \"none\" } },\n  thumbOn: { insetInlineStart: 24, borderColor: \"transparent\", backgroundColor: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" }, forcedColorAdjust: \"none\" },\n  input: { position: \"absolute\", inset: 0, width: \"100%\", height: \"100%\", margin: 0, opacity: 0, cursor: { default: \"pointer\", \":disabled\": \"not-allowed\" } },\n});\n\n/** The native checkbox owns focus, form submission and Space activation. */\nexport const IOSSwitch = React.forwardRef<HTMLInputElement, IOSSwitchProps>(function IOSSwitch({ checked, defaultChecked = false, onCheckedChange, onChange, disabled, className, style, ...props }, forwardedRef) {\n  const [inner, setInner] = React.useState(defaultChecked);\n  const input = React.useRef<HTMLInputElement>(null);\n  const ref = useMergedRefs(input, forwardedRef);\n  const controlled = checked !== undefined;\n  const on = controlled ? checked : inner;\n  React.useEffect(() => {\n    const form = props.form ? document.getElementById(props.form) : input.current?.form;\n    let mounted = true;\n    const reset = (event: Event) => queueMicrotask(() => { if (mounted && !controlled && !event.defaultPrevented) { if (input.current) input.current.checked = defaultChecked; setInner(defaultChecked); } });\n    form?.addEventListener(\"reset\", reset);\n    return () => { mounted = false; form?.removeEventListener(\"reset\", reset); };\n  }, [controlled, defaultChecked, props.form]);\n  const root = rs([\"rs-ios-switch\", disabled && \"rs-ios-switch-disabled\", className], styles.root, disabled && styles.disabled);\n  const track = rs([\"rs-ios-switch-track\", on && \"rs-ios-switch-on\"], styles.track, on && styles.on);\n  const thumb = rs([\"rs-ios-switch-thumb\", on && \"rs-ios-switch-thumb-on\"], styles.thumb, on && styles.thumbOn);\n  const field = rs([\"rs-ios-switch-input\"], styles.input);\n  return <span className={root.className} style={{ ...root.style, ...style }}><span {...track} aria-hidden=\"true\" /><span {...thumb} aria-hidden=\"true\" /><input {...props} {...field} ref={ref} type=\"checkbox\" role=\"switch\" aria-checked={on} checked={on} disabled={disabled} onChange={(event) => { onChange?.(event); if (event.defaultPrevented) return; if (!controlled) setInner(event.currentTarget.checked); onCheckedChange?.(event.currentTarget.checked); }} /></span>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-switch.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-switch.css",
+      "content": "/* ── ios-switch: generated from packages/react/src/components/ios-switch.tsx ── */\n.rs-ios-switch{display:inline-flex;position:relative;align-items:center;width:64px;min-width:64px;height:44px;min-height:44px;vertical-align:middle;flex-shrink:0;border-radius:22px;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:2px}\n.rs-ios-switch:focus-within{outline-width:2px}\n.rs-ios-switch-disabled{opacity:0.45}\n.rs-ios-switch-track{position:absolute;inset-inline:0;top:8px;height:28px;border-radius:14px;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--control-fill);pointer-events:none;transition:background-color 220ms ease}\n@media (forced-colors: active){.rs-ios-switch-track{border-color:ButtonText;background-color:Canvas}}\n@media (prefers-reduced-motion: reduce){.rs-ios-switch-track{transition:none}}\n.rs-ios-switch-on{background-color:var(--text);border-color:var(--text);forced-color-adjust:none}\n@media (forced-colors: active){.rs-ios-switch-on{background-color:Highlight;border-color:Highlight}}\n.rs-ios-switch-thumb{position:absolute;top:10px;inset-inline-start:2px;height:24px;width:38px;border-radius:12px;box-sizing:border-box;border-width:1px;border-style:solid;border-color:var(--control-border);background-color:var(--bg);pointer-events:none;transition:inset-inline-start 220ms cubic-bezier(.2,.8,.2,1)}\n@media (forced-colors: active){.rs-ios-switch-thumb{border-color:ButtonText;background-color:Canvas}}\n@media (prefers-reduced-motion: reduce){.rs-ios-switch-thumb{transition:none}}\n.rs-ios-switch-thumb-on{inset-inline-start:24px;border-color:transparent;background-color:var(--bg);forced-color-adjust:none}\n@media (forced-colors: active){.rs-ios-switch-thumb-on{background-color:HighlightText}}\n.rs-ios-switch-input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}\n.rs-ios-switch-input:disabled{cursor:not-allowed}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-switch.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-switch",
+        "rs-ios-switch-disabled",
+        "rs-ios-switch-track",
+        "rs-ios-switch-on",
+        "rs-ios-switch-thumb",
+        "rs-ios-switch-thumb-on",
+        "rs-ios-switch-input"
+      ],
+      "snippet": "<span class=\"rs-ios-switch\"><span class=\"rs-ios-switch-track\" aria-hidden=\"true\"></span><span class=\"rs-ios-switch-thumb\" aria-hidden=\"true\"></span><input class=\"rs-ios-switch-input\" type=\"checkbox\" role=\"switch\" aria-label=\"Wi-Fi\" /></span>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UISwitch",
+        "iOS toggle"
+      ],
+      "example": "import { IOSSwitch } from \"@noorddev/vlak-react\";\n\n<IOSSwitch name=\"wifi\" aria-label=\"Wi-Fi\" defaultChecked onCheckedChange={checked => console.log(checked)} />",
+      "usage": {
+        "use": [
+          "An immediately applied on/off preference.",
+          "Associate it with a visible label or an aria-label."
+        ],
+        "avoid": [
+          "A choice among several alternatives; use the iOS segmented control.",
+          "A submit command that needs a button."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves focus to or away from an enabled switch."
+        },
+        {
+          "keys": "Space",
+          "does": "Toggles the native checkbox."
+        }
+      ],
+      "a11y": [
+        "A native checkbox with switch semantics retains form submission, required and disabled behavior.",
+        "Fill and thumb position both communicate state. Reduced motion removes thumb travel; forced colors keeps the boundary visible."
+      ]
+    }
+  }
+}

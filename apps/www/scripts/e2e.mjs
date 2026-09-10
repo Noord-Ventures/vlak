@@ -53,12 +53,38 @@ const browser = await chromium.launch(
     : undefined,
 );
 
+/* Independent page sweeps share three workers; interactive journeys stay serial. */
+async function sweepPages(label, paths, contextOptions, check) {
+  let next = 0;
+  let completed = 0;
+  const results = await Promise.allSettled(Array.from({ length: Math.min(3, paths.length) }, async () => {
+    const context = await browser.newContext(contextOptions);
+    try {
+      const page = await context.newPage();
+      while (next < paths.length) {
+        const path = paths[next++];
+        try {
+          await check(page, path);
+        } catch (error) {
+          fail(`${label} ${path}: ${error instanceof Error ? error.stack : String(error)}`);
+        } finally {
+          completed++;
+          if (completed % 50 === 0 || completed === paths.length) console.log(`${label}: ${completed}/${paths.length} pages checked`);
+        }
+      }
+    } finally {
+      await context.close();
+    }
+  }));
+  const errors = results.filter(result => result.status === "rejected").map(result => result.reason);
+  if (errors.length) throw new AggregateError(errors, `${label}: worker setup or cleanup failed`);
+}
+
 /* axe on every page, desktop. */
 const docs = ["", "frameworks/", "theming/", "tokens/", "layers/", "stylex/", "accessibility/", "health/", "civic/", "science/", "creative/", "engineering/", "geospatial/", "robotics/", "electronics/", "microbiology/", "agents/"].map((d) => `/docs/${d}`);
 const componentPages = catalogComponents.map((component) => `/${component.category === "ai" ? "ai" : "components"}/${component.name}/`);
 const pages = ["/", ...docs, "/components/", "/ai/", "/ai/widgets/", "/about/", "/interfaces/", "/interfaces/evening/", "/interfaces/microscopy/", ...componentPages];
-const desk = await browser.newPage({ viewport: { width: 1280, height: 900 } });
-for (const path of pages) {
+await sweepPages("Desktop axe", pages, { viewport: { width: 1280, height: 900 } }, async (desk, path) => {
   const errors = [];
   const collectError = error => errors.push(error.message);
   desk.on("pageerror", collectError);
@@ -79,9 +105,10 @@ for (const path of pages) {
     desk.off("pageerror", collectError);
     for (const error of errors) fail(`${path}: page error ${error}`);
   }
-}
+});
 
 /* Skip link. */
+const desk = await browser.newPage({ viewport: { width: 1280, height: 900 } });
 await desk.goto(`${base}/components/dialog/`, { waitUntil: "networkidle" });
 await desk.keyboard.press("Tab");
 if ((await desk.evaluate(() => document.activeElement?.className)) !== "skip-link") fail("skip link is not the first tab stop");
@@ -164,12 +191,13 @@ if (kanbanCards.length !== 3 || kanbanCards.some(card => card.leftOffset > 1 || 
 await desk.close();
 
 /* Phone. */
-const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-for (const path of ["/", "/docs/", "/components/", "/ai/", "/ai/widgets/", "/about/", "/interfaces/evening/", ...componentPages]) {
+const phonePages = ["/", "/docs/", "/components/", "/ai/", "/ai/widgets/", "/about/", "/interfaces/evening/", ...componentPages];
+await sweepPages("Phone overflow", phonePages, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }, async (phone, path) => {
   await phone.goto(base + path, { waitUntil: "networkidle" });
   const overflow = await phone.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   if (overflow > 0) fail(`${path}: horizontal overflow of ${overflow}px at 390px`);
-}
+});
+const phone = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
 await phone.goto(`${base}/components/switch/`, { waitUntil: "networkidle" });
 const breadcrumbSpacing = await phone.evaluate(() => {
   const trail = document.querySelector(".site-crumb-bar .rs-crumbs");

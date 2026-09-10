@@ -1,0 +1,11 @@
+/* ── android-search-bar: generated from packages/react/src/components/android-search-bar.tsx ── */
+.rs-android-search-bar{width:100%;max-width:100%;box-sizing:border-box;display:flex;align-items:center;gap:8px;min-height:56px;min-width:0;padding-inline:12px;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:28px;background-color:var(--control-fill);color:var(--text)}
+.rs-android-search-icon{display:flex;align-items:center;justify-content:center;flex-shrink:0;width:24px;height:24px;margin-inline:4px}
+.rs-android-search-input{appearance:none;box-sizing:border-box;flex:1 1 0%;width:0;min-width:44px;min-height:48px;padding:8px 0;margin:0;border-width:0;border-radius:4px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:16px;line-height:1.5;outline-offset:0}
+.rs-android-search-input:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}
+.rs-android-search-input::placeholder{color:var(--text);opacity:1}
+.rs-android-search-input::-webkit-search-cancel-button{appearance:none}
+.rs-android-search-clear{appearance:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;margin-inline-end:-6px;padding:0;border-width:0;border-radius:50%;background-color:transparent;color:var(--text);cursor:pointer;outline-offset:0}
+.rs-android-search-clear:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}
+@media (hover: hover) and (pointer: fine){.rs-android-search-clear:hover{background-color:var(--control-fill)}}
+.rs-android-search-bar-disabled{opacity:0.45}

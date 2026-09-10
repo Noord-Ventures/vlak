@@ -235,6 +235,15 @@ export function useNativeDialog(
     [base, register],
   );
 
+  const restoreFocus = React.useCallback((dialog: HTMLDialogElement) => {
+    const previous = restoreTo.current;
+    restoreTo.current = null;
+    const active = document.activeElement;
+    if (previous instanceof HTMLElement && previous.isConnected && (active === document.body || dialog.contains(active))) {
+      previous.focus();
+    }
+  }, []);
+
   React.useEffect(() => {
     openRef.current = open;
     const dialog = ref.current;
@@ -252,13 +261,22 @@ export function useNativeDialog(
       return;
     }
     if (dialog.open) dialog.close();
-    const previous = restoreTo.current;
-    restoreTo.current = null;
-    const active = document.activeElement;
-    if (previous instanceof HTMLElement && previous.isConnected && (active === document.body || dialog.contains(active))) {
-      previous.focus();
-    }
-  }, [open]);
+    restoreFocus(dialog);
+  }, [open, restoreFocus]);
+
+  React.useEffect(() => {
+    // Capture the node now: React clears the forwarded ref before unmount cleanup.
+    const dialog = ref.current;
+    return () => {
+      openRef.current = false;
+      if (!dialog) return;
+      if (dialog.open) {
+        if (typeof dialog.close === "function") dialog.close();
+        else dialog.open = false;
+      }
+      restoreFocus(dialog);
+    };
+  }, [restoreFocus]);
 
   const closedBy = !dismissable ? "none" : lightDismiss ? "any" : "closerequest";
 
@@ -273,7 +291,9 @@ export function useNativeDialog(
   const onNativeClose = () => {
     // Closed by the platform (a forced close request, a method="dialog"
     // form) while the parent still says open: tell it.
-    if (openRef.current) onClose?.();
+    // A close event is queued by the browser. A newer open (including Strict
+    // Mode's effect replay) must not be dismissed by the previous close event.
+    if (openRef.current && !ref.current?.open) onClose?.();
   };
 
   const labelledBy = props["aria-labelledby"] ?? (props["aria-label"] ? undefined : parts.title);

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "ios-navigation-bar",
+  "type": "registry:component",
+  "title": "iOS navigation bar",
+  "description": "Compact or large-title navigation with circular actions and an optional vertical rail.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/ios-navigation-bar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Icon } from \"./icons\";\n\nexport interface IOSNavigationBarAction extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, \"children\"> {\n  id: string;\n  label: string;\n  icon?: React.ReactNode;\n  /** Explicit DOM ID when another element needs to reference this action. */\n  buttonId?: string;\n}\nexport interface IOSNavigationBarProps extends Omit<React.HTMLAttributes<HTMLElement>, \"title\" | \"children\"> {\n  title: React.ReactNode;\n  onBack?: () => void;\n  backLabel?: string;\n  actions?: IOSNavigationBarAction[];\n  orientation?: \"horizontal\" | \"vertical\";\n  largeTitle?: boolean;\n}\nconst styles = stylex.create({\n  root: { boxSizing: \"border-box\", fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\", color: vlak.ink, minWidth: 0, padding: 8 },\n  vertical: { display: \"flex\", alignItems: \"flex-start\", justifyContent: \"space-between\", gap: 16, padding: 0 },\n  row: { display: \"grid\", gridTemplateColumns: \"minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr)\", gap: 8, alignItems: \"center\", minHeight: 54 },\n  leading: { justifySelf: \"start\" },\n  actions: { display: \"inline-flex\", alignItems: \"center\", gap: 2, padding: 3, borderRadius: 27, justifySelf: \"end\", backgroundColor: vlak.controlFill, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" } },\n  rail: { display: \"flex\", flexDirection: \"column\", alignItems: \"center\", gap: 12, flexShrink: 0 },\n  verticalActions: { flexDirection: \"column\" },\n  button: { appearance: \"none\", display: \"inline-flex\", alignItems: \"center\", justifyContent: \"center\", gap: 6, boxSizing: \"border-box\", minWidth: 44, minHeight: 44, paddingBlock: 10, paddingInline: 12, borderWidth: 0, borderRadius: 22, backgroundColor: { default: \"transparent\", \":hover\": { default: null, [mq.hover]: vlak.paper } }, color: vlak.ink, fontFamily: \"Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif\", fontSize: 17, lineHeight: \"22px\", cursor: \"pointer\", outlineWidth: { default: 0, \":focus-visible\": 2 }, outlineStyle: \"solid\", outlineColor: vlak.ink, outlineOffset: -2, transition: { default: \"background-color 200ms ease\", [mq.reduce]: \"none\" } },\n  iconButton: { width: 44, padding: 0 },\n  back: { minWidth: 48, minHeight: 48, width: 48, borderRadius: 24, padding: 0, backgroundColor: vlak.controlFill, borderWidth: 1, borderStyle: \"solid\", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: \"ButtonText\" } },\n  disabled: { opacity: 0.45, cursor: \"not-allowed\" },\n  title: { margin: 0, textAlign: \"center\", fontSize: 17, lineHeight: \"22px\", fontWeight: 600, overflowWrap: \"anywhere\" },\n  large: { marginBlock: \"10px 4px\", marginInline: 8, fontSize: 34, lineHeight: \"41px\", letterSpacing: \"-0.035em\", textAlign: \"start\", fontWeight: 700 },\n  verticalTitle: { textAlign: \"start\", fontSize: 28, lineHeight: \"34px\", fontWeight: 700, marginBlock: 8, marginInline: 0 },\n});\n\n/** Compact and large-title navigation, with an optional trailing Duo action rail. */\nexport const IOSNavigationBar = React.forwardRef<HTMLElement, IOSNavigationBarProps>(function IOSNavigationBar({ title, onBack, backLabel = \"Back\", actions = [], orientation = \"horizontal\", largeTitle = false, className, style, ...props }, ref) {\n  const vertical = orientation === \"vertical\";\n  const base = React.useId();\n  const root = rs([\"rs-ios-navigation-bar\", vertical && \"rs-ios-navigation-bar-vertical\", className], styles.root, vertical && styles.vertical);\n  const row = rs([\"rs-ios-navigation-bar-row\"], styles.row);\n  const leading = rs([\"rs-ios-navigation-bar-leading\"], styles.leading);\n  const rail = rs([\"rs-ios-navigation-bar-rail\"], styles.rail);\n  const group = rs([\"rs-ios-navigation-bar-actions\", vertical && \"rs-ios-navigation-bar-actions-vertical\"], styles.actions, vertical && styles.verticalActions);\n  const heading = rs([\"rs-ios-navigation-bar-title\", largeTitle && \"rs-ios-navigation-bar-large-title\", vertical && \"rs-ios-navigation-bar-vertical-title\"], styles.title, largeTitle && styles.large, vertical && styles.verticalTitle);\n  const backStyle = rs([\"rs-ios-navigation-bar-button\", \"rs-ios-navigation-bar-back\"], styles.button, styles.back);\n  const back = onBack && <button {...backStyle} type=\"button\" aria-label={backLabel} onClick={onBack}><Icon name=\"chevron-left\" size={24} /></button>;\n  const actionGroup = actions.length > 0 && <div {...group}>{actions.map(({ id, label, icon, buttonId, type = \"button\", className: actionClass, style: actionStyle, disabled, ...buttonProps }) => {\n    const action = rs([\"rs-ios-navigation-bar-button\", !!icon && \"rs-ios-navigation-bar-icon-button\", disabled && \"rs-ios-navigation-bar-disabled\", actionClass], styles.button, !!icon && styles.iconButton, disabled && styles.disabled);\n    return <button {...buttonProps} key={id} id={buttonId ?? `${base}-${id}`} type={type} disabled={disabled} aria-label={icon ? label : undefined} className={action.className} style={{ ...action.style, ...actionStyle }}>{icon ? <span aria-hidden=\"true\">{icon}</span> : label}</button>;\n  })}</div>;\n  return <header ref={ref} {...props} className={root.className} style={{ ...root.style, ...style }}>{vertical ? <><h2 {...heading}>{title}</h2><div {...rail}>{back}{actionGroup}</div></> : <><div {...row}><div {...leading}>{back}</div>{largeTitle ? <span /> : <h2 {...heading}>{title}</h2>}{actionGroup || <span />}</div>{largeTitle && <h2 {...heading}>{title}</h2>}</>}</header>;\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/ios-navigation-bar.tsx"
+    },
+    {
+      "path": "vlak/styles/ios-navigation-bar.css",
+      "content": "/* ── ios-navigation-bar: generated from packages/react/src/components/ios-navigation-bar.tsx ── */\n.rs-ios-navigation-bar{box-sizing:border-box;font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;color:var(--text);min-width:0;padding:8px}\n.rs-ios-navigation-bar-vertical{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:0}\n.rs-ios-navigation-bar-row{display:grid;grid-template-columns:minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr);gap:8px;align-items:center;min-height:54px}\n.rs-ios-navigation-bar-leading{justify-self:start}\n.rs-ios-navigation-bar-actions{display:inline-flex;align-items:center;gap:2px;padding:3px;border-radius:27px;justify-self:end;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--control-border)}\n@media (forced-colors: active){.rs-ios-navigation-bar-actions{border-color:ButtonText}}\n.rs-ios-navigation-bar-rail{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0}\n.rs-ios-navigation-bar-actions-vertical{flex-direction:column}\n.rs-ios-navigation-bar-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;min-width:44px;min-height:44px;padding-block:10px;padding-inline:12px;border-width:0;border-radius:22px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px;transition:background-color 200ms ease}\n.rs-ios-navigation-bar-button:focus-visible{outline-width:2px}\n@media (hover: hover) and (pointer: fine){.rs-ios-navigation-bar-button:hover{background-color:var(--bg)}}\n@media (prefers-reduced-motion: reduce){.rs-ios-navigation-bar-button{transition:none}}\n.rs-ios-navigation-bar-icon-button{width:44px;padding:0}\n.rs-ios-navigation-bar-back{min-width:48px;min-height:48px;width:48px;border-radius:24px;padding:0;background-color:var(--control-fill);border-width:1px;border-style:solid;border-color:var(--control-border)}\n@media (forced-colors: active){.rs-ios-navigation-bar-back{border-color:ButtonText}}\n.rs-ios-navigation-bar-disabled{opacity:0.45;cursor:not-allowed}\n.rs-ios-navigation-bar-title{margin:0;text-align:center;font-size:17px;line-height:22px;font-weight:600;overflow-wrap:anywhere}\n.rs-ios-navigation-bar-large-title{margin-block:10px 4px;margin-inline:8px;font-size:34px;line-height:41px;letter-spacing:-0.035em;text-align:start;font-weight:700}\n.rs-ios-navigation-bar-vertical-title{text-align:start;font-size:28px;line-height:34px;font-weight:700;margin-block:8px;margin-inline:0}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/ios-navigation-bar.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "ios",
+      "classes": [
+        "rs-ios-navigation-bar",
+        "rs-ios-navigation-bar-vertical",
+        "rs-ios-navigation-bar-row",
+        "rs-ios-navigation-bar-leading",
+        "rs-ios-navigation-bar-rail",
+        "rs-ios-navigation-bar-actions",
+        "rs-ios-navigation-bar-actions-vertical",
+        "rs-ios-navigation-bar-title",
+        "rs-ios-navigation-bar-large-title",
+        "rs-ios-navigation-bar-vertical-title",
+        "rs-ios-navigation-bar-button",
+        "rs-ios-navigation-bar-back",
+        "rs-ios-navigation-bar-icon-button",
+        "rs-ios-navigation-bar-disabled"
+      ],
+      "snippet": "<header class=\"rs-ios-navigation-bar\"><div class=\"rs-ios-navigation-bar-row\"><button class=\"rs-ios-navigation-bar-button rs-ios-navigation-bar-back\" type=\"button\" aria-label=\"Back\">←</button><h2 class=\"rs-ios-navigation-bar-title\">Notes</h2><div class=\"rs-ios-navigation-bar-actions\"><button class=\"rs-ios-navigation-bar-button\" type=\"button\">Done</button></div></div></header>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "UIKit navigation bar",
+        "UINavigationBar",
+        "iOS toolbar",
+        "Duo vertical toolbar"
+      ],
+      "example": "import { IOSNavigationBar } from \"@noorddev/vlak-react\";\n\n<IOSNavigationBar title=\"Notes\" onBack={() => history.back()} actions={[{ id: \"done\", label: \"Done\", type: \"submit\", form: \"note-editor\" }]} />",
+      "usage": {
+        "use": [
+          "A compact app title, a large root-screen title, or a trailing vertical action rail.",
+          "Pass native button properties to actions, including disabled, form and type."
+        ],
+        "avoid": [
+          "Primary destination switching; use the iOS tab bar.",
+          "More actions than fit comfortably in the available width."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab, Shift+Tab",
+          "does": "Moves through enabled Back and action buttons."
+        },
+        {
+          "keys": "Enter, Space",
+          "does": "Activates a focused action with native button behavior."
+        }
+      ],
+      "a11y": [
+        "Back and icon actions have accessible labels. Each target is at least 44px.",
+        "Instance-scoped action IDs avoid collisions; buttonId permits explicit references."
+      ]
+    }
+  }
+}

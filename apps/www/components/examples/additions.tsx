@@ -3,6 +3,22 @@
 import dynamic from "next/dynamic";
 
 import type { ComponentType } from "react";
+import { Use as IOSNavigationBar } from "./ios-navigation-bar/use";
+import { Use as IOSTabBar } from "./ios-tab-bar/use";
+import { Use as IOSSearchField } from "./ios-search-field/use";
+import { Use as IOSSwitch } from "./ios-switch/use";
+import { Use as IOSList } from "./ios-list/use";
+import { Use as IOSSegmentedControl } from "./ios-segmented-control/use";
+import { Use as IOSSlider } from "./ios-slider/use";
+import { Use as IOSSheet } from "./ios-sheet/use";
+import { Use as AndroidAppBar } from "./android-app-bar/use";
+import { Use as AndroidNavigation } from "./android-navigation/use";
+import { Use as AndroidSearchBar } from "./android-search-bar/use";
+import { Use as AndroidSwitch } from "./android-switch/use";
+import { Use as AndroidList } from "./android-list/use";
+import { Use as AndroidChip } from "./android-chip/use";
+import { Use as AndroidFab } from "./android-fab/use";
+import { Use as AndroidSheet } from "./android-sheet/use";
 import { Use as AiOpenInChat } from "./open-in-chat/use";
 import { Use as AiInlineCitation } from "./inline-citation/use";
 import { Use as AiSources } from "./sources/use";
@@ -144,6 +160,22 @@ import { Use as PropertyGrid } from "./property-grid/use";
 
 /** Contextual examples for In action. Never use these as raw previews. */
 export const additions: Record<string, ComponentType> = {
+  "ios-navigation-bar": IOSNavigationBar,
+  "ios-tab-bar": IOSTabBar,
+  "ios-search-field": IOSSearchField,
+  "ios-switch": IOSSwitch,
+  "ios-list": IOSList,
+  "ios-segmented-control": IOSSegmentedControl,
+  "ios-slider": IOSSlider,
+  "ios-sheet": IOSSheet,
+  "android-app-bar": AndroidAppBar,
+  "android-navigation": AndroidNavigation,
+  "android-search-bar": AndroidSearchBar,
+  "android-switch": AndroidSwitch,
+  "android-list": AndroidList,
+  "android-chip": AndroidChip,
+  "android-fab": AndroidFab,
+  "android-sheet": AndroidSheet,
   "jsx-preview": dynamic(() => import("./jsx-preview/use").then(module => module.Use)),
   "open-in-chat": AiOpenInChat,
   "inline-citation": AiInlineCitation,

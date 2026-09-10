@@ -1,0 +1,85 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-app-bar",
+  "type": "registry:component",
+  "title": "Android app bar",
+  "description": "A Material app bar with a title, navigation action and trailing actions in Vlak tones.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-app-bar.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\n\nconst styles = stylex.create({\n\tbar: {\n\t\tboxSizing: \"border-box\",\n\t\tdisplay: \"grid\",\n\t\tgridTemplateColumns: \"auto minmax(0, 1fr) auto\",\n\t\talignItems: \"center\",\n\t\tcolumnGap: 8,\n\t\tminHeight: 64,\n\t\tpaddingInline: 16,\n\t\tpaddingBlock: 8,\n\t\tbackgroundColor: vlak.paper,\n\t\tcolor: vlak.ink,\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t},\n\tmedium: { minHeight: 112, alignItems: \"start\", rowGap: 8 },\n\ttitle: {\n\t\tgridRow: 1,\n\t\tminWidth: 0,\n\t\tmargin: 0,\n\t\tfontSize: 22,\n\t\tfontWeight: 500,\n\t\tlineHeight: 1.3,\n\t\toverflowWrap: \"anywhere\",\n\t},\n\tleadingTitle: { gridColumn: \"1 / 3\" },\n\tmediumTitle: {\n\t\tgridColumn: \"1 / -1\",\n\t\tgridRow: 2,\n\t\tfontSize: 28,\n\t\tpaddingBottom: 8,\n\t},\n\tnavigation: {\n\t\tgridColumn: 1,\n\t\tgridRow: 1,\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tminHeight: 48,\n\t},\n\tactions: {\n\t\tgridColumn: 3,\n\t\tgridRow: 1,\n\t\tdisplay: \"flex\",\n\t\talignItems: \"center\",\n\t\tflexWrap: \"wrap\",\n\t\tjustifyContent: \"end\",\n\t\tgap: 4,\n\t},\n\taction: {\n\t\tappearance: \"none\",\n\t\tdisplay: \"inline-flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tflexShrink: 0,\n\t\twidth: 48,\n\t\theight: 48,\n\t\tpadding: 12,\n\t\tborderWidth: 0,\n\t\tborderRadius: \"50%\",\n\t\tcolor: vlak.ink,\n\t\tbackgroundColor: {\n\t\t\tdefault: \"transparent\",\n\t\t\t\":hover\": { default: null, [mq.hover]: vlak.controlFill },\n\t\t},\n\t\tcursor: { default: \"pointer\", \":disabled\": \"not-allowed\" },\n\t\topacity: { default: 1, \":disabled\": 0.45 },\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 2,\n\t},\n});\n\nexport interface AndroidAppBarProps\n\textends Omit<React.HTMLAttributes<HTMLElement>, \"title\"> {\n\ttitle: React.ReactNode;\n\tnavigation?: React.ReactNode;\n\tactions?: React.ReactNode;\n\tvariant?: \"small\" | \"medium\";\n}\n\nexport const AndroidAppBar = React.forwardRef<HTMLElement, AndroidAppBarProps>(\n\tfunction AndroidAppBar(\n\t\t{\n\t\t\ttitle,\n\t\t\tnavigation,\n\t\t\tactions,\n\t\t\tvariant = \"small\",\n\t\t\tclassName,\n\t\t\tstyle,\n\t\t\tchildren,\n\t\t\t...props\n\t\t},\n\t\tref,\n\t) {\n\t\tconst medium = variant === \"medium\";\n\t\tconst sx = rs(\n\t\t\t[\"rs-android-app-bar\", medium && \"rs-android-app-bar-medium\", className],\n\t\t\tstyles.bar,\n\t\t\tmedium && styles.medium,\n\t\t);\n\t\tconst nav = rs([\"rs-android-app-bar-navigation\"], styles.navigation);\n\t\tconst heading = rs(\n\t\t\t[\n\t\t\t\t\"rs-android-app-bar-title\",\n\t\t\t\t!navigation && !medium && \"rs-android-app-bar-leading-title\",\n\t\t\t\tmedium && \"rs-android-app-bar-medium-title\",\n\t\t\t],\n\t\t\tstyles.title,\n\t\t\t!navigation && !medium && styles.leadingTitle,\n\t\t\tmedium && styles.mediumTitle,\n\t\t);\n\t\tconst action = rs([\"rs-android-app-bar-actions\"], styles.actions);\n\t\treturn (\n\t\t\t<header\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t\tclassName={sx.className}\n\t\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t\t>\n\t\t\t\t<div {...nav}>{navigation}</div>\n\t\t\t\t<h2 {...heading}>{title}</h2>\n\t\t\t\t<div {...action}>{actions}</div>\n\t\t\t\t{children}\n\t\t\t</header>\n\t\t);\n\t},\n);\n\nexport const AndroidAppBarAction = React.forwardRef<\n\tHTMLButtonElement,\n\tReact.ButtonHTMLAttributes<HTMLButtonElement>\n>(function AndroidAppBarAction(\n\t{ className, style, type = \"button\", ...props },\n\tref,\n) {\n\tconst sx = rs([\"rs-android-app-bar-action\", className], styles.action);\n\treturn (\n\t\t<button\n\t\t\tref={ref}\n\t\t\ttype={type}\n\t\t\t{...props}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t/>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-app-bar.tsx"
+    },
+    {
+      "path": "vlak/styles/android-app-bar.css",
+      "content": "/* ── android-app-bar: generated from packages/react/src/components/android-app-bar.tsx ── */\n.rs-android-app-bar{box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0, 1fr) auto;align-items:center;column-gap:8px;min-height:64px;padding-inline:16px;padding-block:8px;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif}\n.rs-android-app-bar-medium{min-height:112px;align-items:start;row-gap:8px}\n.rs-android-app-bar-title{grid-row:1;min-width:0;margin:0;font-size:22px;font-weight:500;line-height:1.3;overflow-wrap:anywhere}\n.rs-android-app-bar-leading-title{grid-column:1 / 3}\n.rs-android-app-bar-medium-title{grid-column:1 / -1;grid-row:2;font-size:28px;padding-bottom:8px}\n.rs-android-app-bar-navigation{grid-column:1;grid-row:1;display:flex;align-items:center;min-height:48px}\n.rs-android-app-bar-actions{grid-column:3;grid-row:1;display:flex;align-items:center;flex-wrap:wrap;justify-content:end;gap:4px}\n.rs-android-app-bar-action{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:48px;height:48px;padding:12px;border-width:0;border-radius:50%;color:var(--text);background-color:transparent;cursor:pointer;opacity:1;outline-offset:2px}\n.rs-android-app-bar-action:disabled{cursor:not-allowed;opacity:0.45}\n.rs-android-app-bar-action:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n@media (hover: hover) and (pointer: fine){.rs-android-app-bar-action:hover{background-color:var(--control-fill)}}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-app-bar.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-app-bar",
+        "rs-android-app-bar-medium",
+        "rs-android-app-bar-navigation",
+        "rs-android-app-bar-title",
+        "rs-android-app-bar-leading-title",
+        "rs-android-app-bar-medium-title",
+        "rs-android-app-bar-actions",
+        "rs-android-app-bar-action"
+      ],
+      "snippet": "<header class=\"rs-android-app-bar\"><div class=\"rs-android-app-bar-navigation\"><button class=\"rs-android-app-bar-action\" type=\"button\" aria-label=\"Go back\">←</button></div><h2 class=\"rs-android-app-bar-title\">Documents</h2><div class=\"rs-android-app-bar-actions\"><button class=\"rs-android-app-bar-action\" type=\"button\" aria-label=\"More actions\">⋯</button></div></header>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material top app bar",
+        "Android toolbar",
+        "center-aligned top app bar"
+      ],
+      "example": "import { AndroidAppBar, AndroidAppBarAction, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidAppBar title=\"Documents\" navigation={<AndroidAppBarAction aria-label=\"Go back\" onClick={goBack}><Icon name=\"arrow-left\" /></AndroidAppBarAction>} />",
+      "usage": {
+        "use": [
+          "Top-level Android screens with a title and a small set of actions.",
+          "A medium app bar when the screen needs a larger title."
+        ],
+        "avoid": [
+          "Page navigation with more destinations than fit in an app bar."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Moves between enabled actions."
+        },
+        {
+          "keys": "Enter or Space",
+          "does": "Activates the focused action."
+        }
+      ],
+      "a11y": [
+        "Uses a native header and a level-two heading.",
+        "Label icon-only actions with aria-label.",
+        "Action buttons keep a 48-pixel target and a visible keyboard focus indicator."
+      ]
+    }
+  }
+}

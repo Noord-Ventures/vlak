@@ -1,0 +1,91 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-sheet",
+  "type": "registry:component",
+  "title": "Android bottom sheet",
+  "description": "A native modal bottom sheet with Material geometry, accessible naming and focus restoration.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/dialog.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-sheet.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { DialogContext, useDialogPart, useNativeDialog } from \"./dialog\";\nimport { Icon } from \"./icons\";\n\nconst enter = stylex.keyframes({\n\tfrom: { transform: \"translateY(32px)\", opacity: 0 },\n\tto: { transform: \"translateY(0)\", opacity: 1 },\n});\n\nconst styles = stylex.create({\n\topen: {\n\t\tanimationName: { default: enter, [mq.reduce]: \"none\" },\n\t\tanimationDuration: \"280ms\",\n\t\tanimationTimingFunction: \"cubic-bezier(.2,0,0,1)\",\n\t},\n\tsheet: {\n\t\tboxSizing: \"border-box\",\n\t\tposition: \"fixed\",\n\t\tinsetInline: 0,\n\t\ttop: \"auto\",\n\t\tbottom: 0,\n\t\twidth: \"min(640px, 100%)\",\n\t\tmaxWidth: \"100%\",\n\t\tmaxHeight: \"90dvh\",\n\t\tmargin: \"0 auto\",\n\t\tpadding: \"28px 24px max(24px, env(safe-area-inset-bottom))\",\n\t\toverflowY: \"auto\",\n\t\toverscrollBehavior: \"contain\",\n\t\tborderWidth: 1,\n\t\tborderStyle: \"solid\",\n\t\tborderColor: vlak.divider,\n\t\tborderBottomWidth: 0,\n\t\tborderRadius: \"28px 28px 0 0\",\n\t\tbackgroundColor: vlak.paper,\n\t\tcolor: vlak.ink,\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t\tboxShadow: \"none\",\n\t\t\"::backdrop\": {\n\t\t\tbackgroundColor: [\n\t\t\t\t\"rgba(0,0,0,.32)\",\n\t\t\t\t`color-mix(in srgb, ${vlak.ink} 32%, transparent)`,\n\t\t\t],\n\t\t},\n\t},\n\thandle: {\n\t\tposition: \"absolute\",\n\t\ttop: 12,\n\t\tinsetInlineStart: \"calc(50% - 16px)\",\n\t\twidth: 32,\n\t\theight: 4,\n\t\tborderRadius: 2,\n\t\tbackgroundColor: { default: vlak.gray, [mq.forcedColors]: \"CanvasText\" },\n\t},\n\tclose: {\n\t\tappearance: \"none\",\n\t\tfloat: \"inline-end\",\n\t\tdisplay: \"inline-flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\twidth: 48,\n\t\theight: 48,\n\t\tmargin: \"-4px -12px 4px 8px\",\n\t\tpadding: 12,\n\t\tborderWidth: 0,\n\t\tborderRadius: \"50%\",\n\t\tcolor: vlak.ink,\n\t\tbackgroundColor: {\n\t\t\tdefault: \"transparent\",\n\t\t\t\":hover\": { default: null, [mq.hover]: vlak.controlFill },\n\t\t},\n\t\tcursor: \"pointer\",\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 0,\n\t},\n\ttitle: {\n\t\tmargin: \"8px 0 16px\",\n\t\tfontSize: 24,\n\t\tfontWeight: 500,\n\t\tlineHeight: 1.3,\n\t\toverflowWrap: \"anywhere\",\n\t},\n\tbody: {\n\t\tmargin: \"0 0 24px\",\n\t\tfontSize: 16,\n\t\tlineHeight: 1.5,\n\t\tcolor: vlak.gray,\n\t\toverflowWrap: \"anywhere\",\n\t},\n});\nexport interface AndroidSheetProps\n\textends Omit<\n\t\tReact.DialogHTMLAttributes<HTMLDialogElement>,\n\t\t\"open\" | \"onClose\"\n\t> {\n\topen?: boolean;\n\tdefaultOpen?: boolean;\n\tonOpenChange?: (open: boolean) => void;\n\tonClose?: () => void;\n\tdismissable?: boolean;\n\tlightDismiss?: boolean;\n\tcloseLabel?: string;\n}\nexport const AndroidSheet = React.forwardRef<\n\tHTMLDialogElement,\n\tAndroidSheetProps\n>(function AndroidSheet(\n\t{\n\t\topen,\n\t\tdefaultOpen = false,\n\t\tonOpenChange,\n\t\tonClose,\n\t\tdismissable = true,\n\t\tlightDismiss = true,\n\t\tcloseLabel = \"Close\",\n\t\tclassName,\n\t\tstyle,\n\t\tchildren,\n\t\t...props\n\t},\n\tforwardedRef,\n) {\n\tconst [inner, setInner] = React.useState(defaultOpen);\n\tconst current = open ?? inner;\n\tconst close = () => {\n\t\tif (open === undefined) setInner(false);\n\t\tonOpenChange?.(false);\n\t\tonClose?.();\n\t};\n\tconst { ref, context, dialogProps } = useNativeDialog(\n\t\t{ open: current, onClose: close, dismissable, lightDismiss },\n\t\tprops,\n\t\tforwardedRef,\n\t);\n\tconst sx = rs(\n\t\t[\"rs-android-sheet\", current && \"rs-android-sheet-open\", className],\n\t\tstyles.sheet,\n\t\tcurrent && styles.open,\n\t);\n\tconst handle = rs([\"rs-android-sheet-handle\"], styles.handle);\n\tconst closeSx = rs([\"rs-android-sheet-close\"], styles.close);\n\treturn (\n\t\t<DialogContext.Provider value={context}>\n\t\t\t<dialog\n\t\t\t\tref={ref}\n\t\t\t\t{...props}\n\t\t\t\t{...dialogProps}\n\t\t\t\tclassName={sx.className}\n\t\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t\t>\n\t\t\t\t<span {...handle} aria-hidden=\"true\" />\n\t\t\t\t{dismissable && (\n\t\t\t\t\t<button\n\t\t\t\t\t\ttype=\"button\"\n\t\t\t\t\t\t{...closeSx}\n\t\t\t\t\t\taria-label={closeLabel}\n\t\t\t\t\t\tonClick={close}\n\t\t\t\t\t>\n\t\t\t\t\t\t<Icon name=\"close\" size={24} />\n\t\t\t\t\t</button>\n\t\t\t\t)}\n\t\t\t\t{children}\n\t\t\t</dialog>\n\t\t</DialogContext.Provider>\n\t);\n});\nexport const AndroidSheetTitle = React.forwardRef<\n\tHTMLHeadingElement,\n\tReact.HTMLAttributes<HTMLHeadingElement>\n>(function AndroidSheetTitle({ id, className, style, ...props }, ref) {\n\tconst titleId = useDialogPart(\"title\", id);\n\tconst sx = rs([\"rs-android-sheet-title\", className], styles.title);\n\treturn (\n\t\t<h2\n\t\t\tref={ref}\n\t\t\t{...props}\n\t\t\tid={titleId}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t/>\n\t);\n});\nexport const AndroidSheetBody = React.forwardRef<\n\tHTMLParagraphElement,\n\tReact.HTMLAttributes<HTMLParagraphElement>\n>(function AndroidSheetBody({ id, className, style, ...props }, ref) {\n\tconst bodyId = useDialogPart(\"body\", id);\n\tconst sx = rs([\"rs-android-sheet-body\", className], styles.body);\n\treturn (\n\t\t<p\n\t\t\tref={ref}\n\t\t\t{...props}\n\t\t\tid={bodyId}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t/>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-sheet.tsx"
+    },
+    {
+      "path": "vlak/styles/android-sheet.css",
+      "content": "/* ── android-sheet: generated from packages/react/src/components/android-sheet.tsx ── */\n@keyframes rs-anim-enter{from{transform:translateY(32px);opacity:0}to{transform:translateY(0);opacity:1}}\n.rs-android-sheet-open{animation-name:rs-anim-enter;animation-duration:280ms;animation-timing-function:cubic-bezier(.2,0,0,1)}\n@media (prefers-reduced-motion: reduce){.rs-android-sheet-open{animation-name:none}}\n.rs-android-sheet{box-sizing:border-box;position:fixed;inset-inline:0;top:auto;bottom:0;width:min(640px, 100%);max-width:100%;max-height:90dvh;margin:0 auto;padding:28px 24px max(24px, env(safe-area-inset-bottom));overflow-y:auto;overscroll-behavior:contain;border-width:1px;border-style:solid;border-color:var(--divider);border-bottom-width:0;border-radius:28px 28px 0 0;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;box-shadow:none}\n.rs-android-sheet::backdrop{background-color:rgba(0,0,0,.32);background-color:color-mix(in srgb, var(--text) 32%, transparent)}\n.rs-android-sheet-handle{position:absolute;top:12px;inset-inline-start:calc(50% - 16px);width:32px;height:4px;border-radius:2px;background-color:var(--text-secondary)}\n@media (forced-colors: active){.rs-android-sheet-handle{background-color:CanvasText}}\n.rs-android-sheet-close{appearance:none;float:inline-end;display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;margin:-4px -12px 4px 8px;padding:12px;border-width:0;border-radius:50%;color:var(--text);background-color:transparent;cursor:pointer;outline-offset:0}\n.rs-android-sheet-close:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n@media (hover: hover) and (pointer: fine){.rs-android-sheet-close:hover{background-color:var(--control-fill)}}\n.rs-android-sheet-title{margin:8px 0 16px;font-size:24px;font-weight:500;line-height:1.3;overflow-wrap:anywhere}\n.rs-android-sheet-body{margin:0 0 24px;font-size:16px;line-height:1.5;color:var(--text-secondary);overflow-wrap:anywhere}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-sheet.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-sheet",
+        "rs-android-sheet-open",
+        "rs-android-sheet-handle",
+        "rs-android-sheet-close",
+        "rs-android-sheet-title",
+        "rs-android-sheet-body"
+      ],
+      "snippet": "<dialog class=\"rs-android-sheet\" aria-labelledby=\"android-sheet-title\"><span class=\"rs-android-sheet-handle\" aria-hidden=\"true\"></span><button class=\"rs-android-sheet-close\" type=\"button\" aria-label=\"Close\">×</button><h2 class=\"rs-android-sheet-title\" id=\"android-sheet-title\">Connection settings</h2><p class=\"rs-android-sheet-body\">Choose how this device connects.</p></dialog>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "dialog",
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material modal bottom sheet",
+        "Android bottom sheet",
+        "modal sheet"
+      ],
+      "example": "import { AndroidSheet, AndroidSheetTitle, AndroidSheetBody } from \"@noorddev/vlak-react\";\n\n<AndroidSheet open={open} onOpenChange={setOpen}>\n  <AndroidSheetTitle>Connection settings</AndroidSheetTitle>\n  <AndroidSheetBody>Choose how this device connects.</AndroidSheetBody>\n</AndroidSheet>",
+      "usage": {
+        "use": [
+          "Contextual Android controls that temporarily cover the lower screen.",
+          "A focused choice or short task with a clear way to dismiss it."
+        ],
+        "avoid": [
+          "Permanent side navigation or long documents."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab or Shift+Tab",
+          "does": "Moves through the modal's controls using native dialog focus containment."
+        },
+        {
+          "keys": "Escape",
+          "does": "Requests dismissal when dismissable is enabled."
+        },
+        {
+          "keys": "Enter or Space",
+          "does": "Activates the focused control."
+        }
+      ],
+      "a11y": [
+        "Native dialog showModal supplies the top layer, inert background and focus containment.",
+        "Title and body parts connect aria-labelledby and aria-describedby automatically.",
+        "Closing returns focus to the connected opener.",
+        "The handle is decorative; this sheet does not promise a drag gesture.",
+        "Supports controlled open state or defaultOpen; onOpenChange reports dismissal."
+      ]
+    }
+  }
+}

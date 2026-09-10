@@ -109,6 +109,70 @@ describe("Dialog", () => {
     expect(ref.current).toBe(dialog());
     expect(dialog().getAttribute("aria-labelledby")).toBe("custom");
   });
+
+  it("restores the opener when a parent unmounts its open dialog", async () => {
+    const user = userEvent.setup();
+    const closed = vi.fn();
+    function ConditionalDialog() {
+      const [visible, setVisible] = React.useState(false);
+      return <><button type="button" onClick={() => setVisible(true)}>Open conditionally</button>{visible && <Dialog open aria-label="Temporary dialog" closeLabel="Close temporary dialog" onClose={() => { closed(); setVisible(false); }} />}</>;
+    }
+    render(<ConditionalDialog />);
+    const opener = screen.getByRole("button", { name: "Open conditionally" });
+    await user.click(opener);
+    expect(dialog().contains(document.activeElement)).toBe(true);
+    await user.click(screen.getByRole("button", { name: "Close temporary dialog" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(opener);
+    expect(closed).toHaveBeenCalledTimes(1);
+  });
+
+  it("preserves a newer focus target when an open dialog unmounts", async () => {
+    const user = userEvent.setup();
+    function FocusDestination() {
+      const [visible, setVisible] = React.useState(false);
+      const destination = React.useRef<HTMLButtonElement>(null);
+      return <><button type="button" onClick={() => setVisible(true)}>Open dialog</button><button type="button" ref={destination}>Next workspace</button>{visible && <Dialog open aria-label="Temporary dialog"><button type="button" onClick={() => { destination.current?.focus(); setVisible(false); }}>Continue</button></Dialog>}</>;
+    }
+    render(<FocusDestination />);
+    await user.click(screen.getByRole("button", { name: "Open dialog" }));
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(screen.queryByRole("dialog")).toBeNull();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Next workspace" }));
+  });
+
+  it("keeps Strict Mode replay open and reports a subsequent native close once", async () => {
+    const closed = vi.fn();
+    const nativeClose = vi.spyOn(HTMLDialogElement.prototype, "close").mockImplementation(function (this: HTMLDialogElement) {
+      this.open = false;
+      queueMicrotask(() => this.dispatchEvent(new Event("close")));
+    });
+    try {
+      render(<React.StrictMode><Dialog open aria-label="Strict dialog" onClose={closed}><button type="button">Inside</button></Dialog></React.StrictMode>);
+      await act(async () => { await Promise.resolve(); });
+      expect(dialog().open).toBe(true);
+      expect(dialog().contains(document.activeElement)).toBe(true);
+      expect(closed).not.toHaveBeenCalled();
+      await act(async () => { dialog().close(); await Promise.resolve(); });
+      expect(closed).toHaveBeenCalledTimes(1);
+    } finally { nativeClose.mockRestore(); }
+  });
+
+  it("ignores a queued native close after a controlled dialog has reopened", async () => {
+    const closed = vi.fn();
+    const nativeClose = vi.spyOn(HTMLDialogElement.prototype, "close").mockImplementation(function (this: HTMLDialogElement) {
+      this.open = false;
+      queueMicrotask(() => this.dispatchEvent(new Event("close")));
+    });
+    try {
+      const view = render(<Dialog open aria-label="Reopened dialog" onClose={closed}><button type="button">Inside</button></Dialog>);
+      view.rerender(<Dialog open={false} aria-label="Reopened dialog" onClose={closed}><button type="button">Inside</button></Dialog>);
+      view.rerender(<Dialog open aria-label="Reopened dialog" onClose={closed}><button type="button">Inside</button></Dialog>);
+      await act(async () => { await Promise.resolve(); });
+      expect(dialog().open).toBe(true);
+      expect(closed).not.toHaveBeenCalled();
+    } finally { nativeClose.mockRestore(); }
+  });
 });
 
 describe("AlertDialog", () => {

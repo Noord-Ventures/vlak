@@ -1,0 +1,12 @@
+/* ── android-app-bar: generated from packages/react/src/components/android-app-bar.tsx ── */
+.rs-android-app-bar{box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0, 1fr) auto;align-items:center;column-gap:8px;min-height:64px;padding-inline:16px;padding-block:8px;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif}
+.rs-android-app-bar-medium{min-height:112px;align-items:start;row-gap:8px}
+.rs-android-app-bar-title{grid-row:1;min-width:0;margin:0;font-size:22px;font-weight:500;line-height:1.3;overflow-wrap:anywhere}
+.rs-android-app-bar-leading-title{grid-column:1 / 3}
+.rs-android-app-bar-medium-title{grid-column:1 / -1;grid-row:2;font-size:28px;padding-bottom:8px}
+.rs-android-app-bar-navigation{grid-column:1;grid-row:1;display:flex;align-items:center;min-height:48px}
+.rs-android-app-bar-actions{grid-column:3;grid-row:1;display:flex;align-items:center;flex-wrap:wrap;justify-content:end;gap:4px}
+.rs-android-app-bar-action{appearance:none;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:48px;height:48px;padding:12px;border-width:0;border-radius:50%;color:var(--text);background-color:transparent;cursor:pointer;opacity:1;outline-offset:2px}
+.rs-android-app-bar-action:disabled{cursor:not-allowed;opacity:0.45}
+.rs-android-app-bar-action:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}
+@media (hover: hover) and (pointer: fine){.rs-android-app-bar-action:hover{background-color:var(--control-fill)}}

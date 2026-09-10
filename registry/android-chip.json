@@ -1,0 +1,79 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "android-chip",
+  "type": "registry:component",
+  "title": "Android chip",
+  "description": "A Material filter chip with a filled selection state and a checkmark.",
+  "registryDependencies": [
+    "https://vlak.dev/r/vlak-base.json",
+    "https://vlak.dev/r/inter.json",
+    "https://vlak.dev/r/icons.json",
+    "https://vlak.dev/r/vlak-lib.json"
+  ],
+  "dependencies": [
+    "@stylexjs/stylex"
+  ],
+  "devDependencies": [
+    "@stylexjs/babel-plugin"
+  ],
+  "docs": "Vlak leaves are StyleX. Compile them with @stylexjs/babel-plugin (Vite: @stylexjs/unplugin, Next: @stylexjs/nextjs-plugin). If you would rather not run a compiler, import @noorddev/vlak-react instead: it ships precompiled with one stylesheet.",
+  "files": [
+    {
+      "path": "vlak/android-chip.tsx",
+      "content": "\"use client\";\n\nimport * as React from \"react\";\nimport * as stylex from \"@stylexjs/stylex\";\nimport { vlak, mq } from \"./tokens.stylex\";\nimport { rs } from \"./rs\";\nimport { Icon } from \"./icons\";\n\nconst styles = stylex.create({\n\tchip: {\n\t\tappearance: \"none\",\n\t\tboxSizing: \"border-box\",\n\t\tposition: \"relative\",\n\t\tisolation: \"isolate\",\n\t\tdisplay: \"inline-flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tgap: 8,\n\t\tminWidth: 48,\n\t\tminHeight: 48,\n\t\tpadding: \"8px 16px\",\n\t\tborderWidth: 0,\n\t\tborderRadius: 8,\n\t\tbackgroundColor: \"transparent\",\n\t\tcolor: vlak.ink,\n\t\tfontFamily: \"Inter, -apple-system, BlinkMacSystemFont, sans-serif\",\n\t\tfontSize: 14,\n\t\tfontWeight: 500,\n\t\tlineHeight: 1.4,\n\t\tcursor: { default: \"pointer\", \":disabled\": \"not-allowed\" },\n\t\topacity: { default: 1, \":disabled\": 0.45 },\n\t\toutlineWidth: { default: null, \":focus-visible\": 2 },\n\t\toutlineStyle: { default: null, \":focus-visible\": \"solid\" },\n\t\toutlineColor: { default: null, \":focus-visible\": vlak.ink },\n\t\toutlineOffset: 0,\n\t\t\"::before\": {\n\t\t\tcontent: '\"\"',\n\t\t\tposition: \"absolute\",\n\t\t\tzIndex: -1,\n\t\t\tinset: \"8px 0\",\n\t\t\tborderWidth: 1,\n\t\t\tborderStyle: \"solid\",\n\t\t\tborderColor: vlak.controlBorder,\n\t\t\tborderRadius: 8,\n\t\t\tbackgroundColor: {\n\t\t\t\tdefault: vlak.paper,\n\t\t\t\t\":hover\": { default: null, [mq.hover]: vlak.controlFill },\n\t\t\t},\n\t\t\ttransition: {\n\t\t\t\tdefault: \"background-color 240ms cubic-bezier(.2,0,0,1)\",\n\t\t\t\t[mq.reduce]: \"none\",\n\t\t\t},\n\t\t},\n\t},\n\tselected: {\n\t\tcolor: { default: vlak.paper, [mq.forcedColors]: \"HighlightText\" },\n\t\tfontWeight: 600,\n\t\t\"::before\": {\n\t\t\tbackgroundColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" },\n\t\t\tborderColor: { default: vlak.ink, [mq.forcedColors]: \"Highlight\" },\n\t\t},\n\t},\n\ticon: {\n\t\tdisplay: \"inline-flex\",\n\t\talignItems: \"center\",\n\t\tjustifyContent: \"center\",\n\t\tflexShrink: 0,\n\t\twidth: 20,\n\t\theight: 20,\n\t},\n});\nexport interface AndroidChipProps\n\textends React.ButtonHTMLAttributes<HTMLButtonElement> {\n\tselected?: boolean;\n\tdefaultSelected?: boolean;\n\tonSelectedChange?: (selected: boolean) => void;\n\ticon?: React.ReactNode;\n}\nexport const AndroidChip = React.forwardRef<\n\tHTMLButtonElement,\n\tAndroidChipProps\n>(function AndroidChip(\n\t{\n\t\tselected,\n\t\tdefaultSelected = false,\n\t\tonSelectedChange,\n\t\ticon,\n\t\tonClick,\n\t\tclassName,\n\t\tstyle,\n\t\tchildren,\n\t\ttype = \"button\",\n\t\t...props\n\t},\n\tref,\n) {\n\tconst [inner, setInner] = React.useState(defaultSelected);\n\tconst current = selected ?? inner;\n\tconst sx = rs(\n\t\t[\"rs-android-chip\", current && \"rs-android-chip-selected\", className],\n\t\tstyles.chip,\n\t\tcurrent && styles.selected,\n\t);\n\tconst glyph = rs([\"rs-android-chip-icon\"], styles.icon);\n\treturn (\n\t\t<button\n\t\t\tref={ref}\n\t\t\ttype={type}\n\t\t\t{...props}\n\t\t\taria-pressed={current}\n\t\t\tonClick={(event) => {\n\t\t\t\tonClick?.(event);\n\t\t\t\tif (!event.defaultPrevented) {\n\t\t\t\t\tif (selected === undefined) setInner(!current);\n\t\t\t\t\tonSelectedChange?.(!current);\n\t\t\t\t}\n\t\t\t}}\n\t\t\tclassName={sx.className}\n\t\t\tstyle={{ ...sx.style, ...style }}\n\t\t>\n\t\t\t{(current || icon != null) && (\n\t\t\t\t<span {...glyph} aria-hidden=\"true\">\n\t\t\t\t\t{current ? <Icon name=\"check\" size={16} /> : icon}\n\t\t\t\t</span>\n\t\t\t)}\n\t\t\t{children}\n\t\t</button>\n\t);\n});\n",
+      "type": "registry:component",
+      "target": "components/vlak/android-chip.tsx"
+    },
+    {
+      "path": "vlak/styles/android-chip.css",
+      "content": "/* ── android-chip: generated from packages/react/src/components/android-chip.tsx ── */\n.rs-android-chip{appearance:none;box-sizing:border-box;position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:48px;min-height:48px;padding:8px 16px;border-width:0;border-radius:8px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;font-size:14px;font-weight:500;line-height:1.4;cursor:pointer;opacity:1;outline-offset:0}\n.rs-android-chip:disabled{cursor:not-allowed;opacity:0.45}\n.rs-android-chip:focus-visible{outline-width:2px;outline-style:solid;outline-color:var(--text)}\n.rs-android-chip::before{content:\"\";position:absolute;z-index:-1;inset:8px 0;border-width:1px;border-style:solid;border-color:var(--control-border);border-radius:8px;background-color:var(--bg);transition:background-color 240ms cubic-bezier(.2,0,0,1)}\n@media (hover: hover) and (pointer: fine){.rs-android-chip::before:hover{background-color:var(--control-fill)}}\n@media (prefers-reduced-motion: reduce){.rs-android-chip::before{transition:none}}\n.rs-android-chip-selected{color:var(--bg);font-weight:600}\n.rs-android-chip-selected::before{background-color:var(--text);border-color:var(--text)}\n@media (forced-colors: active){.rs-android-chip-selected{color:HighlightText}.rs-android-chip-selected::before{background-color:Highlight;border-color:Highlight}}\n.rs-android-chip-icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:20px;height:20px}\n",
+      "type": "registry:file",
+      "target": "styles/vlak/android-chip.css"
+    }
+  ],
+  "meta": {
+    "vlak": {
+      "category": "android",
+      "classes": [
+        "rs-android-chip",
+        "rs-android-chip-selected",
+        "rs-android-chip-icon"
+      ],
+      "snippet": "<button class=\"rs-android-chip rs-android-chip-selected\" type=\"button\" aria-pressed=\"true\"><span class=\"rs-android-chip-icon\" aria-hidden=\"true\">✓</span>Unread</button>",
+      "cssOnly": false,
+      "registryDependencies": [
+        "icons",
+        "vlak-lib"
+      ],
+      "aliases": [
+        "Material filter chip",
+        "Android filter chip",
+        "selectable chip"
+      ],
+      "example": "import { AndroidChip } from \"@noorddev/vlak-react\";\n\n<AndroidChip selected={unread} onSelectedChange={setUnread}>Unread</AndroidChip>",
+      "usage": {
+        "use": [
+          "Independent filters that users can select and clear."
+        ],
+        "avoid": [
+          "Mutually exclusive navigation or status labels with no action."
+        ]
+      },
+      "keyboard": [
+        {
+          "keys": "Tab",
+          "does": "Focuses each enabled filter."
+        },
+        {
+          "keys": "Enter or Space",
+          "does": "Toggles the focused filter."
+        }
+      ],
+      "a11y": [
+        "A native button exposes selection through aria-pressed.",
+        "The checkmark and filled surface distinguish selection without hue.",
+        "The compact chip keeps a 48-pixel hit area."
+      ]
+    }
+  }
+}
