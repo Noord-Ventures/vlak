@@ -1,5 +1,5 @@
 // Every catalog name owns one Use file. No shared dump.
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 
@@ -73,7 +73,8 @@ function checkPreview(file) {
       ? resolve(root, "apps/www", specifier.slice(2))
       : resolve(dirname(file), specifier);
     if (!/\.[jt]sx?$/.test(path) && /\.[a-z]+$/.test(path)) continue;
-    const dependency = [path, `${path}.tsx`, `${path}.ts`].find(existsSync);
+    const dependency = [path, `${path}.tsx`, `${path}.ts`, join(path, "index.tsx"), join(path, "index.ts")]
+      .find(candidate => existsSync(candidate) && statSync(candidate).isFile());
     if (!dependency) throw new Error(`Missing preview dependency: ${path}`);
     if (dependency.startsWith(examples + "/")) throw new Error(`Preview imports In action: ${dependency}`);
     checkPreview(dependency);

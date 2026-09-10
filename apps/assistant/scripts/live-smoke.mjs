@@ -5,7 +5,10 @@ if (process.env.AI_REFERENCE_LIVE_TEST !== "1") {
   throw new Error("Live verification is opt-in. Set AI_REFERENCE_LIVE_TEST=1 to use the configured server model.");
 }
 const base = new URL(process.env.AI_REFERENCE_URL || "http://localhost:3211");
-if (!['localhost', '127.0.0.1', '[::1]'].includes(base.hostname)) throw new Error("This smoke check is limited to a local reference server.");
+const local = ['localhost', '127.0.0.1', '[::1]'].includes(base.hostname);
+if (!local && process.env.AI_REFERENCE_LIVE_ORIGIN !== base.origin) {
+  throw new Error("For a hosted server you own, set AI_REFERENCE_LIVE_ORIGIN to its exact origin.");
+}
 let cookie = "";
 async function request(path, body) {
   const response = await fetch(new URL(path, base), {

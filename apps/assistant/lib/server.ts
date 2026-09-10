@@ -2,7 +2,7 @@ import { randomBytes, randomUUID } from "node:crypto";
 import { createAgentUIStreamResponse, createUIMessageStream, createUIMessageStreamResponse, consumeStream, isToolUIPart, type UIMessageStreamOnEndCallback } from "ai";
 import { z } from "zod";
 import { createReferenceAgent, referenceConfiguration, resolveMessageFiles } from "./agent.ts";
-import { checkedId, createConversation, dataDirectory, listConversations, lockConversation, MAX_UPLOAD_BYTES, ownerId, readConversation, readUpload, ReferenceAppError, restoreConversation, saveConversation, saveUploads, snapshotConversation } from "./store.ts";
+import { checkedId, consumeModelBudget, conversationRunState, createConversation, dataDirectory, listConversations, lockConversation, monitorConversationStop, ownerId, readConversation, readUpload, ReferenceAppError, requestConversationStop, restoreConversation, saveConversation, saveUploads, snapshotConversation, uploadLimits, usesBlobStorage } from "./store.ts";
 import type { ChatIntent, ReferenceConversation, ReferenceMessage } from "./types.ts";
 
 type ActiveRun = { controller: AbortController; done: Promise<void>; finish: () => void };
@@ -58,14 +58,14 @@ async function handle(request: Request, createSession: boolean, operation: (owne
     return jsonResponse({ error: "The local assistant could not complete the request. Try again." }, 500);
   }
 }
-export function conversationsGet(request: Request) { return handle(request, true, async owner => jsonResponse({ conversations: await listConversations(owner), ...referenceConfiguration() })); }
+export function conversationsGet(request: Request) { return handle(request, true, async owner => jsonResponse({ conversations: await listConversations(owner), ...referenceConfiguration(), uploadLimits: uploadLimits(), storage: usesBlobStorage() ? "private-blob" : "local" })); }
 export function conversationsPost(request: Request) { return handle(request, true, async owner => jsonResponse({ conversation: await createConversation(owner) }, 201)); }
 export function conversationGet(request: Request, id: string) { return handle(request, false, async owner => jsonResponse({ conversation: await readConversation(owner, checkedId(id)) })); }
 export function conversationRestore(request: Request, id: string) { return handle(request, false, async owner => { const body = z.object({ versionId: idSchema }).parse(await requestJson(request)); return jsonResponse({ conversation: await restoreConversation(owner, checkedId(id), body.versionId) }); }); }
 export function uploadsPost(request: Request) {
   return handle(request, false, async owner => {
     if (!request.headers.get("content-type")?.startsWith("multipart/form-data;")) throw new ReferenceAppError(400, "Upload files as multipart form data.");
-    const bytes = await readLimitedBody(request, MAX_UPLOAD_BYTES + 64 * 1024);
+    const bytes = await readLimitedBody(request, uploadLimits().maxTotalBytes + 64 * 1024);
     let form: FormData;
     try { form = await new Request(request.url, { method: "POST", headers: { "Content-Type": request.headers.get("content-type")! }, body: bytes }).formData(); }
     catch { throw new ReferenceAppError(400, "The upload form could not be read."); }
@@ -133,10 +133,11 @@ export function chatPost(request: Request) {
     const run: ActiveRun = { controller: new AbortController(), done: new Promise<void>(resolve => { complete = resolve; }), finish: () => complete() };
     const key = runKey(owner, intent.conversationId);
     activeRuns.set(key, run);
+    const stopMonitoring = monitorConversationStop(owner, intent.conversationId, run.controller);
     const abort = () => run.controller.abort();
     request.signal.addEventListener("abort", abort, { once: true });
     if (request.signal.aborted) abort();
-    const release = async () => { request.signal.removeEventListener("abort", abort); try { await unlock(); } finally { if (activeRuns.get(key) === run) activeRuns.delete(key); run.finish(); } };
+    const release = async () => { stopMonitoring(); request.signal.removeEventListener("abort", abort); try { await unlock(); } finally { if (activeRuns.get(key) === run) activeRuns.delete(key); run.finish(); } };
     try {
       const config = referenceConfiguration();
       if (!config.configured) throw new ReferenceAppError(503, "Set OPENAI_API_KEY on the server to use the live assistant.");
@@ -156,6 +157,7 @@ export function chatPost(request: Request) {
       if (intent.intent === "approve" && pendingApprovals(conversation).length) {
         return createUIMessageStreamResponse({ consumeSseStream, stream: createUIMessageStream<ReferenceMessage>({ originalMessages: conversation.messages, onEnd: finish, execute({ writer }) { writer.write({ type: "start", messageId: conversation.messages.at(-1)!.id }); writer.write({ type: "tool-approval-response", approvalId: intent.approvalId, approved: intent.approved }); writer.write({ type: "finish" }); } }) });
       }
+      if (config.mode === "live") await consumeModelBudget(owner);
       const agent = await createReferenceAgent(owner, conversation.id);
       return await createAgentUIStreamResponse({
         agent, uiMessages: await resolveMessageFiles(owner, conversation.messages), originalMessages: conversation.messages,
@@ -175,10 +177,18 @@ export function chatStop(request: Request) {
     const { conversationId } = z.object({ conversationId: idSchema }).parse(await requestJson(request));
     await readConversation(owner, conversationId);
     const run = activeRuns.get(runKey(owner, conversationId));
-    if (!run) return jsonResponse({ stopped: false });
-    run.controller.abort();
+    const sharedRun = await requestConversationStop(owner, conversationId);
+    if (!run && !sharedRun) return jsonResponse({ stopped: false });
+    run?.controller.abort();
+    const waitForRun = run?.done ?? (async () => {
+      const deadline = Date.now() + 10_000;
+      while ((await conversationRunState(owner, conversationId)).running) {
+        if (Date.now() >= deadline) throw new ReferenceAppError(503, "Stopping is still in progress. Reload the conversation shortly.");
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+    })();
     let timer: ReturnType<typeof setTimeout> | undefined;
-    try { await Promise.race([run.done, new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new ReferenceAppError(503, "Stopping is still in progress. Reload the conversation shortly.")), 10_000); })]); }
+    try { await Promise.race([waitForRun, new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new ReferenceAppError(503, "Stopping is still in progress. Reload the conversation shortly.")), 10_000); })]); }
     finally { clearTimeout(timer); }
     return jsonResponse({ stopped: true });
   });

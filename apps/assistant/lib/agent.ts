@@ -7,7 +7,7 @@ import type { Brief, ProjectWidget, ReferenceMessage } from "./types.ts";
 
 export function referenceConfiguration() {
   const mode = process.env.AI_REFERENCE_MODE === "fixture" ? "fixture" as const : "live" as const;
-  return { mode, model: mode === "fixture" ? "deterministic-fixture" : process.env.AI_MODEL || "gpt-6-astra", configured: mode === "fixture" || Boolean(process.env.OPENAI_API_KEY) };
+  return { mode, model: mode === "fixture" ? "deterministic-fixture" : process.env.AI_REFERENCE_MODEL || process.env.AI_MODEL || "gpt-6-astra", configured: mode === "fixture" || Boolean(process.env.OPENAI_API_KEY) };
 }
 export const projectBrief: Brief = {
   title: "Launch review brief",

@@ -1,0 +1,11 @@
+# Vlak assistant
+
+> A working reference app for Vlak's React AI components. Conversations and uploaded files belong to private browser sessions and are not public documentation.
+
+## Public documentation
+
+- [AI components](https://vlak.dev/ai/): Interactive examples and component documentation.
+- [Integration guide](https://vlak.dev/docs/ai.md): Installation, composition, AI SDK integration, tools, and widgets.
+- [Feature coverage](https://vlak.dev/docs/ai-parity.md): Vlak's mapping to the AI Elements catalog and integration boundaries.
+- [Complete documentation index](https://vlak.dev/llms.txt): Canonical Vlak component, token, registry, CLI, and MCP documentation.
+- [Reference app source](https://github.com/Noord-Ventures/vlak/tree/main/apps/assistant): Setup, server contracts, persistence, and verification.
