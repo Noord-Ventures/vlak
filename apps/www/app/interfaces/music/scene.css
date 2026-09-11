@@ -70,7 +70,7 @@
 .mu-footer { flex: none; padding: 12px 20px; border-top: 1px solid var(--divider); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
 .mu-footer > p { flex: 1 1 230px; color: var(--text-secondary); font-size: 12px; margin: 0; max-width: 50ch; }
 .mu-footer > div { display: flex; gap: 8px; }
-.mu-footer button { width: auto; white-space: nowrap; }
+.mu-footer button { width: auto; min-height: 44px; white-space: nowrap; }
 @container music (max-width: 640px) {
   .mu-transport { padding: 12px; gap: 12px; }
   .mu-project { gap: 8px; }
@@ -116,8 +116,10 @@
   .mu-mixer .rs-audio-meter-label { font-size: 16px; }
   .mu-footer { padding: 10px 12px; }
   .mu-footer > p { font-size: 12px; flex-basis: 100%; }
-  .mu-footer > div { width: 100%; }
-  .mu-footer button { flex: 1; }
+  .mu-footer > div { width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); }
+  .mu-footer .project-tools { width: 100%; min-width: 0; }
+  .mu-footer .project-tools-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mu-footer .project-tools-actions button, .mu-footer > div > button { width: 100%; min-width: 0; }
 }
 @container music (max-width: 340px) {
   .mu-controls { display: grid; grid-template-columns: minmax(0, 1fr) 116px; }

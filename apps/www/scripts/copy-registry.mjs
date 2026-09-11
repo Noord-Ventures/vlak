@@ -84,3 +84,9 @@ writeFileSync(starterDest, readFileSync(starterSrc, "utf8")
   .replaceAll("{{CSS_HREF}}", "/vlak.css")
   .replace("</head>", '<meta name="robots" content="noindex,follow">\n</head>'));
 console.log("wrote starter specimen → public/starter/index.html");
+
+// Authored service handoff templates are downloadable alongside the local brief.
+const serviceSrc = fileURLToPath(new URL("../../../docs/services", import.meta.url));
+const serviceDest = `${docsDest}/services`;
+mkdirSync(serviceDest, { recursive: true });
+cpSync(serviceSrc, serviceDest, { recursive: true });

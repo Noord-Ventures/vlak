@@ -94,9 +94,10 @@ export async function checkMusicInterface({ page, base, fail }) {
     assert(await page.getByRole("button", { name: "Play session", exact: true }).isVisible());
 
     const saved = page.waitForEvent("download");
-    await page.getByRole("button", { name: "Save session", exact: true }).click();
+    await page.getByRole("button", { name: "Save project file", exact: true }).click();
     const project = JSON.parse(readFileSync(await (await saved).path(), "utf8"));
-    assert.equal(project.tempo, 120); assert.equal(project.tracks[0].clips[1].name, "New rhythm"); assert.equal(project.tracks[0].active, 1);
+    assert.equal(project.schema, "vlak.project"); assert.equal(project.kind, "music");
+    assert.equal(project.payload.tempo, 120); assert.equal(project.payload.tracks[0].clips[1].name, "New rhythm"); assert.equal(project.payload.tracks[0].active, 1);
     const exported = page.waitForEvent("download");
     await page.getByRole("button", { name: "Export audio", exact: true }).click();
     const audio = readFileSync(await (await exported).path());

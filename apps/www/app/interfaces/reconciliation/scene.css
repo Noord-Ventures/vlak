@@ -1,0 +1,112 @@
+.rc-frame { container: reconciliation / inline-size; height: 100%; min-height: 0; }
+.rc { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; height: 100%; min-width: 0; min-height: 680px; overflow: hidden; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.45; }
+.rc *, .rc *::before, .rc *::after { box-sizing: border-box; }
+.rc h2, .rc h3, .rc h4, .rc p, .rc dl, .rc dd { margin: 0; }
+.rc button { touch-action: manipulation; }
+.rc .rs-btn-primary, .rc .rs-btn-ghost { min-height: 44px; width: auto; height: auto; padding: 10px 12px; font-size: 12px; }
+.rc .rs-input, .rc .rs-dropdown { min-height: 44px; }
+.rc-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 68px; padding: 10px 16px; border-bottom: 1px solid var(--divider); }
+.rc-header > div:first-child { display: grid; gap: 2px; flex: none; }
+.rc-header strong { font-size: 14px; font-weight: 600; }
+.rc-header span, .rc-header .project-tools p { color: var(--text-secondary); font-size: 10px; }
+.rc-header .project-tools { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 4px 10px; }
+.rc-header .project-tools-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
+.rc-header .project-tools-actions .rs-btn-ghost { min-height: 44px; padding: 7px 9px; }
+.rc-header .project-tools > p { flex-basis: 100%; text-align: end; }
+.rc-body { display: grid; grid-template-columns: minmax(300px, .88fr) minmax(0, 1.12fr); min-width: 0; min-height: 0; }
+.rc-setup { min-width: 0; min-height: 0; overflow-y: auto; border-inline-end: 1px solid var(--divider); scrollbar-width: thin; }
+.rc-intro, .rc-source, .rc-recipe, .rc-export { display: grid; gap: 12px; padding: 18px; border-bottom: 1px solid var(--divider); }
+.rc-intro p, .rc-source > p, .rc-recipe > p, .rc-export > p, .rc-record > p, .rc-empty { color: var(--text-secondary); max-width: 66ch; }
+.rc-source > header, .rc-record > header, .rc-worklist > header, .rc-results-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.rc-source > header > div, .rc-results-head > div { display: grid; gap: 2px; min-width: 0; }
+.rc-source > header span, .rc-results-head span, .rc-source small, .rc-diagnostic { color: var(--text-secondary); font-size: 10px; }
+.rc-source h3, .rc-recipe h3, .rc-export h3, .rc-worklist h3 { font-size: 15px; font-weight: 500; overflow-wrap: anywhere; }
+.rc-diagnostic { padding: 8px; background: var(--control-fill); }
+.rc-table-scroll { overflow: auto; max-height: 190px; border: 1px solid var(--divider); }
+.rc table { width: 100%; border-collapse: collapse; font-size: 11px; white-space: nowrap; }
+.rc th, .rc td { min-width: 96px; max-width: 190px; padding: 7px 8px; overflow: hidden; text-overflow: ellipsis; text-align: start; border-inline-end: 1px solid var(--divider); border-bottom: 1px solid var(--divider); }
+.rc th { position: sticky; top: 0; background: var(--control-fill); font-weight: 600; }
+.rc td[data-missing="true"], .rc dd[data-missing="true"] { color: var(--text-secondary); font-style: italic; }
+.rc-recipe > div:not(.rc-actions) { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rc-field { display: grid; gap: 7px; }
+.rc-field > span { color: var(--text-secondary); font-size: 11px; }
+.rc-recipe > div > span { align-self: center; min-height: 44px; padding: 12px; color: var(--text-secondary); border: 1px solid var(--divider); }
+.rc-columns { border: 1px solid var(--divider); }
+.rc-columns summary { min-height: 44px; padding: 12px; cursor: pointer; font-weight: 500; }
+.rc-columns fieldset { max-height: 280px; margin: 0; padding: 12px; overflow-y: auto; display: grid; gap: 8px; border: 0; border-top: 1px solid var(--divider); }
+.rc-columns legend { padding: 0 0 8px; color: var(--text-secondary); font-size: 11px; }
+.rc-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.rc-results { min-width: 0; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
+.rc-results-head { min-height: 76px; padding: 16px 18px; border-bottom: 1px solid var(--divider); }
+.rc-results-head h2 { font-size: 22px; line-height: 1.2; font-weight: 500; }
+.rc-results-head > span { text-align: end; }
+.rc-totals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-bottom: 1px solid var(--divider); }
+.rc-totals button { display: grid; gap: 2px; min-height: 70px; padding: 12px; color: var(--text); background: var(--bg); border: 0; border-inline-end: 1px solid var(--divider); text-align: start; cursor: pointer; }
+.rc-totals button:last-child { border-inline-end: 0; }
+.rc-totals button[aria-pressed="true"] { background: var(--control-fill); font-weight: 600; }
+.rc-totals button:focus-visible, .rc-worklist button:focus-visible { outline: 2px solid var(--text); outline-offset: -3px; }
+.rc-totals strong { font-size: 22px; font-weight: 400; font-variant-numeric: tabular-nums; }
+.rc-totals span { color: var(--text-secondary); font-size: 10px; }
+.rc-worklist > header { padding: 16px 18px; }
+.rc-worklist > header span { color: var(--text-secondary); font-size: 11px; }
+.rc-worklist ul { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--divider); }
+.rc-worklist li { border-bottom: 1px solid var(--divider); }
+.rc-worklist li > button { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 58px; padding: 10px 18px; color: var(--text); background: var(--bg); border: 0; text-align: start; cursor: pointer; }
+.rc-worklist li > button:hover { background: var(--control-fill); }
+.rc-worklist li > button > span:first-child { display: grid; gap: 3px; min-width: 0; }
+.rc-worklist li strong, .rc-worklist li small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-worklist li strong { font-weight: 500; }
+.rc-worklist li small { color: var(--text-secondary); }
+.rc-empty { display: grid; gap: 10px; padding: 24px 18px; }
+.rc-export { border-top: 1px solid var(--divider); }
+.rc-record { min-height: 100%; display: flex; flex-direction: column; }
+.rc .rc-back { align-self: flex-start; margin: 10px; }
+.rc-record > header { padding: 18px; border-block: 1px solid var(--divider); }
+.rc-record > header > div { display: grid; gap: 8px; }
+.rc-record > header h3 { font-size: 22px; font-weight: 500; overflow-wrap: anywhere; }
+.rc-record > header > span { color: var(--text-secondary); }
+.rc-record > p { padding: 16px 18px; border-bottom: 1px solid var(--divider); }
+.rc-record-sides { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.rc-record-sides > section { min-width: 0; padding: 18px; }
+.rc-record-sides > section + section { border-inline-start: 1px solid var(--divider); }
+.rc-record-sides h4 { margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+.rc-record-sides dl { border-top: 1px solid var(--divider); }
+.rc-record-sides dl + dl { margin-top: 14px; }
+.rc-record-sides dl > div { display: grid; grid-template-columns: minmax(90px, .8fr) minmax(0, 1.2fr); gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--divider); }
+.rc-record-sides dt { color: var(--text-secondary); overflow-wrap: anywhere; }
+.rc-record-sides dd { overflow-wrap: anywhere; }
+.rc-record > footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 16px 18px; border-top: 1px solid var(--divider); }
+.rc-record > footer > div { display: flex; flex-wrap: wrap; gap: 8px; }
+.rc-status { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 34px; padding: 6px 16px; border-top: 1px solid var(--divider); color: var(--text-secondary); font-size: 10px; }
+.rc-status p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-status > span { flex: none; font-variant-numeric: tabular-nums; }
+@container reconciliation (max-width: 680px) {
+  .rc { min-height: 760px; font-size: 15px; }
+  .rc-header { align-items: flex-start; }
+  .rc-header .project-tools { max-width: 60%; }
+  .rc-header .project-tools-actions { flex-wrap: nowrap; max-width: 100%; overflow-x: auto; }
+  .rc-header .project-tools > p { display: none; }
+  .rc-body { display: block; overflow-y: auto; }
+  .rc-setup { overflow: visible; border-inline-end: 0; }
+  .rc-results { overflow: visible; border-top: 1px solid var(--divider); }
+  .rc-source, .rc-recipe, .rc-intro, .rc-export { padding: 18px 16px; }
+  .rc-recipe > div:not(.rc-actions) { grid-template-columns: minmax(0, 1fr); }
+  .rc-totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rc-totals button:nth-child(2) { border-inline-end: 0; }
+  .rc-totals button:nth-child(-n+2) { border-bottom: 1px solid var(--divider); }
+  .rc-worklist li > button { min-height: 66px; padding-inline: 16px; }
+  .rc-record-sides { grid-template-columns: minmax(0, 1fr); }
+  .rc-record-sides > section + section { border-inline-start: 0; border-top: 1px solid var(--divider); }
+  .rc-status { position: sticky; bottom: 0; background: var(--bg); }
+  .rc-status > span { display: none; }
+  .rc .rs-btn-primary, .rc .rs-btn-ghost { font-size: 14px; }
+}
+@container reconciliation (max-width: 420px) {
+  .rc-header > div:first-child { display: none; }
+  .rc-header .project-tools { max-width: 100%; width: 100%; }
+  .rc-header .project-tools-actions { justify-content: flex-start; }
+  .rc-record-sides dl > div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+@media (forced-colors: active) {
+  .rc-totals button[aria-pressed="true"] { background: Highlight; color: HighlightText; }
+}

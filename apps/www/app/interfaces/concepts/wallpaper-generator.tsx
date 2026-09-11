@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Button, Icon, NativeSelect, Slider, Textarea } from "@noorddev/vlak-react";
+import { Button, Icon, Input, NativeSelect, Slider, Textarea } from "@noorddev/vlak-react";
+import { ProjectTools } from "@/components/project-tools";
+import { parseWallpaperProject, type WallpaperProject } from "./wallpaper-project";
 
 
 type Format = "widescreen" | "desktop" | "phone";
@@ -58,6 +60,10 @@ function random(seed: number) {
     number ^= number + Math.imul(number ^ (number >>> 7), number | 61);
     return ((number ^ (number >>> 14)) >>> 0) / 4294967296;
   };
+}
+
+function exportSlug(value: string) {
+  return value.normalize("NFKC").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 64) || "wallpaper";
 }
 
 function makeWallpapers(prompt: string, variation: number, generation: number) {
@@ -153,6 +159,7 @@ function drawWallpaper(context: CanvasRenderingContext2D, wallpaper: Wallpaper, 
 
 export function WallpaperGenerator() {
   const rootRef = React.useRef<HTMLElement>(null);
+  const [title, setTitle] = React.useState("Field studies");
   const [mobileView, setMobileView] = React.useState("preview");
   const [selected, setSelected] = React.useState(0);
   const [prompt, setPrompt] = React.useState("A quiet geometric field for focused work, with one cobalt signal.");
@@ -180,18 +187,25 @@ export function WallpaperGenerator() {
   function exportSelected() {
     const wallpaper = results[selected];
     if (!wallpaper || exporting) return;
-    const dimensions = formats[format];
+    const snapshot = {
+      title: title.trim() || "Untitled project",
+      wallpaper: { ...wallpaper },
+      format,
+      generation,
+      selected,
+      dimensions: { ...formats[format] },
+    };
     const canvas = document.createElement("canvas");
-    canvas.width = dimensions.width;
-    canvas.height = dimensions.height;
+    canvas.width = snapshot.dimensions.width;
+    canvas.height = snapshot.dimensions.height;
     const context = canvas.getContext("2d");
     if (!context) {
       setStatus("This browser cannot prepare the export.");
       return;
     }
-    drawWallpaper(context, wallpaper, dimensions.width, dimensions.height);
+    drawWallpaper(context, snapshot.wallpaper, snapshot.dimensions.width, snapshot.dimensions.height);
     setExporting(true);
-    setStatus(`Preparing ${dimensions.width} × ${dimensions.height} PNG…`);
+    setStatus(`Preparing ${snapshot.dimensions.width} × ${snapshot.dimensions.height} PNG…`);
     canvas.toBlob((blob) => {
       setExporting(false);
       if (!blob) {
@@ -201,20 +215,25 @@ export function WallpaperGenerator() {
       const href = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = href;
-      anchor.download = `vlak-wallpaper-${format}-${selected + 1}-6k.png`;
+      anchor.download = `${exportSlug(snapshot.title)}-${snapshot.format}-collection-${snapshot.generation + 1}-composition-${snapshot.selected + 1}.png`;
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(href), 1000);
-      setStatus(`${dimensions.width} × ${dimensions.height} PNG exported.`);
+      setStatus(`${snapshot.dimensions.width} × ${snapshot.dimensions.height} PNG exported.`);
     }, "image/png");
+  }
+
+  function restoreProject(value: WallpaperProject, title: string) {
+    setTitle(title); setPrompt(value.prompt); setVariation(value.variation); setGeneration(value.generation); setFormat(value.format); setResults(value.results); setSelected(value.selected); setStatus(`Opened ${title}.`); setMobileView("preview");
   }
 
   const current = results[selected]!;
   return <section ref={rootRef} className="wg" data-mobile-view={mobileView} aria-label="Wallpaper studio">
-    <header className="wg-header"><div className="wg-project"><Icon name="image" size={24} /><div><strong>Field studies</strong><span>Collection {String(generation + 1).padStart(2, "0")}</span></div></div><Button className="wg-export" variant="ghost" size="sm" disabled={exporting} onClick={exportSelected}><Icon name="download" size={16} />{exporting ? "Exporting…" : "Export 6K"}</Button></header>
+      <header className="wg-header"><div className="wg-project"><Icon name="image" size={24} /><div><strong>{title.trim() || "Untitled project"}</strong><span>Collection {String(generation + 1).padStart(2, "0")}</span></div></div><div className="wg-header-actions"><ProjectTools kind="wallpaper" title={title} value={{ prompt, variation, generation, selected, format, results, generatorVersion: 1, rendererVersion: 1 }} parse={parseWallpaperProject} onRestore={restoreProject} documentVersion={1} /><Button className="wg-export" variant="ghost" size="sm" disabled={exporting} onClick={exportSelected}><Icon name="download" size={16} />{exporting ? "Exporting…" : "Export 6K"}</Button></div></header>
     <div className="wg-body">
       <aside className="wg-direction" aria-label="Composition direction">
         <div className="wg-panel-head"><div><span>Generator</span><h2>Shape the field</h2></div><Icon name="sliders" size={16} /></div>
         <div className="wg-direction-scroll">
+          <Input label="Project name" maxLength={120} value={title} onChange={(event) => setTitle(event.target.value)} />
           <Textarea label="Variation seed" rows={4} maxLength={500} value={prompt} onChange={(event) => setPrompt(event.target.value)} />
           <p className="wg-hint">Your words seed the shapes and palette. Every set is drawn locally.</p>
           <div className="wg-format"><NativeSelect label="Canvas format" value={format} onChange={(event) => setFormat(event.target.value as Format)}>{(Object.keys(formats) as Format[]).map(value => <option key={value} value={value}>{formats[value].label}</option>)}</NativeSelect><span className="wg-output-size">{formats[format].width} × {formats[format].height} · PNG</span></div>

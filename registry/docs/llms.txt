@@ -329,3 +329,18 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 - [Full documentation](https://vlak.dev/llms-full.txt): guide, tokens, and every component page in one file
 - [Site](https://vlak.dev): the human documentation and gallery
+
+<!-- VLAK_WORKFLOWS -->
+
+## Workflow kits and local tools
+
+- [Record review workflow](https://vlak.dev/workflows/record-review/): A runnable list, edit, review, commit, conflict recovery, history, and bounded undo workflow.
+- [Action approval workflow](https://vlak.dev/workflows/action-approval/): A runnable recipe that binds a decision to one frozen action payload version.
+- [Schedule editing workflow](https://vlak.dev/workflows/schedule-editing/): A runnable bounded event-edit recipe using the same revision and idempotency contract.
+- [Workflow modernization](https://vlak.dev/services/): Local scoping worksheet and service delivery templates.
+- [CSV reconciliation](https://vlak.dev/interfaces/reconciliation/): Exact comparison, exception review, reusable projects and exports.
+
+- [Project files](https://vlak.dev/docs/projects/): Portable projects, browser revisions, conflict handling and recovery.
+- [Safe source updates](https://vlak.dev/docs/updates/): Review pinned CLI updates and recover interrupted writes.
+
+Machine-readable workflows with source: https://vlak.dev/r/workflows/index.json

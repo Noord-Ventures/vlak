@@ -20,7 +20,7 @@
   "scripts": {
     "build": "pnpm -r --filter './packages/*' build",
     "build:registry": "pnpm --filter @noorddev/vlak build:registry",
-    "test": "pnpm -r --filter './packages/*' test",
+    "test": "pnpm -r --filter './packages/*' test && node --experimental-strip-types --test examples/workflows/record-review/tests/*.test.ts",
     "typecheck": "pnpm -r --filter './packages/*' typecheck",
     "check:agents": "node scripts/check-agent-surfaces.mjs",
     "lint": "biome check .",

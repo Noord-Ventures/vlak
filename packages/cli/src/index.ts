@@ -1,4 +1,7 @@
-import { VERSION, add, docsFor, init, list, search, snippetFor, tokensJson } from "./lib";
+import { dirname } from "node:path";
+import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { applyUpdate, managedStatus, readUpdatePlan, recoverUpdate, safePath } from "./managed";
+import { VERSION, add, docsFor, init, list, search, snippetFor, tokensJson, updatePlan, loadBundle } from "./lib";
 
 const HELP = `@noorddev/vlak-cli ${VERSION}, the minimal design system
 
@@ -9,6 +12,13 @@ Usage
   npx @noorddev/vlak-cli search <term> [--json]
   npx @noorddev/vlak-cli docs <component | guide | index | tokens>
   npx @noorddev/vlak-cli tokens [--json]
+  npx @noorddev/vlak-cli workflows [--json]
+  npx @noorddev/vlak-cli workflow <id> [--output <new-directory>]
+  npx @noorddev/vlak-cli status
+  npx @noorddev/vlak-cli diff [--registry <url>]
+  npx @noorddev/vlak-cli update-plan --output <file> [--registry <url>]
+  npx @noorddev/vlak-cli update --plan <file>
+  npx @noorddev/vlak-cli recover [--rollback]
   npx @noorddev/vlak-cli help
 
 Commands
@@ -22,6 +32,16 @@ Commands
   docs      The markdown page for a component (install, example, props, keyboard,
             accessibility), or the guide, the index, or the tokens page.
   tokens    The design tokens as JSON.
+  workflows List runnable workflow kits and recipes.
+  workflow  Read a kit manifest, or copy its reference workspace into a new directory.
+  status    Show clean, modified and missing installed files.
+  diff      Review current file contents against the target registry snapshot.
+  update-plan  Save a plan with exact source bytes and local-file preconditions.
+  update    Apply a reviewed plan. Conflicts or later edits stop all writes.
+  recover   Inspect an interrupted update; --rollback restores recognized original bytes.
+
+Keep .vlak/ with your project: it contains installed provenance and recovery data.
+Updates preserve local-only changes and never execute package scripts.
 
 Everything works offline: the registry snapshot, the CSS, the docs, and Inter ship with the CLI.
 `;
@@ -115,6 +135,66 @@ Next steps
       break;
     }
 
+    case "workflows":
+    case "workflow": {
+      const workflows = (loadBundle() as ReturnType<typeof loadBundle> & { workflows?: { items: { id: string; title: string; description: string }[]; files: Record<string, string> } }).workflows;
+      if (!workflows) throw new Error("Workflow catalog is missing. Rebuild the CLI.");
+      if (command === "workflows") { console.log(JSON.stringify(workflows.items, null, 2)); break; }
+      const kit = workflows.items.find(item => item.id === positional[0]);
+      if (!kit) throw new Error("Unknown workflow. Run vlak workflows.");
+      if (typeof flags.output === "string") {
+        const directory = safePath(cwd, flags.output);
+        const entries = Object.entries(workflows.files).map(([path, content]) => {
+          if (!path.startsWith("examples/workflows/")) throw new Error("Unexpected workflow source path.");
+          return { path: safePath(cwd, `${flags.output}/${path.slice("examples/workflows/".length)}`), content };
+        });
+        mkdirSync(directory); // A new directory is required; existing work is never merged.
+        for (const entry of entries) { mkdirSync(dirname(entry.path), { recursive: true }); writeFileSync(entry.path, entry.content, { flag: "wx" }); }
+        console.log(`Copied ${kit.title} and its companion recipes to ${flags.output}. Read README.md for install and run commands. No packages or scripts were executed.`);
+      } else console.log(JSON.stringify(kit, null, 2));
+      break;
+    }
+
+    case "status":
+      console.log(JSON.stringify(managedStatus(cwd), null, 2));
+      break;
+
+    case "diff":
+    case "update-plan": {
+      const plan = await updatePlan(cwd, registryFlag(flags));
+      if (command === "update-plan") {
+        if (typeof flags.output !== "string") throw new Error("Use --output <project-relative file>.");
+        writeFileSync(safePath(cwd, flags.output), JSON.stringify(plan, null, 2) + "\n", { flag: "wx" });
+        console.log(`Saved ${flags.output}. Review the diff and plan before running update --plan ${flags.output}.`);
+      } else {
+        console.log(`Target snapshot: ${plan.source}`);
+        for (const change of plan.changes) {
+          console.log(`\n${change.state}: ${change.path}`);
+          if (change.state === "unchanged" || change.state === "local") continue;
+          const before = change.before ? readFileSync(safePath(cwd, change.path)) : Buffer.alloc(0);
+          const after = change.content === null ? Buffer.alloc(0) : Buffer.from(change.content, "base64");
+          if (before.includes(0) || after.includes(0)) { console.log(`Binary: ${change.before ?? "absent"} → ${change.after ?? "absent"}`); continue; }
+          console.log(`--- current/${change.path}\n+++ target/${change.path}\n${before.toString().split("\n").map(line => `-${line}`).join("\n")}\n${after.toString().split("\n").map(line => `+${line}`).join("\n")}`);
+        }
+      }
+      break;
+    }
+    case "update": {
+      if (typeof flags.plan !== "string") throw new Error("Use --plan <reviewed plan file>.");
+      const path = safePath(cwd, flags.plan);
+      if (!statSync(path).isFile() || statSync(path).size > 256 * 1024 * 1024) throw new Error("Update plan must be a regular file no larger than 256 MiB.");
+      const plan = readUpdatePlan(cwd, readFileSync(path, "utf8"));
+      const result = applyUpdate(cwd, plan);
+      console.log(`Updated ${result.changed} files; preserved ${result.preserved} locally edited files.`);
+      break;
+    }
+    case "recover": {
+      const result = recoverUpdate(cwd, Boolean(flags.rollback));
+      console.log(JSON.stringify(result, null, 2));
+      if (result.pending) console.log("Preserve .vlak and review these paths. Run recover --rollback to restore their original bytes.");
+      break;
+    }
+
     case "list": {
       const entries = list();
       if (flags.json) {
@@ -196,4 +276,4 @@ Next steps
   }
 }
 
-await main();
+await main().catch(error => { console.error(error instanceof Error ? error.message : String(error)); process.exitCode = 1; });

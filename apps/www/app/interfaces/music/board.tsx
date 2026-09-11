@@ -4,11 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { AudioMeter, Button, ChannelStrip, Icon, Input, NumberField, ParameterKnob, Select, ToggleGroup } from "@noorddev/vlak-react";
 import { initialSession, renderSession, SessionEngine } from "./engine";
 import type { Clip, Session, Track } from "./engine";
+import { parseMusicProject } from "./project";
+import { ProjectTools } from "@/components/project-tools";
 
 const scenes = ["First light", "Open space", "After hours", "Home again"];
 const notes = Array.from({ length: 25 }, (_, index) => ({ value: String(36 + index), label: `${["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"][index % 12]}${Math.floor((36 + index) / 12) - 1}` }));
 function download(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob); const link = document.createElement("a"); link.href = url; link.download = name; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function exportSlug(value: string) {
+  return value.normalize("NFKC").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 64) || "session";
 }
 
 export function MusicBoard() {
@@ -75,13 +80,19 @@ export function MusicBoard() {
     finally { if (alive.current) setStarting(false); }
   }
   function stop() { engine.current?.stop(); setPlaying(false); setPlayhead({ step: -1, bar: 1, levels: [-Infinity, -Infinity, -Infinity, -Infinity] }); setNotice("Stopped. Your patterns are kept."); }
+  function restoreProject(value: Session, title: string) {
+    engine.current?.stop(); engine.current?.dispose(); engine.current = null;
+    setSession({ ...value, name: value.name }); setSelected({ track: 0, clip: value.tracks[0]!.active }); setUndo(null); setPlaying(false); setPlayhead({ step: -1, bar: 1, levels: [-Infinity, -Infinity, -Infinity, -Infinity] }); setNotice(`${title || "Project"} opened. Press Play to hear it.`);
+  }
   function launchScene(index: number) {
     setSession(current => ({ ...current, tracks: current.tracks.map(item => ({ ...item, active: index })) }));
     setSelected(current => ({ ...current, clip: index })); setNotice(`${scenes[index]} is active on all four tracks${playing ? ". Playing from the current beat." : ". Press Play to listen."}`);
   }
   async function exportAudio() {
+    const snapshot = structuredClone(session);
+    const filename = `${exportSlug(snapshot.name)}-session.wav`;
     setExporting(true); setNotice("Rendering four bars of the active clips…");
-    try { const blob = await renderSession(session); if (alive.current) { download(blob, "vlak-session.wav"); setNotice("Stereo wave exported: four bars plus the instrument tails."); } }
+    try { const blob = await renderSession(snapshot); if (alive.current) { download(blob, filename); setNotice("Stereo wave exported: four bars plus the instrument tails."); } }
     catch { if (alive.current) setNotice("Audio export failed. Your session is still here; try exporting again."); }
     finally { if (alive.current) setExporting(false); }
   }
@@ -130,7 +141,7 @@ export function MusicBoard() {
           <AudioMeter label="Channel levels" min={-60} max={0} channels={session.tracks.map((item, index) => ({ id: item.id, label: item.name, level: playing ? Math.round(playhead.levels[index]! * 10) / 10 : -Infinity }))} />
         </aside>
       </div>
-      <footer className="mu-footer"><p role="status">{notice}</p><div><Button variant="ghost" size="sm" onClick={() => { download(new Blob([JSON.stringify(session, null, 2)], { type: "application/json" }), "vlak-session.json"); setNotice("Editable session saved as JSON."); }}><Icon name="download" size={16} />Save session</Button><Button size="sm" disabled={exporting} onClick={exportAudio}><Icon name="download" size={16} />{exporting ? "Rendering…" : "Export audio"}</Button></div></footer>
+      <footer className="mu-footer"><p role="status">{notice}</p><div><ProjectTools kind="music" title={session.name} value={session} parse={parseMusicProject} onRestore={restoreProject} documentVersion={1} /><Button size="sm" disabled={exporting} onClick={exportAudio}><Icon name="download" size={16} />{exporting ? "Rendering…" : "Export audio"}</Button></div></footer>
     </div>
   </div>;
 }

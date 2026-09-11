@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { add, docsFor, init, list, loadConfig, resolveWithDependencies, search } from "../src/lib";
+import { installed, sha } from "../src/managed";
 
 let cwd: string;
 
@@ -26,6 +27,9 @@ describe("init", () => {
     expect(existsSync(join(cwd, "styles/fonts/inter/InterVariable-latin.woff2"))).toBe(true);
     expect(existsSync(join(cwd, "styles/fonts/inter/InterVariable-latin-ext.woff2"))).toBe(true);
     expect(readFileSync(join(cwd, "styles/fonts/inter/OFL.txt"), "utf8")).toContain("SIL Open Font License");
+    const provenance = installed(cwd);
+    expect(provenance.files).toHaveLength(4);
+    expect(provenance.files.find(file => file.path === "styles/vlak.css")?.base).toBe(sha(readFileSync(join(cwd, "styles/vlak.css"))));
     const page = readFileSync(join(cwd, "index.html"), "utf8");
     expect(page).toContain('href="styles/vlak.css"');
     expect(page).toContain("workhorse of a design system");
@@ -107,7 +111,7 @@ describe("add", () => {
         name,
         files: [
           { path: `vlak/${name}.tsx`, target: `components/vlak/${name}.tsx`, content: "export {};", type: "registry:component" },
-          { path: "vlak/shared.ts", target: name === "first" ? "components/vlak/shared.ts" : "components/vlak/helpers/../shared.ts", content: `// ${name}\n`, type: "registry:file" },
+          { path: "vlak/shared.ts", target: "components/vlak/shared.ts", content: `// ${name}\n`, type: "registry:file" },
         ],
       }));
     }
@@ -115,6 +119,21 @@ describe("add", () => {
     expect(readFileSync(join(cwd, "components/vlak/shared.ts"), "utf8")).toBe("// consumer's helper\n");
     expect(existsSync(join(cwd, "components/vlak/first.tsx"))).toBe(false);
     expect(existsSync(join(cwd, "components/vlak/second.tsx"))).toBe(false);
+  });
+
+  it("rejects unsafe or mismatched registry records before writing any source", async () => {
+    init(cwd);
+    const registry = join(cwd, "unsafe-registry");
+    mkdirSync(registry);
+    writeFileSync(join(registry, "unsafe.json"), JSON.stringify({
+      name: "unsafe",
+      files: [{ path: "vlak/unsafe.ts", target: "../outside.ts", content: "unsafe", type: "registry:file" }],
+    }));
+    await expect(add(cwd, ["unsafe"], { registry, overwrite: true })).rejects.toThrow(/Invalid registry file target/);
+    writeFileSync(join(registry, "mismatch.json"), JSON.stringify({ name: "other", files: [] }));
+    await expect(add(cwd, ["mismatch"], { registry, overwrite: true })).rejects.toThrow(/Registry item is invalid/);
+    expect(existsSync(join(cwd, "outside.ts"))).toBe(false);
+    expect(existsSync(join(cwd, "components/vlak/unsafe.ts"))).toBe(false);
   });
 
   it("vendors component source plus the shared lib once", async () => {
@@ -129,6 +148,8 @@ describe("add", () => {
     expect(existsSync(join(cwd, "components/vlak/rs.ts"))).toBe(true);
     expect(readFileSync(join(cwd, "components/vlak/rs.ts"), "utf8")).toContain('from "./cx"');
     expect(existsSync(join(cwd, "components/vlak/tokens.stylex.ts"))).toBe(true);
+    const button = installed(cwd).files.find(file => file.path === "components/vlak/button.tsx");
+    expect(button).toMatchObject({ owners: ["button"], base: sha(readFileSync(join(cwd, "components/vlak/button.tsx"))) });
   });
 
   it("pulls registry dependencies in install order", async () => {

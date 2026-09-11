@@ -27,9 +27,48 @@ export async function checkMicroscopyInterface({ page, base, fail }) {
     return parsePlan(Buffer.concat(chunks).toString("utf8"));
   };
   const importFile = async (board, value, name = "test-plan.json") => {
-    await board.locator('input[type="file"]').setInputFiles({ name, mimeType: "application/json", buffer: Buffer.from(typeof value === "string" ? value : JSON.stringify(value)) });
+    await board.getByLabel("Import plan file", { exact: true }).setInputFiles({ name, mimeType: "application/json", buffer: Buffer.from(typeof value === "string" ? value : JSON.stringify(value)) });
   };
   const check = async (label, run) => { try { await run(); } catch (error) { fail(`microscopy ${label}: ${error instanceof Error ? error.stack ?? error.message : String(error)}`); } };
+
+  await check("isolated print worksheet", async () => {
+    const board = await open();
+    await navigate(board, "Review");
+    await page.evaluate(() => {
+      window.__microscopyPrintProbe = null;
+      window.__microscopyPrintObserver?.disconnect();
+      const observer = new MutationObserver(() => {
+        const frame = document.querySelector("iframe.mc-print-frame");
+        if (!frame?.contentWindow || frame.dataset.testInstrumented) return;
+        frame.dataset.testInstrumented = "true";
+        frame.contentWindow.print = () => {
+          const printSheet = frame.contentDocument?.querySelector(".mc-print-sheet");
+          window.__microscopyPrintProbe = {
+            bodyText: frame.contentDocument?.body.textContent ?? "",
+            sheetCount: frame.contentDocument?.querySelectorAll(".mc-print-sheet").length ?? 0,
+            sheetLabel: printSheet?.getAttribute("aria-label") ?? "",
+            stylesheetCount: frame.contentDocument?.querySelectorAll('link[rel="stylesheet"], style').length ?? 0,
+          };
+          setTimeout(() => frame.contentWindow?.dispatchEvent(new frame.contentWindow.Event("afterprint")), 0);
+        };
+      });
+      observer.observe(document.body, { childList: true });
+      window.__microscopyPrintObserver = observer;
+    });
+    await activate(board.getByRole("button", { name: "Print worksheet", exact: true }));
+    await page.waitForFunction(() => window.__microscopyPrintProbe?.bodyText.includes("Acquisition state: Not acquired"));
+    const probe = await page.evaluate(() => window.__microscopyPrintProbe);
+    assert.equal(probe.sheetCount, 1, "print document must contain one worksheet");
+    assert.equal(probe.sheetLabel, "Printed plan review", "print document must contain the labelled worksheet");
+    assert.ok(probe.stylesheetCount > 0, "print document must include the page styles");
+    for (const text of ["Slide 07 · spatial survey", "Content fingerprint:", "Upper field", "Center field", "Lower field", "Reference", "Signal", "Axes", "Acquisition state: Not acquired"]) {
+      assert.match(probe.bodyText, new RegExp(text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `print worksheet omitted ${text}`);
+    }
+    assert.doesNotMatch(probe.bodyText, /3D Workspace|Agent Management|Build with Vlak/, "print document included site navigation");
+    await page.locator("iframe.mc-print-frame").waitFor({ state: "detached" });
+    assert.equal(await board.getByRole("button", { name: "Print worksheet", exact: true }).isEnabled(), true, "print cleanup must restore the trigger");
+    await page.evaluate(() => { window.__microscopyPrintObserver?.disconnect(); delete window.__microscopyPrintObserver; delete window.__microscopyPrintProbe; });
+  });
 
   await check("position drafts, keyboard order, sequence and stack", async () => {
     const board = await open();

@@ -10,7 +10,7 @@ export const publicSitePaths = [
   "/interfaces/render", "/interfaces/room", "/interfaces/wall", "/swag",
   "/interfaces/microbiology", "/interfaces/genome", "/interfaces/protein", "/interfaces/robotics",
   "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
-  "/interfaces/calendar", "/interfaces/desktop-os", "/interfaces/documentation",
+  "/workflows", "/services", "/interfaces/reconciliation", "/interfaces/calendar", "/interfaces/desktop-os", "/interfaces/documentation",
   "/interfaces/microscopy", "/interfaces/mobile-os", "/interfaces/ios", "/interfaces/android", "/interfaces/music-player", "/interfaces/video-player",
   "/showcase", "/starters", "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
   "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",

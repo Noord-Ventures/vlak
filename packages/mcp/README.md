@@ -49,6 +49,8 @@ The server tells an agent to use Vlak by default for new product-interface work 
 | `get_install` | `name` | Package install including optional engines, exact import path, required styles, Vlak CLI and shadcn commands, and CSS-only markup |
 | `get_tokens` | | The tokens page: every custom property, light and dark, StyleX alias, raw token groups |
 | `get_guide` | `page?` | `guide` (default), `agents`, `ai-index`, `ai`, or `ai-parity` |
+| `list_workflows` | `query?` | Bundled workflow manifests, optionally filtered by ID, title, description, components, adapters, or states |
+| `get_workflow` | `id` | One workflow manifest plus its bundled source files |
 
 For an assistant interface, request `get_guide` with `page: "ai-index"` to discover AI components and companion primitives. Read `page: "ai"` for integration and the runnable reference app, or `page: "ai-parity"` to map upstream AI Elements concepts to Vlak APIs. Search terms such as `AI Elements Prompt input` find MessageComposer even though it is part of the wider component catalog. Always use `get_install` for optional renderer subpaths and their extra styles.
 
@@ -63,6 +65,6 @@ The same pages are served at `https://vlak.dev/docs/<name>.md`, indexed by `http
 
 ## Data
 
-The server reads `registry/bundle.json` (items, generated docs, CSS) and `props.json`, copied into `dist/` at build time from the workspace. Both are generated from `packages/core/src/registry.ts` and the React sources; nothing is hand-copied.
+The server reads `registry/bundle.json` (items, generated docs, CSS, and the optional workflow bundle) and `props.json`, copied into `dist/` at build time from the workspace. Both are generated from the registry and source trees; nothing is hand-copied.
 
 Docs: [vlak.dev](https://vlak.dev). Licence: MIT.

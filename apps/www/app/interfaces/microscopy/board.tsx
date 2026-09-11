@@ -5,6 +5,7 @@ import { AcquisitionSequencer, Button, Icon, Input, QuantityField, Select, Stack
 import type { AcquisitionStep, StackSelection } from "@noorddev/vlak-react";
 import { PLAN_LIMITS, axisValue, formatNumber, initialPlan, parsePlan, previewFrame, reviewPlan, serializePlan } from "./plan";
 import type { MicroscopyPlan, PlanAxis, PlanIssue, PlanPosition, PlanScreen } from "./plan";
+import { ProjectTools } from "@/components/project-tools";
 
 const screens = [["positions", "Positions"], ["sequence", "Sequence"], ["stack", "Stack"], ["review", "Review"]] as const;
 const unitOptions = [{ value: "µm", label: "µm" }];
@@ -63,6 +64,8 @@ export function MicroscopyBoard() {
   const [importError, setImportError] = React.useState("");
   const [candidate, setCandidate] = React.useState<{ plan: MicroscopyPlan; name: string } | null>(null);
   const [reading, setReading] = React.useState(false);
+  const [printing, setPrinting] = React.useState(false);
+  const printFrame = React.useRef<HTMLIFrameElement | null>(null);
   const root = React.useRef<HTMLElement>(null);
   const positionHeading = React.useRef<HTMLHeadingElement>(null);
   const editorTrigger = React.useRef<HTMLButtonElement>(null);
@@ -76,6 +79,12 @@ export function MicroscopyBoard() {
   const unsaved = plan.positions.filter(position => (ownRecord(drafts, position.id) && JSON.stringify(drafts[position.id]) !== JSON.stringify(position)) || (ownRecord(unitDrafts, position.id) && JSON.stringify(unitDrafts[position.id]) !== JSON.stringify(plan.units))).length;
   const review = reviewPlan(plan);
   const included = plan.positions.filter(position => position.enabled);
+  const worksheetFingerprint = React.useMemo(() => {
+    // A compact content identifier for comparing worksheets, not a security digest.
+    let value = 2166136261;
+    for (const character of JSON.stringify(plan)) value = Math.imul(value ^ character.charCodeAt(0), 16777619);
+    return `fnv1a-${(value >>> 0).toString(16).padStart(8, "0")}`;
+  }, [plan]);
   const getIndex = (key: string, length: number) => !length || selection[key] === null ? null : Math.max(0, Math.min(length - 1, selection[key] ?? 0));
   const previewSelection = { position: getIndex("position", included.length), z: getIndex("z", boundedCount(plan.z.count)), t: getIndex("t", boundedCount(plan.t.count)), step: getIndex("step", plan.steps.length) };
   const preview = previewFrame(plan, previewSelection);
@@ -84,7 +93,7 @@ export function MicroscopyBoard() {
     let index = 1; while (records.some(record => record.id === `${prefix}-${String(index).padStart(2, "0")}`)) index++;
     return `${prefix}-${String(index).padStart(2, "0")}`;
   };
-  React.useEffect(() => { setReady(true); return () => { request.current++; for (const url of downloadUrls.current) URL.revokeObjectURL(url); }; }, []);
+  React.useEffect(() => { setReady(true); return () => { request.current++; printFrame.current?.remove(); for (const url of downloadUrls.current) URL.revokeObjectURL(url); }; }, []);
 
   function update(next: MicroscopyPlan) { setPlan(next); setReviewed(false); setMessage(""); }
   function navigate(next: PlanScreen) { setScreen(next); setPositionError(""); }
@@ -145,6 +154,57 @@ export function MicroscopyBoard() {
     update(candidate.plan); setSelectedId(candidate.plan.positions[0]?.id ?? null); setEditing(false); setDrafts({}); setUnitDrafts({}); setSelection({ position: 0, z: 0, t: 0, step: 0 });
     setMessage(`${candidate.name} imported as a local draft. Nothing has been acquired.`); setCandidate(null);
   }
+  function parseProject(value: unknown): MicroscopyPlan {
+    const parsed = parsePlan(JSON.stringify(value));
+    return parsed;
+  }
+  function restoreProject(next: MicroscopyPlan, title: string) {
+    update(next); setSelectedId(next.positions[0]?.id ?? null); setEditing(false); setDrafts({}); setUnitDrafts({}); setSelection({ position: 0, z: 0, t: 0, step: 0 });
+    setScreen("review"); setMessage(`${title || "Microscopy project"} restored as a local draft. Nothing has been acquired.`);
+  }
+  async function printReview(event: React.MouseEvent<HTMLButtonElement>) {
+    const sheet = root.current?.parentElement?.querySelector(".mc-print-sheet");
+    if (!sheet || printing) return;
+    const trigger = event.currentTarget;
+    const frame = document.createElement("iframe");
+    frame.title = "Microscopy worksheet";
+    frame.className = "mc-print-frame";
+    frame.tabIndex = -1;
+    frame.setAttribute("aria-hidden", "true");
+    frame.setAttribute("sandbox", "allow-same-origin allow-modals");
+    printFrame.current?.remove(); printFrame.current = frame;
+    document.body.append(frame); setPrinting(true); setMessage("Preparing worksheet…");
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    const cleanup = () => { if (timeout) clearTimeout(timeout); frame.remove(); if (printFrame.current === frame) printFrame.current = null; if (trigger.isConnected) { setPrinting(false); trigger.focus(); } };
+    try {
+      const doc = frame.contentDocument;
+      const view = frame.contentWindow;
+      if (!doc || !view) throw new Error("Print document unavailable");
+      doc.title = `${plan.title || "Untitled plan"} · Microscopy worksheet`;
+      doc.body.className = "mc-print-document";
+      const styles = [...document.querySelectorAll<HTMLLinkElement | HTMLStyleElement>('link[rel="stylesheet"], style')].map(source => {
+        const copy = source.cloneNode(true) as HTMLLinkElement | HTMLStyleElement;
+        const loaded = source.tagName === "LINK" ? new Promise<void>((resolve, reject) => {
+          copy.addEventListener("load", () => resolve(), { once: true });
+          copy.addEventListener("error", () => reject(new Error("Print styles unavailable")), { once: true });
+        }) : Promise.resolve();
+        doc.head.append(copy); return loaded;
+      });
+      // DOM cloning keeps user-supplied titles and values as text, with no HTML interpolation.
+      doc.body.append(doc.importNode(sheet, true));
+      await Promise.race([Promise.all(styles).then(() => doc.fonts.ready), new Promise((_, reject) => { timeout = setTimeout(() => reject(new Error("Print styles timed out")), 10000); })]);
+      if (timeout) clearTimeout(timeout);
+      if (!frame.isConnected) return;
+      view.addEventListener("afterprint", cleanup, { once: true });
+      setMessage("Worksheet opened for printing. Unapplied position edits are excluded.");
+      view.focus(); view.print();
+      // Some browsers do not deliver afterprint when the print dialog is dismissed.
+      if (frame.isConnected) timeout = setTimeout(cleanup, 60000);
+    } catch {
+      if (trigger.isConnected) setMessage("The worksheet could not be prepared for printing. Your plan is unchanged; try again.");
+      cleanup();
+    }
+  }
   function exportPlan() {
     try {
       const content = serializePlan(plan);
@@ -188,7 +248,7 @@ export function MicroscopyBoard() {
           {screen === "review" && <>
             <div className="mc-section"><Input label="Plan title" value={plan.title} maxLength={96} onChange={event => update({ ...plan, title: event.target.value })} data-plan-path="title" /><div className="mc-review-equation"><span>{included.length} positions × {plan.z.count ?? "?"} slices × {plan.t.count ?? "?"} time points × {plan.steps.length} steps</span><strong data-testid="mc-review-frames">{summary}</strong><p>{review.exposureMs === null ? "Total exposure is unknown." : `${formatNumber(review.exposureMs / 1000)} s total exposure.`} Movement, readout and other overhead are not estimated.</p></div><p className="mc-note">Order: position → time point → depth slice → capture step. Planned Z adds the position Z, slice offset and step depth. Requested time adds the time-point and step offsets. Sequential execution and any overlap need instrument validation.</p></div>
             <div className="mc-section mc-review-status"><h3>{review.issues.length ? `${review.issues.length} fields need attention` : "Working plan is complete"}</h3>{review.issues.length > 0 ? <ul className="mc-issues">{review.issues.map(issue => <li key={issue.path}><Button variant="ghost" onClick={() => focusIssue(issue)}>{issue.message}<Icon name="arrow-right" size={16} /></Button></li>)}</ul> : <p>All required planning values are supplied. This checks the local format, not an instrument's travel, timing or compatibility.</p>}{unsaved > 0 && <p>{unsaved} position {unsaved === 1 ? "has" : "have"} unapplied edits. Review and export use the working coordinates.</p>}<Button disabled={review.issues.length > 0 || unsaved > 0 || reviewed} onClick={() => { setReviewed(true); setMessage("Working plan reviewed locally. All frames remain Not acquired."); }}>{reviewed ? "Reviewed locally" : "Mark plan reviewed"}</Button><span className="mc-not-acquired">Acquisition state: Not acquired</span></div>
-            <div className="mc-section mc-transfer"><h3>Plan file</h3><p>Version 1 · JSON · up to 256 KiB. Imports are checked before you apply them. Export keeps unknown values as null.</p><div className="mc-actions"><Button variant="ghost" onClick={exportPlan}><Icon name="download" size={16} />Export draft</Button><Button variant="ghost" disabled={reading} onClick={() => fileInput.current?.click()}><Icon name="upload" size={16} />{reading ? "Reading file…" : "Import draft"}</Button><input ref={fileInput} className="mc-file-input" type="file" accept=".json,application/json" aria-label="Import plan file" onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; void readImport(file); }} /></div>{importError && <p role="alert" className="mc-import-error">{importError} Working plan and editor drafts preserved.</p>}{candidate && <div className="mc-import-candidate"><h4>Ready to import</h4><p>{candidate.name}</p><strong>{candidate.plan.title || "Untitled plan"}</strong><p>{candidate.plan.positions.length} positions · {candidate.plan.steps.length} steps · {formatNumber(reviewPlan(candidate.plan).frames)} planned frames</p><p>Apply replaces this working plan and its position edits. Imported plans always need a new local review.</p><div className="mc-actions"><Button onClick={applyImport}>Apply import</Button><Button variant="ghost" onClick={() => setCandidate(null)}>Cancel import</Button></div></div>}</div>
+            <div className="mc-section mc-transfer"><h3>Plan file</h3><p>Version 1 · JSON · up to 256 KiB. Imports are checked before you apply them. Export keeps unknown values as null.</p><div className="mc-actions"><Button variant="ghost" onClick={exportPlan}><Icon name="download" size={16} />Export draft</Button><Button variant="ghost" disabled={reading} onClick={() => fileInput.current?.click()}><Icon name="upload" size={16} />{reading ? "Reading file…" : "Import draft"}</Button><Button variant="ghost" disabled={printing} onClick={printReview}>{printing ? "Preparing worksheet…" : reviewed ? "Print reviewed worksheet" : "Print worksheet"}</Button><input ref={fileInput} className="mc-file-input" type="file" accept=".json,application/json" aria-label="Import plan file" onChange={event => { const file = event.target.files?.[0]; event.target.value = ""; void readImport(file); }} /></div>{importError && <p role="alert" className="mc-import-error">{importError} Working plan and editor drafts preserved.</p>}{candidate && <div className="mc-import-candidate"><h4>Ready to import</h4><p>{candidate.name}</p><strong>{candidate.plan.title || "Untitled plan"}</strong><p>{candidate.plan.positions.length} positions · {candidate.plan.steps.length} steps · {formatNumber(reviewPlan(candidate.plan).frames)} planned frames</p><p>Apply replaces this working plan and its position edits. Imported plans always need a new local review.</p><div className="mc-actions"><Button onClick={applyImport}>Apply import</Button><Button variant="ghost" onClick={() => setCandidate(null)}>Cancel import</Button></div></div>}</div>
           </>}
         </div>
         <div className="mc-workflow-foot"><span>{screen === "positions" && dirty ? "Unapplied position edits" : summary}</span><span>Not acquired</span></div>
@@ -196,5 +256,7 @@ export function MicroscopyBoard() {
     </div>
     <nav className="mc-mobile-nav" aria-label="Microscopy screens">{screens.map(([value, label]) => <Button key={value} variant="ghost" aria-current={screen === value ? "page" : undefined} onClick={() => navigate(value)}>{label}</Button>)}</nav>
     <footer className="mc-footer"><span>{plan.stage.label || "Unnamed stage"} · {plan.coordinateFrame?.label || "Frame unknown"}</span><span>No instrument connected</span></footer><p className="mc-announcement" role="status">{message}</p>
+    <section className="mc-print-sheet" aria-label="Printed plan review"><h2>{plan.title || "Untitled plan"}</h2><p>{reviewed ? "Reviewed locally" : "Draft worksheet"} · schema {plan.schema} · version {plan.version}{unsaved > 0 ? " · Unapplied position edits are excluded from this worksheet." : ""}</p><p>Content fingerprint: {worksheetFingerprint}. Identifies the applied plan values printed below.</p><dl><div><dt>Planned frames</dt><dd>{formatNumber(review.frames)}</dd></div><div><dt>Total exposure</dt><dd>{review.exposureMs === null ? "Unknown" : `${formatNumber(review.exposureMs / 1000)} s`}</dd></div><div><dt>Units</dt><dd>X {plan.units.x ?? "Unknown"} · Y {plan.units.y ?? "Unknown"} · Z {plan.units.z ?? "Unknown"}</dd></div><div><dt>Coordinate frame</dt><dd>{plan.coordinateFrame?.label || "Not supplied"}</dd></div></dl><h3>Plan issues</h3>{review.issues.length ? <ul>{review.issues.map(issue => <li key={issue.path}>{issue.path}: {issue.message}</li>)}</ul> : <p>No plan issues recorded.</p>}<h3>Ordered positions</h3><ol>{plan.positions.map(position => <li key={position.id}><strong>{position.name || "Unnamed position"}</strong> · {position.enabled ? "Included" : "Excluded"} · X {coordinate(position.x, plan.units.x)} · Y {coordinate(position.y, plan.units.y)} · Z {coordinate(position.z, plan.units.z)}</li>)}</ol><h3>Capture steps</h3><ol>{plan.steps.map(step => <li key={step.id}><strong>{step.label || "Unnamed step"}</strong> · channel {plan.channels.find(channel => channel.id === step.channel)?.label || "Not supplied"} · exposure {step.exposure === null ? "Unknown" : `${formatNumber(step.exposure)} ms`} · time {step.time === null ? "Unknown" : `${formatNumber(step.time)} s`} · depth {step.depth === null ? "Unknown" : `${formatNumber(step.depth)} µm`}</li>)}</ol><h3>Axes</h3><p>Z: start {coordinate(plan.z.start, "µm")}, interval {coordinate(plan.z.step, "µm")}, count {plan.z.count ?? "Unknown"}. T: start {coordinate(plan.t.start, "s")}, interval {coordinate(plan.t.step, "s")}, count {plan.t.count ?? "Unknown"}.</p><p>Acquisition state: Not acquired. This worksheet is a review of supplied planning values, not an acquisition record.</p></section>
+    <ProjectTools kind="microscopy" title={plan.title || "Microscopy plan"} value={plan} parse={parseProject} onRestore={restoreProject} documentVersion={1} />
   </section></div>;
 }

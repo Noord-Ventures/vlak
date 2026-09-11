@@ -70,7 +70,9 @@ const budgets = [
   ["@noorddev/vlak-react components/stage-position-list.js", "packages/react/dist/components/stage-position-list.js", 4 * 1024],
   ...["joint-panel", "robot-pose", "robot-mission-queue", "pad-inspector", "colony-plate", "culture-log"].map(name =>
     [`@noorddev/vlak-react components/${name}.js`, `packages/react/dist/components/${name}.js`, 3 * 1024]),
-  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 149 * 1024],
+  // Provenance, validated update plans, journal recovery and workflow discovery add bounded CLI code.
+  // Component CSS and runtime budgets remain unchanged.
+  ["@noorddev/vlak-cli dist/index.js (bundles the typed registry for list/search)", "packages/cli/dist/index.js", 160 * 1024],
 ];
 
 let failed = false;

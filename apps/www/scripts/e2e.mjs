@@ -84,7 +84,8 @@ async function sweepPages(label, paths, contextOptions, check) {
 const docs = ["", "frameworks/", "theming/", "tokens/", "layers/", "stylex/", "accessibility/", "health/", "civic/", "science/", "creative/", "engineering/", "geospatial/", "robotics/", "electronics/", "microbiology/", "agents/"].map((d) => `/docs/${d}`);
 const componentPages = catalogComponents.map((component) => `/${component.category === "ai" ? "ai" : "components"}/${component.name}/`);
 const pages = ["/", ...docs, "/components/", "/ai/", "/ai/widgets/", "/about/", "/interfaces/", "/interfaces/evening/", "/interfaces/microscopy/", ...componentPages];
-await sweepPages("Desktop axe", pages, { viewport: { width: 1280, height: 900 } }, async (desk, path) => {
+// Measure settled colors; dedicated interaction checks below still exercise motion.
+await sweepPages("Desktop axe", pages, { viewport: { width: 1280, height: 900 }, reducedMotion: "reduce" }, async (desk, path) => {
   const errors = [];
   const collectError = error => errors.push(error.message);
   desk.on("pageerror", collectError);

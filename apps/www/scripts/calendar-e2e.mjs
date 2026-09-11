@@ -208,7 +208,7 @@ export async function checkCalendar({ page, base, fail }) {
       await settings.getByRole("button", { name: "Import .ics", exact: true }).click();
       await (await chooserReady).setFiles({ name: "browser-calendar.ics", mimeType: "text/calendar", buffer: Buffer.from(fixture) });
       await importDialog.waitFor({ state: "visible" });
-      await importDialog.getByText(/^1 events? ready to import\.$/).waitFor();
+      await importDialog.getByText(/^1 accepted · 0 rejected · 1 source events?\.$$/).waitFor();
       await importDialog.getByRole("combobox", { name: "Import into", exact: true }).selectOption({ label: calendarName });
     };
     const beforeImport = (await saved()).events.length;
@@ -226,6 +226,37 @@ export async function checkCalendar({ page, base, fail }) {
     await importDialog.getByRole("button", { name: "Import events", exact: true }).click();
     await importDialog.waitFor({ state: "hidden" });
     assert.equal((await saved()).events.length, beforeImport + 1, "Importing the same UID again does not duplicate an event");
+
+    stage = "rapid ICS selection keeps the latest report";
+    const calendarFileInput = page.locator('input[type="file"][accept*="text/calendar"]');
+    assert.equal(await calendarFileInput.count(), 1, "Calendar import must expose one iCalendar file input");
+    const rapidA = fixture.replaceAll("browser-import", "rapid-a").replace(importedTitle, "Rapid A");
+    const rapidB = fixture.replaceAll("browser-import", "rapid-b").replace(importedTitle, "Rapid B");
+    await page.evaluate(() => {
+      const original = File.prototype.text;
+      window.__calendarTextWaiters = {};
+      window.__calendarOriginalText = original;
+      File.prototype.text = function () {
+        if (this.name === "rapid-a.ics" || this.name === "rapid-b.ics") return new Promise(resolve => { window.__calendarTextWaiters[this.name] = resolve; });
+        return original.call(this);
+      };
+    });
+    try {
+      await calendarFileInput.setInputFiles({ name: "rapid-a.ics", mimeType: "text/calendar", buffer: Buffer.from(rapidA) });
+      await calendarFileInput.setInputFiles({ name: "rapid-b.ics", mimeType: "text/calendar", buffer: Buffer.from(rapidB) });
+      await page.evaluate((content) => window.__calendarTextWaiters["rapid-b.ics"](content), rapidB);
+    } finally {
+      await page.evaluate(() => { File.prototype.text = window.__calendarOriginalText; delete window.__calendarOriginalText; delete window.__calendarTextWaiters; });
+    }
+    await importDialog.waitFor({ state: "visible" });
+    const originalDownload = page.waitForEvent("download");
+    await importDialog.getByRole("button", { name: "Download original text", exact: true }).click();
+    const rapidDownload = await originalDownload;
+    const rapidStream = await rapidDownload.createReadStream();
+    let rapidText = "";
+    if (rapidStream) for await (const chunk of rapidStream) rapidText += chunk.toString();
+    assert.ok(rapidText.includes("SUMMARY:Rapid B"), "Only the latest rapid ICS selection may populate the report");
+    await importDialog.getByRole("button", { name: "Cancel import", exact: true }).click();
 
     stage = "all-day creation, editing and discard";
     const allDayTitle = `All-day browser event ${width}`;
@@ -327,6 +358,24 @@ export async function checkCalendar({ page, base, fail }) {
     await saveEvent(editDialog);
     assert.ok((await saved()).events.some(event => event.title === blockedTitle), "Saving again after storage recovers persists the retained draft");
     assert.equal(await board.getByRole("alert").count(), 0);
+
+    stage = "cross-tab deletion preserves the working draft";
+    const otherTab = await page.context().newPage();
+    try {
+      await otherTab.goto(`${base}/interfaces/calendar/`, { waitUntil: "networkidle" });
+      await otherTab.evaluate(() => localStorage.removeItem("vlak-calendar-v1"));
+      await board.getByRole("alert").filter({ hasText: "removed in another tab" }).waitFor();
+      const retained = `Cross-tab retained event ${width}`;
+      await (await find(blockedTitle, 1)).click();
+      await editDialog.getByRole("textbox", { name: "Title", exact: true }).fill(retained);
+      await editDialog.getByRole("button", { name: "Save event", exact: true }).click();
+      await board.getByRole("alert").filter({ hasText: "Nothing was saved" }).waitFor();
+      assert.equal(await otherTab.evaluate(() => localStorage.getItem("vlak-calendar-v1")), null, "The first save after cross-tab deletion must not recreate storage");
+      assert.equal(await editDialog.getByRole("textbox", { name: "Title", exact: true }).inputValue(), retained, "The failed save preserves the edit in the open dialog");
+      await editDialog.getByRole("button", { name: "Save event", exact: true }).click();
+      await editDialog.waitFor({ state: "hidden" });
+      assert.ok((await saved()).events.some(event => event.title === retained), "An explicit second save recreates the removed persisted calendar");
+    } finally { await otherTab.close(); }
     console.log(`${width}px Calendar: timed/all-day CRUD, recurrence scopes, calendar management, Undo, search, persistence/recovery, ICS interchange, views and keyboard focus passed`);
   } catch (error) { fail(`Calendar ${width}px ${stage}: ${error.message}`); }
 }

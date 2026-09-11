@@ -22,7 +22,7 @@ function sourceFor(slug: InterfaceSlug) {
 
 export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; children: ReactNode }) {
   const proto = interfaceBySlug(slug)!;
-  const workbench = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "render", "drive", "orbit", "line", "press", "wall", "night", "evening", "room", "graphics", "platforms", "android", "ios", "documentation", "music-player", "video-player", "calendar", "desktop-os"].includes(slug);
+  const workbench = ["reconciliation", "microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "render", "drive", "orbit", "line", "press", "wall", "night", "evening", "room", "graphics", "platforms", "android", "ios", "documentation", "music-player", "video-player", "calendar", "desktop-os"].includes(slug);
   const ordered = orderedInterfaces;
   const next = ordered[(ordered.findIndex((item) => item.slug === slug) + 1) % ordered.length]!;
   const source = sourceFor(slug);

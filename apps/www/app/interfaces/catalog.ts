@@ -434,9 +434,27 @@ const desktopStudy = {
   ],
 } as const;
 
+const reconciliationStudy = {
+  slug: "reconciliation", title: "CSV reconciliation", what: "Reconciliation",
+  voice: "Make differences explicit.",
+  law: "Compare two CSV exports, review exceptions and keep a reusable reconciliation project.",
+  story: "Choose two local CSV files and identify their key columns. Exact text matching preserves leading zeros and separates matches, missing records, conflicting values and ambiguous keys. Review the exceptions, then export the result and the recipe that produced it.",
+  type: "Source comparison, exception review and export", module: "Grid system",
+  ink: "Readable tables, stable record identities and a focused review panel.",
+  use: "Open two files → choose keys → review differences → export",
+  field: "Two source previews lead to a filtered worklist and record comparison.",
+  note: "Files are processed in this browser. Matching is exact; duplicate keys require review. Data-preserving and spreadsheet-safe exports are separate choices. No accounting system is connected.",
+  components: ["Badge", "Button", "Input", "Select"],
+  modifications: [
+    "Native file inputs preserve the source CSV. Input and Select configure key columns and comparison fields; a worker keeps parsing and matching away from the main interface.",
+    "Badge and Button expose the actual comparison state. Decisions remain tied to the source records and are invalidated when their inputs change.",
+    "Project files retain sources, recipe and review decisions. Browser copies, previous revisions and recovery downloads share the same lifecycle as the other local workspaces.",
+  ],
+} as const;
+
 const specialistStudies = [...scienceStudies, ...engineeringStudies, ...careStudies, ...musicStudies] as const;
-export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy, calendarStudy, desktopStudy] as const;
-export const orderedInterfaces = [...specialistStudies, microscopyStudy, calendarStudy, desktopStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
+export const interfaces = [...originalInterfaces, ...specialistStudies, microscopyStudy, calendarStudy, desktopStudy, reconciliationStudy] as const;
+export const orderedInterfaces = [...specialistStudies, microscopyStudy, calendarStudy, desktopStudy, reconciliationStudy, ...originalInterfaces.slice(6), ...originalInterfaces.slice(0, 6)];
 
 export type InterfaceSlug = (typeof interfaces)[number]["slug"];
 
@@ -448,6 +466,7 @@ export function interfaceBySlug(slug: string) {
 
 /** Each compact workspace changes its flow, not just its column widths. */
 export const mobilePatterns: Record<InterfaceSlug, string> = {
+  reconciliation: "On mobile, source setup stacks vertically. Selecting a result opens a focused record comparison with a Back action that retains filters, keys and review decisions.",
   calendar: "On mobile, a focused day agenda replaces the wide time grid. Date navigation, calendar filters, search and event creation remain reachable. The event editor uses the available screen width, preserving the selected day and saved records when returning to the agenda or opening fullscreen preview.",
   "desktop-os": "On mobile, the selected application fills the workspace. Apps and Tasks become separate drawers, keeping file operations and app switching within reach. Window positions, unsaved drafts and independent platform files survive changes between compact and desktop layouts.",
   microscopy: "On mobile, Positions, Sequence, Stack and Review are focused screens. Opening a position replaces the list with its editor; Back preserves the unsaved draft, while Apply and Discard remain explicit. The planned stack and import/export controls stay available without shrinking the desktop workspace.",

@@ -1,3 +1,4 @@
+import { workflowCatalog } from "../../../examples/workflows/catalog.ts";
 import assert from "node:assert/strict";
 import { readdir, readFile } from "node:fs/promises";
 import { register } from "node:module";
@@ -80,6 +81,8 @@ test("every public canonical page is indexed once, including dynamic catalog and
       for (const component of catalogComponents.filter(component => component.category === "ai")) expected.add(`/ai/${component.name}/`);
     } else if (route === "docs/[collection]") {
       for (const collection of domainCollections) expected.add(`/docs/${collection.name}/`);
+    } else if (route === "workflows/[id]") {
+      for (const kit of workflowCatalog) expected.add(`/workflows/${kit.id}/`);
     } else if (route === "use-cases/[slug]") {
       for (const useCase of useCases) expected.add(`/use-cases/${useCase.slug}/`);
     } else {

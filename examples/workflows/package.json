@@ -1,0 +1,25 @@
+{
+  "name": "vlak-workflow-kits",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=22.6" },
+  "scripts": {
+    "test": "node --experimental-strip-types --test record-review/tests/*.test.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "server": "node --experimental-strip-types record-review/server/node-server.ts",
+    "ui": "vite --config record-review/ui/vite.config.ts"
+  },
+  "dependencies": {
+    "@noorddev/vlak-react": "^0.4.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.1.0"
+  }
+}

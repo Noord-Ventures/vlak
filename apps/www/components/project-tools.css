@@ -1,0 +1,13 @@
+.project-tools { border-block: 1px solid var(--divider); padding: 16px 20px; min-width: 0; }
+.project-tools-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.project-tools > p { color: var(--text-secondary); font-size: 13px; line-height: 1.45; margin: 10px 0 0; }
+.project-tools-dialog { width: min(680px, calc(100vw - 32px)); max-width: min(680px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 24px; }
+.project-tools-dialog > p { margin-block: 16px; }
+.project-tools-list { list-style: none; padding: 0; margin: 16px 0; }
+.project-tools-list li { padding: 12px 0; border-top: 1px solid var(--divider); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.project-tools-list li > span { min-width: 0; overflow-wrap: anywhere; }
+.project-tools-list li > div { display: flex; flex-wrap: wrap; gap: 4px; }
+.project-tools-list small { display: block; color: var(--text-secondary); margin-top: 4px; }
+.wg-header-actions .project-tools, .mu-footer .project-tools, .rc-header .project-tools { border: 0; padding: 0; }
+.wg-header-actions .project-tools > p, .mu-footer .project-tools > p { display: none; }
+@media (max-width: 600px) { .project-tools { padding: 12px; } .project-tools-actions > button { flex: 1 1 auto; } .project-tools-dialog { padding: 20px; } }

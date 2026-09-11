@@ -85,7 +85,16 @@ function FrontierCrop() {
   );
 }
 
+function ReconciliationCrop() {
+  return <div style={{ position: "absolute", inset: 0, padding: 20, overflow: "hidden", background: "var(--bg)" }}>
+    <header style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid var(--divider)", paddingBottom: 14 }}><strong>Compare exports</strong><span>Review</span></header>
+    <div style={{ display: "flex", gap: 24, padding: "18px 0", fontSize: 12 }}><span>12 matched</span><strong>3 exceptions</strong></div>
+    {[["0017", "Matched", "84.00"], ["0024", "Conflicting", "62.00 / 64.00"], ["0031", "Missing", "—"]].map(row => <div key={row[0]} style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, padding: "14px 0", borderTop: "1px solid var(--divider)", fontSize: 12 }}>{row.map((cell, i) => <span key={i}>{cell}</span>)}</div>)}
+  </div>;
+}
+
 const CROPS: Record<InterfaceSlug, () => ReactNode> = {
+  reconciliation: ReconciliationCrop,
   calendar: CalendarCrop,
   line: ChatCrop,
   press: DashboardCrop,

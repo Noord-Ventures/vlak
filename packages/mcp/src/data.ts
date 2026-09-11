@@ -50,6 +50,19 @@ export interface Bundle {
   css: { vlak: string };
   items: RegistryItem[];
   docs?: { guide: string; index: string; tokens: string; components: Record<string, string> };
+  workflows?: { schemaVersion: 1; items: WorkflowManifest[]; files: Record<string, string> };
+}
+
+export interface WorkflowManifest {
+  schemaVersion: 1; id: string; version: string; title: string; description: string; status: string;
+  components: string[]; dependencies: { runtime: string[]; development: string[] };
+  compatibility: { node: string; react: string; vlakReact: string };
+  adapters: Array<{ id: string; label: string; durability: string; source: string }>;
+  ownership: { kitProvides: string[]; hostProvides: string[]; externalValidationBoundary: string };
+  states: { initial: string; values: string[]; terminal: string[] };
+  install: { directory: string; commands: string[] };
+  run: { commands: string[]; urls?: string[] };
+  acceptance: string[]; sources: Array<{ path: string; role: string }>; limitations: string[];
 }
 
 export interface VlakProp {
@@ -115,3 +128,7 @@ export function docsFor(name: string): string | undefined {
   if (name === "guide" || name === "index" || name === "tokens") return docs[name];
   return docs.components[name];
 }
+
+export function workflows(): WorkflowManifest[] { return loadBundle().workflows?.items ?? []; }
+export function findWorkflow(id: string): WorkflowManifest | undefined { return workflows().find(item => item.id === id); }
+export function workflowFiles(): Record<string, string> { return loadBundle().workflows?.files ?? {}; }

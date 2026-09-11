@@ -4,10 +4,11 @@
 .wg :is(button, input, select, textarea) { font-family: inherit; }
 .wg button { width: auto; height: auto; min-width: 44px; min-height: 44px; font-size: 13px; line-height: 1.2; padding: 10px 12px; }
 .wg-header .wg-export { flex: none; }
+.wg-header-actions { display: flex; align-items: center; gap: 8px; }
 .wg-header { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 20px; border-bottom: 1px solid var(--divider); }
 .wg-project { display: flex; align-items: center; gap: 12px; }
 .wg-project > div { display: grid; gap: 1px; }
-.wg-project strong { font-size: 15px; font-weight: 500; }
+.wg-project strong { max-width: min(28vw, 280px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 500; }
 .wg-project span { font-size: 11px; color: var(--text-secondary); }
 .wg-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 268px minmax(0, 1fr); }
 .wg-direction { min-height: 0; display: flex; flex-direction: column; border-right: 1px solid var(--divider); }

@@ -231,3 +231,17 @@ test("ICS rejects malformed, huge, cancelled, sub-minute and missing-duration in
   assert.throws(() => exportICS([event(), event()]));
   assert.equal(importICS(ics(...basic), "bad\ncalendar").events.length, 0);
 });
+
+test("import report accounts for every event and exposes omitted metadata without widening semantics", () => {
+  const source = "BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nUID:good\nSUMMARY:Keep\nDTSTART:20260908T090000\nDTEND:20260908T100000\nATTENDEE:mailto:example@example.invalid\nEND:VEVENT\nBEGIN:VEVENT\nUID:cancelled\nSUMMARY:Cancelled\nSTATUS:CANCELLED\nDTSTART:20260908T090000\nDTEND:20260908T100000\nEND:VEVENT\nBEGIN:VEVENT\nSUMMARY:Broken\nEND:VEVENT\nEND:VCALENDAR";
+  const result = importICS(source, "work");
+  assert.equal(result.report.total, 3);
+  assert.equal(result.report.accepted + result.report.rejected, 3);
+  assert.equal(result.report.accepted, result.events.length);
+  assert.deepEqual(result.report.records.map(record => record.status), ["accepted", "rejected", "rejected"]);
+  assert.ok(result.report.records[0].omittedFields.includes("ATTENDEE"));
+  assert.match(result.report.records[1].issues.join(), /cancelled/);
+  assert.match(result.report.records[2].issues.join(), /Missing start/);
+  assert.equal(importICS("broken", "work").report.validDocument, false);
+  assert.equal(importICS("broken", "work").report.total, null);
+});

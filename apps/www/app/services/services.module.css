@@ -1,0 +1,8 @@
+.worksheet { border-block: 1px solid var(--divider); padding-block: 24px; margin-block: 32px; }
+.worksheetHead { display: flex; justify-content: space-between; gap: 24px; align-items: start; }
+.status { color: var(--text-secondary); font-size: .75rem; padding-top: 12px; white-space: nowrap; }
+.hint { color: var(--text-secondary); font-size: .75rem; line-height: 1.4; margin: 6px 0 0; }
+.preview { white-space: pre-wrap; max-height: 55vh; overflow: auto; font: inherit; line-height: 1.45; }
+.formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+@media (max-width: 640px) { .worksheetHead, .formGrid { display: block; } .formGrid > * { margin-top: 16px; } .status { display: block; padding-top: 0; } .actions > * { width: 100%; } }

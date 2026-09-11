@@ -9,9 +9,11 @@
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, resolve } from "node:path";
+import { dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalogComponents, vlakComponents, vlakTokens } from "@noorddev/vlak";
+import { assertReady, installManaged, installed, makeUpdatePlan, safePath, sha } from "./managed";
+import type { SourceFile } from "./managed";
 import { starterPage } from "./starter";
 
 interface Bundle {
@@ -99,7 +101,7 @@ export function loadConfig(cwd: string): VlakConfig {
 }
 
 function writeFileSafe(cwd: string, relPath: string, content: string | Buffer, overwrite: boolean): WriteResult {
-  const abs = join(cwd, relPath);
+  const abs = safePath(cwd, relPath);
   if (existsSync(abs)) {
     const current = readFileSync(abs);
     const next = typeof content === "string" ? Buffer.from(content) : content;
@@ -122,7 +124,7 @@ function copyFonts(cwd: string, cssDir: string, overwrite: boolean): WriteResult
   for (const file of FONT_FILES) {
     const src = join(srcDir, file);
     if (!existsSync(src)) continue;
-    results.push(writeFileSafe(cwd, join(cssDir, "fonts/inter", file), readFileSync(src), overwrite));
+    results.push(writeFileSafe(cwd, posix.join(cssDir, "fonts/inter", file), readFileSync(src), overwrite));
   }
   return results;
 }
@@ -141,15 +143,22 @@ export function init(cwd: string, options: InitOptions = {}): WriteResult[] {
     componentsDir: options.componentsDir ?? defaultConfig.componentsDir,
   };
   if (options.registry) config.registry = options.registry;
-  const results: WriteResult[] = [];
+  assertReady(cwd);
+  safePath(cwd, config.cssDir); safePath(cwd, config.componentsDir);
+  for (const path of [posix.join(config.cssDir, "vlak.css"), ...FONT_FILES.map(file => posix.join(config.cssDir, "fonts/inter", file)), "index.html", CONFIG_FILE]) safePath(cwd, path);
   const cssHref = `${config.cssDir.replace(/\\/g, "/")}/vlak.css`;
-  results.push(writeFileSafe(cwd, join(config.cssDir, "vlak.css"), loadBundle().css.vlak, options.overwrite ?? false));
-  results.push(...copyFonts(cwd, config.cssDir, options.overwrite ?? false));
-  results.push(writeFileSafe(cwd, "index.html", starterPage(cssHref), options.overwrite ?? false));
-  results.push(
-    writeFileSafe(cwd, CONFIG_FILE, JSON.stringify(config, null, 2) + "\n", options.overwrite ?? false),
-  );
-  return results;
+  const sourceFiles: SourceFile[] = [
+    { path: posix.join(config.cssDir, "vlak.css"), content: loadBundle().css.vlak, owners: ["init"] },
+    ...FONT_FILES.map(file => ({ path: posix.join(config.cssDir, "fonts/inter", file), content: readFileSync(join(resolveFontsDir(), file)), owners: ["init"] })),
+  ];
+  return installManaged(cwd, sourceFiles, `bundled:${loadBundle().version}`, () => {
+    const results: WriteResult[] = [];
+    results.push(writeFileSafe(cwd, posix.join(config.cssDir, "vlak.css"), loadBundle().css.vlak, options.overwrite ?? false));
+    results.push(...copyFonts(cwd, config.cssDir, options.overwrite ?? false));
+    results.push(writeFileSafe(cwd, "index.html", starterPage(cssHref), options.overwrite ?? false));
+    results.push(writeFileSafe(cwd, CONFIG_FILE, JSON.stringify(config, null, 2) + "\n", options.overwrite ?? false));
+    return { value: results, installedPaths: sourceFiles.filter(file => results.find(result => result.path === file.path)?.status !== "skipped").map(file => file.path) };
+  });
 }
 
 export function getItems(): RegistryItem[] {
@@ -195,6 +204,26 @@ function itemUrl(registry: string, name: string): string {
   return `${registry.replace(/\/$/, "")}/${name}.json`;
 }
 
+function validateRegistryItem(value: unknown, requestedName: string): RegistryItem {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`Registry item is invalid: ${requestedName}.`);
+  const item = value as Record<string, unknown>;
+  if (item.name !== requestedName || !Array.isArray(item.files) || item.files.length > 10_000) throw new Error(`Registry item is invalid: ${requestedName}.`);
+  for (const file of item.files) {
+    if (!file || typeof file !== "object" || Array.isArray(file)) throw new Error(`Registry item has an invalid file: ${requestedName}.`);
+    const entry = file as Record<string, unknown>;
+    if (typeof entry.path !== "string" || typeof entry.target !== "string" || typeof entry.type !== "string" || typeof entry.content !== "string" || Buffer.byteLength(entry.content) > 16 * 1024 * 1024) throw new Error(`Registry item has an invalid file: ${requestedName}.`);
+  }
+  const vlak = item.meta && typeof item.meta === "object" && !Array.isArray(item.meta) ? (item.meta as { vlak?: unknown }).vlak : undefined;
+  if (vlak !== undefined) {
+    if (!vlak || typeof vlak !== "object" || Array.isArray(vlak)) throw new Error(`Registry item has invalid metadata: ${requestedName}.`);
+    const metadata = vlak as Record<string, unknown>;
+    if (metadata.registryDependencies !== undefined && (!Array.isArray(metadata.registryDependencies) || metadata.registryDependencies.length > 10_000 || metadata.registryDependencies.some(name => typeof name !== "string" || !/^[a-z0-9-]+$/.test(name)))) throw new Error(`Registry item has invalid dependencies: ${requestedName}.`);
+    if (metadata.styles !== undefined && (!Array.isArray(metadata.styles) || metadata.styles.length > 10_000 || metadata.styles.some(style => typeof style !== "string" || style.length > 2_048))) throw new Error(`Registry item has invalid styles: ${requestedName}.`);
+    if (metadata.cssOnly !== undefined && typeof metadata.cssOnly !== "boolean") throw new Error(`Registry item has invalid metadata: ${requestedName}.`);
+  }
+  return value as RegistryItem;
+}
+
 /**
  * One item from a remote registry. Returns undefined when the registry
  * has no such item (HTTP 404, or no file in a local directory); any other
@@ -202,24 +231,29 @@ function itemUrl(registry: string, name: string): string {
  * so the user sees what broke instead of "unknown component".
  */
 async function readRegistryItem(registry: string, name: string): Promise<RegistryItem | undefined> {
+  if (!/^[a-z0-9-]+$/.test(name)) throw new Error("Invalid registry component name.");
   const loc = itemUrl(registry, name);
   if (/^https?:\/\//.test(loc) || loc.startsWith("file:")) {
     const res = await fetch(loc);
     if (res.status === 404) return undefined;
     if (!res.ok) throw new Error(`Registry request failed: ${loc} (${res.status} ${res.statusText})`);
+    let value: unknown;
     try {
-      return (await res.json()) as RegistryItem;
+      value = await res.json();
     } catch (error) {
       throw new Error(`Registry item is not JSON: ${loc} (${(error as Error).message})`);
     }
+    return validateRegistryItem(value, name);
   }
   const file = join(registry, `${name}.json`);
   if (!existsSync(file)) return undefined;
+  let value: unknown;
   try {
-    return JSON.parse(readFileSync(file, "utf8")) as RegistryItem;
+    value = JSON.parse(readFileSync(file, "utf8"));
   } catch (error) {
     throw new Error(`Registry item is not JSON: ${file} (${(error as Error).message})`);
   }
+  return validateRegistryItem(value, name);
 }
 
 async function resolveFromRegistry(
@@ -259,8 +293,9 @@ function planItemFiles(item: RegistryItem, componentsDir: string): Array<{ path:
     if (!file.path.endsWith(".tsx") && !file.path.endsWith(".ts")) continue;
     // Registry targets are `components/vlak/<tree>`; keep the tree so nested
     // imports (charts/, shared helpers) resolve exactly as they do in the source.
+    if (typeof file.content !== "string" || typeof file.target !== "string" || (!file.target.startsWith("components/vlak/") && !file.target.startsWith("vlak/")) || file.target.includes("\0") || file.target.includes("\\") || file.target.split("/").some(part => !part || part === "." || part === "..")) throw new Error("Invalid registry file target.");
     const rel = file.target.replace(/^components\/vlak\//, "").replace(/^vlak\//, "");
-    files.push({ path: join(componentsDir, rel), content: file.content });
+    files.push({ path: posix.join(componentsDir, rel), content: file.content });
   }
   return files;
 }
@@ -282,7 +317,9 @@ export async function add(
   outcomes: AddOutcome[];
   unknown: string[];
 }> {
+  assertReady(cwd);
   const config = loadConfig(cwd);
+  safePath(cwd, config.componentsDir);
   const registry = options.registry ?? config.registry;
   const { resolved, unknown } = registry
     ? await resolveFromRegistry(registry, names)
@@ -295,7 +332,7 @@ export async function add(
   const plan = resolved.map(item => {
     const cssOnly = item.meta?.vlak?.cssOnly ?? false;
     const files = (cssOnly ? [] : planItemFiles(item, config.componentsDir)).filter(file => {
-      const destination = resolve(cwd, file.path);
+      const destination = safePath(cwd, file.path);
       const previous = destinations.get(destination);
       if (previous) {
         if (previous.content !== file.content) throw new Error(`Registry file conflict at ${file.path}: ${previous.owner} and ${item.name} provide different contents.`);
@@ -306,11 +343,12 @@ export async function add(
     });
     return { item, cssOnly, files };
   });
-  const outcomes: AddOutcome[] = plan.map(({ item, cssOnly, files }) => ({
-    item,
-    cssOnly,
-    results: files.map(file => writeFileSafe(cwd, file.path, file.content, options.overwrite ?? false)),
-  }));
+  const sources = resolved.flatMap(item => (item.meta?.vlak?.cssOnly ? [] : planItemFiles(item, config.componentsDir)).map(file => ({ ...file, owners: [item.name] })));
+  const outcomes = installManaged(cwd, sources, registry ? `registry:${registry}` : `bundled:${loadBundle().version}`, () => {
+    const value: AddOutcome[] = plan.map(({ item, cssOnly, files }) => ({ item, cssOnly, results: files.map(file => writeFileSafe(cwd, file.path, file.content, options.overwrite ?? false)) }));
+    const installedPaths = [...new Set(value.flatMap(outcome => outcome.results.filter(result => result.status !== "skipped").map(result => result.path)))];
+    return { value, installedPaths };
+  });
   return { outcomes, unknown };
 }
 
@@ -405,4 +443,27 @@ export function search(term: string): SearchHit[] {
     });
   }
   return hits.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)).map(({ score: _score, ...hit }) => hit);
+}
+
+/** Pin the exact source bytes in the reviewed plan; apply never fetches a registry. */
+export async function updatePlan(cwd: string, registry?: string) {
+  const manifest = installed(cwd), config = loadConfig(cwd);
+  const installedFingerprint = sha(JSON.stringify(manifest));
+  if (manifest.files.some(file => file.source.startsWith("registry:")) && !registry) throw new Error("These files came from a custom registry. Specify --registry explicitly to review its current snapshot.");
+  const owners = [...new Set(manifest.files.flatMap(file => file.owners))].filter(name => name !== "init");
+  const { resolved, unknown } = registry ? await resolveFromRegistry(registry, owners) : resolveWithDependencies(owners);
+  if (unknown.length) throw new Error(`Installed components are missing from the target snapshot: ${unknown.join(", ")}. No removal is assumed.`);
+  const sources: SourceFile[] = resolved.flatMap(item => (item.meta?.vlak?.cssOnly ? [] : planItemFiles(item, config.componentsDir)).map(file => ({ ...file, owners: [item.name] })));
+  if (manifest.files.some(file => file.owners.includes("init"))) {
+    // Keep original destinations even when application config has since moved.
+    for (const entry of manifest.files.filter(file => file.owners.includes("init"))) {
+      const name = entry.path.split("/").pop()!;
+      const content = name === "vlak.css" ? loadBundle().css.vlak : FONT_FILES.includes(name) ? readFileSync(join(resolveFontsDir(), name)) : undefined;
+      if (content === undefined) throw new Error(`Unknown foundation file: ${entry.path}`);
+      sources.push({ path: entry.path, content, owners: ["init"] });
+    }
+  }
+  const fingerprint = sha(JSON.stringify(sources.map(file => ({ ...file, content: sha(Buffer.from(file.content)) }))));
+  if (sha(JSON.stringify(installed(cwd))) !== installedFingerprint) throw new Error("Installed metadata changed while resolving the target snapshot. Generate a fresh plan.");
+  return makeUpdatePlan(cwd, sources, `${registry ? `registry:${registry}` : `bundled:${loadBundle().version}`};sha256:${fingerprint}`);
 }

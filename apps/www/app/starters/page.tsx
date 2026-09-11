@@ -25,6 +25,7 @@ export default function StartersPage() {
 
       <h2 className="section-label">Own the next step</h2>
       <p className="rs-t-body">These are activation paths, not screen presets. Replace the example fields, compose the components around your product states, and use the <a className="rs-link" href="/docs/agents/">MCP server</a> when a coding agent needs the component contracts.</p>
+    <p className="rs-t-body">For record review, approval and scheduling behavior, explore the <a href="/workflows/">workflow kits</a>.</p>
     </DocsShell>
   );
 }

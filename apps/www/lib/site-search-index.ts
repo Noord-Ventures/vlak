@@ -1,6 +1,7 @@
 // Import this builder from the static JSON route, never from the client launcher.
 import { catalogComponents, domainCollections } from "@noorddev/vlak";
 import { interfaces } from "../app/interfaces/catalog";
+import { workflowCatalog } from "../../../examples/workflows/catalog";
 import { useCases } from "../app/use-cases/catalog";
 import type { SiteSearchEntry } from "./site-search";
 
@@ -26,6 +27,11 @@ const destinations = [
   entry("/components/", "Components", "Browse the complete React component library with examples, props, and keyboard guidance.", "Site", ["Catalogue", "Catalog", "Library"]),
   entry("/ai/", "AI components", "Compose conversations, prompts, tools, widgets, rich responses, voice, and workflows.", "Site", ["AI Elements", "Artificial intelligence", "Assistant interfaces"]),
   entry("/interfaces/", "Interfaces", "Explore complete interface studies built with Vlak components.", "Site", ["Studies", "Examples", "Templates"]),
+  entry("/workflows/", "Workflow kits", "Runnable record review, action approval and schedule editing with explicit state and adapter contracts.", "Guides", ["Recipes", "Approval", "Workflow"]),
+  entry("/services/", "Workflow modernization", "Scope a bounded improvement with a portable local brief and delivery templates.", "Site", ["Service", "Brief", "Modernization"]),
+  entry("/docs/projects/", "Project files", "Save, reopen, recover and export local workspaces.", "Guides", ["Backup", "Recovery"]),
+  entry("/docs/updates/", "Safe source updates", "Review installed source changes and recover interrupted CLI updates.", "Guides", ["CLI", "Update", "Provenance"]),
+  ...workflowCatalog.map(kit => entry(`/workflows/${kit.id}/`, kit.title, kit.description, "Workflow kits", [kit.id])),
   entry("/starters/", "Starters", "Small Vite and Next.js projects with the package, stylesheet, and a working form already connected.", "Guides", ["Starter", "Vite", "Next.js", "Templates", "StackBlitz"]),
   entry("/showcase/", "Built with Vlak", "Products and experiments built with Vlak, with a public path for submitting your own work.", "Site", ["Showcase", "Community", "Badge", "Submit project"]),
   entry("/ai/widgets/", "Widget patterns", "Compose application content, third-party React widgets, and embedded provider pages.", "Guides", ["Integrations", "Iframe", "Widget design system"]),

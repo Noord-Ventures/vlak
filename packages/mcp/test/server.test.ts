@@ -24,11 +24,25 @@ afterAll(async () => {
 });
 
 describe("vlak-mcp", () => {
-  it("exposes the six tools", async () => {
+  it("exposes the component and workflow tools", async () => {
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(["get_component", "get_guide", "get_install", "get_tokens", "list_components", "search_components"]);
+    expect(tools.map((t) => t.name).sort()).toEqual(["get_component", "get_guide", "get_install", "get_tokens", "get_workflow", "list_components", "list_workflows", "search_components"]);
     expect(tools.every((tool) => tool.annotations?.readOnlyHint === true)).toBe(true);
     expect(tools.every((tool) => tool.outputSchema)).toBe(true);
+  });
+
+  it("lists and gets bundled workflows, with filtering and missing IDs", async () => {
+    const all = JSON.parse(textOf(await client.callTool({ name: "list_workflows", arguments: {} })));
+    expect(all.schemaVersion).toBe(1);
+    const filtered = JSON.parse(textOf(await client.callTool({ name: "list_workflows", arguments: { query: "record review" } })));
+    expect(all.count).toBeGreaterThanOrEqual(3);
+    expect(filtered.workflows.map((item: { id: string }) => item.id)).toContain("record-review");
+    const detail = JSON.parse(textOf(await client.callTool({ name: "get_workflow", arguments: { id: "record-review" } })));
+    expect(detail.manifest.id).toBe("record-review");
+    expect(detail.files).toHaveProperty("examples/workflows/record-review/domain/review.ts");
+    expect(detail.files).toHaveProperty("examples/workflows/package.json");
+    const missing = await client.callTool({ name: "get_workflow", arguments: { id: "missing" } });
+    expect(missing.isError).toBe(true);
   });
 
   it("lists components, optionally by category", async () => {

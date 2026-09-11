@@ -18,6 +18,7 @@ import { dirname, join, normalize, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { vlakTokens } from "../src/tokens.ts";
 import { vlakComponents } from "../src/registry.ts";
+import { buildWorkflows } from "./build-workflows.mjs";
 import { workflowStylesheet } from "../../react/scripts/workflow-styles.mjs";
 
 const PUBLIC_HOST = vlakTokens.meta.url;
@@ -294,6 +295,7 @@ for (const component of vlakComponents) {
 
 /* The generated markdown docs (scripts/build-docs.mjs), so the CLI and
    the MCP server can print them offline. */
+const workflows = buildWorkflows();
 const docsDir = repoPath("registry/docs");
 if (!existsSync(docsDir)) throw new Error("registry/docs missing: run `npm run build:docs` first");
 const docs = { guide: "", index: "", tokens: "", components: {} };
@@ -325,4 +327,5 @@ write("bundle.json", {
   },
   items,
   docs,
+  workflows,
 });

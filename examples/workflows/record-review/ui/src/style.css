@@ -1,0 +1,55 @@
+.workflow-reference { background: var(--bg); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+.workflow-reference, .workflow-reference * { box-sizing: border-box; }
+
+.workflow-reference { width: min(100% - 40px, 1120px); margin: 0 auto; padding-block: 40px 80px; }
+.workflow-heading { display: grid; grid-template-columns: minmax(0, 1fr) minmax(16rem, 2fr); gap: 20px; align-items: end; padding-bottom: 24px; border-bottom: 1px solid var(--divider); }
+.workflow-heading :is(h1, h2), .workflow-heading p { margin: 0; }
+.workflow-heading :is(h1, h2) { font-size: clamp(2rem, 5vw, 4rem); line-height: 1; letter-spacing: -0.04em; }
+.workflow-heading > p { max-width: 66ch; color: var(--text-secondary); line-height: 1.45; }
+.workflow-heading .eyebrow { color: var(--text-secondary); font-size: 0.75rem; }
+.workflow-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 20px; align-items: end; margin-block: 24px; }
+.workflow-result-count { display: flex; min-height: 44px; gap: 12px; align-items: center; color: var(--text-secondary); font-size: 0.875rem; }
+.workflow-loading { min-height: 240px; display: grid; place-items: center; }
+.workflow-master { display: grid; grid-template-columns: minmax(14rem, 1fr) minmax(0, 2fr); gap: 20px; }
+.workflow-list ul, .workflow-history { margin: 0; padding: 0; list-style: none; }
+.workflow-list button { width: 100%; min-height: 64px; padding: 12px; border: 0; border-radius: var(--radius); background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.workflow-list button:hover, .workflow-list button[aria-current="true"] { background: var(--control-fill); }
+.workflow-list button:focus-visible { outline: 2px solid var(--text); outline-offset: -2px; }
+.workflow-list button strong, .workflow-list button span { display: block; }
+.workflow-list button span { margin-top: 4px; color: var(--text-secondary); font-size: 0.875rem; }
+.workflow-panel { min-width: 0; }
+.workflow-panel > h2 { margin: 0 0 20px; }
+.workflow-back { display: none; margin-bottom: 16px; }
+.workflow-detail, .workflow-form { display: grid; gap: 20px; }
+.workflow-status, .workflow-actions { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.workflow-status { color: var(--text-secondary); font-size: 0.875rem; }
+.workflow-description { margin: 0; }
+.workflow-description > div, .workflow-history > li { display: grid; grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr); gap: 12px; padding-block: 16px; border-bottom: 1px solid var(--divider); }
+.workflow-description dt, .workflow-history time, .workflow-history span { color: var(--text-secondary); font-size: 0.875rem; }
+.workflow-description dd, .workflow-history p { margin: 0; overflow-wrap: anywhere; line-height: 1.45; }
+.workflow-history strong, .workflow-history span { display: block; }
+.workflow-error-summary { border: 1px solid var(--divider); padding: 16px; }
+.workflow-error-summary ul { margin-bottom: 0; }
+.workflow-error-summary a { color: inherit; min-height: 44px; display: inline-flex; align-items: center; }
+.workflow-diff { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-height: 50vh; overflow: auto; }
+.workflow-diff section { min-width: 0; }
+.workflow-diff h3 { font-size: 0.875rem; }
+.workflow-diff pre { min-height: 100%; margin: 0; padding: 12px; overflow: auto; background: var(--control-fill); color: inherit; font: 0.75rem/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.workflow-detail h3 { margin: 32px 0 8px; font-size: 1rem; }
+
+@media (max-width: 640px) {
+  .workflow-reference { width: min(100% - 32px, 1120px); padding-block: 24px 56px; }
+  .workflow-heading, .workflow-filters, .workflow-master, .workflow-diff { grid-template-columns: minmax(0, 1fr); }
+  .workflow-list-hidden-mobile, .workflow-panel-hidden-mobile { display: none; }
+  .workflow-back { display: inline-flex; }
+  .workflow-description > div, .workflow-history > li { grid-template-columns: minmax(0, 1fr); }
+  .workflow-actions > * { flex: 1 1 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .workflow-reference *, .workflow-reference *::before, .workflow-reference *::after { scroll-behavior: auto; }
+}
+
+.workflow-reference[data-embedded="true"] { width: 100%; margin-block: 24px; padding-block: 24px; border-block: 1px solid var(--divider); }
+.workflow-reference[data-embedded="true"] .workflow-heading { display: block; }
+.workflow-reference[data-embedded="true"] .workflow-heading > p { margin-top: 8px; }

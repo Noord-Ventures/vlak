@@ -7,6 +7,8 @@ import type { CalendarEvent, CalendarStore, CalendarView, Occurrence } from "./t
 import { CALENDAR_LIMITS, addDays, addMinutes, addMonths, expandEvents, exportICS, importICS, isDate, localDate, makeInitialStore, parseStore, shiftEvent, startOfWeek } from "./model";
 import { EventEditor, type EditorState, type EditScope } from "./editor";
 import { CalendarViews } from "./views";
+import { parseCalendarProject } from "./project";
+import { ProjectTools } from "@/components/project-tools";
 import "./scene.css";
 
 const storageKey = "vlak-calendar-v1";
@@ -31,6 +33,7 @@ export function CalendarBoard() {
   const [recovery, setRecovery] = React.useState<string | null>(null);
   const [undo, setUndo] = React.useState<CalendarStore | null>(null);
   const [imported, setImported] = React.useState<ReturnType<typeof importICS> | null>(null);
+  const [importSource, setImportSource] = React.useState<{ name: string; text: string; result: ReturnType<typeof importICS>; application?: { appliedIds: string[]; skippedExistingIds: string[]; destinationCalendarId: string } } | null>(null);
   const [importCalendar, setImportCalendar] = React.useState("");
   const [manageCalendar, setManageCalendar] = React.useState<string | null>(null);
   const [managedName, setManagedName] = React.useState("");
@@ -40,6 +43,8 @@ export function CalendarBoard() {
   const current = React.useRef(store); current.current = store;
   const lastStored = React.useRef<string | null>(null);
   const fileInput = React.useRef<HTMLInputElement>(null);
+  const fileRequest = React.useRef(0);
+  const restoredDraft = React.useRef(false);
   const newButton = React.useRef<HTMLButtonElement>(null);
   const board = React.useRef<HTMLDivElement>(null);
 
@@ -56,12 +61,22 @@ export function CalendarBoard() {
     const checkDate = () => setToday(localDate(new Date()));
     const timer = window.setInterval(checkDate, 60000);
     const sync = (event: StorageEvent) => {
-      if (event.key !== storageKey || !event.newValue) return;
+      if (event.key !== storageKey && event.key !== null) return;
+      if (event.newValue === lastStored.current) return;
+      if (event.newValue === null) {
+        setSaveError("Saved calendar data was removed in another tab. Your calendar is still here. The next save will ask you to review before recreating it.");
+        return;
+      }
+      if (restoredDraft.current) {
+        setSaveError("Saved calendar data changed in another tab. Your restored project is still here. Export it before reviewing the saved calendar.");
+        return;
+      }
       const next = parseStore(event.newValue);
       if (next) { lastStored.current = event.newValue; setStore(next); setUndo(null); setStatus("Calendar updated from another tab."); }
+      else { setRecovery(event.newValue); setSaveError("Saved data changed and could not be read. Download a recovery copy in Calendars."); }
     };
     window.addEventListener("storage", sync);
-    return () => { window.clearInterval(timer); window.removeEventListener("storage", sync); };
+    return () => { fileRequest.current++; window.clearInterval(timer); window.removeEventListener("storage", sync); };
   }, []);
 
   function commit(next: CalendarStore, message: string, remember = true): boolean {
@@ -70,12 +85,22 @@ export function CalendarBoard() {
     if (!parseStore(serialized)) { setStatus("This change exceeds the calendar’s limits. Export older events or shorten the event details."); return false; }
     try {
       const incoming = localStorage.getItem(storageKey);
-      if (incoming !== lastStored.current && incoming !== null) {
+      if (incoming !== lastStored.current) {
+        if (incoming === null) {
+          lastStored.current = null;
+          setSaveError("Saved calendar data was removed in another tab. Nothing was saved. Your calendar is preserved; save again only if you want to recreate it.");
+          return false;
+        }
+        if (restoredDraft.current && parseStore(incoming)) {
+          lastStored.current = incoming;
+          setSaveError("Another tab changed the saved calendar. Your restored project is preserved. Export it or save again to replace the saved calendar.");
+          return false;
+        }
         const parsed = parseStore(incoming);
         if (parsed) { lastStored.current = incoming; setStore(parsed); setUndo(null); setStatus("Another tab changed this calendar. Review the updated events and try again."); return false; }
         setRecovery(incoming); setSaveError("Saved data changed and could not be read. Download a recovery copy in Calendars."); return false;
       }
-      localStorage.setItem(storageKey, serialized); lastStored.current = serialized; setSaveError("");
+      localStorage.setItem(storageKey, serialized); lastStored.current = serialized; restoredDraft.current = false; setSaveError("");
     } catch { setSaveError("Changes are held in this tab. Export your calendar because browser storage is unavailable or full."); }
     if (remember) setUndo(current.current);
     current.current = next; setStore(next); setStatus(message); return true;
@@ -125,14 +150,45 @@ export function CalendarBoard() {
     } catch { setStatus("That date is outside the supported calendar range."); }
   }
   async function readFile(file: File | undefined) {
+    const request = ++fileRequest.current;
     if (!file || !store) return;
     if (file.size > 2 * 1024 * 1024) { setStatus("Choose an .ics file smaller than 2 MB."); return; }
-    try { const calendarId = store.calendars.find(calendar => calendar.visible)?.id ?? store.calendars[0]!.id; const result = importICS(await file.text(), calendarId); setImportCalendar(calendarId); setSettings(false); setImported(result); } catch { setStatus("This calendar file could not be read. Choose a valid .ics file."); }
+    try {
+      const text = await file.text();
+      if (request !== fileRequest.current || !current.current) return;
+      const calendarId = current.current.calendars.find(calendar => calendar.visible)?.id ?? current.current.calendars[0]!.id;
+      const result = importICS(text, calendarId);
+      setImportSource({ name: file.name, text, result }); setImportCalendar(calendarId); setSettings(false); setImported(result);
+    } catch { if (request === fileRequest.current) setStatus("This calendar file could not be read. Choose a valid .ics file."); }
+  }
+  function exportImportReport() {
+    if (!importSource) return;
+    download(JSON.stringify({ ...importSource.result.report, sourceName: importSource.name, warnings: importSource.result.warnings, application: importSource.application ?? null }, null, 2), "vlak-calendar-import-report.json", "application/json");
   }
   function exportCalendar() {
     if (!store) return;
     try { download(exportICS(store.events), "vlak-calendar.ics", "text/calendar;charset=utf-8"); setStatus("Calendar exported."); }
     catch { download(JSON.stringify(store, null, 2), "vlak-calendar-backup.json", "application/json"); setStatus("This calendar is too large for .ics export. A complete JSON backup was downloaded instead."); }
+  }
+  function restoreProject(next: CalendarStore, title: string) {
+    let storageState: "unchanged" | "changed" | "unavailable" = "unchanged";
+    try {
+      const incoming = localStorage.getItem(storageKey);
+      if (incoming !== lastStored.current) {
+        storageState = "changed";
+        if (incoming !== null && !parseStore(incoming)) {
+          setRecovery(incoming);
+          setSaveError("Saved calendar data changed and could not be read. Download a recovery copy before replacing it.");
+        }
+      }
+    } catch { storageState = "unavailable"; }
+    fileRequest.current++;
+    restoredDraft.current = true;
+    current.current = next; setStore(next); setUndo(null); setImported(null);
+    if (storageState === "changed") setStatus(`${title || "Calendar project"} restored in this tab. Saved data changed in another tab; review it before saving.`);
+    else if (storageState === "unavailable") setStatus(`${title || "Calendar project"} restored in this tab. Browser storage is unavailable; export a backup before continuing.`);
+    else if (recovery !== null) setStatus(`${title || "Calendar project"} restored in this tab. Download the existing recovery data before replacing it.`);
+    else setStatus(`${title || "Calendar project"} restored in this tab. Save it explicitly when ready.`);
   }
 
   const range = React.useMemo(() => {
@@ -173,11 +229,12 @@ export function CalendarBoard() {
       <div className="cal-main">{query.trim() ? <div className="cal-search-results"><div className="cal-results-heading"><h3>{occurrences.length} {occurrences.length === 1 ? "event" : "events"}</h3><p>Within a year of {selected.toLocaleDateString("en", { month: "short", year: "numeric" })}</p></div>{occurrences.length ? <ul>{occurrences.slice(0, 200).map(occurrence => <li key={occurrence.key}><button type="button" onClick={() => open(occurrence)}><span><strong>{occurrence.event.title}</strong><small>{occurrence.event.location || store.calendars.find(calendar => calendar.id === occurrence.event.calendarId)?.name}</small></span><time>{dateValue(occurrence.start.slice(0, 10)).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}<small>{occurrence.event.allDay ? "All day" : occurrence.start.slice(11)}</small></time></button></li>)}</ul> : <p className="cal-empty-search">No matching events. Try another title, place or note.</p>}{occurrences.length > 200 && <p className="cal-hint">Showing the first 200 matches. Refine your search to see more.</p>}</div> : <CalendarViews view={store.view} date={date} today={today} weekStartsOn={store.weekStartsOn} occurrences={occurrences} calendars={store.calendars} onDate={value => setDate(navigationDate(value))} onCreate={create} onOpen={open} onMove={(occurrence, start) => { if (occurrence.event.recurrence) setMoving({ occurrence, start }); else move(occurrence, start); }} />}</div>
     </div>
     <footer className="cal-status"><span role="status">{status || (occurrences.length === CALENDAR_LIMITS.occurrences ? "Showing the first 10,000 occurrences. Narrow the date range or filters." : saveError ? "Changes are not saved" : "Your time, in one place")}</span>{undo && <Button variant="ghost" onClick={() => { if (commit(undo, "Change undone.", false)) setUndo(null); }}>Undo</Button>}</footer>
+    <ProjectTools kind="calendar" title="Calendar" value={store} parse={parseCalendarProject} onRestore={restoreProject} documentVersion={1} />
     {saveError && <p className="cal-storage-error" role="alert">{saveError}</p>}
     <input ref={fileInput} hidden type="file" accept=".ics,text/calendar" aria-label="Import calendar file" onChange={event => { void readFile(event.target.files?.[0]); event.target.value = ""; }} />
     {editor && <EventEditor weekStart={store.weekStartsOn} editor={editor} calendars={store.calendars} onClose={closeEditor} onSave={save} onDelete={remove} />}
-    <Dialog open={settings} onClose={() => setSettings(false)} className="cal-dialog cal-settings"><header className="cal-dialog-heading"><DialogTitle>Calendars</DialogTitle><Button variant="ghost" className="cal-icon-button" aria-label="Close calendar settings" onClick={() => setSettings(false)}><Icon name="close" /></Button></header><div className="cal-dialog-content">{collections(true)}<form className="cal-add-calendar" onSubmit={addCalendar}><Input label="New calendar" value={calendarName} onChange={event => setCalendarName(event.target.value)} maxLength={60} required placeholder="Name" /><Button variant="ghost" type="submit" disabled={store.calendars.length >= 12}>Add</Button></form><div className="cal-field-pair"><CalendarDateField weekStart={store.weekStartsOn} label="Go to date" type="date" min="1901-01-01" max="2199-12-31" value={date} onValueChange={value => { if (isDate(value) && value >= "1901-01-01" && value <= "2199-12-31") setDate(value); }} /><NativeSelect label="Week starts on" value={store.weekStartsOn} onChange={event => commit({ ...store, weekStartsOn: Number(event.target.value) as 0 | 1 }, "Week start updated.", false)}><option value={1}>Monday</option><option value={0}>Sunday</option></NativeSelect></div><div className="cal-file-actions"><h3>Take your calendar with you</h3><p>Import an .ics file or export your events for another calendar app.</p><div className="cal-action-row"><Button variant="ghost" onClick={() => fileInput.current?.click()}>Import .ics</Button><Button variant="ghost" onClick={exportCalendar}>Export .ics</Button></div></div><p className="cal-hint">Events stay in this browser. Times use {zone}. No account connection is needed.</p>{recovery !== null && <div className="cal-recovery"><p>{saveError}</p><Button variant="ghost" onClick={() => download(recovery, "vlak-calendar-recovery.json", "application/json")}>Download saved data</Button><Button onClick={() => { try { localStorage.removeItem(storageKey); lastStored.current = null; setRecovery(null); setSaveError(""); setStatus("New calendar ready."); } catch { setStatus("Browser storage could not be cleared."); } }}>Start new calendar</Button></div>}<p role="status">{status}</p></div></Dialog>
-    <Dialog open={Boolean(imported)} onClose={() => setImported(null)} className="cal-dialog"><header className="cal-dialog-heading"><DialogTitle>Import events</DialogTitle><Button variant="ghost" className="cal-icon-button" aria-label="Cancel import" onClick={() => setImported(null)}><Icon name="close" /></Button></header><div className="cal-dialog-content"><p>{imported?.events.length ?? 0} events ready to import.</p><NativeSelect label="Import into" value={importCalendar} onChange={event => setImportCalendar(event.target.value)}>{store.calendars.map(calendar => <option key={calendar.id} value={calendar.id}>{calendar.name}</option>)}</NativeSelect>{imported?.warnings.length ? <ul className="cal-import-warnings">{imported.warnings.slice(0, 12).map((warning, index) => <li key={index}>{warning}</li>)}</ul> : <p>Your existing events will be kept.</p>}<div className="cal-action-row"><Button variant="ghost" onClick={() => setImported(null)}>Cancel</Button><Button disabled={!imported?.events.length} onClick={() => { if (!imported) return; const ids = new Set(store.events.map(event => event.id)); const fresh = imported.events.filter(event => !ids.has(event.id)).map(event => ({ ...event, calendarId: importCalendar })); if (commit({ ...store, events: [...store.events, ...fresh] , calendars: store.calendars.map(calendar => calendar.id === importCalendar ? { ...calendar, visible: true } : calendar) }, `${fresh.length} events imported.${fresh.length < imported.events.length ? " Duplicates skipped." : ""}`)) { if (fresh[0]) setDate(navigationDate(fresh[0].start.slice(0, 10))); setImported(null); } }}>Import events</Button></div><p role="status">{status}</p></div></Dialog>
+    <Dialog open={settings} onClose={() => setSettings(false)} className="cal-dialog cal-settings"><header className="cal-dialog-heading"><DialogTitle>Calendars</DialogTitle><Button variant="ghost" className="cal-icon-button" aria-label="Close calendar settings" onClick={() => setSettings(false)}><Icon name="close" /></Button></header><div className="cal-dialog-content">{collections(true)}<form className="cal-add-calendar" onSubmit={addCalendar}><Input label="New calendar" value={calendarName} onChange={event => setCalendarName(event.target.value)} maxLength={60} required placeholder="Name" /><Button variant="ghost" type="submit" disabled={store.calendars.length >= 12}>Add</Button></form><div className="cal-field-pair"><CalendarDateField weekStart={store.weekStartsOn} label="Go to date" type="date" min="1901-01-01" max="2199-12-31" value={date} onValueChange={value => { if (isDate(value) && value >= "1901-01-01" && value <= "2199-12-31") setDate(value); }} /><NativeSelect label="Week starts on" value={store.weekStartsOn} onChange={event => commit({ ...store, weekStartsOn: Number(event.target.value) as 0 | 1 }, "Week start updated.", false)}><option value={1}>Monday</option><option value={0}>Sunday</option></NativeSelect></div><div className="cal-file-actions"><h3>Take your calendar with you</h3><p>Import an .ics file or export your events for another calendar app.</p><div className="cal-action-row"><Button variant="ghost" onClick={() => fileInput.current?.click()}>Import .ics</Button><Button variant="ghost" onClick={exportCalendar}>Export .ics</Button>{importSource && <><Button variant="ghost" onClick={exportImportReport}>Last import report</Button><Button variant="ghost" onClick={() => download(importSource.text, "vlak-original-calendar.ics", "text/calendar;charset=utf-8")}>Original import text</Button></>}</div></div><p className="cal-hint">Events stay in this browser. Times use {zone}. No account connection is needed.</p>{recovery !== null && <div className="cal-recovery"><p>{saveError}</p><Button variant="ghost" onClick={() => download(recovery, "vlak-calendar-recovery.json", "application/json")}>Download saved data</Button><Button onClick={() => { try { localStorage.removeItem(storageKey); lastStored.current = null; setRecovery(null); setSaveError(""); setStatus("New calendar ready."); } catch { setStatus("Browser storage could not be cleared."); } }}>Start new calendar</Button></div>}<p role="status">{status}</p></div></Dialog>
+    <Dialog open={Boolean(imported)} onClose={() => setImported(null)} className="cal-dialog"><header className="cal-dialog-heading"><DialogTitle>Import events</DialogTitle><Button variant="ghost" className="cal-icon-button" aria-label="Cancel import" onClick={() => setImported(null)}><Icon name="close" /></Button></header><div className="cal-dialog-content"><p>{imported?.report.validDocument ? `${imported.report.accepted} accepted · ${imported.report.rejected} rejected · ${imported.report.total} source events.` : "The calendar document could not be read. No events will be imported."}</p><p>Accepted records are candidates. Existing records with the same identifier are kept and reported as duplicates when you import.</p>{importSource && <div className="cal-action-row"><Button variant="ghost" onClick={exportImportReport}>Download import report</Button><Button variant="ghost" onClick={() => download(importSource.text, "vlak-original-calendar.ics", "text/calendar;charset=utf-8")}>Download original text</Button></div>}{imported?.report.records.length ? <details><summary>Review event outcomes and omitted metadata</summary><ol>{imported.report.records.map(record => <li key={record.sourceIndex}><strong>{record.title}</strong> · {record.status}{record.issues.map(issue => <p key={issue}>{issue}</p>)}{record.omittedFields.length > 0 && <p>Not retained: {record.omittedFields.join(", ")}</p>}</li>)}</ol></details> : null}<NativeSelect label="Import into" value={importCalendar} onChange={event => setImportCalendar(event.target.value)}>{store.calendars.map(calendar => <option key={calendar.id} value={calendar.id}>{calendar.name}</option>)}</NativeSelect>{imported?.warnings.length ? <ul className="cal-import-warnings">{imported.warnings.slice(0, 12).map((warning, index) => <li key={index}>{warning}</li>)}</ul> : <p>Your existing events will be kept.</p>}<div className="cal-action-row"><Button variant="ghost" onClick={() => setImported(null)}>Cancel</Button><Button disabled={!imported?.events.length} onClick={() => { if (!imported) return; const ids = new Set(store.events.map(event => event.id)); const fresh = imported.events.filter(event => !ids.has(event.id)).map(event => ({ ...event, calendarId: importCalendar })); if (commit({ ...store, events: [...store.events, ...fresh] , calendars: store.calendars.map(calendar => calendar.id === importCalendar ? { ...calendar, visible: true } : calendar) }, `${fresh.length} events imported.${fresh.length < imported.events.length ? " Duplicates skipped." : ""}`)) { setImportSource(source => source ? { ...source, application: { appliedIds: fresh.map(event => event.id), skippedExistingIds: imported.events.filter(event => ids.has(event.id)).map(event => event.id), destinationCalendarId: importCalendar } } : source); if (fresh[0]) setDate(navigationDate(fresh[0].start.slice(0, 10))); setImported(null); } }}>Import events</Button></div><p role="status">{status}</p></div></Dialog>
     <Dialog open={Boolean(moving)} onClose={() => setMoving(null)} className="cal-dialog"><header className="cal-dialog-heading"><DialogTitle>Move repeating event</DialogTitle></header><div className="cal-dialog-content"><p>Move this occurrence to {moving?.start.replace("T", " at ")}?</p><p>To move the entire series, open the event and choose Entire series.</p><div className="cal-action-row"><Button variant="ghost" onClick={() => setMoving(null)}>Cancel</Button><Button onClick={() => { if (moving) move(moving.occurrence, moving.start); }}>Move this event</Button></div><p role="status">{status}</p></div></Dialog>
     <Dialog open={Boolean(manageCalendar)} onClose={() => setManageCalendar(null)} className="cal-dialog"><header className="cal-dialog-heading"><DialogTitle>{deleteCalendar ? "Delete calendar?" : "Edit calendar"}</DialogTitle><Button variant="ghost" className="cal-icon-button" aria-label="Close calendar editor" onClick={() => setManageCalendar(null)}><Icon name="close" /></Button></header><form className="cal-dialog-content" onSubmit={event => { event.preventDefault(); const name = managedName.trim(); if (!name) return; if (store.calendars.some(calendar => calendar.id !== manageCalendar && calendar.name.toLowerCase() === name.toLowerCase())) { setStatus("A calendar with that name already exists."); return; } if (commit({ ...store, calendars: store.calendars.map(calendar => calendar.id === manageCalendar ? { ...calendar, name } : calendar) }, "Calendar renamed.")) setManageCalendar(null); }}>{deleteCalendar ? <><p>This removes “{managedName}” and its {store.events.filter(event => event.calendarId === manageCalendar).length} saved events, including repeating series. You can undo this afterwards.</p><div className="cal-action-row"><Button variant="ghost" onClick={() => setDeleteCalendar(false)}>Keep calendar</Button><Button onClick={() => { if (store.calendars.length <= 1) return; if (commit({ ...store, calendars: store.calendars.filter(calendar => calendar.id !== manageCalendar), events: store.events.filter(event => event.calendarId !== manageCalendar) }, "Calendar deleted.")) setManageCalendar(null); }}>Confirm delete calendar</Button></div></> : <><Input label="Calendar name" required maxLength={60} value={managedName} onChange={event => setManagedName(event.target.value)} /><div className="cal-action-row"><Button variant="ghost" disabled={store.calendars.length <= 1} onClick={() => setDeleteCalendar(true)}>Delete calendar</Button><Button type="submit">Save calendar</Button></div></>}<p role="status">{status}</p></form></Dialog>
   </div>;

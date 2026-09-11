@@ -385,13 +385,24 @@ const hash = (value: string) => {
   for (const char of value) { first = Math.imul(first ^ char.codePointAt(0)!, 16777619); second = Math.imul(second ^ char.codePointAt(0)!, 2246822519); }
   return `${(first >>> 0).toString(16)}${(second >>> 0).toString(16)}`;
 };
-export function importICS(text: string, calendarId: string): { events: CalendarEvent[]; warnings: string[] } {
+export interface CalendarImportRecord {
+  sourceIndex: number; uid: string | null; title: string; status: "accepted" | "rejected";
+  eventId?: string; issues: string[]; omittedFields: string[];
+}
+export interface CalendarImportReport {
+  schema: "vlak.calendar-import-report"; version: 1; validDocument: boolean;
+  total: number | null; accepted: number; rejected: number | null; records: CalendarImportRecord[];
+}
+export function importICS(text: string, calendarId: string): { events: CalendarEvent[]; warnings: string[]; report: CalendarImportReport } {
   const events: CalendarEvent[] = [], warnings: string[] = [];
-  const warn = (message: string) => { if (warnings.length < 100 && !warnings.includes(message)) warnings.push(message); };
-  if (!identifier(calendarId)) return { events, warnings: ["Choose a valid destination calendar."] };
-  if (typeof text !== "string" || text.length > CALENDAR_LIMITS.bytes || encoder.encode(text).length > CALENDAR_LIMITS.bytes) return { events, warnings: ["Calendar files must be 2 MiB or smaller."] };
+  const report: CalendarImportReport = { schema: "vlak.calendar-import-report", version: 1, validDocument: false, total: null, accepted: 0, rejected: null, records: [] };
+  let activeRecord: CalendarImportRecord | null = null;
+  const warn = (message: string) => { if (warnings.length < 100 && !warnings.includes(message)) warnings.push(message); if (activeRecord && !activeRecord.issues.includes(message)) activeRecord.issues.push(message); };
+  if (!identifier(calendarId)) return { events, warnings: ["Choose a valid destination calendar."], report };
+  if (typeof text !== "string" || text.length > CALENDAR_LIMITS.bytes || encoder.encode(text).length > CALENDAR_LIMITS.bytes) return { events, warnings: ["Calendar files must be 2 MiB or smaller."], report };
   const lines = text.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").replace(/\n[ \t]/g, "").split("\n");
   const components: Property[][] = [], stack: string[] = [];
+  const reminders = new Set<number>();
   let current: Property[] | null = null, calendars = 0, version: string | null = null;
   try {
     for (const line of lines) {
@@ -407,7 +418,7 @@ export function importICS(text: string, calendarId: string): { events: CalendarE
           if (components.length >= CALENDAR_LIMITS.events) throw new Error("Calendar import supports up to 2,000 events.");
           current = []; components.push(current);
         }
-        if (name === "VALARM") warn("Event reminders are not imported.");
+        if (name === "VALARM") { warn("Event reminders are not imported."); if (current) reminders.add(components.length - 1); }
         stack.push(name);
       } else if (item.name === "END") {
         if (stack.pop() !== item.value.toUpperCase()) throw new Error("Calendar components are not balanced.");
@@ -421,7 +432,8 @@ export function importICS(text: string, calendarId: string): { events: CalendarE
     }
     if (stack.length || calendars !== 1) throw new Error("The calendar document is incomplete.");
     if (version !== "2.0") throw new Error("Import requires iCalendar version 2.0.");
-  } catch (error) { return { events: [], warnings: [error instanceof Error ? error.message : "Invalid calendar document."] }; }
+  } catch (error) { return { events: [], warnings: [error instanceof Error ? error.message : "Invalid calendar document."], report }; }
+  report.validDocument = true; report.total = components.length;
   const uidCounts = new Map<string, number>(), unsafeSeries = new Set<string>();
   for (const component of components) {
     const uid = component.find(item => item.name === "UID")?.value;
@@ -433,6 +445,10 @@ export function importICS(text: string, calendarId: string): { events: CalendarE
     const uid = component.find(item => item.name === "UID")?.value;
     const title = unescapeText(component.find(item => item.name === "SUMMARY")?.value ?? "Untitled event").slice(0, 200);
     const label = `Event ${index + 1} (${title.slice(0, 60)})`;
+    const retained = new Set(["UID", "SUMMARY", "DTSTART", "DTEND", "DURATION", "DESCRIPTION", "LOCATION", "RRULE", "EXDATE"]);
+    activeRecord = { sourceIndex: index + 1, uid: uid ?? null, title, status: "rejected", issues: [], omittedFields: [...new Set(component.filter(item => !retained.has(item.name)).map(item => item.name))] };
+    if (reminders.has(index)) activeRecord.omittedFields.push("VALARM");
+    report.records.push(activeRecord);
     try {
       if (component.some(item => item.name === "STATUS" && item.value.toUpperCase() === "CANCELLED")) { warn(`${label}: cancelled event skipped.`); continue; }
       if (uid && unsafeSeries.has(uid) || component.some(item => ["RECURRENCE-ID", "RDATE", "EXRULE"].includes(item.name))) throw new Error("Recurrence overrides or additional dates are not supported; the entire series was skipped.");
@@ -479,11 +495,13 @@ export function importICS(text: string, calendarId: string): { events: CalendarE
       const issue = validateEvent(event);
       if (issue) throw new Error(issue);
       events.push(event); importedIds.add(id);
+      activeRecord.status = "accepted"; activeRecord.eventId = id;
       if (unescapeText(one("SUMMARY")?.value ?? "").length > 200) warn(`${label}: the title was shortened to 200 characters.`);
       if (!uid || !identifier(decodedUid)) warn(`${label}: a safe local identifier was assigned.`);
       if (start.zone || last?.parameters.has("TZID") || last?.value.endsWith("Z")) warn(`${label}: timezone dates were converted to this device's local time.`);
       if (component.some(item => item.name === "ATTENDEE" || item.name === "ORGANIZER")) warn("Meeting attendees and invitations are not imported.");
     } catch (error) { warn(`${label}: ${error instanceof Error ? error.message : "Unable to import this event."}`); }
   }
-  return { events, warnings };
+  report.accepted = events.length; report.rejected = components.length - events.length;
+  return { events, warnings, report };
 }

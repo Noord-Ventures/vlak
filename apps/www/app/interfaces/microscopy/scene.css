@@ -116,9 +116,27 @@
 .mc-footer > span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .mc-mobile-nav { display: none; }
 .mc-announcement { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; white-space: nowrap; }
+.mc-print-sheet { display: none; }
+/* Printing uses an isolated document so the preview's fixed frame cannot clip the plan. */
+.mc-print-frame { position: fixed; width: 1px; height: 1px; inset: auto 0 0 auto; opacity: 0; border: 0; pointer-events: none; }
+@media print {
+  html:has(> body.mc-print-document) { background: white; color: black; }
+  html:has(> body.mc-print-document)::before, html:has(> body.mc-print-document)::after, body.mc-print-document::before, body.mc-print-document::after { display: none; }
+  body.mc-print-document { margin: 0; background: white; color: black; }
+  .mc-print-document .mc-print-sheet { display: block; padding: 32px; color: black; font: 12pt/1.45 Arial, sans-serif; }
+  .mc-print-document .mc-print-sheet > h2 { font-size: 22pt; margin: 0 0 8px; }
+  .mc-print-document .mc-print-sheet h3 { font-size: 14pt; margin: 24px 0 8px; }
+  .mc-print-document .mc-print-sheet dl { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; border-block: 1px solid #999; padding: 16px 0; }
+  .mc-print-document .mc-print-sheet dt { color: #555; font-size: 9pt; }
+  .mc-print-document .mc-print-sheet dd { margin: 4px 0 0; }
+  .mc-print-document .mc-print-sheet li { break-inside: avoid; margin-block: 4px; }
+}
 @container microscopy (max-width: 640px) {
   .mc { grid-template-rows: 64px minmax(0, 1fr) 58px; font-size: 15px; }
   .mc-header { padding: 8px 12px; gap: 10px; }
+  .mc-header, .mc-workflow-head { min-width: 0; overflow: hidden; }
+  .mc-brand, .mc-workflow-head > div { min-width: 0; overflow-wrap: anywhere; }
+  .mc-workflow-head h2, .mc-head-state { overflow-wrap: anywhere; }
   .mc-brand strong { font-size: 15px; }
   .mc-local { display: none; }
   .mc-body { display: block; overflow: hidden; }

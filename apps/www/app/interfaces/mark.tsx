@@ -3,6 +3,7 @@ import type { InterfaceSlug } from "./catalog";
 import { interfaceBySlug } from "./catalog";
 
 const marks = {
+  reconciliation: "list",
   calendar: "calendar",
   line: "message",
   press: "printer",
