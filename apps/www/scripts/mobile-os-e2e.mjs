@@ -926,6 +926,7 @@ export async function checkMobileOS({ page, base, fail }) {
       assert.match(await device.locator(".mo-notice").textContent(), /still suspended/);
       await page.evaluate(() => { const context = window.__mobileOSAudio.at(-1); context.resume = context.__resume; delete context.__resume; });
       await activate(device.getByRole("button", { name: "Play music", exact: true }));
+      await device.getByRole("button", { name: "Pause music", exact: true }).waitFor({ timeout: 5_000 });
       assert.equal(await page.evaluate(() => window.__mobileOSAudio.at(-1).state), "running");
       await activate(device.getByRole("button", { name: "Next track", exact: true }));
       assert.equal(await device.locator(".mo-track h3").textContent(), "Quiet current");

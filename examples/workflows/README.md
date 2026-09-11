@@ -6,7 +6,7 @@ These source examples connect Vlak components to application behavior. `record-r
 
 When exported with `vlak workflow record-review --output review`, use that `review` directory in place of `examples/workflows` below. All companion sources and the license are included.
 
-Node.js 22.6 or newer runs the domain, adapters, server, and tests directly. The React interface needs the dependencies declared in this directory, installed without changing the repository root workspace or lockfile:
+Node.js 22.6 or newer runs the domain, adapters, server, and tests directly. The React interface uses the dependencies declared in this directory. The repository root install includes this workspace. An exported copy can install independently:
 
 ```sh
 cd examples/workflows
