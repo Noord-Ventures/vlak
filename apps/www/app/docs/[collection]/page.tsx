@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { catalogComponents, domainCollections } from "@noorddev/vlak";
 import { DocsShell } from "@/components/docs-shell";
+import { CollectionExample } from "@/components/docs-examples/collections";
 
 export const dynamicParams = false;
 export function generateStaticParams() {
@@ -23,6 +24,7 @@ export default async function CollectionPage({ params }: PageProps) {
   return (
     <DocsShell title={collection.title} summary={collection.description}>
       <p className="rs-t-body">Build a specialised workspace with Vlak’s paper, ink, and hairlines. Each component includes a live specimen, a contextual example, and generated documentation for agents.</p>
+      <CollectionExample collection={name} />
       <p className="rs-t-body"><Link className="rs-link" href={`/components#${name}`}>Browse the collection</Link></p>
       {collection.groups.map(group => (
         <section key={group.title}>

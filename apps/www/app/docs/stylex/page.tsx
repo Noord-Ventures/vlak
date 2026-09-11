@@ -1,6 +1,8 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
+import { StylexCompileExample } from "@/components/docs-examples/foundations";
+import { DocsExample } from "@/components/docs-examples/frame";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
@@ -137,6 +139,14 @@ export default function StylexPage() {
       title="StyleX"
       summary="The components are StyleX leaves. Use the tokens in your own leaves, compile with Vite or Next, or run no compiler at all."
     >
+      <DocsExample
+        flush
+        title="Leaf to simplified output"
+        description="Switch views to follow the concept from token references into layered atomic CSS."
+      >
+        <StylexCompileExample />
+      </DocsExample>
+
       <h2 className="section-label">Writing a leaf</h2>
       <CodeBlock code={leaf} />
       <p className="rs-t-body">

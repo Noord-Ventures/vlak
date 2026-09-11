@@ -1,6 +1,8 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
+import { FrameworkControlExample } from "@/components/docs-examples/foundations";
+import { DocsExample } from "@/components/docs-examples/frame";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
@@ -75,6 +77,14 @@ export default function FrameworksPage() {
       title="Frameworks"
       summary="One stylesheet import, then components. Each framework below is what the packages actually export."
     >
+      <DocsExample
+        flush
+        title="One control contract"
+        description="The React component and the plain HTML class share the same Vlak stylesheet and native button behavior."
+      >
+        <FrameworkControlExample />
+      </DocsExample>
+
       <h2 className="section-label">Next.js</h2>
       <CodeBlock code={next} />
       <p className="rs-t-body">

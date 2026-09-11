@@ -2,6 +2,8 @@ import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { concentricInner, vlakTokens } from "@noorddev/vlak";
 import { CodeBlock } from "@/components/code-block";
+import { TokenGridExample } from "@/components/docs-examples/foundations";
+import { DocsExample } from "@/components/docs-examples/frame";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
@@ -18,6 +20,14 @@ export default function TokensPage() {
       title="Tokens"
       summary="Defined once in TypeScript. The JSON, the CSS custom properties, and the StyleX vars are generated."
     >
+      <DocsExample
+        flush
+        title="Module geometry"
+        description="A grid schematic: each 204px module combines a 184px content column with a 20px gutter."
+      >
+        <TokenGridExample />
+      </DocsExample>
+
       <h2 className="section-label">The neutral scale</h2>
       <p className="rs-t-body">Ink to paper. There is no accent.</p>
       <div

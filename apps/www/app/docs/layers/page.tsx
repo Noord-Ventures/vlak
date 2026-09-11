@@ -1,6 +1,8 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
+import { CascadeLayerExample } from "@/components/docs-examples/foundations";
+import { DocsExample } from "@/components/docs-examples/frame";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
@@ -46,6 +48,14 @@ export default function LayersPage() {
       title="Layers"
       summary="All of Vlak's CSS sits in cascade layers. Unlayered author CSS wins by definition."
     >
+      <DocsExample
+        flush
+        title="A real cascade"
+        description="Remove and restore the later app layer. The readout comes from the browser's computed style."
+      >
+        <CascadeLayerExample />
+      </DocsExample>
+
       <h2 className="section-label">The six layers</h2>
       <div className="docs-table" tabIndex={0}>
         <table className="rs-table">

@@ -5,6 +5,7 @@ import { catalogComponents, healthDataContract, healthWorkflows } from "@noordde
 import { CodeBlock } from "@/components/code-block";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
+import { HealthExample } from "@/components/docs-examples/collections";
 
 export const metadata: Metadata = pageMetadata("/docs/health", {
   title: "Health",
@@ -43,6 +44,7 @@ export default function HealthPage() {
         paper, ink, and hairlines as the rest of Vlak. Every component has a live specimen,
         a contextual example, and generated documentation for agents.
       </p>
+      <HealthExample />
       <p className="rs-t-body"><Link className="rs-link" href="/components#health">Browse the health collection</Link></p>
 
       {healthWorkflows.map(workflow => (

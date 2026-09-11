@@ -1,0 +1,382 @@
+.actions,
+.viewChoices,
+.sandboxChoices > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions > button,
+.viewChoices > button,
+.sandboxChoices button {
+  min-height: 44px;
+}
+
+.focusLayout,
+.cascadeExample {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+}
+
+.focusForm,
+.focusMap,
+.cascadeStage,
+.ruleStack {
+  min-width: 0;
+  padding: 20px;
+}
+
+.focusForm,
+.ruleStack {
+  border-right: 1px solid var(--divider);
+}
+
+.focusForm {
+  display: grid;
+  gap: 20px;
+}
+
+.focusMap {
+  display: grid;
+  align-content: start;
+  gap: 0;
+}
+
+.focusMap > span {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text-secondary);
+}
+
+.focusMap > span:first-child {
+  border-top: 1px solid var(--divider);
+}
+
+.focusMap p,
+.fullStatus,
+.compileExample > p,
+.cascadeStage p,
+.tokenExample > p {
+  margin: 16px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.frameworkExample {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.frameworkColumn {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 20px;
+}
+
+.frameworkColumn:first-child {
+  border-right: 1px solid var(--divider);
+}
+
+.frameworkColumn > code {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.frameworkColumn > span {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+  line-height: 1.45;
+}
+
+.frameworkColumn > button {
+  width: 100%;
+  min-height: 44px;
+}
+
+.fullStatus {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 16px 20px;
+  border-top: 1px solid var(--divider);
+}
+
+.ruleStack {
+  display: grid;
+  align-content: center;
+  padding: 0;
+}
+
+.ruleStack > div {
+  min-height: 88px;
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-content: center;
+  gap: 5px 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--divider);
+  color: var(--text-secondary);
+}
+
+.ruleStack > div:last-child {
+  border-bottom: 0;
+}
+
+.ruleStack > div[data-active] {
+  background: var(--control-fill);
+  color: var(--text);
+}
+
+.ruleStack span {
+  grid-row: 1 / 3;
+  align-self: center;
+}
+
+.ruleStack small {
+  font-size: 0.8125rem;
+}
+
+.cascadeStage {
+  display: grid;
+  align-content: center;
+  gap: 12px;
+}
+
+@layer foundation-demo-component, foundation-demo-app;
+
+@layer foundation-demo-component {
+  .cascadeTarget {
+    min-height: 72px;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    border: 1px solid var(--control-border);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    text-align: center;
+  }
+}
+
+@layer foundation-demo-app {
+  .cascadeApp {
+    border-radius: 0;
+    background: var(--text);
+    color: var(--bg);
+  }
+}
+
+.compileExample {
+  display: grid;
+  grid-template-columns: 184px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.viewChoices {
+  align-content: start;
+  padding: 20px 10px;
+  border-right: 1px solid var(--divider);
+}
+
+.viewChoices > button {
+  width: 100%;
+}
+
+.compileExample pre {
+  min-width: 0;
+  min-height: 264px;
+  margin: 0;
+  padding: 20px;
+  overflow: auto;
+  background: var(--table-alt);
+  color: var(--text);
+  font: 0.8125rem/1.55 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.compileExample > p {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 16px 20px;
+  border-top: 1px solid var(--divider);
+}
+
+.themeExample {
+  display: grid;
+  grid-template-columns: 184px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.sandboxChoices {
+  display: grid;
+  align-content: start;
+  gap: 20px;
+  padding: 20px;
+  border-right: 1px solid var(--divider);
+}
+
+.sandboxChoices > div {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.themeSandbox {
+  min-width: 0;
+  display: grid;
+  align-content: center;
+  gap: 20px;
+  padding: 24px;
+  background: var(--bg);
+  color: var(--text);
+  transition: background-color var(--duration-snap, 120ms), color var(--duration-snap, 120ms);
+}
+
+.themeSandbox > span {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.themeSandbox :global(.rs-field-label) {
+  font-size: var(--control-label);
+}
+
+.themeSandbox :global(.rs-input),
+.themeSandbox :global(.rs-btn-primary) {
+  font-size: var(--control-fs);
+}
+
+.tokenToolbar {
+  min-height: 76px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.tokenToolbar p {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+}
+
+.tokenToolbar span {
+  color: var(--text-secondary);
+  font-size: 0.8125rem;
+}
+
+.gridRatio {
+  min-height: 180px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20px minmax(0, 1fr);
+  padding: 20px;
+  background: var(--table-alt);
+}
+
+.gridRatio > div {
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--divider);
+  background: var(--bg);
+}
+
+.gridRatio > div:nth-child(2) {
+  border-inline: 0;
+  background: var(--control-fill);
+}
+
+.gridRatio span {
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font: 0.8125rem/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-align: center;
+  text-overflow: ellipsis;
+}
+
+.gridRatio > div:nth-child(2) span {
+  color: var(--text);
+  writing-mode: vertical-rl;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .themeSandbox {
+    transition: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .focusLayout,
+  .cascadeExample,
+  .frameworkExample,
+  .compileExample,
+  .themeExample {
+    grid-template-columns: 1fr;
+  }
+
+  .focusForm,
+  .ruleStack,
+  .frameworkColumn:first-child,
+  .viewChoices,
+  .sandboxChoices {
+    border-right: 0;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .frameworkColumn:first-child {
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .fullStatus,
+  .compileExample > p {
+    grid-column: 1;
+  }
+
+  .viewChoices {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .viewChoices > button {
+    min-width: 0;
+  }
+
+  .compileExample pre {
+    min-height: 236px;
+  }
+
+  .sandboxChoices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .themeSandbox {
+    padding: 20px;
+  }
+
+  .tokenToolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .tokenToolbar > button {
+    width: 100%;
+  }
+
+  .gridRatio {
+    min-height: 148px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .sandboxChoices {
+    grid-template-columns: 1fr;
+  }
+}

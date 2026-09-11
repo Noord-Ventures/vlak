@@ -59,6 +59,7 @@
 .workflow-example-description dd { margin: 0; overflow-wrap: anywhere; }
 .workflow-fingerprint { display: block; overflow-wrap: anywhere; color: var(--text-secondary); font-size: .75rem; }
 .workflow-approval-layout pre { margin: 16px 0 0; padding: 14px; overflow: auto; background: var(--control-fill); color: var(--text); font: .75rem/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.workflow-approval-layout pre:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
 .workflow-example-status { padding: 20px 20px 0; }
 .workflow-example-controls { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px 20px; }
 .workflow-example-controls > button { min-height: 44px; }
@@ -78,17 +79,17 @@
 .workflow-schedule-confirmed dt { color: var(--text-secondary); font-size: .8125rem; }
 .workflow-schedule-confirmed dd { margin: 6px 0 0; overflow-wrap: anywhere; font-size: .875rem; line-height: 1.5; }
 
-.workflow-example-notes { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--divider); }
+.workflow-example-notes { margin: 32px calc(-1 * var(--gutter)) 0; padding: 24px var(--gutter) 0; border-top: 1px solid var(--divider); }
 .workflow-example-notes :is(h2, p, dl) { margin: 0; }
 .workflow-example-notes h2 { font-size: 1.125rem; }
 .workflow-example-notes > p { max-width: 66ch; margin-top: 10px; color: var(--text-secondary); font-size: .875rem; line-height: 1.55; }
-.workflow-example-notes dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 20px; border-block: 1px solid var(--divider); }
+.workflow-example-notes dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 20px calc(-1 * var(--gutter)) 0; padding-inline: var(--gutter); border-block: 1px solid var(--divider); }
 .workflow-example-notes dl > div { min-width: 0; padding: 14px 12px; }
 .workflow-example-notes dl > div + div { border-left: 1px solid var(--divider); }
 .workflow-example-notes dt { color: var(--text-secondary); font-size: .75rem; }
 .workflow-example-notes dd { margin: 5px 0 0; overflow-wrap: anywhere; font-size: .875rem; }
 
-.workflow-manifest-meta { margin-top: 24px; padding-block: 14px; border-block: 1px solid var(--divider); color: var(--text-secondary); }
+.workflow-manifest-meta { margin: 24px calc(-1 * var(--gutter)) 0; padding: 14px var(--gutter); border-block: 1px solid var(--divider); color: var(--text-secondary); }
 .workflow-manifest-grid, .workflow-ownership-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
 .workflow-manifest-grid > section, .workflow-ownership-grid > section { min-width: 0; }
 .workflow-manifest-grid .section-label { margin-top: 32px; }
@@ -107,6 +108,8 @@
   .workflow-schedule-confirmed > div + div { border-left: 0; border-top: 1px solid var(--divider); }
   .workflow-example-header { align-items: flex-start; }
   .workflow-example-notes dl { grid-template-columns: minmax(0, 1fr); }
+  .workflow-example-notes dl { padding-inline: 0; }
+  .workflow-example-notes dl > div { padding-inline: calc(var(--gutter) + 12px); }
   .workflow-example-notes dl > div + div { border-left: 0; border-top: 1px solid var(--divider); }
 }
 

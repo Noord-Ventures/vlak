@@ -1,4 +1,5 @@
 import { CodeBlock } from "@/components/code-block";
+import { UpdatesExample } from "@/components/docs-examples/guides";
 import { DocsShell } from "@/components/docs-shell";
 import { pageMetadata } from "@/lib/page-metadata";
 
@@ -6,6 +7,7 @@ export const metadata = pageMetadata("/docs/updates", { title: "Safe source upda
 
 export default function Page() {
   return <DocsShell title="Safe source updates" summary="Review what will change before replacing installed source.">
+    <UpdatesExample />
     <p className="rs-t-body">The repository CLI records source baselines when init or add writes a file. Keep its .vlak directory with your project. Files that existed and were skipped are not adopted automatically. This workflow is for copied source; package imports still follow your package manager’s update process.</p>
     <h2 className="section-label">Review and apply</h2>
     <p className="rs-t-body">Build the CLI from this checkout with <code>pnpm --filter @noorddev/vlak-cli build</code>. Run the built executable from your application directory. The commands below use <code>vlak</code> to denote that executable; check a published release’s help before assuming it includes these commands.</p>

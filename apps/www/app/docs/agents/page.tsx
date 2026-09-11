@@ -1,6 +1,8 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { CodeBlock } from "@/components/code-block";
+import { vlakComponents } from "@noorddev/vlak";
+import { AgentsExample } from "@/components/docs-examples/guides";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR, HOST } from "../../specimen";
 
@@ -60,11 +62,13 @@ const conventions = `// State: value / defaultValue / onValueChange, everywhere 
 <Slider aria-label="Volume" />`;
 
 export default function AgentsPage() {
+  const select = vlakComponents.find(component => component.name === "select");
   return (
     <DocsShell
       title="Agents"
       summary="Components, tokens, props, keyboard behavior, and install paths are available as text or JSON."
     >
+      {select && <AgentsExample description={select.description} example={select.example ?? ""} />}
       <h2 className="section-label">Surfaces</h2>
       <div className="docs-table" tabIndex={0}>
         <table className="rs-table">

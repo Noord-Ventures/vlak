@@ -1,10 +1,12 @@
 import { DocsShell } from "@/components/docs-shell";
+import { ProjectsExample } from "@/components/docs-examples/guides";
 import { pageMetadata } from "@/lib/page-metadata";
 
 export const metadata = pageMetadata("/docs/projects", { title: "Project files", description: "Save, reopen and recover local Vlak workspaces with portable project files and browser revisions." });
 
 export default function Page() {
   return <DocsShell title="Project files" summary="Keep the work you make, and return to it later.">
+    <ProjectsExample />
     <p className="rs-t-body">Calendar, CSV reconciliation, Microscopy, Music, Wallpaper and the modernization brief share project controls. A project contains the workspace’s actual records and settings. Music projects reopen stopped; wallpaper projects retain the generated geometry.</p>
     <h2 className="section-label">Save and reopen</h2>
     <p className="rs-t-body">Choose Save project file for a portable JSON copy, or Save in browser to enable saves as you work. Opening a project asks for confirmation, then saves the outgoing work in Recent projects as a before-opening copy. If that recovery copy cannot be saved, the current work stays on screen. You can also download it before opening another project.</p>

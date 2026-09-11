@@ -1,0 +1,12 @@
+.frame { min-width: 0; margin: 28px 0 32px; border: 1px solid var(--divider); background: var(--bg); }
+.caption { margin: 0; padding: 16px 20px; border-bottom: 1px solid var(--divider); }
+.caption strong { font-size: .875rem; font-weight: 600; }
+.caption p { margin: 6px 0 0; color: var(--text-secondary); font-size: .8125rem; line-height: 1.45; }
+.body { min-width: 0; padding: 20px; }
+.flushBody { min-width: 0; }
+.body > :first-child { margin-top: 0; }
+.body > :last-child { margin-bottom: 0; }
+.frame :global(.code-block) { margin-inline: 0; }
+.frame :global(.code-block) pre { padding-right: 52px; }
+.frame :global(.code-copy) { width: 44px; height: 44px; min-width: 44px; min-height: 44px; top: 4px; right: 4px; }
+@media (max-width: 480px) { .caption, .body { padding-inline: 16px; } }

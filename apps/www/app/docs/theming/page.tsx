@@ -2,6 +2,8 @@ import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { vlakTokens } from "@noorddev/vlak";
 import { CodeBlock } from "@/components/code-block";
+import { ThemeSandboxExample } from "@/components/docs-examples/foundations";
+import { DocsExample } from "@/components/docs-examples/frame";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
@@ -80,6 +82,14 @@ export default function ThemingPage() {
       title="Theming"
       summary="Every token is a custom property on :root. Override it in unlayered CSS; the components follow."
     >
+      <DocsExample
+        flush
+        title="Scoped token sandbox"
+        description="Change the local scheme and control type scale. The rest of this page keeps its current theme."
+      >
+        <ThemeSandboxExample />
+      </DocsExample>
+
       <h2 className="section-label">Custom properties</h2>
       <p className="rs-t-body">
         Defined once in TypeScript, generated into <code className="rs-code">tokens.css</code>, and

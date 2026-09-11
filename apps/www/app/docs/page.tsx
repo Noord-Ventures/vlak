@@ -43,6 +43,7 @@ export default function DocsPage() {
     >
       <h2 className="section-label">Developer walkthrough</h2>
       <MediaPlayer
+        data-docs-example
         title="Build with Vlak in 60 seconds"
         src="/films/vlak-developer-60s-2f141701.mp4"
         poster="/films/vlak-developer-d24f4669.jpg"

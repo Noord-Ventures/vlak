@@ -2,6 +2,8 @@ import { pageMetadata } from "@/lib/page-metadata";
 import type { Metadata } from "next";
 import { catalogComponents } from "@noorddev/vlak";
 import { CodeBlock } from "@/components/code-block";
+import { AccessibilityFocusExample } from "@/components/docs-examples/foundations";
+import { DocsExample } from "@/components/docs-examples/frame";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR } from "../../specimen";
 
@@ -114,6 +116,14 @@ export default function AccessibilityPage() {
       title="Accessibility"
       summary="Native elements provide the baseline. Custom widgets follow WAI-ARIA Authoring Practices for semantics, names, keyboard behavior, and focus."
     >
+      <DocsExample
+        flush
+        title="Keyboard and error recovery"
+        description="Submit an empty field to see its error announced and focus returned to the control."
+      >
+        <AccessibilityFocusExample />
+      </DocsExample>
+
       <h2 className="section-label">Commitments</h2>
       <ul className="docs-list">
         <li>

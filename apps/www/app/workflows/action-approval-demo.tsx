@@ -49,7 +49,7 @@ export function ActionApprovalDemo() {
     <header className="workflow-example-header"><div><p className="section-label">Local memory example</p><h2 id="approval-example-title">Review one frozen action</h2></div><Badge variant={outcome === "pending" ? "muted" : "solid"}>{outcome}</Badge></header>
     <div className="workflow-approval-layout">
       <section aria-labelledby="approval-action-title"><span className="workflow-example-kicker">Action</span><h3 id="approval-action-title">Create task</h3><dl className="workflow-example-description"><div><dt>Title</dt><dd>Inspect north quay notes</dd></div><div><dt>Priority</dt><dd>Normal</dd></div><div><dt>Revision</dt><dd>{session.review.action.revision}</dd></div></dl></section>
-      <section aria-labelledby="approval-payload-title"><span className="workflow-example-kicker">Frozen payload</span><h3 id="approval-payload-title">Version marker</h3><code className="workflow-fingerprint">{session.review.payloadFingerprint}</code><pre>{JSON.stringify(session.review.action.payload, null, 2)}</pre></section>
+      <section aria-labelledby="approval-payload-title"><span className="workflow-example-kicker">Frozen payload</span><h3 id="approval-payload-title">Version marker</h3><code className="workflow-fingerprint">{session.review.payloadFingerprint}</code><pre tabIndex={0} role="region" aria-label="Frozen action payload">{JSON.stringify(session.review.action.payload, null, 2)}</pre></section>
     </div>
     <div className="workflow-example-status"><Alert live="polite" title="Approval status">{message}</Alert></div>
     <div className="workflow-example-controls">

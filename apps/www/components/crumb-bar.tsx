@@ -7,6 +7,7 @@ import { vlakComponents } from "@noorddev/vlak";
 import { chrome } from "@/app/site.stylex";
 import { interfaceBySlug } from "@/app/interfaces/catalog";
 import { sx } from "@/lib/sx";
+import { docsPageForPath } from "@/lib/docs-navigation";
 
 interface Crumb {
   label: string;
@@ -20,8 +21,11 @@ function trailFor(pathname: string): Crumb[] {
     trail.push({ label: "Home" });
   } else if (parts[0] === "docs") {
     trail.push({ label: "Docs", href: "/docs" });
-    if (parts[1] === "tokens") trail.push({ label: "Tokens" });
-    else trail.push({ label: "Getting started" });
+    const page = docsPageForPath(pathname);
+    trail.push({ label: page?.title ?? "Getting started" });
+  } else if (["workflows", "services", "showcase"].includes(parts[0]!)) {
+    const page = docsPageForPath(pathname);
+    trail.push({ label: page?.title ?? "Workflow kits" });
   } else if (parts[0] === "ai") {
     trail.push({ label: "AI", href: "/ai" });
     if (parts[1]) {

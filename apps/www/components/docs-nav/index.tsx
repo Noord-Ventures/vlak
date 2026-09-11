@@ -8,6 +8,7 @@ import { iconGroups } from "@noorddev/vlak-react";
 import { MobileToc } from "@/components/toc-mobile";
 import { sx } from "@/lib/sx";
 import { categoryTitle as sentence } from "@/lib/category-title";
+import { docsNavigation, docsPageForPath } from "@/lib/docs-navigation";
 import { navStyles } from "./docs-nav.stylex";
 import "./docs-nav.css";
 
@@ -46,35 +47,8 @@ function groupLinks(category: VlakCategory) {
     }));
 }
 
-/** Docs pages in rail order. Components has its own rail. */
-export const docsPages = [
-  { href: "/docs", title: "Getting started" },
-  { href: "/docs/frameworks", title: "Frameworks" },
-  { href: "/workflows", title: "Workflow kits" },
-  { href: "/docs/projects", title: "Project files" },
-  { href: "/docs/updates", title: "Safe source updates" },
-  { href: "/services", title: "Workflow modernization" },
-  { href: "/showcase", title: "Built with Vlak" },
-  { href: "/ai", title: "AI components" },
-  { href: "/docs/theming", title: "Theming" },
-  { href: "/docs/tokens", title: "Tokens" },
-  { href: "/docs/layers", title: "Layers" },
-  { href: "/docs/stylex", title: "StyleX" },
-  { href: "/docs/accessibility", title: "Accessibility" },
-  { href: "/docs/health", title: "Health" },
-  { href: "/docs/civic", title: "Civic" },
-  { href: "/docs/science", title: "Science" },
-  { href: "/docs/creative", title: "Creative tools" },
-  { href: "/docs/engineering", title: "Industrial" },
-  { href: "/docs/geospatial", title: "Geospatial" },
-  { href: "/docs/robotics", title: "Robotics" },
-  { href: "/docs/electronics", title: "Circuitry" },
-  { href: "/docs/microbiology", title: "Microbiology" },
-  { href: "/docs/agents", title: "Agents" },
-] as const;
-
 function docsLabel(pathname: string) {
-  const page = docsPages.find((p) => here(pathname, p.href));
+  const page = docsPageForPath(pathname);
   if (page) return page.title;
   if (pathname.startsWith("/components/")) {
     const name = pathname.split("/")[2];
@@ -172,16 +146,7 @@ export function DocsNav() {
 
   const docsLinks = (
     <>
-      {docsPages.map((page) => (
-        <Link
-          key={page.href}
-          href={page.href}
-          className="toc-mobile-item"
-          aria-current={here(pathname, page.href) ? "page" : undefined}
-        >
-          {page.title}
-        </Link>
-      ))}
+      {docsNavigation.map(group => <div className="toc-mobile-doc-group" key={group.title}><p className="toc-mobile-label">{group.title}</p>{group.pages.map(page => <Link key={page.href} href={page.href} className="toc-mobile-item" aria-current={here(pathname, page.href) ? "page" : undefined}>{page.title}</Link>)}</div>)}
     </>
   );
 
@@ -233,16 +198,7 @@ export function DocsNav() {
       <>
         <div {...sx("toc-rail", navStyles.rail)}>
           <nav {...sx("toc", navStyles.toc)} aria-label="Docs">
-            {docsPages.map((page) => (
-              <Link
-                key={page.href}
-                href={page.href}
-                {...sx("toc-item", navStyles.item)}
-                aria-current={here(pathname, page.href) ? "page" : undefined}
-              >
-                {page.title}
-              </Link>
-            ))}
+            {docsNavigation.map(group => <div className="toc-doc-group" key={group.title}><p className="toc-label">{group.title}</p>{group.pages.map(page => <Link key={page.href} href={page.href} {...sx("toc-item", navStyles.item)} aria-current={here(pathname, page.href) ? "page" : undefined}>{page.title}</Link>)}</div>)}
           </nav>
         </div>
         <MobileToc label={docsLabel(pathname)}>{docsLinks}</MobileToc>

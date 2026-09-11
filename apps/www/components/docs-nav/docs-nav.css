@@ -57,3 +57,7 @@
 .toc-item[aria-current="page"],
 .toc-item[aria-current="true"] { font-weight: 500; }
 .toc-item:focus-visible { outline: 1px solid var(--text); outline-offset: 2px; }
+.toc-doc-group + .toc-doc-group { margin-top: 18px; }
+.toc-doc-group .toc-label { margin: 0 0 4px; }
+.toc-mobile-doc-group + .toc-mobile-doc-group { margin-top: 16px; }
+.toc-mobile-label { margin: 0; padding: 12px max(var(--pad), env(safe-area-inset-right, 0px)) 4px max(var(--pad), env(safe-area-inset-left, 0px)); color: var(--text-secondary); font-size: .8125rem; }

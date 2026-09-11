@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DocsShell } from "@/components/docs-shell";
+import { ChoosingExample } from "@/components/docs-examples/guides";
 import { pageMetadata } from "@/lib/page-metadata";
 
 export const metadata: Metadata = pageMetadata("/docs/choosing-vlak", {
@@ -11,6 +12,7 @@ export const metadata: Metadata = pageMetadata("/docs/choosing-vlak", {
 export default function ChoosingVlakPage() {
   return (
     <DocsShell title="Choosing Vlak" summary="Use the system that matches the amount of product judgment you want to keep.">
+      <ChoosingExample />
       <h2 className="section-label">Choose Vlak</h2>
       <ul className="docs-list">
         <li>You want strong typographic, spacing, and interaction rules before choosing a finished product skin.</li>
