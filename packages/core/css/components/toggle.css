@@ -30,5 +30,7 @@
 .rs-toggle-group-subtle{min-width:0;max-width:100%;padding:0;gap:3px;background-color:var(--table-alt);border-color:var(--divider)}
 @media (forced-colors: active){.rs-toggle-group-subtle{background-color:Canvas;border-color:ButtonText}}
 .rs-toggle-grouped-subtle{flex-grow:1;flex-shrink:1;flex-basis:auto;min-width:var(--hit);padding-inline:0.75rem;border-radius:var(--radius-sm);border-inline-start-width:0;border-inline-start-style:none;border-inline-start-color:transparent;overflow-wrap:anywhere;white-space:normal}
+.rs-toggle-grouped-subtle:first-child{border-start-start-radius:0;border-end-start-radius:0}
+.rs-toggle-grouped-subtle:last-child{border-start-end-radius:0;border-end-end-radius:0}
 .rs-toggle-grouped-subtle:not(:first-child){border-inline-start-width:0;border-inline-start-style:none;border-inline-start-color:transparent}
 @media (max-width: 640px){.rs-toggle-grouped-subtle{flex-basis:0;min-width:var(--hit);padding-inline:0.625rem;border-radius:var(--radius-sm)}}
