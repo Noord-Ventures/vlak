@@ -41,7 +41,13 @@ async function chooseOption(page, combobox, label) {
 
 async function exerciseExample(page, path) {
   const example = page.locator("[data-docs-example]").first();
-  if (path === "/docs/agents/") {
+  if (path === "/docs/") {
+    const video = example.locator("video");
+    await example.getByRole("button", { name: "Play", exact: true }).click();
+    await page.waitForFunction(element => !element.paused && element.currentTime > 0, await video.elementHandle());
+    await example.getByRole("button", { name: "Pause", exact: true }).click();
+    assert(await video.evaluate(element => element.paused), `${path}: playback must pause through its controls`);
+  } else if (path === "/docs/agents/") {
     await chooseOption(page, example.getByRole("combobox", { name: "Documentation surface", exact: true }), "CLI command");
     assert.match(await example.locator("[data-docs-request]").innerText(), /^npx /, `${path}: documentation surface must update its request`);
     await chooseOption(page, example.getByRole("combobox", { name: "Example city", exact: true }), "Amsterdam");
@@ -139,7 +145,7 @@ async function loadMarkedMedia(page, path) {
   const videos = page.locator("[data-docs-example] video, video[data-docs-example]");
   for (let index = 0; index < await videos.count(); index++) {
     const video = videos.nth(index);
-    await video.evaluate(element => { if (element.readyState < 1) element.load(); });
+    await video.evaluate(element => { if (element.readyState < 1) { element.preload = "metadata"; element.load(); } });
     await page.waitForFunction(element => element.readyState >= 1 || Boolean(element.error), await video.elementHandle());
   }
   const media = await page.locator("[data-docs-example]").evaluateAll(examples => examples.map((example, index) => {
@@ -152,7 +158,7 @@ async function loadMarkedMedia(page, path) {
       index,
       visible: example.getClientRects().length > 0 && style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0,
       images: images.map(image => ({ complete: image.complete, width: image.naturalWidth, height: image.naturalHeight })),
-      videos: videos.map(video => ({ ready: video.readyState, width: video.videoWidth, height: video.videoHeight, duration: video.duration, error: video.error?.message ?? null })),
+      videos: videos.map(video => ({ ready: video.readyState, width: video.videoWidth, height: video.videoHeight, duration: video.duration, source: video.currentSrc, network: video.networkState, error: video.error ? { code: video.error.code, message: video.error.message } : null, codecs: { mp4: video.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"'), webm: video.canPlayType('video/webm; codecs="vp9, opus"') } })),
       canvases: canvases.map(canvas => ({ width: canvas.width, height: canvas.height })),
       buttons: [...example.querySelectorAll("button")].filter(button => button.getClientRects().length > 0).map(button => ({ width: button.getBoundingClientRect().width, height: button.getBoundingClientRect().height, name: button.getAttribute("aria-label") || button.textContent?.trim() })),
     };
@@ -161,7 +167,7 @@ async function loadMarkedMedia(page, path) {
   assert(media.every(item => item.visible), `${path}: every marked documentation example must render visibly`);
   for (const item of media) {
     assert(item.images.every(image => image.complete && image.width > 0 && image.height > 0), `${path}: example ${item.index + 1} has an image that did not load`);
-    assert(item.videos.every(video => !video.error && video.ready >= 1 && video.width > 0 && video.height > 0 && Number.isFinite(video.duration) && video.duration > 0), `${path}: example ${item.index + 1} has a video without loaded metadata`);
+    assert(item.videos.every(video => !video.error && video.ready >= 1 && video.width > 0 && video.height > 0 && Number.isFinite(video.duration) && video.duration > 0), `${path}: example ${item.index + 1} has a video without loaded metadata: ${JSON.stringify(item.videos)}`);
     assert(item.canvases.every(canvas => canvas.width > 0 && canvas.height > 0), `${path}: example ${item.index + 1} has an empty canvas`);
     assert(item.buttons.every(button => button.width >= 43.5 && button.height >= 43.5), `${path}: example ${item.index + 1} has a button smaller than 44px: ${JSON.stringify(item.buttons)}`);
   }

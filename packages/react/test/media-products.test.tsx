@@ -96,7 +96,45 @@ describe("Playback and seeking", () => {
     fireEvent.loadedMetadata(media); fireEvent.progress(media);
     expect(container.querySelector<HTMLElement>(".rs-media-scrubber-buffered")?.style.width).toBe("80%");
     rerender(<MediaPlayer src="second.wav" kind="audio" title="Recording" />);
+    expect(load).toHaveBeenCalledOnce();
     expect(container.querySelector<HTMLElement>(".rs-media-scrubber-buffered")?.style.width).toBe("0%");
+  });
+
+  it("renders ordered native sources with the required src as the final fallback", () => {
+    const html = renderToString(<MediaPlayer
+      src="/film.mp4"
+      sources={[
+        { src: "/film.webm", type: 'video/webm; codecs="vp9, opus"' },
+        { src: "/film-av1.webm", type: 'video/webm; codecs="av01, opus"' },
+      ]}
+      title="Film"
+    />);
+    expect(html).toContain("<video");
+    expect(html).toContain("controls=\"\"");
+    expect(html).not.toMatch(/<video[^>]+src=/);
+    expect(html.indexOf('src="/film.webm"')).toBeLessThan(html.indexOf('src="/film-av1.webm"'));
+    expect(html.indexOf('src="/film-av1.webm"')).toBeLessThan(html.indexOf('src="/film.mp4"'));
+  });
+
+  it("reloads and clears failure state only when the effective source list changes", async () => {
+    const load = vi.spyOn(HTMLMediaElement.prototype, "load").mockImplementation(() => {});
+    const firstSources = [{ src: "/recording.webm", type: "audio/webm; codecs=opus" }];
+    const { container, rerender } = render(<MediaPlayer src="/recording.mp3" sources={firstSources} kind="audio" title="Recording" />);
+    const media = container.querySelector("audio")!;
+    expect(media.getAttribute("src")).toBeNull();
+    expect(Array.from(media.querySelectorAll("source"), source => source.getAttribute("src"))).toEqual(["/recording.webm", "/recording.mp3"]);
+    expect(load).not.toHaveBeenCalled();
+
+    fireEvent.error(media);
+    expect(screen.getByRole("status").textContent).toContain("could not load");
+    rerender(<MediaPlayer src="/recording.mp3" sources={[...firstSources]} kind="audio" title="Recording" />);
+    expect(load).not.toHaveBeenCalled();
+    expect(screen.getByRole("status").textContent).toContain("could not load");
+
+    rerender(<MediaPlayer src="/recording.mp3" sources={[{ src: "/recording-v2.webm", type: "audio/webm; codecs=opus" }]} kind="audio" title="Recording" />);
+    await waitFor(() => expect(load).toHaveBeenCalledOnce());
+    expect(screen.getByRole("status").textContent).toBe("");
+    expect(Array.from(media.querySelectorAll("source"), source => source.getAttribute("src"))).toEqual(["/recording-v2.webm", "/recording.mp3"]);
   });
 });
 

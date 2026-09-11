@@ -13,8 +13,11 @@ import { PlaybackControls } from "./playback-controls";
 import { MediaScrubber } from "./media-scrubber";
 
 export interface MediaTrack { src: string; srcLang: string; label: string; default?: boolean }
+export interface MediaPlayerSource { src: string; type?: string }
 export interface MediaPlayerProps extends React.HTMLAttributes<HTMLDivElement> {
   src: string;
+  /** Preferred sources in browser selection order. The required `src` is appended as the final fallback. */
+  sources?: readonly MediaPlayerSource[];
   title: string;
   kind?: "audio" | "video";
   poster?: string;
@@ -45,7 +48,7 @@ const styles = stylex.create({
 });
 
 /** Native media with Vlak transport, seeking, volume, captions, and recoverable loading errors. */
-export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(function MediaPlayer({ src, title, kind = "video", poster, preload = "metadata", tracks = [], transcript, onPlayingChange, onTimeChange, className, style, ...props }, ref) {
+export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(function MediaPlayer({ src, sources = [], title, kind = "video", poster, preload = "metadata", tracks = [], transcript, onPlayingChange, onTimeChange, className, style, ...props }, ref) {
   const mediaRef = React.useRef<HTMLMediaElement>(null);
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mergedRef = useMergedRefs(mediaRef, ref);
@@ -62,15 +65,24 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
   const [speed, setSpeed] = React.useState(1);
   const [buffered, setBuffered] = React.useState(0);
   const headingId = React.useId();
+  const hasSources = sources.length > 0;
+  const sourceKey = JSON.stringify([kind, sources.map(source => [source.src, source.type ?? ""]), src]);
+  const previousSourceKey = React.useRef(sourceKey);
   React.useEffect(() => { setHydrated(true); setCanFullscreen(typeof containerRef.current?.requestFullscreen === "function"); }, []);
-  React.useEffect(() => { setPlaying(false); setPosition(0); setDuration(0); setBuffered(0); setFailed(false); setStatus(""); }, [src]);
+  React.useEffect(() => {
+    setPlaying(false); setPosition(0); setDuration(0); setBuffered(0); setFailed(false); setStatus("");
+    if (previousSourceKey.current !== sourceKey) {
+      previousSourceKey.current = sourceKey;
+      if (hasSources) mediaRef.current?.load();
+    }
+  }, [sourceKey, hasSources]);
   const captionsKey = tracks.map(track => `${track.src}:${Boolean(track.default)}`).join("\n");
   const defaultCaptions = String(tracks.findIndex(track => track.default));
   React.useEffect(() => {
     setCaptions(defaultCaptions);
     const list = mediaRef.current?.textTracks;
     if (list) for (let index = 0; index < list.length; index++) list[index]!.mode = index === Number(defaultCaptions) ? "showing" : "disabled";
-  }, [src, captionsKey, defaultCaptions]);
+  }, [sourceKey, captionsKey, defaultCaptions]);
   const applyCaptions = (selected: string) => {
     const list = mediaRef.current?.textTracks;
     if (list) for (let index = 0; index < list.length; index++) list[index]!.mode = index === Number(selected) ? "showing" : "disabled";
@@ -97,8 +109,12 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
   const message = rs(["rs-media-player-status"], styles.status);
   const transcriptStyle = rs(["rs-media-player-transcript"], styles.transcript);
   const summary = rs(["rs-media-player-summary"], styles.summary);
+  const sourceElements = hasSources && <>
+    {sources.map((source, index) => <source key={`${index}:${source.src}:${source.type ?? ""}`} src={source.src} type={source.type} />)}
+    <source key={`fallback:${src}`} src={src} />
+  </>;
   const shared = {
-    ...media, ref: mergedRef, src, preload, controls: !hydrated, "aria-label": title,
+    ...media, ref: mergedRef, src: hasSources ? undefined : src, preload, controls: !hydrated, "aria-label": title,
     onPlay: () => { setPlaying(true); onPlayingChange?.(true); setStatus(""); },
     onPause: () => { setPlaying(false); onPlayingChange?.(false); },
     onEnded: () => { setPlaying(false); onPlayingChange?.(false); },
@@ -114,7 +130,7 @@ export const MediaPlayer = React.forwardRef<HTMLMediaElement, MediaPlayerProps>(
   };
   return <div ref={containerRef} role="region" aria-labelledby={headingId} {...props} className={root.className} style={{ ...root.style, ...style }}>
     <h3 {...heading} id={headingId}>{title}</h3>
-    {kind === "video" ? <video {...shared} poster={poster} playsInline>{tracks.map(track => <track key={track.src} kind="captions" {...track} />)}</video> : <audio {...shared} />}
+    {kind === "video" ? <video {...shared} poster={poster} playsInline>{sourceElements}{tracks.map(track => <track key={track.src} kind="captions" {...track} />)}</video> : <audio {...shared}>{sourceElements}</audio>}
     {hydrated && <>
       <MediaScrubber value={position} duration={duration} buffered={buffered} disabled={failed} onValueChange={next => { const element = mediaRef.current; if (element && Number.isFinite(duration)) { element.currentTime = next; setPosition(next); onTimeChange?.(next); } }} />
       <div {...controls}>

@@ -11,7 +11,7 @@ export { InlineEdit, type InlineEditProps } from "./components/inline-edit";
 export { Rating, type RatingProps } from "./components/rating";
 export { PlaybackControls, type PlaybackControlsProps } from "./components/playback-controls";
 export { MediaScrubber, type MediaScrubberProps } from "./components/media-scrubber";
-export { MediaPlayer, type MediaPlayerProps } from "./components/media-player";
+export { MediaPlayer, type MediaPlayerProps, type MediaPlayerSource } from "./components/media-player";
 export { Waveform, type WaveformProps } from "./components/waveform";
 export { ImageViewer, type ImageViewerProps } from "./components/image-viewer";
 export { CanvasControls, type CanvasControlsProps } from "./components/canvas-controls";

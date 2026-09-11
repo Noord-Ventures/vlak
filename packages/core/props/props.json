@@ -5254,6 +5254,13 @@
               "required": true
             },
             {
+              "name": "sources",
+              "type": "readonly MediaPlayerSource[]",
+              "required": false,
+              "default": "[]",
+              "description": "Preferred sources in browser selection order. The required `src` is appended as the final fallback."
+            },
+            {
               "name": "title",
               "type": "string",
               "required": true

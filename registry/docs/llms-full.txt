@@ -12289,6 +12289,7 @@ Forwards `ref` to the `HTMLMediaElement`.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `src` (required) | `string` |  |  |
+| `sources` | `readonly MediaPlayerSource[]` | `[]` | Preferred sources in browser selection order. The required `src` is appended as the final fallback. |
 | `title` (required) | `string` |  |  |
 | `kind` | `"audio" \| "video"` | `"video"` |  |
 | `poster` | `string` |  |  |

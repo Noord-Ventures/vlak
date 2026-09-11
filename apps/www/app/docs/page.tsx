@@ -46,6 +46,9 @@ export default function DocsPage() {
         data-docs-example
         title="Build with Vlak in 60 seconds"
         src="/films/vlak-developer-60s-2f141701.mp4"
+        sources={[
+          { src: "/films/vlak-developer-60s-cf1c0b96.webm", type: 'video/webm; codecs="vp9, opus"' },
+        ]}
         poster="/films/vlak-developer-d24f4669.jpg"
         preload="none"
         style={{ marginTop: 12 }}
