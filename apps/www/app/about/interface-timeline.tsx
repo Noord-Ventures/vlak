@@ -8,7 +8,7 @@ export function InterfaceTimeline() {
   return <section id="interface-lineage" className="interface-lineage" aria-labelledby="lineage-title">
     <header className="lineage-header">
       <div className="lineage-register"><span>Design lineage</span><span>{count} milestones · 6 chapters</span></div>
-      <div className="lineage-heading"><h2 id="lineage-title">From the page<br />to the agent</h2><div><p className="lineage-range">1917<span aria-hidden="true">—</span>2026</p><p>A selected history of how we arrange information and act through machines.</p></div></div>
+      <div className="lineage-heading"><h2 id="lineage-title">From the page<br />to the agent</h2><div><p className="lineage-range">1917<span>→</span>Today</p><p>A selected history of how we arrange information and act through machines.</p></div></div>
     </header>
     <ol className="lineage-eras" aria-label="Chapters in interface history">
       {timelineEras.map((era, index) => <li className="lineage-era" key={era.id}>

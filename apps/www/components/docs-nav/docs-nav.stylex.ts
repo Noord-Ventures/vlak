@@ -39,6 +39,17 @@ export const navStyles = stylex.create({
       display: "none",
     },
   },
+  docs: {
+    maskImage: "none",
+  },
+  docsLabel: {
+    margin: 0,
+    marginBottom: 4,
+    fontSize: "0.75rem",
+    fontWeight: 600,
+    letterSpacing: 0,
+    color: "var(--text-secondary)",
+  },
   sub: {
     width: 204,
     marginLeft: 0,

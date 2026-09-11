@@ -25,6 +25,10 @@
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 64px), transparent calc(100% - 8px));
   mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 64px), transparent calc(100% - 8px));
 }
+.toc-docs {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
 .toc-sub {
   /* Secondaries occupy the gutter after groups plus the next 184
      column (204). Groups are 184; the rail is 388 and ends on the
@@ -59,5 +63,7 @@
 .toc-item:focus-visible { outline: 1px solid var(--text); outline-offset: 2px; }
 .toc-doc-group + .toc-doc-group { margin-top: 18px; }
 .toc-doc-group .toc-label { margin: 0 0 4px; }
+.toc-docs .toc-label { margin: 0 0 4px; font-size: .75rem; font-weight: 600; letter-spacing: 0; color: var(--text-secondary); }
 .toc-mobile-doc-group + .toc-mobile-doc-group { margin-top: 16px; }
 .toc-mobile-label { margin: 0; padding: 12px max(var(--pad), env(safe-area-inset-right, 0px)) 4px max(var(--pad), env(safe-area-inset-left, 0px)); color: var(--text-secondary); font-size: .8125rem; }
+.toc-mobile-doc-group .toc-mobile-label { font-size: .75rem; font-weight: 600; letter-spacing: 0; }

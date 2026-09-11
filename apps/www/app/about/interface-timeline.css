@@ -7,7 +7,7 @@
 .lineage-heading p { margin: 20px 0 0; font-size: .875rem; line-height: 1.45; color: var(--text-secondary); }
 .lineage-heading .lineage-range { margin: 0; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 400; letter-spacing: -.045em; color: var(--text); font-variant-numeric: tabular-nums; }
 .lineage-range span { display: inline-block; margin-inline: .25em; color: var(--text-secondary); }
-.lineage-eras { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid var(--text); }
+.lineage-eras { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid var(--divider); }
 .lineage-era { display: grid; grid-template-rows: subgrid; grid-row: span 4; min-width: 0; padding-top: 18px; }
 .lineage-era + .lineage-era { border-left: 1px solid var(--divider); }
 .lineage-era-meta { display: flex; justify-content: space-between; gap: 8px; padding-inline: 20px; font-size: .75rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
@@ -46,7 +46,7 @@
 @media (max-width: 1223px) {
   .lineage-eras { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .lineage-era:nth-child(3n + 1) { border-left: 0; }
-  .lineage-era:nth-child(n + 4) { border-top: 1px solid var(--text); }
+  .lineage-era:nth-child(n + 4) { border-top: 1px solid var(--divider); }
   .lineage-heading { gap: 24px; }
 }
 @media (max-width: 640px) {
@@ -57,7 +57,7 @@
   .lineage-heading p { margin: 0; }
   .lineage-eras { grid-template-columns: minmax(0, 1fr); }
   .lineage-era { grid-template-columns: minmax(0, 1fr) 128px; grid-template-rows: auto; grid-row: auto; padding-top: 20px; }
-  .lineage-era + .lineage-era { border-left: 0; border-top: 1px solid var(--text); }
+  .lineage-era + .lineage-era { border-left: 0; border-top: 1px solid var(--divider); }
   .lineage-era-meta { grid-column: 1 / -1; margin-bottom: 20px; }
   .lineage-era-heading { grid-column: 1; grid-row: 2; align-self: center; padding-bottom: 20px; min-height: 0; }
   .lineage-era-heading h3 { font-size: 1.5rem; }

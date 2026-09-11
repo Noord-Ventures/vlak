@@ -1,9 +1,6 @@
 /** Macintosh 128K: compact case, curved CRT, disk slot, separate keyboard and mouse. */
 export function ScreenVignette() {
   return <>
-    <g className="lineage-drawing-guide">
-      <path d="M28 108h139M49 9h5M121 9h5" />
-    </g>
     <path className="lineage-drawing-paper" d="m54 17 7-8h54l6 8v65a3 3 0 0 1-3 3H57a3 3 0 0 1-3-3z" />
     <path d="M54 17h67M75 9v4h25V9M57 81h61M62 24h51v40H62z" />
     <path d="M69 27h37q5 0 5 6v22q0 6-5 6H69q-5 0-5-6V33q0-6 5-6Z" />
@@ -39,9 +36,6 @@ export function ScreenVignette() {
 
 export function DesktopVignette() {
   return <>
-    <g className="lineage-drawing-guide">
-      <path d="M12 13h124M12 10v8M136 10v8M55 100h119" />
-    </g>
     <rect className="lineage-drawing-paper" x="17" y="18" width="117" height="65" rx="2" />
     <path d="M17 29h117M17 75h117M24 22h4v4h-4zM36 23h36M95 23h15M124 22h4v4h-4z" />
     <g className="lineage-drawing-detail">
@@ -54,17 +48,11 @@ export function DesktopVignette() {
       <path d="M65 55h11M82 55h14M104 55h9M138 55h9M153 55h10M94 59v28M160 59v28" />
       <path d="M65 64h4v4h-4zM74 66h13M65 74h4v4h-4zM74 76h10M101 64h8v10h-8zM116 66h32M116 71h23M116 79h29M162 64h5v10h-5M64 92h23M151 92h12" />
     </g>
-    <g className="lineage-drawing-detail">
-      <path d="M13 104h158M20 101h10M39 101h17M66 101h17M145 101h17" />
-    </g>
   </>;
 }
 
 export function TouchVignette() {
   return <>
-    <g className="lineage-drawing-guide">
-      <path d="M9 5h61M9 108h61M76 27h101M76 108h101" />
-    </g>
     <rect className="lineage-drawing-paper" x="79" y="32" width="96" height="72" rx="6" />
     <rect x="85" y="38" width="80" height="60" rx="1" />
     <path d="M85 49h80" />

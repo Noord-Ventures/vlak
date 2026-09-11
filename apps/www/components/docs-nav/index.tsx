@@ -197,8 +197,8 @@ export function DocsNav() {
     return (
       <>
         <div {...sx("toc-rail", navStyles.rail)}>
-          <nav {...sx("toc", navStyles.toc)} aria-label="Docs">
-            {docsNavigation.map(group => <div className="toc-doc-group" key={group.title}><p className="toc-label">{group.title}</p>{group.pages.map(page => <Link key={page.href} href={page.href} {...sx("toc-item", navStyles.item)} aria-current={here(pathname, page.href) ? "page" : undefined}>{page.title}</Link>)}</div>)}
+          <nav {...sx("toc toc-docs", navStyles.toc, navStyles.docs)} aria-label="Docs">
+            {docsNavigation.map(group => <div className="toc-doc-group" key={group.title}><p {...sx("toc-label", navStyles.docsLabel)}>{group.title}</p>{group.pages.map(page => <Link key={page.href} href={page.href} {...sx("toc-item", navStyles.item)} aria-current={here(pathname, page.href) ? "page" : undefined}>{page.title}</Link>)}</div>)}
           </nav>
         </div>
         <MobileToc label={docsLabel(pathname)}>{docsLinks}</MobileToc>

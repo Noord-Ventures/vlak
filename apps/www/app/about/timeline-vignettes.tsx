@@ -55,10 +55,6 @@ function PublishingVignette() {
 
 function AgentsVignette() {
   return <>
-    <g className="lineage-drawing-guide">
-      <path d="M56 9h56M56 105h56M136 82h39" />
-      <path strokeDasharray="1 4" d="M47 19v29M123 66v28" />
-    </g>
     <path d="M33 57h14V30h13M47 57v27h13M108 30h15v54h-15M123 57h15" />
     <path className="lineage-drawing-paper" d="M9 38h17l8 8v29H9z" />
     <path d="M26 38v8h8" />
@@ -74,7 +70,7 @@ function AgentsVignette() {
     <rect className="lineage-drawing-paper" x="138" y="38" width="35" height="39" rx="2" />
     <path d="M138 49h35M144 44h14" />
     <g className="lineage-drawing-detail">
-      <path d="m144 57 2 2 4-4M154 57h13M144 65h23M144 70h17M65 105h7m3 0h7m3 0h7M139 84h7m3 0h7m3 0h7" />
+      <path d="m144 57 2 2 4-4M154 57h13M144 65h23M144 70h17" />
     </g>
     <g className="lineage-drawing-paper">
       <circle cx="47" cy="57" r="2.5" /><circle cx="123" cy="57" r="2.5" />
