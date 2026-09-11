@@ -1,9 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="132" height="24" viewBox="0 0 132 24" role="img" aria-labelledby="title desc">
   <title id="title">Built with Vlak</title>
-  <desc id="desc">A black and paper badge with a modular grid mark.</desc>
+  <desc id="desc">A black and paper badge with the Vlak mark.</desc>
   <rect width="132" height="24" fill="#f4f2ec"/>
   <rect x="0.5" y="0.5" width="131" height="23" fill="none" stroke="#1a1a1a"/>
-  <path d="M8 7h4v4H8zm5 0h4v4h-4zM8 12h4v4H8zm5 0h4v4h-4z" fill="#1a1a1a"/>
+  <g transform="translate(3 3) scale(.0218978102)">
+    <g transform="translate(0 822) scale(1 -1)">
+      <path d="m411.128.67 128.714 128.713L334.5 334.726 129.158 540.068.405 411.315 411.128.669Z" fill="#1a1a1a"/>
+      <path d="M539.429 128.97 411.09.63 282.751 128.97v564.691l128.661 127.928 128.017-127.928V128.97Z" fill="#1a1a1a"/>
+      <path d="m500.812 347.858 128.752-128.752 192.21 192.209-128.752 128.753-96.105-96.105-96.105-96.105Z" fill="#1a1a1a"/>
+    </g>
+  </g>
   <text x="24" y="16" fill="#1a1a1a" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="600">Built with Vlak</text>
 </svg>
-

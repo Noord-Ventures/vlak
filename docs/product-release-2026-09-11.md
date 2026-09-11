@@ -28,7 +28,7 @@ Local verification used Node 26.7.0, pnpm 11.19.0 and Chrome for Testing 151.0.7
 | Consumer checks | Package tarball inspection, React 18/19 consumers, optional-engine isolation and CLI source export passed |
 | Generated artifacts | Core CSS, tokens, props, registry and machine-readable documents regenerate without changes |
 | Bundle limits | All configured budgets pass; CLI is 155.1 KiB gzip against an explicitly raised 160 KiB limit |
-| Website build and discovery | 636 generated pages; canonical/sitemap/metadata checks cover 305 indexed pages and 191 images; agent-surface checks pass |
+| Website build and discovery | 639 generated pages; canonical/sitemap/metadata checks cover 308 indexed pages and 191 images; agent-surface checks pass |
 | General browser checks | Accessibility scans over 256 pages, phone overflow checks over 238 pages, keyboard navigation, mobile navigation/search/components and interface previews passed |
 | Workflow and service UI | Desktop and mobile editing, unsaved-draft protection, commit/history/undo, validation, file export and accessibility passed |
 | Project storage | File round trips, malformed/future documents, competing tabs, revision history, recovery and deletion tests passed |
@@ -57,3 +57,13 @@ Open-source maintenance uses the repository's issue and review process. A report
 Each service engagement must name its accepting owner, deployment operator, support scope and rollback owner in the supplied templates. Those fields cannot be completed without an actual engagement. Scientific handoff requires a domain partner and a receiving-format specification.
 
 Before expanding the products, record observed task completion, assistance needed, whether the exported result opens in its intended destination, whether the user returns with real work and the maintenance effort incurred. Failed attempts count. These are research and continuation decisions, not claims inferred from automated test results.
+
+## Workflow and showcase refinement
+
+The workflow landing now includes three framed visual examples with adjacent example and manifest actions. The example routes contain interactive, bounded local flows; dedicated manifest routes contain source, installation, states, adapters and ownership. Record-review dividers run to the edges of the example frame. Approval supports approval/rejection/reset for a frozen payload. Schedule editing uses the Vlak date/time picker, reviews every changed field, and applies a revision-checked local edit to an explicit UTC fixture.
+
+The modernization page includes an illustrative record-to-decision flow and brief-to-handoff example, plus a framed worksheet. These visuals are examples, not claimed customer outcomes. The showcase includes Tax Scratchpad by Nicholas Pulido, Noord, and Renn, with public-site previews and direct links. The reusable badge now uses the exact Vlak SVG mark; attribution and preview provenance are recorded in `showcase-sources.md`.
+
+The follow-up CI run for `6f52313` found an accessibility issue in empty CSV source regions that the prior local pass missed. `19d53af` gives the two source regions distinct labels, including when their filenames match. Its focused preview tests cover both empty sources and duplicate filenames at 390px and 1440px. The redesign review also corrected preview text contrast, service heading order, and the shared logo's banner landmark.
+
+The refinement passed the 92 website tests, all package/workflow tests, typechecks, lint with no errors, the complete workspace browser suite, and discovery checks. Full axe (including best-practice region/landmark rules), visible keyboard order, runtime-error collection and horizontal overflow checks passed on nine changed routes at 390px and 1440px. Global navigation/search passed at 320/390/768/1024/1440px. Generated artifacts were byte-stable across 735 tracked outputs.

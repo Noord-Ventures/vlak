@@ -4,6 +4,8 @@ A runnable bounded event-edit recipe using the same revision and idempotency con
 
 Reference version: 0.1.0. Status: recipe.
 
+[Try the example](https://vlak.dev/workflows/schedule-editing/) · [Read the manifest](https://vlak.dev/workflows/schedule-editing/manifest/)
+
 ## Run
 
 From `examples/workflows`:

@@ -59,6 +59,9 @@ async function closeSearch(page, method = "escape", focus = searchTrigger(page))
 }
 
 async function headerGeometry(page) {
+  const banner = page.getByRole("banner");
+  assert.equal(await banner.count(), 1, "The global logo has one banner landmark");
+  assert.equal(await banner.locator(".site-logo").count(), 1, "The home link belongs to the global banner");
   assert.equal(await searchTrigger(page).count(), 1, "The navbar must not duplicate its visible search control");
   const result = await page.evaluate(() => {
     const visible = element => {

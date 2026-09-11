@@ -27526,9 +27526,12 @@ CSS: `packages/core/css/components/references.css`
 
 ## Workflow kits and local tools
 
-- [Record review workflow](https://vlak.dev/workflows/record-review/): A runnable list, edit, review, commit, conflict recovery, history, and bounded undo workflow.
-- [Action approval workflow](https://vlak.dev/workflows/action-approval/): A runnable recipe that binds a decision to one frozen action payload version.
-- [Schedule editing workflow](https://vlak.dev/workflows/schedule-editing/): A runnable bounded event-edit recipe using the same revision and idempotency contract.
+- [Record review example](https://vlak.dev/workflows/record-review/): A runnable list, edit, review, commit, conflict recovery, history, and bounded undo workflow.
+- [Record review manifest](https://vlak.dev/workflows/record-review/manifest/): States, adapters, ownership, installation and acceptance.
+- [Action approval example](https://vlak.dev/workflows/action-approval/): A runnable recipe that binds a decision to one frozen action payload version.
+- [Action approval manifest](https://vlak.dev/workflows/action-approval/manifest/): States, adapters, ownership, installation and acceptance.
+- [Schedule editing example](https://vlak.dev/workflows/schedule-editing/): A runnable bounded event-edit recipe using the same revision and idempotency contract.
+- [Schedule editing manifest](https://vlak.dev/workflows/schedule-editing/manifest/): States, adapters, ownership, installation and acceptance.
 - [Workflow modernization](https://vlak.dev/services/): Local scoping worksheet and service delivery templates.
 - [CSV reconciliation](https://vlak.dev/interfaces/reconciliation/): Exact comparison, exception review, reusable projects and exports.
 
@@ -27542,6 +27545,8 @@ Machine-readable workflows with source: https://vlak.dev/r/workflows/index.json
 A runnable list, edit, review, commit, conflict recovery, history, and bounded undo workflow.
 
 Reference version: 0.1.0. Status: reference.
+
+[Try the example](https://vlak.dev/workflows/record-review/) · [Read the manifest](https://vlak.dev/workflows/record-review/manifest/)
 
 ## Run
 
@@ -27606,6 +27611,8 @@ A runnable recipe that binds a decision to one frozen action payload version.
 
 Reference version: 0.1.0. Status: recipe.
 
+[Try the example](https://vlak.dev/workflows/action-approval/) · [Read the manifest](https://vlak.dev/workflows/action-approval/manifest/)
+
 ## Run
 
 From `examples/workflows`:
@@ -27651,6 +27658,8 @@ The host authorizes the approver and rechecks the frozen payload immediately bef
 A runnable bounded event-edit recipe using the same revision and idempotency contract.
 
 Reference version: 0.1.0. Status: recipe.
+
+[Try the example](https://vlak.dev/workflows/schedule-editing/) · [Read the manifest](https://vlak.dev/workflows/schedule-editing/manifest/)
 
 ## Run
 

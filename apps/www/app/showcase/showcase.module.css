@@ -1,0 +1,9 @@
+.collection { display: grid; gap: 24px; margin-top: 32px; }
+.project { min-width: 0; border: 1px solid var(--divider); background: var(--bg); }
+.preview { display: block; width: 100%; height: auto; border-bottom: 1px solid var(--divider); }
+.projectBody { padding: 20px; }
+.projectBody h2 { margin: 8px 0 12px; font-size: 1.5rem; line-height: 1.2; }
+.projectBody p { margin: 0; color: var(--text-secondary); line-height: 1.45; }
+.projectBody .byline { font-size: .8125rem; }
+.projectActions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.projectBody .visit { display: inline-flex; gap: 8px; min-height: 44px; text-decoration: none; }

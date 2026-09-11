@@ -334,9 +334,12 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 
 ## Workflow kits and local tools
 
-- [Record review workflow](https://vlak.dev/workflows/record-review/): A runnable list, edit, review, commit, conflict recovery, history, and bounded undo workflow.
-- [Action approval workflow](https://vlak.dev/workflows/action-approval/): A runnable recipe that binds a decision to one frozen action payload version.
-- [Schedule editing workflow](https://vlak.dev/workflows/schedule-editing/): A runnable bounded event-edit recipe using the same revision and idempotency contract.
+- [Record review example](https://vlak.dev/workflows/record-review/): A runnable list, edit, review, commit, conflict recovery, history, and bounded undo workflow.
+- [Record review manifest](https://vlak.dev/workflows/record-review/manifest/): States, adapters, ownership, installation and acceptance.
+- [Action approval example](https://vlak.dev/workflows/action-approval/): A runnable recipe that binds a decision to one frozen action payload version.
+- [Action approval manifest](https://vlak.dev/workflows/action-approval/manifest/): States, adapters, ownership, installation and acceptance.
+- [Schedule editing example](https://vlak.dev/workflows/schedule-editing/): A runnable bounded event-edit recipe using the same revision and idempotency contract.
+- [Schedule editing manifest](https://vlak.dev/workflows/schedule-editing/manifest/): States, adapters, ownership, installation and acceptance.
 - [Workflow modernization](https://vlak.dev/services/): Local scoping worksheet and service delivery templates.
 - [CSV reconciliation](https://vlak.dev/interfaces/reconciliation/): Exact comparison, exception review, reusable projects and exports.
 

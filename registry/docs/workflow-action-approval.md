@@ -4,6 +4,8 @@ A runnable recipe that binds a decision to one frozen action payload version.
 
 Reference version: 0.1.0. Status: recipe.
 
+[Try the example](https://vlak.dev/workflows/action-approval/) · [Read the manifest](https://vlak.dev/workflows/action-approval/manifest/)
+
 ## Run
 
 From `examples/workflows`:

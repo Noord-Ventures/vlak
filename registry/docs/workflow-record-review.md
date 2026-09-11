@@ -4,6 +4,8 @@ A runnable list, edit, review, commit, conflict recovery, history, and bounded u
 
 Reference version: 0.1.0. Status: reference.
 
+[Try the example](https://vlak.dev/workflows/record-review/) · [Read the manifest](https://vlak.dev/workflows/record-review/manifest/)
+
 ## Run
 
 From `examples/workflows`:

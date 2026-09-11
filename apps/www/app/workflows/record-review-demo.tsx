@@ -18,5 +18,5 @@ export function RecordReviewDemo() {
       getOperation: key => adapter.getOperation(localReferencePrincipal, key),
     };
   });
-  return <div className="workflow-demo"><p className="rs-t-body">Try the reference flow. These fixture records stay in memory and reset when this page reloads. The downloadable kit also includes a local file adapter and HTTP server.</p><RecordReviewApp client={client} embedded /></div>;
+  return <div className="workflow-demo"><p className="workflow-demo-intro">Select a supplied record, edit it, review the diff, and commit or undo the local revision. These fixture records reset when this page reloads; the downloadable kit also includes a local file adapter and HTTP server.</p><RecordReviewApp client={client} embedded /></div>;
 }

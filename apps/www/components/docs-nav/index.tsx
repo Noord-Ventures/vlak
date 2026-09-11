@@ -50,6 +50,11 @@ function groupLinks(category: VlakCategory) {
 export const docsPages = [
   { href: "/docs", title: "Getting started" },
   { href: "/docs/frameworks", title: "Frameworks" },
+  { href: "/workflows", title: "Workflow kits" },
+  { href: "/docs/projects", title: "Project files" },
+  { href: "/docs/updates", title: "Safe source updates" },
+  { href: "/services", title: "Workflow modernization" },
+  { href: "/showcase", title: "Built with Vlak" },
   { href: "/ai", title: "AI components" },
   { href: "/docs/theming", title: "Theming" },
   { href: "/docs/tokens", title: "Tokens" },

@@ -336,14 +336,14 @@ export function SiteChrome() {
 
   return (
     <>
-      <div {...sx("logo-wrap", chrome.logoWrap)}>
+      <header {...sx("logo-wrap", chrome.logoWrap)}>
         <Link href="/" {...sx("site-logo", chrome.logo)} aria-label="Vlak">
           <VlakMark />
         </Link>
         <span className="mobile-site-name" data-visible={atTop && pathname === "/"} aria-hidden="true">
           Vlak.dev
         </span>
-      </div>
+      </header>
 
       <nav {...sx("corner-nav", chrome.cornerNav)} aria-label="Site">
         {links.filter((l) => l.corner).map((l) => (

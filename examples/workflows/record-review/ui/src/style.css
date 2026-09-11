@@ -50,6 +50,17 @@
   .workflow-reference *, .workflow-reference *::before, .workflow-reference *::after { scroll-behavior: auto; }
 }
 
-.workflow-reference[data-embedded="true"] { width: 100%; margin-block: 24px; padding-block: 24px; border-block: 1px solid var(--divider); }
-.workflow-reference[data-embedded="true"] .workflow-heading { display: block; }
+.workflow-reference[data-embedded="true"] { width: 100%; margin: 0; padding: 0; border: 0; }
+.workflow-reference[data-embedded="true"] .workflow-heading { display: block; padding: 20px; }
 .workflow-reference[data-embedded="true"] .workflow-heading > p { margin-top: 8px; }
+.workflow-reference[data-embedded="true"] .workflow-filters { margin: 0; padding: 20px; border-bottom: 1px solid var(--divider); }
+.workflow-reference[data-embedded="true"] .workflow-master { gap: 0; }
+.workflow-reference[data-embedded="true"] .workflow-list { border-right: 1px solid var(--divider); }
+.workflow-reference[data-embedded="true"] .workflow-list li + li { border-top: 1px solid var(--divider); }
+.workflow-reference[data-embedded="true"] .workflow-list button { border-radius: 0; padding-inline: 20px; }
+.workflow-reference[data-embedded="true"] .workflow-panel { padding: 20px; }
+.workflow-reference[data-embedded="true"] :is(.workflow-description > div, .workflow-history > li) { margin-inline: -20px; padding-inline: 20px; }
+
+@media (max-width: 640px) {
+  .workflow-reference[data-embedded="true"] .workflow-list { border-right: 0; }
+}

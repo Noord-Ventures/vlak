@@ -83,6 +83,8 @@ test("every public canonical page is indexed once, including dynamic catalog and
       for (const collection of domainCollections) expected.add(`/docs/${collection.name}/`);
     } else if (route === "workflows/[id]") {
       for (const kit of workflowCatalog) expected.add(`/workflows/${kit.id}/`);
+    } else if (route === "workflows/[id]/manifest") {
+      for (const kit of workflowCatalog) expected.add(`/workflows/${kit.id}/manifest/`);
     } else if (route === "use-cases/[slug]") {
       for (const useCase of useCases) expected.add(`/use-cases/${useCase.slug}/`);
     } else {

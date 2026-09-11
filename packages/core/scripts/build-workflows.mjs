@@ -4,7 +4,7 @@ import { workflowCatalog } from "../../../examples/workflows/catalog.ts";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const output = `${root}registry`;
-const markdown = kit => `# ${kit.title}\n\n${kit.description}\n\nReference version: ${kit.version}. Status: ${kit.status}.\n\n## Run\n\nFrom \`${kit.install.directory}\`:\n\n\`\`\`sh\n${[...kit.install.commands, ...kit.run.commands].join("\n")}\n\`\`\`\n\n## States\n\n${kit.states.values.join(" → ")}\n\n## Acceptance\n\n${kit.acceptance.map(line => `- ${line}`).join("\n")}\n\n## Host responsibilities\n\n${kit.ownership.hostProvides.map(line => `- ${line}`).join("\n")}\n\n${kit.ownership.externalValidationBoundary}\n\n## Limitations\n\n${kit.limitations.map(line => `- ${line}`).join("\n")}\n\n## Source\n\n${kit.sources.map(file => `- [${file.path}](https://github.com/Noord-Ventures/vlak/blob/main/${file.path}) (${file.role})`).join("\n")}\n`;
+const markdown = kit => `# ${kit.title}\n\n${kit.description}\n\nReference version: ${kit.version}. Status: ${kit.status}.\n\n[Try the example](https://vlak.dev/workflows/${kit.id}/) · [Read the manifest](https://vlak.dev/workflows/${kit.id}/manifest/)\n\n## Run\n\nFrom \`${kit.install.directory}\`:\n\n\`\`\`sh\n${[...kit.install.commands, ...kit.run.commands].join("\n")}\n\`\`\`\n\n## States\n\n${kit.states.values.join(" → ")}\n\n## Acceptance\n\n${kit.acceptance.map(line => `- ${line}`).join("\n")}\n\n## Host responsibilities\n\n${kit.ownership.hostProvides.map(line => `- ${line}`).join("\n")}\n\n${kit.ownership.externalValidationBoundary}\n\n## Limitations\n\n${kit.limitations.map(line => `- ${line}`).join("\n")}\n\n## Source\n\n${kit.sources.map(file => `- [${file.path}](https://github.com/Noord-Ventures/vlak/blob/main/${file.path}) (${file.role})`).join("\n")}\n`;
 
 /** One authored catalog feeds human pages, offline tools and the public registry. */
 export function buildWorkflows() {
@@ -35,7 +35,7 @@ export function buildWorkflows() {
   for (const name of ["llms.txt", "llms-full.txt"]) {
     const path = `${output}/docs/${name}`;
     const body = readFileSync(path, "utf8").split(marker)[0];
-    const links = workflowCatalog.map(kit => `- [${kit.title} workflow](https://vlak.dev/workflows/${kit.id}/): ${kit.description}`).join("\n");
+    const links = workflowCatalog.map(kit => `- [${kit.title} example](https://vlak.dev/workflows/${kit.id}/): ${kit.description}\n- [${kit.title} manifest](https://vlak.dev/workflows/${kit.id}/manifest/): States, adapters, ownership, installation and acceptance.`).join("\n");
     writeFileSync(path, `${body}${marker}\n## Workflow kits and local tools\n\n${links}\n- [Workflow modernization](https://vlak.dev/services/): Local scoping worksheet and service delivery templates.\n- [CSV reconciliation](https://vlak.dev/interfaces/reconciliation/): Exact comparison, exception review, reusable projects and exports.\n\n- [Project files](https://vlak.dev/docs/projects/): Portable projects, browser revisions, conflict handling and recovery.\n- [Safe source updates](https://vlak.dev/docs/updates/): Review pinned CLI updates and recover interrupted writes.\n\nMachine-readable workflows with source: https://vlak.dev/r/workflows/index.json\n${name === "llms-full.txt" ? `\n${workflowCatalog.map(markdown).join("\n")}` : ""}`);
   }
   return workflows;

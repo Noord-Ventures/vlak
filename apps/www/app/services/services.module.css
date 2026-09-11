@@ -1,8 +1,54 @@
-.worksheet { border-block: 1px solid var(--divider); padding-block: 24px; margin-block: 32px; }
-.worksheetHead { display: flex; justify-content: space-between; gap: 24px; align-items: start; }
+.worksheet { border: 1px solid var(--divider); padding: 20px; margin-block: 32px; }
+.showcase { display: grid; gap: 16px; margin-block: 32px 40px; }
+.showcaseIntro { display: grid; gap: 8px; }
+.showcaseIntro > :global(.section-label) { margin: 0; }
+.showcaseIntro p { margin: 0; max-width: 48ch; }
+.showcaseIntro .primaryAction { width: fit-content; margin-top: 4px; text-decoration: none; }
+.workflowFrame, .packetFrame { border: 1px solid var(--divider); background: var(--bg); }
+.frameHeader { display: flex; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--divider); color: var(--text-secondary); font-size: .75rem; }
+.recordFlow { padding: 16px; }
+.recordList, .reviewCard, .handoffCard { min-width: 0; }
+.frameLabel { display: block; margin-bottom: 10px; color: var(--text-secondary); font-size: .8125rem; }
+.recordRow { display: flex; justify-content: space-between; gap: 12px; align-items: center; margin-inline: -16px; padding: 11px 16px; border-bottom: 1px solid var(--divider); font-size: .875rem; }
+.recordRow:last-child { border-bottom: 0; }
+.recordRow span, .recordRow small { display: block; }
+.recordRow small { margin-top: 3px; color: var(--text-secondary); font-size: .8125rem; }
+.recordRow em { flex: none; color: var(--text-secondary); font-size: .8125rem; font-style: normal; }
+.recordRow em[data-tone="ready"] { color: var(--text); }
+.reviewHandoff { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); margin: 16px -16px -16px; border-top: 1px solid var(--divider); }
+.reviewCard, .handoffCard { padding: 16px; min-height: 156px; }
+.handoffCard { border-left: 1px solid var(--divider); }
+.reviewCard strong, .handoffCard strong { display: block; font-size: .9375rem; line-height: 1.35; }
+.reviewCard p, .packetGrid p { margin: 10px 0; color: var(--text-secondary); font-size: .875rem; line-height: 1.5; }
+.stateLine { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 16px; color: var(--text-secondary); font-size: .8125rem; }
+.stateLine b { color: var(--text); font-weight: 600; }
+.handoffCard dl { display: grid; gap: 8px; margin: 14px 0 0; }
+.handoffCard dl div { display: flex; justify-content: space-between; gap: 8px; font-size: .8125rem; }
+.handoffCard dt { color: var(--text-secondary); }
+.handoffCard dd { margin: 0; text-align: right; }
+.packetGrid { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); }
+.packetGrid > div:not(.packetDivider) { padding: 16px; }
+.packetGrid h2 { margin: 0; font-size: 1rem; font-weight: 500; line-height: 1.25; }
+.packetGrid ul { display: grid; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; color: var(--text-secondary); font-size: .875rem; }
+.packetGrid li::before { content: "— "; color: var(--text); }
+.packetDivider { background: var(--divider); }
+.packetMeta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.packetMeta span { padding: 5px 7px; border: 1px solid var(--divider); color: var(--text-secondary); font-size: .75rem; }
+.worksheetHead { display: flex; justify-content: space-between; gap: 24px; align-items: start; margin: -20px -20px 0; padding: 20px; border-bottom: 1px solid var(--divider); }
+.worksheet > :global(.project-tools) { margin: 20px -20px -20px; padding: 20px; border-bottom: 0; }
 .status { color: var(--text-secondary); font-size: .75rem; padding-top: 12px; white-space: nowrap; }
 .hint { color: var(--text-secondary); font-size: .75rem; line-height: 1.4; margin: 6px 0 0; }
 .preview { white-space: pre-wrap; max-height: 55vh; overflow: auto; font: inherit; line-height: 1.45; }
 .formGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 20px; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-@media (max-width: 640px) { .worksheetHead, .formGrid { display: block; } .formGrid > * { margin-top: 16px; } .status { display: block; padding-top: 0; } .actions > * { width: 100%; } }
+@media (max-width: 640px) {
+  .frameHeader { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .reviewHandoff, .packetGrid { grid-template-columns: 1fr; }
+  .handoffCard { border-left: 0; border-top: 1px solid var(--divider); }
+  .packetDivider { width: 100%; height: 1px; }
+  .workflowFrame, .packetFrame { margin-inline: -1px; }
+  .worksheetHead, .formGrid { display: block; }
+  .formGrid > * { margin-top: 16px; }
+  .status { display: block; padding-top: 0; }
+  .actions > * { width: 100%; }
+}

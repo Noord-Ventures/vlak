@@ -29,6 +29,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       for (const collection of domainCollections) paths.add(`/docs/${collection.name}/`);
     } else if (path === "workflows/[id]") {
       for (const kit of workflowCatalog) paths.add(`/workflows/${kit.id}/`);
+    } else if (path === "workflows/[id]/manifest") {
+      for (const kit of workflowCatalog) paths.add(`/workflows/${kit.id}/manifest/`);
     } else if (path === "use-cases/[slug]") {
       for (const useCase of useCases) paths.add(`/use-cases/${useCase.slug}/`);
     } else {
