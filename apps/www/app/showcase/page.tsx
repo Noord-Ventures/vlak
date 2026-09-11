@@ -15,7 +15,7 @@ const submitUrl = "https://github.com/Noord-Ventures/vlak/issues/new?template=sh
 const projects = [
   { name: "Tax Scratchpad", url: "https://taxscratchpad.npux.design/", domain: "taxscratchpad.npux.design", image: "/showcase/tax-scratchpad.jpg", description: "A local workspace for exploring hypothetical 2025 federal tax scenarios, comparing assumptions, and tracing the calculations.", author: "Nicholas Pulido · NPUX", post: "https://x.com/NickP_UX/status/2097890666198249625" },
   { name: "Noord", url: "https://noord.dev/", domain: "noord.dev", image: "/showcase/noord.jpg", description: "An applied design lab working on interfaces and visual learning. Home to Vlak.", author: "Noord" },
-  { name: "Renn", url: "https://www.renatovaldes.com/", domain: "renatovaldes.com", image: "/showcase/renn.jpg", description: "A personal website bringing together work, books, and essays.", author: "Renn" },
+  { name: "Personal Site", url: "https://www.renatovaldes.com/", domain: "renatovaldes.com", image: "/showcase/renn.jpg", description: "A personal website bringing together work, books, and essays.", author: "Renn" },
 ];
 
 export default function ShowcasePage() {

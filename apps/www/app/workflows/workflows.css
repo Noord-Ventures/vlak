@@ -3,11 +3,11 @@
 
 .workflow-catalog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 32px; }
 .workflow-card { min-width: 0; display: flex; flex-direction: column; border: 1px solid var(--divider); background: var(--bg); }
-.workflow-card-copy { flex: 1; display: flex; flex-direction: column; min-height: 260px; padding: 20px; }
+.workflow-card-copy { flex: 1; display: flex; flex-direction: column; padding: 20px; }
 .workflow-card-copy :is(h2, p) { margin: 0; }
 .workflow-card-copy h2 { margin-top: 8px; font-size: 1.25rem; line-height: 1.2; }
 .workflow-card-copy > p:last-of-type { margin-top: 12px; color: var(--text-secondary); font-size: .875rem; line-height: 1.55; }
-.workflow-card-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 20px; }
+.workflow-card-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: auto; padding-top: 20px; }
 .workflow-page-actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .workflow-card-actions > a, .workflow-page-actions > a { min-height: 44px; padding-inline: 14px; text-decoration: none; }
 .workflow-page-actions { margin-top: 20px; }
