@@ -26,14 +26,17 @@ export async function checkSiteRails({ browser, base, fail }) {
     const rail = document.querySelector(".toc-rail, .if-rail");
     if (!rail) throw new Error("No side rail found");
     const firstColumn = rail.matches(".if-rail") ? rail : rail.querySelector(".toc");
+    const firstContent = firstColumn?.querySelector(".toc-label, a[href]");
     const firstLink = firstColumn?.querySelector("a[href]");
-    if (!firstColumn || !firstLink) throw new Error("No first navigation column or link found");
+    if (!firstColumn || !firstContent || !firstLink) throw new Error("No first navigation column, content, or link found");
     const bounds = element => {
       const rect = element.getBoundingClientRect();
       return { x: rect.x, top: rect.top, width: rect.width, height: rect.height };
     };
     const style = getComputedStyle(rail);
-    return { rail: bounds(rail), column: bounds(firstColumn), link: bounds(firstLink), position: style.position, visible: style.display !== "none" && style.visibility !== "hidden" && rail.getClientRects().length > 0, scrollY: window.scrollY };
+    const column = bounds(firstColumn);
+    const columnStart = column.top + Number.parseFloat(getComputedStyle(firstColumn).paddingTop);
+    return { rail: bounds(rail), column, columnStart, content: bounds(firstContent), link: bounds(firstLink), position: style.position, visible: style.display !== "none" && style.visibility !== "hidden" && rail.getClientRects().length > 0, scrollY: window.scrollY };
   });
   const desktopGeometry = async (width, label) => {
     if (await page.locator(railSelector).count() !== 1) fail(`site rails ${label}: expected one side rail`);
@@ -43,8 +46,8 @@ export async function checkSiteRails({ browser, base, fail }) {
     // desktop, and exactly one 204px module farther in from 1440px.
     const expectedX = width >= 1440 ? 224 : 20;
     if (!atTop.visible) fail(`site rails ${label}: desktop rail is hidden at ${width}px`);
-    if (![atTop.rail.x, atTop.column.x, atTop.link.x].every(x => near(x, expectedX))) fail(`site rails ${label}: expected rail, first column and first link at x=${expectedX}; got ${JSON.stringify(atTop)}`);
-    if (!near(atTop.rail.top, 0) || !near(atTop.link.top, 120)) fail(`site rails ${label}: first link must start at y=120 inside a rail at y=0; got ${JSON.stringify(atTop)}`);
+    if (![atTop.rail.x, atTop.column.x, atTop.content.x, atTop.link.x].every(x => near(x, expectedX))) fail(`site rails ${label}: expected rail, first column, first content and first link at x=${expectedX}; got ${JSON.stringify(atTop)}`);
+    if (!near(atTop.rail.top, 0) || !near(atTop.columnStart, 120) || !near(atTop.content.top, 120) || atTop.link.top < atTop.content.top - 1) fail(`site rails ${label}: first column and content must start at y=120 inside a rail at y=0; got ${JSON.stringify(atTop)}`);
     if (atTop.position !== "sticky") fail(`site rails ${label}: rail position is ${atTop.position}, expected sticky`);
     if (await page.locator(".toc-mobile-trigger").isVisible()) fail(`site rails ${label}: mobile contents trigger is visible at ${width}px`);
 
@@ -56,7 +59,7 @@ export async function checkSiteRails({ browser, base, fail }) {
       await settle();
       const scrolled = await readRail();
       if (!near(scrolled.scrollY, target)) fail(`site rails ${label}: requested ${target}px scroll, reached ${scrolled.scrollY}px`);
-      if (!near(scrolled.rail.x, atTop.rail.x) || !near(scrolled.link.x, atTop.link.x) || !near(scrolled.rail.top, 0) || !near(scrolled.link.top, 120)) fail(`site rails ${label}: scrolling moved the sticky navigation; got ${JSON.stringify(scrolled)}`);
+      if (!near(scrolled.rail.x, atTop.rail.x) || !near(scrolled.column.x, atTop.column.x) || !near(scrolled.content.x, atTop.content.x) || !near(scrolled.link.x, atTop.link.x) || !near(scrolled.rail.top, 0) || !near(scrolled.columnStart, 120) || !near(scrolled.content.top, 120) || !near(scrolled.link.top, atTop.link.top)) fail(`site rails ${label}: scrolling moved the sticky navigation; got ${JSON.stringify(scrolled)}`);
     }
     await resetScroll();
   };
