@@ -9,6 +9,7 @@ async function readMobileFoldScene(device) {
     const stage = wrapper.querySelector(".mo-fold-stage");
     const body = element => { const style = getComputedStyle(element); return { preserve: style.transformStyle, overflow: style.overflow, filter: style.filter, opacity: style.opacity, mask: style.maskImage, clip: style.clipPath }; };
     const matrix = element => new DOMMatrixReadOnly(getComputedStyle(element).transform);
+    const corners = element => { const style = getComputedStyle(element); return ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius", "borderBottomLeftRadius"].map(key => Number.parseFloat(style[key])); };
     const texture = element => {
       const content = element.querySelector(".mo-screen"), gesture = element.querySelector(".mo-system-nav");
       return { posture: element.closest(".mo-fold-context").dataset.posture, display: element.dataset.duoDisplay,
@@ -19,7 +20,7 @@ async function readMobileFoldScene(device) {
     };
     return {
       inert: wrapper.inert, hidden: wrapper.getAttribute("aria-hidden"), duplicateIds: wrapper.querySelectorAll("[id],[name],[popover]").length,
-      body: body(stage),
+      body: body(stage), device: wrapper.closest("section.mo-device").dataset.device, axis: stage.dataset.axis,
       panels: [...stage.querySelectorAll(".mo-fold-panel")].map(panel => {
         const front = panel.querySelector(".mo-fold-front"), back = panel.querySelector(".mo-fold-back");
         const frontMatrix = matrix(front), backMatrix = matrix(back);
@@ -28,9 +29,10 @@ async function readMobileFoldScene(device) {
           edges: panel.querySelectorAll(".mo-fold-edge").length,
           rimDepths: [...panel.querySelectorAll(".mo-fold-rim")].map(element => matrix(element).m43),
           inner: texture(front.querySelector(".mo-fold-texture")),
+          corners: { front: corners(front), rear: corners(back), glass: corners(front.querySelector(".mo-fold-glass")) },
         };
       }),
-      cover: texture(stage.querySelector(".mo-fold-cover-texture")),
+      cover: texture(stage.querySelector(".mo-fold-cover-texture")), coverCorners: corners(stage.querySelector(".mo-fold-cover")),
       hingeFacets: stage.querySelectorAll(".mo-fold-spine > i").length,
       liveInert: wrapper.closest("section.mo-device").querySelector(".mo-device-fit").inert,
     };
@@ -55,6 +57,20 @@ function assertPhysicalFoldScene(scene) {
     assert(panel.rimDepths.length >= 3 && Math.max(...panel.rimDepths) - Math.min(...panel.rimDepths) > 3, "Rounded chassis sections span real depth");
     assert.equal(panel.inner.posture, "expanded", "Inner displays retain their expanded app arrangement");
   }
+  if (scene.device === "iphone-duo") {
+    // Rear faces flip around the hinge, so their corner handedness is opposite
+    // to the inner glass. Rotating the cover carries the left hinge to the top.
+    const movingFront = scene.axis === "horizontal" ? [true, true, false, false] : [true, false, false, true];
+    const stationaryFront = movingFront.map(rounded => !rounded);
+    for (const [index, panel] of scene.panels.entries()) {
+      const front = index === 0 ? movingFront : stationaryFront;
+      const rear = index === 0 ? stationaryFront : movingFront;
+      assert.deepEqual(panel.corners.front.map(radius => radius > 0), front, "The inner chassis keeps its hinge corners square at every pose");
+      assert.deepEqual(panel.corners.glass.map(radius => radius > 0), front, "Only the exterior inner-glass corners are rounded");
+      assert.deepEqual(panel.corners.rear.map(radius => radius > 0), rear, "Rear shell corners mirror the hinge handedness");
+    }
+    assert.deepEqual(scene.coverCorners.map(radius => radius > 0), stationaryFront, "The cover has a straight left hinge, or top hinge after rotation");
+  }
   assert.equal(scene.cover.posture, "compact", "The rear outer display retains its compact app arrangement");
   assert(scene.hingeFacets >= 6, "The hinge has a curved physical perimeter");
   for (const layout of scene.panels.map(panel => panel.inner)) assert.equal(layout.display, "inner");
@@ -65,6 +81,22 @@ function assertPhysicalFoldScene(scene) {
     assert.equal(layout.gestureHeight, 34, "The Home gesture keeps its native reserved height");
     assert.equal(layout.gestureTop + layout.gestureHeight, layout.height, "Snapshot Home gesture stays pinned at the bottom");
   }
+}
+
+/** Resting hardware must match the disposable fold cover at either endpoint. */
+export async function assertMobileDeviceCorners(device) {
+  const geometry = await device.evaluate(element => {
+    const frame = element.querySelector(".mo-device-fit");
+    const corners = node => { const style = getComputedStyle(node); return ["borderTopLeftRadius", "borderTopRightRadius", "borderBottomRightRadius", "borderBottomLeftRadius"].map(key => Number.parseFloat(style[key])); };
+    return { id: element.dataset.device, expanded: element.dataset.posture === "expanded", rotated: element.dataset.orientation === "landscape", live: frame.dataset.live === "true", phone: corners(frame.querySelector(".mo-phone")), hardware: corners(frame.querySelector(".mo-hardware")) };
+  });
+  if (geometry.live) return;
+  const profile = deviceProfiles.find(item => item.id === geometry.id);
+  assert(profile, "The displayed device has a known geometry profile");
+  const display = geometry.expanded && profile.expanded ? profile.expanded : profile.display;
+  const rounded = geometry.id === "iphone-duo" && !geometry.expanded ? geometry.rotated ? [false, false, true, true] : [false, true, true, false] : [true, true, true, true];
+  assert.deepEqual(geometry.phone, rounded.map(value => value ? display.radius : 0), "Resting display corners preserve the selected device and hinge orientation");
+  assert.deepEqual(geometry.hardware, rounded.map(value => value ? display.radius + display.bezel : 0), "Resting chassis corners match the glass without rounding the hinge side");
 }
 
 /** Include real clipping ancestors, not just the model's own reserved rectangle. */
@@ -159,7 +191,8 @@ export async function assertMobileFoldInspection({ page, device }) {
   if (await page.evaluate(() => matchMedia("(prefers-reduced-motion: reduce)").matches)) {
     assert.equal(Number(await device.locator(".mo-fold-stage").getAttribute("data-hinge-angle")), Number(await range.inputValue()), "Reduced-motion inspection opens directly at its requested static pose");
   }
-  for (const angle of [45, 90, 135]) {
+  // Include both endpoints, then leave an oblique pose for the resize check.
+  for (const angle of [0, 45, 90, 180, 135]) {
     await range.fill(String(angle));
     await page.waitForFunction(angle => Math.abs(Number(document.querySelector(".mo-fold-stage")?.dataset.hingeAngle) - angle) < .1, angle);
     assertPhysicalFoldScene(await readMobileFoldScene(device));
@@ -729,6 +762,7 @@ export async function checkMobileOS({ page, base, fail }) {
         assert(result.pageOverflow <= 1 && result.overflow <= 1 && result.scrollOverflow <= 1, `${platform} overflow: ${JSON.stringify(result)}`);
         assert.deepEqual(result.short, [], `${platform} controls below their logical native hit area`);
         assert.deepEqual(result.escaped, [], `${platform} pinned regions escaped`);
+        await assertMobileDeviceCorners(device);
       };
       stage = `${platform} hardware Home layout`;
       await fit();

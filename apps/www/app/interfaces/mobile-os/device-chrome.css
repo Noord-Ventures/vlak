@@ -158,6 +158,15 @@ section.mo.mo-single { grid-template-rows: auto auto auto; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-left .mo-fold-rim { right: 0; bottom: 16px; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-panel-right .mo-fold-rim { left: 0; top: 16px; }
 .mo-fold-stage[data-axis="horizontal"] .mo-fold-edge-top, .mo-fold-stage[data-axis="horizontal"] .mo-fold-edge-bottom { left: 32px; right: 32px; }
+/* Duo leaves meet along a straight hinge. Rear faces reverse the front's
+   handedness; the cover must match the resting phone when the fold settles. */
+.mo-fold-stage[data-device="iphone-duo"] .mo-fold-rim { border-radius: var(--mo-fold-radius); }
+.mo-fold-stage[data-device="iphone-duo"] .mo-fold-panel-left .mo-fold-back { border-radius: 0 var(--mo-fold-shell-radius) var(--mo-fold-shell-radius) 0; }
+.mo-fold-stage[data-device="iphone-duo"] .mo-fold-panel-right .mo-fold-back { border-radius: var(--mo-fold-shell-radius) 0 0 var(--mo-fold-shell-radius); }
+.mo-fold-stage[data-device="iphone-duo"] .mo-fold-cover { border-radius: 0 var(--mo-fold-cover-radius) var(--mo-fold-cover-radius) 0; }
+.mo-fold-stage[data-device="iphone-duo"][data-axis="horizontal"] .mo-fold-panel-left .mo-fold-back { border-radius: 0 0 var(--mo-fold-shell-radius) var(--mo-fold-shell-radius); }
+.mo-fold-stage[data-device="iphone-duo"][data-axis="horizontal"] .mo-fold-panel-right .mo-fold-back { border-radius: var(--mo-fold-shell-radius) var(--mo-fold-shell-radius) 0 0; }
+.mo-fold-stage[data-device="iphone-duo"][data-axis="horizontal"] .mo-fold-cover { border-radius: 0 0 var(--mo-fold-cover-radius) var(--mo-fold-cover-radius); }
 .mo-fold-tools { display: grid; grid-template-columns: auto minmax(100px, 240px) 44px; justify-content: center; align-items: center; gap: 0 16px; padding: 12px 24px; border-top: 1px solid var(--divider); background: var(--bg); }
 .mo-fold-tools label, .mo-fold-tools output { font-size: 13px; }
 .mo-fold-tools output { text-align: end; font-variant-numeric: tabular-nums; }
@@ -166,9 +175,18 @@ section.mo.mo-single { grid-template-rows: auto auto auto; }
 @media (forced-colors: active) { .mo-fold-front, .mo-fold-back, .mo-fold-rim { background: Canvas; border-color: CanvasText; box-shadow: none; } }
 
 /* Profile geometry wins over the retained platform defaults above. */
-.mo.mo-single .mo-device[data-platform] .mo-phone { width: 100%; height: 100%; border-radius: var(--mo-device-radius); grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 34px; }
+.mo.mo-single .mo-device[data-platform] .mo-phone { width: 100%; height: 100%; border-radius: var(--mo-screen-corners, var(--mo-device-radius)); grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 34px; }
 .mo.mo-single .mo-device[data-platform="android"] .mo-phone { grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 44px; }
-.mo.mo-single .mo-device[data-platform] .mo-hardware { border-radius: calc(var(--mo-device-radius) + var(--mo-device-bezel)); }
+.mo.mo-single .mo-device[data-platform] .mo-hardware { border-radius: var(--mo-shell-corners, calc(var(--mo-device-radius) + var(--mo-device-bezel))); }
+/* The closed Duo's left hinge rotates to the top in landscape. */
+.mo-device[data-device="iphone-duo"][data-posture="compact"] .mo-device-fit[data-live="false"] {
+  --mo-screen-corners: 0 var(--mo-device-radius) var(--mo-device-radius) 0;
+  --mo-shell-corners: 0 calc(var(--mo-device-radius) + var(--mo-device-bezel)) calc(var(--mo-device-radius) + var(--mo-device-bezel)) 0;
+}
+.mo-device[data-device="iphone-duo"][data-posture="compact"][data-orientation="landscape"] .mo-device-fit[data-live="false"] {
+  --mo-screen-corners: 0 0 var(--mo-device-radius) var(--mo-device-radius);
+  --mo-shell-corners: 0 0 calc(var(--mo-device-radius) + var(--mo-device-bezel)) calc(var(--mo-device-radius) + var(--mo-device-bezel));
+}
 @media (prefers-reduced-motion: reduce) {
   .mo.mo-single .mo-device[data-platform] .mo-phone,
   .mo.mo-single .mo-device[data-platform] .mo-hardware,

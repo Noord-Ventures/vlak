@@ -37,6 +37,7 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
   wrapper.ariaHidden = "true"; wrapper.inert = true;
   const stage = document.createElement("div");
   stage.className = "mo-fold-stage"; stage.dataset.axis = rotated ? "horizontal" : "vertical";
+  stage.dataset.device = device.id;
   Object.assign(stage.style, { width: `${width}px`, height: `${height}px` });
   stage.style.setProperty("--mo-fold-depth", `${depth}px`);
   stage.style.setProperty("--mo-fold-bezel", `${display.bezel}px`);
@@ -117,8 +118,9 @@ export function createFoldScene({ viewport, frame, device, rotated, inner, outer
     const turn = Math.sin(Math.PI * p);
     const fold = 180 * (1 - p);
     stage.style.setProperty("--mo-fold-shell-radius", `${mix(device.display.radius + device.display.bezel, display.radius + display.bezel, p)}px`);
-    stage.style.setProperty("--mo-fold-inner-corner", `${(device.display.radius + device.display.bezel) * (1 - clamp(p * 2))}px`);
-    stage.style.setProperty("--mo-fold-inner-glass-corner", `${device.display.radius * (1 - clamp(p * 2))}px`);
+    const cornerBlend = device.id === "iphone-duo" ? 0 : 1 - clamp(p * 2);
+    stage.style.setProperty("--mo-fold-inner-corner", `${(device.display.radius + device.display.bezel) * cornerBlend}px`);
+    stage.style.setProperty("--mo-fold-inner-glass-corner", `${device.display.radius * cornerBlend}px`);
     const yaw = -18 * turn, pitch = 11 * turn, roll = -3 * turn;
     // Project the actual articulated corner positions. Framing follows the
     // object, not a fake shrinking rectangle, in either device orientation.
