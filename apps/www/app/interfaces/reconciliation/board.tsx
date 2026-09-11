@@ -36,8 +36,10 @@ function pairIdentity(pair: { leftId: string; rightId: string }) { return `${pai
 
 function SourcePreview({ side, source, onChoose, busy }: { side: "left" | "right"; source: ReconciliationSource | null; onChoose: (file?: File) => void; busy: boolean }) {
   const input = React.useRef<HTMLInputElement>(null);
-  return <section className="rc-source" aria-labelledby={`rc-${side}-heading`}>
-    <header><div><span>{side === "left" ? "Source A" : "Source B"}</span><h3 id={`rc-${side}-heading`}>{source?.name ?? "Choose a CSV file"}</h3></div><Button variant="ghost" disabled={busy} onClick={() => input.current?.click()}>{source ? "Replace" : "Choose file"}</Button></header>
+  const sourceLabelId = React.useId();
+  const headingId = React.useId();
+  return <section className="rc-source" aria-labelledby={`${sourceLabelId} ${headingId}`}>
+    <header><div><span id={sourceLabelId}>{side === "left" ? "Source A" : "Source B"}</span><h3 id={headingId}>{source?.name ?? "Choose a CSV file"}</h3></div><Button variant="ghost" disabled={busy} onClick={() => input.current?.click()}>{source ? "Replace" : "Choose file"}</Button></header>
     <input ref={input} hidden type="file" accept=".csv,text/csv" onChange={event => { onChoose(event.target.files?.[0]); event.target.value = ""; }} />
     <p>{sourceLabel(source)}</p>
     {source?.table.diagnostics.map(message => <p className="rc-diagnostic" key={message}>{message}</p>)}
@@ -53,9 +55,10 @@ function GroupSide({ label, source, rows }: { label: string; source: Reconciliat
 
 function GroupDetail({ group, project, decision, onDecision, onBack }: { group: ResultGroup; project: ReconciliationProject; decision?: ReviewDecision; onDecision: (status: ReviewDecision["status"]) => void; onBack: () => void }) {
   const sides = [["Source A", project.sources.left!, group.left], ["Source B", project.sources.right!, group.right]] as const;
-  return <article className="rc-record" aria-labelledby="rc-record-title">
+  const titleId = React.useId();
+  return <article className="rc-record" aria-labelledby={titleId}>
     <Button className="rc-back" variant="ghost" onClick={onBack}>Back to worklist</Button>
-    <header><div><Badge>{group.category}</Badge><h3 id="rc-record-title">Key: {cellLabel(group.key)}</h3></div><span>{group.left.length} A · {group.right.length} B</span></header>
+    <header><div><Badge>{group.category}</Badge><h3 id={titleId}>Key: {cellLabel(group.key)}</h3></div><span>{group.left.length} A · {group.right.length} B</span></header>
     {group.category === "ambiguous" && <p>At least one side has a duplicate key, or the key field is missing or empty. Exact matching does not create a many-to-many result.</p>}
     {group.category === "missing" && <p>This key occurs on only one side.</p>}
     {group.category === "conflicting" && <p>Different fields: {group.differences.join(", ") || "none"}.</p>}
@@ -65,6 +68,8 @@ function GroupDetail({ group, project, decision, onDecision, onBack }: { group: 
 }
 
 export function ReconciliationBoard() {
+  const leftKeyLabelId = React.useId();
+  const rightKeyLabelId = React.useId();
   const [project, setProject] = React.useState<ReconciliationProject>(() => initialProject());
   const [leftKey, setLeftKey] = React.useState(""); const [rightKey, setRightKey] = React.useState("");
   const [comparison, setComparison] = React.useState<Comparison | null>(null);
@@ -184,7 +189,7 @@ export function ReconciliationBoard() {
         <SourcePreview side="left" source={project.sources.left} onChoose={file => void chooseSource("left", file)} busy={busy} />
         <SourcePreview side="right" source={project.sources.right} onChoose={file => void chooseSource("right", file)} busy={busy} />
         <section className="rc-recipe"><h3>Exact key recipe</h3><p>Values are compared as text. Case, spaces, Unicode and leading zeros are preserved. No fuzzy or automatic normalization is applied.</p>
-          <div>{project.sources.left?.table.headers.length ? <label className="rc-field"><span id="rc-left-key">Source A key</span><Select fullWidth aria-labelledby="rc-left-key" value={leftKey} options={project.sources.left.table.headers.map(header => ({ value: header.id, label: header.label }))} onValueChange={value => changeKey("left", value)} /></label> : <span>Choose source A</span>}{project.sources.right?.table.headers.length ? <label className="rc-field"><span id="rc-right-key">Source B key</span><Select fullWidth aria-labelledby="rc-right-key" value={rightKey} options={project.sources.right.table.headers.map(header => ({ value: header.id, label: header.label }))} onValueChange={value => changeKey("right", value)} /></label> : <span>Choose source B</span>}</div>
+          <div>{project.sources.left?.table.headers.length ? <label className="rc-field"><span id={leftKeyLabelId}>Source A key</span><Select fullWidth aria-labelledby={leftKeyLabelId} value={leftKey} options={project.sources.left.table.headers.map(header => ({ value: header.id, label: header.label }))} onValueChange={value => changeKey("left", value)} /></label> : <span>Choose source A</span>}{project.sources.right?.table.headers.length ? <label className="rc-field"><span id={rightKeyLabelId}>Source B key</span><Select fullWidth aria-labelledby={rightKeyLabelId} value={rightKey} options={project.sources.right.table.headers.map(header => ({ value: header.id, label: header.label }))} onValueChange={value => changeKey("right", value)} /></label> : <span>Choose source B</span>}</div>
           {project.sources.left && project.sources.right && <><p>{selectedPairs.length} of {availablePairs.length} same-header non-key {availablePairs.length === 1 ? "column is" : "columns are"} selected for exact comparison. Headers that occur more than once are paired by occurrence.</p><details className="rc-columns" onToggle={event => setColumnsOpen(event.currentTarget.open)}><summary>Choose comparison columns</summary>{columnsOpen && <fieldset><legend>Included same-header columns</legend>{availablePairs.length === 0 ? <p>No same-header non-key columns are available.</p> : availablePairs.map(pair => <Checkbox key={pairIdentity(pair)} label={pair.label} checked={selectedPairs.some(selected => pairIdentity(selected) === pairIdentity(pair))} onCheckedChange={checked => includeColumn(pairIdentity(pair), checked)} />)}</fieldset>}</details></>}
           <input ref={recipeInput} type="file" accept=".json,application/json" hidden onChange={async event => {
             const file = event.target.files?.[0]; event.target.value = ""; if (!file) return;
