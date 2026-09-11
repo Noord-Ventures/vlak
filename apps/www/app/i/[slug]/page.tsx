@@ -48,7 +48,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   const item = interfaceBySlug(slug);
   if (!item) notFound();
-  const metadata = pageMetadata(`/interfaces/${slug}`, { title: item.title, description: item.voice, robots: { index: false, follow: true } });
+  const metadata = pageMetadata(`/interfaces/${slug}`, {
+    title: item.title,
+    description: item.voice,
+    robots: { index: false, follow: true },
+  }, slug === "ios" ? { imagePath: "/interfaces/ios/opengraph-image" } : {});
   return { ...metadata, openGraph: { ...metadata.openGraph, url: `${HOST}/i/${slug}/` } };
 }
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {

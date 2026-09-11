@@ -128,6 +128,20 @@ for (const entry of readdirSync(join(out, "interfaces"), { withFileTypes: true }
   previews++;
 }
 for (const path of images) assert(existsSync(join(out, path)), `Missing social image: ${path}`);
+
+// Both the study and its short sharing address show the actual iOS interface.
+const iosImagePath = "/interfaces/ios/opengraph-image";
+for (const path of ["interfaces/ios/index.html", "i/ios/index.html"]) {
+  const head = read(path).match(/<head>([\s\S]*?)<\/head>/i)?.[1] ?? "";
+  const meta = tags(head, "meta");
+  for (const name of ["og:image", "twitter:image"]) {
+    assert.deepEqual(meta.filter(item => (item.property || item.name) === name).map(item => item.content), [`${origin}${iosImagePath}`], `${path}: dedicated iOS sharing image`);
+  }
+}
+const iosImage = readFileSync(join(out, iosImagePath));
+assert.equal(iosImage.subarray(0, 8).toString("hex"), "89504e470d0a1a0a", "iOS social image is a PNG");
+assert.deepEqual([iosImage.readUInt32BE(16), iosImage.readUInt32BE(20)], [1200, 630], "iOS social image has the declared dimensions");
+assert(!iosImage.equals(readFileSync(join(out, "interfaces/opengraph-image"))), "iOS social image is distinct from the interface catalogue card");
 const interfaceIndex = read("interfaces/index.html");
 const interfaceLinks = tags(interfaceIndex, "a").map(item => item.href?.replace(/\/$/, ""));
 for (const platform of ["android", "ios"]) {

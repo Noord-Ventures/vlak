@@ -6,7 +6,7 @@ export const ogContentType = "image/png";
 
 const modules = [204, 408, 612, 816, 1020];
 
-function Mark() {
+export function Mark() {
   return (
     <svg width="34" height="34" viewBox="0 0 822 822" fill="currentColor" aria-hidden="true">
       <g transform="translate(0 822) scale(1 -1)">
