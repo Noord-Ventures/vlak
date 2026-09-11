@@ -14,7 +14,7 @@ export const metadata: Metadata = pageMetadata("/interfaces/ios", {
   description: "Explore an interactive iPhone with local apps, Home navigation, Control Center and settings in Vlak’s paper and ink.",
 }, {
   searchTitle: "iOS interface with interactive iPhone apps · Vlak",
-  imagePath: "/interfaces/ios/opengraph-image",
+  imagePath: "/interfaces/ios/opengraph-image?v=duo-hinge",
 });
 
 export default function Page() {

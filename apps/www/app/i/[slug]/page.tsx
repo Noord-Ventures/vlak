@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: item.title,
     description: item.voice,
     robots: { index: false, follow: true },
-  }, slug === "ios" ? { imagePath: "/interfaces/ios/opengraph-image" } : {});
+  }, slug === "ios" ? { imagePath: "/interfaces/ios/opengraph-image?v=duo-hinge" } : {});
   return { ...metadata, openGraph: { ...metadata.openGraph, url: `${HOST}/i/${slug}/` } };
 }
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
