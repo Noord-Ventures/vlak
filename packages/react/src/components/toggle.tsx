@@ -197,12 +197,13 @@ const styles = stylex.create({
   groupSubtle: {
     minWidth: 0,
     maxWidth: "100%",
-    padding: "3px",
+    padding: 0,
     gap: "3px",
     backgroundColor: { default: vlak.tableAlt, [mq.forcedColors]: "Canvas" },
     borderColor: { default: vlak.divider, [mq.forcedColors]: "ButtonText" },
   },
   groupedSubtle: {
+    flexGrow: 1,
     flexShrink: 1,
     flexBasis: { default: "auto", [mq.phone]: 0 },
     minWidth: { default: vlak.hit, [mq.phone]: vlak.hit },
