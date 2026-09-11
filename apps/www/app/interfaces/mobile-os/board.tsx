@@ -18,6 +18,7 @@ import type { PlatformGlyphName } from "./platform-glyph";
 import { DeviceFrame, StatusSignals } from "./device-chrome";
 import { AndroidSettings, androidSettingsTitles } from "./android-settings";
 import { PlatformRange as Slider, PlatformSwitch as Switch } from "./platform-controls";
+import { trackSiteEvent } from "@/lib/site-analytics";
 
 import { deviceProfiles } from "./device-profiles";
 import type { DeviceProfile, Platform } from "./device-profiles";
@@ -83,8 +84,17 @@ export function Board({ platform = "ios" }: { platform?: Platform }) {
   }, []);
   const live = narrow && (liveOverride ?? true);
   const device = profiles.find(item => item.id === deviceId) ?? profiles[0]!;
+  const isDuo = platform === "ios" && device.id === "iphone-duo";
+  React.useEffect(() => {
+    if (!isDuo) return;
+    trackSiteEvent("duo_open");
+  }, [isDuo]);
+  React.useEffect(() => {
+    if (!isDuo) return;
+    trackSiteEvent(expanded ? "inner_screen" : "outer_screen");
+  }, [expanded, isDuo]);
   return <section className="mo mo-single" aria-label={`${platform === "ios" ? "iOS" : "Android"} operating system workspace`}>
-    <header className="mo-workspace-header"><div><strong>Your phone, your way</strong><span>Everyday apps, in Vlak</span></div><div className="mo-device-controls"><NativeSelect aria-label="Device" value={device.id} onChange={event => { if (platform === "ios") cancelIOSMotion(); setInspectionAngle(null); setDeviceId(event.target.value); }}>{profiles.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</NativeSelect>{device.expanded && <Button variant="ghost" aria-pressed={expanded} onClick={() => { if (platform === "ios") cancelIOSMotion(); prepareFold.current?.(); setLiveOverride(false); setInspectionAngle(null); setExpanded(value => !value); }}>{expanded ? "Fold display" : "Open display"}</Button>}{device.expanded && <Button variant="ghost" aria-pressed={inspectionAngle !== null} onClick={() => { if (platform === "ios") cancelIOSMotion(); prepareFold.current?.(); setLiveOverride(false); setExpanded(true); setInspectionAngle(value => value === null ? 110 : null); }}>{inspectionAngle === null ? "Inspect fold" : "Return to app"}</Button>}<Button variant="ghost" aria-label="Rotate device" aria-pressed={rotated} onClick={() => { if (platform === "ios") cancelIOSMotion(); setLiveOverride(false); setInspectionAngle(null); setRotated(value => !value); }}><Icon name="refresh" />Rotate</Button>{narrow && <Button variant="ghost" onClick={() => { if (platform === "ios") cancelIOSMotion(); setInspectionAngle(null); setLiveOverride(!live); }}>{live ? "View device" : "Use phone"}</Button>}</div></header>
+    <header className="mo-workspace-header"><div><strong>Your phone, your way</strong><span>Everyday apps, in Vlak</span></div><div className="mo-device-controls"><NativeSelect aria-label="Device" value={device.id} onChange={event => { if (platform === "ios") cancelIOSMotion(); setInspectionAngle(null); setDeviceId(event.target.value); }}>{profiles.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</NativeSelect>{device.expanded && <Button variant="ghost" aria-pressed={expanded} onClick={() => { if (platform === "ios") cancelIOSMotion(); trackSiteEvent("fold_transition"); prepareFold.current?.(); setLiveOverride(false); setInspectionAngle(null); setExpanded(value => !value); }}>{expanded ? "Fold display" : "Open display"}</Button>}{device.expanded && <Button variant="ghost" aria-pressed={inspectionAngle !== null} onClick={() => { if (platform === "ios") cancelIOSMotion(); trackSiteEvent("fold_transition"); prepareFold.current?.(); setLiveOverride(false); setExpanded(true); setInspectionAngle(value => value === null ? 110 : null); }}>{inspectionAngle === null ? "Inspect fold" : "Return to app"}</Button>}<Button variant="ghost" aria-label="Rotate device" aria-pressed={rotated} onClick={() => { if (platform === "ios") cancelIOSMotion(); setLiveOverride(false); setInspectionAngle(null); setRotated(value => !value); }}><Icon name="refresh" />Rotate</Button>{narrow && <Button variant="ghost" onClick={() => { if (platform === "ios") cancelIOSMotion(); setInspectionAngle(null); setLiveOverride(!live); }}>{live ? "View device" : "Use phone"}</Button>}</div></header>
     {inspectionAngle !== null && <div className="mo-fold-tools"><label htmlFor="mo-hinge-angle">Hinge angle</label><input id="mo-hinge-angle" aria-label="Hinge angle" type="range" min="0" max="180" step="1" value={inspectionAngle} onChange={event => { if (platform === "ios") cancelIOSMotion(); setInspectionAngle(Number(event.target.value)); }} /><output htmlFor="mo-hinge-angle">{inspectionAngle}°</output><span>Adjust the hinge, then return to the app.</span></div>}
     <div className="mo-stage"><Device platform={platform} device={device} expanded={expanded && Boolean(device.expanded)} rotated={rotated} live={live} prepareFold={prepareFold} inspectionAngle={inspectionAngle} /></div>
     <footer className="mo-workspace-footer"><span>Local apps and sample data. Your work stays here as you change devices.</span></footer>

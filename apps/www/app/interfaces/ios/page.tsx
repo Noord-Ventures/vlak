@@ -10,11 +10,11 @@ import "../mobile-os/android-native.css";
 import "../mobile-os/device-chrome.css";
 
 export const metadata: Metadata = pageMetadata("/interfaces/ios", {
-  title: "iOS",
-  description: "Explore an interactive iPhone with local apps, Home navigation, Control Center and settings in Vlak’s paper and ink.",
+  title: "iPhone Duo",
+  description: "Prototype for the iPhone Duo fold, with outer and inner screens, familiar iOS conventions, and Vlak’s monochrome visual system.",
 }, {
-  searchTitle: "iOS interface with interactive iPhone apps · Vlak",
-  imagePath: "/interfaces/ios/opengraph-image?v=duo-hinge",
+  searchTitle: "iPhone Duo interface prototype · Vlak",
+  imagePath: "/interfaces/ios/opengraph-image?v=duo-prototype",
 });
 
 export default function Page() {

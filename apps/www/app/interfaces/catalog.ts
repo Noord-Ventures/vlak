@@ -290,7 +290,7 @@ const originalInterfaces = [
   },
   {
     slug: "ios",
-    title: "iOS",
+    title: "iPhone Duo",
     voice: "Explore an iPhone through Vlak.",
     law: "An interactive iOS study with everyday apps, familiar navigation and system controls.",
     story: "A focused iPhone workspace with a Home screen, App Library and sixteen local apps. Contextual back navigation, grouped settings and separate Control and Notification Centers preserve the platform structure. Open an app, edit its records and return Home through the indicator.",

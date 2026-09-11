@@ -57,6 +57,8 @@ Dark scheme: `data-theme="dark"` on the root element. Without it the system pref
 
 Want a working project before choosing the rest of the stack? Open the [Vite and Next.js starters](https://vlak.dev/starters/) in StackBlitz or run them from [`examples/`](examples/).
 
+Built something with Vlak? [Tell us what you made and where the constraints helped or got in the way](https://github.com/Noord-Ventures/vlak/issues/new?template=showcase.yml).
+
 ## Why Vlak
 
 Vlak treats an interface as a field rather than a stack of cards. Paper, ink, gray, type, and hairlines establish hierarchy. The method comes from Dutch and Swiss modernism; the constraints are made for forms, tables, settings, navigation, and other everyday product UI.

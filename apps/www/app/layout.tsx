@@ -65,14 +65,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </a>
         <SiteChrome />
         <CrumbBar />
-        {children}
-        <SiteFooter />
         <SiteAnalytics publicPaths={[
           ...publicSitePaths,
           ...catalogComponents.map(({ name, category }) => `/${category === "ai" ? "ai" : "components"}/${name}`),
           ...domainCollections.map(({ name }) => `/docs/${name}`),
           ...interfaces.map(({ slug }) => `/interfaces/${slug}`),
         ]} />
+        {children}
+        <SiteFooter />
       </body>
     </html>
   );

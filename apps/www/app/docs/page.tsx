@@ -35,6 +35,8 @@ const cssUsage = `<link rel="stylesheet" href="node_modules/@noorddev/vlak/css/v
 <button class="rs-btn-primary">Primary action</button>
 <button class="rs-btn-ghost">Secondary</button>`;
 
+const projectSubmission = "https://github.com/Noord-Ventures/vlak/issues/new?template=showcase.yml";
+
 export default function DocsPage() {
   return (
     <DocsShell
@@ -235,6 +237,11 @@ export default function DocsPage() {
           : components and interface studies grouped by the work they support.
         </li>
       </ul>
+
+      <h2 className="section-label">Built something?</h2>
+      <p className="rs-t-body">
+        If Vlak made it into a product, prototype, or substantial experiment, <a className="rs-link" href={projectSubmission}>tell us what you built</a>. Include what you changed and one constraint that helped or got in the way.
+      </p>
     </DocsShell>
   );
 }

@@ -8,6 +8,7 @@ import styles from "./showcase.module.css";
 export const metadata: Metadata = pageMetadata("/showcase", {
   title: "Built with Vlak",
   description: "Products and experiments built with Vlak, with a public path for submitting your own work.",
+  robots: { index: false, follow: false },
 });
 
 const badge = `[![Built with Vlak](https://vlak.dev/badges/built-with-vlak.svg?v=2)](https://vlak.dev)`;

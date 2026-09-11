@@ -73,12 +73,13 @@ try {
       }
       await page.locator('a[href="https://renatovaldes.com"]').click();
       await page.locator('a[href="https://github.com/Noord-Ventures/vlak"]').first().click();
+      await page.locator('a[href="https://github.com/Noord-Ventures/vlak/issues/new?template=showcase.yml"]').click();
       await page.locator('.site-footer a[href="/docs/"]').click();
       await page.locator('a[href="/docs/stylex"]').last().click();
       await page.locator('.code-copy').first().click();
       await page.waitForTimeout(250);
       const custom = () => events.filter(e => e.data.en);
-      for (const name of ['network_click', 'github_click', 'get_started_click', 'docs_click', 'install_copy']) assert(custom().some(e => e.data.en === name), name);
+      for (const name of ['network_click', 'github_click', 'get_started_click', 'docs_click', 'install_copy', 'project_submit_click']) assert(custom().some(e => e.data.en === name), name);
       assert(custom().some(e => e.data.en === 'network_click' && e.data.ed.destination === 'renatovaldes'));
       assert(custom().every(e => e.data.ed.source === 'vlak'));
       const copied = custom().filter(e => e.data.en === 'install_copy').length;
@@ -104,6 +105,29 @@ try {
       assert(events.some(e => e.data.o === `https://${hostname}/docs/stylex`));
       assert(!JSON.stringify(events).includes('SECRET'));
       assert(!events.some(e => e.data.en === 'unknown_event'));
+
+      const duoStart = events.length;
+      await page.goto(`https://${hostname}/interfaces/ios/?utm_source=LinkedIn&utm_medium=Social%20Post&utm_campaign=Duo%20Launch%202026`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await page.getByRole('button', { name: 'Open display' }).click();
+      await page.getByRole('button', { name: 'Copy install command' }).click();
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      await page.getByRole('link', { name: 'Installation guide' }).first().click();
+      await page.getByRole('link', { name: 'GitHub source' }).click();
+      await page.waitForTimeout(350);
+      const duoEvents = events.slice(duoStart).filter(e => e.data.en);
+      for (const name of ['duo_open', 'outer_screen', 'fold_transition', 'inner_screen', 'docs_from_duo', 'install_from_duo', 'github_click']) assert(duoEvents.some(e => e.data.en === name), name);
+      assert(duoEvents.every(e => e.data.ed.channel === 'linkedin'));
+      assert(duoEvents.every(e => e.data.ed.campaign_source === 'linkedin' && e.data.ed.campaign_medium === 'social-post' && e.data.ed.campaign_name === 'duo-launch-2026'));
+
+      await page.goto(`https://${hostname}/docs/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      await page.locator('a[href="https://github.com/Noord-Ventures/vlak"]').first().click();
+      await page.waitForTimeout(150);
+      const persisted = events.filter(e => e.data.en === 'github_click').at(-1);
+      assert.equal(persisted.data.ed.channel, 'linkedin');
+      assert.equal(persisted.data.ed.campaign_name, 'duo-launch-2026');
     } else {
       await page.waitForTimeout(100);
       assert.equal(collectorLoads, 0);

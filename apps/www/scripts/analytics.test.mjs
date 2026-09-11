@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { acquisitionChannel, beforeSend, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
+import { acquisitionAttribution, acquisitionChannel, beforeSend, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
 
 const paths = new Set([...publicSitePaths, "/components/button"]);
 
@@ -28,6 +28,10 @@ test("page URLs lose query/hash and unknown or private paths are dropped", () =>
 test("custom events emit only fixed identifiers, never arbitrary payload fields", () => {
   const event = beforeSend({ type: "event", url: "https://vlak.dev/?token=secret", payload: { name: "network_click", data: { source: "spoofed", destination: "noord", email: "private@example.com" } } }, paths);
   assert.deepEqual(event, { type: "event", url: "https://vlak.dev/", payload: { name: "network_click", data: { source: "vlak", destination: "noord" } } });
+  assert.deepEqual(
+    beforeSend({ type: "event", url: "https://vlak.dev/docs", payload: { name: "project_submit_click", data: { project: "private" } } }, paths),
+    { type: "event", url: "https://vlak.dev/docs", payload: { name: "project_submit_click", data: { source: "vlak" } } },
+  );
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "form_text", data: { value: "secret" } } }, paths), null);
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "network_click", data: { destination: "private@example.com" } } }, paths), null);
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "docs_click", data: { path: "/docs/private-token" } } }, paths), null);
@@ -56,4 +60,22 @@ test("acquisition keeps only a fixed channel and public landing path", () => {
     { type: "event", url: "https://vlak.dev/components/button", payload: { name: "acquisition", data: { source: "vlak", channel: "linkedin", landing: "/components/button" } } },
   );
   assert.equal(beforeSend({ type: "event", url: "https://vlak.dev/", payload: { name: "acquisition", data: { channel: "private", landing: "/" } } }, paths), null);
+});
+
+test("campaign attribution is normalized and retained on Duo funnel events", () => {
+  assert.deepEqual(
+    acquisitionAttribution({ href: "https://vlak.dev/interfaces/ios/?utm_source=LinkedIn&utm_medium=Social%20Post&utm_campaign=Duo%20Launch%202026&utm_content=private" }, ""),
+    { channel: "linkedin", campaign_source: "linkedin", campaign_medium: "social-post", campaign_name: "duo-launch-2026" },
+  );
+  assert.deepEqual(
+    beforeSend({ type: "event", url: "https://vlak.dev/interfaces/ios/?token=private", payload: { name: "duo_open", data: { channel: "linkedin", campaign_source: "LinkedIn", campaign_medium: "Social Post", campaign_name: "Duo Launch 2026", email: "private@example.com" } } }, paths),
+    { type: "event", url: "https://vlak.dev/interfaces/ios", payload: { name: "duo_open", data: { source: "vlak", channel: "linkedin", campaign_source: "linkedin", campaign_medium: "social-post", campaign_name: "duo-launch-2026" } } },
+  );
+  for (const name of ["fold_transition", "outer_screen", "inner_screen", "docs_from_duo"]) {
+    assert(beforeSend({ type: "event", url: "https://vlak.dev/interfaces/ios", payload: { name, data: { channel: "twitter" } } }, paths), name);
+  }
+  assert.deepEqual(
+    beforeSend({ type: "event", url: "https://vlak.dev/interfaces/ios", payload: { name: "install_from_duo", data: { channel: "threads", method: "npm" } } }, paths),
+    { type: "event", url: "https://vlak.dev/interfaces/ios", payload: { name: "install_from_duo", data: { source: "vlak", channel: "threads", method: "npm" } } },
+  );
 });
