@@ -1,7 +1,7 @@
 {
   "name": "@noorddev/vlak-cli",
-  "version": "0.4.0",
-  "description": "The Vlak CLI — install the minimal design system into any project: npx @noorddev/vlak-cli init, npx @noorddev/vlak-cli add <component>.",
+  "version": "0.5.0",
+  "description": "Install and edit Vlak component source in your project. CLI commands for setup, components, docs, tokens, and source updates.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -23,7 +23,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "pnpm --filter @noorddev/vlak build:css && pnpm --filter @noorddev/vlak build:registry && tsup && node scripts/copy-fonts.mjs",
+    "build": "tsup && node scripts/copy-fonts.mjs",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

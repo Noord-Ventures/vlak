@@ -19,6 +19,9 @@ export const social: Metadata = {
   },
   description,
   applicationName: WORD,
+  alternates: {
+    types: { "application/rss+xml": [{ url: "/rss.xml", title: "Vlak updates" }] },
+  },
   icons: {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
   },

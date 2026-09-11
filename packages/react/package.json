@@ -1,7 +1,7 @@
 {
   "name": "@noorddev/vlak-react",
-  "version": "0.4.0",
-  "description": "Vlak React components: precompiled StyleX on Vlak tokens. Import the package and one stylesheet; no compiler to configure.",
+  "version": "0.5.0",
+  "description": "Vlak React components for product exploration. Fixed visual rules, precompiled StyleX, and one stylesheet with no compiler to configure.",
   "license": "MIT",
   "repository": {
     "type": "git",

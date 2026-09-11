@@ -36,6 +36,7 @@ html:has(.specimen-page) .site-footer {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas:
     "face"
+    "start"
     "cmd"
     "law"
     "p01"
@@ -110,9 +111,9 @@ html:has(.specimen-page) .site-footer {
 .specimen-cell-command {
   grid-area: cmd;
   container-type: inline-size;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 20px;
-  min-height: 408px;
+  min-height: 204px;
 }
 .specimen-command-kicker {
   margin: 0;
@@ -125,7 +126,17 @@ html:has(.specimen-page) .site-footer {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  scroll-margin-top: 88px;
 }
+.specimen-start {
+  grid-area: start;
+}
+.specimen-start a {
+  font-size: 13px;
+  line-height: 1.45;
+}
+.specimen-start strong { font-size: 17px; font-weight: 500; }
+.specimen-start a > span { color: var(--text-secondary); }
 .specimen-command-row {
   display: flex;
   align-items: center;
@@ -285,6 +296,10 @@ html:has(.specimen-page) .site-footer {
   align-items: flex-start;
   justify-content: flex-start;
 }
+/* The homepage shows the primary group; the catalogue retains both variants. */
+.specimen-cell-kit-toggle-group .rs-toggle-group-subtle {
+  display: none;
+}
 .specimen-kit-live .rs-btn-group,
 .specimen-kit-live .rs-tabs,
 .specimen-kit-live .rs-acc,
@@ -300,6 +315,7 @@ html:has(.specimen-page) .site-footer {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
       "face face"
+      "start start"
       "cmd cmd"
       "law law"
       "p01 p02"
@@ -323,6 +339,7 @@ html:has(.specimen-page) .site-footer {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-areas:
       "face face face face"
+      "start start start start"
       "cmd cmd cmd cmd"
       "law law law law"
       "p01 p01 p02 p02"
@@ -346,6 +363,7 @@ html:has(.specimen-page) .site-footer {
     grid-template-columns: repeat(6, minmax(0, 1fr));
     grid-template-areas:
       "face face face law law law"
+      "start start start start start start"
       "cmd cmd cmd cmd cmd cmd"
       "p01 p01 p02 p02 p03 p03"
       "p04 p04 p05 p05 p06 p06"
@@ -360,6 +378,7 @@ html:has(.specimen-page) .site-footer {
 }
 
 @media (max-width: 640px) {
+  .specimen-start a { font-size: 15px; }
   .specimen-cell-face {
     padding-top: calc(20px + env(safe-area-inset-top, 0px));
   }

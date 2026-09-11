@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 231 components in 21 categories: actions (14), forms (28), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), ios (8), android (8), ai (47), health (13), civic (5), science (10), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 231 components in 21 categories: actions (14), forms (28), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), ios (8), android (8), ai (47), health (13), civic (5), science (10), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.5.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 

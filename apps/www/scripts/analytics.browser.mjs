@@ -13,6 +13,11 @@ const nativeScript = await scriptResponse.text();
 const types = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.webp': 'image/webp', '.jpg': 'image/jpeg' };
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const reports = [];
+async function waitForReport(predicate, message) {
+  const deadline = Date.now() + 10_000;
+  while (!predicate() && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 50));
+  assert(predicate(), message);
+}
 try {
   for (const hostname of ['vlak.dev', 'www.vlak.dev', 'localhost', 'vlak-git-preview.vercel.app']) {
     // The native collector ignores automation. Emulate a visitor only inside
@@ -101,8 +106,8 @@ try {
         window.va('event', { name: 'network_click', data: { destination: 'noord', email: 'SECRET_FORM_VALUE' } });
         window.va('event', { name: 'unknown_event', data: { text: 'SECRET_FORM_VALUE' } });
       });
-      await page.waitForTimeout(200);
-      assert(events.some(e => e.data.o === `https://${hostname}/docs/stylex`));
+      await waitForReport(() => events.some(e => e.data.o === `https://${hostname}/docs/stylex`), 'Public navigation should report its redacted URL');
+      await waitForReport(() => events.some(e => e.data.o === `https://${hostname}/docs/stylex` && e.data.en === 'network_click'), 'The final privacy fixture event must arrive before the Duo fixture begins');
       assert(!JSON.stringify(events).includes('SECRET'));
       assert(!events.some(e => e.data.en === 'unknown_event'));
 
@@ -117,7 +122,7 @@ try {
       await page.waitForTimeout(350);
       const duoEvents = events.slice(duoStart).filter(e => e.data.en);
       for (const name of ['duo_open', 'outer_screen', 'fold_transition', 'inner_screen', 'docs_from_duo', 'install_from_duo', 'github_click']) assert(duoEvents.some(e => e.data.en === name), name);
-      assert(duoEvents.every(e => e.data.ed.channel === 'linkedin'));
+      assert(duoEvents.every(e => e.data.ed.channel === 'linkedin'), JSON.stringify(duoEvents));
       assert(duoEvents.every(e => e.data.ed.campaign_source === 'linkedin' && e.data.ed.campaign_medium === 'social-post' && e.data.ed.campaign_name === 'duo-launch-2026'));
 
       await page.goto(`https://${hostname}/docs/`, { waitUntil: 'networkidle' });
@@ -128,6 +133,32 @@ try {
       const persisted = events.filter(e => e.data.en === 'github_click').at(-1);
       assert.equal(persisted.data.ed.channel, 'linkedin');
       assert.equal(persisted.data.ed.campaign_name, 'duo-launch-2026');
+
+      const growthStart = events.length;
+      await page.goto(`https://${hostname}/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      for (const choice of ['prototype', 'agent', 'install']) await page.locator(`[data-start-path="${choice}"]`).click();
+      await page.goto(`https://${hostname}/starters/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      for (const slug of ['ios', 'android', 'calendar', 'reconciliation', 'line']) await page.locator(`a[href="/starter/${slug}.zip"]`).click();
+      await page.goto(`https://${hostname}/interfaces/line/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await page.getByRole('button', { name: 'Copy build brief', exact: true }).click();
+      await page.getByRole('button', { name: 'Copy install command', exact: true }).click();
+      await page.goto(`https://${hostname}/updates/`, { waitUntil: 'networkidle' });
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      await page.locator('a[href="/rss.xml"]').first().click();
+      await page.locator('a[href="https://github.com/Noord-Ventures/vlak/releases"]').first().click();
+      await page.waitForTimeout(300);
+      const growthEvents = events.slice(growthStart).filter(e => e.data.en);
+      for (const name of ['start_choice', 'starter_open', 'starter_download', 'agent_setup_open', 'setup_copy', 'interface_install', 'updates_follow']) assert(growthEvents.some(e => e.data.en === name), name);
+      assert.equal(growthEvents.filter(e => e.data.en === 'starter_download').length, 5);
+      assert.equal(growthEvents.filter(e => e.data.en === 'start_choice').length, 3);
+      assert(growthEvents.every(e => e.data.ed.channel === 'linkedin' && e.data.ed.campaign_name === 'duo-launch-2026'));
+      assert(!JSON.stringify(growthEvents).includes('SECRET'));
     } else {
       await page.waitForTimeout(100);
       assert.equal(collectorLoads, 0);

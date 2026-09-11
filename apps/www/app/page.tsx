@@ -30,9 +30,14 @@ export default function Home() {
           <h1 className="specimen-law">{LAW}</h1>
         </section>
 
+        <nav {...sx("specimen-start", specimen.start)} aria-label="Start with Vlak">
+          <a {...sx("specimen-start-tile", specimen.startTile)} href="/starters/" data-start-path="prototype"><strong>Prototype <span aria-hidden="true">↗</span></strong><span>Run an interface and change it.</span></a>
+          <a {...sx("specimen-start-tile", specimen.startTile)} href="/docs/agents/" data-start-path="agent"><strong>Use an agent <span aria-hidden="true">↗</span></strong><span>Connect the component docs and rules.</span></a>
+          <a {...sx("specimen-start-tile", specimen.startTile)} href="#install-command" data-start-path="install"><strong>Install <span aria-hidden="true">↓</span></strong><span>Add Vlak to your project.</span></a>
+        </nav>
+
         <section {...sx("specimen-cell specimen-cell-command", specimen.cell, specimen.cellCommand)}>
-          <p className="specimen-command-kicker">Install</p>
-          <div className="specimen-command-copy">
+          <div className="specimen-command-copy" id="install-command">
             <div className="specimen-command-row">
               <p className="specimen-command">{INSTALL}</p>
               <CopyControl text={INSTALL} />
@@ -41,6 +46,8 @@ export default function Home() {
               <a href="/docs">Getting started</a>
               <span aria-hidden="true"> · </span>
               MIT
+              <span aria-hidden="true"> · </span>
+              <a href="/docs/choosing-vlak/">When to use Vlak</a>
             </p>
           </div>
         </section>

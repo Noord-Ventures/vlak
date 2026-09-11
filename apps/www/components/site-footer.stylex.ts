@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 const compact = "@media (min-width: 900px) and (max-width: 1279px)";
 const tablet = "@media (min-width: 641px) and (max-width: 899px)";
 const phone = "@media (max-width: 640px)";
-const touch = "@media (any-pointer: coarse)";
+const largeTouch = "@media (min-width: 641px) and (any-pointer: coarse)";
 
 export const footer = stylex.create({
   inner: {
@@ -16,7 +16,7 @@ export const footer = stylex.create({
       [phone]: "repeat(auto-fit, minmax(min(100%, max(9em, calc((100% - var(--gutter)) / 2))), 1fr))",
     },
     columnGap: "var(--gutter)",
-    rowGap: 32,
+    rowGap: { default: 32, [phone]: 20 },
     alignItems: "start",
     maxWidth: "100%",
   },
@@ -31,9 +31,9 @@ export const footer = stylex.create({
   categories: { gridColumn: { default: "auto", [phone]: "1 / -1" } },
   heading: {
     margin: 0,
-    marginBottom: 8,
+    marginBottom: { default: 8, [phone]: 6 },
     fontSize: "inherit",
-    lineHeight: 1.45,
+    lineHeight: { default: 1.45, [phone]: 1.2 },
     fontWeight: 600,
     color: "var(--text)",
     overflowWrap: "anywhere",
@@ -56,9 +56,10 @@ export const footer = stylex.create({
     display: "flex",
     alignItems: "center",
     minWidth: 44,
-    minHeight: { default: 28, [touch]: 44 },
-    paddingBlock: 4,
-    lineHeight: 1.45,
+    // Compact footer navigation on phones; retain larger tablet touch rows.
+    minHeight: { default: 28, [largeTouch]: 44 },
+    paddingBlock: { default: 4, [phone]: 2 },
+    lineHeight: { default: 1.45, [phone]: 1.2 },
     overflowWrap: "anywhere",
     ":focus-visible": {
       outlineWidth: 2,
@@ -70,7 +71,7 @@ export const footer = stylex.create({
   about: {
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: { default: 12, [phone]: 8 },
     minWidth: 0,
     maxWidth: 388,
     gridColumn: { default: "auto", [compact]: "2 / -1", [tablet]: "1 / -1", [phone]: "1 / -1" },

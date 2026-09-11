@@ -1,6 +1,6 @@
 # Vlak Android components
 
-8 React components with Material control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.4.0.
+8 React components with Material control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.5.0.
 
 ## Runtime and integration
 

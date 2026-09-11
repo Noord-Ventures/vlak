@@ -40,7 +40,14 @@ export function pageMetadata(path: string, metadata: Metadata, options: Discover
     ...metadata,
     title: { absolute: title },
     metadataBase: new URL(HOST),
-    alternates: { ...metadata.alternates, canonical },
+    alternates: {
+      ...metadata.alternates,
+      canonical,
+      types: {
+        "application/rss+xml": [{ url: "/rss.xml", title: "Vlak updates" }],
+        ...metadata.alternates?.types,
+      },
+    },
     openGraph: { type: "website", siteName: WORD, locale: "en", title, description, url: canonical, images: [image] },
     twitter: { card: "summary_large_image", title, description, images: [image.url] },
   };

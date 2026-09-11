@@ -8,6 +8,7 @@ import { pageMetadata } from "@/lib/page-metadata";
 import { HOST } from "@/app/specimen";
 import { interfaceBySlug } from "@/app/interfaces/catalog";
 import { findUseCase, useCases } from "../catalog";
+import { useCaseGuides } from "../guides";
 
 export const dynamicParams = false;
 
@@ -31,6 +32,7 @@ export default async function UseCasePage({ params }: PageProps) {
   if (!useCase) notFound();
   const components = useCase.componentNames.map(name => catalogComponents.find(component => component.name === name)).filter(Boolean);
   const studies = useCase.interfaceSlugs.map(interfaceBySlug).filter(Boolean);
+  const guide = useCaseGuides[useCase.slug];
   return (
     <DocsShell title={useCase.title} summary={useCase.summary}>
       <StructuredData value={[
@@ -48,12 +50,25 @@ export default async function UseCasePage({ params }: PageProps) {
           isPartOf: { "@id": `${HOST}/#website` },
         },
       ]} />
+      {guide && <>
+        <p className="rs-t-body">{guide.intro}</p>
+        <p className="rs-t-body"><Link className="rs-link" href={guide.starter.href}>{guide.starter.label}</Link> · <Link className="rs-link" href="/docs/">Install Vlak</Link></p>
+        {guide.sections.map(section => <section key={section.title}>
+          <h2 className="section-label">{section.title}</h2>
+          {section.paragraphs.map(paragraph => <p key={paragraph} className="rs-t-body">{paragraph}</p>)}
+          {section.points && <ul className="docs-list">{section.points.map(point => <li key={point}>{point}</li>)}</ul>}
+        </section>)}
+      </>}
       <h2 className="section-label">Working rules</h2>
       <ul className="docs-list">{useCase.principles.map(rule => <li key={rule}>{rule}</li>)}</ul>
       <h2 className="section-label">Components</h2>
       <ul className="docs-list">{components.map(component => component ? (
-        <li key={component.name}><Link className="rs-link" href={`/components/${component.name}/`}>{component.title}</Link>. {component.description}</li>
+        <li key={component.name}><Link className="rs-link" href={`/${component.category === "ai" ? "ai" : "components"}/${component.name}/`}>{component.title}</Link>. {component.description}</li>
       ) : null)}</ul>
+      {guide && <>
+        <h2 className="section-label">Continue</h2>
+        <ul className="docs-list">{guide.next.map(link => <li key={link.href}><Link className="rs-link" href={link.href}>{link.label}</Link>. {link.description}</li>)}</ul>
+      </>}
       <h2 className="section-label">Interfaces</h2>
       <ul className="docs-list">{studies.map(study => study ? (
         <li key={study.slug}><Link className="rs-link" href={`/interfaces/${study.slug}/`}>{study.title}</Link>. {study.law}</li>

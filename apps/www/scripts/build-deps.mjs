@@ -19,4 +19,15 @@ run("node --experimental-strip-types scripts/build-docs.mjs", "packages/core");
 run("node --experimental-strip-types scripts/build-registry.mjs", "packages/core");
 run("./node_modules/.bin/tsup", "packages/core");
 run("node scripts/build.mjs", "packages/react");
+// Production must never advertise APIs that users cannot install from npm.
+// Local previews and CI can still verify an unpublished release candidate.
+if (process.env.VERCEL_ENV === "production") {
+  run("./node_modules/.bin/tsup", "packages/cli");
+  run("node scripts/copy-fonts.mjs", "packages/cli");
+  run("./node_modules/.bin/tsup", "packages/mcp");
+  run("node scripts/copy-data.mjs", "packages/mcp");
+  run("node scripts/check-release.mjs --generated", ".");
+  run("node scripts/check-published-release.mjs", ".");
+}
 run("node scripts/copy-registry.mjs", "apps/www");
+run("node --experimental-strip-types scripts/build-interface-starters.mjs", ".");

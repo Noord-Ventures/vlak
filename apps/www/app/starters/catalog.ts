@@ -1,0 +1,67 @@
+export const interfaceStarters = [
+  {
+    slug: "ios",
+    title: "iPhone Duo",
+    description: "Outer and inner screens, folding, local apps and familiar iOS navigation.",
+    entry: "app/interfaces/mobile-os/board.tsx",
+    component: "Board",
+    props: { platform: "ios" },
+    styles: ["scene.css", "platform-controls.css", "ios-native.css", "android-native.css", "device-chrome.css"].map(name => `app/interfaces/mobile-os/${name}`),
+    edit: "src/app/interfaces/mobile-os/board.tsx",
+    note: "The device is a browser prototype. Camera, messages and other system apps use local sample data; no device service is connected.",
+  },
+  {
+    slug: "android",
+    title: "Android",
+    description: "A phone workspace with app navigation, Quick Settings and editable local data.",
+    entry: "app/interfaces/mobile-os/board.tsx",
+    component: "Board",
+    props: { platform: "android" },
+    styles: ["scene.css", "platform-controls.css", "ios-native.css", "android-native.css", "device-chrome.css"].map(name => `app/interfaces/mobile-os/${name}`),
+    edit: "src/app/interfaces/mobile-os/board.tsx",
+    note: "System controls are browser interactions. Network, camera and account services are not connected.",
+  },
+  {
+    slug: "calendar",
+    title: "Calendar",
+    description: "Month, week, day and agenda views, editable events and iCalendar import and export.",
+    entry: "app/interfaces/calendar/board.tsx",
+    component: "CalendarBoard",
+    props: {},
+    styles: [],
+    edit: "src/app/interfaces/calendar/board.tsx",
+    note: "Events and project files stay local. No shared calendar, account system or calendar service is connected.",
+  },
+  {
+    slug: "reconciliation",
+    title: "CSV reconciliation",
+    description: "Compare two CSV files, review missing or conflicting rows, and export the result.",
+    entry: "app/interfaces/reconciliation/board.tsx",
+    component: "ReconciliationBoard",
+    props: {},
+    styles: ["app/interfaces/reconciliation/scene.css"],
+    edit: "src/app/interfaces/reconciliation/model.ts",
+    note: "Files are processed in a browser worker. Review matching rules and exports before using them with business data.",
+  },
+  {
+    slug: "line",
+    title: "AI conversation",
+    description: "Conversations, a message composer, response details and Markdown export.",
+    entry: "app/interfaces/line/board.tsx",
+    component: "Board",
+    props: {},
+    styles: ["app/interfaces/line/scene.css"],
+    edit: "src/app/interfaces/line/board.tsx",
+    note: "Replies are local templates. Connect a model through your own server; never put provider secrets in the browser.",
+  },
+].map(starter => ({
+  ...starter,
+  preview: `/interfaces/${starter.slug}/`,
+  href: `/starters/#${starter.slug}`,
+  download: `/starter/${starter.slug}.zip`,
+  source: `https://github.com/Noord-Ventures/vlak/tree/main/apps/www/${starter.entry.substring(0, starter.entry.lastIndexOf("/"))}`,
+}));
+
+export function starterByInterface(slug: string) {
+  return interfaceStarters.find(starter => starter.slug === slug);
+}

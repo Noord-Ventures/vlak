@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 const at481 = "@media (min-width: 481px)";
 const at816 = "@media (min-width: 816px)";
 const at1224 = "@media (min-width: 1224px)";
+const phone = "@media (max-width: 640px)";
 
 /**
  * Homepage specimen. Overlay kill (`html:has(.specimen-page)::before`)
@@ -57,8 +58,35 @@ export const specimen = stylex.create({
     justifyContent: "flex-end",
   },
   cellCommand: {
-    minHeight: 408,
-    justifyContent: "space-between",
+    minHeight: 204,
+    justifyContent: "flex-end",
     gap: 20,
+  },
+  start: {
+    display: "grid",
+    gridTemplateColumns: { default: "repeat(3, minmax(0, 1fr))", [phone]: "minmax(0, 1fr)" },
+    gap: 1,
+    // The parent paints the translucent divider; do not composite it twice.
+    backgroundColor: "transparent",
+  },
+  startTile: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    alignItems: "flex-start",
+    minWidth: 0,
+    minHeight: { default: 204, [phone]: 136 },
+    padding: 20,
+    gap: 8,
+    backgroundColor: "var(--bg)",
+    color: "var(--text)",
+    textDecoration: "none",
+    ":hover": { backgroundColor: "var(--control-fill)" },
+    ":focus-visible": {
+      outlineWidth: 2,
+      outlineStyle: "solid",
+      outlineColor: "var(--text)",
+      outlineOffset: -4,
+    },
   },
 });

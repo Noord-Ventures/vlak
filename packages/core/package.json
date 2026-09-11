@@ -1,7 +1,7 @@
 {
   "name": "@noorddev/vlak",
-  "version": "0.4.0",
-  "description": "Vlak core — design tokens, component registry, and CSS. Minimal, CSS-first, zero dependencies.",
+  "version": "0.5.0",
+  "description": "Vlak design tokens, component registry, and CSS for product exploration. Monochrome surfaces, type, spacing, and accessible component contracts.",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -56,7 +56,7 @@
     "build:props": "node --experimental-strip-types scripts/build-props.mjs",
     "build:docs": "node --experimental-strip-types scripts/build-docs.mjs",
     "build:registry": "npm run build:docs && node --experimental-strip-types scripts/build-registry.mjs",
-    "build": "npm run build:css && tsup",
+    "build": "npm run build:css && npm run build:registry && tsup",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "build:components": "node --experimental-strip-types scripts/build-components.mjs"

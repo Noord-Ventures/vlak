@@ -1,6 +1,6 @@
 # Vlak components
 
-231 components in 21 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.4.0.
+231 components in 21 categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version 0.5.0.
 
 ## Actions
 

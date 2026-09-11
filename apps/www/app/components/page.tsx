@@ -2,7 +2,7 @@ import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { vlakCategories, catalogComponents, domainCollections } from "@noorddev/vlak";
-import { Icon, iconGroups } from "@noorddev/vlak-react";
+import { Icon, iconGroups } from "@noorddev/vlak-react/components/icon";
 import { chrome } from "@/app/site.stylex";
 import { DocsNav } from "@/components/docs-nav";
 import { Preview } from "@/components/preview";
@@ -77,6 +77,7 @@ export default function ComponentsPage() {
                         <h3>
                           <Link
                             href={`/components/icons#${iconGroupSlug(group.title)}`}
+                            prefetch={false}
                             className="gallery-item-link"
                           >
                             {group.title}
@@ -100,21 +101,21 @@ export default function ComponentsPage() {
               </h2>
               {category === "health" && (
                 <p className="rs-t-body">
-                  Readings, daily routines, and care workflows. <Link href="/docs/health" className="rs-link">Building health software</Link>
+                  Readings, daily routines, and care workflows. <Link prefetch={false} href="/docs/health" className="rs-link">Building health software</Link>
                 </p>
               )}
-              {collection && <p className="rs-t-body">{collection.description} <Link href={`/docs/${category}`} className="rs-link">Read the collection guide</Link></p>}
-              {category === "ai" && <p className="rs-t-body">Conversations, responses, tool activity, and approvals. <Link href="/ai/" className="rs-link">Explore AI components</Link></p>}
-              {(category === "ios" || category === "android") && <p className="rs-t-body">Navigation, forms, lists, and sheets for {categoryTitle(category)} interfaces. <Link href={`/interfaces/${category}/`} className="rs-link">Explore the {categoryTitle(category)} interface</Link></p>}
+              {collection && <p className="rs-t-body">{collection.description} <Link prefetch={false} href={`/docs/${category}`} className="rs-link">Read the collection guide</Link></p>}
+              {category === "ai" && <p className="rs-t-body">Conversations, responses, tool activity, and approvals. <Link prefetch={false} href="/ai/" className="rs-link">Explore AI components</Link></p>}
+              {(category === "ios" || category === "android") && <p className="rs-t-body">Navigation, forms, lists, and sheets for {categoryTitle(category)} interfaces. <Link prefetch={false} href={`/interfaces/${category}/`} className="rs-link">Explore the {categoryTitle(category)} interface</Link></p>}
               <div {...sx("gallery", chrome.gallery)}>
                 {items.map((c) => (
                   <div key={c.name} {...sx("gallery-item", chrome.galleryItem)}>
                     <div {...sx("gallery-demo", chrome.galleryDemo)}>
-                      <Preview name={c.name} snippet={c.snippet} />
+                      <Preview name={c.name} snippet={c.snippet} defer />
                     </div>
                     <div {...sx("gallery-meta", chrome.galleryMeta)}>
                       <h3>
-                        <Link href={`/${c.category === "ai" ? "ai" : "components"}/${c.name}`} className="gallery-item-link">
+                        <Link href={`/${c.category === "ai" ? "ai" : "components"}/${c.name}`} prefetch={false} className="gallery-item-link">
                           {c.title}
                         </Link>
                       </h3>

@@ -103,14 +103,16 @@ body:has(.if-index) {
 .if-study-caption p { margin: 0; font-size: .8125rem; font-weight: 400; line-height: 1.5; color: var(--text-secondary); }
 .if-study-caption a { flex: none; font-size: .8125rem; line-height: 1.5; color: var(--text); text-underline-offset: 4px; text-decoration-color: var(--divider); }
 .if-study-caption a:hover { text-decoration-color: currentColor; }
-.if-duo-start { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding: 14px 16px; border: 1px solid var(--divider); border-top: 0; background: var(--bg); }
+/* The specimen owns the hairline below this strip. Keep only the side borders. */
+.if-duo-start { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 24px; padding: 14px 16px; border: 1px solid var(--divider); border-block: 0; background: var(--bg); }
 .if-duo-start-copy { min-width: 0; }
 .if-duo-start-copy strong { display: block; font-size: .875rem; font-weight: 600; line-height: 1.4; }
 .if-duo-start-copy span { display: block; margin-top: 2px; color: var(--text-secondary); font-size: .75rem; line-height: 1.45; }
 .if-duo-start-copy code { display: block; margin-top: 7px; font-family: monospace; font-size: .75rem; line-height: 1.45; overflow-wrap: anywhere; }
 .if-duo-start-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
 .if-duo-start-actions .rs-btn-primary { width: auto; min-width: 0; min-height: 44px; gap: 8px; padding-inline: 14px; white-space: nowrap; }
-.if-duo-start-actions a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); font-size: .8125rem; text-underline-offset: 4px; text-decoration-color: var(--divider); }
+.if-duo-start-actions a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: .8125rem; text-underline-offset: 4px; text-decoration-color: var(--divider); }
+.if-duo-start-actions a:not(.rs-btn-primary) { color: var(--text); }
 .if-duo-start-actions a:hover { text-decoration-color: currentColor; }
 .if-detail-content { container: study-details / inline-size; padding: 40px 0 32px; min-width: 0; }
 .if-film { margin-bottom: 40px; }

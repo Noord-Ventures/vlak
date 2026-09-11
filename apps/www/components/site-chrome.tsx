@@ -337,7 +337,7 @@ export function SiteChrome() {
   return (
     <>
       <header {...sx("logo-wrap", chrome.logoWrap)}>
-        <Link href="/" {...sx("site-logo", chrome.logo)} aria-label="Vlak">
+        <Link prefetch={false} href="/" {...sx("site-logo", chrome.logo)} aria-label="Vlak">
           <VlakMark />
         </Link>
         <span className="mobile-site-name" data-visible={atTop && pathname === "/"} aria-hidden="true">
@@ -347,7 +347,7 @@ export function SiteChrome() {
 
       <nav {...sx("corner-nav", chrome.cornerNav)} aria-label="Site">
         {links.filter((l) => l.corner).map((l) => (
-          <Link key={l.href} href={l.href} aria-current={current(l.href)}>
+          <Link prefetch={false} key={l.href} href={l.href} aria-current={current(l.href)}>
             {l.label}
           </Link>
         ))}
@@ -411,7 +411,7 @@ export function SiteChrome() {
       >
         <div className="nav-panel-links">
           {links.filter((l) => l.href !== "/").map((l) => (
-            <Link key={l.href} href={l.href} {...sx("nav-panel-link", chrome.navPanelLink)} aria-current={current(l.href)}>
+            <Link prefetch={false} key={l.href} href={l.href} {...sx("nav-panel-link", chrome.navPanelLink)} aria-current={current(l.href)}>
               {l.label}
             </Link>
           ))}

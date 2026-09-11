@@ -2,7 +2,8 @@ name: Release
 
 # Publishes @noorddev/vlak, @noorddev/vlak-react, @noorddev/vlak-cli,
 # and @noorddev/vlak-mcp with npm provenance. Runs as a dry run on every
-# manual trigger unless `publish` is set; a pushed tag v* publishes for real.
+# manual trigger unless `publish` is set on a matching version tag; a pushed
+# tag v* publishes for real only after version and generated-data validation.
 
 on:
   push:
@@ -21,7 +22,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -31,12 +32,27 @@ jobs:
           cache: pnpm
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck && pnpm build && pnpm test && pnpm smoke
+      - name: Validate release declarations and failure gates
+        run: node scripts/check-release.mjs && node --test scripts/release.test.mjs
+      # Workspace consumers resolve the packages' generated declarations.
+      - run: pnpm build && pnpm typecheck && pnpm test && pnpm smoke
+      - name: Validate built catalog and bundled versions
+        run: node scripts/check-release.mjs --generated
+      - name: Verify starter ZIPs against the release candidate
+        run: pnpm check:starters
       - name: Publish (dry run)
         if: ${{ !(startsWith(github.ref, 'refs/tags/v') || inputs.publish) }}
         run: pnpm -r --filter './packages/*' publish --access public --no-git-checks --dry-run
       - name: Publish
         if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish }}
-        run: pnpm -r --filter './packages/*' publish --access public --no-git-checks --provenance
+        run: |
+          node scripts/check-release.mjs --generated --publishing
+          pnpm -r --filter './packages/*' publish --access public --no-git-checks --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Verify public npm release before site deployment
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish }}
+        run: node scripts/check-published-release.mjs
+      - name: Verify starters with public packages
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish }}
+        run: node --experimental-strip-types scripts/verify-interface-starters.mjs --registry

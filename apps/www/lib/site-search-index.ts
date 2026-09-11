@@ -41,6 +41,7 @@ const destinations = [
   entry("/use-cases/", "Use cases", "Components and studies for enterprise, consumer, agent, data, science, healthcare, and industrial software.", "Site"),
   entry("/", "Vlak", "A minimal React design system with monochrome surfaces, accessible controls, and CSS tokens.", "Site", ["Home", "Design system"]),
   entry("/about/", "About", "The method, design lineage, and practical constraints behind Vlak.", "Site", ["Principles", "Design philosophy"]),
+  entry("/updates/", "Updates", "Package releases, interface studies, and source updates. Subscribe by RSS or follow GitHub releases.", "Site", ["Changelog", "Releases", "RSS", "Subscribe"]),
   entry("/inspiration/", "Inspiration", "Furniture, architecture, and graphic systems behind Vlak.", "Site", ["References", "Design history"]),
   entry("/privacy/", "Privacy", "How Vlak handles website and MCP request data.", "Site", ["Privacy policy", "Analytics"]),
   entry("/terms/", "Terms", "Terms for using the website, hosted MCP server, and software.", "Site", ["Terms of use", "License"]),
@@ -55,6 +56,10 @@ export const siteSearchEntries: SiteSearchEntry[] = [
     component.title, component.description, component.category === "ai" ? "AI components" : "Components",
     [component.name, component.category, ...(component.aliases ?? [])],
   )),
-  ...interfaces.map(study => entry(`/interfaces/${study.slug}/`, study.title, study.law, "Interfaces", [study.slug, study.what, study.type])),
+  ...interfaces.map(study => entry(
+    `/interfaces/${study.slug}/`, study.slug === "ios" ? "iOS" : study.title,
+    study.slug === "ios" ? `${study.title}. ${study.law}` : study.law,
+    "Interfaces", [study.slug, study.title, study.what, study.type],
+  )),
   ...useCases.map(useCase => entry(`/use-cases/${useCase.slug}/`, useCase.title, useCase.summary, "Use cases", [useCase.slug])),
 ];

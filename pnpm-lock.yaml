@@ -193,8 +193,8 @@ importers:
   examples/workflows:
     dependencies:
       '@noorddev/vlak-react':
-        specifier: ^0.4.0
-        version: 0.4.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+        specifier: workspace:*
+        version: link:../../packages/react
       react:
         specifier: ^19.2.0
         version: 19.2.8
@@ -263,6 +263,9 @@ importers:
         specifier: ^4.5.4
         version: 4.5.4
     devDependencies:
+      '@noorddev/vlak':
+        specifier: workspace:*
+        version: link:../core
       '@types/node':
         specifier: ^26.4.1
         version: 26.4.1
@@ -1123,17 +1126,6 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
-
-  '@noorddev/vlak-react@0.4.0':
-    resolution: {integrity: sha512-5LzqvZWVkenAe7CDdYwfVAKdTyhAuQUt/MsAJeT1uNdYKTzuSNvSa4xLDnlBiAkGjig/PziqgbS4hXIgIJhRig==}
-    engines: {node: '>=18.18'}
-    peerDependencies:
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
-
-  '@noorddev/vlak@0.4.0':
-    resolution: {integrity: sha512-Lum9dc1U6JQpL8xQXySbQzpKKUS3NrWJdfSObxRLHNgzA3UUsI2X8ci+nooyTwBuJCwYHJSuZu8QrXZz89QK9g==}
-    engines: {node: '>=18.18'}
 
   '@publint/pack@0.1.7':
     resolution: {integrity: sha512-4EDEmvxWtgsCnnVeBvtFIFZtUhPPt1+bA9JrSwU4Sa//6oKtzCSlGGXYJr44OD9aGISymbieJ4mCKHUygUDU+g==}
@@ -4416,15 +4408,6 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.3
-
-  '@noorddev/vlak-react@0.4.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
-    dependencies:
-      '@noorddev/vlak': 0.4.0
-      '@stylexjs/stylex': 0.19.0
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
-
-  '@noorddev/vlak@0.4.0': {}
 
   '@publint/pack@0.1.7':
     dependencies:

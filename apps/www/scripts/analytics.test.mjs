@@ -79,3 +79,20 @@ test("campaign attribution is normalized and retained on Duo funnel events", () 
     { type: "event", url: "https://vlak.dev/interfaces/ios", payload: { name: "install_from_duo", data: { source: "vlak", channel: "threads", method: "npm" } } },
   );
 });
+
+test("activation events retain attribution and reject arbitrary starter, interface and follow data", () => {
+  const send = (name, data) => beforeSend({ type: "event", url: "https://vlak.dev/starters/", payload: { name, data: { channel: "linkedin", campaign_name: "duo-launch", private: "discard", ...data } } }, paths)?.payload?.data;
+  for (const slug of ["ios", "android", "calendar", "reconciliation", "line"]) {
+    assert.deepEqual(send("starter_download", { slug }), { source: "vlak", channel: "linkedin", campaign_name: "duo-launch", slug });
+    assert(send("setup_copy", { slug }));
+    assert(send("interface_install", { slug, method: "npm" }));
+  }
+  assert(send("starter_open", { slug: "all" }));
+  assert(send("start_choice", { path: "agent" }));
+  assert(send("updates_follow", { method: "rss" }));
+  assert.equal(send("starter_download", { slug: "private-project" }), undefined);
+  assert.equal(send("setup_copy", { slug: "private-project" }), undefined);
+  assert.equal(send("interface_install", { slug: "ios", method: "private" }), undefined);
+  assert.equal(send("start_choice", { path: "private" }), undefined);
+  assert.equal(send("updates_follow", { method: "private@example.com" }), undefined);
+});

@@ -2,7 +2,7 @@
 
 [![GitHub stars](https://img.shields.io/github/stars/Noord-Ventures/vlak?style=social)](https://github.com/Noord-Ventures/vlak/stargazers) [![npm downloads](https://img.shields.io/npm/dm/%40noorddev%2Fvlak-react?style=flat-square&color=1a1a1a)](https://www.npmjs.com/package/@noorddev/vlak-react) [![CI](https://img.shields.io/github/actions/workflow/status/Noord-Ventures/vlak/ci.yml?branch=main&style=flat-square&label=build&color=1a1a1a)](https://github.com/Noord-Ventures/vlak/actions/workflows/ci.yml) [![MIT license](https://img.shields.io/github/license/Noord-Ventures/vlak?style=flat-square&color=1a1a1a)](LICENSE)
 
-A constraint-first design system for product exploration. 215 accessible components ship as React, CSS, vendored StyleX source, a shadcn-compatible registry, CLI tooling, and machine-readable context for coding agents.
+A design system for product exploration with fixed visual rules. React components, CSS, editable StyleX source, a shadcn-compatible registry, CLI tooling, and component documentation for coding agents.
 
 [Browse components](https://vlak.dev/components/) · [Try the interfaces](https://vlak.dev/interfaces/) · [Open a starter](https://vlak.dev/starters/) · [Use with coding agents](https://vlak.dev/docs/agents/)
 
@@ -55,7 +55,9 @@ npx shadcn add https://vlak.dev/r/button.json
 
 Dark scheme: `data-theme="dark"` on the root element. Without it the system preference applies.
 
-Want a working project before choosing the rest of the stack? Open the [Vite and Next.js starters](https://vlak.dev/starters/) in StackBlitz or run them from [`examples/`](examples/).
+Want a working project first? Download a [standalone interface starter](https://vlak.dev/starters/) for Duo, Android, calendars, record reconciliation, or an AI conversation. The smaller Vite and Next.js form examples are also available there.
+
+Follow [updates](https://vlak.dev/updates/), subscribe to the [RSS feed](https://vlak.dev/rss.xml), or watch [GitHub releases](https://github.com/Noord-Ventures/vlak/releases).
 
 Built something with Vlak? [Tell us what you made and where the constraints helped or got in the way](https://github.com/Noord-Ventures/vlak/issues/new?template=showcase.yml).
 
@@ -128,7 +130,7 @@ The tests enforce what generation cannot: every registry class is applied by the
 
 ## Development
 
-Node 22.6 or newer, pnpm 10.
+Node 22.6 or newer, the pnpm version pinned in `package.json`.
 
 ```sh
 pnpm install
@@ -142,6 +144,8 @@ pnpm dev          # docs site at localhost:3000
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+Public GitHub descriptions are kept in [`.github/repository.json`](.github/repository.json). Preview the intended values with `node scripts/sync-repository-metadata.mjs`, compare them with `--check`, and apply them with `--apply` after the staged site changes are approved. Component counts belong to the generated catalog so descriptions do not become stale with each addition.
 
 ## Typeface
 

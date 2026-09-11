@@ -15,9 +15,10 @@ export const publicSitePaths = [
   "/showcase", "/starters", "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
   "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",
   "/use-cases/enterprise-software", "/use-cases/consumer-software",
+  "/use-cases/product-prototyping", "/updates",
 ];
 
-type EventName = "acquisition" | "docs_click" | "docs_from_duo" | "duo_open" | "fold_transition" | "get_started_click" | "github_click" | "inner_screen" | "install_copy" | "install_from_duo" | "interface_video_play" | "network_click" | "outer_screen" | "project_submit_click";
+type EventName = "acquisition" | "docs_click" | "docs_from_duo" | "duo_open" | "fold_transition" | "get_started_click" | "github_click" | "inner_screen" | "install_copy" | "install_from_duo" | "interface_video_play" | "network_click" | "outer_screen" | "project_submit_click" | "start_choice" | "starter_open" | "starter_download" | "agent_setup_open" | "interface_install" | "setup_copy" | "updates_follow";
 type EventData = Record<string, string>;
 type AnalyticsEvent = { type: "pageview" | "event"; url: string; payload?: { name: string; data?: EventData } };
 type AnalyticsQueue = (command: string, value: unknown) => void;
@@ -40,6 +41,7 @@ function normalizePath(path: string): string {
 }
 
 const acquisitionChannels = new Set(["direct", "twitter", "linkedin", "threads", "github", "npm", "producthunt", "search", "referral"]);
+const starterSlugs = new Set(["ios", "android", "calendar", "reconciliation", "line"]);
 
 function safeCampaignValue(value: string | undefined): string | undefined {
   const normalized = value?.toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 64);
@@ -86,6 +88,25 @@ function safeEventData(name: string | undefined, data: EventData = {}, paths: Se
     if (data.destination !== "noord" && data.destination !== "renatovaldes") return null;
     return { ...result, destination: data.destination };
   }
+  if (name === "start_choice") {
+    return ["prototype", "agent", "install"].includes(data.path ?? "") ? { ...result, path: data.path! } : null;
+  }
+  if (name === "starter_open") {
+    return data.slug === "all" || starterSlugs.has(data.slug ?? "") ? { ...result, slug: data.slug! } : null;
+  }
+  if (name === "starter_download") {
+    return starterSlugs.has(data.slug ?? "") ? { ...result, slug: data.slug! } : null;
+  }
+  if (name === "setup_copy" || name === "interface_install") {
+    const slug = data.slug;
+    if (!slug || !paths.has(`/interfaces/${slug}`)) return null;
+    if (name === "interface_install") return data.method === "npm" ? { ...result, slug, method: "npm" } : null;
+    return { ...result, slug };
+  }
+  if (name === "updates_follow") {
+    return data.method === "rss" || data.method === "github" ? { ...result, method: data.method } : null;
+  }
+  if (name === "agent_setup_open") return result;
   if (name === "install_copy") {
     const method = data.method;
     if (method !== "npm" && method !== "cli" && method !== "shadcn") return null;
@@ -145,7 +166,7 @@ export function acquisitionChannel(location: Pick<Location, "href">, referrer: s
     const host = new URL(referrer).hostname.replace(/^www\./, "");
     if (host === "t.co" || host === "x.com" || host.endsWith("twitter.com")) return "twitter";
     if (host.endsWith("linkedin.com")) return "linkedin";
-    if (host.endsWith("threads.net")) return "threads";
+    if (host === "threads.net" || host.endsWith(".threads.net") || host === "threads.com" || host.endsWith(".threads.com")) return "threads";
     if (host === "github.com") return "github";
     if (host === "npmjs.com") return "npm";
     if (host.endsWith("producthunt.com")) return "producthunt";
@@ -215,6 +236,18 @@ export function initializeSiteAnalytics(publicPaths: string[]): void {
     try { url = new URL(anchor.href, window.location.href); } catch { return; }
     if (url.protocol !== "https:") return;
     const host = url.hostname;
+    if (productionHosts.has(host)) {
+      const path = normalizePath(url.pathname);
+      if (anchor.dataset.startPath) trackSiteEvent("start_choice", { path: anchor.dataset.startPath });
+      if (path === "/starters") trackSiteEvent("starter_open", { slug: starterSlugs.has(url.hash.slice(1)) ? url.hash.slice(1) : "all" });
+      const download = /^\/starter\/([a-z-]+)\.zip$/.exec(path);
+      if (download) trackSiteEvent("starter_download", { slug: download[1]! });
+      if (path === "/docs/agents") trackSiteEvent("agent_setup_open");
+      if (path === "/rss.xml") trackSiteEvent("updates_follow", { method: "rss" });
+    }
+    if (host === "github.com" && /^\/Noord-Ventures\/vlak\/releases(?:\/|\.atom|$)/i.test(url.pathname)) {
+      trackSiteEvent("updates_follow", { method: "github" });
+    }
     if (host === "noord.dev" || host === "www.noord.dev" || host === "noord.vc" || host === "www.noord.vc") {
       trackSiteEvent("network_click", { destination: "noord" });
     } else if (host === "renatovaldes.com" || host === "www.renatovaldes.com") {

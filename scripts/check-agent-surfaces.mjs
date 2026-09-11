@@ -31,7 +31,7 @@ assert(portableMcp.$schema === "https://agent-plugins.org/schemas/1.0.0/mcp.sche
 assert(portableMcp.mcpServers.vlak.type === "streamable-http", "Portable MCP transport must be Streamable HTTP");
 assert(portableMcp.mcpServers.vlak.url === "https://vlak.dev/mcp", "Portable MCP must use the stable Vlak endpoint");
 assert(claudePlugin.mcpServers === "./.mcp.json", "Claude plugin must use its compatible MCP config");
-assert(claudeMcp.mcpServers.vlak.args.includes("@noorddev/vlak-mcp"), "Claude MCP config must launch Vlak");
+assert(claudeMcp.mcpServers.vlak.args.includes(`@noorddev/vlak-mcp@${json("packages/mcp/package.json").version}`), "Claude MCP config must launch the matching Vlak release");
 assert(marketplace.plugins.some((entry) => entry.name === "vlak" && entry.source === "./plugins/vlak"), "Marketplace must expose the Vlak plugin");
 assert(openAiMarketplace.plugins.some((entry) => entry.name === "vlak" && entry.source.path === "./plugins/vlak"), "OpenAI marketplace must expose the Vlak plugin");
 assert(skill.startsWith("---\nname: use-vlak\n"), "Vlak skill needs valid frontmatter");

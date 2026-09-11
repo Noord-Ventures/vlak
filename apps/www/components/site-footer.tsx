@@ -13,6 +13,8 @@ const groups = [
     links: [
       { href: "/", title: "Home" },
       { href: "/about/", title: "About" },
+      { href: "/updates/", title: "Updates" },
+      { href: "/rss.xml", title: "RSS feed" },
       { href: "/privacy/", title: "Privacy" },
       { href: "/terms/", title: "Terms" },
       { href: DOOR, title: "vlak.dev" },
@@ -32,6 +34,7 @@ const groups = [
       { href: "/showcase/", title: "Built with Vlak" },
       { href: "/docs/", title: "Docs" },
       { href: person.repo, title: "GitHub" },
+      { href: `${person.repo}/releases`, title: "GitHub releases" },
     ],
   },
   {
@@ -57,7 +60,7 @@ export function SiteFooter() {
             <ul {...sx("site-footer-links", footer.links, group.id === "use-cases" && footer.categoryLinks)}>
               {group.links.map(link => (
                 <li key={link.href} {...sx("", footer.item)}>
-                  <Link href={link.href} {...sx("site-footer-link", footer.link)}>{link.title}</Link>
+                  <Link prefetch={false} href={link.href} {...sx("site-footer-link", footer.link)}>{link.title}</Link>
                 </li>
               ))}
             </ul>

@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "vlak",
-  "version": "0.1.0",
+  "version": "0.5.0",
   "description": "Design and implement accessible product interfaces with the Vlak component system.",
   "author": {
     "name": "Noord Ventures",

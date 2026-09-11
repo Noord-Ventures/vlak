@@ -2,7 +2,7 @@
   "mcpServers": {
     "vlak": {
       "command": "npx",
-      "args": ["-y", "@noorddev/vlak-mcp"]
+      "args": ["-y", "@noorddev/vlak-mcp@0.5.0"]
     }
   }
 }

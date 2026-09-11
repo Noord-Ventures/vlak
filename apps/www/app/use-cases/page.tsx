@@ -11,7 +11,7 @@ import "../interfaces/interfaces.css";
 
 export const metadata: Metadata = pageMetadata("/use-cases", {
   title: "Use cases",
-  description: "Components and interface studies for enterprise, consumer, agent, data-heavy, scientific, healthcare, and industrial software.",
+  description: "React product prototyping guides, components, and interface studies for enterprise, consumer, AI, data-heavy, scientific, healthcare, and industrial software.",
 }, { searchTitle: "React design system use cases · Vlak" });
 
 export default function UseCasesPage() {

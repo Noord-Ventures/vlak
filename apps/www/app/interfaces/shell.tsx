@@ -6,7 +6,7 @@ import { type InterfaceSlug, interfaceBySlug, orderedInterfaces, mobilePatterns 
 import { interfaces } from "./interfaces.stylex";
 import { InterfacesNav } from "./nav";
 import { StartBuilding } from "./start-building";
-import { DuoStart } from "./duo-start";
+import { InterfaceStart } from "./duo-start";
 import { InterfacePreviewProvider, InterfacePreview, PreviewButton } from "./preview";
 import { InterfaceFilm } from "./interface-film";
 import { hasInterfaceFilm, INTERFACE_FILM_DURATION, INTERFACE_FILM_UPLOAD_DATE } from "./films";
@@ -70,7 +70,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
               <h1 id={`${slug}-name`}>{proto.title}</h1>
               <div className="if-study-actions"><PreviewButton /><a className="rs-btn-primary if-build-link" href="#build-with-vlak">Build with Vlak <span aria-hidden="true">↓</span></a></div>
             </header>
-            {slug === "ios" && <DuoStart source={source} />}
+            <InterfaceStart source={source} slug={slug} title={proto.title} />
             <InterfacePreview><div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, workbench && interfaces.workbenchSpecimen)}>{children}</div></InterfacePreview>
             <div className="if-study-caption"><p>{proto.use}</p>{slug !== "ios" && <a href={source}>View source <span aria-hidden="true">↗</span></a>}</div>
           </InterfacePreviewProvider>

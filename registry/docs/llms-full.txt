@@ -1,6 +1,6 @@
 # Vlak guide
 
-Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 231 components in 21 categories: actions (14), forms (28), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), ios (8), android (8), ai (47), health (13), civic (5), science (10), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.4.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
+Vlak is a minimal design system built from paper, ink, gray, hairlines, and a 204px module. 231 components in 21 categories: actions (14), forms (28), navigation (9), feedback (13), surfaces (8), content (22), icons (1), charts (7), patterns (13), ios (8), android (8), ai (47), health (13), civic (5), science (10), creative (11), engineering (2), geospatial (3), robotics (3), electronics (3), microbiology (3). Version 0.5.0. Site: https://vlak.dev. Source: https://github.com/Noord-Ventures/vlak.
 
 Three install paths share one source, so nothing drifts: the React package (precompiled StyleX plus one stylesheet), the vendored source (the shadcn model, through the Vlak CLI or the shadcn CLI), and CSS only (`rs-*` classes on plain markup).
 
@@ -526,7 +526,7 @@ npx shadcn add https://vlak.dev/r/check-in.json
 
 # Vlak iOS components
 
-8 React components with iOS control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.4.0.
+8 React components with iOS control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.5.0.
 
 ## Runtime and integration
 
@@ -588,7 +588,7 @@ npx @noorddev/vlak-cli docs ios-switch
 
 # Vlak Android components
 
-8 React components with Material control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.4.0.
+8 React components with Material control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.5.0.
 
 ## Runtime and integration
 
@@ -650,7 +650,7 @@ npx @noorddev/vlak-cli docs android-switch
 
 # Vlak AI components
 
-47 AI components and 2 existing companion primitives, generated from the 231-component registry. Each linked record includes the exact exports, props, install commands, keyboard behavior, and accessibility contract. Version 0.4.0.
+47 AI components and 2 existing companion primitives, generated from the 231-component registry. Each linked record includes the exact exports, props, install commands, keyboard behavior, and accessibility contract. Version 0.5.0.
 
 ## Start here
 

@@ -1,6 +1,6 @@
 {
   "name": "@noorddev/vlak-mcp",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "mcpName": "io.github.Noord-Ventures/vlak",
   "description": "MCP server for the Vlak design system: components, props, docs, tokens, and install commands for coding agents. Works offline.",
   "license": "MIT",
@@ -29,6 +29,7 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@noorddev/vlak": "workspace:*",
     "@types/node": "^26.4.1",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3",

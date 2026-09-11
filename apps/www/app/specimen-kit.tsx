@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { catalogComponents } from "@noorddev/vlak";
 import { Preview } from "@/components/preview";
@@ -30,17 +28,17 @@ export function SpecimenKit() {
             aria-label={component.title}
           >
             <p className="specimen-kit-name">
-              <Link href={`/components/${component.name}`}>{component.title}</Link>
+              <Link href={`/components/${component.name}`} prefetch={false}>{component.title}</Link>
             </p>
             <div className="specimen-kit-live">
-              <Preview name={component.name} snippet={component.snippet} />
+              <Preview name={component.name} snippet={component.snippet} defer />
             </div>
           </section>
         );
       })}
       <section {...sx("specimen-cell specimen-cell-more", specimen.cell)} aria-label="More components">
         <p className="specimen-more">
-          <Link href="/components">Browse {more} more components</Link>
+          <Link href="/components" prefetch={false}>Browse {more} more components</Link>
         </p>
       </section>
     </>

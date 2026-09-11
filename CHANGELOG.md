@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.5.0 (unreleased)
+
+This candidate brings the published packages into line with the component reference. It is not a publication announcement. The release is available only after all four npm packages pass the published-release check.
+
+### Components and interactions
+
+- iOS and Android navigation, search, lists, sheets, and controls follow platform conventions and retain system fonts.
+- AI conversations, structured results, widgets, approvals, and workflow components include explicit application and provider boundaries. Optional Markdown, highlighting, JSX, and workflow engines remain separate imports.
+- Scientific, healthcare, industrial, creative, and data components carry units, record identity, status, and supplied-data contracts.
+- Menu placement, dialog focus behavior, input and timeline interactions, and keyboard coverage include the fixes already documented on the site.
+
+### Source and agents
+
+- CLI source updates include baselines, status and diff, reviewed update plans, interrupted-write recovery, and guarded rollback.
+- Workflow kits expose example source, adapter contracts, and machine-readable manifests through the registry and MCP server.
+- The portable plugin, its Claude-compatible manifest, MCP configuration, server descriptor, and package versions are aligned. The stdio plugin pins this MCP version.
+
+### Distribution
+
+- Five standalone interface starters install the same public Vlak version used by the site. Downloads do not rely on private snapshots or unpublished package aliases.
+- Production site builds require all four npm `latest` tags to match the release and verify their tarball integrity, export maps, and generated package payloads against the checkout.
+- Release tags must match the package, plugin, registry, and server versions. Published-package verification runs after npm publication and before the site can pass its production gate.
+
+### Upgrade
+
+Install matching 0.5.0 versions of the core and React packages after publication. Keep the existing stylesheet import. For vendored source, review `vlak status`, `vlak diff`, and an update plan before applying changes. Check each optional renderer's documented dependencies before adding it to a project.
+
 ## 0.4.0
 
 Vlak becomes a package you can install three ways, with one source of paint behind all of them.

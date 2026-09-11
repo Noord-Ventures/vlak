@@ -1,6 +1,7 @@
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { workflowCatalog } from "../../../examples/workflows/catalog.ts";
+import { workflowManifestForRelease } from "./workflow-manifest.mjs";
 
 const root = fileURLToPath(new URL("../../../", import.meta.url));
 const output = `${root}registry`;
@@ -18,6 +19,9 @@ export function buildWorkflows() {
     }
   }
   visit("examples/workflows");
+  const manifestPath = "examples/workflows/package.json";
+  const version = JSON.parse(readFileSync(`${root}packages/core/package.json`, "utf8")).version;
+  files[manifestPath] = JSON.stringify(workflowManifestForRelease(JSON.parse(files[manifestPath]), version), null, 2) + "\n";
   const ids = new Set();
   for (const kit of workflowCatalog) {
     if (ids.has(kit.id)) throw new Error(`Duplicate workflow: ${kit.id}`);

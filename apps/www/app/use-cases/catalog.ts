@@ -1,5 +1,18 @@
 export const useCases = [
   {
+    slug: "product-prototyping",
+    title: "Product prototyping",
+    searchTitle: "React design system for product prototyping · Vlak",
+    summary: "Prototype product behavior in React with fixed visual rules, working interactions, and explicit empty, loading, and failure states.",
+    interfaceSlugs: ["ios", "calendar", "reconciliation", "line"],
+    componentNames: ["button", "field", "input", "dialog", "empty", "progress", "tabs"],
+    principles: [
+      "Start with one task and the state changes it needs. Add a component when the task calls for it.",
+      "Keep paper, ink, type, spacing, and borders consistent while testing different product decisions.",
+      "Separate a working local prototype from the services, permissions, and persistence required to ship it.",
+    ],
+  },
+  {
     slug: "enterprise-software",
     title: "Enterprise software",
     searchTitle: "React components for enterprise software · Vlak",
@@ -29,9 +42,9 @@ export const useCases = [
     slug: "agent-interfaces",
     title: "Agent interfaces",
     searchTitle: "React components for AI agent interfaces · Vlak",
-    summary: "Compose queues, activity, approvals, prompts, and results without turning the interface into decoration.",
+    summary: "Build AI product interfaces in React with visible task state, inspectable output, explicit approvals, and a clear boundary around tool execution.",
     interfaceSlugs: ["agents", "line"],
-    componentNames: ["assistant", "activity-timeline", "command", "progress", "data-table", "textarea", "dialog"],
+    componentNames: ["assistant", "confirmation", "widget", "activity-timeline", "progress", "textarea", "dialog"],
     principles: [
       "Keep a task, its run state, and the approval that affects it in the same context.",
       "Treat generated output as inspectable content. Preserve selection, copying, provenance, and failure states.",
@@ -42,8 +55,8 @@ export const useCases = [
     slug: "data-heavy-software",
     title: "Data-heavy software",
     searchTitle: "React components for data-heavy dashboards · Vlak",
-    summary: "Build dense working views with tables, filters, status, charts, and record inspectors.",
-    interfaceSlugs: ["press", "night", "orbit"],
+    summary: "Build data-heavy React interfaces with readable tables, persistent filters, record inspectors, and explicit missing, stale, and error states.",
+    interfaceSlugs: ["reconciliation", "press", "night", "orbit"],
     componentNames: ["data-table", "filter-bar", "description-list", "badge", "progress", "bar-chart", "drawer"],
     principles: [
       "Keep filters close to the records they change and preserve the selected record when the result set changes.",

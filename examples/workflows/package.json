@@ -11,7 +11,7 @@
     "ui": "vite --config record-review/ui/vite.config.ts"
   },
   "dependencies": {
-    "@noorddev/vlak-react": "^0.4.0",
+    "@noorddev/vlak-react": "workspace:*",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

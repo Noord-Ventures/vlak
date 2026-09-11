@@ -25,12 +25,15 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Release declarations and publication failure gates
+        run: node scripts/check-release.mjs && node --test scripts/release.test.mjs
+      # Workspace consumers resolve the packages' generated declarations.
+      - name: Build packages
+        run: pnpm build
       - name: Typecheck (packages and site)
         run: pnpm typecheck && pnpm --filter www typecheck
       - name: Lint
         run: pnpm lint
-      - name: Build packages
-        run: pnpm build
       - name: Reference app route types, typecheck, and server tests
         env:
           AI_REFERENCE_MODE: fixture
