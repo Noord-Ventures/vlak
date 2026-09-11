@@ -58,6 +58,10 @@ const title = (s) => s === "ai" ? "AI" : s === "ios" ? "iOS" : domainCollections
 
 const docUrl = (name) => `${HOST}/docs/${name}.md`;
 const pageUrl = (name) => `${HOST}/${catalogComponents.find(component => component.name === name)?.category === "ai" ? "ai" : "components"}/${name}/`;
+const platformCollections = [
+  { name: "ios", title: "iOS", patterns: "iOS control geometry", sample: "ios-switch", exported: "IOSSwitch" },
+  { name: "android", title: "Android", patterns: "Material control geometry", sample: "android-switch", exported: "AndroidSwitch" },
+];
 const aiCompanionNames = ["message-composer", "tree-view"];
 const aiComponents = catalogComponents.filter(component => component.category === "ai");
 const aiCompanions = aiCompanionNames.map(name => {
@@ -132,6 +136,8 @@ function componentPage(c) {
   if (c.aliases?.length) facts.push(`Also known as: ${c.aliases.join(", ")}`);
   facts.push(`Page: ${pageUrl(c.name)}`);
   parts.push(facts.join("  \n"));
+  const platform = platformCollections.find(collection => collection.name === c.category);
+  if (platform) parts.push(`[${platform.title} component index](${docUrl(platform.name)}) · [Interactive component catalog](${HOST}/components/#${platform.name}) · [Related ${platform.title} interface study](${HOST}/interfaces/${platform.name}/)`);
   if (c.category === "ai" || aiCompanionNames.includes(c.name)) parts.push(`[AI component index](${docUrl("ai-index")}) · [Integration guide](${docUrl("ai")}) · [AI Elements feature coverage](${docUrl("ai-parity")})`);
   if (c.usage) {
     parts.push(`## When to use\n\n${list(c.usage.use)}`);
@@ -155,9 +161,44 @@ function indexPage() {
   const parts = [`# Vlak components`, `${catalogComponents.length} components in ${vlakCategories.length} categories. Each page lists install paths, a React example, props, keyboard, and accessibility notes. Version ${VERSION}.`];
   for (const [category, items] of byCategory) {
     if (!items.length) continue;
-    parts.push(`## ${title(category)}\n\n${list(items.map((c) => `[${c.title}](${c.name}.md): ${c.description}`))}`);
+    const platform = platformCollections.find(collection => collection.name === category);
+    const overview = platform ? `[${platform.title} component index](${platform.name}.md): exports, integration boundaries, and related interface study.\n\n` : "";
+    parts.push(`## ${title(category)}\n\n${overview}${list(items.map((c) => `[${c.title}](${c.name}.md): ${c.description}`))}`);
   }
   parts.push(`## Also\n\n${list([`[Guide](guide.md): install, theming, layers, StyleX, CSS, CLI, registry, conventions`, `[AI component index](ai-index.md): AI surfaces, companion primitives, and optional renderer imports`, `[AI integration](ai.md): application contracts and the runnable assistant`, `[AI Elements coverage](ai-parity.md): functional mappings and deliberate differences`, `[Tokens](tokens.md): every custom property, light and dark`, `[Registry index](${HOST}/r/index.json): the shadcn-compatible registry`, `[Props JSON](${HOST}/docs/props.json): every export and its props as data`])}`);
+  return `${parts.join("\n\n")}\n`;
+}
+
+/** Platform records stay related to their studies without claiming the study imports these leaves. */
+function platformIndexPage(collection) {
+  const entries = catalogComponents.filter(component => component.category === collection.name);
+  const parts = [
+    `# Vlak ${collection.title} components`,
+    `${entries.length} React components with ${collection.patterns}, Inter typography, and Vlak's paper-and-ink palette. Version ${VERSION}.`,
+    "## Runtime and integration",
+    "These components render HTML in React websites and web apps. Installation supplies JavaScript, TypeScript declarations, and CSS. Platform control names describe the UI patterns; use the Vlak exports and props listed in the component records.",
+    "The application owns navigation, records, persistence, and connections to device or account services. Each record documents its controlled or uncontrolled state, keyboard behavior, native HTML element, and forwarded ref. CSS-only markup supplies the visual structure; the application owns its event handling and state updates.",
+    `## Install\n\n${fence("sh", `npm install ${REACT}`)}\n\n${fence("tsx", `import "${REACT}/css";\nimport { ${collection.exported} } from "${REACT}";\n\n<${collection.exported} aria-label="Background sync" defaultChecked />`)}`,
+    `Per-component imports use \`${REACT}/components/${collection.sample}\`. The individual records also include Vlak CLI and shadcn registry commands.`,
+    "## Component records",
+    table(["Component", "React exports", "Purpose"], entries.map(component => [
+      `[${component.title}](${docUrl(component.name)})`,
+      (props.components[component.name]?.exports ?? []).filter(entry => entry.kind === "component").map(entry => code(entry.name)).join(", "),
+      component.description,
+    ])),
+    "## Related interface study",
+    `The [${collection.title} interface](${HOST}/interfaces/${collection.name}/) is a separate browser study with local apps and device views. It shares platform patterns with this collection and has its own application implementation. The reusable components can be installed independently of that study and its device chrome.`,
+    list([
+      `[Interactive component catalog](${HOST}/components/#${collection.name})`,
+      `[Interface source](https://github.com/Noord-Ventures/vlak/tree/main/apps/www/app/interfaces/mobile-os)`,
+      `[Platform study reference](https://github.com/Noord-Ventures/vlak/blob/main/apps/www/app/interfaces/mobile-os/${collection.name}-reference.md)`,
+      `[React component source](https://github.com/Noord-Ventures/vlak/tree/main/packages/react/src/components)`,
+    ]),
+    "## Agent and data access",
+    `MCP \`get_guide\` with \`page: "${collection.name}"\` returns this index; the same Markdown is available at \`vlak://docs/${collection.name}\`. \`list_components\` with \`category: "${collection.name}"\` returns the collection. Read the selected component with \`get_component\` and its install instructions with \`get_install\` before writing imports. The [props JSON](${HOST}/docs/props.json) and [registry index](${HOST}/r/index.json) expose the same records as structured data.`,
+    fence("sh", `npx ${CLI} docs ${collection.name}\nnpx ${CLI} search "${collection.title}" --json\nnpx ${CLI} docs ${collection.sample}`),
+    `[Component index](${docUrl("index")}) · [Agent guide](${docUrl("agents")}) · [Full documentation](${HOST}/llms-full.txt)`,
+  ];
   return `${parts.join("\n\n")}\n`;
 }
 
@@ -413,7 +454,7 @@ ${fence("json", `{
   }
 }`)}
 
-The server exposes component search and records, tokens, install commands, and guides. Call \`get_guide\` without arguments for the general guide, or with \`page: "ai-index"\`, \`page: "ai"\`, \`page: "ai-parity"\`, or \`page: "agents"\`. These guides are also available as \`vlak://docs/<name>\` resources. All tools are read-only. Structured results carry output schemas and structured MCP content.
+The server exposes component search and records, tokens, install commands, and guides. Call \`get_guide\` without arguments for the general guide, or with \`page: "ai-index"\`, \`page: "ai"\`, \`page: "ai-parity"\`, or \`page: "agents"\`. For browser UI with iOS or Android patterns, use \`page: "ios"\` or \`page: "android"\` for exact exports and related interface studies. These guides are also available as \`vlak://docs/<name>\` resources. All tools are read-only. Structured results carry output schemas and structured MCP content.
 
 Install it in a supported coding client:
 
@@ -483,6 +524,7 @@ function llmsIndex() {
     `- [Guide](${docUrl("guide")}): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents`,
     `- [Agent guide](${docUrl("agents")}): machine-readable surfaces, CLI commands, and MCP setup`,
     `- [Component index](${docUrl("index")}): the catalogue by category`,
+    ...platformCollections.map(collection => `- [${collection.title} component index](${docUrl(collection.name)}): browser React exports, integration boundaries, and related interface study`),
     `- [Health guide](${docUrl("health")}): health, wellness, and care components with data and action contracts`,
     `- [AI component index](${docUrl("ai-index")}): ${aiComponents.length} AI components, companion primitives, optional engine imports and widget patterns`,
     `- [AI interfaces](${docUrl("ai")}): integration recipes, application boundaries and the runnable assistant with durable history and verified approvals`,
@@ -513,6 +555,11 @@ const ai = read(repoPath("docs/ai.md"));
 const aiParity = read(repoPath("docs/ai-parity.md"));
 const aiIndex = aiIndexPage();
 const agents = agentsPage();
+const platforms = platformCollections.map(collection => {
+  const page = platformIndexPage(collection);
+  write(`${collection.name}.md`, page);
+  return page;
+});
 const domains = domainCollections.map(collection => {
   const page = domainPage(collection);
   write(`${collection.name}.md`, page);
@@ -529,7 +576,7 @@ write("ai-index.md", aiIndex);
 write("llms.txt", llmsIndex());
 write(
   "llms-full.txt",
-  [guide, agents, tokens, health, aiIndex, ai, aiParity, ...domains, ...[...pages.values()]].join("\n\n---\n\n"),
+  [guide, agents, tokens, health, ...platforms, aiIndex, ai, aiParity, ...domains, ...[...pages.values()]].join("\n\n---\n\n"),
 );
 
 /* Hidden entries are documented too, for the CLI and MCP only. */

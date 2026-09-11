@@ -79,6 +79,22 @@ describe("vlak-mcp", () => {
     }
   });
 
+  it("finds each Material 3 browser component across spacing and punctuation", async () => {
+    for (const [control, name] of [
+      ["top app bar", "android-app-bar"], ["navigation bar", "android-navigation"],
+      ["search bar", "android-search-bar"], ["switch", "android-switch"],
+      ["list", "android-list"], ["filter chip", "android-chip"],
+      ["floating action button", "android-fab"], ["bottom sheet", "android-sheet"],
+    ] as const) {
+      for (const term of [`Material3 ${control}`, `MATERIAL-3 ${control.toUpperCase()}`]) {
+        const found = JSON.parse(textOf(await client.callTool({ name: "search_components", arguments: { term } })));
+        expect(found.hits.map((hit: { name: string }) => hit.name), term).toContain(name);
+      }
+    }
+    const appBar = JSON.parse(textOf(await client.callTool({ name: "get_component", arguments: { name: "android-app-bar" } })));
+    expect(appBar.aliases).not.toContain("center-aligned top app bar");
+  });
+
   it("returns canonical AI pages and explicit optional installation metadata", async () => {
     const response = JSON.parse(textOf(await client.callTool({ name: "get_component", arguments: { name: "response-markdown" } })));
     expect(response.page).toBe("https://vlak.dev/ai/response-markdown/");
@@ -104,6 +120,37 @@ describe("vlak-mcp", () => {
     expect(index).toContain("/docs/tree-view.md");
     expect(index).toContain("/ai/widgets/");
     expect(index).toContain("/components/workflow-canvas");
+  });
+
+  it("exposes both browser platform indexes, every component record, and matching resources", async () => {
+    const resources = (await client.listResources()).resources.map(resource => resource.uri);
+    const families = [
+      { category: "ios", title: "iOS", names: ["ios-navigation-bar", "ios-tab-bar", "ios-search-field", "ios-switch", "ios-list", "ios-segmented-control", "ios-slider", "ios-sheet"] },
+      { category: "android", title: "Android", names: ["android-app-bar", "android-navigation", "android-search-bar", "android-switch", "android-list", "android-chip", "android-fab", "android-sheet"] },
+    ];
+    for (const { category, title, names } of families) {
+      const result = await client.callTool({ name: "get_guide", arguments: { page: category } });
+      expect(result.isError).not.toBe(true);
+      const markdown = textOf(result);
+      expect(result.structuredContent).toEqual({ page: category, markdown });
+      expect(markdown).toContain(`# Vlak ${title} components`);
+      expect(markdown).toContain("render HTML in React websites and web apps");
+      expect(markdown).toContain(`/interfaces/${category}/`);
+      expect(markdown).toContain("its own application implementation");
+      expect(resources).toContain(`vlak://docs/${category}`);
+      expect(resourceText(await client.readResource({ uri: `vlak://docs/${category}` }))).toBe(markdown);
+      const listed = JSON.parse(textOf(await client.callTool({ name: "list_components", arguments: { category } })));
+      expect(listed.components.map((entry: { name: string }) => entry.name).sort()).toEqual([...names].sort());
+      for (const name of names) {
+        expect(markdown).toContain(`/docs/${name}.md`);
+        const component = JSON.parse(textOf(await client.callTool({ name: "get_component", arguments: { name } })));
+        expect(component.docs).toContain(`/docs/${category}.md`);
+        expect(component.page).toBe(`https://vlak.dev/components/${name}/`);
+        for (const exported of component.props as Array<{ name: string; kind: string }>) {
+          if (exported.kind === "component") expect(markdown).toContain(`\`${exported.name}\``);
+        }
+      }
+    }
   });
 
   it("gives install commands and the guide and tokens pages", async () => {

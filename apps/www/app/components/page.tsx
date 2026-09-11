@@ -8,7 +8,8 @@ import { DocsNav } from "@/components/docs-nav";
 import { Preview } from "@/components/preview";
 import { sx } from "@/lib/sx";
 import { categoryTitle } from "@/lib/category-title";
-import { DOOR } from "../specimen";
+import { StructuredData, breadcrumbData } from "@/components/structured-data";
+import { HOST } from "../specimen";
 
 function iconGroupSlug(title: string) {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, "-");
@@ -17,7 +18,7 @@ function iconGroupSlug(title: string) {
 export const metadata: Metadata = pageMetadata("/components", {
   title: "Components",
   description: `${catalogComponents.length} components, each with a live preview, install path, props, keyboard behavior, and accessibility notes.`,
-  alternates: { canonical: `${DOOR}/components/` },
+  alternates: { types: { "text/markdown": "/docs/index.md" } },
 });
 
 export default function ComponentsPage() {
@@ -25,6 +26,32 @@ export default function ComponentsPage() {
     <div className="site-layout catalog-page">
       <DocsNav />
       <main id="main" {...sx("site-content", chrome.catalogContent)}>
+        <StructuredData value={[
+          breadcrumbData([{ name: "Vlak", url: `${HOST}/` }, { name: "Components", url: `${HOST}/components/` }]),
+          {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": `${HOST}/components/#collection`,
+            name: "Vlak React components",
+            url: `${HOST}/components/`,
+            isPartOf: { "@id": `${HOST}/#website` },
+            hasPart: ["ios", "android"].map(platform => ({
+              "@type": "CollectionPage",
+              "@id": `${HOST}/components/#${platform}`,
+              url: `${HOST}/components/#${platform}`,
+              name: `${categoryTitle(platform)} components`,
+              mainEntity: {
+                "@type": "ItemList",
+                itemListElement: catalogComponents.filter(component => component.category === platform).map((component, index) => ({
+                  "@type": "ListItem",
+                  position: index + 1,
+                  name: component.title,
+                  url: `${HOST}/components/${component.name}/`,
+                })),
+              },
+            })),
+          },
+        ]} />
         <header {...sx("cover", chrome.cover)}>
           <h1 className="rs-t-display">Components</h1>
           <p className="rs-t-sub">

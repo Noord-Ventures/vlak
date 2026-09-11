@@ -50,7 +50,8 @@
       "aliases": [
         "Material search bar",
         "Android search field",
-        "search input"
+        "search input",
+        "Material 3 search bar"
       ],
       "example": "import { AndroidSearchBar } from \"@noorddev/vlak-react\";\n\n<AndroidSearchBar aria-label=\"Search documents\" placeholder=\"Search documents\" value={query} onValueChange={setQuery} />",
       "usage": {

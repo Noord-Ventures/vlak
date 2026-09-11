@@ -4,8 +4,10 @@ A Material floating action button with an optional extended text label.
 
 Category: android  
 Name: `android-fab`  
-Also known as: Material FAB, Android extended FAB, floating action button  
+Also known as: Material FAB, Android extended FAB, floating action button, Material 3 floating action button  
 Page: https://vlak.dev/components/android-fab/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

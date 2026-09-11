@@ -146,6 +146,8 @@
 
 ## iOS
 
+[iOS component index](ios.md): exports, integration boundaries, and related interface study.
+
 - [iOS navigation bar](ios-navigation-bar.md): Compact or large-title navigation with circular actions and an optional vertical rail.
 - [iOS tab bar](ios-tab-bar.md): Floating peer tabs with icon labels, roving focus and horizontal or vertical placement.
 - [iOS search field](ios-search-field.md): A 48px search capsule with a native input and a separate clear action.
@@ -156,6 +158,8 @@
 - [iOS sheet](ios-sheet.md): A native modal bottom sheet with a centered title, grabber and deliberate entrance.
 
 ## Android
+
+[Android component index](android.md): exports, integration boundaries, and related interface study.
 
 - [Android app bar](android-app-bar.md): A Material app bar with a title, navigation action and trailing actions in Vlak tones.
 - [Android navigation](android-navigation.md): Material destination indicators for a bottom navigation bar or vertical rail.

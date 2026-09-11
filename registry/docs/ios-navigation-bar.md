@@ -7,6 +7,8 @@ Name: `ios-navigation-bar`
 Also known as: UIKit navigation bar, UINavigationBar, iOS toolbar, Duo vertical toolbar  
 Page: https://vlak.dev/components/ios-navigation-bar/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A compact app title, a large root-screen title, or a trailing vertical action rail.

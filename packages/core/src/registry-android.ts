@@ -53,7 +53,7 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material top app bar",
       "Android toolbar",
-      "center-aligned top app bar"
+      "Material 3 top app bar"
     ]
   },
   {
@@ -119,7 +119,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material navigation bar",
       "Android navigation rail",
-      "bottom navigation"
+      "bottom navigation",
+      "Material 3 navigation bar"
     ]
   },
   {
@@ -175,7 +176,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material search bar",
       "Android search field",
-      "search input"
+      "search input",
+      "Material 3 search bar"
     ]
   },
   {
@@ -221,7 +223,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material switch",
       "Android toggle",
-      "Expressive switch"
+      "Expressive switch",
+      "Material 3 switch"
     ]
   },
   {
@@ -246,7 +249,9 @@ export const androidComponents: VlakComponent[] = [
       "components/android-list.css"
     ],
     "react": "components/android-list.tsx",
-    "registryDependencies": ["android-switch"],
+    "registryDependencies": [
+      "android-switch"
+    ],
     "snippet": "<ul class=\"rs-android-list\" aria-label=\"Connections\"><li class=\"rs-android-list-row\"><button class=\"rs-android-list-body rs-android-list-action rs-android-list-two-line\" type=\"button\"><span class=\"rs-android-list-copy\"><span class=\"rs-android-list-headline\">Wi-Fi</span><span class=\"rs-android-list-secondary\">Studio network</span></span></button><span class=\"rs-android-list-trailing\">Connected</span></li><li class=\"rs-android-list-row\"><div class=\"rs-android-list-body\"><span class=\"rs-android-list-copy\"><span class=\"rs-android-list-headline\">Device name</span></span></div><span class=\"rs-android-list-trailing\">Pixel</span></li></ul>",
     "example": "import { AndroidList, AndroidListRow, AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<AndroidList aria-label=\"Connections\">\n  <AndroidListRow headline=\"Wi-Fi\" supportingText=\"Studio network\" onAction={openNetworks} trailing={<AndroidSwitch aria-label=\"Wi-Fi enabled\" defaultChecked />} />\n  <AndroidListRow headline=\"Device name\" supportingText=\"Pixel\" />\n</AndroidList>",
     "usage": {
@@ -277,7 +282,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material list item",
       "Android settings row",
-      "Expressive segmented list"
+      "Expressive segmented list",
+      "Material 3 list"
     ]
   },
   {
@@ -325,7 +331,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material filter chip",
       "Android filter chip",
-      "selectable chip"
+      "selectable chip",
+      "Material 3 filter chip"
     ]
   },
   {
@@ -342,7 +349,9 @@ export const androidComponents: VlakComponent[] = [
       "components/android-fab.css"
     ],
     "react": "components/android-fab.tsx",
-    "registryDependencies": ["icons"],
+    "registryDependencies": [
+      "icons"
+    ],
     "snippet": "<button class=\"rs-android-fab rs-android-fab-extended\" type=\"button\"><span class=\"rs-android-fab-icon\" aria-hidden=\"true\">+</span>New document</button>",
     "example": "import { AndroidFab, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidFab icon={<Icon name=\"plus\" size={24} />} onClick={createDocument}>New document</AndroidFab>",
     "usage": {
@@ -371,7 +380,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material FAB",
       "Android extended FAB",
-      "floating action button"
+      "floating action button",
+      "Material 3 floating action button"
     ]
   },
   {
@@ -430,7 +440,8 @@ export const androidComponents: VlakComponent[] = [
     "aliases": [
       "Material modal bottom sheet",
       "Android bottom sheet",
-      "modal sheet"
+      "modal sheet",
+      "Material 3 bottom sheet"
     ]
   }
 ];

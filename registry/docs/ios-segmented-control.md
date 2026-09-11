@@ -7,6 +7,8 @@ Name: `ios-segmented-control`
 Also known as: UISegmentedControl, iOS segmented picker  
 Page: https://vlak.dev/components/ios-segmented-control/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A small set of mutually exclusive modes or filters.

@@ -53,7 +53,7 @@
       "aliases": [
         "Material top app bar",
         "Android toolbar",
-        "center-aligned top app bar"
+        "Material 3 top app bar"
       ],
       "example": "import { AndroidAppBar, AndroidAppBarAction, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidAppBar title=\"Documents\" navigation={<AndroidAppBarAction aria-label=\"Go back\" onClick={goBack}><Icon name=\"arrow-left\" /></AndroidAppBarAction>} />",
       "usage": {

@@ -77,7 +77,7 @@
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-clock-tabs button > span:not(.rs-icon) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-screen:has(> .mo-clock-tabs) > .mo-scroll { padding-bottom: 20px; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] .mo-screen:has(> .mo-clock-tabs) > .mo-app-actions { margin-bottom: 0; }
-.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] > .mo-ios-gesture-nav { position: absolute; bottom: 0; left: 0; right: 84px; height: 34px; min-height: 34px; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"] > .mo-ios-gesture-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 34px; min-height: 34px; }
 
 /* Rotating the outer display carries its corner lens to the bottom. Native
    status text compresses away, leaving an accessible Control Center target. */
@@ -86,6 +86,9 @@
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"] > .mo-status-bar { top: auto; bottom: 20px; height: 48px; opacity: 0; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"] > .mo-status-bar > button:first-child { display: none; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"] > .mo-status-bar:focus-within { opacity: 1; background: var(--bg); border-radius: 24px; }
+/* The focused system trigger stays above the camera while its panel is open.
+   App navigation keeps its own rail positions when the panel is closed. */
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"][data-overlay="quick"] > .mo-status-bar { top: 16px; bottom: auto; }
 
 /* Inner portrait returns to the horizontal native toolbar and tab capsule. */
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="horizontal"] { display: block; }
@@ -138,7 +141,13 @@
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail { display: flex; position: absolute; z-index: 7; right: -76px; bottom: 14px; width: 48px; height: 48px; min-height: 48px; min-width: 48px; padding: 12px; gap: 0; font-size: 0; border-radius: 50%; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail::before { inset: 0; border-radius: inherit; }
 .mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail .rs-icon { width: 20px; height: 20px; }
-.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-tools { justify-content: center; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-ios-home-tools { position: absolute; inset: auto calc(-1 * var(--mo-duo-rail-width)) 0 0; margin: 0; min-height: 44px; padding: 0; justify-content: center; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-layout="vertical"][data-app="home"]:not([data-overlay]) .mo-library-page { position: static; }
+/* The rotated outer display has a lower corner camera. Stack the Home rail
+   above that exclusion area, with space between its dock and Search target. */
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"][data-app="home"]:not([data-overlay]) .mo-dock { top: calc(50% - 16px); }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"][data-app="home"]:not([data-overlay]) .mo-ios-home-search-rail { bottom: 44px; }
+.mo.mo-single .mo-device[data-device="iphone-duo"] .mo-phone[data-duo-display="outer"][data-duo-orientation="landscape"][data-app="home"]:not([data-overlay]) > .mo-status-bar { top: 16px; bottom: auto; }
 
 /* Native sheets preserve an 8pt outer gutter. Outer sheets retain a vertical
    action column; the inner display gives sheets their own horizontal bar. */

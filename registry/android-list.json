@@ -56,7 +56,8 @@
       "aliases": [
         "Material list item",
         "Android settings row",
-        "Expressive segmented list"
+        "Expressive segmented list",
+        "Material 3 list"
       ],
       "example": "import { AndroidList, AndroidListRow, AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<AndroidList aria-label=\"Connections\">\n  <AndroidListRow headline=\"Wi-Fi\" supportingText=\"Studio network\" onAction={openNetworks} trailing={<AndroidSwitch aria-label=\"Wi-Fi enabled\" defaultChecked />} />\n  <AndroidListRow headline=\"Device name\" supportingText=\"Pixel\" />\n</AndroidList>",
       "usage": {

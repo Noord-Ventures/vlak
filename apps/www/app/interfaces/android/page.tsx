@@ -12,7 +12,7 @@ import "../mobile-os/device-chrome.css";
 export const metadata: Metadata = pageMetadata("/interfaces/android", {
   title: "Android",
   description: "Explore an interactive Android phone with local apps, Material navigation, Quick Settings and Vlak’s paper and ink.",
-});
+}, { searchTitle: "Android interface with interactive phone apps · Vlak" });
 
 export default function Page() {
   return <InterfaceShell slug="android"><Board platform="android" /></InterfaceShell>;

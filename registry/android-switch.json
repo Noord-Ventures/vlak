@@ -45,7 +45,8 @@
       "aliases": [
         "Material switch",
         "Android toggle",
-        "Expressive switch"
+        "Expressive switch",
+        "Material 3 switch"
       ],
       "example": "import { AndroidSwitch } from \"@noorddev/vlak-react\";\n\n<label htmlFor=\"sync\">Background sync</label>\n<AndroidSwitch id=\"sync\" name=\"sync\" checked={enabled} onCheckedChange={setEnabled} />",
       "usage": {

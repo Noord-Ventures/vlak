@@ -13,6 +13,8 @@ Install with `npm install @noorddev/vlak-react` and `import "@noorddev/vlak-reac
 - [Guide](https://vlak.dev/docs/guide.md): install, theming, cascade layers, StyleX, CSS, CLI, registry, and conventions for agents
 - [Agent guide](https://vlak.dev/docs/agents.md): machine-readable surfaces, CLI commands, and MCP setup
 - [Component index](https://vlak.dev/docs/index.md): the catalogue by category
+- [iOS component index](https://vlak.dev/docs/ios.md): browser React exports, integration boundaries, and related interface study
+- [Android component index](https://vlak.dev/docs/android.md): browser React exports, integration boundaries, and related interface study
 - [Health guide](https://vlak.dev/docs/health.md): health, wellness, and care components with data and action contracts
 - [AI component index](https://vlak.dev/docs/ai-index.md): 47 AI components, companion primitives, optional engine imports and widget patterns
 - [AI interfaces](https://vlak.dev/docs/ai.md): integration recipes, application boundaries and the runnable assistant with durable history and verified approvals

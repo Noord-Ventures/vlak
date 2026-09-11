@@ -73,6 +73,10 @@ section.mo.mo-single { grid-template-rows: auto auto auto; }
 .mo-single .mo-device .mo-phone { width: 100%; height: 100%; border-radius: var(--mo-device-radius); grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 34px; container-type: inline-size; transition: border-radius 680ms cubic-bezier(.22,1,.36,1), padding 680ms cubic-bezier(.22,1,.36,1); }
 .mo-single .mo-device[data-platform="android"] .mo-phone { grid-template-rows: var(--mo-safe-top) minmax(0, 1fr) 44px; }
 .mo-single .mo-camera-cutout { z-index: 6; transition: width 680ms cubic-bezier(.22,1,.36,1), height 680ms cubic-bezier(.22,1,.36,1), top 680ms cubic-bezier(.22,1,.36,1), left 680ms cubic-bezier(.22,1,.36,1), border-radius 680ms cubic-bezier(.22,1,.36,1); }
+/* Camera geometry and its safe inset change together. Independently tweening
+   the cutout across the glass can cover live controls during rotation. */
+.mo-single .mo-device[data-platform="ios"] .mo-phone { transition: border-radius 680ms cubic-bezier(.22,1,.36,1); }
+.mo-single .mo-device[data-platform="ios"] .mo-camera-cutout { transition: border-radius 680ms cubic-bezier(.22,1,.36,1); }
 .mo-single .mo-device[data-platform="android"] [data-cutout="notch"] .mo-camera-cutout { width: 26px; height: 23px; left: calc(50% - 13px); top: -3px; border-radius: 0 0 15px 15px; box-shadow: none; }
 .mo-single .mo-device[data-orientation="landscape"][data-platform="ios"] .mo-camera-cutout { left: 10px; top: calc(50% - 63px); width: 37px; height: 126px; }
 .mo-single .mo-device[data-orientation="landscape"][data-platform="ios"] .mo-camera-cutout::after { top: 12px; right: 13px; }

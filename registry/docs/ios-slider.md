@@ -7,6 +7,8 @@ Name: `ios-slider`
 Also known as: UISlider, iOS volume slider  
 Page: https://vlak.dev/components/ios-slider/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A bounded numeric level such as volume, brightness or playback intensity.

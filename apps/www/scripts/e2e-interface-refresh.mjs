@@ -91,6 +91,11 @@ try {
       const { checkDocsNavPointer } = await import("./docs-nav-pointer-e2e.mjs");
       await checkDocsNavPointer({page,base,fail});
     }
+    if (width === 1440 && process.env.FLOWS !== "0" && slugs.includes("ios")) {
+      const { checkIOSSystemLayout } = await import("./ios-system-layout-e2e.mjs");
+      const variants = await checkIOSSystemLayout({ page, base });
+      console.log(`iOS system alignment: ${variants.length} device layouts and rotation camera clearance passed`);
+    }
     await context.close();
   }
 } finally { await browser.close(); }

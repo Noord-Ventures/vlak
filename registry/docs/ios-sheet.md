@@ -7,6 +7,8 @@ Name: `ios-sheet`
 Also known as: UISheetPresentationController, iOS bottom sheet, iOS modal sheet  
 Page: https://vlak.dev/components/ios-sheet/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A focused modal task presented from the bottom edge.

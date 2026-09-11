@@ -4,8 +4,10 @@ A Material filter chip with a filled selection state and a checkmark.
 
 Category: android  
 Name: `android-chip`  
-Also known as: Material filter chip, Android filter chip, selectable chip  
+Also known as: Material filter chip, Android filter chip, selectable chip, Material 3 filter chip  
 Page: https://vlak.dev/components/android-chip/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

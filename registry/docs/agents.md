@@ -47,7 +47,7 @@ Hosted clients connect to `https://vlak.dev/mcp` over Streamable HTTP. Local cli
 }
 ```
 
-The server exposes component search and records, tokens, install commands, and guides. Call `get_guide` without arguments for the general guide, or with `page: "ai-index"`, `page: "ai"`, `page: "ai-parity"`, or `page: "agents"`. These guides are also available as `vlak://docs/<name>` resources. All tools are read-only. Structured results carry output schemas and structured MCP content.
+The server exposes component search and records, tokens, install commands, and guides. Call `get_guide` without arguments for the general guide, or with `page: "ai-index"`, `page: "ai"`, `page: "ai-parity"`, or `page: "agents"`. For browser UI with iOS or Android patterns, use `page: "ios"` or `page: "android"` for exact exports and related interface studies. These guides are also available as `vlak://docs/<name>` resources. All tools are read-only. Structured results carry output schemas and structured MCP content.
 
 Install it in a supported coding client:
 

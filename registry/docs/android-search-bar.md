@@ -4,8 +4,10 @@ A rounded Material search field with a leading icon and a clear action.
 
 Category: android  
 Name: `android-search-bar`  
-Also known as: Material search bar, Android search field, search input  
+Also known as: Material search bar, Android search field, search input, Material 3 search bar  
 Page: https://vlak.dev/components/android-search-bar/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

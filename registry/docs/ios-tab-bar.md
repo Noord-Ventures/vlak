@@ -7,6 +7,8 @@ Name: `ios-tab-bar`
 Also known as: UITabBar, iOS bottom navigation, Duo tab rail  
 Page: https://vlak.dev/components/ios-tab-bar/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A small set of peer views in an app, with content managed by the parent.

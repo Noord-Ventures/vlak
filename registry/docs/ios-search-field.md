@@ -7,6 +7,8 @@ Name: `ios-search-field`
 Also known as: UISearchBar, UISearchTextField, iOS search input  
 Page: https://vlak.dev/components/ios-search-field/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - Search within a list, app or document.

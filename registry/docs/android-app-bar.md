@@ -4,8 +4,10 @@ A Material app bar with a title, navigation action and trailing actions in Vlak 
 
 Category: android  
 Name: `android-app-bar`  
-Also known as: Material top app bar, Android toolbar, center-aligned top app bar  
+Also known as: Material top app bar, Android toolbar, Material 3 top app bar  
 Page: https://vlak.dev/components/android-app-bar/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

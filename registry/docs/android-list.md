@@ -4,8 +4,10 @@ Segmented Material list rows with leading content, supporting text and independe
 
 Category: android  
 Name: `android-list`  
-Also known as: Material list item, Android settings row, Expressive segmented list  
+Also known as: Material list item, Android settings row, Expressive segmented list, Material 3 list  
 Page: https://vlak.dev/components/android-list/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

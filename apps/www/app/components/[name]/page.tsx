@@ -29,7 +29,12 @@ export async function generateMetadata({
   const { name } = await params;
   const component = catalogComponents.find((c) => c.name === name);
   if (!component) notFound();
-  return pageMetadata(`/${component.category === "ai" ? "ai" : "components"}/${name}`, { title: component.title, description: component.description, ...(component.category === "ai" ? { robots: { index: false } } : {}) });
+  return pageMetadata(`/${component.category === "ai" ? "ai" : "components"}/${name}`, {
+    title: component.title,
+    description: component.description,
+    alternates: { types: { "text/markdown": `/docs/${name}.md` } },
+    ...(component.category === "ai" ? { robots: { index: false } } : {}),
+  });
 }
 
 function pascal(name: string) {
@@ -119,6 +124,7 @@ export default async function ComponentPage({
   const deps = component.registryDependencies ?? [];
   const usedIn = interfaces.filter(study => study.components.some(label => componentForLabel(label)?.name === component.name));
   const related = relatedComponents(component.name);
+  const platform = component.category === "ios" ? "iOS" : component.category === "android" ? "Android" : null;
 
   const packageInstall = `${INSTALL}\n\n// once, next to your app's root\nimport "@noorddev/vlak-react/css";\n\nimport { ${names.join(", ")} } from "@noorddev/vlak-react";`;
   const cliInstall = `${COMMAND.replace("init", `add ${component.name}`)}`;
@@ -138,10 +144,14 @@ export default async function ComponentPage({
           {
             "@context": "https://schema.org",
             "@type": "TechArticle",
+            "@id": `${HOST}/components/${component.name}/#documentation`,
             headline: `${component.title} React component`,
             description: component.description,
             url: `${HOST}/components/${component.name}/`,
-            isPartOf: { "@id": `${HOST}/#website` },
+            mainEntityOfPage: `${HOST}/components/${component.name}/`,
+            isPartOf: { "@id": `${HOST}/components/#collection` },
+            inLanguage: "en",
+            encoding: { "@type": "MediaObject", encodingFormat: "text/markdown", contentUrl: `${HOST}/docs/${component.name}.md` },
             about: ["React", "accessibility", component.category],
           },
         ]} />
@@ -299,6 +309,11 @@ export default async function ComponentPage({
           <a href={`/docs/${component.name}.md`} className="rs-chip">Markdown</a>
           <a href={`/r/${component.name}.json`} className="rs-chip">Registry item</a>
           <a href={`https://github.com/Noord-Ventures/vlak/tree/main/packages/react/src/${component.react ?? `components/${component.name}.tsx`}`} className="rs-chip">Source</a>
+          {platform && <>
+            <a href={`/components/#${component.category}`} className="rs-chip">{platform} components</a>
+            <a href={`/docs/${component.category}.md`} className="rs-chip">{platform} reference</a>
+            <a href={`/interfaces/${component.category}/`} className="rs-chip">{platform} interface study</a>
+          </>}
         </div>
 
         {usedIn.length > 0 ? (

@@ -7,6 +7,8 @@ Name: `ios-list`
 Also known as: UITableView grouped, iOS settings list, Inset grouped list  
 Page: https://vlak.dev/components/ios-list/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - Grouped settings, preferences and navigation rows.

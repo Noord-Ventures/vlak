@@ -48,7 +48,8 @@
       "aliases": [
         "Material FAB",
         "Android extended FAB",
-        "floating action button"
+        "floating action button",
+        "Material 3 floating action button"
       ],
       "example": "import { AndroidFab, Icon } from \"@noorddev/vlak-react\";\n\n<AndroidFab icon={<Icon name=\"plus\" size={24} />} onClick={createDocument}>New document</AndroidFab>",
       "usage": {

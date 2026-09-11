@@ -4,8 +4,10 @@ Material destination indicators for a bottom navigation bar or vertical rail.
 
 Category: android  
 Name: `android-navigation`  
-Also known as: Material navigation bar, Android navigation rail, bottom navigation  
+Also known as: Material navigation bar, Android navigation rail, bottom navigation, Material 3 navigation bar  
 Page: https://vlak.dev/components/android-navigation/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

@@ -4,8 +4,10 @@ A Material switch with a 52-by-32 track and an expanding thumb, built on a nativ
 
 Category: android  
 Name: `android-switch`  
-Also known as: Material switch, Android toggle, Expressive switch  
+Also known as: Material switch, Android toggle, Expressive switch, Material 3 switch  
 Page: https://vlak.dev/components/android-switch/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

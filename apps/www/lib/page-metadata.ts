@@ -15,6 +15,7 @@ function discoveryTitle(path: string, metadata: Metadata): string {
       : WORD;
   if (path === "/") return `${WORD} · React design system`;
   if (path === "/components") return `React components · ${WORD}`;
+  if (/^\/components\/(ios|android)-/.test(path)) return `${authored} React component · ${WORD}`;
   if (path.startsWith("/components/")) return `Accessible React ${authored} component · ${WORD}`;
   if (path === "/ai") return `AI components for React · ${WORD}`;
   if (path.startsWith("/ai/")) return `React AI ${authored} component · ${WORD}`;

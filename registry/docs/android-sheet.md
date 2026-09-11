@@ -4,8 +4,10 @@ A native modal bottom sheet with Material geometry, accessible naming and focus 
 
 Category: android  
 Name: `android-sheet`  
-Also known as: Material modal bottom sheet, Android bottom sheet, modal sheet  
+Also known as: Material modal bottom sheet, Android bottom sheet, modal sheet, Material 3 bottom sheet  
 Page: https://vlak.dev/components/android-sheet/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

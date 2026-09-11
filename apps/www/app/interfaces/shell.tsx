@@ -53,9 +53,11 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
           {
             "@context": "https://schema.org",
             "@type": "TechArticle",
+            "@id": `${pageUrl}#documentation`,
             headline: `${proto.title} interface study`,
             description: proto.law,
             url: pageUrl,
+            mainEntityOfPage: pageUrl,
             isPartOf: { "@id": `${HOST}/#website` },
             about: proto.components,
           },
@@ -90,6 +92,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
               </ul>
               {slug === "ios" && <p className="if-asset-credit">Component anatomy and measurements from <a href="https://developer.apple.com/design/resources/" target="_blank" rel="noreferrer">Apple’s iOS 27 UI Kit</a>, rebuilt for the browser with Vlak typography and surfaces. <a href={`${source}/ios-reference.md`}>Component reference</a>.</p>}
               {slug === "android" && <p className="if-asset-credit">Component anatomy from <a href="https://m3.material.io/" target="_blank" rel="noreferrer">Material 3 Expressive</a>, adapted with Vlak typography and surfaces. <a href={`${source}/android-reference.md`}>Component reference</a>.</p>}
+              {(slug === "ios" || slug === "android") && <p className="if-asset-credit">Related: <Link href={`/components/#${slug}`}>{proto.title} React components</Link> and <a href={`/docs/${slug}.md`}>Markdown reference</a>.</p>}
               {slug === "drive" && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/2022-land-rover-range-rover-evoque-034600db0cc94d64a7f3ccb19c7799fa" target="_blank" rel="noreferrer">2022 Land Rover Range Rover Evoque</a> by <a href="https://sketchfab.com/tonielpro520" target="_blank" rel="noreferrer">tonielpro520</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Original geometry retained, with simplified source contours and monochrome materials.</p>}
               {slug === "render" && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/radio-t3-aad3d54384904cfc9b3df8791d254c5c" target="_blank" rel="noreferrer">Radio T3</a> model by <a href="https://sketchfab.com/ludwigangulodi" target="_blank" rel="noreferrer">ludwigangulodi</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Geometry repacked and monochrome materials applied for Vlak. Product design: <a href="https://www.moma.org/collection/works/4134" target="_blank" rel="noreferrer">Dieter Rams and Hochschule für Gestaltung, Ulm, 1958</a>.</p>}
               {slug === "frontier" && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/bust-of-athena-6f372d03e69b48ee8901bdc6e48f17b5" target="_blank" rel="noreferrer">Bust of Athena</a> by <a href="https://sketchfab.com/yugengen" target="_blank" rel="noreferrer">yugengen</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Adapted into an animated contour drawing for Vlak.</p>}

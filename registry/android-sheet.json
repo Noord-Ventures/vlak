@@ -53,7 +53,8 @@
       "aliases": [
         "Material modal bottom sheet",
         "Android bottom sheet",
-        "modal sheet"
+        "modal sheet",
+        "Material 3 bottom sheet"
       ],
       "example": "import { AndroidSheet, AndroidSheetTitle, AndroidSheetBody } from \"@noorddev/vlak-react\";\n\n<AndroidSheet open={open} onOpenChange={setOpen}>\n  <AndroidSheetTitle>Connection settings</AndroidSheetTitle>\n  <AndroidSheetBody>Choose how this device connects.</AndroidSheetBody>\n</AndroidSheet>",
       "usage": {

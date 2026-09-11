@@ -12,6 +12,22 @@ const decode = value => value.replace(/&#(x[\da-f]+|\d+);|&(amp|quot|apos|lt|gt)
   : ({ amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" })[name.toLowerCase()]);
 const attributes = tag => Object.fromEntries([...tag.matchAll(/([\w:-]+)\s*=\s*(["'])(.*?)\2/gs)].map(([, key, , value]) => [key.toLowerCase(), decode(value)]));
 const tags = (html, tag) => [...html.matchAll(new RegExp(`<${tag}\\b[^>]*>`, "gi"))].map(([tag]) => attributes(tag));
+function sectionContent(html, id) {
+  let depth = 0;
+  let start;
+  for (const match of html.matchAll(/<\/?section\b[^>]*>/gi)) {
+    const closing = match[0].startsWith("</");
+    if (depth === 0) {
+      if (!closing && attributes(match[0]).id === id) {
+        start = match.index + match[0].length;
+        depth = 1;
+      }
+      continue;
+    }
+    depth += closing ? -1 : 1;
+    if (depth === 0) return html.slice(start, match.index);
+  }
+}
 const read = path => readFileSync(join(out, path), "utf8");
 const urls = new Set();
 const titles = new Map();
@@ -56,6 +72,17 @@ for (const file of readdirSync(out, { recursive: true, encoding: "utf8" })) {
   const structured = [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].map(([, json]) => JSON.parse(json));
   const structuredItems = structured.flat();
   assert(structuredItems.some(item => item["@type"] === "WebSite" && item.url === `${origin}/` && item.name === "Vlak"), `${path}: truthful site identity`);
+  if (path.startsWith("/components/") && path !== "/components/") {
+    const name = path.split("/")[2];
+    const markdown = `/docs/${name}.md`;
+    const article = structuredItems.find(item => item["@type"] === "TechArticle");
+    assert.equal(article?.mainEntityOfPage, expected, `${path}: component article identifies this page`);
+    assert.equal(article?.isPartOf?.["@id"], `${origin}/components/#collection`, `${path}: article belongs to the component catalogue`);
+    assert.equal(article?.encoding?.contentUrl, `${origin}${markdown}`, `${path}: article points to its own Markdown`);
+    assert.deepEqual(tags(head, "link").filter(item => item.rel === "alternate" && item.type === "text/markdown").map(item => new URL(item.href, origin).href), [`${origin}${markdown}`], `${path}: matching Markdown alternate`);
+    assert(existsSync(join(out, markdown)), `${path}: Markdown alternate exists`);
+    assert(tags(html, "a").some(item => item.href === markdown), `${path}: readers can reach the same Markdown`);
+  }
   if (path.startsWith("/ai/")) {
     assert(structuredItems.some(item => item["@type"] === "BreadcrumbList" && item.itemListElement?.at(-1)?.item === expected), `${path}: AI breadcrumb ends at this page`);
     const article = structuredItems.find(item => item["@type"] === "TechArticle");
@@ -136,10 +163,35 @@ const robots = read("robots.txt");
 assert.match(robots, /User-agent:\s*\*[\s\S]*Allow:\s*\//i, "Ordinary search crawling stays allowed");
 assert.match(robots, /Sitemap: https:\/\/vlak\.dev\/sitemap\.xml/);
 const llms = read("llms.txt");
+const componentHtml = read("components/index.html");
+const componentStructured = [...componentHtml.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)].flatMap(([, json]) => JSON.parse(json));
+const componentCollection = componentStructured.find(item => item["@id"] === `${origin}/components/#collection`);
+assert(componentCollection, "Component articles have a matching collection identity");
+for (const platform of ["ios", "android"]) {
+  const entries = catalogComponents.filter(component => component.category === platform);
+  const section = sectionContent(componentHtml, platform);
+  assert(section, `${platform}: visible component category`);
+  const expectedLinks = entries.map(component => `${origin}/components/${component.name}/`).sort();
+  const category = componentCollection.hasPart?.find(item => item["@id"] === `${origin}/components/#${platform}`);
+  assert.deepEqual(category?.mainEntity?.itemListElement?.map(item => item.url).sort(), expectedLinks, `${platform}: structured list matches registry`);
+  for (const component of entries) {
+    assert(tags(section, "a").some(item => item.href?.replace(/\/$/, "") === `/components/${component.name}`), `${component.name}: visible before hydration`);
+    const html = read(`components/${component.name}/index.html`);
+    for (const link of [`/interfaces/${platform}/`, `/docs/${platform}.md`, `/components/#${platform}`]) {
+      assert(tags(html, "a").some(item => item.href === link), `${component.name}: linked platform reference ${link}`);
+    }
+    assert(read(`docs/${platform}.md`).includes(`${origin}/docs/${component.name}.md`), `${component.name}: indexed in platform Markdown`);
+    assert(read(`docs/${component.name}.md`).includes(`${origin}/docs/${platform}.md`), `${component.name}: Markdown platform backlink`);
+  }
+  const study = read(`interfaces/${platform}/index.html`);
+  for (const link of [`/components/#${platform}`, `/docs/${platform}.md`]) assert(tags(study, "a").some(item => item.href === link), `${platform}: interface links related platform references`);
+  assert(llms.includes(`${origin}/docs/${platform}.md`), `${platform}: short agent index`);
+  assert(read("llms-full.txt").includes(read(`docs/${platform}.md`).trim()), `${platform}: complete agent documentation`);
+}
 for (const path of ["/design.md", "/interfaces.md", "/docs/ai.md", "/docs/ai-index.md"]) assert(llms.includes(`${origin}${path}`), `Agent index includes ${path}`);
 for (const [, url] of llms.matchAll(/\]\((https:\/\/vlak\.dev[^\s)]*)\)/g)) {
   const { pathname } = new URL(url);
   assert(existsSync(join(out, pathname)) || existsSync(join(out, pathname, "index.html")), `Broken agent-index link: ${url}`);
 }
 for (const path of ["docs/agents.md", "docs/button.md", "docs/props.json"]) assert(existsSync(join(out, path)), `Missing machine-readable surface: ${path}`);
-console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, ${previews} direct preview links, ${aiComponents.length} linked AI references with Markdown alternatives, site identity and agent links.`);
+console.log(`Discovery export passed: ${checked} self-canonical pages, matching sharing metadata, ${images.size} local card images, exact sitemap, ${previews} direct preview links, component and AI Markdown alternatives, both mobile platform collections, site identity and agent links.`);

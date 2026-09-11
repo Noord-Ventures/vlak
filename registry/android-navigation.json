@@ -53,7 +53,8 @@
       "aliases": [
         "Material navigation bar",
         "Android navigation rail",
-        "bottom navigation"
+        "bottom navigation",
+        "Material 3 navigation bar"
       ],
       "example": "import { AndroidNavigation } from \"@noorddev/vlak-react\";\n\n<AndroidNavigation aria-label=\"Workspace\" items={[{ value: \"home\", label: \"Home\" }, { value: \"files\", label: \"Files\" }, { value: \"settings\", label: \"Settings\" }]} defaultValue=\"home\" onValueChange={setScreen} />",
       "usage": {

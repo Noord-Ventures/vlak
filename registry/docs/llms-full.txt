@@ -182,7 +182,7 @@ Hosted clients connect to `https://vlak.dev/mcp` over Streamable HTTP. Local cli
 }
 ```
 
-The server exposes component search and records, tokens, install commands, and guides. Call `get_guide` without arguments for the general guide, or with `page: "ai-index"`, `page: "ai"`, `page: "ai-parity"`, or `page: "agents"`. These guides are also available as `vlak://docs/<name>` resources. All tools are read-only. Structured results carry output schemas and structured MCP content.
+The server exposes component search and records, tokens, install commands, and guides. Call `get_guide` without arguments for the general guide, or with `page: "ai-index"`, `page: "ai"`, `page: "ai-parity"`, or `page: "agents"`. For browser UI with iOS or Android patterns, use `page: "ios"` or `page: "android"` for exact exports and related interface studies. These guides are also available as `vlak://docs/<name>` resources. All tools are read-only. Structured results carry output schemas and structured MCP content.
 
 Install it in a supported coding client:
 
@@ -517,6 +517,130 @@ npx @noorddev/vlak-cli add check-in
 # Or use the registry
 npx shadcn add https://vlak.dev/r/check-in.json
 ```
+
+
+---
+
+# Vlak iOS components
+
+8 React components with iOS control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.4.0.
+
+## Runtime and integration
+
+These components render HTML in React websites and web apps. Installation supplies JavaScript, TypeScript declarations, and CSS. Platform control names describe the UI patterns; use the Vlak exports and props listed in the component records.
+
+The application owns navigation, records, persistence, and connections to device or account services. Each record documents its controlled or uncontrolled state, keyboard behavior, native HTML element, and forwarded ref. CSS-only markup supplies the visual structure; the application owns its event handling and state updates.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { IOSSwitch } from "@noorddev/vlak-react";
+
+<IOSSwitch aria-label="Background sync" defaultChecked />
+```
+
+Per-component imports use `@noorddev/vlak-react/components/ios-switch`. The individual records also include Vlak CLI and shadcn registry commands.
+
+## Component records
+
+| Component | React exports | Purpose |
+| --- | --- | --- |
+| [iOS navigation bar](https://vlak.dev/docs/ios-navigation-bar.md) | `IOSNavigationBar` | Compact or large-title navigation with circular actions and an optional vertical rail. |
+| [iOS tab bar](https://vlak.dev/docs/ios-tab-bar.md) | `IOSTabBar` | Floating peer tabs with icon labels, roving focus and horizontal or vertical placement. |
+| [iOS search field](https://vlak.dev/docs/ios-search-field.md) | `IOSSearchField` | A 48px search capsule with a native input and a separate clear action. |
+| [iOS switch](https://vlak.dev/docs/ios-switch.md) | `IOSSwitch` | A native checkbox with a 64px pill track, translating thumb and a 44px hit height. |
+| [iOS list](https://vlak.dev/docs/ios-list.md) | `IOSList`, `IOSListRow` | Inset list groups with labels, descriptions, leading symbols and independent trailing controls. |
+| [iOS segmented control](https://vlak.dev/docs/ios-segmented-control.md) | `IOSSegmentedControl` | A pill-shaped single choice with a full selected fill, radio semantics and arrow-key selection. |
+| [iOS slider](https://vlak.dev/docs/ios-slider.md) | `IOSSlider` | A native range input with a quiet track, pill thumb and synchronized stepped values. |
+| [iOS sheet](https://vlak.dev/docs/ios-sheet.md) | `IOSSheet` | A native modal bottom sheet with a centered title, grabber and deliberate entrance. |
+
+## Related interface study
+
+The [iOS interface](https://vlak.dev/interfaces/ios/) is a separate browser study with local apps and device views. It shares platform patterns with this collection and has its own application implementation. The reusable components can be installed independently of that study and its device chrome.
+
+- [Interactive component catalog](https://vlak.dev/components/#ios)
+- [Interface source](https://github.com/Noord-Ventures/vlak/tree/main/apps/www/app/interfaces/mobile-os)
+- [Platform study reference](https://github.com/Noord-Ventures/vlak/blob/main/apps/www/app/interfaces/mobile-os/ios-reference.md)
+- [React component source](https://github.com/Noord-Ventures/vlak/tree/main/packages/react/src/components)
+
+## Agent and data access
+
+MCP `get_guide` with `page: "ios"` returns this index; the same Markdown is available at `vlak://docs/ios`. `list_components` with `category: "ios"` returns the collection. Read the selected component with `get_component` and its install instructions with `get_install` before writing imports. The [props JSON](https://vlak.dev/docs/props.json) and [registry index](https://vlak.dev/r/index.json) expose the same records as structured data.
+
+```sh
+npx @noorddev/vlak-cli docs ios
+npx @noorddev/vlak-cli search "iOS" --json
+npx @noorddev/vlak-cli docs ios-switch
+```
+
+[Component index](https://vlak.dev/docs/index.md) · [Agent guide](https://vlak.dev/docs/agents.md) · [Full documentation](https://vlak.dev/llms-full.txt)
+
+
+---
+
+# Vlak Android components
+
+8 React components with Material control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.4.0.
+
+## Runtime and integration
+
+These components render HTML in React websites and web apps. Installation supplies JavaScript, TypeScript declarations, and CSS. Platform control names describe the UI patterns; use the Vlak exports and props listed in the component records.
+
+The application owns navigation, records, persistence, and connections to device or account services. Each record documents its controlled or uncontrolled state, keyboard behavior, native HTML element, and forwarded ref. CSS-only markup supplies the visual structure; the application owns its event handling and state updates.
+
+## Install
+
+```sh
+npm install @noorddev/vlak-react
+```
+
+```tsx
+import "@noorddev/vlak-react/css";
+import { AndroidSwitch } from "@noorddev/vlak-react";
+
+<AndroidSwitch aria-label="Background sync" defaultChecked />
+```
+
+Per-component imports use `@noorddev/vlak-react/components/android-switch`. The individual records also include Vlak CLI and shadcn registry commands.
+
+## Component records
+
+| Component | React exports | Purpose |
+| --- | --- | --- |
+| [Android app bar](https://vlak.dev/docs/android-app-bar.md) | `AndroidAppBar`, `AndroidAppBarAction` | A Material app bar with a title, navigation action and trailing actions in Vlak tones. |
+| [Android navigation](https://vlak.dev/docs/android-navigation.md) | `AndroidNavigation` | Material destination indicators for a bottom navigation bar or vertical rail. |
+| [Android search bar](https://vlak.dev/docs/android-search-bar.md) | `AndroidSearchBar` | A rounded Material search field with a leading icon and a clear action. |
+| [Android switch](https://vlak.dev/docs/android-switch.md) | `AndroidSwitch` | A Material switch with a 52-by-32 track and an expanding thumb, built on a native checkbox. |
+| [Android list](https://vlak.dev/docs/android-list.md) | `AndroidList`, `AndroidListRow` | Segmented Material list rows with leading content, supporting text and independent trailing controls. |
+| [Android chip](https://vlak.dev/docs/android-chip.md) | `AndroidChip` | A Material filter chip with a filled selection state and a checkmark. |
+| [Android floating action button](https://vlak.dev/docs/android-fab.md) | `AndroidFab` | A Material floating action button with an optional extended text label. |
+| [Android bottom sheet](https://vlak.dev/docs/android-sheet.md) | `AndroidSheet`, `AndroidSheetBody`, `AndroidSheetTitle` | A native modal bottom sheet with Material geometry, accessible naming and focus restoration. |
+
+## Related interface study
+
+The [Android interface](https://vlak.dev/interfaces/android/) is a separate browser study with local apps and device views. It shares platform patterns with this collection and has its own application implementation. The reusable components can be installed independently of that study and its device chrome.
+
+- [Interactive component catalog](https://vlak.dev/components/#android)
+- [Interface source](https://github.com/Noord-Ventures/vlak/tree/main/apps/www/app/interfaces/mobile-os)
+- [Platform study reference](https://github.com/Noord-Ventures/vlak/blob/main/apps/www/app/interfaces/mobile-os/android-reference.md)
+- [React component source](https://github.com/Noord-Ventures/vlak/tree/main/packages/react/src/components)
+
+## Agent and data access
+
+MCP `get_guide` with `page: "android"` returns this index; the same Markdown is available at `vlak://docs/android`. `list_components` with `category: "android"` returns the collection. Read the selected component with `get_component` and its install instructions with `get_install` before writing imports. The [props JSON](https://vlak.dev/docs/props.json) and [registry index](https://vlak.dev/r/index.json) expose the same records as structured data.
+
+```sh
+npx @noorddev/vlak-cli docs android
+npx @noorddev/vlak-cli search "Android" --json
+npx @noorddev/vlak-cli docs android-switch
+```
+
+[Component index](https://vlak.dev/docs/index.md) · [Agent guide](https://vlak.dev/docs/agents.md) · [Full documentation](https://vlak.dev/llms-full.txt)
 
 
 ---
@@ -1623,6 +1747,8 @@ Name: `ios-navigation-bar`
 Also known as: UIKit navigation bar, UINavigationBar, iOS toolbar, Duo vertical toolbar  
 Page: https://vlak.dev/components/ios-navigation-bar/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A compact app title, a large root-screen title, or a trailing vertical action rail.
@@ -1724,6 +1850,8 @@ Category: ios
 Name: `ios-tab-bar`  
 Also known as: UITabBar, iOS bottom navigation, Duo tab rail  
 Page: https://vlak.dev/components/ios-tab-bar/
+
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
 
 ## When to use
 
@@ -1828,6 +1956,8 @@ Name: `ios-search-field`
 Also known as: UISearchBar, UISearchTextField, iOS search input  
 Page: https://vlak.dev/components/ios-search-field/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - Search within a list, app or document.
@@ -1929,6 +2059,8 @@ Name: `ios-switch`
 Also known as: UISwitch, iOS toggle  
 Page: https://vlak.dev/components/ios-switch/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - An immediately applied on/off preference.
@@ -2027,6 +2159,8 @@ Category: ios
 Name: `ios-list`  
 Also known as: UITableView grouped, iOS settings list, Inset grouped list  
 Page: https://vlak.dev/components/ios-list/
+
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
 
 ## When to use
 
@@ -2143,6 +2277,8 @@ Name: `ios-segmented-control`
 Also known as: UISegmentedControl, iOS segmented picker  
 Page: https://vlak.dev/components/ios-segmented-control/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A small set of mutually exclusive modes or filters.
@@ -2248,6 +2384,8 @@ Name: `ios-slider`
 Also known as: UISlider, iOS volume slider  
 Page: https://vlak.dev/components/ios-slider/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - A bounded numeric level such as volume, brightness or playback intensity.
@@ -2349,6 +2487,8 @@ Category: ios
 Name: `ios-sheet`  
 Also known as: UISheetPresentationController, iOS bottom sheet, iOS modal sheet  
 Page: https://vlak.dev/components/ios-sheet/
+
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
 
 ## When to use
 
@@ -2453,8 +2593,10 @@ A Material app bar with a title, navigation action and trailing actions in Vlak 
 
 Category: android  
 Name: `android-app-bar`  
-Also known as: Material top app bar, Android toolbar, center-aligned top app bar  
+Also known as: Material top app bar, Android toolbar, Material 3 top app bar  
 Page: https://vlak.dev/components/android-app-bar/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -2559,8 +2701,10 @@ Material destination indicators for a bottom navigation bar or vertical rail.
 
 Category: android  
 Name: `android-navigation`  
-Also known as: Material navigation bar, Android navigation rail, bottom navigation  
+Also known as: Material navigation bar, Android navigation rail, bottom navigation, Material 3 navigation bar  
 Page: https://vlak.dev/components/android-navigation/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -2661,8 +2805,10 @@ A rounded Material search field with a leading icon and a clear action.
 
 Category: android  
 Name: `android-search-bar`  
-Also known as: Material search bar, Android search field, search input  
+Also known as: Material search bar, Android search field, search input, Material 3 search bar  
 Page: https://vlak.dev/components/android-search-bar/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -2763,8 +2909,10 @@ A Material switch with a 52-by-32 track and an expanding thumb, built on a nativ
 
 Category: android  
 Name: `android-switch`  
-Also known as: Material switch, Android toggle, Expressive switch  
+Also known as: Material switch, Android toggle, Expressive switch, Material 3 switch  
 Page: https://vlak.dev/components/android-switch/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -2859,8 +3007,10 @@ Segmented Material list rows with leading content, supporting text and independe
 
 Category: android  
 Name: `android-list`  
-Also known as: Material list item, Android settings row, Expressive segmented list  
+Also known as: Material list item, Android settings row, Expressive segmented list, Material 3 list  
 Page: https://vlak.dev/components/android-list/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -2973,8 +3123,10 @@ A Material filter chip with a filled selection state and a checkmark.
 
 Category: android  
 Name: `android-chip`  
-Also known as: Material filter chip, Android filter chip, selectable chip  
+Also known as: Material filter chip, Android filter chip, selectable chip, Material 3 filter chip  
 Page: https://vlak.dev/components/android-chip/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -3070,8 +3222,10 @@ A Material floating action button with an optional extended text label.
 
 Category: android  
 Name: `android-fab`  
-Also known as: Material FAB, Android extended FAB, floating action button  
+Also known as: Material FAB, Android extended FAB, floating action button, Material 3 floating action button  
 Page: https://vlak.dev/components/android-fab/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 
@@ -3164,8 +3318,10 @@ A native modal bottom sheet with Material geometry, accessible naming and focus 
 
 Category: android  
 Name: `android-sheet`  
-Also known as: Material modal bottom sheet, Android bottom sheet, modal sheet  
+Also known as: Material modal bottom sheet, Android bottom sheet, modal sheet, Material 3 bottom sheet  
 Page: https://vlak.dev/components/android-sheet/
+
+[Android component index](https://vlak.dev/docs/android.md) · [Interactive component catalog](https://vlak.dev/components/#android) · [Related Android interface study](https://vlak.dev/interfaces/android/)
 
 ## When to use
 

@@ -48,7 +48,8 @@
       "aliases": [
         "Material filter chip",
         "Android filter chip",
-        "selectable chip"
+        "selectable chip",
+        "Material 3 filter chip"
       ],
       "example": "import { AndroidChip } from \"@noorddev/vlak-react\";\n\n<AndroidChip selected={unread} onSelectedChange={setUnread}>Unread</AndroidChip>",
       "usage": {

@@ -7,6 +7,8 @@ Name: `ios-switch`
 Also known as: UISwitch, iOS toggle  
 Page: https://vlak.dev/components/ios-switch/
 
+[iOS component index](https://vlak.dev/docs/ios.md) · [Interactive component catalog](https://vlak.dev/components/#ios) · [Related iOS interface study](https://vlak.dev/interfaces/ios/)
+
 ## When to use
 
 - An immediately applied on/off preference.
