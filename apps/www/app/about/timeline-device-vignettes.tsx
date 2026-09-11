@@ -13,9 +13,23 @@ export function ScreenVignette() {
       <path d="M61 12h10M103 12h12M56 20v58M119 20v58M63 68h17M58 85v2h59v-2" />
       <path d="M122 78c17-7 28-4 28 6" />
     </g>
-    <path className="lineage-drawing-paper" d="M41 88h82l7 13H33zM33 101v3h97v-3" />
+    <path className="lineage-drawing-paper" d="M41 87.5h81a3 3 0 0 1 2.8 1.9l3.6 16.8H34.6l3.6-16.8a3 3 0 0 1 2.8-1.9Z" />
+    <path className="lineage-drawing-detail" d="M34.6 106.2v.3q0 1 2 1h89.8q2 0 2-1v-.3M38 89h87" />
     <g className="lineage-drawing-detail">
-      <path d="M44 91h77M42 95h81M40 99h85M50 90l-2 8M57 90l-1 8M64 90l-1 8M71 90v8M78 90v8M85 90l1 8M92 90l1 8M99 90l2 8M106 90l2 8M113 90l3 8M59 99h41" />
+      {[42.5, 50.5, 58.5, 66.5, 74.5, 82.5, 90.5, 98.5, 106.5, 114.5].map(x => <rect key={`top-${x}`} x={x} y="89.5" width="5.5" height="2.5" rx=".5" />)}
+      <rect x="40" y="94.2" width="7.5" height="2.5" rx=".5" />
+      {[50, 58, 66, 74, 82, 90, 98, 106].map(x => <rect key={`upper-${x}`} x={x} y="94.2" width="5.5" height="2.5" rx=".5" />)}
+      <rect x="114" y="94.2" width="7.5" height="2.5" rx=".5" />
+      <rect x="39" y="98.9" width="9" height="2.5" rx=".5" />
+      {[50.5, 58.5, 66.5, 74.5, 82.5, 90.5, 98.5, 106.5].map(x => <rect key={`home-${x}`} x={x} y="98.9" width="5.5" height="2.5" rx=".5" />)}
+      <rect x="114.5" y="98.9" width="9" height="2.5" rx=".5" />
+      <rect x="38.5" y="103.6" width="8" height="2.1" rx=".5" />
+      <rect x="49" y="103.6" width="6" height="2.1" rx=".5" />
+      <rect x="57.5" y="103.6" width="6" height="2.1" rx=".5" />
+      <rect x="66" y="103.6" width="32" height="2.1" rx=".5" />
+      <rect x="100.5" y="103.6" width="6" height="2.1" rx=".5" />
+      <rect x="109" y="103.6" width="6" height="2.1" rx=".5" />
+      <rect x="117.5" y="103.6" width="8" height="2.1" rx=".5" />
     </g>
     <path className="lineage-drawing-paper" d="M146 84h8q3 0 4 4l4 13q1 4-3 4h-17q-4 0-3-4l3-13q1-4 4-4Z" />
     <path d="M146 88h8q1 0 1 1l1 4h-12l1-4q0-1 1-1Z" />

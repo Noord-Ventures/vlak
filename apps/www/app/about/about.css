@@ -480,3 +480,8 @@ html:has(.field-page) .site-footer {
     min-height: 44px;
   }
 }
+
+/* Match the filmstrip's existing full-width inset without shifting the copy. */
+.field-cell-inspiration .inspiration-stage {
+  margin-inline: -20px;
+}

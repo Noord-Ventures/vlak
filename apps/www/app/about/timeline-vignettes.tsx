@@ -36,7 +36,7 @@ function PublishingVignette() {
     </g>
     <rect className="lineage-drawing-paper" x="14" y="19" width="20" height="80" rx="3" />
     <g className="lineage-drawing-detail">
-      <path d="M20 24v10l3-3 3 5 2-1-3-5h5z" />
+      <path strokeLinejoin="miter" strokeMiterlimit="3" d="M19.5 24v13l3.4-3.5 2.6 5 2.2-1.2-2.6-4.9h5.3Z" />
       <path d="M20 42h8M20 42v2M28 42v2M24 42v9M21 51h6" />
       <rect x="20" y="58" width="8" height="8" />
       <path d="m24 72-4 7 4 4 4-4zM24 76v7" />
