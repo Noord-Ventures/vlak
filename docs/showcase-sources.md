@@ -8,6 +8,6 @@ Verified on 11 September 2026. The project owner requested these three entries. 
 | Noord | https://noord.dev/ | Noord. The site links to Vlak as its design system. |
 | Personal Site | https://www.renatovaldes.com/ | Renn. Included at the site owner's request. |
 
-The three JPEG previews in `apps/www/public/showcase/` are browser captures of the public pages at 1280 × 800, in light mode. Tax Scratchpad uses the initial sample scenario. No customer data or authenticated pages were used. Updating these previews is an editorial task, not a network dependency in the build.
+The displayed JPEG previews in `apps/www/public/showcase/` are browser captures of the public pages at 1280 × 800, in light mode. Tax Scratchpad uses the initial sample scenario. The Personal Site capture uses the live Workbooks image and the product word bubble shown on the homepage. No customer data or authenticated pages were used. Updating these previews is an editorial task, not a network dependency in the build.
 
-The Personal Site preview was refreshed after the owner changed the books photograph to `workbook-lounge.jpg`. The capture waits for the live rotating role bubble to display “product”; the page text is not replaced for the screenshot.
+The Personal Site preview was refreshed again on 11 September after the homepage switched to `workbook-bundle.jpg`, replacing the earlier lounge photograph. It is served as `renn-20260911.jpg` so the previous preview cannot remain cached at the same URL. The capture waits for the live rotating role bubble to display “product”; the page text is not replaced for the screenshot.
