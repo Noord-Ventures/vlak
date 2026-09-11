@@ -66,6 +66,13 @@ function exportSlug(value: string) {
   return value.normalize("NFKC").toLocaleLowerCase().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-+|-+$/g, "").slice(0, 64) || "wallpaper";
 }
 
+function projectRevision(project: { title: string; prompt: string; variation: number; generation: number; selected: number; format: Format; results: Wallpaper[] }) {
+  const fingerprint = JSON.stringify({ ...project, generatorVersion: 1, rendererVersion: 1 });
+  // This is a readable content label for exported art, not a security digest
+  // and not the random revision used by browser project storage.
+  return `r${hash(fingerprint).toString(16).padStart(8, "0")}`;
+}
+
 function makeWallpapers(prompt: string, variation: number, generation: number) {
   return Array.from({ length: 3 }, (_, index): Wallpaper => {
     const seed = hash(`${prompt}:${variation}:${generation}:${index}`);
@@ -187,13 +194,25 @@ export function WallpaperGenerator() {
   function exportSelected() {
     const wallpaper = results[selected];
     if (!wallpaper || exporting) return;
-    const snapshot = {
+    // Capture the complete project payload before rendering so edits during an
+    // asynchronous PNG export cannot change its revision or filename.
+    const project = {
       title: title.trim() || "Untitled project",
-      wallpaper: { ...wallpaper },
-      format,
+      prompt,
+      variation,
       generation,
       selected,
-      dimensions: { ...formats[format] },
+      format,
+      results: results.map(result => ({ ...result })),
+    };
+    const snapshot = {
+      title: project.title,
+      wallpaper: { ...wallpaper },
+      format: project.format,
+      generation: project.generation,
+      selected: project.selected,
+      dimensions: { ...formats[project.format] },
+      revision: projectRevision(project),
     };
     const canvas = document.createElement("canvas");
     canvas.width = snapshot.dimensions.width;
@@ -215,7 +234,7 @@ export function WallpaperGenerator() {
       const href = URL.createObjectURL(blob);
       const anchor = document.createElement("a");
       anchor.href = href;
-      anchor.download = `${exportSlug(snapshot.title)}-${snapshot.format}-collection-${snapshot.generation + 1}-composition-${snapshot.selected + 1}.png`;
+      anchor.download = `${exportSlug(snapshot.title)}-${snapshot.format}-${snapshot.revision}-composition-${snapshot.selected + 1}.png`;
       anchor.click();
       window.setTimeout(() => URL.revokeObjectURL(href), 1000);
       setStatus(`${snapshot.dimensions.width} × ${snapshot.dimensions.height} PNG exported.`);

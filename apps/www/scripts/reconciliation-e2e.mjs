@@ -112,6 +112,7 @@ async function checkReconciliation() {
   await confirm.waitFor({ state: "visible", timeout: 8_000 });
   assert.equal(await confirm.count(), 1, "valid ProjectTools file should open a confirmation dialog");
   await confirm.click();
+  await page.locator("dialog[open]").waitFor({ state: "hidden" });
   await page.getByRole("heading", { name: /exception groups/i }).waitFor({ state: "visible", timeout: 10_000 });
   await page.screenshot({ path: "/tmp/reconciliation-desktop.png", fullPage: true });
   await page.close();

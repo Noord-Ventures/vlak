@@ -7,7 +7,7 @@ export default function Page() {
   return <DocsShell title="Project files" summary="Keep the work you make, and return to it later.">
     <p className="rs-t-body">Calendar, CSV reconciliation, Microscopy, Music, Wallpaper and the modernization brief share project controls. A project contains the workspace’s actual records and settings. Music projects reopen stopped; wallpaper projects retain the generated geometry.</p>
     <h2 className="section-label">Save and reopen</h2>
-    <p className="rs-t-body">Choose Save project file for a portable JSON copy, or Save in browser to enable saves as you work. Recent projects opens copies stored in this browser. A file import shows a confirmation before replacing the work on screen; save the current file first if you want to keep it.</p>
+    <p className="rs-t-body">Choose Save project file for a portable JSON copy, or Save in browser to enable saves as you work. Opening a project asks for confirmation, then saves the outgoing work in Recent projects as a before-opening copy. If that recovery copy cannot be saved, the current work stays on screen. You can also download it before opening another project.</p>
     <p className="rs-t-body">Browser storage keeps up to 20 projects per workspace and 20 revisions per project. Clearing site data removes those copies. Project files are limited to 8 MiB; the workspace reports an export or storage failure without claiming the work was saved.</p>
     <h2 className="section-label">Conflicts and recovery</h2>
     <p className="rs-t-body">When another tab has saved the same project, a later save stops instead of replacing it. Open the latest revision or save your work as a separate copy. History opens an earlier revision as a copy, keeping the current saved project.</p>

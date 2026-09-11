@@ -1,18 +1,19 @@
 import type { ChannelStripValue } from "@noorddev/vlak-react";
 
 export type Instrument = "kick" | "hat" | "bass" | "keys";
-export interface Clip { name: string; steps: boolean[]; root: number }
+export interface Clip { id: string; name: string; steps: boolean[]; root: number }
 export interface Track { id: string; name: string; instrument: Instrument; active: number; tone: number; channel: ChannelStripValue; clips: Clip[] }
 export interface Session { name: string; tempo: number; tracks: Track[] }
 const pattern = (positions: number[]) => Array.from({ length: 16 }, (_, index) => positions.includes(index));
 const scenes = ["First light", "Open space", "After hours", "Home again"];
+export const legacyClipId = (trackId: string, index: number) => `${trackId}:clip:${index + 1}`;
 
 export function initialSession(): Session {
   return { name: "A little room", tempo: 112, tracks: [
-    { id: "drums", name: "Drum machine", instrument: "kick", active: 0, tone: 48, channel: { gain: -4, pan: 0, muted: false, solo: false }, clips: scenes.map((_, i) => ({ name: ["Four on the floor", "Half time", "Off balance", "Steady return"][i]!, root: 36, steps: pattern([[0, 4, 8, 12], [0, 8, 11], [0, 3, 8, 10, 14], [0, 4, 8, 12, 15]][i]!) })) },
-    { id: "hats", name: "Closed hats", instrument: "hat", active: 0, tone: 64, channel: { gain: -14, pan: 16, muted: false, solo: false }, clips: scenes.map((_, i) => ({ name: ["In between", "Little skips", "Sixteenths", "Breathing room"][i]!, root: 60, steps: pattern([[2, 6, 10, 14], [2, 5, 6, 10, 14, 15], [0, 2, 4, 6, 8, 10, 12, 14], [2, 6, 14]][i]!) })) },
-    { id: "bass", name: "Round bass", instrument: "bass", active: 0, tone: 38, channel: { gain: -9, pan: -8, muted: false, solo: false }, clips: scenes.map((_, i) => ({ name: ["Rooted", "Small motion", "A longer walk", "Back to one"][i]!, root: [45, 48, 41, 45][i]!, steps: pattern([[0, 3, 6, 8, 11, 14], [0, 6, 8, 14], [0, 2, 5, 8, 10, 13], [0, 3, 8, 11]][i]!) })) },
-    { id: "keys", name: "Soft keys", instrument: "keys", active: 0, tone: 56, channel: { gain: -14, pan: 22, muted: false, solo: false }, clips: scenes.map((_, i) => ({ name: ["Soft edges", "Window light", "Night air", "Still here"][i]!, root: [57, 60, 53, 57][i]!, steps: pattern([[0, 6, 10], [0, 8], [2, 6, 12], [0, 10]][i]!) })) },
+    { id: "drums", name: "Drum machine", instrument: "kick", active: 0, tone: 48, channel: { gain: -4, pan: 0, muted: false, solo: false }, clips: scenes.map((_, i) => ({ id: legacyClipId("drums", i), name: ["Four on the floor", "Half time", "Off balance", "Steady return"][i]!, root: 36, steps: pattern([[0, 4, 8, 12], [0, 8, 11], [0, 3, 8, 10, 14], [0, 4, 8, 12, 15]][i]!) })) },
+    { id: "hats", name: "Closed hats", instrument: "hat", active: 0, tone: 64, channel: { gain: -14, pan: 16, muted: false, solo: false }, clips: scenes.map((_, i) => ({ id: legacyClipId("hats", i), name: ["In between", "Little skips", "Sixteenths", "Breathing room"][i]!, root: 60, steps: pattern([[2, 6, 10, 14], [2, 5, 6, 10, 14, 15], [0, 2, 4, 6, 8, 10, 12, 14], [2, 6, 14]][i]!) })) },
+    { id: "bass", name: "Round bass", instrument: "bass", active: 0, tone: 38, channel: { gain: -9, pan: -8, muted: false, solo: false }, clips: scenes.map((_, i) => ({ id: legacyClipId("bass", i), name: ["Rooted", "Small motion", "A longer walk", "Back to one"][i]!, root: [45, 48, 41, 45][i]!, steps: pattern([[0, 3, 6, 8, 11, 14], [0, 6, 8, 14], [0, 2, 5, 8, 10, 13], [0, 3, 8, 11]][i]!) })) },
+    { id: "keys", name: "Soft keys", instrument: "keys", active: 0, tone: 56, channel: { gain: -14, pan: 22, muted: false, solo: false }, clips: scenes.map((_, i) => ({ id: legacyClipId("keys", i), name: ["Soft edges", "Window light", "Night air", "Still here"][i]!, root: [57, 60, 53, 57][i]!, steps: pattern([[0, 6, 10], [0, 8], [2, 6, 12], [0, 10]][i]!) })) },
   ] };
 }
 

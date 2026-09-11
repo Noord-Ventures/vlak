@@ -6,13 +6,34 @@ import { makeWallpapers, parseWallpaperProject } from "../app/interfaces/concept
 
 test("music accepts the canonical envelope and rejects malformed nested limits", () => {
   const session = initialSession();
+  const clipIds = session.tracks.flatMap(track => track.clips.map(clip => clip.id));
+  assert.equal(clipIds.length, 16); assert.equal(new Set(clipIds).size, 16);
   const envelope = { schema: "vlak.project", envelopeVersion: 1, kind: "music", documentVersion: 1, payload: session };
   assert.deepEqual(parseMusicProject(envelope), session);
   assert.throws(() => parseMusicProject({ ...session, playing: true }), /unsupported shape/);
   const bad = structuredClone(session);
   bad.tracks[0].clips[0].steps.push(false);
   assert.throws(() => validateSession(bad), /16 booleans/);
+  const duplicate = structuredClone(session);
+  duplicate.tracks[1].clips[0].id = duplicate.tracks[0].clips[0].id;
+  assert.throws(() => validateSession(duplicate), /clip IDs must be unique/);
   assert.throws(() => parseMusicProject({ ...session, tracks: [] }), /4 tracks/);
+});
+
+test("legacy music clips receive deterministic IDs that remain stable through edits and envelopes", () => {
+  const canonical = initialSession();
+  const legacy = structuredClone(canonical);
+  for (const track of legacy.tracks) for (const clip of track.clips) delete clip.id;
+  const migrated = parseMusicProject(legacy);
+  assert.deepEqual(migrated, canonical);
+  assert.deepEqual(parseMusicProject(structuredClone(legacy)), migrated, "raw legacy migration is deterministic");
+  assert.deepEqual(parseMusicProject({ schema: "vlak.project", envelopeVersion: 1, kind: "music", documentVersion: 1, payload: legacy }), migrated, "legacy envelope migration is deterministic");
+  const edited = structuredClone(migrated);
+  edited.tracks[0].clips[0].name = "Renamed rhythm";
+  edited.tracks[0].clips[0].steps[1] = !edited.tracks[0].clips[0].steps[1];
+  assert.equal(parseMusicProject(edited).tracks[0].clips[0].id, migrated.tracks[0].clips[0].id, "editing does not regenerate clip identity");
+  edited.tracks[0].clips.reverse();
+  assert.deepEqual(parseMusicProject(edited).tracks[0].clips.map(clip => clip.id), edited.tracks[0].clips.map(clip => clip.id), "reordering keeps IDs attached to clips");
 });
 
 test("wallpaper generation is deterministic and the parser rejects SVG-shaped imports", () => {

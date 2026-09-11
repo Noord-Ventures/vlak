@@ -12,7 +12,9 @@ This record covers the first software releases from the product and service asse
 | Modernization service | Local brief builder, portable files, proposal/discovery/acceptance/handoff/support templates | No paid pilot, outreach, contract, customer integration or managed support has occurred. A partner and agreed acceptance remain necessary. |
 | Creative tools | Wallpaper and Music project files, validated restoration, optional browser saves/history/recovery; deterministic PNG and snapshot WAV exports | Existing generators and four-track music scope remain. Project files contain editable work; exported images/audio are finished artifacts. No cloud sync or project-state sharing. |
 
-The common document envelope is versioned separately from each app's payload. Imported data is validated before replacement. Optional IndexedDB storage uses revision checks in the write transaction, bounded history and a recovery export; downloaded project files remain the portable ownership mechanism. These utilities do not send project contents to a service.
+The common document envelope is versioned separately from each app's payload. Imported data is validated before replacement. Opening another project first commits a separate copy of outgoing work to Recent projects; failed recovery storage leaves current work on screen. Optional ongoing IndexedDB saves use revision checks in the write transaction, bounded history and a recovery export; downloaded project files remain the portable ownership mechanism. These utilities do not send project contents to a service.
+
+The final plan audit added stable Music clip IDs with deterministic migration for existing files. Wallpaper PNG filenames include a snapshot-derived content label and selected composition; that readable label is distinct from the browser database's revision ID and is not a security checksum.
 
 ## Verification
 
@@ -21,7 +23,7 @@ Local verification used Node 26.7.0, pnpm 11.19.0 and Chrome for Testing 151.0.7
 | Check | Evidence |
 | --- | --- |
 | Package and workflow tests | 1,561 passed: React 1,409; core 73; CLI 42; MCP 17; workflow examples 20 |
-| Website and reference server tests | 91 website tests and 16 assistant tests passed |
+| Website and reference server tests | 92 website tests and 16 assistant tests passed |
 | Types, lint and package builds | Package, workflow, website and assistant checks passed locally; lint has no errors, with 78 warnings and 9 informational findings |
 | Consumer checks | Package tarball inspection, React 18/19 consumers, optional-engine isolation and CLI source export passed |
 | Generated artifacts | Core CSS, tokens, props, registry and machine-readable documents regenerate without changes |
@@ -36,7 +38,7 @@ Local verification used Node 26.7.0, pnpm 11.19.0 and Chrome for Testing 151.0.7
 | Creative output | PNG dimensions for all three formats, restored-image comparison in the same browser, stable export snapshots and WAV PCM structure passed |
 | Existing interfaces | Refreshed interface and specialist checks passed after focused investigation of timing-sensitive assertions; iOS audio resume was repeated five times with state-based readiness |
 
-The first hosted build of `745e3ee` failed because the workflow example's dependencies were not declared in the root workspace. The previous production deployment remained active. The correction in `9ae8e0e` adds that workspace and its lockfile importer, and includes its typecheck in the root command. A fresh checkout build and hosted CI are release gates; local dependency folders are not sufficient evidence.
+The first hosted build of `745e3ee` failed because the workflow example's dependencies were not declared in the root workspace. The previous production deployment remained active. The correction in `9ae8e0e` adds that workspace and its lockfile importer, and includes its typecheck in the root command. A fresh detached checkout passed frozen-lockfile installation, package/workflow/site typechecks and the production site build. Hosted CI remains a release gate; local dependency folders are not sufficient evidence.
 
 No independent customer task-completion study has been run. The proposed four-of-five unassisted completion gate, return-use measures, adoption rates, task-time improvements, pricing and service demand remain unmeasured.
 

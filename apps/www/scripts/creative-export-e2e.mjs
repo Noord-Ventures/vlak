@@ -109,11 +109,12 @@ async function checkWallpaper(context) {
   const desktopPath = await desktopDownload.path();
   assert(desktopPath);
   const desktop = { bytes: await readFile(desktopPath), filename: desktopDownload.suggestedFilename() };
-  assert.equal(desktop.filename, "field-notes-september-desktop-collection-2-composition-3.png");
+  assert.match(desktop.filename, /^field-notes-september-desktop-r[0-9a-f]{8}-composition-3\.png$/);
   assert.deepEqual(pngSize(desktop.bytes), { width: 6144, height: 3840 });
 
   const phone = await downloaded(page, () => page.getByRole("button", { name: "Export 6K" }).click());
-  assert.match(phone.filename, /^renamed-while-png-renders-phone-collection-2-composition-3\.png$/);
+  assert.match(phone.filename, /^renamed-while-png-renders-phone-r[0-9a-f]{8}-composition-3\.png$/);
+  assert.notEqual(phone.filename.match(/-r[0-9a-f]{8}-/)?.[0], desktop.filename.match(/-r[0-9a-f]{8}-/)?.[0], "changed content must receive a different export revision");
   assert.deepEqual(pngSize(phone.bytes), { width: 3456, height: 6144 });
   await format.selectOption("widescreen");
   const widescreen = await downloaded(page, () => page.getByRole("button", { name: "Export 6K" }).click());
@@ -128,6 +129,7 @@ async function checkWallpaper(context) {
   const reopened = await projectFile(page, tools);
   assert.deepEqual(reopened.project.payload, saved.project.payload, "save/open must preserve selected format and generated geometry");
   const reopenedPng = await downloaded(page, () => page.getByRole("button", { name: "Export 6K" }).click());
+  assert.equal(reopenedPng.filename, desktop.filename, "the restored project must retain its export revision filename");
   assert.deepEqual(pngSize(reopenedPng.bytes), { width: 6144, height: 3840 });
   assert.equal(await pixelFingerprint(page, reopenedPng.bytes), await pixelFingerprint(page, desktop.bytes), "reopened geometry must render the same pixels in one browser");
   await page.close();

@@ -31,6 +31,8 @@ export function ProjectTools<T>({ kind, title, value, parse, onRestore, document
   const [deleting, setDeleting] = useState<Project<unknown> | null>(null);
   const [enabled, setEnabled] = useState(false);
   const [writing, setWriting] = useState(false);
+  const [restoring, setRestoring] = useState(false);
+  const restoreBusy = useRef(false);
   const [blocked, setBlocked] = useState(false);
   const [copyTick, setCopyTick] = useState(0);
   const file = useRef<HTMLInputElement>(null);
@@ -69,8 +71,9 @@ export function ProjectTools<T>({ kind, title, value, parse, onRestore, document
   // snapshot reads the latest render through current; copyTick deliberately retries an unchanged value.
   // biome-ignore lint/correctness/useExhaustiveDependencies: ref-backed snapshot and explicit retry trigger are intentional.
   useEffect(() => {
-    if (!enabled || writing || blocked || savedKey.current === signature) return;
+    if (!enabled || writing || restoring || blocked || savedKey.current === signature) return;
     const timer = window.setTimeout(async () => {
+      if (restoreBusy.current) return;
       const token = generation.current;
       setWriting(true);
       try {
@@ -85,7 +88,7 @@ export function ProjectTools<T>({ kind, title, value, parse, onRestore, document
       } finally { if (alive.current) setWriting(false); }
     }, 650);
     return () => window.clearTimeout(timer);
-  }, [signature, enabled, writing, blocked, copyTick]);
+  }, [signature, enabled, writing, restoring, blocked, copyTick]);
 
   function exportFile() {
     try {
@@ -116,20 +119,39 @@ export function ProjectTools<T>({ kind, title, value, parse, onRestore, document
       setBrowserOpen(false); setCandidate({ project: validated, copy }); setError("");
     } catch (failure) { setError(failure instanceof Error ? failure.message : "This saved project could not be read."); }
   }
-  function restore() {
-    if (!candidate) return;
+  async function restore() {
+    if (!candidate || writing || restoreBusy.current) return;
+    restoreBusy.current = true;
+    setRestoring(true);
+    const token = generation.current;
+    let applying = false;
     try {
-      // Validate the outgoing snapshot; the dialog offers file export before replacement.
+      // A committed recovery copy must exist before the app relinquishes its current work.
       const outgoing = snapshot();
       serializeProject(outgoing);
+      const outgoingKey = JSON.stringify([current.current.title, current.current.value]);
+      // Use a separate identity so a competing tab cannot prevent or overwrite recovery.
+      const suffix = " (before opening)";
+      const recoveryCopy = createProject(kind, `${outgoing.title.slice(0, 120 - suffix.length)}${suffix}`, outgoing.payload, documentVersion);
+      await saveProjectRevision(recoveryCopy, null);
+      if (!alive.current || token !== generation.current) return;
+      if (outgoingKey !== JSON.stringify([current.current.title, current.current.value])) {
+        throw new Error("Work changed while its recovery copy was saving. Current work is unchanged; open the project again to save the latest version first.");
+      }
       const next = candidate.copy ? createProject(kind, candidate.project.title, candidate.project.payload, documentVersion) : candidate.project;
+      applying = true;
       onRestore(next.payload, next.title);
       generation.current++;
       identity.current = next; expected.current = candidate.copy ? null : next.revision;
       savedKey.current = candidate.copy ? "" : JSON.stringify([next.title, next.payload]);
       setEnabled(true); setBlocked(false); setCandidate(null); setRecovery(null); setBrowserOpen(false); setHistory([]); setError("");
-      setNotice(candidate.copy ? "Opened as a new copy. Browser save will keep this project." : "Project opened. Changes will save in this browser.");
-    } catch (failure) { setError(failure instanceof Error ? failure.message : "Project could not be restored."); }
+      setNotice("Project opened. Previous work is saved in Recent projects as a before-opening copy.");
+    } catch (failure) {
+      if (alive.current) setError(`${applying ? "Opening could not finish. Previous work is saved in Recent projects." : "Current work is unchanged."} ${failure instanceof Error ? failure.message : "A recovery copy could not be saved. Export and remove an older browser copy, then try again."}`);
+    } finally {
+      restoreBusy.current = false;
+      if (alive.current) setRestoring(false);
+    }
   }
   function saveCopy() {
     generation.current++; identity.current = createProject(kind, title, value, documentVersion); expected.current = null; savedKey.current = "";
@@ -167,11 +189,12 @@ export function ProjectTools<T>({ kind, title, value, parse, onRestore, document
       <ul className="project-tools-list">{recovery?.projects.map((project, index) => <li key={`${project.projectId}-${index}`}><span>{project.title}</span><Button type="button" onClick={() => { setRecovery(null); setCandidate({ project, copy: true }); }}>Open copy</Button></li>)}</ul>
       <Button type="button" onClick={() => setRecovery(null)}>Done</Button>
     </Dialog>
-    <Dialog open={Boolean(candidate)} onClose={() => setCandidate(null)} className="project-tools-dialog">
+    <Dialog open={Boolean(candidate)} onClose={() => { if (!restoreBusy.current) setCandidate(null); }} className="project-tools-dialog">
       <DialogTitle>Open {candidate?.project.title}?</DialogTitle>
-      <p>This replaces the work on screen. Save your current project file first if you want to keep it. Imported files and historical revisions open as separate copies.</p>
+      <p>Your current work will be saved in Recent projects before this opens. You can also download a project file. Imported files and historical revisions open as separate copies.</p>
       {error && <p role="status">{error}</p>}
-      <div className="project-tools-actions"><Button type="button" variant="ghost" onClick={exportFile}>Save current file</Button><Button type="button" variant="ghost" onClick={() => setCandidate(null)}>Cancel</Button><Button type="button" onClick={restore}>Open project</Button></div>
+      {restoring && <p role="status">Saving your current work before opening…</p>}
+      <div className="project-tools-actions"><Button type="button" variant="ghost" onClick={exportFile}>Save current file</Button><Button type="button" variant="ghost" disabled={restoring} onClick={() => setCandidate(null)}>Cancel</Button><Button type="button" disabled={writing || restoring} onClick={restore}>Open project</Button></div>
     </Dialog>
     <Dialog open={Boolean(deleting)} onClose={() => setDeleting(null)} className="project-tools-dialog">
       <DialogTitle>Remove {deleting?.title}?</DialogTitle>{error && <p role="status">{error}</p>}<p>This removes the browser copy and its saved revisions. Download a project file first to keep it.</p>
