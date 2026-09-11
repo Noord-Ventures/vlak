@@ -116,7 +116,7 @@
 
 ## Icons
 
-- [Icons](icons.md): Provides interface marks on a 16px viewBox. 1px currentColor strokes with butt caps and miter joins.
+- [Icons](icons.md): Provides interface marks on a 16px viewBox. Round currentColor strokes are 1px at 12, 1.25px at 16, and 1.5px at 24.
 
 ## Charts
 

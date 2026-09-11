@@ -1,6 +1,6 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { Icon, type IconSize, type IconVariant } from "../src/components/icon";
+import { ICON_STROKES, Icon, type IconSize, type IconVariant } from "../src/components/icon";
 import {
   filledCutouts,
   filledMarks,
@@ -129,7 +129,7 @@ describe("Wi-Fi optical fidelity", () => {
     }
   });
 
-  it.each(sizes)("preserves square-ended hairlines and scaled filled waves at %ipx", (size) => {
+  it.each(sizes)("preserves round optical strokes and scaled filled waves at %ipx", (size) => {
     for (const variant of variants) for (const name of names) {
       const { container, unmount } = render(<Icon name={name} size={size} variant={variant} />);
       const paths = container.querySelectorAll("path");
@@ -137,9 +137,9 @@ describe("Wi-Fi optical fidelity", () => {
         const wave = paths[index]!;
         expect(wave.getAttribute("d")).toBe(pathAt(marks.wifi, index));
         expect(wave.getAttribute("fill")).toBe("none");
-        expect(wave.getAttribute("stroke-width")).toBe(variant === "line" ? "1" : "2");
-        expect(wave.getAttribute("stroke-linecap")).toBe("butt");
-        expect(wave.getAttribute("stroke-linejoin")).toBe("miter");
+        expect(wave.getAttribute("stroke-width")).toBe(variant === "line" ? String(ICON_STROKES[size]) : "2");
+        expect(wave.getAttribute("stroke-linecap")).toBe("round");
+        expect(wave.getAttribute("stroke-linejoin")).toBe("round");
         expect(wave.getAttribute("vector-effect")).toBe(variant === "line" ? "non-scaling-stroke" : "none");
       }
       unmount();

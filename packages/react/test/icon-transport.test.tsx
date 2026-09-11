@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { axe } from "vitest-axe";
-import { Icon, iconGroups, iconNames, resolveIcon } from "../src/components/icon";
+import { ICON_STROKES, Icon, iconGroups, iconNames, resolveIcon } from "../src/components/icon";
 
 const transport = ["truck", "car", "van", "bicycle"] as const;
 
@@ -17,7 +17,7 @@ describe("Transportation marks", () => {
     expect(new Set(figures).size).toBe(4);
   });
 
-  it("keeps a shared wheel baseline and hairline side profile at every supported size", () => {
+  it("keeps a shared wheel baseline and optical side profile at every supported size", () => {
     for (const name of transport) for (const size of [12, 16, 24] as const) {
       const { container, unmount } = render(<Icon name={name} size={size} />);
       const wheels = [...container.querySelectorAll("circle")];
@@ -26,9 +26,9 @@ describe("Transportation marks", () => {
       expect(Number(wheels[0]!.getAttribute("cx"))).toBeLessThan(Number(wheels[1]!.getAttribute("cx")));
       for (const mark of container.querySelectorAll("path,rect,circle")) {
         expect(mark.getAttribute("fill")).toBe("none");
-        expect(mark.getAttribute("stroke-width")).toBe("1");
-        expect(mark.getAttribute("stroke-linecap")).toBe("butt");
-        expect(mark.getAttribute("stroke-linejoin")).toBe("miter");
+        expect(mark.getAttribute("stroke-width")).toBe(String(ICON_STROKES[size]));
+        expect(mark.getAttribute("stroke-linecap")).toBe("round");
+        expect(mark.getAttribute("stroke-linejoin")).toBe("round");
         expect(mark.getAttribute("vector-effect")).toBe("non-scaling-stroke");
       }
       unmount();

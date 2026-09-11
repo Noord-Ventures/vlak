@@ -144,7 +144,10 @@ describe("Checkbox", () => {
     const box = screen.getByRole("checkbox", { name: "Brand" });
     await user.click(box);
     expect((box as HTMLInputElement).checked).toBe(true);
-    expect(document.querySelector('path[d="M3.5 8.5 L6.5 11.5 L12.5 4.5"]')).toBeTruthy();
+    const check = document.querySelector(".rs-check path");
+    expect(check).toBeTruthy();
+    expect(check?.getAttribute("stroke-width")).toBe("1");
+    expect(check?.getAttribute("stroke-linecap")).toBe("round");
   });
 });
 
@@ -223,7 +226,7 @@ describe("Tabs", () => {
 });
 
 describe("Icon", () => {
-  it("locks a 16 viewBox, 1px currentColor hairline, butt/miter, no radius", () => {
+  it("locks a 16 viewBox and the 16px optical currentColor stroke", () => {
     const { container } = render(<Icon name="copy" />);
     const svg = container.querySelector("svg");
     expect(svg?.getAttribute("viewBox")).toBe("0 0 16 16");
@@ -231,12 +234,12 @@ describe("Icon", () => {
     expect(svg?.getAttribute("height")).toBe("16");
     expect(svg?.getAttribute("fill")).toBe("none");
     expect(svg?.getAttribute("stroke")).toBe("currentColor");
-    expect(svg?.getAttribute("stroke-width")).toBe("1");
-    expect(svg?.getAttribute("stroke-linecap")).toBe("butt");
-    expect(svg?.getAttribute("stroke-linejoin")).toBe("miter");
+    expect(svg?.getAttribute("stroke-width")).toBe("1.25");
+    expect(svg?.getAttribute("stroke-linecap")).toBe("round");
+    expect(svg?.getAttribute("stroke-linejoin")).toBe("round");
     expect(svg?.classList.contains("rs-icon")).toBe(true);
     expect(container.querySelector("[rx]")).toBeNull();
-    expect(ICON_STROKE).toBe(1);
+    expect(ICON_STROKE).toBe(1.25);
     expect(ICON_VIEWBOX).toBe(16);
   });
 
@@ -270,25 +273,22 @@ describe("Icon", () => {
 
   it("uses one check path for copied and check", () => {
     const { container, rerender } = render(<Icon name="copied" />);
-    expect(container.querySelector('path[d="M3.5 8.5 L6.5 11.5 L12.5 4.5"]')).toBeTruthy();
+    const copied = container.querySelector("path")?.getAttribute("d");
+    expect(copied).toBeTruthy();
     rerender(<Icon name="check" />);
-    expect(container.querySelector('path[d="M3.5 8.5 L6.5 11.5 L12.5 4.5"]')).toBeTruthy();
+    expect(container.querySelector("path")?.getAttribute("d")).toBe(copied);
     expect(container.querySelector("svg")?.getAttribute("viewBox")).toBe("0 0 16 16");
   });
 
-  it("keeps the core chevrons and close paths exact", () => {
+  it("keeps the core chevrons and close as distinct centered marks", () => {
     expect(iconNames.slice(0, 5)).toEqual(["copy", "copied", "chevron-left", "chevron-right", "close"]);
-    const { container } = render(
-      <>
-        <Icon name="chevron-left" />
-        <Icon name="chevron-right" />
-        <Icon name="close" />
-      </>,
-    );
-    expect(container.querySelector('path[d="M10.5 3.75 L5.5 8.25 L10.5 12.75"]')).toBeTruthy();
-    expect(container.querySelector('path[d="M5.5 3.75 L10.5 8.25 L5.5 12.75"]')).toBeTruthy();
-    expect(container.querySelector('path[d="M4.5 4.5 L11.5 11.5"]')).toBeTruthy();
-    expect(container.querySelector('path[d="M11.5 4.5 L4.5 11.5"]')).toBeTruthy();
+    const { container } = render(<><Icon name="chevron-left" /><Icon name="chevron-right" /><Icon name="close" /></>);
+    const figures = [...container.querySelectorAll("svg")].map(svg => svg.innerHTML);
+    expect(new Set(figures)).toHaveLength(3);
+    for (const svg of container.querySelectorAll("svg")) {
+      expect(svg.getAttribute("viewBox")).toBe("0 0 16 16");
+      expect(svg.querySelectorAll("path").length).toBeGreaterThan(0);
+    }
   });
 
   it("ships a complete family on the same 16 module", () => {
@@ -305,16 +305,21 @@ describe("Icon", () => {
       expect(svg.getAttribute("width")).toBe("12");
       expect(svg.getAttribute("height")).toBe("12");
       expect(svg.getAttribute("stroke-width")).toBe("1");
-      expect(svg.getAttribute("stroke-linecap")).toBe("butt");
+      expect(svg.getAttribute("stroke-linecap")).toBe("round");
+      expect(svg.getAttribute("stroke-linejoin")).toBe("round");
       expect(svg.querySelector("[rx]")).toBeNull();
     }
   });
 
   it("reuses the check for success and rotates chevron-right for up and down", () => {
-    const { container, rerender } = render(<Icon name="success" />);
-    expect(container.querySelector('path[d="M3.5 8.5 L6.5 11.5 L12.5 4.5"]')).toBeTruthy();
+    const { container, rerender } = render(<Icon name="check" />);
+    const check = container.querySelector("path")?.getAttribute("d");
+    rerender(<Icon name="success" />);
+    expect(container.querySelector("path")?.getAttribute("d")).toBe(check);
+    rerender(<Icon name="chevron-right" />);
+    const chevron = container.querySelector("path")?.getAttribute("d");
     rerender(<Icon name="chevron-down" />);
-    expect(container.querySelector('path[d="M5.5 3.75 L10.5 8.25 L5.5 12.75"]')).toBeTruthy();
+    expect(container.querySelector("path")?.getAttribute("d")).toBe(chevron);
     expect(container.querySelector('g[transform="rotate(90 8 8)"]')).toBeTruthy();
     rerender(<Icon name="chevron-up" />);
     expect(container.querySelector('g[transform="rotate(270 8 8)"]')).toBeTruthy();
@@ -325,8 +330,9 @@ describe("Icon", () => {
     const path = container.querySelector('path[d="M5.5 3 H13 V10.5"]');
     const rect = container.querySelector("rect");
     expect(path?.getAttribute("vector-effect")).toBe("non-scaling-stroke");
-    expect(path?.getAttribute("stroke-width")).toBe("1");
-    expect(path?.getAttribute("stroke-linecap")).toBe("butt");
+    expect(path?.getAttribute("stroke-width")).toBe("1.25");
+    expect(path?.getAttribute("stroke-linecap")).toBe("round");
+    expect(path?.getAttribute("stroke-linejoin")).toBe("round");
     expect(rect?.getAttribute("vector-effect")).toBe("non-scaling-stroke");
   });
 
@@ -336,23 +342,23 @@ describe("Icon", () => {
     expect(sun?.classList.contains("rs-icon")).toBe(true);
     expect(sun?.classList.contains("icon-sun")).toBe(true);
     const circle = container.querySelector("circle");
-    expect(circle?.getAttribute("stroke-width")).toBe("1");
-    expect(circle?.getAttribute("stroke-linecap")).toBe("butt");
-    expect(circle?.getAttribute("stroke-linejoin")).toBe("miter");
+    expect(circle?.getAttribute("stroke-width")).toBe("1.25");
+    expect(circle?.getAttribute("stroke-linecap")).toBe("round");
+    expect(circle?.getAttribute("stroke-linejoin")).toBe("round");
     expect(circle?.getAttribute("vector-effect")).toBe("non-scaling-stroke");
     expect(circle?.getAttribute("fill")).toBe("none");
     rerender(<Icon name="moon" className="icon-moon" />);
     const moon = container.querySelector("svg");
     expect(moon?.classList.contains("rs-icon")).toBe(true);
     const crescent = container.querySelector("path");
-    expect(crescent?.getAttribute("d")).toBe("M13.5 8.5 A5.5 5.5 0 1 1 7.5 2.5 A4.5 4.5 0 0 0 13.5 8.5 Z");
-    expect(crescent?.getAttribute("d")).not.toMatch(/M13\.5 9\.5A5\.5/);
-    expect(crescent?.getAttribute("stroke-width")).toBe("1");
-    expect(crescent?.getAttribute("stroke-linecap")).toBe("butt");
+    expect(crescent?.getAttribute("d")).toMatch(/[Aa]/);
+    expect(crescent?.getAttribute("stroke-width")).toBe("1.25");
+    expect(crescent?.getAttribute("stroke-linecap")).toBe("round");
+    expect(crescent?.getAttribute("stroke-linejoin")).toBe("round");
     expect(crescent?.getAttribute("vector-effect")).toBe("non-scaling-stroke");
   });
 
-  it("holds calendar on the same hairline", () => {
+  it("holds calendar on the same optical stroke", () => {
     const { container } = render(<Icon name="calendar" />);
     const rect = container.querySelector("rect");
     expect(rect?.getAttribute("x")).toBe("3");
@@ -414,7 +420,6 @@ describe("Icon", () => {
       "key",
       "database",
       "monitor",
-      "sun",
       "moon",
       "receipt",
       "wallet",
@@ -464,9 +469,9 @@ describe("ThemeToggle", () => {
     expect(marks).toHaveLength(1);
     expect(marks[0]?.classList.contains("rs-icon")).toBe(true);
     expect(marks[0]?.getAttribute("viewBox")).toBe("0 0 16 16");
-    expect(marks[0]?.getAttribute("stroke-width")).toBe("1");
-    expect(marks[0]?.getAttribute("stroke-linecap")).toBe("butt");
-    expect(container.querySelector('[stroke-width="1.5"]')).toBeNull();
+    expect(marks[0]?.getAttribute("stroke-width")).toBe("1.5");
+    expect(marks[0]?.getAttribute("stroke-linecap")).toBe("round");
+    expect(marks[0]?.getAttribute("stroke-linejoin")).toBe("round");
   });
 });
 

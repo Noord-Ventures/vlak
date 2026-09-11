@@ -1,6 +1,6 @@
 # Icons
 
-Provides interface marks on a 16px viewBox. 1px currentColor strokes with butt caps and miter joins.
+Provides interface marks on a 16px viewBox. Round currentColor strokes are 1px at 12, 1.25px at 16, and 1.5px at 24.
 
 Category: icons  
 Name: `icons`  
@@ -14,7 +14,7 @@ Page: https://vlak.dev/components/icons/
 
 ## When not to
 
-- Illustration or brand marks; these are 1px hairline glyphs.
+- Illustration or brand marks; these are compact interface glyphs.
 - Icons as the only label; add text or an aria-label on the control.
 
 ## Install
@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/icons.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<div class="rs-icons"><svg class="rs-icon" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg><svg class="rs-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg></div>
+<div class="rs-icons"><svg class="rs-icon" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg><svg class="rs-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg></div>
 ```
 
 ## Example
@@ -77,7 +77,7 @@ Forwards `ref` to the `SVGSVGElement`.
 | --- | --- | --- | --- |
 | `name` (required) | `IconName` |  |  |
 | `size` | `IconSize` | `16` |  |
-| `variant` | `IconVariant` | `"line"` | Line hairline, or filled kinship of the same figure. |
+| `variant` | `IconVariant` | `"line"` | Optically weighted line, or filled silhouette of the same figure. |
 | `rotate` | `IconRotate` |  | Same mark, spun around 8,8. Accordion down is chevron-right at 90. |
 
 ### IconCatalog

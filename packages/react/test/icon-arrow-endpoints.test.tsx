@@ -1,6 +1,6 @@
 import { cleanup, render } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { Icon, type IconSize, type IconVariant } from "../src/components/icon";
+import { ICON_STROKES, Icon, type IconSize, type IconVariant } from "../src/components/icon";
 import {
   filledMarks,
   marks,
@@ -116,8 +116,9 @@ describe("Arrow endpoint craft", () => {
           expect(length(tangent)).toBeGreaterThan(0);
           expect(dot(tangent, bisector) / (length(tangent) * length(bisector))).toBeCloseTo(1, 8);
         }
-        // Include the 90° miter's full reach inside the filled SVG mask.
-        const reach = variant === "filled" ? Math.SQRT2 : 16 / size / Math.SQRT2;
+        // Include the round join's radius, converted to viewBox units for
+        // non-scaling line strokes. Filled mask strokes scale with the SVG.
+        const reach = variant === "filled" ? 1 : ICON_STROKES[size] * 8 / size;
         for (const coordinate of tip) {
           expect(coordinate - reach).toBeGreaterThanOrEqual(0);
           expect(coordinate + reach).toBeLessThanOrEqual(16);
@@ -134,9 +135,9 @@ describe("Arrow endpoint craft", () => {
       const path = [...scope.querySelectorAll("path")].find((entry) => entry.getAttribute("d") === expected);
       expect(path, `${name} ${variant}`).toBeTruthy();
       expect(path!.getAttribute("fill")).toBe("none");
-      expect(path!.getAttribute("stroke-linecap")).toBe("butt");
-      expect(path!.getAttribute("stroke-linejoin")).toBe("miter");
-      expect(path!.getAttribute("stroke-width")).toBe(variant === "line" ? "1" : "2");
+      expect(path!.getAttribute("stroke-linecap")).toBe("round");
+      expect(path!.getAttribute("stroke-linejoin")).toBe("round");
+      expect(path!.getAttribute("stroke-width")).toBe(variant === "line" ? String(ICON_STROKES[size]) : "2");
       expect(path!.getAttribute("vector-effect")).toBe(variant === "line" ? "non-scaling-stroke" : "none");
       expect(path!.getAttribute("stroke")).toBe(variant === "line" ? "currentColor" : "white");
       unmount();

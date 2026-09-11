@@ -9854,7 +9854,7 @@
               "type": "IconVariant",
               "required": false,
               "default": "\"line\"",
-              "description": "Line hairline, or filled kinship of the same figure."
+              "description": "Optically weighted line, or filled silhouette of the same figure."
             },
             {
               "name": "rotate",

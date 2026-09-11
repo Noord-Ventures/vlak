@@ -82,7 +82,7 @@ export default function ComponentsPage() {
                             {group.title}
                           </Link>
                         </h3>
-                        <p>{group.names.length} marks on a 16px viewBox, drawn with 1px currentColor strokes.</p>
+                        <p>{group.names.length} marks on a 16px viewBox, optically weighted for 12, 16, and 24px.</p>
                       </div>
                     </div>
                   ))}

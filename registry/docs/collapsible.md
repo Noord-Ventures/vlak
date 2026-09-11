@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/collapsible.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<details class="rs-disclosure"><summary>Show the details<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-disclosure-body">Here they are.</div></details>
+<details class="rs-disclosure"><summary>Show the details<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-disclosure-body">Here they are.</div></details>
 ```
 
 ## Example

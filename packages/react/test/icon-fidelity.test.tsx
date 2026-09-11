@@ -1,7 +1,6 @@
-import * as React from "react";
 import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import { Icon, IconCatalog, type IconSize } from "../src/components/icon";
+import { ICON_STROKES, Icon, IconCatalog, type IconSize } from "../src/components/icon";
 import {
   filledCutouts,
   filledMarks,
@@ -12,6 +11,19 @@ import {
 } from "../src/components/icon-marks";
 
 describe("Icon optical fidelity", () => {
+  it("uses the specified non-scaling optical stroke at each supported size", () => {
+    expect(ICON_STROKES).toEqual({ 12: 1, 16: 1.25, 24: 1.5 });
+    for (const size of [12, 16, 24] as const) {
+      const { container, unmount } = render(<Icon name="plus" size={size} />);
+      const svg = container.querySelector("svg")!;
+      expect(svg.getAttribute("stroke-width")).toBe(String(ICON_STROKES[size]));
+      expect(svg.getAttribute("stroke-linecap")).toBe("round");
+      expect(svg.getAttribute("stroke-linejoin")).toBe("round");
+      expect(svg.querySelector("path")?.getAttribute("vector-effect")).toBe("non-scaling-stroke");
+      unmount();
+    }
+  });
+
   it("keeps save detail enclosed within the silhouette at every supported size", () => {
     for (const size of [12, 16, 24] as const) {
       const { container, unmount } = render(<Icon name="save" variant="filled" size={size} />);
@@ -58,11 +70,15 @@ describe("Icon optical fidelity", () => {
     expect(cuts.length).toBeGreaterThan(0);
     for (const cut of cuts) {
       expect(cut.getAttribute("vector-effect")).toBe("none");
+      expect(cut.getAttribute("stroke-linecap")).toBe("round");
+      expect(cut.getAttribute("stroke-linejoin")).toBe("round");
       expect(Number(cut.getAttribute("stroke-width")) * size / 16).toBeGreaterThanOrEqual(1);
     }
     const { container: action } = render(<Icon name="plus" variant="filled" size={size} />);
     for (const stroke of action.querySelectorAll('mask path[stroke="white"]')) {
       expect(stroke.getAttribute("vector-effect")).toBe("none");
+      expect(stroke.getAttribute("stroke-linecap")).toBe("round");
+      expect(stroke.getAttribute("stroke-linejoin")).toBe("round");
     }
   });
 

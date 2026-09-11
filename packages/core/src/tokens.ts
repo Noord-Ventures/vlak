@@ -115,10 +115,11 @@ export const vlakTokens = {
   icons: {
     sizes: [12, 16, 24],
     variants: ["line", "filled"],
-    stroke: 1,
+    stroke: 1.25,
+    strokes: { 12: 1, 16: 1.25, 24: 1.5 },
     viewBox: 16,
     center: [8, 8],
-    rule: "Line: 1px currentColor hairline, butt/miter, no rx. Filled: solid silhouettes with transparent detail cuts. Draw at 12, 16, or 24; 12px uses simplified fine detail",
+    rule: "Line: currentColor strokes use 1px at 12, 1.25px at 16, and 1.5px at 24, with round caps and joins. Filled: solid silhouettes with transparent detail cuts. Draw at 12, 16, or 24; 12px uses simplified fine detail",
   },
   motion: {
     duration: "0.1–0.4s",

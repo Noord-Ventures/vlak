@@ -392,7 +392,7 @@ const [plan, setPlan] = useState("monthly");
     classes: ["rs-choice", "rs-check", "rs-check-on"],
     css: ["components/checkbox.css"],
     react: "components/checkbox.tsx",
-    snippet: `<label class="rs-choice"><span class="rs-check rs-check-on"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M3.5 8.5 L6.5 11.5 L12.5 4.5" vector-effect="non-scaling-stroke"/></svg></span>Brand</label>`,
+    snippet: `<label class="rs-choice"><span class="rs-check rs-check-on"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.25 L6.25 11.5 L13 4.5" vector-effect="non-scaling-stroke"/></svg></span>Brand</label>`,
     example: `import { useState } from "react";
 import { Checkbox } from "@noorddev/vlak-react";
 
@@ -606,7 +606,7 @@ const [volume, setVolume] = useState(62);
     classes: ["rs-pages", "rs-page", "rs-page-on", "rs-page-gap", "rs-pages-icon"],
     css: ["components/pagination.css"],
     react: "components/pagination.tsx",
-    snippet: `<div class="rs-pages"><span class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M10.5 3.75 L5.5 8.25 L10.5 12.75" vector-effect="non-scaling-stroke"/></svg></span><span class="rs-page rs-page-on">1</span><span class="rs-page">2</span><span class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" vector-effect="non-scaling-stroke"/></svg></span></div>`,
+    snippet: `<div class="rs-pages"><span class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.75 L5.5 8.25 L10.5 12.75" vector-effect="non-scaling-stroke"/></svg></span><span class="rs-page rs-page-on">1</span><span class="rs-page">2</span><span class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" vector-effect="non-scaling-stroke"/></svg></span></div>`,
     example: `import { useState } from "react";
 import { Pagination } from "@noorddev/vlak-react";
 
@@ -878,7 +878,7 @@ innerRadius(28, 16); // 12`,
   {
     name: "icons",
     title: "Icons",
-    description: "Provides interface marks on a 16px viewBox. 1px currentColor strokes with butt caps and miter joins.",
+    description: "Provides interface marks on a 16px viewBox. Round currentColor strokes are 1px at 12, 1.25px at 16, and 1.5px at 24.",
     category: "icons",
     classes: [
       "rs-icons",
@@ -894,7 +894,7 @@ innerRadius(28, 16); // 12`,
     ],
     css: ["components/icons.css"],
     react: "components/icon.tsx",
-    snippet: `<div class="rs-icons"><svg class="rs-icon" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg><svg class="rs-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg></div>`,
+    snippet: `<div class="rs-icons"><svg class="rs-icon" viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg><svg class="rs-icon" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3 H13 V10.5" vector-effect="non-scaling-stroke"/><rect x="3" y="5.5" width="7.5" height="7.5" vector-effect="non-scaling-stroke"/></svg></div>`,
     example: `import { Icon, IconCatalog, iconNames } from "@noorddev/vlak-react";
 
 <Icon name="search" size={12} />
@@ -907,7 +907,7 @@ iconNames; // every drawn mark
 <IconCatalog />`,
     usage: {
       use: ["Chrome marks at 12, 16, or 24: chevrons, close, search, sort, and the rest of the family.", "rotate for the down and up chevrons; variant=\"filled\" for the solid kin."],
-      avoid: ["Illustration or brand marks; these are 1px hairline glyphs.", "Icons as the only label; add text or an aria-label on the control."],
+      avoid: ["Illustration or brand marks; these are compact interface glyphs.", "Icons as the only label; add text or an aria-label on the control."],
     },
     a11y: [
       "Icon renders an inline <svg aria-hidden=\"true\">; it is decorative unless you pass aria-hidden={false}, role=\"img\", and aria-label.",
@@ -923,7 +923,7 @@ iconNames; // every drawn mark
     classes: ["rs-acc", "rs-acc-item", "rs-acc-chevron", "rs-acc-body", "rs-acc-chevron-open", "rs-acc-summary"],
     css: ["components/accordion.css"],
     react: "components/accordion.tsx",
-    snippet: `<div class="rs-acc"><details class="rs-acc-item" name="faq" open><summary>What is Vlak?<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-acc-body">A minimal, CSS-first design system.</div></details><details class="rs-acc-item" name="faq"><summary>Does it require Radix?<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-acc-body">No. Native elements provide the behavior.</div></details></div>`,
+    snippet: `<div class="rs-acc"><details class="rs-acc-item" name="faq" open><summary>What is Vlak?<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-acc-body">A minimal, CSS-first design system.</div></details><details class="rs-acc-item" name="faq"><summary>Does it require Radix?<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-acc-body">No. Native elements provide the behavior.</div></details></div>`,
     example: `import { Accordion, AccordionItem } from "@noorddev/vlak-react";
 
 <Accordion exclusive>
@@ -1751,7 +1751,7 @@ const [open, setOpen] = useState(false);
     css: ["components/collapsible.css"],
     react: "components/collapsible.tsx",
     registryDependencies: ["accordion"],
-    snippet: `<details class="rs-disclosure"><summary>Show the details<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-disclosure-body">Here they are.</div></details>`,
+    snippet: `<details class="rs-disclosure"><summary>Show the details<svg class="rs-acc-chevron" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"><g transform="rotate(90 8 8)"><path d="M5.5 3.5 L10.5 8 L5.5 12.5" vector-effect="non-scaling-stroke"/></g></svg></summary><div class="rs-disclosure-body">Here they are.</div></details>`,
     example: `import { Collapsible } from "@noorddev/vlak-react";
 
 <Collapsible title="Show the details">Here they are.</Collapsible>
@@ -1996,7 +1996,7 @@ const [open, setOpen] = useState(false);
     css: ["components/carousel.css"],
     react: "components/carousel.tsx",
     registryDependencies: ["pagination"],
-    snippet: `<div class="rs-carousel"><div class="rs-carousel-track"><div class="rs-carousel-slide">One</div><div class="rs-carousel-slide">Two</div><div class="rs-carousel-slide">Three</div></div><div class="rs-carousel-nav"><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M10.5 3.75 L5.5 8.25 L10.5 12.75" vector-effect="non-scaling-stroke"/></svg></button><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" vector-effect="non-scaling-stroke"/></svg></button></div></div>`,
+    snippet: `<div class="rs-carousel"><div class="rs-carousel-track"><div class="rs-carousel-slide">One</div><div class="rs-carousel-slide">Two</div><div class="rs-carousel-slide">Three</div></div><div class="rs-carousel-nav"><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.75 L5.5 8.25 L10.5 12.75" vector-effect="non-scaling-stroke"/></svg></button><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" vector-effect="non-scaling-stroke"/></svg></button></div></div>`,
     example: `import { Carousel, CarouselSlide } from "@noorddev/vlak-react";
 
 <Carousel aria-label="Case studies">
@@ -2161,7 +2161,7 @@ useEffect(() => {
     css: ["components/calendar.css"],
     react: "components/calendar.tsx",
     registryDependencies: ["pagination"],
-    snippet: `<div class="rs-cal"><div class="rs-cal-head"><span class="rs-cal-title">July 2026</span><span class="rs-cal-nav"><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M10.5 3.75 L5.5 8.25 L10.5 12.75" vector-effect="non-scaling-stroke"/></svg></button><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" vector-effect="non-scaling-stroke"/></svg></button></span></div><div class="rs-cal-grid" role="grid"><div class="rs-cal-row" role="row"><span class="rs-cal-dow" role="columnheader">Mo</span><span class="rs-cal-dow" role="columnheader">Tu</span><span class="rs-cal-dow" role="columnheader">We</span><span class="rs-cal-dow" role="columnheader">Th</span><span class="rs-cal-dow" role="columnheader">Fr</span><span class="rs-cal-dow" role="columnheader">Sa</span><span class="rs-cal-dow" role="columnheader">Su</span></div><div class="rs-cal-row" role="row"><button class="rs-cal-day" role="gridcell" tabindex="-1">20</button><button class="rs-cal-day" role="gridcell" tabindex="-1">21</button><button class="rs-cal-day" role="gridcell" tabindex="-1">22</button><button class="rs-cal-day" role="gridcell" tabindex="-1">23</button><button class="rs-cal-day rs-cal-day-selected" role="gridcell" tabindex="0" aria-selected="true">24</button><button class="rs-cal-day rs-cal-day-today" role="gridcell" tabindex="-1" aria-current="date">25</button><button class="rs-cal-day" role="gridcell" tabindex="-1">26</button></div></div></div>`,
+    snippet: `<div class="rs-cal"><div class="rs-cal-head"><span class="rs-cal-title">July 2026</span><span class="rs-cal-nav"><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 3.75 L5.5 8.25 L10.5 12.75" vector-effect="non-scaling-stroke"/></svg></button><button class="rs-page"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 3.75 L10.5 8.25 L5.5 12.75" vector-effect="non-scaling-stroke"/></svg></button></span></div><div class="rs-cal-grid" role="grid"><div class="rs-cal-row" role="row"><span class="rs-cal-dow" role="columnheader">Mo</span><span class="rs-cal-dow" role="columnheader">Tu</span><span class="rs-cal-dow" role="columnheader">We</span><span class="rs-cal-dow" role="columnheader">Th</span><span class="rs-cal-dow" role="columnheader">Fr</span><span class="rs-cal-dow" role="columnheader">Sa</span><span class="rs-cal-dow" role="columnheader">Su</span></div><div class="rs-cal-row" role="row"><button class="rs-cal-day" role="gridcell" tabindex="-1">20</button><button class="rs-cal-day" role="gridcell" tabindex="-1">21</button><button class="rs-cal-day" role="gridcell" tabindex="-1">22</button><button class="rs-cal-day" role="gridcell" tabindex="-1">23</button><button class="rs-cal-day rs-cal-day-selected" role="gridcell" tabindex="0" aria-selected="true">24</button><button class="rs-cal-day rs-cal-day-today" role="gridcell" tabindex="-1" aria-current="date">25</button><button class="rs-cal-day" role="gridcell" tabindex="-1">26</button></div></div></div>`,
     example: `import { useState } from "react";
 import { Calendar } from "@noorddev/vlak-react";
 

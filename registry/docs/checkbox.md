@@ -45,7 +45,7 @@ npx shadcn add https://vlak.dev/r/checkbox.json
 **CSS only.** `rs-*` classes on plain markup, styled by `@noorddev/vlak/css`.
 
 ```html
-<label class="rs-choice"><span class="rs-check rs-check-on"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="butt" stroke-linejoin="miter"><path d="M3.5 8.5 L6.5 11.5 L12.5 4.5" vector-effect="non-scaling-stroke"/></svg></span>Brand</label>
+<label class="rs-choice"><span class="rs-check rs-check-on"><svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.25 L6.25 11.5 L13 4.5" vector-effect="non-scaling-stroke"/></svg></span>Brand</label>
 ```
 
 ## Example

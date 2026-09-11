@@ -24,29 +24,22 @@ export type { IconName, IconRotate };
 export type { DrawnName, IconAlias, IconGroup } from "./icon-marks";
 
 /**
- * Vlak chrome marks. Vera 28 Aug 2026; arrow endpoint pass 6 Sep 2026.
- *
- * 16×16 module, optical center 8,8. Line: stroke 1, fill none.
- * Filled: same figures, solid closed geometry, currentColor. Select open
- * figures use hand-cut silhouettes to keep the pair optically complete.
- * Cap butt, join miter, no rx. Line hairlines stay 1 CSS px at 12, 16, and 24.
- * Filled geometry and its strokes scale together; small detail cuts stay at
- * least 1 CSS px. Dense silhouettes have a dedicated 12px optical cut.
- * Arrowheads have equal 90° wings; the shaft meets the apex without turning
- * into a wing. Both live in one compound path to avoid overlapping paint.
- * Copied is check. Accordion down is chevron-right rotated 90°.
- * The first five marks keep their original construction; copy has a tighter
- * measured overlap and L/R chevrons take a +0.25y optical nudge toward 8,8.
+ * Vlak chrome marks, optically drawn on a 16×16 module centered at 8,8.
+ * Line weight is tuned for each displayed size; rounded terminals keep small
+ * strokes clear without sharp spurs. Filled figures share the same silhouettes
+ * and use transparent detail cuts of at least one CSS pixel at the small size.
+ * Arrow shafts and symmetric heads meet in one compound painted path.
  */
-export const ICON_STROKE = 1;
+export const ICON_STROKE = 1.25;
+export const ICON_STROKES = { 12: 1, 16: ICON_STROKE, 24: 1.5 } as const;
 export const ICON_VIEWBOX = 16;
 
 export const iconInk = {
   fill: "none",
   stroke: "currentColor",
   strokeWidth: ICON_STROKE,
-  strokeLinecap: "butt",
-  strokeLinejoin: "miter",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
   vectorEffect: "non-scaling-stroke",
 } as const;
 
@@ -60,8 +53,8 @@ const maskPositiveStroke = {
   fill: "none",
   stroke: "white",
   strokeWidth: 2,
-  strokeLinecap: "butt",
-  strokeLinejoin: "miter",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
   vectorEffect: "none",
 } as const;
 const maskCutoutFill = { fill: "black", stroke: "none" } as const;
@@ -69,8 +62,8 @@ const maskCutoutStroke = {
   fill: "none",
   stroke: "black",
   strokeWidth: 1.25,
-  strokeLinecap: "butt",
-  strokeLinejoin: "miter",
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
   vectorEffect: "none",
 } as const;
 
@@ -159,12 +152,12 @@ function isClosed(el: MarkEl): boolean {
   return false;
 }
 
-function inkFor(el: MarkEl, variant: IconVariant) {
-  return (el.t === "circle" && el.solid) || (variant === "filled" && isClosed(el)) ? iconFill : iconInk;
+function inkFor(el: MarkEl, variant: IconVariant, size: IconSize) {
+  return (el.t === "circle" && el.solid) || (variant === "filled" && isClosed(el)) ? iconFill : { ...iconInk, strokeWidth: ICON_STROKES[size] };
 }
 
-function renderEl(el: MarkEl, key: number, variant: IconVariant): React.ReactNode {
-  const ink = inkFor(el, variant);
+function renderEl(el: MarkEl, key: number, variant: IconVariant, size: IconSize): React.ReactNode {
+  const ink = inkFor(el, variant, size);
   switch (el.t) {
     case "path":
       return <path key={key} d={el.d} {...ink} />;
@@ -180,7 +173,7 @@ function renderEl(el: MarkEl, key: number, variant: IconVariant): React.ReactNod
 function renderMaskEl(el: MarkEl, key: number, cutout: boolean, size: IconSize): React.ReactNode {
   const ink = cutout
     ? (isClosed(el) ? maskCutoutFill : { ...maskCutoutStroke, strokeWidth: Math.max(1.25, 16 / size) })
-    : (isClosed(el) ? maskPositiveFill : maskPositiveStroke);
+    : (isClosed(el) ? maskPositiveFill : { ...maskPositiveStroke, strokeWidth: el.strokeWidth ?? maskPositiveStroke.strokeWidth });
   switch (el.t) {
     case "path":
       return <path key={key} d={el.d} {...ink} />;
@@ -196,7 +189,7 @@ function renderMaskEl(el: MarkEl, key: number, cutout: boolean, size: IconSize):
 export interface IconProps extends Omit<React.SVGAttributes<SVGSVGElement>, "children" | "rotate"> {
   name: IconName;
   size?: IconSize;
-  /** Line hairline, or filled kinship of the same figure. */
+  /** Optically weighted line, or filled silhouette of the same figure. */
   variant?: IconVariant;
   /** Same mark, spun around 8,8. Accordion down is chevron-right at 90. */
   rotate?: IconRotate;
@@ -223,6 +216,7 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function Icon(
       height={size}
       aria-hidden="true"
       {...iconInk}
+      strokeWidth={ICON_STROKES[size]}
       {...props}
       className={sx.className}
       /* rem, so the mark scales with the text-size setting; the attributes keep the px ratio for SVG. */
@@ -239,9 +233,9 @@ export const Icon = React.forwardRef<SVGSVGElement, IconProps>(function Icon(
           <rect width="16" height="16" fill="currentColor" stroke="none" mask={`url(#${maskId})`} />
         </>
       ) : turn ? (
-        <g transform={`rotate(${turn} 8 8)`}>{figure.map((el, i) => renderEl(el, i, variant))}</g>
+        <g transform={`rotate(${turn} 8 8)`}>{figure.map((el, i) => renderEl(el, i, variant, size))}</g>
       ) : (
-        figure.map((el, i) => renderEl(el, i, variant))
+        figure.map((el, i) => renderEl(el, i, variant, size))
       )}
     </svg>
   );
