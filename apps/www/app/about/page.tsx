@@ -19,6 +19,7 @@ import {
   usage,
 } from "./facts";
 import { AboutNotes } from "./about-notes";
+import { InterfaceTimeline } from "./interface-timeline";
 import { about } from "./about.stylex";
 import { referenceCaptions } from "./reference-captions";
 import "./about.css";
@@ -87,7 +88,7 @@ export default function AboutPage() {
             <div {...sx("field-step", about.step)}>
               <Kicker>{usage.commandWhere}</Kicker>
               <div {...sx("field-code-row", about.codeRow)}>
-                <pre {...sx("field-code", about.code)}>
+                <pre {...sx("field-code", about.code)} tabIndex={0} role="region" aria-label="Install command">
                   <code>{usage.command}</code>
                 </pre>
                 <CopyControl text={usage.command} />
@@ -96,7 +97,7 @@ export default function AboutPage() {
             <div {...sx("field-step", about.step)}>
               <Kicker>{usage.htmlWhere}</Kicker>
               <div {...sx("field-code-row", about.codeRow)}>
-                <pre {...sx("field-code", about.code)}>
+                <pre {...sx("field-code", about.code)} tabIndex={0} role="region" aria-label="Stylesheet example">
                   <code>{usage.html}</code>
                 </pre>
                 <CopyControl text={usage.html} />
@@ -105,7 +106,7 @@ export default function AboutPage() {
             <div {...sx("field-step", about.step)}>
               <Kicker>{usage.controlWhere}</Kicker>
               <div {...sx("field-code-row", about.codeRow)}>
-                <pre {...sx("field-code", about.code)}>
+                <pre {...sx("field-code", about.code)} tabIndex={0} role="region" aria-label="Button example">
                   <code>{usage.control}</code>
                 </pre>
                 <CopyControl text={usage.control} />
@@ -198,6 +199,8 @@ export default function AboutPage() {
             <CopyP>{history.now}</CopyP>
           </Copy>
         </section>
+
+        <InterfaceTimeline />
 
         <section id="reference-collection" {...sx("field-cell field-cell-inspiration", about.cell, about.cellStart)} aria-label="Reference collection">
           <Kicker>Reference collection</Kicker>

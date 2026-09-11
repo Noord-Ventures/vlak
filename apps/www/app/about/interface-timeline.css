@@ -1,0 +1,73 @@
+.interface-lineage { grid-area: timeline; min-width: 0; background: var(--bg); color: var(--text); scroll-margin-top: 90px; }
+.lineage-header { padding: 24px 20px 40px; }
+.lineage-register { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 20px; color: var(--text-secondary); font-size: .8125rem; }
+.lineage-heading { display: grid; grid-template-columns: 2fr 1fr; align-items: end; gap: 40px; padding-top: 44px; }
+.lineage-heading h2 { margin: 0; font-size: clamp(2.75rem, 6.5vw, 6rem); font-weight: 500; letter-spacing: -.055em; line-height: .98; }
+.lineage-heading > div { max-width: 25em; }
+.lineage-heading p { margin: 20px 0 0; font-size: .875rem; line-height: 1.45; color: var(--text-secondary); }
+.lineage-heading .lineage-range { margin: 0; font-size: clamp(1.5rem, 3vw, 2.5rem); font-weight: 400; letter-spacing: -.045em; color: var(--text); font-variant-numeric: tabular-nums; }
+.lineage-range span { display: inline-block; margin-inline: .25em; color: var(--text-secondary); }
+.lineage-eras { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1px solid var(--text); }
+.lineage-era { display: grid; grid-template-rows: subgrid; grid-row: span 4; min-width: 0; padding-top: 18px; }
+.lineage-era + .lineage-era { border-left: 1px solid var(--divider); }
+.lineage-era-meta { display: flex; justify-content: space-between; gap: 8px; padding-inline: 20px; font-size: .75rem; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+.lineage-era-meta > :first-child { color: var(--text); font-weight: 600; }
+.lineage-illustration { display: grid; place-items: center; padding: 28px 12px 22px; }
+.lineage-illustration svg { display: block; width: min(184px, 100%); height: auto; }
+.lineage-drawing { color: color-mix(in srgb, var(--text) 52%, var(--bg)); }
+.lineage-drawing :is(path, rect, circle, ellipse, line, polyline, polygon) { vector-effect: non-scaling-stroke; }
+.lineage-drawing-detail { color: color-mix(in srgb, var(--text) 36%, var(--bg)); stroke: currentColor; }
+.lineage-drawing-guide { color: color-mix(in srgb, var(--text) 18%, var(--bg)); stroke: currentColor; }
+.lineage-drawing-paper { fill: var(--bg); }
+.lineage-era-heading { min-width: 0; padding: 0 20px 12px; }
+.lineage-era-heading h3 { margin: 0; font-size: 1.25rem; font-weight: 500; letter-spacing: -.025em; line-height: 1.15; }
+.lineage-era-heading p { margin: 8px 0 0; color: var(--text-secondary); font-size: .8125rem; line-height: 1.4; }
+.lineage-events { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--divider); }
+.lineage-events > li + li { border-top: 1px solid var(--divider); }
+.lineage-event summary { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 16px; align-content: start; gap: 10px 8px; padding: 16px 20px 20px; min-height: 110px; list-style: none; cursor: pointer; transition: background-color 160ms ease; }
+.lineage-event summary::-webkit-details-marker { display: none; }
+.lineage-event summary::marker { content: ""; }
+.lineage-year { font-size: .75rem; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.lineage-event-name { grid-column: 1; font-size: 1rem; line-height: 1.2; font-weight: 500; letter-spacing: -.015em; }
+.lineage-expand { grid-column: 2; grid-row: 1; justify-self: end; align-self: start; color: var(--text-secondary); font-size: 1rem; line-height: 1; }
+.lineage-event[open] { background: var(--control-fill); }
+.lineage-event[open] .lineage-year, .lineage-event[open] .lineage-expand { color: var(--text); }
+.lineage-event[open] .lineage-expand { transform: rotate(45deg); }
+.lineage-event summary:focus-visible { outline: 2px solid var(--text); outline-offset: -4px; }
+.lineage-detail { padding: 0 20px 20px; font-size: .8125rem; line-height: 1.45; overflow-wrap: anywhere; }
+.lineage-detail p { margin: 0 0 12px; }
+.lineage-detail a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; max-width: 100%; color: var(--text); font-size: .75rem; }
+.lineage-detail a svg { flex: none; }
+.lineage-footer { display: flex; justify-content: space-between; gap: 20px; padding: 20px; border-top: 1px solid var(--divider); }
+.lineage-footer p { margin: 0; max-width: 40em; color: var(--text-secondary); font-size: .8125rem; line-height: 1.45; }
+@media (hover: hover) { .lineage-event summary:hover { background: var(--control-fill); } .lineage-event summary:hover .lineage-year { color: var(--text); } }
+@media (prefers-reduced-motion: reduce) { .lineage-event summary { transition: none; } }
+@media (forced-colors: active) { .lineage-event[open] { outline: 1px solid CanvasText; outline-offset: -1px; } }
+@media (max-width: 1223px) {
+  .lineage-eras { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .lineage-era:nth-child(3n + 1) { border-left: 0; }
+  .lineage-era:nth-child(n + 4) { border-top: 1px solid var(--text); }
+  .lineage-heading { gap: 24px; }
+}
+@media (max-width: 640px) {
+  .lineage-header { padding-bottom: 28px; }
+  .lineage-heading { grid-template-columns: 1fr; gap: 24px; padding-top: 32px; }
+  .lineage-heading h2 { font-size: clamp(2.75rem, 11vw, 4.25rem); }
+  .lineage-heading > div { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  .lineage-heading p { margin: 0; }
+  .lineage-eras { grid-template-columns: minmax(0, 1fr); }
+  .lineage-era { grid-template-columns: minmax(0, 1fr) 128px; grid-template-rows: auto; grid-row: auto; padding-top: 20px; }
+  .lineage-era + .lineage-era { border-left: 0; border-top: 1px solid var(--text); }
+  .lineage-era-meta { grid-column: 1 / -1; margin-bottom: 20px; }
+  .lineage-era-heading { grid-column: 1; grid-row: 2; align-self: center; padding-bottom: 20px; min-height: 0; }
+  .lineage-era-heading h3 { font-size: 1.5rem; }
+  .lineage-illustration { grid-column: 2; grid-row: 2; padding: 0 20px 20px 0; }
+  .lineage-events { grid-column: 1 / -1; }
+  .lineage-event summary { grid-template-columns: 58px minmax(0, 1fr) 16px; align-items: baseline; min-height: 68px; gap: 12px; padding: 20px; }
+  .lineage-year { white-space: nowrap; }
+  .lineage-event-name { grid-column: 2; }
+  .lineage-expand { grid-column: 3; }
+  .lineage-detail { padding-left: 90px; font-size: .875rem; }
+  .lineage-detail a { font-size: .8125rem; }
+  .lineage-footer { flex-direction: column; gap: 12px; }
+}

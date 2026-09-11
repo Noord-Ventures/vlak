@@ -45,6 +45,7 @@ html:has(.field-page) .site-footer {
     "flush"
     "grot"
     "hist"
+    "timeline"
     "inspiration"
     "faq"
     "colo";
@@ -224,6 +225,11 @@ html:has(.field-page) .site-footer {
   font-size: 0.7813rem;
   line-height: 1.5;
   color: var(--text);
+}
+
+.field-code:focus-visible {
+  outline: 2px solid var(--text);
+  outline-offset: -2px;
 }
 
 .field-cell-use .code-copy {
@@ -409,6 +415,7 @@ html:has(.field-page) .site-footer {
       "mod hair"
       "flush grot"
       "hist hist"
+      "timeline timeline"
       "inspiration inspiration"
       "faq faq"
       "colo colo";
@@ -427,6 +434,7 @@ html:has(.field-page) .site-footer {
       "mod mod hair hair"
       "flush flush grot grot"
       "hist hist hist hist"
+      "timeline timeline timeline timeline"
       "inspiration inspiration inspiration inspiration"
       "faq faq faq faq"
       "colo colo colo colo";
@@ -443,6 +451,7 @@ html:has(.field-page) .site-footer {
       "free free spec spec spec spec"
       "mod mod hair hair flush flush"
       "grot grot grot hist hist hist"
+      "timeline timeline timeline timeline timeline timeline"
       "inspiration inspiration inspiration inspiration inspiration inspiration"
       "faq faq faq faq faq faq"
       "colo colo colo colo colo colo";
