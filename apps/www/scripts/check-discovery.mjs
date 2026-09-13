@@ -131,7 +131,7 @@ for (const path of images) assert(existsSync(join(out, path)), `Missing social i
 
 // Both the study and its short sharing address show the actual iOS interface.
 const iosImagePath = "/interfaces/ios/opengraph-image";
-const iosImageUrl = `${origin}${iosImagePath}?v=duo-hinge`;
+const iosImageUrl = `${origin}${iosImagePath}?v=duo-prototype`;
 for (const path of ["interfaces/ios/index.html", "i/ios/index.html"]) {
   const head = read(path).match(/<head>([\s\S]*?)<\/head>/i)?.[1] ?? "";
   const meta = tags(head, "meta");
