@@ -46,7 +46,7 @@ export async function checkCalendarEarlyHydration({ browser, base, width, name }
     release();
     await page.waitForFunction(() => [...document.querySelectorAll("iframe")].some(frame => frame.src.endsWith("/widgets/calendar-demo.html#theme-dark")), undefined, { polling: 100 });
     // Hydration must reuse the already selected frame, not replace it or reload its document.
-    const hydrated = page.locator('iframe[src$="/widgets/calendar-demo.html#theme-dark"]').first();
+    const hydrated = themedFrame.and(page.locator('iframe[src$="/widgets/calendar-demo.html#theme-dark"]'));
     const selected = hydrated.contentFrame().getByRole("radio").nth(1);
     ensure(await selected.isChecked(), "hydration reset the calendar's preselected time");
     const appearance = page.getByRole("button", { name: "Appearance", exact: true });
