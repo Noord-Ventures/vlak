@@ -4,7 +4,7 @@
 
 A design system for product exploration with fixed visual rules. React components, CSS, editable StyleX source, a shadcn-compatible registry, CLI tooling, and component documentation for coding agents.
 
-[Browse components](https://vlak.dev/components/) · [Try the interfaces](https://vlak.dev/interfaces/) · [Open a starter](https://vlak.dev/starters/) · [Use with coding agents](https://vlak.dev/docs/agents/)
+[Browse components](https://vlak.dev/components/) · [Explore interfaces](https://vlak.dev/interfaces/) · [Use with coding agents](https://vlak.dev/docs/agents/)
 
 Use the navbar search or press **⌘K / Ctrl+K** to find components, AI references, guides, and interfaces. Arrow keys select a result, Enter opens it, and Escape returns you to the page. Search runs locally and recognizes familiar API aliases.
 
@@ -55,7 +55,7 @@ npx shadcn add https://vlak.dev/r/button.json
 
 Dark scheme: `data-theme="dark"` on the root element. Without it the system preference applies.
 
-Want a working project first? Download a [standalone interface starter](https://vlak.dev/starters/) for Duo, Android, calendars, record reconciliation, or an AI conversation. The smaller Vite and Next.js form examples are also available there.
+Want a working project first? Every [interface study has a standalone Vite and React download](https://vlak.dev/interfaces/), from Duo and Android to calendars, data workspaces, media and 3D. Each download includes setup notes and any third-party asset credits. The smaller Vite and Next.js form examples are in the [installation guide](https://vlak.dev/docs/#base-examples).
 
 Follow [updates](https://vlak.dev/updates/), subscribe to the [RSS feed](https://vlak.dev/rss.xml), or watch [GitHub releases](https://github.com/Noord-Ventures/vlak/releases).
 

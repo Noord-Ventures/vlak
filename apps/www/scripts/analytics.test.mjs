@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { acquisitionAttribution, acquisitionChannel, beforeSend, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
+import { interfaceStarters } from "../app/starters/catalog.ts";
+import { acquisitionAttribution, acquisitionChannel, beforeSend, initializeSiteAnalytics, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
 
 const paths = new Set([...publicSitePaths, "/components/button"]);
 
@@ -81,9 +82,10 @@ test("campaign attribution is normalized and retained on Duo funnel events", () 
 });
 
 test("activation events retain attribution and reject arbitrary starter, interface and follow data", () => {
-  const send = (name, data) => beforeSend({ type: "event", url: "https://vlak.dev/starters/", payload: { name, data: { channel: "linkedin", campaign_name: "duo-launch", private: "discard", ...data } } }, paths)?.payload?.data;
-  for (const slug of ["ios", "android", "calendar", "reconciliation", "line"]) {
+  const send = (name, data, url = "https://vlak.dev/interfaces/") => beforeSend({ type: "event", url, payload: { name, data: { channel: "linkedin", campaign_name: "duo-launch", private: "discard", ...data } } }, paths)?.payload?.data;
+  for (const { slug } of interfaceStarters) {
     assert.deepEqual(send("starter_download", { slug }), { source: "vlak", channel: "linkedin", campaign_name: "duo-launch", slug });
+    assert.deepEqual(send("starter_download", { slug }, `https://vlak.dev/interfaces/${slug}/?private=discard#screen`), { source: "vlak", channel: "linkedin", campaign_name: "duo-launch", slug });
     assert(send("setup_copy", { slug }));
     assert(send("interface_install", { slug, method: "npm" }));
   }
@@ -91,8 +93,24 @@ test("activation events retain attribution and reject arbitrary starter, interfa
   assert(send("start_choice", { path: "agent" }));
   assert(send("updates_follow", { method: "rss" }));
   assert.equal(send("starter_download", { slug: "private-project" }), undefined);
+  assert.equal(send("starter_download", { slug: "mobile-os" }), undefined);
   assert.equal(send("setup_copy", { slug: "private-project" }), undefined);
   assert.equal(send("interface_install", { slug: "ios", method: "private" }), undefined);
   assert.equal(send("start_choice", { path: "private" }), undefined);
   assert.equal(send("updates_follow", { method: "private@example.com" }), undefined);
+});
+
+test("the legacy gallery redirect does not initialize collection or consume acquisition", () => {
+  for (const pathname of ["/starters", "/starters/"]) {
+    assert.equal(beforeSend({ type: "pageview", url: `https://vlak.dev${pathname}?utm_source=linkedin#ios` }, paths), null);
+    assert.equal(beforeSend({ type: "event", url: `https://vlak.dev${pathname}`, payload: { name: "acquisition", data: { channel: "linkedin", landing: pathname } } }, paths), null);
+    const stored = new Map();
+    globalThis.window = { location: { hostname: "vlak.dev", protocol: "https:", pathname, href: `https://vlak.dev${pathname}` } };
+    globalThis.document = { referrer: "https://www.linkedin.com/feed/" };
+    globalThis.sessionStorage = { getItem: key => stored.get(key) ?? null, setItem: (key, value) => stored.set(key, value) };
+    try {
+      initializeSiteAnalytics(publicSitePaths); assert.equal(window.__vlakSiteAnalytics, undefined);
+      assert.deepEqual([...stored], [["vlak-attribution", JSON.stringify({ channel: "linkedin" })]], "Only sanitized attribution is carried to the canonical page, never an acquisition marker");
+    } finally { delete globalThis.window; delete globalThis.document; delete globalThis.sessionStorage; }
+  }
 });

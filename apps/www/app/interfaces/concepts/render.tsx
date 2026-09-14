@@ -1,20 +1,20 @@
 "use client";
 
 import * as React from "react";
-import dynamic from "next/dynamic";
 import { Button, Card, DescriptionList, Icon, PropertyGrid, TreeView } from "@noorddev/vlak-react";
 import type { PropertyValues } from "@noorddev/vlak-react";
 import { renderAsset } from "./render-asset";
 
-const ModelViewport = dynamic(
-  () => import("./model-viewport").then(module => module.ModelViewport),
-  { ssr: false, loading: () => <div className="rw-viewer-loading" role="status">Preparing the model viewport…</div> },
-);
+const ModelViewport = React.lazy(() => import("./model-viewport").then(module => ({ default: module.ModelViewport })));
+function ModelViewportLoading() {
+  return <div className="rw-viewer-loading" role="status">Preparing the model viewport…</div>;
+}
 
 type Screen = "viewport" | "inspector";
 type Inspector = "object" | "surface" | "viewport";
 
 export function RenderBoard() {
+  const [mounted, setMounted] = React.useState(false);
   const [screen, setScreen] = React.useState<Screen>("viewport");
   const [rotating, setRotating] = React.useState(true);
   const [wireframe, setWireframe] = React.useState(false);
@@ -29,6 +29,7 @@ export function RenderBoard() {
   const treeLabel = React.useId();
 
   React.useEffect(() => {
+    setMounted(true);
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => setReducedMotion(preference.matches);
     sync();
@@ -91,7 +92,7 @@ export function RenderBoard() {
             <Button variant="ghost" className="rw-tool" disabled={!ready} aria-label="Reset camera" title="Reset camera" onClick={() => { setResetKey(value => value + 1); setAnnouncement("Camera reset requested."); }}><Icon name="camera" size={16} /></Button>
           </nav>
         </div>
-        <div className="rw-model-host"><ModelViewport rotating={playing} wireframe={wireframe} material={material} resetKey={resetKey} onStatusChange={setStatus} /></div>
+        <div className="rw-model-host"><React.Suspense fallback={<ModelViewportLoading />}>{mounted ? <ModelViewport rotating={playing} wireframe={wireframe} material={material} resetKey={resetKey} onStatusChange={setStatus} /> : <ModelViewportLoading />}</React.Suspense></div>
         <div className="rw-transport"><Button variant="ghost" className="rw-tool" disabled={!ready || reducedMotion} aria-label={playing ? "Pause turntable" : "Play turntable"} onClick={toggleRotation}><Icon name={playing ? "pause" : "play"} size={16} /></Button><div><strong>Turntable</strong><span>{turntableLabel}</span></div><span className="rw-current-material">{materialLabel}</span></div>
       </section>
 

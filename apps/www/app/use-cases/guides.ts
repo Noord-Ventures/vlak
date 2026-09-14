@@ -9,7 +9,7 @@ type Guide = {
 export const useCaseGuides: Record<string, Guide> = {
   "product-prototyping": {
     intro: "Vlak is a React design system for product prototyping. It supplies a consistent type scale, neutral surfaces, controls, and layout rules so you can test what a product does before settling every visual detail. Begin with a task someone needs to complete, then use the smallest set of components that lets them do it.",
-    starter: { href: "/starters/#ios", label: "Start a foldable prototype" },
+    starter: { href: "/interfaces/#ios", label: "Start a foldable prototype" },
     sections: [
       {
         title: "Choose a question",
@@ -38,14 +38,14 @@ export const useCaseGuides: Record<string, Guide> = {
       },
     ],
     next: [
-      { href: "/starters/#calendar", label: "Calendar starter", description: "Start with an editable schedule." },
+      { href: "/interfaces/#calendar", label: "Calendar starter", description: "Start with an editable schedule." },
       { href: "/docs/agents/", label: "Use with an agent", description: "Give your coding tool the same component and token reference." },
       { href: "/docs/choosing-vlak/", label: "Choosing Vlak", description: "Check the fit before adopting the system." },
     ],
   },
   "data-heavy-software": {
     intro: "Vlak provides React components for data-heavy software: tables, filters, record details, charts, and the controls around them. Start with the decision a person must make from the data. The visible columns, units, sorting, and next action should follow from that decision.",
-    starter: { href: "/starters/#reconciliation", label: "Start a record comparison" },
+    starter: { href: "/interfaces/#reconciliation", label: "Start a record comparison" },
     sections: [
       {
         title: "Build a review loop",
@@ -82,7 +82,7 @@ export const useCaseGuides: Record<string, Guide> = {
   },
   "agent-interfaces": {
     intro: "Vlak provides React components for AI product interfaces, including conversations, structured results, activity, and approval controls. Use them to show what the system is doing and what a person can inspect or change. The interface components do not connect a model or execute tools on their own.",
-    starter: { href: "/starters/#line", label: "Start an AI conversation" },
+    starter: { href: "/interfaces/#line", label: "Start an AI conversation" },
     sections: [
       {
         title: "Show the task, not only the reply",

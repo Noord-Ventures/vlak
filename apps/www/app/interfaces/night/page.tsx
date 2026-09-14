@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata("/interfaces/night", {
 export default function Page() {
   return (
     <InterfaceShell slug="night">
-      <Board />
+      <Board mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN} />
     </InterfaceShell>
   );
 }

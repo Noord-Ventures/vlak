@@ -119,9 +119,11 @@ try {
       await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
       await page.getByRole('link', { name: 'Installation guide' }).first().click();
       await page.getByRole('link', { name: 'GitHub source' }).click();
+      await page.locator('.if-duo-start a[download]').click();
       await page.waitForTimeout(350);
       const duoEvents = events.slice(duoStart).filter(e => e.data.en);
-      for (const name of ['duo_open', 'outer_screen', 'fold_transition', 'inner_screen', 'docs_from_duo', 'install_from_duo', 'github_click']) assert(duoEvents.some(e => e.data.en === name), name);
+      for (const name of ['duo_open', 'outer_screen', 'fold_transition', 'inner_screen', 'docs_from_duo', 'install_from_duo', 'github_click', 'starter_download']) assert(duoEvents.some(e => e.data.en === name), name);
+      assert.equal(duoEvents.filter(e => e.data.en === 'starter_download' && e.data.ed.slug === 'ios').length, 1);
       assert(duoEvents.every(e => e.data.ed.channel === 'linkedin'), JSON.stringify(duoEvents));
       assert(duoEvents.every(e => e.data.ed.campaign_source === 'linkedin' && e.data.ed.campaign_medium === 'social-post' && e.data.ed.campaign_name === 'duo-launch-2026'));
 
@@ -139,14 +141,19 @@ try {
       await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
       await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
       for (const choice of ['prototype', 'agent', 'install']) await page.locator(`[data-start-path="${choice}"]`).click();
-      await page.goto(`https://${hostname}/starters/`, { waitUntil: 'networkidle' });
+      await page.goto(`https://${hostname}/interfaces/`, { waitUntil: 'networkidle' });
       await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
       await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
-      for (const slug of ['ios', 'android', 'calendar', 'reconciliation', 'line']) await page.locator(`a[href="/starter/${slug}.zip"]`).click();
+      const starterDownloads = page.locator('article.if-tile a[download][data-vlak-starter]');
+      const starterCount = await starterDownloads.count();
+      assert.equal(starterCount, 30);
+      for (const link of await starterDownloads.all()) await link.click();
       await page.goto(`https://${hostname}/interfaces/line/`, { waitUntil: 'networkidle' });
       await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
       await page.getByRole('button', { name: 'Copy build brief', exact: true }).click();
       await page.getByRole('button', { name: 'Copy install command', exact: true }).click();
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      await page.locator('.if-duo-start a[download]').click();
       await page.goto(`https://${hostname}/updates/`, { waitUntil: 'networkidle' });
       await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
       await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
@@ -155,10 +162,42 @@ try {
       await page.waitForTimeout(300);
       const growthEvents = events.slice(growthStart).filter(e => e.data.en);
       for (const name of ['start_choice', 'starter_open', 'starter_download', 'agent_setup_open', 'setup_copy', 'interface_install', 'updates_follow']) assert(growthEvents.some(e => e.data.en === name), name);
-      assert.equal(growthEvents.filter(e => e.data.en === 'starter_download').length, 5);
+      assert.equal(growthEvents.filter(e => e.data.en === 'starter_download').length, starterCount + 1);
+      assert(growthEvents.some(e => e.data.en === 'starter_download' && e.data.ed.slug === 'line' && e.data.o === `https://${hostname}/interfaces/line`));
       assert.equal(growthEvents.filter(e => e.data.en === 'start_choice').length, 3);
       assert(growthEvents.every(e => e.data.ed.channel === 'linkedin' && e.data.ed.campaign_name === 'duo-launch-2026'));
       assert(!JSON.stringify(growthEvents).includes('SECRET'));
+
+      // Start a fresh attributed visit through the static-host compatibility
+      // page, not a mocked redirect. Only the canonical gallery may collect.
+      await page.evaluate(() => sessionStorage.clear());
+      const redirectStart = events.length, scriptsBeforeRedirect = collectorLoads;
+      const campaign = '?utm_source=LinkedIn&utm_medium=Social%20Post&utm_campaign=Gallery%20Launch%202026&token=SECRET_TOKEN#ios';
+      await page.goto(`https://${hostname}/starters/${campaign}`, { waitUntil: 'networkidle' });
+      await page.waitForURL(`https://${hostname}/interfaces/${campaign}`);
+      await page.waitForFunction(() => window.__vlakSiteAnalytics && window.vai);
+      await waitForReport(() => events.slice(redirectStart).some(e => e.data.en === 'acquisition'), 'Redirect destination records acquisition');
+      await page.evaluate(() => document.addEventListener('click', e => e.preventDefault(), { capture: true }));
+      await page.locator('article.if-tile#ios a[download]').click();
+      await waitForReport(() => events.slice(redirectStart).some(e => e.data.en === 'starter_download'), 'Redirect campaign reaches direct download');
+      const redirected = events.slice(redirectStart);
+      assert.equal(collectorLoads - scriptsBeforeRedirect, 1, 'The compatibility page never loads the collector');
+      assert.equal(redirected.filter(e => e.data.en === 'acquisition').length, 1, 'Redirect creates one acquisition');
+      assert.equal(redirected.find(e => e.data.en === 'acquisition').data.ed.landing, '/interfaces');
+      assert.equal(redirected.filter(e => e.endpoint.endsWith('/view')).length, 1, 'Redirect creates one canonical page view');
+      assert(redirected.every(e => e.data.o === `https://${hostname}/interfaces`));
+      assert(redirected.filter(e => e.data.en).every(e => e.data.ed.channel === 'linkedin' && e.data.ed.campaign_name === 'gallery-launch-2026'));
+      assert(!JSON.stringify(redirected).includes('SECRET'));
+
+      await page.evaluate(() => sessionStorage.clear());
+      const untaggedStart = events.length;
+      await page.goto(`https://${hostname}/starters/#ios`, { waitUntil: 'networkidle', referer: 'https://www.linkedin.com/feed/' });
+      await page.waitForURL(`https://${hostname}/interfaces/#ios`);
+      await waitForReport(() => events.slice(untaggedStart).some(e => e.data.en === 'acquisition'), 'Untagged external redirect retains its original referral');
+      const untagged = events.slice(untaggedStart).filter(e => e.data.en === 'acquisition');
+      assert.equal(untagged.length, 1);
+      assert.equal(untagged[0].data.ed.channel, 'linkedin', 'Static redirect must not turn an external referral into direct');
+      assert.equal(untagged[0].data.ed.landing, '/interfaces');
     } else {
       await page.waitForTimeout(100);
       assert.equal(collectorLoads, 0);

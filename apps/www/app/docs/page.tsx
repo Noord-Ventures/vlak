@@ -36,6 +36,7 @@ const cssUsage = `<link rel="stylesheet" href="node_modules/@noorddev/vlak/css/v
 <button class="rs-btn-ghost">Secondary</button>`;
 
 const projectSubmission = "https://github.com/Noord-Ventures/vlak/issues/new?template=showcase.yml";
+const examplesRepo = "https://github.com/Noord-Ventures/vlak/tree/main/examples";
 
 export default function DocsPage() {
   return (
@@ -140,6 +141,29 @@ export default function DocsPage() {
         <code className="rs-code">@noorddev/vlak/css/tokens.css</code>,{" "}
         <code className="rs-code">@noorddev/vlak/css/components/button.css</code>.
       </p>
+
+      <h2 className="section-label" id="base-examples">Small project examples</h2>
+      <p className="rs-t-body">
+        Start with a form and the Vlak package already connected. Open an example in StackBlitz,
+        or run the commands below from a checkout of the{" "}
+        <a className="rs-link" href="https://github.com/Noord-Ventures/vlak">Vlak repository</a>.
+        For a complete working screen, browse the{" "}
+        <a className="rs-link" href="/interfaces/">interfaces and their standalone downloads</a>.
+      </p>
+      <h3 className="section-label">Vite and React</h3>
+      <p className="rs-t-body">A client-side settings form with no framework conventions beyond React.</p>
+      <p className="rs-t-body">
+        <a className="rs-link" href="https://stackblitz.com/github/Noord-Ventures/vlak/tree/main/examples/vite-react">Open in StackBlitz</a>
+        {" · "}<a className="rs-link" href={`${examplesRepo}/vite-react`}>View source</a>
+      </p>
+      <CodeBlock code={"pnpm --dir examples/vite-react install\npnpm --dir examples/vite-react dev"} />
+      <h3 className="section-label">Next.js</h3>
+      <p className="rs-t-body">An App Router page with the global Vlak stylesheet loaded from the root layout.</p>
+      <p className="rs-t-body">
+        <a className="rs-link" href="https://stackblitz.com/github/Noord-Ventures/vlak/tree/main/examples/next-app">Open in StackBlitz</a>
+        {" · "}<a className="rs-link" href={`${examplesRepo}/next-app`}>View source</a>
+      </p>
+      <CodeBlock code={"pnpm --dir examples/next-app install\npnpm --dir examples/next-app dev"} />
 
       <Callout>
         <p className="rs-t-label">One source of paint</p>

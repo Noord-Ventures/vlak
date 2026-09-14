@@ -1,8 +1,10 @@
-import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import assert from "node:assert/strict";
+import { existsSync, lstatSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, extname, isAbsolute, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateRawSync } from "node:zlib";
 import { interfaceStarters } from "../apps/www/app/starters/catalog.ts";
+import { packageName, transformStarterSource } from "./interface-starter-source.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const site = join(root, "apps/www");
@@ -13,48 +15,91 @@ const analyticsStub = `// The standalone starter does not send website analytics
 function localPath(from, specifier) {
   const candidate = specifier.startsWith("@/") ? join(site, specifier.slice(2)) : resolve(dirname(from), specifier);
   if (!candidate.startsWith(`${site}/`)) throw new Error(`Starter import leaves the site source: ${specifier}`);
-  for (const suffix of ["", ".ts", ".tsx", ".js", ".mjs", "/index.ts", "/index.tsx"]) {
-    if (existsSync(candidate + suffix) && statSync(candidate + suffix).isFile()) return candidate + suffix;
+  const candidates = [candidate, ...[".ts", ".tsx", ".js", ".jsx", ".mjs", ".json", "/index.ts", "/index.tsx", "/index.js"].map(suffix => candidate + suffix)];
+  if (/\.(m?js|jsx)$/.test(candidate)) candidates.push(candidate.replace(/\.(m?js|jsx)$/, ".ts"), candidate.replace(/\.(m?js|jsx)$/, ".tsx"));
+  for (const path of candidates) {
+    if (existsSync(path) && statSync(path).isFile()) return path;
   }
   throw new Error(`Missing starter dependency ${specifier} from ${from}`);
 }
 
-function projectFiles(starter) {
-  const files = new Map();
+function inside(directory, path) {
+  directory = resolve(directory);
+  assert(path.startsWith(`${directory}/`), `Starter path must stay inside ${directory}: ${path}`);
+  for (let current = path; current !== directory; current = dirname(current)) assert(!lstatSync(current).isSymbolicLink(), `Starter files must not follow symlinks: ${current}`);
+  return path;
+}
+const scriptExtension = /\.(?:[cm]?tsx?|jsx?)$/;
+const relativeImport = (from, to) => { const path = relative(dirname(from), to).replaceAll("\\", "/"); return path.startsWith(".") ? path : `./${path}`; };
+const html = value => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+
+// Generated website copies are ignored by git and can be stale or absent in CI.
+// Always take documentation from the canonical release inputs, even if public/ exists.
+export function starterAssetSource(path) {
+  assert(!isAbsolute(path) && !path.split(/[\\/]/).includes(".."), `Public starter assets must be relative and bounded: ${path}`);
+  if (path === "design.md") return inside(root, join(root, "design.md"));
+  if (/^docs\/[\w-]+\.md$/.test(path)) return inside(root, join(root, "registry", path));
+  return inside(join(site, "public"), resolve(site, "public", path));
+}
+
+export function projectFiles(starter) {
+  assert.match(starter.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Starter slugs must be safe directory names");
+  const dependencies = { ...starter.dependencies, "@noorddev/vlak": starterPackageVersion, "@noorddev/vlak-react": starterPackageVersion, react: "^19.2.0", "react-dom": "^19.2.0" };
+  const devDependencies = { ...starter.devDependencies, "@types/react": "^19.2.0", "@types/react-dom": "^19.2.0", typescript: "~5.9.3", vite: "^7.1.0" };
+  for (const [name, version] of Object.entries({ ...dependencies, ...devDependencies })) {
+    assert.match(name, /^(?:@[a-z0-9._-]+\/)?[a-z0-9._-]+$/, `Invalid starter package name: ${name}`);
+    assert.match(version, /^(?:\^|~)?\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/, `Starter dependencies must use explicit public semver versions: ${name}`);
+    assert(name !== "next", "A standalone starter cannot require Next.js");
+  }
+  const env = starter.env ?? [];
+  for (const variable of env) {
+    assert.match(variable.name, /^VITE_[A-Z0-9_]+$/, "Only declared public Vite environment variables may enter the starter");
+    if (variable.prop) assert.match(variable.prop, /^[a-zA-Z_$][\w$]*$/, "Environment props must be valid JSX identifiers");
+    assert(variable.description?.trim(), `Describe environment variable ${variable.name}`);
+  }
+  assert.equal(new Set(env.map(variable => variable.name)).size, env.length, "Environment variable names must be unique");
+  const files = new Map(), assetDirectories = new Set();
+  function copyPublic(path) {
+    const absolute = starterAssetSource(path);
+    if (statSync(absolute).isDirectory()) {
+      for (const entry of readdirSync(absolute).sort()) copyPublic(`${path}/${entry}`);
+    } else files.set(`public/${path}`, readFileSync(absolute));
+  }
+  for (const asset of [...starter.assets ?? [], ...starter.credits ?? []]) copyPublic(asset);
   function include(filename) {
     const output = `src/${relative(site, filename)}`;
     if (files.has(output)) return;
+    inside(site, filename);
+    if (!scriptExtension.test(filename) && extname(filename) !== ".css") { files.set(output, readFileSync(filename)); return; }
     let source = relative(site, filename) === "lib/site-analytics.ts" ? analyticsStub : readFileSync(filename, "utf8");
-    // The site references locally supplied fonts; exports use the platform fonts already on the device.
-    if (output.endsWith("/platform-controls.css")) source = source.replace(/@font-face\s*\{[^}]*\}\s*/g, "");
     files.set(output, Buffer.from(source));
-    const dependencies = [];
-    const imports = /(?:\b(?:import|export)\s+(?:[^;"']*?\s+from\s*)?|@import\s+)["']([^"']+)["']|new URL\(["']([^"']+)["'],\s*import\.meta\.url\)/g;
-    for (const match of source.matchAll(imports)) {
-      const specifier = match[1] ?? match[2];
-      if (!specifier.startsWith(".") && !specifier.startsWith("@/")) {
-        if (!specifier.startsWith("@noorddev/vlak-react") && !["react", "react-dom"].includes(specifier)) throw new Error(`Undeclared package import ${specifier} in ${filename}`);
-        continue;
-      }
-      const dependency = localPath(filename, specifier);
-      dependencies.push(dependency);
-      if (specifier.startsWith("@/")) {
-        const next = relative(dirname(filename), dependency);
-        source = source.replaceAll(`"${specifier}"`, `"${next.startsWith(".") ? next : `./${next}`}"`);
-      }
-    }
-    for (const dependency of dependencies) include(dependency);
-    for (const match of source.matchAll(/["'(](\/(?:interfaces|fonts)\/[^"')\s]+\.(?:png|jpe?g|webp|svg|gif|woff2?|ttf))["')]/g)) {
-      const asset = join(site, "public", match[1]);
-      if (!existsSync(asset)) throw new Error(`Missing starter asset ${match[1]}`);
-      files.set(`public${match[1]}`, readFileSync(asset));
-    }
-    if ([".ts", ".tsx", ".js", ".mjs"].includes(extname(filename))) {
-      source = source.replace(/(=)?(["'])(\/(?:interfaces|fonts)\/[^"']+\.(?:png|jpe?g|webp|svg|gif|woff2?|ttf))\2/g, (_match, attribute, _quote, asset) => {
-        const expression = `import.meta.env.BASE_URL + ${JSON.stringify(asset.slice(1))}`;
-        return attribute ? `={${expression}}` : `(${expression})`;
-      });
-    }
+    source = transformStarterSource({ filename, source, envNames: env.map(variable => variable.name),
+      onImport(specifier, { local, typeOnly }) {
+        if (!local) {
+          const name = packageName(specifier);
+          assert(name !== "next", `Next runtime import must be adapted before exporting ${starter.slug}: ${specifier}`);
+          assert(Object.hasOwn(dependencies, name) || typeOnly && Object.hasOwn(devDependencies, name), `Undeclared package import ${specifier} in ${filename}; declare it in starter dependencies`);
+          return specifier;
+        }
+        const [, path, suffix] = /^([^?#]*)(.*)$/.exec(specifier);
+        const dependency = localPath(filename, path);
+        include(dependency);
+        return relativeImport(filename, dependency) + suffix;
+      },
+      onAsset(value, { kind }) {
+        const match = /^([^?#]*)(.*)$/.exec(value), path = match[1], suffix = match[2];
+        if (path.startsWith("/")) {
+          const absolute = starterAssetSource(path.slice(1));
+          if (statSync(absolute).isDirectory()) assetDirectories.add(path.slice(1).replace(/\/$/, "") + "/");
+          else copyPublic(path.slice(1));
+          return kind === "css" ? relativeImport(output, `public${path}`) + suffix : value;
+        }
+        assert(kind === "css", `Unsupported relative script asset: ${value}`);
+        const asset = localPath(filename, path);
+        include(asset);
+        return relativeImport(filename, asset) + suffix;
+      },
+    });
     files.set(output, Buffer.from(source));
   }
   include(join(site, starter.entry));
@@ -63,18 +108,24 @@ function projectFiles(starter) {
     name: `vlak-${starter.slug}-starter`, version: "0.0.0", private: true, type: "module", license: "MIT",
     engines: { node: ">=22.12.0" },
     scripts: { dev: "vite --host 0.0.0.0", build: "vite build", preview: "vite preview", typecheck: "tsc --noEmit" },
-    dependencies: { "@noorddev/vlak": starterPackageVersion, "@noorddev/vlak-react": starterPackageVersion, react: "^19.2.0", "react-dom": "^19.2.0" },
-    devDependencies: { "@types/react": "^19.2.0", "@types/react-dom": "^19.2.0", typescript: "~5.9.3", vite: "^7.1.0" },
+    dependencies, devDependencies,
   };
+  for (const directory of assetDirectories) assert([...files.keys()].some(path => path.startsWith(`public/${directory}`)), `Referenced public directory has no declared assets: ${directory}`);
   const put = (name, value) => files.set(name, Buffer.from(value));
+  const services = starter.networkNotes ?? [];
+  const credits = starter.credits ?? [];
+  const creditFooter = credits.length ? `<footer className="starter-credits" aria-label="Sample asset attribution">${credits.map((path, index) => `<a href={import.meta.env.BASE_URL + ${JSON.stringify(path)}}>Asset credits${credits.length > 1 ? ` ${index + 1}` : ""}</a>`).join("")}</footer>` : "";
   put("package.json", `${JSON.stringify(manifest, null, 2)}\n`);
   put("tsconfig.json", `${JSON.stringify({ compilerOptions: { target: "ES2022", lib: ["ES2022", "DOM", "DOM.Iterable"], types: ["vite/client"], module: "ESNext", moduleResolution: "bundler", jsx: "react-jsx", strict: true, skipLibCheck: true, allowImportingTsExtensions: true, noEmit: true, resolveJsonModule: true }, include: ["src"] }, null, 2)}\n`);
   put("vite.config.ts", `import { defineConfig } from "vite";\nexport default defineConfig({ base: "./", esbuild: { jsx: "automatic" } });\n`);
-  put("index.html", `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="description" content="${starter.description}" /><title>${starter.title} · Vlak starter</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n`);
-  put("src/main.tsx", `import { createRoot } from "react-dom/client";\nimport "@noorddev/vlak-react/css";\nimport { ${starter.component} } from "./${starter.entry}";\n${starter.styles.map(style => `import "./${style}";`).join("\n")}\nimport "./starter.css";\n\ncreateRoot(document.getElementById("root")!).render(<main className="starter"><${starter.component} {...${JSON.stringify(starter.props)}} /></main>);\n`);
-  put("src/starter.css", `:root { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }\n* { box-sizing: border-box; }\nbody { margin: 0; }\n.starter { width: min(100%, 1440px); margin-inline: auto; padding: 24px; }\n.mo .mo-device[data-platform="ios"] .mo-phone { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }\n.mo .mo-device[data-platform="android"] .mo-phone { font-family: Roboto, "Noto Sans", system-ui, sans-serif; }\n@media (max-width: 640px) { .starter { padding: 8px; } }\n`);
-  put(".gitignore", "node_modules/\ndist/\n*.tsbuildinfo\n.env*\n");
-  put("README.md", `# ${starter.title}\n\n${starter.description}\n\n## Run\n\nRequires Node 22.12 or newer and Vlak ${starterPackageVersion}. Dependencies install from npm. No monorepo installation is needed.\n\n\`\`\`sh\nnpm install\nnpm run dev\n\`\`\`\n\nOpen the local URL printed by Vite. \`npm run typecheck\` checks TypeScript; \`npm run build\` creates a static \`dist/\` directory. The build also works when hosted below a subdirectory.\n\n## Make it yours\n\nStart in \`${starter.edit}\`. Source files are copied from the Vlak study, including its local state and styles. The \`src/components\` and \`src/lib\` directories, when present, contain supporting code you own too.\n\n${starter.note}\n\nNo website analytics are sent. The mobile examples retain platform system fonts. Sample images are bundled locally.\n\n[Component documentation](https://vlak.dev/components/) · [Study preview](https://vlak.dev${starter.preview}) · [Upstream source](${starter.source})\n\nMIT licensed. See LICENSE.\n`);
+  put("index.html", `<!doctype html>\n<html lang="en"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><meta name="description" content="${html(starter.description)}" /><title>${html(starter.title)} · Vlak starter</title></head><body><div id="root"></div><script type="module" src="/src/main.tsx"></script></body></html>\n`);
+  put("src/main.tsx", `import { createRoot } from "react-dom/client";\nimport "@noorddev/vlak-react/css";\nimport { ${starter.component} } from "./${starter.entry}";\n${starter.styles.map(style => `import "./${style}";`).join("\n")}\nimport "./starter.css";\n\ncreateRoot(document.getElementById("root")!).render(<><main className="starter"><${starter.component} {...${JSON.stringify(starter.props)}}${env.filter(variable => variable.prop).map(variable => ` ${variable.prop}={import.meta.env.${variable.name}}`).join("")} /></main>${creditFooter}</>);\n`);
+  put("src/starter.css", `:root { font-family: system-ui, sans-serif; background: var(--bg); color: var(--text); }\n* { box-sizing: border-box; }\nbody { margin: 0; }\n.starter { width: min(100%, 1440px); height: 100svh; min-height: 640px; container-type: inline-size; margin-inline: auto; padding: 24px; }\n.starter-credits { width: min(100%, 1440px); display: flex; flex-wrap: wrap; gap: 8px 20px; margin-inline: auto; padding: 8px 24px; font-size: 12px; }\n.starter-credits a { display: inline-flex; align-items: center; min-height: 44px; color: var(--text); text-underline-offset: 3px; }\n.starter-credits a:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }\n.mo .mo-device[data-platform="ios"] .mo-phone { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }\n.mo .mo-device[data-platform="android"] .mo-phone { font-family: Roboto, "Noto Sans", system-ui, sans-serif; }\n@media (max-width: 640px) { .starter, .starter-credits { padding: 8px; } }\n`);
+  put(".gitignore", "node_modules/\ndist/\n*.tsbuildinfo\n.env*\n!.env.example\n");
+  put(".env.example", `# Public Vite configuration only. Never put server secrets here.\n${env.length ? env.map(variable => `# ${variable.required ? "Required" : "Optional"}: ${variable.description.replaceAll("\n", "\n# ")}\n${variable.name}=\n`).join("\n") : "# This starter needs no environment variables.\n"}`);
+  put("CREDITS.md", `# Asset credits\n\nSource code is MIT licensed. Bundled third-party assets retain their original terms and attribution.\n\n${credits.length ? credits.map(path => `- [${path}](public/${path})`).join("\n") : "No additional attribution files are declared for this study."}\n`);
+  const config = env.length ? `\n## Configuration\n\nCopy \`.env.example\` to \`.env.local\` to enable optional services, then restart Vite. Variables beginning with \`VITE_\` are public in browser builds; use public, domain-restricted tokens only.\n\n${env.map(variable => `- \`${variable.name}\` (${variable.required ? "required" : "optional"}): ${variable.description}`).join("\n")}\n` : "";
+  put("README.md", `# ${starter.title}\n\n${starter.description}\n\n## Run\n\nRequires Node 22.12 or newer and Vlak ${starterPackageVersion}. Dependencies install from npm. No monorepo installation is needed.\n\n\`\`\`sh\nnpm install\nnpm run dev\n\`\`\`\n\nOpen the local URL printed by Vite. \`npm run typecheck\` checks TypeScript; \`npm run build\` creates a static \`dist/\` directory. The build also works when hosted below a subdirectory.\n${config}\n## Make it yours\n\nStart in \`${starter.edit}\`. Source files are copied from the Vlak study, including its local state and styles. The \`src/components\` and \`src/lib\` directories, when present, contain supporting code you own too.\n\n${starter.note}\n\n## Data and external services\n\nNo website analytics are sent. Platform examples retain native system fonts. Bundled sample assets stay local; see [asset credits](CREDITS.md) for their terms.\n\n${services.length ? services.map(note => `- ${note}`).join("\n") : "No external service is required for the supplied local example."}\n\n[Component documentation](https://vlak.dev/components/) · [Study preview](https://vlak.dev${starter.preview}) · [Upstream source](${starter.source})\n\nSource code is MIT licensed. See LICENSE and CREDITS.md.\n`);
   files.set("LICENSE", readFileSync(join(root, "LICENSE")));
   return files;
 }

@@ -178,7 +178,7 @@ export async function checkInterfacePreviews({ browser, base, fail, widths = [39
     await index.goto(`${base}/interfaces/`, { waitUntil: "domcontentloaded" });
     await index.locator(".if-tile").first().waitFor();
     studies = await index.locator(".if-tile").evaluateAll(tiles => tiles.map(tile => ({
-      slug: new URL(tile.href).pathname.split("/").filter(Boolean).at(-1), title: tile.querySelector("h2").textContent.trim(),
+      slug: new URL(tile.querySelector(".if-tile-preview").href).pathname.split("/").filter(Boolean).at(-1), title: tile.querySelector("h2").textContent.trim(),
     })));
     assert.ok(studies.length > 0, "gallery exposes its catalog of studies");
     assert.equal(new Set(studies.map(study => study.slug)).size, studies.length, "catalog contains no duplicate preview slugs");

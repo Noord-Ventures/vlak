@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { chromium } from "playwright";
 import { createExportServer } from "./serve-export.mjs";
+import { interfaceStarters } from "../app/starters/catalog.ts";
 
 const screenshots = await mkdtemp(join(tmpdir(), "vlak-layout-review-"));
 const server = createExportServer();
@@ -15,10 +16,9 @@ const browser = await chromium.launch(process.env.PLAYWRIGHT_EXECUTABLE_PATH
   ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : undefined);
 const errors = [];
 const noOverflow = page => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth);
-const duoReady = (page, theme) => page.waitForFunction(theme => {
-  const images = [...document.querySelectorAll(".starter-duo img")].filter(image => image.getBoundingClientRect().width > 0);
-  return images.length === 2 && images.every(image => image.dataset.previewTheme === theme && image.complete && image.naturalWidth > 0);
-}, theme);
+const cropReady = (page, slug) => page.waitForFunction(slug => [...document.getElementById(slug).querySelectorAll("img")]
+  .filter(image => image.getBoundingClientRect().width > 0 && new URL(image.src).origin === location.origin)
+  .every(image => image.complete && image.naturalWidth > 0), slug);
 
 try {
   for (const mobile of [false, true]) {
@@ -86,28 +86,45 @@ try {
       await page.locator(".site-footer").screenshot({ path: join(screenshots, "mobile-footer.png") });
     }
 
-    await page.goto(`${base}/starters/`);
-    assert.equal(await page.locator(".starter-visual").count(), 5);
-    assert.equal(await page.locator(".starter-card .starter-button-primary[download][data-vlak-starter]").count(), 5);
-    assert.equal(await page.locator(".starter-card .starter-button").count(), 15);
-    const buttonsFit = await page.locator(".starter-card .starter-button").evaluateAll(elements => elements.every(element => {
+    await page.goto(`${base}/interfaces/`);
+    assert.equal(await page.locator("article.if-tile").count(), interfaceStarters.length);
+    assert.equal(await page.locator(".if-tile .if-crop").count(), interfaceStarters.length);
+    assert.equal(await page.locator(".if-tile a[download][data-vlak-starter]").count(), interfaceStarters.length);
+    assert.equal(await page.locator(".if-tile-actions a").count(), interfaceStarters.length * 3);
+    assert.equal(await page.locator(".if-tile a a, a.if-tile, .if-tile a button, .if-tile a input").count(), 0, "Gallery actions are independent links, not nested controls");
+    for (const starter of interfaceStarters) {
+      const card = page.locator(`article.if-tile#${starter.slug}`);
+      assert.equal(await card.locator("[download]").getAttribute("href"), starter.download);
+      assert.equal(await card.locator("[download]").getAttribute("data-vlak-starter"), starter.slug);
+      const actions = card.locator(".if-tile-actions a");
+      assert.deepEqual(await actions.evaluateAll(links => links.map(link => link.textContent.replace(/[→↗↓]/g, "").trim())), ["Try", "Download", "View source"]);
+      assert.equal(await actions.nth(0).getAttribute("href"), starter.preview);
+      assert.equal(await actions.nth(2).getAttribute("href"), starter.source);
+      assert.equal(await card.getByRole("heading", { level: 2 }).count(), 1, `${starter.slug}: named article`);
+    }
+    const buttonsFit = await page.locator(".if-tile-actions a").evaluateAll(elements => elements.every(element => {
       const rect = element.getBoundingClientRect();
       return rect.width >= 44 && rect.height >= 44 && rect.left >= 0 && rect.right <= innerWidth;
     }));
-    assert(buttonsFit, `${label}: starter actions are reachable and at least 44px`);
-    await page.locator(".starter-duo").scrollIntoViewIfNeeded();
-    await duoReady(page, mobile ? "dark" : "light");
-    for (const card of await page.locator(".starter-card").all()) {
+    assert(buttonsFit, `${label}: interface actions are reachable and at least 44px`);
+    for (const card of await page.locator("article.if-tile").all()) {
       await card.scrollIntoViewIfNeeded();
-      await card.screenshot({ path: join(screenshots, `${label}-starter-${await card.getAttribute("id")}.png`) });
+      await cropReady(page, await card.getAttribute("id"));
+      await card.screenshot({ path: join(screenshots, `${label}-interface-${await card.getAttribute("id")}.png`) });
     }
-    await page.locator(".starter-duo").scrollIntoViewIfNeeded();
     for (const theme of ["dark", "light"]) {
       await page.evaluate(theme => document.documentElement.dataset.theme = theme, theme);
-      await duoReady(page, theme);
-      await page.locator(".starter-card#ios").screenshot({ path: join(screenshots, `${label}-duo-${theme}.png`) });
+      for (const slug of ["ios", "render", "drive"]) {
+        const card = page.locator(`article.if-tile#${slug}`); await card.scrollIntoViewIfNeeded(); await cropReady(page, slug);
+        await card.screenshot({ path: join(screenshots, `${label}-${slug}-${theme}.png`) });
+      }
     }
-    assert(await noOverflow(page), `${label}: starters fit viewport`);
+    assert(await noOverflow(page), `${label}: interfaces fit viewport`);
+
+    const campaign = "?utm_source=linkedin&utm_campaign=gallery-launch#ios";
+    await page.goto(`${base}/starters/${campaign}`);
+    await page.waitForURL(`${base}/interfaces/${campaign}`);
+    assert.equal(new URL(page.url()).hash, "#ios", "Legacy deep links reach the same interface tile");
 
     await page.goto(`${base}/interfaces/ios/`);
     const duoLinks = page.locator(".if-duo-start-actions a");
@@ -121,6 +138,10 @@ try {
         return { strip: getComputedStyle(strip).borderBottomWidth, specimen: getComputedStyle(specimen).borderTopWidth, gap: specimen.getBoundingClientRect().top - strip.getBoundingClientRect().bottom };
       });
       assert.deepEqual(seam, { strip: "0px", specimen: "1px", gap: 0 }, `${label}: ${slug} has one shared strip/specimen border`);
+      const download = page.locator(".if-duo-start a[download]");
+      assert.equal(await download.getAttribute("href"), interfaceStarters.find(starter => starter.slug === slug).download);
+      assert.match(await download.innerText(), /Download starter/);
+      const box = await download.boundingBox(); assert(box && box.height >= 44 && box.width >= 44, `${slug}: direct download is a touch target`);
     }
     await context.close();
   }
@@ -135,10 +156,16 @@ try {
   await nojs.goto(`${base}/`);
   assert.equal(await nojs.locator(".specimen-cell-kit-toggle-group").getByRole("group").count(), 1, "Server-rendered homepage also shows only the primary group");
   await nojs.goto(`${base}/starters/`);
-  await nojs.locator(".starter-duo").scrollIntoViewIfNeeded();
+  assert.equal(new URL(nojs.url()).pathname, "/starters/", "Static-host fallback remains readable without JavaScript");
+  const fallback = nojs.locator('main a[href="/interfaces/"]').first();
+  assert(await fallback.isVisible(), "Redirect has an ordinary no-JavaScript link");
+  assert.equal(await nojs.locator('main a[href="/interfaces/#ios"]').count(), 1, "Old fragment has a usable no-JavaScript destination");
+  await fallback.click();
+  assert.equal(await nojs.locator("article.if-tile a[download]").count(), interfaceStarters.length, "Every download is present before hydration");
+  assert.equal(await nojs.locator(".if-tile-actions a").count(), interfaceStarters.length * 3);
   for (const theme of ["dark", "light"]) {
     await nojs.emulateMedia({ colorScheme: theme });
-    await duoReady(nojs, theme);
+    await nojs.locator(".if-tile#render").scrollIntoViewIfNeeded(); await cropReady(nojs, "render");
   }
   await plain.close();
   assert.deepEqual(errors, [], "No runtime errors");

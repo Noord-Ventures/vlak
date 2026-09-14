@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
+import { promisify } from "node:util";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { isAbsolute, join } from "node:path";
@@ -9,8 +10,9 @@ import { buildInterfaceStarters, starterPackageVersion } from "./build-interface
 import { checkRelease, releasePackages } from "./check-release.mjs";
 import { builtFiles, compareManifest, comparePayload, tarFiles } from "./check-published-release.mjs";
 
-const args = process.argv.slice(2);
-if (args.length && !(args.length === 1 && ["--candidate", "--registry"].includes(args[0])) && !(args.length === 2 && args[0] === "--candidate-dir" && isAbsolute(args[1]))) throw new Error("Usage: verify-interface-starters.mjs [--registry | --candidate | --candidate-dir /absolute/tarball/directory]");
+const smoke = process.argv.slice(2).includes("--smoke");
+const args = process.argv.slice(2).filter(argument => argument !== "--smoke");
+if (args.length && !(args.length === 1 && ["--candidate", "--registry"].includes(args[0])) && !(args.length === 2 && args[0] === "--candidate-dir" && isAbsolute(args[1]))) throw new Error("Usage: verify-interface-starters.mjs [--registry | --candidate | --candidate-dir /absolute/tarball/directory] [--smoke]");
 const candidate = args[0] !== "--registry";
 const root = fileURLToPath(new URL("../", import.meta.url));
 checkRelease({ root, generated: true });
@@ -58,7 +60,8 @@ if (candidate) {
   console.log(`Registry verification for published Vlak ${starterPackageVersion}`);
 }
 console.log(`Standalone verification: ${output}`);
-for (const { slug } of interfaceStarters) {
+const runFile = promisify(execFile);
+async function verifyStarter({ slug }) {
   execFileSync("unzip", ["-q", join(archives, `${slug}.zip`), "-d", output]);
   const cwd = join(output, `vlak-${slug}`), path = join(cwd, "package.json");
   const manifest = JSON.parse(readFileSync(path, "utf8"));
@@ -70,7 +73,7 @@ for (const { slug } of interfaceStarters) {
   }
   for (const args of [["install", "--no-audit", "--no-fund", "--prefer-offline"], ["run", "typecheck"], ["run", "build"]]) {
     try {
-      const result = execFileSync("npm", args, { cwd, encoding: "utf8", stdio: "pipe", maxBuffer: 16 * 1024 * 1024 });
+      const { stdout: result } = await runFile("npm", args, { cwd, encoding: "utf8", maxBuffer: 16 * 1024 * 1024, timeout: 300_000 });
       console.log(`${slug}: npm ${args.join(" ")} passed`);
       if (args[1] === "build") console.log(result.split("\n").filter(line => line.startsWith("dist/")).join("\n"));
     } catch (error) {
@@ -79,9 +82,25 @@ for (const { slug } of interfaceStarters) {
     }
   }
 }
+// Keep memory and package-registry pressure bounded while checking the whole
+// catalogue. Collect failures so one study cannot hide problems in the rest.
+const pending = [...interfaceStarters];
+const failures = [];
+await Promise.all(Array.from({ length: 2 }, async () => {
+  while (pending.length) {
+    const starter = pending.shift();
+    try { await verifyStarter(starter); }
+    catch (error) { failures.push(`${starter.slug}: ${error.message}`); }
+  }
+}));
+assert.deepEqual(failures, [], `Starter verification failed. Projects kept at ${output}`);
 if (candidate) {
   checkRelease({ root, generated: true });
   verifyCandidatePayloads();
   console.log("Candidate core/React manifests, props and runtime payloads still match the completed checkout build");
 }
-console.log(`All five starters build in ${candidate ? "candidate" : "registry"} mode. Outputs kept at ${output}`);
+console.log(`All ${interfaceStarters.length} starters build in ${candidate ? "candidate" : "registry"} mode. Outputs kept at ${output}`);
+if (smoke) {
+  const { stdout } = await runFile(process.execPath, ["--experimental-strip-types", join(root, "scripts/smoke-interface-starters.mjs"), output, "/examples/vlak/"], { encoding: "utf8", maxBuffer: 16 * 1024 * 1024, timeout: 1_200_000 });
+  console.log(stdout);
+}

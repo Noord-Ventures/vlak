@@ -38,7 +38,7 @@ function AgentsCrop() {
 function RenderCrop() {
   return <div className="if-crop-scene if-crop-render">
     <header className="if-crop-console-head"><Icon name="layers" size={16} /><div><strong>Braun T3 · 1958</strong><span>Surface inspection</span></div><span>Fine lines</span></header>
-    <div className="if-crop-model-view rw-crop-model"><img className="rw-crop-light" src="/interfaces/concepts/braun-t3-line-preview-light-v1.png" alt="" /><img className="rw-crop-dark" src="/interfaces/concepts/braun-t3-line-preview-dark-v1.png" alt="" /><div className="if-crop-model-tools">{(["refresh", "grid", "camera"] as const).map(name => <i key={name}><Icon name={name} size={16} /></i>)}</div></div>
+    <div className="if-crop-model-view rw-crop-model"><img loading="lazy" decoding="async" className="rw-crop-light" src="/interfaces/concepts/braun-t3-line-preview-light-v1.png" alt="" /><img loading="lazy" decoding="async" className="rw-crop-dark" src="/interfaces/concepts/braun-t3-line-preview-dark-v1.png" alt="" /><div className="if-crop-model-tools">{(["refresh", "grid", "camera"] as const).map(name => <i key={name}><Icon name={name} size={16} /></i>)}</div></div>
     <footer className="if-crop-console-foot"><span>Perspective view</span><span>32,027 triangles</span></footer>
   </div>;
 }
@@ -46,7 +46,7 @@ function RenderCrop() {
 function DriveCrop() {
   return <div className="if-crop-scene if-crop-drive">
     <header className="if-crop-console-head"><Icon name="sliders" size={16} /><div><strong>Vehicle 01</strong><span>Parked / connected</span></div><Icon name="lock" size={16} /></header>
-    <div className="if-crop-vehicle-art rw-crop-model"><img className="rw-crop-light" src="/interfaces/concepts/evoque-line-side-light-v4.png" alt="" /><img className="rw-crop-dark" src="/interfaces/concepts/evoque-line-side-dark-v4.png" alt="" /></div>
+    <div className="if-crop-vehicle-art rw-crop-model"><img loading="lazy" decoding="async" className="rw-crop-light" src="/interfaces/concepts/evoque-line-side-light-v4.png" alt="" /><img loading="lazy" decoding="async" className="rw-crop-dark" src="/interfaces/concepts/evoque-line-side-dark-v4.png" alt="" /></div>
     <div className="if-crop-ev-status"><div><span>Range · 84%</span><strong>386 <small>km</small></strong></div><div><span>Cabin</span><strong>20<small>°</small></strong></div><div><span>Media</span><strong>Loathe</strong></div></div>
   </div>;
 }

@@ -12,7 +12,7 @@ export const publicSitePaths = [
   "/interfaces/circuitry", "/interfaces/identity", "/interfaces/patient", "/interfaces/music",
   "/workflows", "/services", "/interfaces/reconciliation", "/interfaces/calendar", "/interfaces/desktop-os", "/interfaces/documentation",
   "/interfaces/microscopy", "/interfaces/mobile-os", "/interfaces/ios", "/interfaces/android", "/interfaces/music-player", "/interfaces/video-player",
-  "/showcase", "/starters", "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
+  "/showcase", "/use-cases", "/use-cases/agent-interfaces", "/use-cases/data-heavy-software",
   "/use-cases/scientific-software", "/use-cases/healthcare-software", "/use-cases/industrial-software",
   "/use-cases/enterprise-software", "/use-cases/consumer-software",
   "/use-cases/product-prototyping", "/updates",
@@ -41,7 +41,9 @@ function normalizePath(path: string): string {
 }
 
 const acquisitionChannels = new Set(["direct", "twitter", "linkedin", "threads", "github", "npm", "producthunt", "search", "referral"]);
-const starterSlugs = new Set(["ios", "android", "calendar", "reconciliation", "line"]);
+// Every actual study is downloadable. Reuse the public allowlist without
+// bringing build metadata and asset manifests into the browser bundle.
+const starterSlugs = new Set(publicSitePaths.filter(path => path.startsWith("/interfaces/") && path !== "/interfaces/mobile-os").map(path => path.slice("/interfaces/".length)));
 
 function safeCampaignValue(value: string | undefined): string | undefined {
   const normalized = value?.toLowerCase().trim().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 64);
@@ -204,6 +206,10 @@ export function initializeSiteAnalytics(publicPaths: string[]): void {
   } catch {
     // Analytics stays optional when storage is unavailable or malformed.
   }
+  // Retain the original source even for untagged external links: a static
+  // redirect changes document.referrer to our own site. Only the canonical
+  // destination loads the collector and records acquisition.
+  if (normalizePath(window.location.pathname) === "/starters") return;
   window.__vlakSiteAnalytics = { paths, attribution };
   window.va ??= (...args: unknown[]) => {
     window.vaq ??= [];
@@ -239,7 +245,8 @@ export function initializeSiteAnalytics(publicPaths: string[]): void {
     if (productionHosts.has(host)) {
       const path = normalizePath(url.pathname);
       if (anchor.dataset.startPath) trackSiteEvent("start_choice", { path: anchor.dataset.startPath });
-      if (path === "/starters") trackSiteEvent("starter_open", { slug: starterSlugs.has(url.hash.slice(1)) ? url.hash.slice(1) : "all" });
+      // Retain the historical event name for the consolidated gallery funnel.
+      if (path === "/interfaces" || path === "/starters") trackSiteEvent("starter_open", { slug: starterSlugs.has(url.hash.slice(1)) ? url.hash.slice(1) : "all" });
       const download = /^\/starter\/([a-z-]+)\.zip$/.exec(path);
       if (download) trackSiteEvent("starter_download", { slug: download[1]! });
       if (path === "/docs/agents") trackSiteEvent("agent_setup_open");

@@ -4,6 +4,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { catalogComponents } from "@noorddev/vlak";
+import { interfaceStarters } from "../app/starters/catalog.ts";
 
 const out = resolve(process.env.SITE_EXPORT || fileURLToPath(new URL("../out", import.meta.url)));
 const origin = "https://vlak.dev";
@@ -145,6 +146,19 @@ assert.deepEqual([iosImage.readUInt32BE(16), iosImage.readUInt32BE(20)], [1200, 
 assert(!iosImage.equals(readFileSync(join(out, "interfaces/opengraph-image"))), "iOS social image is distinct from the interface catalogue card");
 const interfaceIndex = read("interfaces/index.html");
 const interfaceLinks = tags(interfaceIndex, "a").map(item => item.href?.replace(/\/$/, ""));
+assert.equal(tags(interfaceIndex, "article").filter(item => item.class?.split(/\s+/).includes("if-tile")).length, interfaceStarters.length, "One Interfaces tile per runnable study before hydration");
+const galleryDownloads = tags(interfaceIndex, "a").filter(item => item["data-vlak-starter"]);
+assert.equal(galleryDownloads.length, interfaceStarters.length, "The one gallery exposes every direct starter download");
+for (const starter of interfaceStarters) {
+  assert(galleryDownloads.some(link => link["data-vlak-starter"] === starter.slug && link.href === starter.download), `${starter.slug}: gallery directly links the correct download`);
+  assert(interfaceLinks.includes(starter.preview.replace(/\/$/, "")), `${starter.slug}: gallery keeps its interactive preview`);
+  assert(interfaceLinks.includes(starter.source), `${starter.slug}: gallery links exact study source`);
+  assert(tags(read(`interfaces/${starter.slug}/index.html`), "a").some(link => link["data-vlak-starter"] === starter.slug && link.href === starter.download), `${starter.slug}: detail page exposes its own download without JavaScript`);
+}
+const legacyStarters = read("starters/index.html");
+assert(tags(legacyStarters, "meta").some(item => item.name === "robots" && /noindex/.test(item.content)), "Legacy starter gallery is not indexable");
+assert.deepEqual(tags(legacyStarters, "link").filter(item => item.rel === "canonical").map(item => item.href), [`${origin}/interfaces/`], "Legacy gallery points to its consolidated canonical");
+assert(tags(legacyStarters, "a").some(item => item.href === "/interfaces/"), "Legacy gallery has an ordinary no-JavaScript destination");
 for (const platform of ["android", "ios"]) {
   assert(interfaceLinks.includes(`/interfaces/${platform}`), `Interface gallery includes ${platform}`);
   assert(read("interfaces.md").includes(`${origin}/interfaces/${platform}/`), `Agent interface catalogue includes ${platform}`);

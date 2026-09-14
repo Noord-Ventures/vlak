@@ -7,6 +7,7 @@ import { hasInterfaceFilm } from "./films";
 
 export function InterfaceFilm({ slug, title }: { slug: InterfaceSlug; title: string }) {
   const tracked = useRef(false);
+  const video = useRef<HTMLVideoElement>(null);
   if (!hasInterfaceFilm(slug)) return null;
   function recordPlay() {
     if (tracked.current) return;
@@ -14,17 +15,16 @@ export function InterfaceFilm({ slug, title }: { slug: InterfaceSlug; title: str
     trackSiteEvent("interface_video_play", { slug });
   }
   return (
-    <section className="if-film" aria-labelledby={`${slug}-film-title`}>
-      <div className="if-film-head">
-        <h2 id={`${slug}-film-title`}>Interface film</h2>
-        <p>20 seconds</p>
+    <details className="if-film" onToggle={event => { if (!event.currentTarget.open) video.current?.pause(); }}>
+      <summary>Watch the 20-second walkthrough</summary>
+      <div className="if-film-body">
+        <video ref={video} controls playsInline preload="none" poster={`/interfaces/films/posters/${slug}.jpg`} onPlay={recordPlay} aria-label={`${title} walkthrough`} aria-describedby={`${slug}-film-note`}>
+          <source src={`/interfaces/films/${slug}.mp4`} type="video/mp4" />
+          <track default kind="captions" src="/interfaces/films/captions.vtt" srcLang="en" label="English" />
+          Your browser does not support embedded video.
+        </video>
+        <p id={`${slug}-film-note`} className="if-film-note">A short walkthrough of the working {title.toLowerCase()} study.</p>
       </div>
-      <video controls playsInline preload="metadata" poster={`/interfaces/films/posters/${slug}.jpg`} onPlay={recordPlay} aria-describedby={`${slug}-film-note`}>
-        <source src={`/interfaces/films/${slug}.mp4`} type="video/mp4" />
-        <track default kind="captions" src="/interfaces/films/captions.vtt" srcLang="en" label="English" />
-        Your browser does not support embedded video.
-      </video>
-      <p id={`${slug}-film-note`} className="if-film-note">A short walkthrough of the working {title.toLowerCase()} study. The interface and its behaviour are described below.</p>
-    </section>
+    </details>
   );
 }

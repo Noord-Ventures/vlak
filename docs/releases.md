@@ -31,7 +31,7 @@ Workflow examples use `workspace:*` in the repository so checks exercise the cur
 1. Review and push the candidate commit. Create and push its matching version tag, such as `v0.5.0`, only when publication is intended. Pushing a version tag triggers the Release workflow and publishes all four packages. A manual dry run can use a branch; a manual publish must run on the matching tag.
 2. Let package checks and consumer tarball tests pass. The workflow checks the tag against every manifest and checks bundled registry versions before publishing with provenance.
 3. Verify all four exact versions exist on npm and are each tagged `latest`. The post-publication check verifies SHA-512 tarball integrity, export maps, dependencies, runtime files, declarations, CSS, tokens, props, and bundled registry content against the release checkout. Sourcemaps are excluded because they are not consumed APIs and can contain build paths.
-4. Let all five starters install and build using the public registry. Run `node --experimental-strip-types scripts/verify-interface-starters.mjs --registry` to repeat this check.
+4. Let every interface starter install and build using the public registry. Run `node --experimental-strip-types scripts/verify-interface-starters.mjs --registry` to repeat this check.
 5. Redeploy that verified checkout to production. No deploy hook is assumed. The Vercel production build runs the same published-release check after building packages; it stops if publication is incomplete or the site source has advanced beyond the package release.
 6. Record the actual npm publication date in the release notes and shared updates feed only after verification. Keep old feed IDs and dates unchanged.
 

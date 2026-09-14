@@ -35,7 +35,7 @@ function trailFor(pathname: string, components: readonly ComponentLabel[], pages
   } else if (parts[0] === "about") {
     trail.push({ label: "About" });
   } else if (parts[0] === "starters") {
-    trail.push({ label: "Starters" });
+    trail.push({ label: "Interfaces", href: "/interfaces/" });
   } else if (parts[0] === "updates") {
     trail.push({ label: "Updates" });
   } else if (parts[0] === "use-cases") {

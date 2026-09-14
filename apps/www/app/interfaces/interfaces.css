@@ -115,12 +115,13 @@ body:has(.if-index) {
 .if-duo-start-actions a:not(.rs-btn-primary) { color: var(--text); }
 .if-duo-start-actions a:hover { text-decoration-color: currentColor; }
 .if-detail-content { container: study-details / inline-size; padding: 40px 0 32px; min-width: 0; }
-.if-film { margin-bottom: 40px; }
-.if-film-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--gutter); margin-bottom: 12px; }
-.if-film-head h2 { margin: 0; font-size: .9375rem; font-weight: 600; line-height: 1.4; }
-.if-film-head p, .if-film-note { margin: 0; color: var(--text-secondary); font-size: .75rem; line-height: 1.45; }
+.if-film { margin-top: 16px; max-width: 592px; }
+.if-film summary { min-height: 44px; padding-block: 12px; color: var(--text-secondary); font-size: .8125rem; line-height: 1.45; cursor: pointer; }
+.if-film summary:hover, .if-film[open] summary { color: var(--text); }
+.if-film summary:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+.if-film-body { padding-top: 4px; }
 .if-film video { display: block; width: 100%; aspect-ratio: 16 / 9; border: 1px solid var(--divider); border-radius: 0; background: var(--control-fill); }
-.if-film-note { margin-top: 10px; max-width: 66ch; }
+.if-film-note { margin: 10px 0 0; max-width: 66ch; color: var(--text-secondary); font-size: .75rem; line-height: 1.45; }
 .if-overview { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 184px), 1fr)); gap: 28px var(--gutter); }
 .if-overview > div { grid-column: 1 / -1; min-width: 0; }
 @container study-details (min-width: 592px) {
@@ -244,6 +245,29 @@ body:has(.if-index) {
   .if-tile:hover { border-color: var(--text); background: color-mix(in srgb, var(--text) 2%, transparent); }
 }
 .if-tile:focus-visible { outline: 1px solid var(--text); outline-offset: 2px; }
+
+/* Downloads are sibling actions, never links nested inside a linked poster. */
+.if-tile.if-download-tile { height: auto; min-height: 408px; min-width: 0; grid-template-rows: minmax(204px, 1fr) auto; scroll-margin-top: 100px; }
+.if-tile-preview { position: relative; display: block; min-height: 204px; overflow: hidden; color: inherit; text-decoration: none; }
+.if-tile-preview > .if-crop { height: 100%; }
+.if-tile-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.if-tile-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 44px; min-height: 44px; padding: 8px 10px; border: 1px solid var(--control-border); border-radius: var(--radius-sm); color: var(--text); background: var(--bg); font-size: .75rem; line-height: 1.4; text-decoration: none; }
+.if-tile-action > span { flex: none; }
+.if-tile-download { background: var(--text); color: var(--bg); border-color: var(--text); }
+.if-tile-action:focus-visible, .if-download-link:focus-visible, .if-download-details summary:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.if-download-details { border-top: 1px solid var(--divider); font-size: .875rem; line-height: 1.45; }
+.if-download-details summary { padding-block: 12px; min-height: 44px; cursor: pointer; }
+.if-download-details > div { max-width: 72ch; padding-bottom: 16px; }
+.if-download-details p { margin: 0 0 12px; }
+.if-download-details code { font-size: .8125rem; }
+.if-download-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text); text-underline-offset: 4px; }
+@media (hover: hover) {
+  .if-tile-action:hover { border-color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+}
+@media (forced-colors: active) {
+  .if-tile-action { border-color: ButtonText; background: ButtonFace; color: ButtonText; }
+  .if-tile-download { border-color: Highlight; background: Highlight; color: HighlightText; }
+}
 
 .if-crop {
   position: relative;

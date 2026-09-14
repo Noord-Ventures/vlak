@@ -1,9 +1,10 @@
 // Run against a development or preview server: SITE_URL=http://localhost:3000 node scripts/e2e-interfaces.mjs
 import assert from "node:assert/strict";
 import { chromium } from "playwright";
+import { interfaceStarters } from "../app/starters/catalog.ts";
 
 const base = process.env.SITE_URL || "http://localhost:3000";
-const slugs = ["microbiology", "genome", "protein", "robotics", "circuitry", "identity", "patient", "music", "microscopy", "agents", "graphics", "render", "drive", "orbit", "frontier", "platforms", "android", "ios", "documentation", "music-player", "line", "press", "wall", "night", "evening", "room"];
+const slugs = interfaceStarters.map(starter => starter.slug);
 const browser = await chromium.launch({
   ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}),
   args: ["--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
@@ -73,16 +74,12 @@ try {
   const page = await context.newPage();
   await page.goto(base + "/interfaces/", { waitUntil: "networkidle" });
   assert.equal(await page.locator(".if-tile").count(), slugs.length);
-  assert.match(await page.locator(".if-tile").first().getAttribute("href"), /microbiology/);
+  assert.match(await page.locator(".if-tile .if-tile-preview").first().getAttribute("href"), /microbiology/);
   await page.goto(base + "/interfaces/graphics/", { waitUntil: "networkidle" });
-  await page.locator(".if-build-link").click();
-  await page.waitForFunction(() => location.hash === "#build-with-vlak");
-  await page.waitForFunction(() => {
-    const top = document.getElementById("build-with-vlak").getBoundingClientRect().top;
-    return top >= 60 && top < 400;
-  });
-  const top = await page.locator("#build-with-vlak").evaluate(el => el.getBoundingClientRect().top);
-  assert(top >= 60 && top < 400, `Build section should land below mobile navigation, got ${top}px`);
+  const [download] = await Promise.all([page.waitForEvent("download"), page.locator(".if-duo-start a[download]").click()]);
+  assert.match(download.url(), /\/starter\/graphics\.zip$/);
+  assert.equal(await download.failure(), null, "The contextual action downloads the actual starter ZIP");
+  assert.equal(new URL(page.url()).pathname, "/interfaces/graphics/", "Downloading keeps the working study open");
   await page.getByRole("button", { name: "Copy install", exact: true }).click();
   assert.equal(await page.evaluate(() => navigator.clipboard.readText()), "npm install @noorddev/vlak-react");
   await page.getByRole("button", { name: "Copy build brief", exact: true }).click();

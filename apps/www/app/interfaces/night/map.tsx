@@ -8,13 +8,13 @@ export type MapVehicle = { id: string; name: string; icon: IconName; status: str
 const center: LngLat = [-122.3886, 37.7581];
 const baseZoom = 14.5;
 export const fleetZoomLimits = { min: 2 ** (12 - baseZoom), max: 2 ** (18 - baseZoom) };
-const publicToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN || "";
 const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const styleURL = (dark: boolean) => `mapbox://styles/mapbox/${dark ? "dark" : "light"}-v11`;
 const routeData = (route?: StreetRoute) => ({ type: "FeatureCollection", features: route ? [{ type: "Feature", properties: { profile: route.profile, source: "Mapbox Directions" }, geometry: route.geometry }] : [] });
 function sketchPoint([lng, lat]: LngLat): [number, number] { return [(lng + 122.397) / .018 * 660, (37.766 - lat) / .016 * 500]; }
 
-export function FleetMap({ vehicles, selected, zoom, onZoomChange, onSelect }: { vehicles: readonly MapVehicle[]; selected?: string; zoom: number; onZoomChange: (zoom: number) => void; onSelect: (id: string) => void }) {
+export function FleetMap({ vehicles, selected, zoom, onZoomChange, onSelect, accessToken = "" }: { vehicles: readonly MapVehicle[]; selected?: string; zoom: number; onZoomChange: (zoom: number) => void; onSelect: (id: string) => void; accessToken?: string }) {
+  const publicToken = accessToken.trim();
   const host = React.useRef<HTMLDivElement>(null);
   const viewer = React.useRef<MapInstance | null>(null);
   const dispatchingCamera = React.useRef(false);
@@ -49,10 +49,11 @@ export function FleetMap({ vehicles, selected, zoom, onZoomChange, onSelect }: {
       setRouteState({ key: routeKey, status: "ready", route: result });
     }).catch(() => { if (!cancelled) setRouteState({ key: routeKey, status: "error" }); }).finally(() => window.clearTimeout(timeout));
     return () => { cancelled = true; controller.abort(); window.clearTimeout(timeout); };
-  }, [routeKey, routeRetry]);
+  }, [publicToken, routeKey, routeRetry]);
   // biome-ignore lint/correctness/useExhaustiveDependencies: A retry deliberately replaces the failed viewer.
   React.useEffect(() => {
-    if (!publicToken.startsWith("pk.") || !host.current) return;
+    if (!publicToken.startsWith("pk.")) { setStatus("preview"); setPoints({}); return; }
+    if (!host.current) return;
     let cancelled = false;
     let map: MapInstance | undefined;
     let timeout = 0;
@@ -101,7 +102,7 @@ export function FleetMap({ vehicles, selected, zoom, onZoomChange, onSelect }: {
       themeObserver = new MutationObserver(setTheme); themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme", "class", "style"] }); theme.addEventListener("change", setTheme);
     }).catch(() => { if (!cancelled) setStatus("error"); });
     return () => { cancelled = true; window.clearTimeout(timeout); resizeObserver?.disconnect(); themeObserver?.disconnect(); theme.removeEventListener("change", setTheme); map?.remove(); viewer.current = null; };
-  }, [retry]);
+  }, [publicToken, retry]);
   React.useEffect(() => {
     const map = viewer.current;
     if (!map || !ready) return;

@@ -43,7 +43,8 @@ test("API aliases normalize case, punctuation, CamelCase, and diacritics", () =>
 test("all query words must match, including queries combining names and features", () => {
   assert.equal(searchSite(siteSearchEntries, "prompt screenshot")[0]?.href, "/components/message-composer/");
   assert.equal(searchSite(siteSearchEntries, "promptinput screenshot")[0]?.href, "/components/message-composer/");
-  assert.equal(searchSite(siteSearchEntries, "nextjs starter")[0]?.href, "/starters/");
+  assert.equal(searchSite(siteSearchEntries, "nextjs starter")[0]?.href, "/docs/");
+  assert.equal(searchSite(siteSearchEntries, "interface starter")[0]?.href, "/interfaces/");
   assert.equal(searchSite(siteSearchEntries, "AI workflow")[0]?.href, "/ai/workflow-canvas/");
   assert.equal(searchSite(siteSearchEntries, "theming")[0]?.href, "/docs/theming/");
   assert.equal(searchSite(siteSearchEntries, "microscopy")[0]?.href, "/interfaces/microscopy/");
@@ -74,7 +75,7 @@ test("every public canonical page is indexed once, including dynamic catalog and
   for (const file of await readdir(new URL("../app/", import.meta.url), { recursive: true })) {
     if (file !== "page.tsx" && !file.endsWith("/page.tsx")) continue;
     const route = file === "page.tsx" ? "" : file.slice(0, -"/page.tsx".length);
-    if (["swag", "i/[slug]", "docs/ai", "interfaces/mobile-os"].includes(route)) continue;
+    if (["swag", "i/[slug]", "docs/ai", "interfaces/mobile-os", "starters"].includes(route)) continue;
     if (route === "components/[name]") {
       for (const component of catalogComponents.filter(component => component.category !== "ai")) expected.add(`/components/${component.name}/`);
     } else if (route === "ai/[name]") {
@@ -99,6 +100,7 @@ test("every public canonical page is indexed once, including dynamic catalog and
     assert.ok(!siteSearchEntries.some(entry => entry.href === `/components/${component.name}/`));
   }
   for (const study of interfaces) assert.ok(siteSearchEntries.some(entry => entry.href === `/interfaces/${study.slug}/`));
+  assert.ok(!siteSearchEntries.some(entry => entry.href === "/starters/"), "The compatibility redirect is not a second gallery search result");
 });
 
 test("the launcher payload contains navigation data without implementation or private records", async () => {

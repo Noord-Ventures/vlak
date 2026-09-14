@@ -10,7 +10,7 @@ function entry(href: string, title: string, description: string, section: string
 }
 
 const guides = [
-  entry("/docs/", "Getting started", "Install React components, copy StyleX source, or use Vlak CSS classes directly.", "Guides", ["Installation", "Setup", "Quick start", "npm", "pnpm", "CLI", "shadcn"]),
+  entry("/docs/", "Getting started", "Install React components, copy StyleX source, use Vlak CSS classes, or open a small Vite and React or Next.js project.", "Guides", ["Installation", "Setup", "Quick start", "npm", "pnpm", "CLI", "shadcn", "Vite", "Next.js", "React", "StackBlitz", "Form", "Starter"]),
   entry("/docs/frameworks/", "Frameworks", "Use Vlak in Next.js, Vite, Remix, React Router, Astro, and plain HTML.", "Guides"),
   entry("/docs/theming/", "Theming", "Customize CSS properties, the dark scheme, module grid, and text scale.", "Guides", ["Dark mode", "Light mode", "Theme", "Colors"]),
   entry("/docs/tokens/", "Tokens", "The neutral scale, typography, grid, radius, motion, and control dimensions.", "Guides", ["Design tokens", "CSS variables", "Spacing", "Typography"]),
@@ -26,7 +26,7 @@ const guides = [
 const destinations = [
   entry("/components/", "Components", "Browse the complete React component library with examples, props, and keyboard guidance.", "Site", ["Catalogue", "Catalog", "Library"]),
   entry("/ai/", "AI components", "Compose conversations, prompts, tools, widgets, rich responses, voice, and workflows.", "Site", ["AI Elements", "Artificial intelligence", "Assistant interfaces"]),
-  entry("/interfaces/", "Interfaces", "Explore complete interface studies built with Vlak components.", "Site", ["Studies", "Examples", "Templates"]),
+  entry("/interfaces/", "Interfaces", "Try complete interface studies and download their standalone Vite and React projects.", "Site", ["Studies", "Examples", "Templates", "Starter", "Starters", "Vite", "React", "Download"]),
   entry("/workflows/", "Workflow kits", "Runnable record review, action approval and schedule editing with explicit state and adapter contracts.", "Guides", ["Recipes", "Approval", "Workflow"]),
   entry("/services/", "Workflow modernization", "Scope a bounded improvement with a portable local brief and delivery templates.", "Site", ["Service", "Brief", "Modernization"]),
   entry("/docs/projects/", "Project files", "Save, reopen, recover and export local workspaces.", "Guides", ["Backup", "Recovery"]),
@@ -35,7 +35,6 @@ const destinations = [
     entry(`/workflows/${kit.id}/`, kit.title, kit.description, "Workflow kits", [kit.id, "Example"]),
     entry(`/workflows/${kit.id}/manifest/`, `${kit.title} manifest`, `States, adapters, ownership, installation and acceptance for the ${kit.title.toLowerCase()} workflow.`, "Workflow kits", [kit.id, "Manifest", "Contract"]),
   ]),
-  entry("/starters/", "Starters", "Small Vite and Next.js projects with the package, stylesheet, and a working form already connected.", "Guides", ["Starter", "Vite", "Next.js", "Templates", "StackBlitz"]),
   entry("/showcase/", "Built with Vlak", "Products and experiments built with Vlak, with a public path for submitting your own work.", "Site", ["Showcase", "Community", "Badge", "Submit project", "Tax Scratchpad", "Nicholas Pulido", "NPUX", "Noord", "Personal Site", "Renn", "renatovaldes.com"]),
   entry("/ai/widgets/", "Widget patterns", "Compose application content, third-party React widgets, and embedded provider pages.", "Guides", ["Integrations", "Iframe", "Widget design system"]),
   entry("/use-cases/", "Use cases", "Components and studies for enterprise, consumer, agent, data, science, healthcare, and industrial software.", "Site"),

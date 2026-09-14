@@ -98,9 +98,9 @@ try {
   }
   const page = await browser.newPage({ viewport: { width: 1440, height: 960 } });
   await page.goto(`${base}/interfaces/`, { waitUntil: "networkidle" });
-  const agentTile = page.locator(".if-tile[href='/interfaces/agents'], .if-tile[href='/interfaces/agents/']");
+  const agentTile = page.locator("article.if-tile#agents");
   assert.equal(await agentTile.count(), 1, "The gallery has one Agent management study");
-  await agentTile.click();
+  await agentTile.locator(".if-tile-actions a").first().click();
   await page.waitForURL(/\/interfaces\/agents\/?$/);
   const current = page.locator(".if-rail a[aria-current='page']");
   assert(await current.isVisible());

@@ -2,5 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install",
-  "buildCommand": "node scripts/build-deps.mjs && next build"
+  "buildCommand": "node scripts/build-deps.mjs && next build",
+  "redirects": [
+    { "source": "/starters", "destination": "/interfaces/", "permanent": true },
+    { "source": "/starters/", "destination": "/interfaces/", "permanent": true }
+  ]
 }

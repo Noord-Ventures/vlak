@@ -31,7 +31,7 @@ export default function Home() {
         </section>
 
         <nav {...sx("specimen-start", specimen.start)} aria-label="Start with Vlak">
-          <a {...sx("specimen-start-tile", specimen.startTile)} href="/starters/" data-start-path="prototype"><strong>Prototype <span aria-hidden="true">↗</span></strong><span>Run an interface and change it.</span></a>
+          <a {...sx("specimen-start-tile", specimen.startTile)} href="/interfaces/" data-start-path="prototype"><strong>Prototype <span aria-hidden="true">↗</span></strong><span>Run an interface and change it.</span></a>
           <a {...sx("specimen-start-tile", specimen.startTile)} href="/docs/agents/" data-start-path="agent"><strong>Use an agent <span aria-hidden="true">↗</span></strong><span>Connect the component docs and rules.</span></a>
           <a {...sx("specimen-start-tile", specimen.startTile)} href="#install-command" data-start-path="install"><strong>Install <span aria-hidden="true">↓</span></strong><span>Add Vlak to your project.</span></a>
         </nav>

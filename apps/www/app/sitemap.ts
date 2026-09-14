@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     if (file !== "page.tsx" && !file.endsWith("/page.tsx")) continue;
     const path = file === "page.tsx" ? "" : file.slice(0, -"/page.tsx".length);
     // Retired pages, private collections, compatibility choosers and share-only previews are not indexed.
-    if (path === "swag" || path === "showcase" || path === "i/[slug]" || path === "docs/ai" || path === "interfaces/mobile-os") continue;
+    if (path === "swag" || path === "showcase" || path === "starters" || path === "i/[slug]" || path === "docs/ai" || path === "interfaces/mobile-os") continue;
     if (path === "components/[name]") {
       for (const component of catalogComponents) {
         if (component.category !== "ai") paths.add(`/components/${component.name}/`);

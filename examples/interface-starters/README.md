@@ -2,7 +2,7 @@
 
 Five standalone Vite and React projects are exported from the interface studies: iPhone Duo, Android, calendar, CSV reconciliation and AI conversation.
 
-Download them at [vlak.dev/starters](https://vlak.dev/starters/). Each ZIP contains source, CSS, local sample assets, a package manifest and a README. After extracting one:
+Download them beside the previews at [vlak.dev/interfaces](https://vlak.dev/interfaces/). Each ZIP contains source, CSS, local sample assets, a package manifest and a README. After extracting one:
 
 ```sh
 npm install

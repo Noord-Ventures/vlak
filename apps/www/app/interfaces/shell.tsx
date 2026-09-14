@@ -13,6 +13,8 @@ import { hasInterfaceFilm, INTERFACE_FILM_DURATION, INTERFACE_FILM_UPLOAD_DATE }
 import { componentForLabel } from "@/lib/catalog-relationships";
 import { StructuredData, breadcrumbData } from "@/components/structured-data";
 import { HOST } from "../specimen";
+import { starterByInterface } from "../starters/catalog";
+import starterPackage from "../../../../packages/react/package.json";
 
 const sourceRoot = "https://github.com/Noord-Ventures/vlak/tree/main/apps/www/app/interfaces";
 
@@ -27,6 +29,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
   const ordered = orderedInterfaces;
   const next = ordered[(ordered.findIndex((item) => item.slug === slug) + 1) % ordered.length]!;
   const source = sourceFor(slug);
+  const starter = starterByInterface(slug);
   const pageUrl = `${HOST}/interfaces/${slug}/`;
   const filmData = hasInterfaceFilm(slug) ? {
     "@context": "https://schema.org",
@@ -70,18 +73,28 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
               <h1 id={`${slug}-name`}>{proto.title}</h1>
               <div className="if-study-actions"><PreviewButton /><a className="rs-btn-primary if-build-link" href="#build-with-vlak">Build with Vlak <span aria-hidden="true">↓</span></a></div>
             </header>
-            <InterfaceStart source={source} slug={slug} title={proto.title} />
+            <InterfaceStart source={source} slug={slug} title={proto.title} starterDownload={starter?.download} />
             <InterfacePreview><div {...sx(`if-specimen${workbench ? " if-workbench" : ""}`, interfaces.specimen, workbench && interfaces.workbenchSpecimen)}>{children}</div></InterfacePreview>
             <div className="if-study-caption"><p>{proto.use}</p>{slug !== "ios" && <a href={source}>View source <span aria-hidden="true">↗</span></a>}</div>
+            {starter && <details className="if-download-details">
+              <summary>About this download</summary>
+              <div>
+                <p>A standalone Vite and React project using Vlak {starterPackage.version}. Extract the ZIP, open its folder, then run <code>npm install</code> and <code>npm run dev</code>. Requires Node 22.12 or newer.</p>
+                <p>{starter.note}</p>
+                {starter.networkNotes?.map(note => <p key={note}>{note}</p>)}
+                {!!starter.credits?.length && <p>Asset attribution and license notices are included in <code>CREDITS.md</code> and linked from the running project.</p>}
+                <a className="if-download-link" href="/docs/#base-examples">Installation and base examples <span aria-hidden="true">→</span></a>
+              </div>
+            </details>}
           </InterfacePreviewProvider>
         </section>
         <div className="if-detail-content">
-          <InterfaceFilm slug={slug} title={proto.title} />
           <section className="if-overview" aria-labelledby={`${slug}-overview`}>
             <div>
               <h2 id={`${slug}-overview`}>Inside the interface</h2>
               <p className="if-story">{proto.story}</p>
               <p className="if-demo-note">{proto.note}</p>
+              <InterfaceFilm slug={slug} title={proto.title} />
             </div>
             <div className="if-used-components">
               <h2>Components used</h2>
@@ -100,7 +113,7 @@ export function InterfaceShell({ slug, children }: { slug: InterfaceSlug; childr
               {slug === "frontier" && <p className="if-asset-credit"><a href="https://sketchfab.com/3d-models/bust-of-athena-6f372d03e69b48ee8901bdc6e48f17b5" target="_blank" rel="noreferrer">Bust of Athena</a> by <a href="https://sketchfab.com/yugengen" target="_blank" rel="noreferrer">yugengen</a>, licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>. Adapted into an animated contour drawing for Vlak.</p>}
             </div>
           </section>
-          <StartBuilding title={proto.title} slug={slug} source={source} />
+          <StartBuilding title={proto.title} slug={slug} source={source} starterDownload={starter?.download} />
           <section className="if-modifications" aria-labelledby={`${slug}-modifications`}>
             <h2 id={`${slug}-modifications`}>Component modifications</h2>
             <ul>

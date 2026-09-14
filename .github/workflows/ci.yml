@@ -100,6 +100,10 @@ jobs:
         run: pnpm --filter @noorddev/vlak-assistant-reference build
       - name: Canonical pages, sharing metadata, sitemap and agent links
         run: node apps/www/scripts/check-discovery.mjs
+      - name: Starter gallery, theme previews and activation layout
+        run: node --experimental-strip-types apps/www/scripts/growth-layout-e2e.mjs
+      - name: Optional interface walkthroughs
+        run: node --experimental-strip-types apps/www/scripts/interface-film-e2e.mjs
       - name: Agent plugin, MCP and model-readable docs
         run: pnpm check:agents
       - name: Mobile navigation and interactive workspaces
@@ -150,9 +154,29 @@ jobs:
             ${{ runner.temp }}/vlak-assistant-recovery-e2e
             ${{ runner.temp }}/vlak-assistant-server.log
           retention-days: 7
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: site
           path: apps/www/out
           retention-days: 7
+
+  starters:
+    name: Standalone interface starters
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Export dependency, asset and isolation contracts
+        run: node --experimental-strip-types --test scripts/interface-starters.test.mjs
+      - run: pnpm --filter www exec playwright install chromium --with-deps
+      - name: Install, typecheck, build and exercise every ZIP under a subdirectory
+        run: node --experimental-strip-types scripts/verify-interface-starters.mjs --smoke

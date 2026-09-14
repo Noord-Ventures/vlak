@@ -8,11 +8,12 @@ import { InterfaceCrop } from "./crops";
 import { InterfacesNav } from "./nav";
 import { interfaces as ifx } from "./interfaces.stylex";
 import { DOOR } from "../specimen";
+import { starterByInterface } from "../starters/catalog";
 import "./interfaces.css";
 
 export const metadata: Metadata = pageMetadata("/interfaces", {
   title: "Interfaces",
-  description: "Explore working interface studies, inspect their components, and build your own with Vlak. React, CSS, and source included.",
+  description: "Try working interface studies and download each as a standalone Vite and React project. Components, styles, source and setup notes included.",
   alternates: { canonical: `${DOOR}/interfaces/` },
 });
 
@@ -25,23 +26,28 @@ export default function InterfacesPage() {
         <header className={`${cover.className} if-index-cover`} style={cover.style}>
           <h1 className="rs-t-display">Interfaces</h1>
           <p className="rs-t-sub">See what you can build with Vlak.</p>
-          <p className="if-index-intro">Working studies, from a conversation to a complete workspace. Try the interactions, inspect the components, and take the source into your own project.</p>
+          <p className="if-index-intro">Working studies, from a conversation to a complete workspace. Try each interface or download it as a standalone Vite and React project, with source, styles, assets and setup notes included.</p>
           <div className="if-index-links"><Link className="rs-link-underline" href="/docs/">Start building <span aria-hidden="true">→</span></Link><a className="rs-link-underline" href="/design.md">Get design.md <span aria-hidden="true">↗</span></a></div>
         </header>
         <div {...sx("if-list", ifx.list)}>
-          {orderedInterfaces.map((item, index) => (
-            <Link key={item.slug} href={`/interfaces/${item.slug}`} {...sx("if-tile", ifx.tile)}>
-              <InterfaceCrop slug={item.slug} />
+          {orderedInterfaces.map((item, index) => {
+            const starter = starterByInterface(item.slug)!;
+            return <article key={item.slug} id={item.slug} aria-labelledby={`interface-${item.slug}-title`} {...sx("if-tile if-download-tile", ifx.tile)}>
+              <Link className="if-tile-preview" href={starter.preview} tabIndex={-1} aria-hidden="true" prefetch={false}><InterfaceCrop slug={item.slug} /></Link>
               <div {...sx("if-tile-matter", ifx.tileMatter)}>
                 <div className="if-tile-head">
-                  <h2 {...sx("", ifx.tileTitle)}>{item.title}</h2>
-                  <span aria-hidden="true">↗</span>
+                  <h2 id={`interface-${item.slug}-title`} {...sx("", ifx.tileTitle)}>{item.title}</h2>
                 </div>
                 <p {...sx("", ifx.tileVoice)}>{item.voice}</p>
-                <div className="if-tile-foot"><span>{String(index + 1).padStart(2, "0")} / Interface study</span><span>Explore study <span aria-hidden="true">→</span></span></div>
+                <div className="if-tile-foot"><span>{String(index + 1).padStart(2, "0")} / Interface study</span><span>Vite + React</span></div>
+                <div className="if-tile-actions">
+                  <Link className="if-tile-action" href={starter.preview} prefetch={false} aria-label={`Try ${item.title}`}>Try <span aria-hidden="true">→</span></Link>
+                  <a className="if-tile-action if-tile-download" href={starter.download} download data-vlak-starter={item.slug} aria-label={`Download ${item.title} starter ZIP`}>Download <span aria-hidden="true">↓</span></a>
+                  <a className="if-tile-action" href={starter.source} aria-label={`View ${item.title} source`}>View source <span aria-hidden="true">↗</span></a>
+                </div>
               </div>
-            </Link>
-          ))}
+            </article>;
+          })}
         </div>
       </main>
     </div>
