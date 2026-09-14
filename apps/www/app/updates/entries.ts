@@ -17,6 +17,24 @@ export type UpdateEntry = {
  */
 export const updateEntries: readonly UpdateEntry[] = [
   {
+    id: "v0-5-0",
+    title: "Vlak 0.5.0",
+    publishedAt: "2026-09-14T11:52:09.655Z",
+    kind: "Package release",
+    summary: "The core, React, CLI, and MCP packages now include the components used by the interface studies.",
+    changes: [
+      "iOS and Android controls retain platform conventions and system fonts. AI, workflow, scientific, healthcare, and data components are included in the published reference.",
+      "Five standalone interface starters install matching public packages. Their downloads need no private package snapshot or monorepo setup.",
+      "CLI source updates, workflow kits, and the agent plugin use the same release. See the changelog for optional renderer dependencies and upgrade guidance.",
+    ],
+    links: [
+      { href: "/docs/", label: "Install Vlak" },
+      { href: "/interfaces/", label: "Explore interfaces" },
+      { href: "https://github.com/Noord-Ventures/vlak/blob/main/CHANGELOG.md", label: "Read the release changes" },
+    ],
+    source: { href: "https://www.npmjs.com/package/@noorddev/vlak/v/0.5.0", label: "Published package" },
+  },
+  {
     id: "native-mobile-components",
     title: "iOS and Android components",
     publishedAt: "2026-09-11T00:24:56+02:00",

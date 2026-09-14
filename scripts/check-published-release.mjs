@@ -8,12 +8,17 @@ import { fileURLToPath } from "node:url";
 import { gunzipSync } from "node:zlib";
 import { checkRelease, readJson, releasePackages, releaseRoot } from "./check-release.mjs";
 
+/** npm metadata and tarballs can become publicly visible after publication. */
+export class RegistryNotReadyError extends Error {
+  constructor(message) { super(message); this.name = "RegistryNotReadyError"; }
+}
+
 export function publishedVersion(document, name, version) {
   const manifest = document.versions?.[version];
-  assert.ok(manifest, `${name}@${version} is not published. Publish all four packages before deploying the site.`);
-  assert.equal(document["dist-tags"]?.latest, version, `${name}: npm latest must be ${version} because the site advertises an unversioned install`);
+  if (!manifest) throw new RegistryNotReadyError(`${name}@${version} is not published. Publish all four packages before deploying the site.`);
   assert.equal(manifest.name, name);
   assert.equal(manifest.version, version);
+  if (document["dist-tags"]?.latest !== version) throw new RegistryNotReadyError(`${name}: npm latest must be ${version} because the site advertises an unversioned install`);
   return manifest;
 }
 
@@ -111,21 +116,37 @@ export function compareManifest(local, published, version) {
   assert.deepEqual(bins(published.bin), bins(local.bin), `${local.name}: published executables differ`);
 }
 
-async function fetchBytes(url, fetcher) {
+export async function fetchBytes(url, fetcher, signal) {
   const target = new URL(url);
   assert.ok(target.protocol === "https:" && target.hostname === "registry.npmjs.org", "Release verification only reads the official npm registry");
-  const response = await fetcher(target.href, { cache: "no-store", signal: AbortSignal.timeout(30_000) });
+  const requestTimeout = AbortSignal.timeout(30_000);
+  const response = await fetcher(target.href, { cache: "no-store", signal: signal ? AbortSignal.any([signal, requestTimeout]) : requestTimeout });
+  if (response.status === 404) throw new RegistryNotReadyError(`npm has not made ${target.pathname} visible yet (404)`);
   assert.ok(response.ok, `npm returned ${response.status} for ${target.pathname}; publish all four packages before deploying the site`);
   return Buffer.from(await response.arrayBuffer());
 }
 
-export async function checkPublishedRelease({ root = releaseRoot, fetcher = fetch } = {}) {
+/** A visibility delay in one package must not hide another package's corruption. */
+export async function publishedReports(checks) {
+  const results = await Promise.all(checks.map(async check => {
+    try { return { report: await check }; }
+    catch (error) {
+      if (!(error instanceof RegistryNotReadyError)) throw error;
+      return { notReady: error };
+    }
+  }));
+  const failure = results.find(result => result.notReady);
+  if (failure) throw failure.notReady;
+  return results.map(result => result.report);
+}
+
+export async function checkPublishedRelease({ root = releaseRoot, fetcher = fetch, signal } = {}) {
   const version = checkRelease({ root, generated: true });
-  const reports = await Promise.all(releasePackages.map(async ({ directory, name, payload }) => {
+  const reports = await publishedReports(releasePackages.map(async ({ directory, name, payload }) => {
     const local = readJson(root, `packages/${directory}/package.json`);
-    const document = JSON.parse((await fetchBytes(`https://registry.npmjs.org/${encodeURIComponent(name)}`, fetcher)).toString());
+    const document = JSON.parse((await fetchBytes(`https://registry.npmjs.org/${encodeURIComponent(name)}`, fetcher, signal)).toString());
     const manifest = publishedVersion(document, name, version);
-    const archive = await fetchBytes(manifest.dist.tarball, fetcher);
+    const archive = await fetchBytes(manifest.dist.tarball, fetcher, signal);
     verifyIntegrity(archive, manifest.dist.integrity);
     const files = tarFiles(archive), packagedManifest = JSON.parse(files.get("package.json").toString());
     compareManifest(local, packagedManifest, version);
@@ -135,10 +156,42 @@ export async function checkPublishedRelease({ root = releaseRoot, fetcher = fetc
   return { version, reports };
 }
 
+/** Opt-in only after publication; normal production builds still check once. */
+export async function verifyWithRegistryReadiness(check, {
+  wait = false, maxWaitMs = 10 * 60_000, intervalMs = 20_000,
+  now = Date.now, sleep = milliseconds => new Promise(done => setTimeout(done, milliseconds)), onRetry = () => {},
+} = {}) {
+  if (!wait) return check();
+  assert(Number.isSafeInteger(maxWaitMs) && maxWaitMs > 0 && maxWaitMs <= 10 * 60_000, "Registry readiness wait must be bounded to at most ten minutes");
+  assert(Number.isSafeInteger(intervalMs) && intervalMs > 0, "Registry readiness interval must be a positive whole number of milliseconds");
+  const deadline = now() + maxWaitMs;
+  let lastFailure;
+  const timeout = () => new Error(`npm registry readiness timed out after ${maxWaitMs / 1000}s; the published release has not passed verification`, { cause: lastFailure });
+  for (;;) {
+    const remaining = deadline - now();
+    if (remaining <= 0) throw timeout();
+    try {
+      // The same deadline bounds a slow metadata or tarball request too.
+      return await check({ signal: AbortSignal.timeout(remaining) });
+    } catch (error) {
+      if (!(error instanceof RegistryNotReadyError)) throw error;
+      lastFailure = error;
+      const delay = Math.min(intervalMs, deadline - now());
+      if (delay <= 0) throw timeout();
+      onRetry({ error, delay, remainingMs: deadline - now() });
+      await sleep(delay);
+    }
+  }
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  assert.equal(process.argv.length, 2, "Usage: node scripts/check-published-release.mjs");
+  const args = process.argv.slice(2);
+  assert(args.length === 0 || args.length === 1 && args[0] === "--wait", "Usage: node scripts/check-published-release.mjs [--wait]");
   try {
-    const result = await checkPublishedRelease();
+    const result = await verifyWithRegistryReadiness(options => checkPublishedRelease(options), {
+      wait: args[0] === "--wait",
+      onRetry: ({ error, delay, remainingMs }) => console.log(`Waiting for npm visibility: ${error.message} Retrying in ${delay / 1000}s (${Math.ceil(remainingMs / 1000)}s remaining).`),
+    });
     for (const report of result.reports) console.log(report);
     console.log(`Published release ${result.version} matches this site. Production export may proceed.`);
   } catch (error) {

@@ -641,7 +641,7 @@ export async function checkMobileOS({ page, base, fail }) {
       await page.waitForFunction(() => Object.keys(document.querySelector(".mo-app-icon") ?? {}).some(key => key.startsWith("__reactProps")));
       await page.evaluate(async () => { await document.fonts.ready; });
       assert.equal(await root.locator("section.mo-device").count(), 1, "Each study renders exactly one platform");
-      assert.equal(await page.getByRole("heading", { level: 1, name: platform === "ios" ? "iOS" : "Android", exact: true }).count(), 1);
+      assert.equal(await page.getByRole("heading", { level: 1, name: platform === "ios" ? "iPhone Duo" : "Android", exact: true }).count(), 1, `${platform}: one canonical study heading`);
       const device = root.locator(`section.mo-device[data-platform="${platform}"]`);
       if (page.viewportSize().width <= 640) {
         stage = `${platform} readable phone mode`;

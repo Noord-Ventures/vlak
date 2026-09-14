@@ -1,8 +1,8 @@
 # Changelog
 
-## 0.5.0 (unreleased)
+## 0.5.0 (2026-09-14)
 
-This candidate brings the published packages into line with the component reference. It is not a publication announcement. The release is available only after all four npm packages pass the published-release check.
+The core, React, CLI, and MCP packages are available on npm at 0.5.0. Their public archives match the component reference and the verified release source.
 
 ### Components and interactions
 
@@ -25,7 +25,7 @@ This candidate brings the published packages into line with the component refere
 
 ### Upgrade
 
-Install matching 0.5.0 versions of the core and React packages after publication. Keep the existing stylesheet import. For vendored source, review `vlak status`, `vlak diff`, and an update plan before applying changes. Check each optional renderer's documented dependencies before adding it to a project.
+Install matching 0.5.0 versions of the core and React packages. Keep the existing stylesheet import. For vendored source, review `vlak status`, `vlak diff`, and an update plan before applying changes. Check each optional renderer's documented dependencies before adding it to a project.
 
 ## 0.4.0
 

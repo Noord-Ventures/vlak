@@ -52,7 +52,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Verify public npm release before site deployment
         if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish }}
-        run: node scripts/check-published-release.mjs
+        run: node scripts/check-published-release.mjs --wait
       - name: Verify starters with public packages
         if: ${{ startsWith(github.ref, 'refs/tags/v') || inputs.publish }}
         run: node --experimental-strip-types scripts/verify-interface-starters.mjs --registry
