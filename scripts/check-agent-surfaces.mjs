@@ -1,5 +1,8 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+import { checkPluginPackagePins } from "./check-plugin-package-pins.mjs";
+
+checkPluginPackagePins();
 
 const root = resolve(import.meta.dirname, "..");
 const read = (path) => readFileSync(resolve(root, path), "utf8");

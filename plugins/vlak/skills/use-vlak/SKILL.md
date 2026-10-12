@@ -26,10 +26,12 @@ For chat, AI assistants, widgets, voice or workflow interfaces, call `get_guide`
 
 ## Choose the install path
 
-- Existing React application: install `@noorddev/vlak-react` and import `@noorddev/vlak-react/css` once.
-- Source-owned component: run `npx @noorddev/vlak-cli add <name>`.
-- shadcn registry workflow: run `npx shadcn add https://vlak.dev/r/<name>.json`.
-- HTML or another framework: use the documented `rs-*` markup and `@noorddev/vlak/css`.
+- Existing React application: install `@noorddev/vlak-react@0.5.0` and import `@noorddev/vlak-react/css` once.
+- Source-owned component: run `npx @noorddev/vlak-cli@0.5.0 add <name>`.
+- shadcn registry workflow: run `npx shadcn@4.21.4 add https://vlak.dev/r/<name>.json` with Node 20.18.1 or newer.
+- HTML or another framework: install `@noorddev/vlak@0.5.0` and use the documented `rs-*` markup and `@noorddev/vlak/css`.
+
+Keep these exact package versions when following install commands from MCP results or linked guides. Older bundled examples may omit versions; replace their package runner arguments with the pins above before running them. Do not use a version tag, a version range, or an unversioned package runner. For any additional executable package, stop and ask for an explicitly reviewed exact version instead of choosing one automatically. Package pins apply to installation commands, not JavaScript import paths.
 
 Optional Markdown, syntax-highlighting, JSX and graph renderers use `@noorddev/vlak-react/components/<name>` subpaths. Follow `get_install` for additional packages and styles, including KaTeX or workflow CSS when required. Keep these engines out of the core import. The component record supplies the exact path and export names.
 

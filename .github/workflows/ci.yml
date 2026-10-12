@@ -27,6 +27,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Release declarations and publication failure gates
         run: node scripts/check-release.mjs && node --test scripts/release.test.mjs
+      - name: Claude plugin manifest and exact package versions
+        run: node scripts/check-plugin-package-pins.mjs && node --test scripts/plugin-package-pins.test.mjs
       # Workspace consumers resolve the packages' generated declarations.
       - name: Build packages
         run: pnpm build
