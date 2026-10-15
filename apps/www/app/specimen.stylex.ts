@@ -4,6 +4,11 @@ const at481 = "@media (min-width: 481px)";
 const at816 = "@media (min-width: 816px)";
 const at1224 = "@media (min-width: 1224px)";
 const phone = "@media (max-width: 640px)";
+const reduce = "@media (prefers-reduced-motion: reduce)";
+const reveal = stylex.keyframes({
+  from: { opacity: 0, transform: "translateY(8px)" },
+  to: { opacity: 1, transform: "translateY(0)" },
+});
 
 /**
  * Homepage specimen. Overlay kill (`html:has(.specimen-page)::before`)
@@ -88,5 +93,80 @@ export const specimen = stylex.create({
       outlineColor: "var(--text)",
       outlineOffset: -4,
     },
+  },
+  /** Keep the three-path row and AI specimen in one full-width grid region. */
+  startRegion: {
+    gridArea: "start",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    gap: 1,
+  },
+  startFeatureTile: {
+    minHeight: 612,
+    gap: 32,
+    justifyContent: "space-between",
+  },
+  aiDemos: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [at816]: "minmax(0, 1.5fr) minmax(0, 1fr)" },
+    gap: { default: 24, [at816]: 40 },
+    alignItems: "start",
+    width: "100%",
+    maxWidth: 1060,
+    minWidth: 0,
+    marginInlineStart: "auto",
+    marginInlineEnd: 0,
+    marginBlock: "auto",
+  },
+  aiStack: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 20,
+    minWidth: 0,
+    // Reserve the largest playback state so disclosures do not move the next tile.
+    minHeight: { default: 680, [at481]: 612 },
+  },
+  aiExchange: {
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    gap: 12,
+  },
+  aiReveal: {
+    animationName: { default: reveal, [reduce]: "none" },
+    animationDuration: "280ms",
+    animationTimingFunction: "ease-out",
+    animationFillMode: "both",
+  },
+  aiCopy: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 0,
+  },
+  aiTitle: {
+    margin: 0,
+    fontSize: 17,
+    fontWeight: 500,
+    lineHeight: 1.45,
+  },
+  aiLink: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    minHeight: 44,
+    color: "var(--text)",
+    textDecoration: "none",
+    ":hover": { textDecoration: "underline" },
+  },
+  aiDescription: {
+    margin: 0,
+    fontSize: { default: 13, [phone]: 15 },
+    lineHeight: 1.45,
+    color: "var(--text-secondary)",
+  },
+  aiContext: {
+    margin: 0,
   },
 });

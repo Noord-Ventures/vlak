@@ -14,6 +14,7 @@ export const metadata: Metadata = pageMetadata("/showcase", {
 const badge = `[![Built with Vlak](https://vlak.dev/badges/built-with-vlak.svg?v=3)](https://vlak.dev)`;
 const submitUrl = "https://github.com/Noord-Ventures/vlak/issues/new?template=showcase.yml";
 const projects = [
+  { name: "Bureau", url: "https://getbureau.app/", domain: "getbureau.app", image: "/showcase/bureau-20261015.jpg", description: "A shared workspace for creative teams and their AI agents, bringing client conversations, knowledge, and work together. The web app is built entirely with Vlak." },
   { name: "Staatskaart", url: "https://staatskaart.nl/", domain: "staatskaart.nl", image: "/showcase/staatskaart-20261001.jpg", description: "An interactive map of Dutch government, connecting its people, institutions, and decisions.", author: "Noord Labs" },
   { name: "Tax Scratchpad", url: "https://taxscratchpad.npux.design/", domain: "taxscratchpad.npux.design", image: "/showcase/tax-scratchpad.jpg", description: "A local workspace for exploring hypothetical 2025 federal tax scenarios, comparing assumptions, and tracing the calculations.", author: "Nicholas Pulido · NPUX", post: "https://x.com/NickP_UX/status/2097890666198249625" },
   { name: "Noord", url: "https://noord.dev/", domain: "noord.dev", image: "/showcase/noord.jpg", description: "An applied design lab working on interfaces and visual learning. Home to Vlak.", author: "Noord" },
@@ -26,7 +27,7 @@ export default function ShowcasePage() {
       <StructuredData value={{ "@context": "https://schema.org", "@type": "ItemList", name: "Built with Vlak", url: "https://vlak.dev/showcase/", itemListElement: projects.map((project, index) => ({ "@type": "ListItem", position: index + 1, name: project.name, url: project.url, description: project.description, image: `https://vlak.dev${project.image}` })) }} />
       <div className={styles.collection}>{projects.map(project => <article className={styles.project} key={project.url}>
         <img className={styles.preview} src={project.image} alt={`${project.name} website preview`} width="1280" height="800" loading="lazy" />
-        <div className={styles.projectBody}><p className={styles.byline}>{project.domain} · {project.author}</p><h2>{project.name}</h2><p>{project.description}</p><div className={styles.projectActions}><a className={`rs-btn-ghost ${styles.visit}`} href={project.url}>Visit website <span aria-hidden="true">→</span></a>{project.post && <a className={`rs-btn-ghost ${styles.visit}`} href={project.post}>Project post <span aria-hidden="true">→</span></a>}</div></div>
+        <div className={styles.projectBody}><p className={styles.byline}>{project.domain}{project.author && <> · {project.author}</>}</p><h2>{project.name}</h2><p>{project.description}</p><div className={styles.projectActions}><a className={`rs-btn-ghost ${styles.visit}`} href={project.url}>Visit website <span aria-hidden="true">→</span></a>{project.post && <a className={`rs-btn-ghost ${styles.visit}`} href={project.post}>Project post <span aria-hidden="true">→</span></a>}</div></div>
       </article>)}</div>
       <h2 className="section-label">Submit a project</h2>
       <p className="rs-t-body">

@@ -990,6 +990,7 @@ html[data-grid="off"]::after { display: none !important; }
 html[data-grid="off"] .site-footer { background-image: none !important; }
 html[data-grid="off"] .specimen,
 html[data-grid="off"] .specimen-start,
+html[data-grid="off"] .specimen-start-region,
 html[data-grid="off"] .field,
 html[data-grid="off"] .swag-field {
   background: var(--bg) !important;

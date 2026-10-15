@@ -5,6 +5,7 @@ import { sx } from "@/lib/sx";
 import { INSTALL, LAW, POSTER, WORD } from "./specimen";
 import { SpecimenKit } from "./specimen-kit";
 import { SpecimenPrinciples } from "./specimen-principles";
+import { SpecimenAiTile } from "./specimen-ai-tile";
 import { specimen } from "./specimen.stylex";
 import "./specimen.css";
 
@@ -14,6 +15,14 @@ export const metadata: Metadata = pageMetadata("/", {
 });
 
 export default function Home() {
+  const start = (
+    <nav {...sx("specimen-start", specimen.start)} aria-label="Start with Vlak">
+      <a {...sx("specimen-start-tile", specimen.startTile)} href="/interfaces/" data-start-path="prototype"><strong>Prototype <span aria-hidden="true">↗</span></strong><span>Run an interface and change it.</span></a>
+      <a {...sx("specimen-start-tile", specimen.startTile)} href="/docs/agents/" data-start-path="agent"><strong>Use an agent <span aria-hidden="true">↗</span></strong><span>Connect the component docs and rules.</span></a>
+      <a {...sx("specimen-start-tile", specimen.startTile)} href="#install-command" data-start-path="install"><strong>Install <span aria-hidden="true">↓</span></strong><span>Add Vlak to your project.</span></a>
+    </nav>
+  );
+
   return (
     <main id="main" {...sx("specimen-page", specimen.page)} aria-label="Vlak specimen">
       <div {...sx("specimen", specimen.field)}>
@@ -30,11 +39,7 @@ export default function Home() {
           <h1 className="specimen-law">{LAW}</h1>
         </section>
 
-        <nav {...sx("specimen-start", specimen.start)} aria-label="Start with Vlak">
-          <a {...sx("specimen-start-tile", specimen.startTile)} href="/interfaces/" data-start-path="prototype"><strong>Prototype <span aria-hidden="true">↗</span></strong><span>Run an interface and change it.</span></a>
-          <a {...sx("specimen-start-tile", specimen.startTile)} href="/docs/agents/" data-start-path="agent"><strong>Use an agent <span aria-hidden="true">↗</span></strong><span>Connect the component docs and rules.</span></a>
-          <a {...sx("specimen-start-tile", specimen.startTile)} href="#install-command" data-start-path="install"><strong>Install <span aria-hidden="true">↓</span></strong><span>Add Vlak to your project.</span></a>
-        </nav>
+        <div {...sx("specimen-start-region", specimen.startRegion)}>{start}<SpecimenAiTile /></div>
 
         <section {...sx("specimen-cell specimen-cell-command", specimen.cell, specimen.cellCommand)}>
           <div className="specimen-command-copy" id="install-command">
