@@ -43,6 +43,28 @@ const aeeg = `:root{
   --surface:var(--control-fill);
   --accent-fg:#FFFFFF;
 }
+[data-theme="light"]{
+  --bg:#F8F4EE;
+  --text:#1C1B1B;
+  --text-secondary:#6B6B6B;
+  --accent:#A04A2A;
+  --rs-chart-spot:#A04A2A;
+  --action:#D4A24C;
+  --action-text:#1C1B1B;
+  --divider:rgba(28,27,27,0.08);
+  --divider-subtle:rgba(28,27,27,0.06);
+  --table-alt:rgba(28,27,27,0.02);
+  --grid-line:rgba(28,27,27,0.04);
+  --control-border:rgba(28,27,27,0.42);
+  --control-fill:#E2DDD6;
+  --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-display:"Rethink Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --fg:var(--text);
+  --muted:var(--text-secondary);
+  --border:var(--divider);
+  --surface:var(--control-fill);
+  --accent-fg:#FFFFFF;
+}
 [data-theme="dark"]{
   --bg:#100D0B;
   --text:#E7E5E4;
@@ -265,7 +287,8 @@ export default function BrandPage() {
       <p className="rs-t-body">
         That is the sample brand above, in light and dark. It is unlayered, so it beats the{" "}
         <code className="rs-code">vlak.tokens</code> layer at any specificity, and it repeats the dark
-        values under both selectors Vlak uses. See{" "}
+        values under both selectors Vlak uses and the light values under{" "}
+        <code className="rs-code">data-theme=&quot;light&quot;</code>, so a light section inside a dark page stays light. See{" "}
         <a className="rs-link" href="/docs/theming">
           Theming
         </a>{" "}
