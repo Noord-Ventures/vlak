@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { interfaceStarters } from "../app/starters/catalog.ts";
-import { acquisitionAttribution, acquisitionChannel, beforeSend, initializeSiteAnalytics, installMethod, isProductionLocation, publicSitePaths, redactUrl } from "../lib/site-analytics.ts";
+import { acquisitionAttribution, acquisitionChannel, beforeSend, initializeSiteAnalytics, installMethod, isProductionLocation, publicSitePaths, redactUrl, speedInsightsBeforeSend } from "../lib/site-analytics.ts";
 
 const paths = new Set([...publicSitePaths, "/components/button"]);
 
@@ -113,4 +113,9 @@ test("the legacy gallery redirect does not initialize collection or consume acqu
       assert.deepEqual([...stored], [["vlak-attribution", JSON.stringify({ channel: "linkedin" })]], "Only sanitized attribution is carried to the canonical page, never an acquisition marker");
     } finally { delete globalThis.window; delete globalThis.document; delete globalThis.sessionStorage; }
   }
+});
+
+test("Speed Insights vitals keep public paths only, without query or hash", () => {
+  assert.deepEqual(speedInsightsBeforeSend({ type: "vital", url: "https://vlak.dev/docs/?email=private@example.com#t", route: "/docs" }, paths), { type: "vital", url: "https://vlak.dev/docs", route: "/docs" });
+  assert.equal(speedInsightsBeforeSend({ type: "vital", url: "https://vlak.dev/account/private@example.com" }, paths), null);
 });
