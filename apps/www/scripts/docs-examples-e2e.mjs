@@ -21,6 +21,7 @@ const darkRoutes = [
   "/docs/",
   "/docs/accessibility/",
   "/docs/agents/",
+  "/docs/brand/",
   "/docs/choosing-vlak/",
   "/docs/frameworks/",
   "/docs/layers/",

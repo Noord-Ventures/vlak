@@ -13,6 +13,7 @@ const guides = [
   entry("/docs/", "Getting started", "Install React components, copy StyleX source, use Vlak CSS classes, or open a small Vite and React or Next.js project.", "Guides", ["Installation", "Setup", "Quick start", "npm", "pnpm", "CLI", "shadcn", "Vite", "Next.js", "React", "StackBlitz", "Form", "Starter"]),
   entry("/docs/frameworks/", "Frameworks", "Use Vlak in Next.js, Vite, Remix, React Router, Astro, and plain HTML.", "Guides"),
   entry("/docs/theming/", "Theming", "Customize CSS properties, the dark scheme, module grid, and text scale.", "Guides", ["Dark mode", "Light mode", "Theme", "Colors"]),
+  entry("/docs/brand/", "Brand on Vlak", "Set an accent, primary buttons and two typefaces with five custom properties; everything else stays fixed.", "Guides", ["Brand", "Branding", "White label", "Accent color", "Primary button", "Fonts", "Typeface", "Skin"]),
   entry("/docs/tokens/", "Tokens", "The neutral scale, typography, grid, radius, motion, and control dimensions.", "Guides", ["Design tokens", "CSS variables", "Spacing", "Typography"]),
   entry("/docs/layers/", "Layers", "Cascade layers, application overrides, and the rs-* class contract.", "Guides", ["CSS cascade", "Specificity", "Overrides"]),
   entry("/docs/stylex/", "StyleX", "Write component styles against Vlak tokens and compile them with Vite or Next.js.", "Guides", ["Source components", "Compiler"]),

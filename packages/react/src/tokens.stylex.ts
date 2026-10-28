@@ -9,6 +9,9 @@ export const vlak = stylex.defineVars({
   ink: "var(--text)",
   gray: "var(--text-secondary)",
   accent: "var(--accent)",
+  /** Fill of the primary action and the label on it. Ink and paper until a product sets them. */
+  action: "var(--action)",
+  actionText: "var(--action-text)",
   divider: "var(--divider)",
   dividerSubtle: "var(--divider-subtle)",
   tableAlt: "var(--table-alt)",
@@ -46,9 +49,11 @@ export const vlak = stylex.defineVars({
   zToast: "var(--z-toast)",
 });
 
-/** Inter stack. Same as body in base.css. Not a token var — @font-face stays CSS. */
-export const vlakFont =
-  "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif";
+/** The text face, `--font-sans`: Inter until a product sets it. Same as body in base.css. @font-face stays CSS. */
+export const vlakFont = "var(--font-sans)";
+
+/** The display, display XL and title steps, `--font-display`: follows `--font-sans` until a product sets it. */
+export const vlakDisplay = "var(--font-display)";
 
 export const vlakMono = "ui-monospace, SFMono-Regular, Menlo, monospace";
 

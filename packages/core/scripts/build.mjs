@@ -31,6 +31,8 @@ const darkBlock = (selector) => `${selector} {
   --text: ${color.dark.white};
   --text-secondary: ${color.dark.gray};
   --accent: ${color.dark.white};
+  --action: ${color.dark.action};
+  --action-text: ${color.dark.actionText};
   --divider: ${color.dark.divider};
   --divider-subtle: ${color.dark.dividerSubtle};
   --table-alt: ${color.dark.tableAlt};
@@ -46,6 +48,8 @@ const tokensCss = `/* ── Tokens ── GENERATED from src/tokens.ts. Do not 
   --text: ${color.light.ink};                      /* ink */
   --text-secondary: ${color.light.gray};            /* gray */
   --accent: ${color.light.ink};                   /* the "accent" is ink; monochrome */
+  --action: ${color.light.action};                /* primary button fill: ink until a product sets it */
+  --action-text: ${color.light.actionText};            /* the label on it: paper */
   --divider: ${color.light.divider};
   --divider-subtle: ${color.light.dividerSubtle};
   --table-alt: ${color.light.tableAlt};
@@ -72,6 +76,8 @@ const tokensCss = `/* ── Tokens ── GENERATED from src/tokens.ts. Do not 
   --grid-size: ${grid.module}px;
   --grid-pos: ${grid.gutter}px 0;
   --text-scale: ${type.textScale.default};
+  --font-sans: ${type.family};    /* the text face (vlakFont); a product sets it in its own unlayered CSS */
+  --font-display: ${type.display};    /* display, display XL and title steps (vlakDisplay); follows --font-sans until set */
   /* Stacking scale. Native dialog and popover use the top layer instead. */
   --z-raised: ${z.raised};
   --z-sticky: ${z.sticky};
@@ -136,6 +142,8 @@ const dtcg = {
       "table-alt": { $type: "color", $value: color.light.tableAlt, $description: "Alternate row. --table-alt" },
       "control-border": { $type: "color", $value: color.light.controlBorder, $description: "Form control boundary, 3:1. --control-border" },
       "control-fill": { $type: "color", $value: color.light.controlFill, $description: "Hover fill of a ghost control. --control-fill" },
+      action: { $type: "color", $value: "{color.light.ink}", $description: "Primary button fill, an alias of ink until a product sets it. --action" },
+      "action-text": { $type: "color", $value: "{color.light.paper}", $description: "Primary button label, an alias of paper. --action-text" },
     },
     dark: {
       paper: { $type: "color", $value: color.dark.black, $description: "--bg" },
@@ -147,6 +155,8 @@ const dtcg = {
       "table-alt": { $type: "color", $value: color.dark.tableAlt, $description: "--table-alt" },
       "control-border": { $type: "color", $value: color.dark.controlBorder, $description: "--control-border" },
       "control-fill": { $type: "color", $value: color.dark.controlFill, $description: "--control-fill" },
+      action: { $type: "color", $value: "{color.dark.ink}", $description: "--action" },
+      "action-text": { $type: "color", $value: "{color.dark.paper}", $description: "--action-text" },
     },
     neutral: Object.fromEntries(color.neutralScale.map((v, i) => [String(i), { $type: "color", $value: v }])),
   },
@@ -204,6 +214,8 @@ const dtcg = {
   },
   font: {
     family: { $type: "fontFamily", $value: ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "system-ui", "sans-serif"] },
+    sans: { $type: "fontFamily", $value: "{font.family}", $description: "Text face, an alias of family. --font-sans" },
+    display: { $type: "fontFamily", $value: "{font.sans}", $description: "Display, display XL and title steps, an alias of sans until a product sets it. --font-display" },
     weight: {
       body: { $type: "fontWeight", $value: 500 },
       heading: { $type: "fontWeight", $value: 600 },

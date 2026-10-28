@@ -10,6 +10,8 @@ Every custom property `@noorddev/vlak/css/tokens.css` defines, generated from `p
 | `--text` | `#1A1A1A` | `#E8E8E8` | `vlak.ink` | ink |
 | `--text-secondary` | `#6B6B6B` | `#949494` | `vlak.gray` | gray |
 | `--accent` | `#1A1A1A` | `#E8E8E8` | `vlak.accent` | the "accent" is ink; monochrome |
+| `--action` | `var(--text)` | `var(--text)` | `vlak.action` | primary button fill: ink until a product sets it |
+| `--action-text` | `var(--bg)` | `var(--bg)` | `vlak.actionText` | the label on it: paper |
 | `--divider` | `rgba(0,0,0,0.08)` | `rgba(255,255,255,0.10)` | `vlak.divider` |  |
 | `--divider-subtle` | `rgba(0,0,0,0.06)` | `rgba(255,255,255,0.07)` | `vlak.dividerSubtle` |  |
 | `--table-alt` | `rgba(0,0,0,0.02)` | `rgba(255,255,255,0.03)` | `vlak.tableAlt` |  |
@@ -32,6 +34,8 @@ Every custom property `@noorddev/vlak/css/tokens.css` defines, generated from `p
 | `--grid-size` | `204px` |  | `vlak.module` |  |
 | `--grid-pos` | `20px 0` |  | `vlak.gridPos` |  |
 | `--text-scale` | `1` |  | `vlak.textScale` |  |
+| `--font-sans` | `Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif` |  |  | the text face (vlakFont); a product sets it in its own unlayered CSS |
+| `--font-display` | `var(--font-sans)` |  |  | display, display XL and title steps (vlakDisplay); follows --font-sans until set |
 | `--z-raised` | `10` |  | `vlak.zRaised` |  |
 | `--z-sticky` | `100` |  | `vlak.zSticky` |  |
 | `--z-float` | `200` |  | `vlak.zFloat` |  |
@@ -83,6 +87,8 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 | `light.tableAlt` | `rgba(0,0,0,0.02)` |
 | `light.controlBorder` | `rgba(0,0,0,0.42)` |
 | `light.controlFill` | `#E4E2DC` |
+| `light.action` | `var(--text)` |
+| `light.actionText` | `var(--bg)` |
 | `dark.black` | `#0E0C0A` |
 | `dark.white` | `#E8E8E8` |
 | `dark.gray` | `#949494` |
@@ -92,6 +98,8 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 | `dark.tableAlt` | `rgba(255,255,255,0.03)` |
 | `dark.controlBorder` | `rgba(255,255,255,0.38)` |
 | `dark.controlFill` | `#242220` |
+| `dark.action` | `var(--text)` |
+| `dark.actionText` | `var(--bg)` |
 | `neutralScale` | `["#1A1A1A","#3D3D3D","#6B6B6B","#949494","#C4C2BD","#E8E8E8","#FAF8F2"]` |
 | `accent` | `none; emphasis comes from weight, size, and spacing` |
 
@@ -100,6 +108,7 @@ The raw values from `vlakTokens` (`import { vlakTokens } from "@noorddev/vlak"`,
 | Key | Value |
 | --- | --- |
 | `family` | `Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif` |
+| `display` | `var(--font-sans)` |
 | `foundry.typeface` | `Inter` |
 | `foundry.designer` | `Rasmus Andersson` |
 | `foundry.license` | `SIL OFL 1.1` |

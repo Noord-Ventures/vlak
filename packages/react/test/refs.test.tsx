@@ -20,6 +20,7 @@ const NOT_COMPONENTS = [
   "rail",
   "wide",
   "vlakFont",
+  "vlakDisplay",
   "vlakMono",
   "ICON_STROKE",
   "ICON_VIEWBOX",

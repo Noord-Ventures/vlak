@@ -23,7 +23,7 @@ const styles = stylex.create({
 		borderRadius: 8,
 		backgroundColor: "transparent",
 		color: vlak.ink,
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 		fontSize: 14,
 		fontWeight: 500,
 		lineHeight: 1.4,

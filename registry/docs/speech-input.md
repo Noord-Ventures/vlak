@@ -91,7 +91,7 @@ Forwards `ref` to the `HTMLButtonElement`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `variant` | `"primary" \| "ghost" \| "subtle"` |  | Solid ink primary, hairline ghost, or borderless subtle. One primary per view. |
+| `variant` | `"primary" \| "ghost" \| "subtle"` |  | Solid primary (ink, or the product's `--action`), hairline ghost, or borderless subtle. One primary per view. |
 | `size` | `"default" \| "sm" \| "icon"` |  | Icon buttons stay square at every breakpoint. Supply an accessible name. |
 | `grouped` | `boolean` |  | Flush into a ButtonGroup: no own stroke, one ink seam. |
 | `onTranscript` (required) | `(text: string) => void` |  |  |

@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased (0.6.0)
+
+A product built on Vlak can set its accent, its primary buttons and two typefaces in its own unlayered CSS. With none of the hooks set, the generated stylesheet is 0.5.0's again.
+
+### Brand hooks
+
+- Five properties may be set by a product and nothing else: `--accent`, `--action`, `--action-text`, `--font-sans` and `--font-display`. `--accent` already worked; the other four are new.
+- `--action` fills the primary button and the inline form's submit, and `--action-text` labels them. Both alias ink and paper, in the dark blocks too, because a `var()` is substituted where it is declared. Selected, on, checked, active, progress, badge and avatar fills stay ink; the Brand page lists each decision.
+- `--font-sans` carries the Inter stack that `base.css` and thirteen iOS and Android leaves spelled out. The display, display XL and title steps read `--font-display`, which follows `--font-sans` until it is set. `fonts.css` is unchanged: a brand brings its own `@font-face`.
+- The token JSON and the DTCG file carry `action`, `action-text`, `font.sans` and `font.display` as aliases of existing entries. In StyleX, `vlak.action`, `vlak.actionText` and the new `vlakDisplay` join `vlakFont`, which is now `var(--font-sans)`.
+- A test substitutes the defaults back into the generated `vlak.css` and requires it to equal 0.5.0's. The Android leaves are the one difference: their fallback chain was shorter and now matches the others, which only shows where Inter does not load.
+
+### Docs and doctrine
+
+- New page: Brand on Vlak. It lists the five hooks, a sample brand in light and dark, what stays fixed, the contrast floors, and the primary-versus-selected decisions.
+- Theming and Tokens list the new properties. The doctrine in `AGENTS.md` and `design.md` now says that Vlak's own CSS is monochrome and that a product may set the five hooks.
+
+### Upgrade
+
+Nothing to change. To brand a product, set the hooks after Vlak's stylesheet, or in unlayered CSS. Code that read `vlakFont` as a font stack now receives `var(--font-sans)`, which resolves wherever the Vlak stylesheet is loaded.
+
 ## 0.5.0 (2026-09-14)
 
 The core, React, CLI, and MCP packages are available on npm at 0.5.0. Their public archives match the component reference and the verified release source.

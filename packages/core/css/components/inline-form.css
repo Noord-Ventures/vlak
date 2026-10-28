@@ -8,7 +8,7 @@
 @media (max-width: 640px){.rs-inline-input{font-size:1rem;padding-block:0;padding-inline:0.875rem;min-height:var(--hit)}}
 .rs-reveal{max-width:0;opacity:0;overflow:hidden;transition:max-width var(--duration) var(--ease), opacity var(--duration) var(--ease)}
 .rs-reveal-in{max-width:10rem;opacity:1}
-.rs-btn-primary.rs-inline-btn.rs-inline-field-btn{height:var(--hit);padding-inline:1rem;font-size:0.78125rem;min-width:var(--hit);border-radius:0;white-space:nowrap;font-family:inherit;font-weight:600;letter-spacing:-0.01em;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background-color:var(--text);color:var(--bg);border-width:0}
+.rs-btn-primary.rs-inline-btn.rs-inline-field-btn{height:var(--hit);padding-inline:1rem;font-size:0.78125rem;min-width:var(--hit);border-radius:0;white-space:nowrap;font-family:inherit;font-weight:600;letter-spacing:-0.01em;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background-color:var(--action);color:var(--action-text);border-width:0}
 @media (max-width: 640px){.rs-btn-primary.rs-inline-btn.rs-inline-field-btn{height:var(--hit);min-height:var(--hit);padding-inline:1rem;font-size:var(--control-fs);border-radius:0}}
 .rs-subscribed{display:flex;align-items:center;gap:0.5rem;font-size:0.875rem;font-weight:600;letter-spacing:-0.01em;color:var(--text);animation-name:rs-anim-fade-in;animation-duration:var(--duration-confirm);animation-timing-function:var(--ease)}
 .rs-inline-error{flex-basis:100%;margin:0;padding:0.5rem;font-size:var(--control-fs);color:var(--text)}

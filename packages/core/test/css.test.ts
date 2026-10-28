@@ -232,3 +232,120 @@ describe("generated vlak.css", () => {
     expect(vlakCss).toMatch(/@media\s*\(hover:\s*none\)/);
   });
 });
+
+describe("brand hooks", () => {
+  const stack = vlakTokens.type.family;
+  const read = (file: string) => readFileSync(join(pkgDir, file), "utf8");
+
+  /** The text between the braces of the first block that opens with `opener`. */
+  function block(css: string, opener: string): string {
+    const at = css.indexOf(opener);
+    expect(at, `${opener} is missing`).toBeGreaterThanOrEqual(0);
+    const open = css.indexOf("{", at);
+    let depth = 0;
+    for (let i = open; i < css.length; i++) {
+      if (css[i] === "{") depth++;
+      else if (css[i] === "}" && --depth === 0) return css.slice(open + 1, i);
+    }
+    throw new Error(`${opener} is not closed`);
+  }
+
+  /** Where two strings first differ, short enough to read in a failure. */
+  function firstDifference(a: string, b: string): string {
+    let i = 0;
+    while (i < a.length && i < b.length && a[i] === b[i]) i++;
+    return `first difference at ${i}: ${JSON.stringify(a.slice(Math.max(0, i - 60), i + 80))} against ${JSON.stringify(b.slice(Math.max(0, i - 60), i + 80))}`;
+  }
+
+  it("declares --action and --action-text in all three colour blocks, and the fonts once", () => {
+    const tokens = read("css/tokens.css");
+    const light = block(tokens, ":root {");
+    const dark = block(tokens, '[data-theme="dark"] {');
+    const system = block(tokens, ':root:not([data-theme="light"]) {');
+    // A var() is substituted where it is declared, so a dark wrapper that redefines --text needs its own --action.
+    for (const colours of [light, dark, system]) {
+      expect(colours).toMatch(/^\s*--action: var\(--text\);/m);
+      expect(colours).toMatch(/^\s*--action-text: var\(--bg\);/m);
+    }
+    expect(light).toContain(`--font-sans: ${stack};`);
+    expect(light).toContain("--font-display: var(--font-sans);");
+    expect(vlakTokens.type.family).toBe("Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif");
+    for (const [name, expected] of [["--action", 3], ["--action-text", 3], ["--font-sans", 1], ["--font-display", 1]] as const) {
+      expect(tokens.match(new RegExp(`^\\s*${name}:`, "gm"))?.length, name).toBe(expected);
+      expect(vlakCss.match(new RegExp(`^\\s*${name}:`, "gm"))?.length, `${name} in vlak.css`).toBe(expected);
+    }
+  });
+
+  it("is vlak.css 0.5.0 again once the five hooks take their defaults", () => {
+    const released = read("test/fixtures/vlak-0.5.0.css");
+    const hooks = /^[ \t]*--(?:action|action-text|font-sans|font-display):[^\n]*\n/gm;
+    const fonts = vlakCss.match(/font-family:var\(--font-sans\)/g)?.length ?? 0;
+    // The Android leaves spelled a shorter fallback chain than everything else. They share --font-sans now, so
+    // 'Segoe UI' and system-ui come before sans-serif in them: a difference only where Inter does not load.
+    const legacy = [
+      "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif",
+      "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+    ];
+    let before = released;
+    for (const spelling of legacy) before = before.replaceAll(`font-family:${spelling}`, `font-family:${stack}`);
+    const current = vlakCss
+      .replace(hooks, "")
+      .replaceAll("font-family:var(--font-display);", "")
+      .replaceAll("var(--action-text)", "var(--bg)")
+      .replaceAll("var(--action)", "var(--text)")
+      .replaceAll("var(--font-sans)", stack);
+    expect(vlakCss.match(hooks)?.length).toBe(8);
+    expect(vlakCss.match(/font-family:var\(--font-display\);/g)?.length).toBe(3);
+    // Every Inter stack of 0.5.0 became the hook: no more, no fewer.
+    expect(fonts).toBe(15);
+    expect(before.split(`font-family:${stack}`).length - 1).toBe(fonts);
+    expect(current === before, current === before ? "" : firstDifference(current, before)).toBe(true);
+  });
+
+  it("spends --action on the primary action and nothing else", () => {
+    const rules = [...vlakCss.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(/([^{}]+)\{([^{}]*)\}/g)]
+      .filter(([, , body]) => /var\(--action(?:-text)?\)/.test(body!))
+      .map(([, selector]) => selector!.trim());
+    // A selected, on, checked, active, progress, badge or avatar fill stays ink; docs/brand lists each decision.
+    expect(rules).toEqual([".rs-btn-primary", ".rs-btn-primary.rs-inline-btn.rs-inline-field-btn"]);
+    expect(read("css/components/button.css")).toContain(".rs-btn-primary{font-weight:600;background-color:var(--action);color:var(--action-text);");
+  });
+
+  it("gives the display, display XL and title steps the display face, and no other step", () => {
+    const type = read("css/type.css");
+    for (const step of ["xl", "display", "title"]) expect(type).toMatch(new RegExp(`\\.rs-t-${step}\\{font-family:var\\(--font-display\\);`));
+    for (const step of ["sub", "body", "label"]) expect(type).not.toMatch(new RegExp(`\\.rs-t-${step}\\{[^}]*font-family`));
+  });
+
+  it("reaches every face through a hook, inherit or a monospace stack", () => {
+    const sources = ["css/components.css", "css/base.css", "css/type.css", "css/touch.css", "css/motion.css"].map(read).join("\n");
+    const families = [...new Set([...sources.matchAll(/font-family:([^;}]+)/g)].map((m) => m[1]!.trim()))];
+    const stray = families.filter((f) => !["inherit", "var(--font-sans)", "var(--font-display)"].includes(f) && !f.startsWith("ui-monospace"));
+    expect(stray, `faces a brand cannot reach: ${stray.join(" | ")}`).toEqual([]);
+  });
+
+  it("carries the hooks in the token JSON and the DTCG file as aliases of existing entries", () => {
+    const json = JSON.parse(read("tokens/vlak.tokens.json"));
+    const dtcg = JSON.parse(read("tokens/vlak.tokens.dtcg.json"));
+    expect(json.color.light).toMatchObject({ action: "var(--text)", actionText: "var(--bg)" });
+    expect(json.color.dark).toMatchObject({ action: "var(--text)", actionText: "var(--bg)" });
+    expect(json.type.display).toBe("var(--font-sans)");
+    expect(dtcg.color.light.action.$value).toBe("{color.light.ink}");
+    expect(dtcg.color.light["action-text"].$value).toBe("{color.light.paper}");
+    expect(dtcg.color.dark.action.$value).toBe("{color.dark.ink}");
+    expect(dtcg.color.dark["action-text"].$value).toBe("{color.dark.paper}");
+    expect(dtcg.font.sans.$value).toBe("{font.family}");
+    expect(dtcg.font.display.$value).toBe("{font.sans}");
+    const unresolved: string[] = [];
+    const walk = (node: Record<string, unknown>, path: string[]) => {
+      for (const [key, value] of Object.entries(node)) {
+        if (key === "$value" && typeof value === "string" && /^\{.+\}$/.test(value)) {
+          const target = value.slice(1, -1).split(".").reduce<unknown>((at, part) => (at as Record<string, unknown> | undefined)?.[part], dtcg);
+          if (!(target && typeof target === "object" && "$value" in target)) unresolved.push(`${path.join(".")} -> ${value}`);
+        } else if (value && typeof value === "object" && !Array.isArray(value)) walk(value as Record<string, unknown>, [...path, key]);
+      }
+    };
+    walk(dtcg, []);
+    expect(unresolved).toEqual([]);
+  });
+});

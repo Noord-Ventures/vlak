@@ -231,6 +231,12 @@ export default function DocsPage() {
           : custom properties, the module grid, the text scale.
         </li>
         <li>
+          <a className="rs-link" href="/docs/brand">
+            Brand on Vlak
+          </a>
+          : the five properties a product may set for its accent, primary buttons, and fonts.
+        </li>
+        <li>
           <a className="rs-link" href="/docs/stylex">
             StyleX
           </a>

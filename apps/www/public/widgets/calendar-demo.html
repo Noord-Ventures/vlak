@@ -13,6 +13,8 @@
   --text: #1A1A1A;                      /* ink */
   --text-secondary: #6B6B6B;            /* gray */
   --accent: #1A1A1A;                   /* the "accent" is ink; monochrome */
+  --action: var(--text);                /* primary button fill: ink until a product sets it */
+  --action-text: var(--bg);            /* the label on it: paper */
   --divider: rgba(0,0,0,0.08);
   --divider-subtle: rgba(0,0,0,0.06);
   --table-alt: rgba(0,0,0,0.02);
@@ -39,6 +41,8 @@
   --grid-size: 204px;
   --grid-pos: 20px 0;
   --text-scale: 1;
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;    /* the text face (vlakFont); a product sets it in its own unlayered CSS */
+  --font-display: var(--font-sans);    /* display, display XL and title steps (vlakDisplay); follows --font-sans until set */
   /* Stacking scale. Native dialog and popover use the top layer instead. */
   --z-raised: 10;
   --z-sticky: 100;
@@ -61,6 +65,8 @@
   --text: #E8E8E8;
   --text-secondary: #949494;
   --accent: #E8E8E8;
+  --action: var(--text);
+  --action-text: var(--bg);
   --divider: rgba(255,255,255,0.10);
   --divider-subtle: rgba(255,255,255,0.07);
   --table-alt: rgba(255,255,255,0.03);
@@ -76,6 +82,8 @@
   --text: #E8E8E8;
   --text-secondary: #949494;
   --accent: #E8E8E8;
+  --action: var(--text);
+  --action-text: var(--bg);
   --divider: rgba(255,255,255,0.10);
   --divider-subtle: rgba(255,255,255,0.07);
   --table-alt: rgba(255,255,255,0.03);

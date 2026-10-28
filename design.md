@@ -33,7 +33,7 @@ Vlak treats the page as a plane. Type, controls, images, and data share one fiel
 - Use square corners on structural surfaces. The small radius belongs to standalone controls and selected states, not every container.
 - Use one strong image, diagram, or live work surface when the subject benefits from it. Do not decorate empty areas with arbitrary gradients.
 - Keep shadows absent or nearly imperceptible. Separation comes from contrast, overlap, and 1px rules.
-- Use one accent only when it communicates state, identity, or data. Never distribute color merely to make the page feel lively.
+- Use one accent only when it communicates state, identity, or data. A brand's colour is that accent: set it through `--accent`, and its primary buttons through `--action` and `--action-text` (see https://vlak.dev/docs/brand). Never distribute color merely to make the page feel lively.
 
 ## Composition
 
@@ -71,7 +71,7 @@ Use the Vlak grid as a relationship, not a compulsory measurement everywhere.
 
 ## Type and copy
 
-Use Inter through the Vlak stylesheet. Body copy is regular enough to read at length; headings and labels are firm, not heavy.
+Use Inter through the Vlak stylesheet unless the brand sets `--font-sans` and `--font-display`. Body copy is regular enough to read at length; headings and labels are firm, not heavy.
 
 - Use sentence case everywhere.
 - Write short, concrete labels.

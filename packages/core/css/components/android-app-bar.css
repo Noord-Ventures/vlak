@@ -1,5 +1,5 @@
 /* ── android-app-bar: generated from packages/react/src/components/android-app-bar.tsx ── */
-.rs-android-app-bar{box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0, 1fr) auto;align-items:center;column-gap:8px;min-height:64px;padding-inline:16px;padding-block:8px;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif}
+.rs-android-app-bar{box-sizing:border-box;display:grid;grid-template-columns:auto minmax(0, 1fr) auto;align-items:center;column-gap:8px;min-height:64px;padding-inline:16px;padding-block:8px;background-color:var(--bg);color:var(--text);font-family:var(--font-sans)}
 .rs-android-app-bar-medium{min-height:112px;align-items:start;row-gap:8px}
 .rs-android-app-bar-title{grid-row:1;min-width:0;margin:0;font-size:22px;font-weight:500;line-height:1.3;overflow-wrap:anywhere}
 .rs-android-app-bar-leading-title{grid-column:1 / 3}

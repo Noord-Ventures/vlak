@@ -140,8 +140,8 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    backgroundColor: vlak.ink,
-    color: vlak.paper,
+    backgroundColor: vlak.action,
+    color: vlak.actionText,
     borderWidth: 0,
   },
   subscribed: {
