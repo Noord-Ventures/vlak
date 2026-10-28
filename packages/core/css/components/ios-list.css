@@ -1,5 +1,5 @@
 /* ── ios-list: generated from packages/react/src/components/ios-list.tsx ── */
-.rs-ios-list{font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;color:var(--text);min-width:0}
+.rs-ios-list{font-family:var(--font-sans);font-size:17px;line-height:22px;color:var(--text);min-width:0}
 .rs-ios-list-title{margin-block:0 8px;margin-inline:16px;font-size:15px;line-height:20px;font-weight:400;color:var(--text-secondary)}
 .rs-ios-list-group{border-radius:22px;background-color:var(--bg);border-width:1px;border-style:solid;border-color:var(--divider);overflow:hidden}
 @media (forced-colors: active){.rs-ios-list-group{border-color:ButtonText}}

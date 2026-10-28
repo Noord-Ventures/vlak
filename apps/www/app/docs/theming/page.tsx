@@ -19,12 +19,16 @@ const properties: { name: string; light: string; dark?: string; does: string }[]
   { name: "--bg", light: color.light.paper, dark: color.dark.black, does: "Paper. The page and every surface." },
   { name: "--text", light: color.light.ink, dark: color.dark.white, does: "Ink. Type, borders of solid controls, focus rings." },
   { name: "--text-secondary", light: color.light.gray, dark: color.dark.gray, does: "Gray. Labels, hints, table cells." },
-  { name: "--accent", light: color.light.ink, dark: color.dark.white, does: "Aliases ink. There is no hue in the system." },
+  { name: "--accent", light: color.light.ink, dark: color.dark.white, does: "Aliases ink in Vlak's own CSS. A product's brand colour goes here." },
+  { name: "--action", light: color.light.action, dark: color.dark.action, does: "Fill of the primary button. Aliases ink until a product sets it." },
+  { name: "--action-text", light: color.light.actionText, dark: color.dark.actionText, does: "The label on --action. Aliases paper." },
   { name: "--divider", light: color.light.divider, dark: color.dark.divider, does: "Hairlines: rules, frames, table rows." },
   { name: "--divider-subtle", light: color.light.dividerSubtle, dark: color.dark.dividerSubtle, does: "Fills only: hover, skeleton, muted." },
   { name: "--grid-line", light: color.light.gridLine, dark: color.dark.gridLine, does: "The quiet 204 verticals behind inner pages." },
   { name: "--table-alt", light: color.light.tableAlt, dark: color.dark.tableAlt, does: "Alternate rows, code block ground." },
   { name: "--control-border", light: color.light.controlBorder, dark: color.dark.controlBorder, does: "Form control boundary. 3:1 against the ground." },
+  { name: "--font-sans", light: "Inter, -apple-system, …", does: "Body text and controls. Inter until a product sets it." },
+  { name: "--font-display", light: "var(--font-sans)", does: "The display, display XL and title steps." },
   { name: "--radius-sm", light: `${radius.small}px`, does: "Buttons, boxes, dialogs, sheets." },
   { name: "--radius", light: "var(--radius-sm)", does: "Alias of --radius-sm." },
   { name: "--radius-chrome", light: `${radius.chrome}px`, does: "Page chrome, cards, icon marks, charts." },
@@ -130,8 +134,13 @@ export default function ThemingPage() {
         Author CSS outside any layer beats it, so a plain <code className="rs-code">:root</code> rule
         is the whole override. Set the dark value under{" "}
         <code className="rs-code">[data-theme=&quot;dark&quot;]</code> and, if you rely on the system
-        preference, under the media query too. The palette is neutral by design; there is no accent
-        token that takes a hue, and the test suite fails on one.
+        preference, under the media query too. Vlak&apos;s own CSS has no hue and a test keeps it so;
+        a product sets its brand colour in its own unlayered CSS through{" "}
+        <code className="rs-code">--accent</code>. The five properties a brand may set are on{" "}
+        <a className="rs-link" href="/docs/brand">
+          Brand on Vlak
+        </a>
+        .
       </p>
 
       <h2 className="section-label">data-theme and color-scheme</h2>

@@ -30,7 +30,7 @@ export type { WaveformRegion } from "./components/waveform";
 export type { ViewerImage } from "./components/image-viewer";
 export type { ComposedMessage } from "./components/message-composer";
 export { rs } from "./rs";
-export { vlak, phone, mobileGrid, rail, wide, vlakFont, vlakMono } from "./tokens.stylex";
+export { vlak, phone, mobileGrid, rail, wide, vlakFont, vlakDisplay, vlakMono } from "./tokens.stylex";
 export { HealthMetric, type HealthMetricProps } from "./components/health-metric";
 export { ReferenceRange, type ReferenceRangeProps } from "./components/reference-range";
 export { LabResults, type LabResultsProps, type LabResult } from "./components/lab-results";

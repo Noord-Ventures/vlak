@@ -1,5 +1,5 @@
 /* ── android-navigation: generated from packages/react/src/components/android-navigation.tsx ── */
-.rs-android-navigation{box-sizing:border-box;background-color:var(--bg);color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif}
+.rs-android-navigation{box-sizing:border-box;background-color:var(--bg);color:var(--text);font-family:var(--font-sans)}
 .rs-android-navigation-list{display:flex;flex-direction:row;align-items:stretch;justify-content:space-around;gap:4px;list-style-type:none;padding:8px 4px;margin:0}
 .rs-android-navigation-rail{flex-direction:column;align-items:stretch;justify-content:start;width:88px;padding:12px 4px;gap:12px}
 .rs-android-navigation-item{min-width:0;flex-grow:1;display:flex;justify-content:center}

@@ -65,6 +65,8 @@ export default function TokensPage() {
               ["gridLine", color.light.gridLine, color.dark.gridLine],
               ["tableAlt", color.light.tableAlt, color.dark.tableAlt],
               ["controlBorder", color.light.controlBorder, color.dark.controlBorder],
+              ["action", color.light.action, color.dark.action],
+              ["actionText", color.light.actionText, color.dark.actionText],
             ].map(([name, light, dark]) => (
               <tr key={name} className="rs-table-row">
                 <td className="rs-table-td">
@@ -85,11 +87,18 @@ export default function TokensPage() {
         Two grid inks in one family: <code className="rs-code">divider</code> is the stronger step
         for cell cages and rules; <code className="rs-code">gridLine</code> is the quieter step for
         the 204 verticals. <code className="rs-code">controlBorder</code> is the one boundary that
-        must reach 3:1, so form controls read on paper and on black. Each scheme also sets{" "}
+        must reach 3:1, so form controls read on paper and on black.{" "}
+        <code className="rs-code">action</code> and <code className="rs-code">actionText</code> fill
+        the primary button and label it; they alias ink and paper until a product sets them. Each
+        scheme also sets{" "}
         <code className="rs-code">color-scheme</code>. The custom property names and the override
         recipe are in{" "}
         <a className="rs-link" href="/docs/theming">
           Theming
+        </a>
+        ; the five properties a brand may set are on{" "}
+        <a className="rs-link" href="/docs/brand">
+          Brand on Vlak
         </a>
         .
       </p>
@@ -120,7 +129,9 @@ export default function TokensPage() {
         </table>
       </div>
       <p className="rs-t-body">
-        Inter, {type.weights.body} for body and {type.weights.heading} for headings and labels. Sizes
+        Inter, {type.weights.body} for body and {type.weights.heading} for headings and labels. The
+        face is <code className="rs-code">--font-sans</code>; the display, display XL and title steps
+        read <code className="rs-code">--font-display</code>, which follows it. Sizes
         ship in rem with no root font-size pin. The measure is {type.measure.columns} columns,{" "}
         {type.measure.px}px, about {type.measure.characters} characters. {type.caseRule} Reading type
         multiplies by <code className="rs-code">--text-scale</code> (steps{" "}

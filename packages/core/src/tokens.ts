@@ -29,6 +29,10 @@ export const vlakTokens = {
       controlBorder: "rgba(0,0,0,0.42)",
       /** Hover fill of a ghost control: paper with 10% ink, solid so edge and fill match. */
       controlFill: "#E4E2DC",
+      /** Fill of the primary action, and its label. Aliases of ink and paper, so Vlak stays monochrome.
+          A product sets `--action` and `--action-text` in its own unlayered CSS (docs/brand). */
+      action: "var(--text)",
+      actionText: "var(--bg)",
     },
     dark: {
       black: "#0E0C0A",
@@ -43,6 +47,9 @@ export const vlakTokens = {
       controlBorder: "rgba(255,255,255,0.38)",
       /** Black with 10% white. */
       controlFill: "#242220",
+      /** Repeated per theme: a var() is substituted where it is declared, so a dark wrapper needs its own. */
+      action: "var(--text)",
+      actionText: "var(--bg)",
     },
     /** Ink → paper, the in-between steps. Monochrome: there is no accent. */
     neutralScale: [
@@ -58,6 +65,8 @@ export const vlakTokens = {
   },
   type: {
     family: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+    /** Headings: the display, display XL and title steps. Follows `--font-sans` until a product sets `--font-display` (docs/brand). */
+    display: "var(--font-sans)",
     foundry: {
       typeface: "Inter",
       designer: "Rasmus Andersson",

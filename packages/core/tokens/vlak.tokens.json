@@ -14,7 +14,9 @@
       "gridLine": "rgba(0,0,0,0.04)",
       "tableAlt": "rgba(0,0,0,0.02)",
       "controlBorder": "rgba(0,0,0,0.42)",
-      "controlFill": "#E4E2DC"
+      "controlFill": "#E4E2DC",
+      "action": "var(--text)",
+      "actionText": "var(--bg)"
     },
     "dark": {
       "black": "#0E0C0A",
@@ -25,7 +27,9 @@
       "gridLine": "rgba(255,255,255,0.05)",
       "tableAlt": "rgba(255,255,255,0.03)",
       "controlBorder": "rgba(255,255,255,0.38)",
-      "controlFill": "#242220"
+      "controlFill": "#242220",
+      "action": "var(--text)",
+      "actionText": "var(--bg)"
     },
     "neutralScale": [
       "#1A1A1A",
@@ -40,6 +44,7 @@
   },
   "type": {
     "family": "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif",
+    "display": "var(--font-sans)",
     "foundry": {
       "typeface": "Inter",
       "designer": "Rasmus Andersson",

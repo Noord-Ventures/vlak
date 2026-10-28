@@ -26,7 +26,7 @@ const styles = stylex.create({
 			[mq.forcedColors]: "ButtonFace",
 		},
 		color: { default: vlak.paper, [mq.forcedColors]: "ButtonText" },
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 		fontSize: 16,
 		fontWeight: 500,
 		lineHeight: 1.5,

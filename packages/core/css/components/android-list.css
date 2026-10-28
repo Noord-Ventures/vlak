@@ -1,5 +1,5 @@
 /* ── android-list: generated from packages/react/src/components/android-list.tsx ── */
-.rs-android-list{box-sizing:border-box;display:flex;flex-direction:column;gap:2px;padding:0;margin:0;list-style-type:none;font-family:Inter, -apple-system, BlinkMacSystemFont, sans-serif;color:var(--text)}
+.rs-android-list{box-sizing:border-box;display:flex;flex-direction:column;gap:2px;padding:0;margin:0;list-style-type:none;font-family:var(--font-sans);color:var(--text)}
 .rs-android-list-row{box-sizing:border-box;display:flex;align-items:center;gap:8px;min-height:56px;min-width:0;background-color:var(--control-fill);border-radius:4px}
 .rs-android-list-row:first-child{border-radius:16px 16px 4px 4px}
 .rs-android-list-row:last-child{border-radius:4px 4px 16px 16px}

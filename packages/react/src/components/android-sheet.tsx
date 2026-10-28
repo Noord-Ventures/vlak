@@ -38,7 +38,7 @@ const styles = stylex.create({
 		borderRadius: "28px 28px 0 0",
 		backgroundColor: vlak.paper,
 		color: vlak.ink,
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 		boxShadow: "none",
 		"::backdrop": {
 			backgroundColor: [

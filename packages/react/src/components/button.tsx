@@ -4,7 +4,7 @@ import { vlak, mq } from "../tokens.stylex";
 import { rs } from "../rs";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Solid ink primary, hairline ghost, or borderless subtle. One primary per view. */
+  /** Solid primary (ink, or the product's `--action`), hairline ghost, or borderless subtle. One primary per view. */
   variant?: "primary" | "ghost" | "subtle";
   /** Icon buttons stay square at every breakpoint. Supply an accessible name. */
   size?: "default" | "sm" | "icon";
@@ -84,11 +84,11 @@ const styles = stylex.create({
   primary: {
     fontWeight: 600,
     backgroundColor: {
-      default: vlak.ink,
+      default: vlak.action,
       [mq.forcedColors]: "ButtonFace",
     },
     color: {
-      default: vlak.paper,
+      default: vlak.actionText,
       [mq.forcedColors]: {
         default: "ButtonText",
         ":disabled": "GrayText",

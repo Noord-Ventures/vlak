@@ -1,0 +1,91 @@
+:root{
+  --bg:#F8F4EE;
+  --text:#1C1B1B;
+  --text-secondary:#6B6B6B;
+  --accent:#A04A2A;
+  --rs-chart-spot:#A04A2A;
+  --action:#D4A24C;
+  --action-text:#1C1B1B;
+  --divider:rgba(28,27,27,0.08);
+  --divider-subtle:rgba(28,27,27,0.06);
+  --table-alt:rgba(28,27,27,0.02);
+  --grid-line:rgba(28,27,27,0.04);
+  --control-border:rgba(28,27,27,0.42);
+  --control-fill:#E2DDD6;
+  --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-display:"Rethink Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --fg:var(--text);
+  --muted:var(--text-secondary);
+  --border:var(--divider);
+  --surface:var(--control-fill);
+  --accent-fg:#FFFFFF;
+}
+[data-theme="light"]{
+  --bg:#F8F4EE;
+  --text:#1C1B1B;
+  --text-secondary:#6B6B6B;
+  --accent:#A04A2A;
+  --rs-chart-spot:#A04A2A;
+  --action:#D4A24C;
+  --action-text:#1C1B1B;
+  --divider:rgba(28,27,27,0.08);
+  --divider-subtle:rgba(28,27,27,0.06);
+  --table-alt:rgba(28,27,27,0.02);
+  --grid-line:rgba(28,27,27,0.04);
+  --control-border:rgba(28,27,27,0.42);
+  --control-fill:#E2DDD6;
+  --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-display:"Rethink Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --fg:var(--text);
+  --muted:var(--text-secondary);
+  --border:var(--divider);
+  --surface:var(--control-fill);
+  --accent-fg:#FFFFFF;
+}
+[data-theme="dark"]{
+  --bg:#100D0B;
+  --text:#E7E5E4;
+  --text-secondary:#949494;
+  --accent:#BA6242;
+  --rs-chart-spot:#BA6242;
+  --action:#D4A24C;
+  --action-text:#100D0B;
+  --divider:rgba(231,229,228,0.1);
+  --divider-subtle:rgba(231,229,228,0.07);
+  --table-alt:rgba(231,229,228,0.03);
+  --grid-line:rgba(231,229,228,0.05);
+  --control-border:rgba(231,229,228,0.38);
+  --control-fill:#282321;
+  --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --font-display:"Rethink Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --fg:var(--text);
+  --muted:var(--text-secondary);
+  --border:var(--divider);
+  --surface:var(--control-fill);
+  --accent-fg:#100D0B;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#100D0B;
+    --text:#E7E5E4;
+    --text-secondary:#949494;
+    --accent:#BA6242;
+    --rs-chart-spot:#BA6242;
+    --action:#D4A24C;
+    --action-text:#100D0B;
+    --divider:rgba(231,229,228,0.1);
+    --divider-subtle:rgba(231,229,228,0.07);
+    --table-alt:rgba(231,229,228,0.03);
+    --grid-line:rgba(231,229,228,0.05);
+    --control-border:rgba(231,229,228,0.38);
+    --control-fill:#282321;
+    --font-sans:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    --font-display:"Rethink Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    --fg:var(--text);
+    --muted:var(--text-secondary);
+    --border:var(--divider);
+    --surface:var(--control-fill);
+    --accent-fg:#100D0B;
+  }
+}
+h1,h2,h3{font-family:var(--font-display)}

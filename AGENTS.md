@@ -58,7 +58,7 @@ Run the two core builds twice and confirm `git status` is clean the second time:
 
 ## Doctrine
 
-- Monochrome. Paper, ink, gray. No hue anywhere in the system; a test rejects hex that is not gray. Charts may carry one spot color through `spot`.
+- Monochrome. Paper, ink, gray. No hue anywhere in Vlak's own CSS; a test rejects hex that is not gray. Charts may carry one spot color through `spot`. A product built on Vlak may set five brand hooks in its own unlayered CSS and nothing else: `--accent`, `--action`, `--action-text`, `--font-sans` and `--font-display`. Every other token and rule in this list stays as it is.
 - Hairlines (1px), square corners by default, one 4px radius token for controls, the 204px module (184 column + 20 gutter).
 - Sentence case. No all caps, no periods in titles, no marketing.
 - Platform first: `<dialog>`, `<details>`, the Popover API, scroll snap, native inputs. JavaScript only where the platform has nothing, and then the APG pattern with full keyboard support.

@@ -1677,7 +1677,7 @@
               "name": "variant",
               "type": "\"primary\" | \"ghost\" | \"subtle\"",
               "required": false,
-              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+              "description": "Solid primary (ink, or the product's `--action`), hairline ghost, or borderless subtle. One primary per view."
             },
             {
               "name": "size",
@@ -1790,7 +1790,7 @@
               "name": "variant",
               "type": "\"primary\" | \"ghost\" | \"subtle\"",
               "required": false,
-              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+              "description": "Solid primary (ink, or the product's `--action`), hairline ghost, or borderless subtle. One primary per view."
             },
             {
               "name": "size",
@@ -2312,7 +2312,7 @@
               "name": "variant",
               "type": "\"primary\" | \"ghost\" | \"subtle\"",
               "required": false,
-              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+              "description": "Solid primary (ink, or the product's `--action`), hairline ghost, or borderless subtle. One primary per view."
             },
             {
               "name": "size",
@@ -8866,7 +8866,7 @@
               "type": "\"primary\" | \"ghost\" | \"subtle\"",
               "required": false,
               "default": "\"primary\"",
-              "description": "Solid ink primary, hairline ghost, or borderless subtle. One primary per view."
+              "description": "Solid primary (ink, or the product's `--action`), hairline ghost, or borderless subtle. One primary per view."
             },
             {
               "name": "size",

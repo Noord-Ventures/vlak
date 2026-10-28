@@ -22,14 +22,14 @@ export interface IOSNavigationBarProps extends Omit<React.HTMLAttributes<HTMLEle
   largeTitle?: boolean;
 }
 const styles = stylex.create({
-  root: { boxSizing: "border-box", fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif", color: vlak.ink, minWidth: 0, padding: 8 },
+  root: { boxSizing: "border-box", fontFamily: "var(--font-sans)", color: vlak.ink, minWidth: 0, padding: 8 },
   vertical: { display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, padding: 0 },
   row: { display: "grid", gridTemplateColumns: "minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr)", gap: 8, alignItems: "center", minHeight: 54 },
   leading: { justifySelf: "start" },
   actions: { display: "inline-flex", alignItems: "center", gap: 2, padding: 3, borderRadius: 27, justifySelf: "end", backgroundColor: vlak.controlFill, borderWidth: 1, borderStyle: "solid", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: "ButtonText" } },
   rail: { display: "flex", flexDirection: "column", alignItems: "center", gap: 12, flexShrink: 0 },
   verticalActions: { flexDirection: "column" },
-  button: { appearance: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, boxSizing: "border-box", minWidth: 44, minHeight: 44, paddingBlock: 10, paddingInline: 12, borderWidth: 0, borderRadius: 22, backgroundColor: { default: "transparent", ":hover": { default: null, [mq.hover]: vlak.paper } }, color: vlak.ink, fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif", fontSize: 17, lineHeight: "22px", cursor: "pointer", outlineWidth: { default: 0, ":focus-visible": 2 }, outlineStyle: "solid", outlineColor: vlak.ink, outlineOffset: -2, transition: { default: "background-color 200ms ease", [mq.reduce]: "none" } },
+  button: { appearance: "none", display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, boxSizing: "border-box", minWidth: 44, minHeight: 44, paddingBlock: 10, paddingInline: 12, borderWidth: 0, borderRadius: 22, backgroundColor: { default: "transparent", ":hover": { default: null, [mq.hover]: vlak.paper } }, color: vlak.ink, fontFamily: "var(--font-sans)", fontSize: 17, lineHeight: "22px", cursor: "pointer", outlineWidth: { default: 0, ":focus-visible": 2 }, outlineStyle: "solid", outlineColor: vlak.ink, outlineOffset: -2, transition: { default: "background-color 200ms ease", [mq.reduce]: "none" } },
   iconButton: { width: 44, padding: 0 },
   back: { minWidth: 48, minHeight: 48, width: 48, borderRadius: 24, padding: 0, backgroundColor: vlak.controlFill, borderWidth: 1, borderStyle: "solid", borderColor: { default: vlak.controlBorder, [mq.forcedColors]: "ButtonText" } },
   disabled: { opacity: 0.45, cursor: "not-allowed" },

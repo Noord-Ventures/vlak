@@ -1,5 +1,5 @@
 /* ── ios-navigation-bar: generated from packages/react/src/components/ios-navigation-bar.tsx ── */
-.rs-ios-navigation-bar{box-sizing:border-box;font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;color:var(--text);min-width:0;padding:8px}
+.rs-ios-navigation-bar{box-sizing:border-box;font-family:var(--font-sans);color:var(--text);min-width:0;padding:8px}
 .rs-ios-navigation-bar-vertical{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:0}
 .rs-ios-navigation-bar-row{display:grid;grid-template-columns:minmax(48px, 1fr) minmax(0, auto) minmax(48px, 1fr);gap:8px;align-items:center;min-height:54px}
 .rs-ios-navigation-bar-leading{justify-self:start}
@@ -7,7 +7,7 @@
 @media (forced-colors: active){.rs-ios-navigation-bar-actions{border-color:ButtonText}}
 .rs-ios-navigation-bar-rail{display:flex;flex-direction:column;align-items:center;gap:12px;flex-shrink:0}
 .rs-ios-navigation-bar-actions-vertical{flex-direction:column}
-.rs-ios-navigation-bar-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;min-width:44px;min-height:44px;padding-block:10px;padding-inline:12px;border-width:0;border-radius:22px;background-color:transparent;color:var(--text);font-family:Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;font-size:17px;line-height:22px;cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px;transition:background-color 200ms ease}
+.rs-ios-navigation-bar-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-sizing:border-box;min-width:44px;min-height:44px;padding-block:10px;padding-inline:12px;border-width:0;border-radius:22px;background-color:transparent;color:var(--text);font-family:var(--font-sans);font-size:17px;line-height:22px;cursor:pointer;outline-width:0;outline-style:solid;outline-color:var(--text);outline-offset:-2px;transition:background-color 200ms ease}
 .rs-ios-navigation-bar-button:focus-visible{outline-width:2px}
 @media (hover: hover) and (pointer: fine){.rs-ios-navigation-bar-button:hover{background-color:var(--bg)}}
 @media (prefers-reduced-motion: reduce){.rs-ios-navigation-bar-button{transition:none}}

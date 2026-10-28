@@ -47,7 +47,7 @@ const styles = stylex.create({
 		borderRadius: 4,
 		backgroundColor: "transparent",
 		color: vlak.ink,
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 		fontSize: 16,
 		lineHeight: 1.5,
 		outlineWidth: { default: null, ":focus-visible": 2 },

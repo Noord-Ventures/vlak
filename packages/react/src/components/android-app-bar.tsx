@@ -17,7 +17,7 @@ const styles = stylex.create({
 		paddingBlock: 8,
 		backgroundColor: vlak.paper,
 		color: vlak.ink,
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 	},
 	medium: { minHeight: 112, alignItems: "start", rowGap: 8 },
 	title: {

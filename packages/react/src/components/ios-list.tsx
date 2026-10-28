@@ -19,7 +19,7 @@ export interface IOSListRowProps extends Omit<React.HTMLAttributes<HTMLElement>,
   disclosure?: boolean;
 }
 const styles = stylex.create({
-  root: { fontFamily: "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif", fontSize: 17, lineHeight: "22px", color: vlak.ink, minWidth: 0 },
+  root: { fontFamily: "var(--font-sans)", fontSize: 17, lineHeight: "22px", color: vlak.ink, minWidth: 0 },
   title: { marginBlock: "0 8px", marginInline: 16, fontSize: 15, lineHeight: "20px", fontWeight: 400, color: vlak.gray },
   group: { borderRadius: 22, backgroundColor: vlak.paper, borderWidth: 1, borderStyle: "solid", borderColor: { default: vlak.divider, [mq.forcedColors]: "ButtonText" }, overflow: "hidden" },
   footer: { marginBlock: "8px 0", marginInline: 16, fontSize: 13, lineHeight: "18px", color: vlak.gray },

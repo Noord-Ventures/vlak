@@ -14,7 +14,7 @@ const styles = stylex.create({
 		padding: 0,
 		margin: 0,
 		listStyleType: "none",
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 		color: vlak.ink,
 	},
 	row: {

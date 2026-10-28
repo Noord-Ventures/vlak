@@ -36,6 +36,7 @@ const vars = [
   ["paper, ink, gray", "--bg, --text, --text-secondary"],
   ["divider, dividerSubtle, gridLine, tableAlt", "the four grays"],
   ["controlBorder", "--control-border, 3:1 against the ground"],
+  ["action, actionText", "--action, --action-text, the primary button's fill and its label"],
   ["radiusSm, radius, radiusChrome, radiusIn", "the radius family"],
   ["pad, gutter, module", "--pad, --gutter, --grid-size"],
   ["hit, controlH, controlFs, controlLabel", "the control scale"],
@@ -199,8 +200,10 @@ export default function StylexPage() {
         </table>
       </div>
       <p className="rs-t-body">
-        <code className="rs-code">vlakFont</code> and <code className="rs-code">vlakMono</code>{" "}
-        export the two font stacks as strings.
+        <code className="rs-code">vlakFont</code> and <code className="rs-code">vlakDisplay</code>{" "}
+        export <code className="rs-code">var(--font-sans)</code> and{" "}
+        <code className="rs-code">var(--font-display)</code> as strings; a brand sets those two in its
+        own CSS. <code className="rs-code">vlakMono</code> exports the monospace stack.
       </p>
 
       <h2 className="section-label">Include the tokens in your compile</h2>

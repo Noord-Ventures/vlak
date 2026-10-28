@@ -10,7 +10,7 @@ const styles = stylex.create({
 		boxSizing: "border-box",
 		backgroundColor: vlak.paper,
 		color: vlak.ink,
-		fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif",
+		fontFamily: "var(--font-sans)",
 	},
 	list: {
 		display: "flex",

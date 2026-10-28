@@ -12,6 +12,7 @@
       "!**/.build-components",
       "!packages/core/css",
       "!packages/core/tokens",
+      "!packages/core/test/fixtures/vlak-0.5.0.css",
       "!packages/cli/src/starter.html",
       "!pnpm-lock.yaml"
     ]

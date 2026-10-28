@@ -48,6 +48,16 @@
         "$type": "color",
         "$value": "#E4E2DC",
         "$description": "Hover fill of a ghost control. --control-fill"
+      },
+      "action": {
+        "$type": "color",
+        "$value": "{color.light.ink}",
+        "$description": "Primary button fill, an alias of ink until a product sets it. --action"
+      },
+      "action-text": {
+        "$type": "color",
+        "$value": "{color.light.paper}",
+        "$description": "Primary button label, an alias of paper. --action-text"
       }
     },
     "dark": {
@@ -95,6 +105,16 @@
         "$type": "color",
         "$value": "#242220",
         "$description": "--control-fill"
+      },
+      "action": {
+        "$type": "color",
+        "$value": "{color.dark.ink}",
+        "$description": "--action"
+      },
+      "action-text": {
+        "$type": "color",
+        "$value": "{color.dark.paper}",
+        "$description": "--action-text"
       }
     },
     "neutral": {
@@ -415,6 +435,16 @@
         "system-ui",
         "sans-serif"
       ]
+    },
+    "sans": {
+      "$type": "fontFamily",
+      "$value": "{font.family}",
+      "$description": "Text face, an alias of family. --font-sans"
+    },
+    "display": {
+      "$type": "fontFamily",
+      "$value": "{font.sans}",
+      "$description": "Display, display XL and title steps, an alias of sans until a product sets it. --font-display"
     },
     "weight": {
       "body": {
