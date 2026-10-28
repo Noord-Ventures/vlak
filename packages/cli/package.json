@@ -1,6 +1,6 @@
 {
   "name": "@noorddev/vlak-cli",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Install and edit Vlak component source in your project. CLI commands for setup, components, docs, tokens, and source updates.",
   "license": "MIT",
   "repository": {

@@ -1,6 +1,6 @@
 {
   "name": "@noorddev/vlak-mcp",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "mcpName": "io.github.Noord-Ventures/vlak",
   "description": "MCP server for the Vlak design system: components, props, docs, tokens, and install commands for coding agents. Works offline.",
   "license": "MIT",
