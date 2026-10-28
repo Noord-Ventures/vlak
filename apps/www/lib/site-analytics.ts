@@ -28,6 +28,8 @@ declare global {
   interface Window {
     va?: AnalyticsQueue;
     vaq?: unknown[][];
+    si?: (...args: unknown[]) => void;
+    siq?: unknown[][];
     __vlakSiteAnalytics?: { paths: Set<string>; attribution: Attribution };
   }
 }
@@ -140,6 +142,14 @@ export function beforeSend(event: AnalyticsEvent, paths: Set<string>): Analytics
   return data && payload ? { type: "event", url, payload: { name: payload.name, data } } : null;
 }
 
+export type SpeedInsightsEvent = { type: "vital"; url: string; route?: string };
+
+// Speed Insights sends Core Web Vitals with the page URL. Keep only public paths, without query or hash.
+export function speedInsightsBeforeSend<T extends SpeedInsightsEvent>(event: T, paths: Set<string>): T | null {
+  const url = redactUrl(event.url, paths);
+  return url ? { ...event, url } : null;
+}
+
 export function installMethod(text: string): "npm" | "cli" | "shadcn" | null {
   // Inspect the fixed example locally; never send copied text or clipboard contents.
   if (/^npm install @noorddev\/vlak(?:-react)?(?:\s|$)/.test(text)) return "npm";
@@ -223,6 +233,18 @@ export function initializeSiteAnalytics(publicPaths: string[]): void {
   // Suppress automatic URL/referrer HTTP headers on this script request.
   script.referrerPolicy = "no-referrer";
   document.head.appendChild(script);
+
+  window.si ??= (...args: unknown[]) => {
+    window.siq ??= [];
+    window.siq.push(args);
+  };
+  window.si("beforeSend", (event: SpeedInsightsEvent) => speedInsightsBeforeSend(event, paths));
+  const vitals = document.createElement("script");
+  vitals.src = "/_vercel/speed-insights/script.js";
+  vitals.defer = true;
+  vitals.referrerPolicy = "no-referrer";
+  vitals.dataset.sdkn = "@vercel/speed-insights";
+  document.head.appendChild(vitals);
 
   try {
     if (sessionStorage.getItem("vlak-acquisition") !== "sent") {
