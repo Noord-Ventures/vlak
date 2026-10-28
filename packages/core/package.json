@@ -1,6 +1,6 @@
 {
   "name": "@noorddev/vlak",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Vlak design tokens, component registry, and CSS for product exploration. Monochrome surfaces, type, spacing, and accessible component contracts.",
   "license": "MIT",
   "repository": {

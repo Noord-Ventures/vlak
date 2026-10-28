@@ -28,11 +28,11 @@ The portable plugin connects ChatGPT and other hosted clients to `https://vlak.d
 The MCP server can also be installed directly in Codex:
 
 ```sh
-codex mcp add vlak -- npx -y @noorddev/vlak-mcp@0.5.0
+codex mcp add vlak -- npx -y @noorddev/vlak-mcp@0.6.0
 ```
 
 ## Claude directory submission
 
 Submit `https://github.com/Noord-Ventures/vlak` with `plugins/vlak` as the plugin folder. The repository root is a marketplace, not the plugin. The manifest is at `plugins/vlak/.claude-plugin/plugin.json`.
 
-The Claude launcher pins the published MCP package to `0.5.0`. The skill also pins executable package commands, including commands copied from MCP results or linked guides. The shadcn path requires Node 20.18.1 or newer.
+The Claude launcher pins the published MCP package to `0.6.0`. The skill also pins executable package commands, including commands copied from MCP results or linked guides. The shadcn path requires Node 20.18.1 or newer.

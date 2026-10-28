@@ -1,6 +1,6 @@
 # Vlak iOS components
 
-8 React components with iOS control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.5.0.
+8 React components with iOS control geometry, Inter typography, and Vlak's paper-and-ink palette. Version 0.6.0.
 
 ## Runtime and integration
 
