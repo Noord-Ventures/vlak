@@ -71,7 +71,8 @@ jobs:
 
   site:
     name: Docs site build and end-to-end
-    runs-on: ubuntu-latest
+    # Playwright 1.56 supports Ubuntu 24.04; keep browser dependencies on that image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +86,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .pw
-          key: pw-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: pw-ubuntu-24.04-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm --filter www exec playwright install chromium --with-deps
       - name: Every catalogue entry has an isolated example
         run: node apps/www/scripts/check-examples.mjs
@@ -166,7 +167,7 @@ jobs:
 
   starters:
     name: Standalone interface starters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
