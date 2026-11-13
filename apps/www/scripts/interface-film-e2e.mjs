@@ -16,7 +16,8 @@ server.listen(0, "127.0.0.1");
 await once(server, "listening");
 const base = `http://127.0.0.1:${server.address().port}`;
 const browser = await chromium.launch(process.env.PLAYWRIGHT_EXECUTABLE_PATH
-  ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : undefined);
+  ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH }
+  : process.env.PLAYWRIGHT_BROWSER_CHANNEL ? { channel: process.env.PLAYWRIGHT_BROWSER_CHANNEL } : undefined);
 const errors = [];
 const summaryText = "Watch the 20-second walkthrough";
 const videos = html => [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)]
