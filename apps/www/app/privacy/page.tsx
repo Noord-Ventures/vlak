@@ -11,7 +11,7 @@ export const metadata: Metadata = pageMetadata("/privacy", {
 
 export default function PrivacyPage() {
   return (
-    <DocsShell title="Privacy" summary="How Vlak handles website and MCP request data. Last updated 27 September 2026.">
+    <DocsShell title="Privacy" summary="How Vlak handles website and MCP request data. Last updated 13 November 2026.">
       <h2 className="section-label">Who operates Vlak</h2>
       <p className="rs-t-body">
         Noord.dev publishes Vlak and operates vlak.dev and its public MCP endpoint. Questions or privacy requests can be sent to{" "}
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
 
       <h2 className="section-label">Hosted MCP usage</h2>
       <p className="rs-t-body">
-        When usage measurement is enabled, the hosted MCP endpoint sends a small operational record to Noord&apos;s private analytics service: the published tool name, request completion time, success or error status, response duration, a random event identifier used to prevent duplicate counting, and whether optional OpenAI client metadata was present. That presence is an unverified hint, not proof of a particular client or an installed plugin.
+        When usage measurement is enabled, the hosted MCP endpoint sends a small operational record to Noord&apos;s private analytics service: the published tool name, request completion time, success or error status, response duration, a random event identifier used to prevent duplicate counting, and whether optional OpenAI client metadata was present. When diagnostics are enabled, the record also includes the deployed Vlak version and a fixed error category, such as invalid arguments, a missing record, or a transport failure. Error messages are not collected. The presence of OpenAI metadata is an unverified hint, not proof of a particular client or an installed plugin.
       </p>
       <p className="rs-t-body">
         These records contain no tool arguments, search text, prompts, results, raw client metadata, IP addresses, user identifiers, or conversation identifiers. They are used for aggregate usage and reliability reporting, not user profiles or confirmed installation counts. Reports cover the most recent 30 days. Older operational records are removed when the service next receives a measurement or generates a report.

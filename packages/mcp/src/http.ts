@@ -1,6 +1,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createServer } from "./server.js";
+import { loadBundle } from "./data.js";
 import { observeToolCalls, type McpMetricObserver } from "./telemetry.js";
 
 export type McpHttpRequest = IncomingMessage & { body?: unknown };
@@ -40,7 +41,7 @@ export async function handleMcpRequest(request: McpHttpRequest, response: Server
 
   try {
     await server.connect(transport);
-    if (observe) observeToolCalls(transport, observe);
+    if (observe) observeToolCalls(transport, observe, loadBundle().version);
     await transport.handleRequest(request, response, request.body);
   } catch {
     console.error("Vlak MCP request failed");
