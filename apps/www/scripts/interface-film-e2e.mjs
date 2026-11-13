@@ -22,6 +22,30 @@ const summaryText = "Watch the 20-second walkthrough";
 const videos = html => [...html.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/gi)]
   .flatMap(([, source]) => JSON.parse(source)).filter(item => item["@type"] === "VideoObject");
 const settle = page => page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
+// A <source> that cannot be decoded can leave play() pending indefinitely.
+// Fail with media state instead of using the entire CI job timeout; the actual
+// playback and currentTime assertions below still have to pass.
+const play = video => video.evaluate(async element => {
+  element.muted = true;
+  let timer;
+  try {
+    await Promise.race([
+      element.play(),
+      new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error(`Video playback did not start within 15 seconds: ${JSON.stringify({
+          readyState: element.readyState,
+          networkState: element.networkState,
+          paused: element.paused,
+          mediaErrorCode: element.error?.code ?? null,
+          h264: element.canPlayType('video/mp4; codecs="avc1.640028"'),
+          aac: element.canPlayType('audio/mp4; codecs="mp4a.40.2"'),
+        })}`)), 15_000);
+      }),
+    ]);
+  } finally {
+    clearTimeout(timer);
+  }
+});
 
 try {
   for (const slug of FILMED_INTERFACE_SLUGS) {
@@ -87,7 +111,7 @@ try {
       assert(box.width <= specimen.width && (width < 600 || box.width < specimen.width * 0.6), "Walkthrough remains smaller than the live interface");
       assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "Opened page fits the viewport");
       assert(await video.evaluate(element => element.paused), "Opening does not auto-play");
-      await video.evaluate(async element => { element.muted = true; await element.play(); });
+      await play(video);
       await page.waitForFunction(() => { const video = document.querySelector(".if-film video"); return !video.paused && video.currentTime > 0.2 && video.videoWidth > 0; });
       assert(requests.length > 0, "Playback used the actual local film");
       await film.screenshot({ path: join(screenshots, `${width}-${colorScheme}-open.png`) });
@@ -123,10 +147,10 @@ try {
     await page.waitForFunction(() => window.__vlakSiteAnalytics);
     const film = page.locator("details.if-film"), summary = film.locator("summary"), video = film.locator("video");
     await summary.click();
-    await video.evaluate(async element => { element.muted = true; await element.play(); });
+    await play(video);
     await page.waitForFunction(() => window.__filmEvents.some(event => event.name === "interface_video_play"));
     await summary.click(); await page.waitForFunction(() => document.querySelector(".if-film video").paused);
-    await summary.click(); await video.evaluate(element => element.play()); await settle(page);
+    await summary.click(); await play(video); await settle(page);
     const events = await page.evaluate(() => window.__filmEvents.filter(event => event.name === "interface_video_play"));
     assert.equal(events.length, 1, "Closing/replaying the disclosure counts one play per mount");
     assert.equal(events[0].data.slug, "patient"); assert.equal(events[0].data.channel, "linkedin");
