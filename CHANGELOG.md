@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.6.0 (2026-10-28)
+## 0.6.0 (2026-11-13)
 
 A product built on Vlak can set its accent, its primary buttons and two typefaces in its own unlayered CSS. With none of the hooks set, the generated stylesheet is 0.5.0's again.
 

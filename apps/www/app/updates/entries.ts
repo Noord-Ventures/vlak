@@ -17,6 +17,24 @@ export type UpdateEntry = {
  */
 export const updateEntries: readonly UpdateEntry[] = [
   {
+    id: "v0-6-0",
+    title: "Vlak 0.6.0",
+    publishedAt: "2026-11-13T11:21:31.263Z",
+    kind: "Package release",
+    summary: "Primary action colors and font hooks for products built with Vlak.",
+    changes: [
+      "Set --action and --action-text for primary buttons and inline form submission. Selected and active fills keep their existing behavior.",
+      "Set --font-sans and --font-display to use a product's typefaces. The Brand documentation covers the supported hooks and contrast requirements.",
+      "The core, React, CLI, and MCP packages are available at 0.6.0. Interface starters have been verified against the public packages.",
+    ],
+    links: [
+      { href: "/docs/brand/", label: "Brand on Vlak" },
+      { href: "/docs/", label: "Install Vlak" },
+      { href: "https://github.com/Noord-Ventures/vlak/blob/main/CHANGELOG.md", label: "Read the release changes" },
+    ],
+    source: { href: "https://www.npmjs.com/package/@noorddev/vlak/v/0.6.0", label: "Published package" },
+  },
+  {
     id: "v0-5-0",
     title: "Vlak 0.5.0",
     publishedAt: "2026-09-14T11:52:09.655Z",
