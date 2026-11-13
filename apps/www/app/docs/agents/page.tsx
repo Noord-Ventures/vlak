@@ -6,6 +6,7 @@ import vlakPackage from "@noorddev/vlak/package.json";
 import { AgentsExample } from "@/components/docs-examples/guides";
 import { DocsShell } from "@/components/docs-shell";
 import { DOOR, HOST } from "../../specimen";
+import { AgentHeading } from "./agent-heading";
 
 export const metadata: Metadata = pageMetadata("/docs/agents", {
   title: "Agents",
@@ -83,7 +84,7 @@ export default function AgentsPage() {
         Each setup includes a prompt to check that Vlak&apos;s tools are connected.
       </p>
 
-      <h3 className="section-label" id="chatgpt">ChatGPT</h3>
+      <AgentHeading brand="openai" id="chatgpt">ChatGPT</AgentHeading>
       <p className="rs-t-body">
         <a className="rs-link" href="https://chatgpt.com/plugins/plugin_asdk_app_6aa136938ca08191808d78bef2e7a887">
           Open Vlak in ChatGPT
@@ -96,7 +97,7 @@ export default function AgentsPage() {
         command. This confirms a connection to the component registry.
       </p>
 
-      <h3 className="section-label" id="claude-code">Claude Code</h3>
+      <AgentHeading brand="claude" id="claude-code">Claude Code</AgentHeading>
       <p className="rs-t-body">Run this in your terminal to make Vlak available across your projects.</p>
       <CodeBlock code={claudeInstall} copyLabel="Copy Claude Code setup command" />
       <p className="rs-t-body">
@@ -105,7 +106,7 @@ export default function AgentsPage() {
       </p>
       <CodeBlock code={verifyConnection} copyLabel="Copy Claude Code verification prompt" />
 
-      <h3 className="section-label" id="codex">Codex</h3>
+      <AgentHeading brand="openai" id="codex">Codex</AgentHeading>
       <p className="rs-t-body">Run this in your terminal with the Codex CLI installed.</p>
       <CodeBlock code={codexInstall} copyLabel="Copy Codex setup command" />
       <p className="rs-t-body">
@@ -165,7 +166,7 @@ export default function AgentsPage() {
         Streamable HTTP. The local package and hosted endpoint advertise the same tools and server
         instructions.
       </p>
-      <h3 className="section-label">Grok</h3>
+      <AgentHeading brand="grok">Grok</AgentHeading>
       <CodeBlock code={grokInstall} copyLabel="Copy Grok setup command" />
       <p className="rs-t-body">
         The server is read-only. It tells an agent to reach for Vlak on new product-interface work
@@ -178,9 +179,9 @@ export default function AgentsPage() {
         plugin instead of adding the server separately. These commands install it directly from
         the repository.
       </p>
-      <h3 className="section-label">Claude Code plugin</h3>
+      <AgentHeading brand="claude">Claude Code plugin</AgentHeading>
       <CodeBlock code={claudePluginInstall} copyLabel="Copy Claude Code plugin commands" />
-      <h3 className="section-label">Codex plugin</h3>
+      <AgentHeading brand="openai">Codex plugin</AgentHeading>
       <CodeBlock code={codexPluginInstall} copyLabel="Copy Codex plugin commands" />
       <p className="rs-t-body">
         Grok can read the same Claude Code marketplace and plugin format. For other clients, the{" "}
