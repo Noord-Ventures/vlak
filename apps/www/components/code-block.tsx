@@ -21,7 +21,7 @@ async function writeClipboard(text: string) {
   if (!copied) throw new Error("Clipboard copy failed");
 }
 
-export function CopyControl({ text }: { text: string }) {
+export function CopyControl({ text, copyLabel = "Copy" }: { text: string; copyLabel?: string }) {
   const [copied, setCopied] = React.useState(false);
   const timer = React.useRef<number>(0);
 
@@ -47,7 +47,7 @@ export function CopyControl({ text }: { text: string }) {
       type="button"
       className="code-copy"
       onClick={copy}
-      aria-label={copied ? "Copied" : "Copy"}
+      aria-label={copied ? "Copied" : copyLabel}
     >
       {copied ? <Icon name="copied" size={16} /> : <Icon name="copy" size={16} />}
       <span className="rs-sr" aria-live="polite">
@@ -57,13 +57,13 @@ export function CopyControl({ text }: { text: string }) {
   );
 }
 
-export function CodeBlock({ code }: { code: string }) {
+export function CodeBlock({ code, copyLabel }: { code: string; copyLabel?: string }) {
   const lines = code.trim().includes("\n") ? "many" : "one";
   return (
     <div className="code-block" data-lines={lines}>
       {/* Scrolls sideways on narrow screens, so it must take keyboard focus. */}
       <pre tabIndex={0}>{code}</pre>
-      <CopyControl text={code} />
+      <CopyControl text={code} copyLabel={copyLabel} />
     </div>
   );
 }
