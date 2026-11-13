@@ -21,9 +21,13 @@ export function createMcpMetricsReporter(
     observe(event: McpToolMetric) {
       if (!enabled) return;
       // An explicit payload protects against future accidental additions to observer events.
-      const payload: McpToolMetric = {
-        schemaVersion: 1, eventId: event.eventId, occurredAt: event.occurredAt,
+      // The collector must be deployed with v2 support before this flag is set.
+      // Until then preserve the exact v1 contract and existing usage reporting.
+      const diagnostics = env.VLAK_MCP_DIAGNOSTICS_ENABLED === "true";
+      const payload = {
+        schemaVersion: diagnostics ? 2 : 1, eventId: event.eventId, occurredAt: event.occurredAt,
         tool: event.tool, source: event.source, outcome: event.outcome, durationMs: event.durationMs,
+        ...(diagnostics ? { serverVersion: event.serverVersion, errorCategory: event.errorCategory } : {}),
       };
       pending.push((async () => {
         try {

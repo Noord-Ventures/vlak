@@ -7,7 +7,8 @@ is needed. This does not query an OpenAI install-count API.
 ## Meaning of the metrics
 
 - A tool call is one observed response to a known `tools/call` request, including
-  validation and application errors. Discovery, initialization, resources,
+  validation and application errors, or a known request whose transport closes
+  without a response. Discovery, initialization, resources,
   unsupported tool names and notifications are not counted.
 - `get_install` counts requests for instructions, not executed package installs.
 - `openai_hint` means nonempty `openai/userAgent`, `openai/session` or
@@ -20,6 +21,9 @@ is needed. This does not query an OpenAI install-count API.
   same metric can be deduplicated by its random event ID at the collector.
 - No user/session IDs, arguments, prompts, search terms, outputs, IPs, raw headers,
   or error messages are included. No unique-user or retention metric is inferred.
+- With diagnostics enabled, records also contain the deployed registry package
+  version and a fixed error category. These describe observed failures, not user
+  intent or proof of a client bug. Existing records are not reclassified.
 - Counts begin after activation. Missing historical data is not backfilled.
   Delivery is best-effort; a collector timeout can undercount activity.
 
@@ -48,6 +52,44 @@ can finish after the HTTP response ends. Delivery cannot change the tool result.
 DNT: 1 and Sec-GPC: 1 opt out when the client
 sends them. Reports use a rolling 30-day window; expired events are purged on the
 next collector write or report read. No cleanup job is provisioned automatically.
+
+## Diagnostic rollout
+
+The default payload remains schema version 1, with exactly its original seven
+fields. Deploy Noord's additive diagnostics migration and compatible collector
+first. Only then set `VLAK_MCP_DIAGNOSTICS_ENABLED=true` on the Vlak production
+deployment. The existing metrics enable flag, credential, production check and
+privacy opt-outs still apply. Remove the diagnostics flag to return to the old
+payload without stopping basic usage reporting.
+
+Schema version 2 adds two fields:
+
+- `serverVersion`: the bundled registry version used by the deployed MCP server,
+  such as `0.6.0`. It is not the client version or a user-provided value. The
+  collector accepts numeric release versions; prerelease deployments must keep
+  diagnostics disabled until the collector explicitly supports their versions.
+- `errorCategory`: `null` for success; otherwise one of `invalid_arguments`,
+  `not_found`, `output_validation`, `internal`, `transport`, or `unknown`.
+
+The SDK currently turns input validation, output validation and handler failures
+into text-only `isError` results. The hosted observer reads only fixed,
+tool-specific SDK validation prefixes and Vlak lookup prefixes in memory; it
+does not copy them into the event or log them. Protocol invalid-parameter and
+internal-error codes are also recognized. Unrecognized errors are `unknown`,
+not guessed. A rejected send or a connection closed before a known call responds
+is `transport`. Error categories do not establish whether a caller was a real
+user, an automated probe, or which application supplied the arguments.
+
+Local tests exercise actual SDK input/output validation, missing records,
+successful empty searches, unknown errors and transport failures. SDK upgrades
+must preserve these tests or explicitly update the classifier. Historical
+schema-v1 errors remain “not recorded”; they are different from a new error
+classified as `unknown`.
+
+The diagnostics observer and HTTP entry are not part of the published stdio
+bundle. This change does not alter tool schemas, descriptions, results, or the
+npm package. Verify the published payload check when deploying; do not edit
+`server.ts` under an already-published version to improve tool metadata.
 
 ## Verify locally
 

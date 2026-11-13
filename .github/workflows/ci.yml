@@ -71,7 +71,8 @@ jobs:
 
   site:
     name: Docs site build and end-to-end
-    runs-on: ubuntu-latest
+    # Playwright 1.56 supports Ubuntu 24.04; keep browser dependencies on that image.
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +86,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .pw
-          key: pw-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: pw-ubuntu-24.04-${{ runner.arch }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm --filter www exec playwright install chromium --with-deps
       - name: Every catalogue entry has an isolated example
         run: node apps/www/scripts/check-examples.mjs
@@ -104,7 +105,13 @@ jobs:
         run: node apps/www/scripts/check-discovery.mjs
       - name: Starter gallery, theme previews and activation layout
         run: node --experimental-strip-types apps/www/scripts/growth-layout-e2e.mjs
+      # Bundled Linux Chromium lacks the H.264/AAC codecs in the actual films.
+      # Use the official channel for this media check; other checks use Chromium.
+      - name: Install Chrome for interface film playback
+        run: pnpm --filter www exec playwright install chrome
       - name: Optional interface walkthroughs
+        env:
+          PLAYWRIGHT_BROWSER_CHANNEL: chrome
         run: node --experimental-strip-types apps/www/scripts/interface-film-e2e.mjs
       - name: Agent plugin, MCP and model-readable docs
         run: pnpm check:agents
@@ -166,7 +173,7 @@ jobs:
 
   starters:
     name: Standalone interface starters
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     steps:
       - uses: actions/checkout@v4
